@@ -29,6 +29,22 @@ npm run dev        # tsx watch — auto-reloads on save
 npm run build && npm start
 ```
 
+### Local Codex / Cowork path
+
+For this machine, Codex/Cowork can connect to the compiled MCP server at:
+
+```text
+/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js
+```
+
+`dist/` is local build output and is intentionally ignored by git. The public GitHub repo will not include it. If a local client cannot connect because `dist/index.js` is missing, rebuild it:
+
+```bash
+cd /Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server
+npm install
+npm run build
+```
+
 ---
 
 ## Connect to Claude Desktop

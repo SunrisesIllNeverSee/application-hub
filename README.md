@@ -50,6 +50,22 @@ See `application-hub-mcp-server/README.md` for full setup, including Claude Desk
 
 **Prerequisites**: Supabase project with all 8 migrations applied.
 
+### Local Codex / Cowork connection
+
+This repository can be public on GitHub while the local MCP connection still points at the local compiled server:
+
+```text
+/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js
+```
+
+The `dist/` directory is intentionally ignored and not pushed to GitHub. If Codex, Cowork, Claude Desktop, Cursor, or Windsurf cannot connect after a fresh clone or cleanup, rebuild it locally:
+
+```bash
+cd /Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server
+npm install
+npm run build
+```
+
 ---
 
 ## Tech stack
