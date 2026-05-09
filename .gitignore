@@ -9,6 +9,7 @@ dist/
 */.next/
 out/
 coverage/
+*.tsbuildinfo
 
 # Local environment
 .env
