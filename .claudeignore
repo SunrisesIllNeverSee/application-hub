@@ -1,0 +1,33 @@
+# .claudeignore — files Claude should skip during code review and search
+
+# Build output
+application-hub-mcp-server/dist/
+application-hub-mcp-server/node_modules/
+
+# Supabase generated types (regenerate with: npx supabase gen types typescript)
+application-hub-mcp-server/src/types/supabase.ts
+
+# Environment files (never read secrets)
+.env
+.env.local
+.env.production
+.env.*
+
+# Lock files (not useful to read)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Migrations already applied — skip during planning sessions
+# (Comment out if you need Claude to review migration history)
+# migrations/001_*.sql
+# migrations/002_*.sql
+# migrations/003_*.sql
+# migrations/004_*.sql
+# migrations/005_*.sql
+# migrations/006_*.sql
+# migrations/007_*.sql
