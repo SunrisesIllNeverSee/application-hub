@@ -13,6 +13,34 @@ Application Hub closes that gap by treating every application question as data �
 
 ---
 
+## Positioning — what this actually is in the landscape
+
+Application Hub is **infrastructure for the application graph**, not an AI writer.
+
+Every other "application platform" is either a form builder (JotForm, Typeform) or a tracker (Airtable, Notion templates). Nobody else has:
+
+- A **question archive** with semantic deduplication and significance scoring
+- An **answer bank** with cross-program reuse — answer once, apply everywhere
+- **MCP-first architecture** — power users can query the archive from Claude/Cursor/Windsurf without touching the UI
+- **Stress testing** as product philosophy — applications as living, validated artifacts, not static one-shots
+
+The AI writing space is saturated. The application intelligence space is empty. We're not competing with AI writers — we're building the data structure and intelligence layer that AI writing depends on.
+
+**The moat is the application graph itself.** Questions as reusable assets. Answers as permanent capital. Programs as discoverable nodes. The AI is plumbing — bring your own.
+
+### Why this matters for the levelling story
+
+User insight (2026-05-10): "i start at ground zero so the question is how do i have a chance versus a seasoned AI user with money who has all the tools and knows how to use them right."
+
+A novice founder with no AI tools and no money should be able to compete with a polished funded founder with a stack of subscriptions. The platform makes that possible because:
+
+- **The question archive levels the unknown-unknowns** — both founders see the same 225 questions ranked by significance, so the novice can't be tricked by an obscure question the seasoned founder happens to know
+- **The answer bank levels the time investment** — the novice answers once, that answer is reusable across 30+ programs; the seasoned founder doesn't get a multiplier for being faster
+- **Stress testing levels presentation skill** — the seasoned founder's polished surface gets probed for substance; the novice's rough draft gets its hidden gems surfaced. Both get evaluated on what's actually there, not on writing quality.
+- **MoatScore levels the brand-name advantage** — score is computed from quality + survival under stress + outcomes, not from who you know or where you went to school
+
+This is the equity story underneath the product story. **Stress testing is the most important component** — it's the mechanism by which a poorly-presented gem can carry the application through, and the mechanism by which a polished façade can be exposed.
+
 ## The Answer Bank as a Living Asset
 
 The core retention mechanic, not an afterthought.
@@ -301,13 +329,15 @@ UI implications:
 - Program detail page shows distribution: "founders applying to this program have moatscores ranging X–Y"
 - Premium: see your delta to the next standing tier ("answer 3 more questions in Vision and you'd jump 12 places")
 
-**Open question for the user**: do you want this built using the Founder Ranking concept already in VISION.md, or do you have an existing framework definition you'd like to bring in? If existing, share the schema/weights/algorithm.
+**Status (2026-05-10)**: User has an existing framework. Once they bring the spec into the repo, we'll customize from there. Until then, we use the Founder Ranking shape as a placeholder for downstream design (e.g., the MoatScore display surface in ROADMAP P3) — but the actual computation is reserved for the user's brought-in spec.
 
 ### Bring Your Own Key (BYOK) — AI provider integrations
 
-User direction (2026-05-10): "users will be able to plug in their own key... my key will be added later or we will find another solution."
+User direction (2026-05-10): "users will be able to plug in their own key... my key will be added later or we will find another solution. i have no money and i am not paying for other people's AI use."
 
-**Architectural shift**: today `/api/draft` uses a platform-owned `ANTHROPIC_API_KEY`. Going forward, users bring their own keys.
+**This is not just an architectural preference — it's a financial necessity.** Today `/api/draft` uses a platform-owned `ANTHROPIC_API_KEY` which would charge the platform per token. The platform owner is bootstrapping. Subsidizing users' AI calls bankrupts the project before it ships. **BYOK is therefore P0** — the only way `/api/draft` ships at all.
+
+**Reframe**: Application Hub is the integration/orchestration layer, not the AI provider. Users connect their Anthropic / OpenAI / Google / Ollama keys; Application Hub routes requests through their provider. We provide the question archive, the answer bank, the program intelligence, the stress-test prompts. They provide the compute.
 
 Why this is right:
 - Removes the platform's largest variable cost (Anthropic API spend per draft)
@@ -336,14 +366,21 @@ CREATE TABLE user_integrations (
 
 **UI**: new `/profile/integrations` page where users paste API keys for whichever providers they want. Visible "test connection" button per provider.
 
-**Free tier policy** (TBD with user):
-- Option A: Free tier requires user to BYOK (no platform fallback)
-- Option B: Free tier gets 5–10 platform-key drafts/month, then must BYOK
-- Option C: Free tier has zero AI access, BYOK gives 10/month free + Pro = unlimited
+**Free tier policy** (decided 2026-05-10): **Option A — Free tier requires user to BYOK.** No platform fallback. The platform isn't going to subsidize users' AI consumption.
 
-Premium pricing matrix needs to reflect this — see Free vs Paid Philosophy section below.
+Implications for the user journey:
+- Free user signs up → lands on `/profile/integrations` early in onboarding
+- "Connect an AI provider to enable drafting and stress testing" — pasted Anthropic / OpenAI / Google / Ollama key
+- Without a connected key, AI features are visible but disabled with "Connect a provider →" hover hint
+- Pro users (when Stripe is wired) optionally get pooled platform-key access on top of their own — not a subsidy, a convenience baked into the price
+
+This also positions Application Hub correctly: **integration platform, not AI middleman.** We orchestrate, the user pays the compute provider directly.
+
+Premium pricing matrix below reflects this.
 
 ### Integration roadmap — what to connect, in what order
+
+**Architectural rule** (user direction 2026-05-10): integrations attach to the **user profile**, not to specific applications. A user connects GitHub once on their profile; that data flows into every application's traction-relevant questions. This keeps the application surface focused on content, not config, and means a user only configures each integration once.
 
 User insight: "how to connect this with other platforms... vs code github llms what other ideas do we have"
 
