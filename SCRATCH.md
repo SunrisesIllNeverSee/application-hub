@@ -44,6 +44,7 @@ Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` wh
 
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
+| Codex | Mark cross-theme portability as a core product requirement | `README.md`, `ROADMAP.md`, `TASKS.md`, `VISION.md`, `SCRATCH.md` | 2026-05-10T20:58:34Z | Capture the importance of switching between founder, jobs, grants, and school application themes without re-architecting. |
 
 ---
 
