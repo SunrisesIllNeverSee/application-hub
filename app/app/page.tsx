@@ -43,7 +43,7 @@ export default async function RootPage() {
           <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
             The question archive
             <br />
-            <span className="text-neutral-500">for founders.</span>
+            <span className="text-neutral-400">for founders.</span>
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg text-neutral-300 leading-relaxed">
             Founders apply to 10+ programs and answer the same questions 10+ times. Application Hub archives every question, scores it by significance, and lets you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Techstars, SBIR</span>, and 27 more.
@@ -66,11 +66,11 @@ export default async function RootPage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
                 <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
                 <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
-                <span className="ml-3 text-xs text-neutral-500 font-mono">mos2es.xyz/hub</span>
+                <span className="ml-3 text-xs text-neutral-400 font-mono">mos2es.xyz/hub</span>
               </div>
               <div className="grid grid-cols-12 text-left">
                 <aside className="col-span-3 hidden md:flex flex-col gap-1 p-4 border-r border-neutral-800 bg-neutral-950/40 text-xs">
-                  <p className="text-neutral-500 uppercase tracking-wide mb-2 px-2">Archive</p>
+                  <p className="text-neutral-400 uppercase tracking-wide mb-2 px-2">Archive</p>
                   {['Universal questions', 'Team & founders', 'Traction & metrics', 'Vision & market', 'Financials'].map((cat, i) => (
                     <div key={cat} className={`px-2 py-1.5 rounded ${i === 0 ? 'bg-brand-600/15 text-brand-300' : 'text-neutral-400'}`}>{cat}</div>
                   ))}
@@ -86,7 +86,7 @@ export default async function RootPage() {
                     <div key={row.q} className="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900/60 px-4 py-3 hover:border-neutral-700 transition-colors">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-neutral-100 truncate">{row.q}</p>
-                        <p className="text-xs text-neutral-500 mt-0.5">{row.programs} programs ask this</p>
+                        <p className="text-xs text-neutral-400 mt-0.5">{row.programs} programs ask this</p>
                       </div>
                       <div className="ml-4 shrink-0 flex items-center gap-3">
                         <div className="w-20 h-1.5 rounded-full bg-neutral-800 overflow-hidden">
@@ -184,7 +184,7 @@ export default async function RootPage() {
               { step: '03', title: 'Apply anywhere', body: 'Open a program — your existing answers pre-fill. Fit score shows where you’re strong.' },
             ].map((s) => (
               <div key={s.step} className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6">
-                <p className="text-xs font-mono text-neutral-500">{s.step}</p>
+                <p className="text-xs font-mono text-neutral-400">{s.step}</p>
                 <p className="mt-3 text-lg font-semibold text-neutral-100">{s.title}</p>
                 <p className="mt-2 text-sm text-neutral-300 leading-relaxed">{s.body}</p>
               </div>
@@ -224,9 +224,9 @@ export default async function RootPage() {
                   <tr key={i} className={`border-b border-neutral-800/60 ${i === 6 ? 'bg-neutral-900/40' : ''}`}>
                     <td className="p-4 text-neutral-200 font-medium">{row[0]}</td>
                     <td className="p-4 text-center text-brand-300 font-semibold">{row[1]}</td>
-                    <td className="p-4 text-center text-neutral-500">{row[2]}</td>
-                    <td className="p-4 text-center text-neutral-500">{row[3]}</td>
-                    <td className="p-4 text-center text-neutral-500">{row[4]}</td>
+                    <td className="p-4 text-center text-neutral-400">{row[2]}</td>
+                    <td className="p-4 text-center text-neutral-400">{row[3]}</td>
+                    <td className="p-4 text-center text-neutral-400">{row[4]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -248,13 +248,13 @@ export default async function RootPage() {
                 </p>
               </div>
               <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5 font-mono text-sm">
-                <p className="text-neutral-500"># Connect to Application Hub</p>
+                <p className="text-neutral-400"># Connect to Application Hub</p>
                 <p className="mt-2 text-neutral-300">
                   <span className="text-brand-300">npx</span> @modelcontextprotocol/inspector \
                 </p>
                 <p className="text-neutral-300 pl-3">application-hub-mcp-server</p>
-                <p className="mt-3 text-neutral-500"># 225 questions, indexed and queryable</p>
-                <p className="text-neutral-500"># Sub-200ms semantic search via pgvector</p>
+                <p className="mt-3 text-neutral-400"># 225 questions, indexed and queryable</p>
+                <p className="text-neutral-400"># Sub-200ms semantic search via pgvector</p>
               </div>
             </div>
           </div>
@@ -279,7 +279,7 @@ export default async function RootPage() {
               </ul>
             </div>
             <div className="rounded-2xl border-2 border-brand-600/60 bg-gradient-to-b from-brand-950/40 to-neutral-900/40 p-8 relative">
-              <span className="absolute -top-2 left-8 px-2 py-0.5 rounded-full bg-brand-600 text-xs font-medium text-white">Most popular</span>
+              <span className="absolute -top-2 left-8 px-2 py-0.5 rounded-full bg-brand-700 text-xs font-medium text-white">Most popular</span>
               <p className="text-sm font-semibold text-brand-300">Pro</p>
               <p className="mt-2 text-4xl font-semibold">$19<span className="text-base text-neutral-400 font-normal">/mo</span></p>
               <p className="text-xs text-neutral-400 mb-6">per founder</p>
