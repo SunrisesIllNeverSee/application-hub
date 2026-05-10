@@ -28,6 +28,17 @@ The AI writing space is saturated. The application intelligence space is empty. 
 
 **The moat is the application graph itself.** Questions as reusable assets. Answers as permanent capital. Programs as discoverable nodes. The AI is plumbing — bring your own.
 
+### AI native — not AI-augmented
+
+This isn't a product that added AI features. AI is the spine of the architecture:
+
+- **The database computes intelligence** — significance scores, program DNA, fit scores, composite rankings are SQL functions running in Postgres, not API calls to a model
+- **The MCP server is a first-class surface** — 19 tools, 7 resources, 3 prompts. The web app is one client; Claude Desktop, Cursor, and Windsurf are others. Power users may never touch the web UI.
+- **Drafting and review are architecturally separate** — hosted drafting (`/api/draft`) is synchronous convenience. Agent-side review (RNS/MO§ES judgment layer) is asynchronous intelligence that runs after the fact over saved answers, not in the request path.
+- **RNS is additive, not replacement** — the current scoring formulas are scaffolding. RNS signal purity, commitment conservation metrics, and SigToken contextual scoring layer on top as the answer corpus grows. The database columns become display aliases while the deeper measurement system matures.
+
+The architecture forces a clean separation: Application Hub owns the data graph and the intelligence layer. AI agents — the user's own or the platform's — consume it. This is the correct inversion. Most "AI products" are a model with a UI. This is a data platform with AI as a first-class interface.
+
 ### Why this matters for the levelling story
 
 User insight (2026-05-10): "i start at ground zero so the question is how do i have a chance versus a seasoned AI user with money who has all the tools and knows how to use them right."
@@ -115,6 +126,31 @@ When users log "got in" / "rejected" / "waitlisted":
 - Surfaces patterns: "Founders with traction scores >80 got into YC at 3× the rate"
 - Becomes a public-good dataset for the founder community
 - Premium: "your acceptance probability for this program is X%"
+
+### Winning applications marketplace
+
+When a user gets accepted to a program through the platform, two new flows become possible:
+
+**Model A — User sells their application as a template:**
+- User opts in to list their accepted application (anonymized or credited, their choice)
+- Other founders can purchase access to read the winning answers as a reference
+- Revenue split: platform takes a transaction fee, seller keeps the majority
+- Buyers get the template + the stress-test transcript + the program DNA context that shaped it
+- Not a copy-paste product — the buyer's answers still go through their own bank. This is reference material.
+
+**Model B — Platform purchases and licenses:**
+- Platform buys winning applications outright from the founder (one-time payment)
+- Platform maintains a premium library of vetted, accepted applications
+- Pro+ tier unlocks access to the library as part of the subscription
+- Particularly valuable for programs like YC, SBIR, NSF SBIR where the application format rarely changes
+
+**Why this is interesting:**
+- Creates a real economic incentive for users to log outcomes (currently the hardest behavior to drive)
+- Turns accepted founders into contributors — they get paid, we get signal
+- The dataset becomes a moat: no competitor can replicate a library of verified-accepted applications without the same user base
+- The privacy architecture supports this: we never stored the content, so the founder owns it cleanly and can sell it
+
+**What never gets sold:** stress-test responses that expose business weaknesses, financial specifics the founder marked private, or anything the founder didn't explicitly approve for release.
 
 ### Recruiter agent
 
@@ -343,7 +379,13 @@ Why this is right:
 - Removes the platform's largest variable cost (Anthropic API spend per draft)
 - Lets users pick their preferred provider — Claude, GPT-5, Gemini, Mistral, local Ollama
 - Premium users who don't want to manage keys can use the platform's pooled key (Pro feature)
-- Privacy story: power users keep their answers entirely under their own provider's terms
+- **Privacy architecture**: the platform never stores answer content or application text. We track metrics, lineage, and scoring signals — encrypted, with provenance — but the actual words belong to the user and travel only to their chosen provider. BYOK is what makes this possible at the structural level.
+
+**What we keep vs. what we don't:**
+- **We never store**: answer content, draft text, application submissions, prompt text
+- **We do track**: word count, confidence level, update timestamps, significance-weighted metadata, stress-test outcomes (scores, not content), submission events
+- Everything tracked is encrypted and carries lineage — who produced it, when, from what source
+- Users who delete their account have all tracked metadata deleted with them
 
 **Schema** (future migration):
 ```sql
@@ -473,6 +515,30 @@ This reduces cognitive load (4 entries → 5 but each has a clearer job), gives 
 
 ---
 
+## Scoring philosophy — we are not the arbiters of truth
+
+This needs to live in the product itself, not just in documentation.
+
+Every time a score appears — significance, fit, composite, heat, MoatScore — the UI should make this explicit:
+
+> *"We are not the arbiters of truth, nor do we wish to be. Our scoring systems measure mathematical signals derived from the words themselves and their sources. Two founders can submit identical answers and receive different scores — because the meaning of words comes from their source: their history, their track record, their context. We measure signal against source, compared with other sources. The final decision on who gets chosen belongs to the programs. We are making sure the right people are in the right rooms, and the data presents it."*
+
+**What this means structurally:**
+
+The scores are not subjective judgments. They're internally formulated measurements. The significance formula (`asked_by_count × word_limit_weight × theme_prestige × universal_bonus`) derives from what programs collectively weight, not from our opinion. The fit formula measures coverage and alignment against existing data. The composite is a function of fit and program value.
+
+More importantly: once RNS integrates, scoring derives from the words and their sources — commitment conservation, signal-to-noise ratios, dual-weight analysis. Two founders with identical surface answers will score differently because their underlying signal is different. The platform surfaces that difference mathematically, not editorially.
+
+**UI implication:** every score needs:
+1. A one-line description of what it measures
+2. A "how is this calculated?" tooltip with the high-level formula
+3. A "what does this range mean?" label (e.g., "0.8+ = strong signal in this theme")
+4. The platform philosophy statement — short version: *"Mathematical signal, not judgment"*
+
+A `/intelligence` or `/about/scoring` page should exist that explains the full system — all scoring dimensions, the source-aware philosophy, the RNS upgrade path — in plain language. This is also IP defense: showing that our scoring is methodologically grounded, not arbitrary, matters when programs stake decisions on it.
+
+---
+
 ## Free vs Paid Philosophy
 
 The pricing matrix is downstream of a principle. Naming the principle helps:
@@ -516,21 +582,34 @@ The pricing matrix is downstream of a principle. Naming the principle helps:
 
 ## Premium pricing structure (working draft)
 
-| Feature | Free | Pro ($19/mo) | Team ($49/mo) |
-|---|---|---|---|
-| Programs visible | All 30+ | All | All |
-| Answer Bank size | 5–10 to start, drip 2–5/day, ~30 cap | All 225+ unlocked | All + shared library |
-| AI drafts | 10/month | Unlimited | Unlimited |
-| Answer history | Last 5 versions | Unlimited | Unlimited |
-| Heat scores + acceptance rates | Hidden | Visible | Visible |
-| Application ranking + feedback | Rank only | Rank + feedback | Rank + feedback |
-| Live application updates | No | Yes | Yes |
-| Auto-submit | No | 5/month | Unlimited |
-| Recruiter agent | Manual | Auto | Auto |
-| Multi-seat | 1 | 1 | Up to 5 |
-| Export | No | PDF, Notion | PDF, Notion, Markdown |
-| Priority support | No | Email | Email + Slack |
-| API access | No | Read-only | Full read/write |
+One product, governors removed per tier. Not separate products.
+
+| Feature | Free | Pro ($19/mo) | Pro+ ($49/mo) | Team ($99/mo) |
+|---|---|---|---|---|
+| Programs visible | All 30+ | All | All | All |
+| Answer Bank size | Drip (~30 cap) | All 225+ unlocked | All 225+ | All + shared library |
+| AI drafts | 10/month (BYOK required) | Unlimited | Unlimited | Unlimited |
+| Answer history | Last 5 versions | Unlimited | Unlimited | Unlimited |
+| Heat scores + acceptance rates | Hidden | Visible | Visible | Visible |
+| Application ranking | Rank only | Rank + feedback | Rank + feedback + predictions | Rank + feedback + predictions |
+| Stress testing | 3/month | Unlimited | Unlimited + community panel | Unlimited |
+| MoatScore / FundScore / Standing | Hidden | Basic score | Full breakdown + standing | Full breakdown |
+| Founder Ranking percentile | Hidden | Hidden | Visible | Visible |
+| Live application updates | No | Yes | Yes | Yes |
+| Auto-submit | No | 5/month | Unlimited | Unlimited |
+| Recruiter agent | Manual | Auto | Auto | Auto |
+| Winning applications library | No | No | Access included | Access included |
+| Multi-seat | 1 | 1 | 1 | Up to 5 |
+| Export | No | PDF, Notion | PDF, Notion, Markdown | PDF, Notion, Markdown |
+| API access | No | Read-only | Read-only | Full read/write |
+| Priority support | No | Email | Email | Email + Slack |
+
+**B2B stream (separate):**
+- Standard listing: Free
+- Verified listing: $299/cycle
+- Featured listing: $999/cycle
+- Hosted applications: Custom
+- Funder webhooks: Custom
 
 ---
 
