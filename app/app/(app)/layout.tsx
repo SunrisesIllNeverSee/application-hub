@@ -16,9 +16,26 @@ export default async function AppLayout({
     redirect('/login')
   }
 
+  // Fetch user's applications for sidebar list
+  const { data: appRows } = await supabase
+    .from('user_applications')
+    .select('id, program_id, status, programs(id, name, slug)')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false })
+    .limit(20)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applications = (appRows ?? []).map((a: any) => ({
+    id: a.id as string,
+    program_id: a.program_id as string,
+    status: a.status as string,
+    program_name: (Array.isArray(a.programs) ? a.programs[0]?.name : a.programs?.name) as string ?? 'Unknown',
+    program_slug: (Array.isArray(a.programs) ? a.programs[0]?.slug : a.programs?.slug) as string ?? '',
+  }))
+
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
-      <Sidebar user={user} />
+      <Sidebar user={user} applications={applications} />
       <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">{children}</div>
       </main>

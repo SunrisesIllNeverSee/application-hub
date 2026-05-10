@@ -10,7 +10,7 @@ export const metadata = {
 export default async function HubPage({
   searchParams,
 }: {
-  searchParams: { sort?: string; type?: string; rolling?: string }
+  searchParams: { sort?: string; type?: string; rolling?: string; view?: string }
 }) {
   const supabase = createClient()
 
@@ -90,36 +90,57 @@ export default async function HubPage({
     return scoreB - scoreA
   })
 
+  const view = searchParams.view === 'timeline' ? 'timeline' : 'cards'
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Program Hub</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          {sorted.length > 0
-            ? `${sorted.length} programs ranked by fit and opportunity value`
-            : 'Discover accelerators, grants, and fellowships matched to your startup'}
-        </p>
-      </div>
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Hub</h1>
+          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+            {sorted.length > 0
+              ? `${sorted.length} programs ranked by fit and opportunity value`
+              : 'Discover accelerators, grants, and fellowships matched to your startup'}
+          </p>
+        </div>
 
-      <div className="flex gap-6">
-        {/* Filters sidebar */}
-        <aside className="w-56 flex-shrink-0">
-          <HubFilters currentSort={sort} currentType={searchParams.type} currentRolling={searchParams.rolling} />
-        </aside>
-
-        {/* Program list */}
-        <div className="flex-1 min-w-0">
-          {sorted.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="space-y-3">
-              {sorted.map((program, i) => (
-                <ProgramCard key={program.id} program={program} rank={i + 1} />
-              ))}
-            </div>
-          )}
+        {/* View tabs */}
+        <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 flex-shrink-0">
+          <a href="/hub"
+            className={view === 'cards'
+              ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
+            Programs
+          </a>
+          <a href="/hub?view=timeline"
+            className={view === 'timeline'
+              ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
+            Timeline
+          </a>
         </div>
       </div>
+
+      {view === 'timeline' ? (
+        <TimelineView programs={sorted} />
+      ) : (
+        <div className="flex gap-6">
+          <aside className="w-48 flex-shrink-0 hidden lg:block">
+            <HubFilters currentSort={sort} currentType={searchParams.type} currentRolling={searchParams.rolling} />
+          </aside>
+          <div className="flex-1 min-w-0">
+            {sorted.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="space-y-3">
+                {sorted.map((program, i) => (
+                  <ProgramCard key={program.id} program={program} rank={i + 1} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -151,5 +172,92 @@ function EmptyState() {
         what you&apos;re looking for.
       </p>
     </div>
+  )
+}
+
+// ─── Timeline view ────────────────────────────────────────────────────────────
+
+function TimelineView({ programs }: { programs: ProgramWithFit[] }) {
+  const MS_PER_DAY = 86_400_000
+  const now = Date.now()
+
+  function daysLeft(p: ProgramWithFit) {
+    if (!p.deadline_at) return null
+    return Math.ceil((new Date(p.deadline_at).getTime() - now) / MS_PER_DAY)
+  }
+
+  const rolling = programs.filter(p => p.is_rolling || !p.deadline_at)
+  const withDeadline = programs.filter(p => !p.is_rolling && p.deadline_at)
+  const closingSoon = withDeadline.filter(p => { const d = daysLeft(p); return d !== null && d >= 0 && d <= 14 })
+  const open = withDeadline.filter(p => { const d = daysLeft(p); return d !== null && d > 14 })
+  const closed = withDeadline.filter(p => { const d = daysLeft(p); return d !== null && d! < 0 })
+
+  return (
+    <div className="space-y-8">
+      {closingSoon.length > 0 && (
+        <TimelineSection title="Closing Soon" subtitle={`${closingSoon.length} program${closingSoon.length !== 1 ? 's' : ''} closing within 14 days`} urgent>
+          {closingSoon.map(p => <TimelineRow key={p.id} program={p} days={daysLeft(p)} />)}
+        </TimelineSection>
+      )}
+      {open.length > 0 && (
+        <TimelineSection title="Open" subtitle={`${open.length} program${open.length !== 1 ? 's' : ''} with upcoming deadlines`}>
+          {open.map(p => <TimelineRow key={p.id} program={p} days={daysLeft(p)} />)}
+        </TimelineSection>
+      )}
+      {rolling.length > 0 && (
+        <TimelineSection title="Rolling Admissions" subtitle="Always accepting — apply any time">
+          {rolling.map(p => <TimelineRow key={p.id} program={p} days={null} />)}
+        </TimelineSection>
+      )}
+      {closed.length > 0 && (
+        <TimelineSection title="Closed" subtitle="Bookmark for next cycle" dimmed>
+          {closed.map(p => <TimelineRow key={p.id} program={p} days={daysLeft(p)} />)}
+        </TimelineSection>
+      )}
+    </div>
+  )
+}
+
+function TimelineSection({ title, subtitle, urgent, dimmed, children }: {
+  title: string; subtitle: string; urgent?: boolean; dimmed?: boolean; children: React.ReactNode
+}) {
+  return (
+    <div className={dimmed ? 'opacity-50' : undefined}>
+      <div className="mb-3">
+        <h2 className={`text-sm font-semibold ${urgent ? 'text-warning-600 dark:text-warning-400' : 'text-neutral-900 dark:text-white'}`}>{title}</h2>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">{subtitle}</p>
+      </div>
+      <div className="space-y-2">{children}</div>
+    </div>
+  )
+}
+
+import Link from 'next/link'
+
+function TimelineRow({ program, days }: { program: ProgramWithFit; days: number | null }) {
+  const pct = days === null ? 0
+    : days < 0 ? 100
+    : Math.max(0, Math.min(100, Math.round((1 - days / 120) * 100)))
+
+  const barColor = days === null ? 'bg-brand-500'
+    : days < 0 ? 'bg-neutral-300 dark:bg-neutral-700'
+    : days <= 7 ? 'bg-warning-500'
+    : days <= 30 ? 'bg-success-500'
+    : 'bg-brand-500'
+
+  return (
+    <Link href={`/hub/${program.slug}`} className="card p-4 block hover:shadow-card-hover transition-shadow group">
+      <div className="flex items-center justify-between gap-4 mb-2">
+        <span className="text-sm font-medium text-neutral-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors truncate">
+          {program.name}
+        </span>
+        <span className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0">
+          {days === null ? 'Rolling' : days < 0 ? 'Closed' : `${days}d left`}
+        </span>
+      </div>
+      <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-1">
+        <div className={`h-1 rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+      </div>
+    </Link>
   )
 }
