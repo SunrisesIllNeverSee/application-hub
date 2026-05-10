@@ -2,6 +2,11 @@
 
 > Read this before touching anything. Both Cowork (Claude) and Codex must read this file at the start of every session.
 > Check the ownership table before editing files — don't create merge conflicts.
+> Then check `SCRATCH.md` for active claims before picking up work.
+> Then read `ROADMAP.md` for what's next in priority order.
+>
+> **We are nonlinear and temporal.** No calendar deadlines. Work happens when Deric is engaged.
+> The roadmap is priority-ordered, not time-ordered.
 
 ---
 
@@ -78,7 +83,8 @@ This is the coordination contract. **Do not edit files owned by the other agent 
 | `SECURITY.md` | **Codex** | Security policy |
 | `README.md` | **Shared** | Coordinate via commit messages |
 | `CONTRIBUTING.md` | **Shared** | Coordinate via commit messages |
-| `VISION.md` | **Cowork** | Product roadmap and aspirations |
+| `VISION.md` | **Cowork** | Product vision — the why and the future aspirations |
+| `ROADMAP.md` | **Shared** | Priority-ordered list of work — read at session start |
 | `SCRATCH.md` | **Shared** | Active work claims — both agents must read before starting |
 
 ---

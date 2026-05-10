@@ -8,8 +8,6 @@
 
 ## Currently claimed
 
-_(empty — no active claims)_
-
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
 
@@ -56,8 +54,13 @@ A task lives in TASKS.md whether claimed or not. SCRATCH.md is just the layer on
 
 ### Stale claims
 
-If a claim has been here >24h with no related commits:
-- The other agent can take it
-- Leave a one-line note: "Reclaimed 2026-05-12 — original claim 2026-05-10 had no commits in 48h"
+We are **nonlinear and temporal** — claims don't expire on a schedule. They're stale when:
+- The claiming agent's `git log` shows no commits touching the claimed paths since the claim landed, AND
+- The other agent has work to do that needs those paths
+
+When that happens:
+- Leave a one-line note: "Reclaimed — original claim had no commits since landing"
+- Take the work
+- Update the claim row to your name
 
 Don't argue about claims. Just communicate via commit messages.

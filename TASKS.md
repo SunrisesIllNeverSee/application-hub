@@ -261,13 +261,20 @@ User confirmed working after retest. Agent investigation had already found no pl
 
 ---
 
-## Milestones
+## Milestones (sequence, not schedule)
 
-| Milestone | Target | Status |
-|---|---|---|
-| MCP server production-ready | Week 3 | ✅ Done |
-| 30 programs seeded + intelligence live | Week 5 | ✅ Done |
-| Hub UI live (real data) | Week 6 | ✅ Build verified |
-| First paying user | Week 8 | ⬜ Not started |
-| 30 draft runs logged | Week 9 | ⬜ Not started |
-| Recalibration checkpoint | Week 10 | ⬜ Not started |
+We are **nonlinear and temporal** — no calendar weeks, no dates. Milestones exist
+to track sequence and dependency, not to commit to timelines.
+
+| Milestone | Status |
+|---|---|
+| MCP server production-ready | ✅ Done |
+| 30 programs seeded + intelligence live | ✅ Done |
+| Hub UI live (real data) | ✅ Smoke-tested 2026-05-10 |
+| Question Bank UI + Drip mechanic | ⬜ Next critical milestone |
+| Custom SMTP + reliable magic-link auth | ⬜ Queued |
+| First paying user | ⬜ After above two |
+| 30 draft runs logged | ⬜ After first paying user |
+| Recalibration checkpoint (theme prestige weights) | ⬜ After 30 drafts |
+
+See `ROADMAP.md` for the priority-ordered list of work.

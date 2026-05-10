@@ -6,6 +6,17 @@ Built by Ello Cello LLC.
 
 ---
 
+## Where we're at
+
+- **`ROADMAP.md`** — priority-ordered list of work, what's next, the visionary backlog
+- **`VISION.md`** — product vision, the why, premium pricing structure, future aspirations
+- **`TASKS.md`** — granular task list with smoke-test feedback and follow-ups
+- **`STATUS.md`** — current confirmed state of the GitHub-visible repo
+- **`AGENTS.md`** — Cowork (Claude) + Codex coordination contract, file ownership
+- **`SCRATCH.md`** — active work-in-progress claims (what each agent is touching right now)
+
+We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
+
 ## What it is
 
 Application Hub is a platform for founders applying to programs. It solves one specific problem: the same questions show up everywhere, answered slightly differently each time, losing context and quality with every copy-paste.
