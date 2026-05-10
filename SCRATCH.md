@@ -43,6 +43,7 @@ Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` wh
 
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
+| Codex | Custom SMTP docs/setup, stress-test MCP groundwork, `/api/draft` metering | `docs/`, `application-hub-mcp-server/src/`, `app/app/api/draft/route.ts`, `SCRATCH.md`, status/roadmap docs | 2026-05-10T15:31:09Z | User explicitly asked Codex to bang out all three with parallel agents. |
 
 ---
 
