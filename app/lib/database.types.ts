@@ -158,8 +158,20 @@ export interface UserSubscription {
 
 // ─── Joined / UI types ────────────────────────────────────────────────────────
 
+export interface UserApplication {
+  id: string
+  user_id: string
+  program_id: string
+  status: 'saved' | 'drafting' | 'submitted' | 'accepted' | 'rejected' | 'waitlisted'
+  submitted_at: string | null
+  is_public_result: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface ProgramWithFit extends Program {
   fit?: UserProgramFit
+  application?: UserApplication
 }
 
 export interface ProgramQuestionWithArchived extends ProgramQuestion {

@@ -5,10 +5,12 @@ import type {
   Program,
   ProgramQuestionWithArchived,
   ProfileAnswer,
+  UserApplication,
   UserProgramFit,
 } from '@/lib/database.types'
 import { AnswerEditor } from '@/components/AnswerEditor'
 import { ThemeTag } from '@/components/ThemeTag'
+import { ApplicationStatusTracker } from '@/components/ApplicationStatusTracker'
 import { formatDeadline } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
@@ -81,6 +83,14 @@ export default async function WorkspaceDetailPage({ params }: Props) {
   ).length
   const progressPct = requiredCount > 0 ? Math.round((answeredRequired / requiredCount) * 100) : 0
   const deadline = formatDeadline(program.deadline_at)
+
+  // User's application status for this program
+  const { data: userApplication } = await supabase
+    .from('user_applications')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('program_id', program.id)
+    .maybeSingle<UserApplication>()
 
   // Group by section
   const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {
@@ -161,6 +171,20 @@ export default async function WorkspaceDetailPage({ params }: Props) {
               All required questions answered. Ready to submit.
             </p>
           )}
+        </div>
+
+        {/* Application status tracker */}
+        <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-4">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            {userApplication?.status === 'submitted'
+              ? `Submitted${userApplication.submitted_at ? ' ' + new Date(userApplication.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}`
+              : 'Track your application status'}
+          </p>
+          <ApplicationStatusTracker
+            programId={program.id}
+            initialStatus={userApplication?.status ?? null}
+            programName={program.name}
+          />
         </div>
       </div>
 

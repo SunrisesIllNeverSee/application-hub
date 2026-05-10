@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Program, UserProgramFit, ProgramWithFit } from '@/lib/database.types'
+import type { Program, UserProgramFit, UserApplication, ProgramWithFit } from '@/lib/database.types'
 import { ProgramCard } from '@/components/ProgramCard'
 import { HubFilters } from './HubFilters'
 
@@ -47,9 +47,23 @@ export default async function HubPage({
     }
   }
 
+  // Fetch user's application statuses for all programs
+  let applicationMap: Record<string, UserApplication> = {}
+  if (user) {
+    const { data: appRows } = await supabase
+      .from('user_applications')
+      .select('*')
+      .eq('user_id', user.id)
+      .returns<UserApplication[]>()
+    if (appRows) {
+      applicationMap = Object.fromEntries(appRows.map((a) => [a.program_id, a]))
+    }
+  }
+
   const programsWithFit: ProgramWithFit[] = (programs ?? []).map((p) => ({
     ...p,
     fit: fitMap[p.id],
+    application: applicationMap[p.id],
   }))
 
   // Sort

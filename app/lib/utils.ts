@@ -32,23 +32,25 @@ export function formatDeadline(dateStr: string | null | undefined): {
   label: string
   daysLeft: number | null
   urgent: boolean
+  status: 'rolling' | 'open' | 'closing_soon' | 'closed'
 } {
-  if (!dateStr) return { label: 'Rolling', daysLeft: null, urgent: false }
+  if (!dateStr) return { label: 'Rolling', daysLeft: null, urgent: false, status: 'rolling' }
 
   const deadline = new Date(dateStr)
   const now = new Date()
   const diff = deadline.getTime() - now.getTime()
   const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24))
 
-  if (daysLeft < 0) return { label: 'Closed', daysLeft, urgent: false }
-  if (daysLeft === 0) return { label: 'Closes today', daysLeft: 0, urgent: true }
-  if (daysLeft <= 7) return { label: `${daysLeft}d left`, daysLeft, urgent: true }
-  if (daysLeft <= 30) return { label: `${daysLeft}d left`, daysLeft, urgent: false }
+  if (daysLeft < 0) return { label: 'Closed', daysLeft, urgent: false, status: 'closed' }
+  if (daysLeft === 0) return { label: 'Closes today', daysLeft: 0, urgent: true, status: 'closing_soon' }
+  if (daysLeft <= 7) return { label: `${daysLeft}d left`, daysLeft, urgent: true, status: 'closing_soon' }
+  if (daysLeft <= 30) return { label: `${daysLeft}d left`, daysLeft, urgent: false, status: 'closing_soon' }
 
   return {
-    label: deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    label: `${daysLeft}d · ${deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
     daysLeft,
     urgent: false,
+    status: 'open',
   }
 }
 
