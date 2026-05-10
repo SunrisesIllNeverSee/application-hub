@@ -29,7 +29,7 @@ Claude Desktop / Cursor / Windsurf ← AI drafting interface (current)
 Next.js app (app/)                 ← user-facing product, live-data wired
 ```
 
-**Current phase: Phase 2 — live app smoke testing + launch hardening**
+**Current phase: Launch hardening — ship the spine, layer RNS**
 **MCP server: complete, clean build**
 
 ---
@@ -173,7 +173,7 @@ Recommended MCPs to add for this project:
 
 ---
 
-## Current status (Phase 2)
+## Current status (launch hardening)
 
 | Component | Status |
 |---|---|
@@ -190,6 +190,7 @@ Recommended MCPs to add for this project:
 | AnswerEditor (save/upsert) | ✅ Done — uses real confidence enum (draft/solid/locked) |
 | Build verification | ✅ Done — zero TypeScript errors (`npx tsc --noEmit` passes) |
 | AI draft button | ✅ Done — POST /api/draft wired, AnswerEditor "Draft with AI" button live |
+| Hosted draft metering | ✅ Done — successful hosted drafts log to `ai_draft_runs` |
 | Stripe integration | ⬜ Phase 3 |
 
 ---
@@ -198,8 +199,10 @@ Recommended MCPs to add for this project:
 
 See `TASKS.md` for the prioritized task list.
 
-**Current P0**: Smoke-test the live-data app flows in browser:
-`/hub`, `/hub/[slug]`, `/workspace/[program_id]`, `/profile`, and `POST /api/draft`.
+**Current launch sequence**:
+1. Ship today to 10–20 power users through MCP/web app with clear BYOK/hosted-AI caveats.
+2. MVP: Question Bank UI (`/bank`), Drip mechanic, BYOK, hosted draft policy/gating.
+3. Polished public launch: real deadlines, program TL;DR/pros/cons, profile split, custom SMTP, draft smoke test.
 
 `cd app && npm run type-check` and `cd app && npm run build` are passing as of 2026-05-10.
 

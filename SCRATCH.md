@@ -44,13 +44,12 @@ Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` wh
 
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
-| Codex | Refine launch roadmap/tasks and add archive lane | `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `README.md`, `docs/archive/` | 2026-05-10T15:47:27Z | Incorporating external launch roadmap while preserving current repo-only items. |
 
 ---
 
 ## Recently released
 
-_(empty)_
+| Codex | Refined launch roadmap/tasks and added archive lane | `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/archive/` | Released 2026-05-10 | External launch roadmap merged with current repo truth; legacy planning docs archived. |
 
 ---
 

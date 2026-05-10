@@ -62,6 +62,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - Hosted AI drafting is wired through `POST /api/draft`; successful drafts are logged to `ai_draft_runs` so the database trigger updates `ai_usage`.
 - Deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
+- The active launch roadmap is `ROADMAP.md`; older duplicate planning docs have been moved to `docs/archive/`.
 
 ### CI
 - GitHub Actions workflow exists at `.github/workflows/ci.yml`.
@@ -87,7 +88,6 @@ This file is the current GitHub-visible source of truth. It separates what is co
 These may exist locally, but are not confirmed by the current GitHub-visible repository state:
 
 - Root `package.json`
-- `application-hub-roadmap.md`
 - Production deployment configuration
 - Stripe webhook implementation
 - Browser smoke testing against real Supabase credentials
@@ -107,16 +107,18 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 ---
 
-## Immediate priorities (post 2026-05-10 smoke test)
+## Immediate priorities (launch roadmap)
 
-1. **Build the Question Bank UI** — biggest gap surfaced by smoke test; merges with the Drip mechanic
-2. **Fix responsive layout** — sidebar/main padding/program-detail squeeze at <1024px viewports
-3. **Seed real deadlines** — every program currently shows "Rolling" because seed lacks dates
-4. **Program detail TL;DR / pros & cons block** — user feedback: pages are too blob-y
-5. **Build proper user profile section** — `/profile` is currently the Answer Bank, no actual profile page
-6. **Set up custom SMTP** (Resend recommended) — setup guide is documented; dashboard/DNS configuration remains manual
-7. **Stress-test saved answers through MCP groundwork** — UI/persistence still pending
-8. **Smoke-test `POST /api/draft`** with valid Anthropic key (deferred — user doesn't have one yet)
+1. **Soft-launch checklist for 10–20 power users** — MCP/web app can ship now with clear BYOK/hosted-AI caveats
+2. **Build the Question Bank UI** — biggest web-app gap; pairs with Drip mechanic
+3. **Answer Bank drip mechanic** — pre-load 5–10 questions, drip 2–5/day, Pro unlocks all
+4. **BYOK AI provider integration** — `user_integrations`, `/profile/integrations`, and `/api/draft` provider routing
+5. **Hosted draft policy/gating** — rate logging exists; product still needs provider/limit UX
+6. **Seed real deadlines + urgency sort**
+7. **Program detail TL;DR / pros & cons block**
+8. **Build proper user profile split**
+9. **Custom SMTP completion** — docs done; dashboard/DNS work remains manual
+10. **Smoke-test `POST /api/draft`** with valid Anthropic key/session
 
 ## What landed during the 2026-05-10 smoke session
 
@@ -127,6 +129,9 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `app/app/(auth)/login/page.tsx` — added dev-only password sign-in escape hatch
 - `app/app/(app)/layout.tsx` — reverted experimental dynamic export (cookies trigger dynamic on their own)
 - `app/package.json` — bumped Next.js 14.2.0 → 14.2.35 (CVE chain + dev-mode regressions)
+- `app/app/api/draft/route.ts` — hosted draft metering through `ai_draft_runs`
 - `VISION.md` — new product vision doc
 - `TASKS.md` — captured 16 follow-ups from smoke test
+- `ROADMAP.md` — reframed around Launch Milestones 1/2/3
+- `docs/archive/` — created for superseded planning docs
 - `app/.env.local` (worktree + main) — populated with Supabase URL + publishable key

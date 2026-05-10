@@ -28,12 +28,12 @@ Supabase (PostgreSQL + pgvector)   ← single source of truth
   ↕                                   project: betcyfbzsgusaghriptz
 MCP Server (TypeScript)            ← intelligence layer, 20 tools
   ↕
-Next.js app (app/)                 ← user-facing product (Phase 2)
+Next.js app (app/)                 ← user-facing product, live-data wired
 ```
 
 ---
 
-## Current Phase: 2 — Live data integration
+## Current Phase: Launch hardening
 
 | Component | Status | Owner |
 |---|---|---|
@@ -50,16 +50,18 @@ Next.js app (app/)                 ← user-facing product (Phase 2)
 | Sidebar active-state bug | ✅ Fixed | Cowork |
 | CI workflow | ✅ Done | Codex |
 | Next.js bumped to 14.2.35 | ✅ Done | Cowork |
+| Hosted draft metering | ✅ Done | Codex |
 
-## What's open for Codex
+## What's open next
 
-See `TASKS.md` "Tonight's follow-ups" — but specifically Codex's lane:
+See `ROADMAP.md` for the canonical launch sequence and `TASKS.md` for implementation details.
 
-1. **P1 — Agent-side review/comment contract** (assigned to Codex + Deric in commit `d5c2587`)
-2. **Custom SMTP setup** — Resend integration, Supabase auth Email config
-3. **Doc sync** — STATUS.md / ARCHITECTURE.md were updated by Cowork tonight; if Codex wants to refine them, coordinate via commit messages
+Current launch frame:
+1. **Milestone 1 — Ship today to power users** through MCP/web app with clear BYOK/hosted-AI caveats.
+2. **Milestone 2 — MVP**: Question Bank UI, Drip mechanic, BYOK, hosted draft policy/gating.
+3. **Milestone 3 — Polished public launch**: real deadlines, program TL;DR/pros/cons, profile split, custom SMTP, draft smoke test.
 
-Cowork is going to attack the P1 bugs (responsive layout, Question Bank UI, real deadlines, program TL;DR). Codex shouldn't touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` until those land — to avoid merge conflicts.
+Cowork owns most user-facing `app/` work. Codex should prefer MCP server, CI, docs, security, metering, cron, webhook, and architecture work unless explicitly coordinating through `SCRATCH.md`.
 
 ---
 
@@ -86,6 +88,7 @@ This is the coordination contract. **Do not edit files owned by the other agent 
 | `VISION.md` | **Cowork** | Product vision — the why and the future aspirations |
 | `ROADMAP.md` | **Shared** | Priority-ordered list of work — read at session start |
 | `SCRATCH.md` | **Shared** | Active work claims — both agents must read before starting |
+| `docs/archive/` | **Shared** | Superseded/completed planning files; update archive README when moving files |
 
 ---
 

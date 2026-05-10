@@ -15,6 +15,7 @@ Built by Ello Cello LLC.
 - **`AGENTS.md`** — Cowork (Claude) + Codex coordination contract, file ownership
 - **`SCRATCH.md`** — active work-in-progress claims (what each agent is touching right now)
 - **`docs/08_resend_smtp_setup.md`** — practical Supabase Auth custom SMTP setup with Resend
+- **`docs/archive/`** — historical/superseded planning docs that are useful context but no longer active direction
 
 We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
 
@@ -28,7 +29,7 @@ The product is built around a **question archive** — every question asked by e
 
 ## Current state
 
-**Phase 2** — live data integration and launch hardening.
+**Launch hardening** — the spine is built; the next work is cold-start, BYOK, and public-launch polish.
 
 | Component | Status |
 |---|---|
@@ -39,6 +40,12 @@ The product is built around a **question archive** — every question asked by e
 | Next.js app | ✅ Live data wired, build verified |
 
 The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 20 tools, 7 resources, and 3 prompts.
+
+Current launch frame:
+
+- **Ship today**: soft launch to 10–20 power users through MCP/web app.
+- **MVP**: add `/bank`, Drip mechanic, BYOK, and hosted draft policy/gating.
+- **Polished launch**: real deadlines, program TL;DR/pros/cons, profile split, custom SMTP, and full draft smoke test.
 
 ---
 
@@ -106,7 +113,7 @@ npm run build
 
 ## Roadmap
 
-See `application-hub-roadmap.md` for the full four-phase roadmap with milestones, scoring formulas, dependency table, and what's deliberately not on it.
+See `ROADMAP.md` for the launch milestones and `TASKS.md` for implementation details. Older duplicate planning docs live in `docs/archive/` so they remain referenceable without clogging the active pipeline.
 
 ---
 

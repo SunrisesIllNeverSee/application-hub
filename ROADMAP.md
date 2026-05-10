@@ -1,190 +1,175 @@
-# Application Hub — Roadmap
+# Application Hub — Launch Roadmap
 
-> **We are nonlinear and temporal.** This project doesn't run on weeks or sprints.
-> Work happens when Deric is engaged. The roadmap is priority-ordered, not time-ordered.
-> No deadlines, no calendars, no "by next month." Just **what's next** when someone shows up.
+> **We are nonlinear and temporal.** This project does not run on calendar sprints.
+> The order below is sequence and leverage, not a promise about dates.
 
 > **For Cowork (Claude) and Codex**: this is the canonical roadmap. Read at session start.
-> When you complete an item, mark it `[x]` and link the commit. When priorities shift, edit it.
-> `TASKS.md` has finer-grained items. `VISION.md` has the why. This file is the **what and in what order**.
+> `TASKS.md` has implementation details. `STATUS.md` has confirmed repo state. `VISION.md` has the bigger thesis.
 
 ---
 
-## Where the project stands
+## Current Truth
 
-### What's solid (done, working, in production-ready shape)
+Application Hub already has a shippable spine:
 
-- **Schema**: Migrations 001–009 applied to Supabase. Auth trigger gotcha fixed.
-- **Seed**: 30 programs, 225 questions. Significance scores + DNA weights computed.
-- **Intelligence layer**: live — `program_dna`, `user_program_fit`, fit scoring, significance scoring.
-- **MCP server**: 20 tools, 7 resources, 3 prompts. Including `hub_get_universal_questions`, `hub_get_answer_review_context`, `hub_stress_test_answer`, `hub_save_answer`.
-- **Next.js app**: Phase 2 complete. Builds clean on 14.2.35. All public routes wired to live Supabase.
-- **Auth**: magic link (works) + dev-only password sign-in (escape hatch).
-- **CI**: MCP + app jobs in `.github/workflows/ci.yml`.
-- **Smoke tested**: Hub, program detail, workspace, profile all render against live data.
+- **Database**: Supabase migrations `001` through `009`, 30 programs, 225 archived questions.
+- **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
+- **MCP server**: 20 tools, 7 resources, 3 prompts. Power-user path is real today.
+- **Next.js app**: Hub, program detail, workspace, profile/answer bank, live Supabase wiring.
+- **Auth**: magic links plus a dev-only password escape hatch.
+- **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, which drives `ai_usage` through the database trigger.
+- **RNS direction**: additive intelligence layer above the current Supabase/MCP/app spine, not a launch blocker.
 
-### What's known broken or missing
+The refined external roadmap was built outside the repo, so keep these corrections in mind:
 
-- **Question Bank UI** — concept is foundational (see `docs/04_question_intelligence.md`), MCP tool exists, schema ready, only the Next.js surface is missing.
-- **Responsive layout** — sidebar doesn't collapse on mobile; main padding doesn't scale; program detail squeezes at tablet width. Specific fixes scoped (see `TASKS.md`).
-- **Real deadlines** — every program shows "Rolling" because seed lacks dates.
-- **Program detail page** — long blob description, no TL;DR / pros / cons / "best for X founder" block.
-- **User profile** — `/profile` is the Answer Bank; no actual profile page (company, stage, bio, social).
-- **Email reliability** — Supabase free-tier rate-limited; needs custom SMTP (Resend/SendGrid).
-- **AI draft BYOK/rate-limit policy** — `/api/draft` now logs successful hosted drafts to `ai_draft_runs`, but BYOK routing and user-facing provider gating remain open.
+- MCP is **20 tools**, not 19.
+- Rate logging for hosted `/api/draft` is already implemented; BYOK and user-facing provider policy are still open.
+- Responsive layout has had a first sweep committed; continue testing real devices, but do not treat it as untouched.
+- Custom SMTP is documented; remaining work is manual Resend domain verification and Supabase dashboard configuration.
 
 ---
 
-## P0 — the retention engine
+## Launch Milestone 1 — Ship Today
 
-These are the things that change the product's trajectory, not just polish it.
+**Verdict**: Ship to 10–20 power users today through MCP and the web app, with clear expectations.
 
-- [ ] **Answer Bank drip mechanic** — *Cowork*  
-  Pre-load 5–10 universal questions on signup matched to user profile. Drip 2–5/day on free login. Pro tier unlocks all 225+ immediately. New table `user_question_unlocks`. See `VISION.md` for full reasoning. **This is the daily-engagement loop the platform doesn't have today.**
+Best users for this milestone:
 
-- [ ] **Question Bank UI surface** — *Cowork*  
-  `/bank` route. Combines with the Drip mechanic. Shows unlocked questions ready to answer + locked previews + countdown to next unlock. Calls existing MCP tool `hub_get_universal_questions`. Becomes the natural daily landing page. **Backend already exists; only the Next.js page is missing.**
+- They are comfortable in Claude/Cursor/Windsurf.
+- They understand the value of the question archive without a guided drip loop.
+- They can tolerate BYOK being unfinished or AI drafting being limited.
 
-- [ ] **BYOK (Bring Your Own Key) AI provider integration** — *Cowork*  
-  User direction: founders bring their own keys (Anthropic, OpenAI, Google, local Ollama). New `user_integrations` table (encrypted keys), `/profile/integrations` UI, routing logic in `/api/draft` that picks user's key first, falls back to platform pooled key for Pro tier (TBD whether Free gets any platform key access). **Architectural prerequisite** for `/api/draft` going forward — current code uses platform-only `ANTHROPIC_API_KEY`. See VISION.md "BYOK" section.
+What is already good enough:
 
-- [x] **Rate-limit `/api/draft` properly** — *Codex*
-  Insert into `ai_draft_runs` after each successful Anthropic call. The existing trigger `track_ai_usage_on_draft` then updates monthly `ai_usage`. BYOK routing remains the larger policy layer.
+- 30 programs and 225 scored questions.
+- Program discovery, detail, workspace, and saved answers.
+- MCP access to the intelligence layer.
+- Live Supabase wiring and clean builds.
+- RNS path documented as an additive advantage.
 
----
+Launch caveats:
 
-## P1 — visible polish that makes it feel done
-
-Bug fixes and feature gaps that, once fixed, raise the launch-readiness perception by a level.
-
-- [ ] **Fix responsive layout** — *Cowork*  
-  Three specific fixes from background-agent investigation:  
-  1. `app/components/Sidebar.tsx:91` — `hidden md:flex` + mobile drawer toggle  
-  2. `app/app/(app)/layout.tsx:23` — `px-4 md:px-6 py-4 md:py-8` + `min-w-0` on `<main>`  
-  3. `app/app/(app)/hub/[slug]/page.tsx:152` — tablet squeeze fix
-
-- [ ] **Seed real deadlines + sort by urgency** — *Cowork*  
-  Today every program shows "Rolling" because seed lacks dates. Real deadlines on YC, Techstars, SBIR cycles, etc. Default sort: closest non-rolling deadline first, then composite_score within Rolling.
-
-- [ ] **Program detail TL;DR / pros / cons / "best for X founder" block** — *Cowork*  
-  Either static seed columns (`tldr`, `pros[]`, `cons[]`, `best_for_founder_type`), or AI-generated on first view. Static ships faster, AI is more unique.
-
-- [ ] **Build proper user profile page** — *Cowork*  
-  Split `/profile` into `/profile/answers` (current Answer Bank) + `/profile/about` (real profile: company, stage, bio, industry tags, social) + `/profile/settings` (account, billing, integrations). Unblocks: better fit scores, smarter drip, Founder Ranking, Application Hub Fund eligibility.
-
-- [ ] **Set up custom SMTP (Resend)** — *Codex*  
-  Supabase Authentication → Emails → "Set up custom SMTP." Resend is the path of least resistance. Setup guide exists at `docs/08_resend_smtp_setup.md`; remaining work is manual Resend domain verification, Supabase SMTP entry, and magic-link testing. Unblocks reliable magic-link auth + future transactional emails.
-
-- [ ] **Home dashboard + sidebar IA** — *Cowork*  
-  New `/` (or `/today`) home dashboard: "Today" view synthesizing — questions unlocked today, closest deadlines, in-progress applications, answers needing stress tests, moatscore. Sidebar reorganized: Today / Hub / Bank / Apps / Profile (Timeline folds into Hub view tabs). See VISION.md "Home dashboard" section.
-
-- [x] **Stress-testing MCP groundwork** — *Codex*
-  New MCP tool `hub_stress_test_answer` returns deterministic follow-up prompts from a saved answer, question theme, static risk flags, and optional program DNA. UI, quota, `answer_stress_tests` persistence, and LLM/BYOK generation remain follow-up work.
-
-- [ ] **Smoke-test `POST /api/draft` end-to-end** — *Cowork*  
-  Deferred until user has an Anthropic key. Verify the AnswerEditor "Draft with AI" button → `/api/draft` → Anthropic → response → text inserted flow.
+- New web users can still land on a thin/empty Answer Bank.
+- `/bank` does not exist yet.
+- BYOK is not built, so platform-paid hosted drafts need strict policy.
+- Custom SMTP is not configured in Supabase yet, though Supabase default email works for low-volume testing.
 
 ---
 
-## P2 — once the launch surface is clean
+## Launch Milestone 2 — MVP
 
-- [ ] **Three-layer schema: Funders / Programs / Applications** — *Cowork*  
-  YC runs W26 and S26 separately. Techstars runs Boulder, Seattle, NYC. New `funders` table, `programs.funder_id` FK. New `/funders` index. Foundation for funder-side product.
+**Verdict**: This is the real 100-founder launch point.
 
-- [ ] **Collapsible sidebar** — *Cowork*  
-  Chevron toggle, collapses to icon-only ~56px width, persist in localStorage.
+These are the minimum additions that make the app work for non-technical founders:
 
-- [ ] **Workspace discoverability** — *Cowork*  
-  Sidebar shows "My Applications" but docs/code use "Workspace." Pick one term and align everywhere.
+- [ ] **Question Bank UI (`/bank`)** — *Cowork*
+  Daily landing surface for unlocked questions, locked previews, and high-significance answer prompts. Uses existing question archive/scoring.
 
-- [ ] **Heat scores + applicant counts** — *Cowork (data) + Codex (compute)*  
-  Every program currently shows "0 heat" / "0 applicants." Real heat: scrape acceptance rates, social mentions, portfolio company GitHub stars. Real applicants: program partnerships or own telemetry. MVP: synthetic heat from prestige + cohort exclusivity.
+- [ ] **Answer Bank drip mechanic** — *Cowork*
+  New `user_question_unlocks` flow. Pre-load 5–10 high-signal questions for new users, then drip 2–5/day for free users. Pro unlocks the full bank.
 
-- [ ] **Stripe integration** — *Cowork (UI) + Codex (webhook)*  
-  Free / Pro ($19/mo) / Team ($49/mo). Webhook handler updates `user_subscriptions`. Gates: unlimited AI, export, heat scores, acceptance rates behind Pro.
+- [ ] **BYOK AI provider integration** — *Cowork + Codex*
+  `user_integrations` table, `/profile/integrations` UI, encrypted provider keys, and `/api/draft` routing that prefers the user's key. Free tier should not make Deric pay for unbounded hosted AI.
 
-- [ ] **Information architecture review** — *Cowork (design)*  
-  Timeline as separate sidebar tab vs. view mode within Hub. Defer until after Drip mechanic ships and reshapes the daily flow.
+- [x] **Hosted draft rate logging** — *Codex*
+  `/api/draft` inserts successful Anthropic calls into `ai_draft_runs`; the trigger updates `ai_usage`.
 
----
-
-## P3 — premium features and platform layer
-
-- [ ] **"Golden Opportunities" premium rail** — *Cowork (design) + Codex (data)*  
-  Combines days-until-deadline (urgency), applicant count (low competition), DNA-fit (high match), recency. Pro-only rail at top of `/hub`.
-
-- [ ] **MoatScore / FundScore / Standing surface** — *Cowork*  
-  User has a "Floating Moat / Standing / FundScore / MoatScore" framework — exact definition TBD with user. Composite score from Answer Bank quality, stress-test survival rate, external integrations, outcome track record. Surfaces on founder profile, Hub list sort, program detail. See VISION.md "Floating Moat" section. **Open question**: is there an existing framework spec to import, or are we deriving from Founder Ranking?
-
-- [ ] **Significance score display** — *Cowork*  
-  Star rating (1–5) on each question. Sort questions by significance within each section. "Asked by N programs" tooltip.
-
-- [ ] **DNA radar chart on program detail** — *Cowork*  
-  Compare user's profile coverage against program DNA visually.
-
-- [ ] **TypeScript types regeneration** — *Cowork*  
-  `npx supabase gen types typescript --project-id betcyfbzsgusaghriptz > app/lib/database.types.ts` after schema settles further.
-
-- [ ] **Outcome tracking** — *Cowork*  
-  User logs "got in" / "rejected" / "waitlisted." Closes feedback loop on fit scores and DNA calibration.
-
-- [ ] **Deadline alerts** — *Cowork (UI) + Codex (cron)*  
-  30d / 7d / 24h warnings per program when readiness > 60%. Email via Supabase Edge Function + Resend.
-
-- [ ] **Recruiter agent** — *Codex*  
-  Scheduled job scans new programs against user profile. Alerts on high-fit matches.
+- [ ] **Hosted draft policy + UI gating** — *Cowork + Codex*
+  Decide when platform pooled keys are allowed: free trial, Pro fallback, disabled until BYOK, or admin-only. Surface remaining draft count in the UI.
 
 ---
 
-## Vision tier — the platform plays (see VISION.md for full detail)
+## Launch Milestone 3 — Polished Public Launch
 
-- [ ] **Integrations roadmap** (see VISION.md for full tiered list)  
-  Tier 1: GitHub App (traction signals), BYOK AI, Stripe billing, Resend SMTP. Tier 2: VS Code/Cursor extension, LinkedIn import, Notion sync, Google Calendar, Stripe data. Tier 3: Slack, Linear/Jira, Zapier. Tier 4: Grants.gov, Carta, Mercury, social signals. Each tier ships independently when its anchor user appears.
+**Verdict**: This is the public announcement bar. The product should feel complete, not just functional.
 
-- [ ] **Question Databank as a service**  
-  Already partially built (MCP server). Founders connect their own Claude/Cursor/Windsurf, query the question archive programmatically. Power-user flow. *(A) MCP/API endpoint or (B) embeddable widget for partner sites — both worth pursuing.*
+- [x] **Responsive layout first sweep** — *Cowork*
+  Commit `9d83151` landed sidebar, padding, and tablet squeeze work. Keep device/browser testing open as polish, but the first pass is done.
 
-- [ ] **Application Hub Fund**  
-  Platform-as-backer. Direct micro-grants, revenue-share fund (1–3% capped), acceptance bonuses, community fund. Inverts every other founder tool's incentive: we make money only when founders succeed.
+- [ ] **Real deadlines + urgency sort** — *Cowork*
+  Seed real upcoming deadlines where available. Default sort should prefer closest non-rolling deadline, then composite score within rolling programs.
 
-- [ ] **Founder Ranking / credit-score**  
-  Multi-weighted score that travels with founders across programs. Public leaderboard ("Top 100 funding seekers this month"). Programs use it for proactive outreach.
+- [ ] **Program detail TL;DR / pros / cons / best-for block** — *Cowork*
+  Program pages need scannable judgment, not only long descriptions. Static seed columns ship faster; AI generation can come later.
 
-- [ ] **Host applications directly**  
-  Become the canonical submission portal for partner programs. We own the application data. Massive structural advantage.
+- [ ] **Proper user profile split** — *Cowork*
+  Split current `/profile` Answer Bank into `/profile/answers`, `/profile/about`, `/profile/settings`, and `/profile/integrations`.
 
-- [ ] **Application ranking + feedback**  
-  "Your application ranks 10,000 of 15,000." Premium: detailed feedback on what's missing. Premium: "If you raise your Traction score 20%, your rank improves to 6,500."
+- [ ] **Custom SMTP through Resend** — *Deric/Codex docs support*
+  Setup guide exists at `docs/08_resend_smtp_setup.md`. Remaining work: verify domain in Resend, enter SMTP settings in Supabase Auth, run magic-link tests.
 
-- [ ] **Live application updates**  
-  Allow updates post-submit (programs that opt in). Pull GitHub stars, MRR, customer counts automatically.
-
-- [ ] **Application automation**  
-  Auto-fill from bank. Auto-submit to qualified programs (Pro feature, with caps on free).
-
-- [ ] **Outcome tracking + cohort intelligence**  
-  Public-good dataset for the founder community. "Founders with traction scores >80 got into YC at 3× the rate."
-
-- [ ] **Public API**  
-  Open the program + question dataset to partners. Tiered API access. Becomes the canonical "application graph."
+- [ ] **AI draft end-to-end smoke test** — *Cowork*
+  With a valid Anthropic key/session, verify workspace button → `/api/draft` → response inserted into the editor → usage row logged.
 
 ---
 
-## Working principles
+## Next Product Layer
 
-- **Schema-first**: every feature ask becomes a column or table before it becomes UI.
-- **MCP-first**: every data access pattern becomes an MCP tool before it becomes a Next.js route. Power users live in their own agent.
-- **Free tier builds value daily**: a founder using only the free tier should still have something growing in their bank every day they show up.
-- **Two-agent collaboration**: Cowork drives user-facing surface; Codex drives infrastructure/governance/specs. Coordinate via `SCRATCH.md` (active claims) + `AGENTS.md` (file ownership).
-- **Document before you build, build before you optimize.** Every P0/P1 item should have a paragraph in `TASKS.md` describing the why before code lands.
-- **Nonlinear and temporal**: no calendar deadlines. Work happens when there's energy for it.
+These are not launch blockers, but they are still part of the current roadmap and should not be lost.
+
+- [ ] **Home dashboard + sidebar IA** — Today view with unlocked questions, closest deadlines, in-progress applications, answers needing review/stress tests, and MoatScore/FundScore surface.
+- [ ] **Stress-test saved answers UI/persistence** — MCP stub exists. Add `answer_stress_tests`, quota policy, UI, and eventual BYOK/LLM-backed generation.
+- [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
+- [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.
+- [ ] **Heat scores + applicant counts** — Replace zeros with synthetic MVP heat from prestige/cohort exclusivity, then real signals later.
+- [ ] **Workspace discoverability** — Align “Workspace” vs. “My Applications” naming across sidebar/docs/routes.
+- [ ] **Dev-only password sign-in decision** — Gate behind development/feature flag or remove before public launch once SMTP is reliable.
+- [ ] **Residual dependency audit** — Next 14.2.35 is in place; remaining advisories should be handled as a deliberate upgrade path, not blind `--force`.
 
 ---
 
-## How this doc gets maintained
+## Platform Layer
 
-- **When a P0 or P1 ships**: change `[ ]` to `[x]`, add commit SHA reference.
-- **When something new comes up**: add it to the right priority bucket (P0–P3 or Vision).
-- **When a priority shifts**: move the item between buckets.
-- **When something gets fully done and isn't relevant to ongoing work**: archive into a "Done" section at the bottom or remove.
-- **Keep this file under ~300 lines**: prune as you go. `TASKS.md` is for granular detail; this file is for direction.
+- [ ] **Three-layer schema: Funders / Programs / Applications**
+  Split YC the funder from YC W26/S26 programs. Add `funders`, `programs.funder_id`, and a future `/funders` index.
+
+- [ ] **Stripe integration**
+  Free / Pro ($19/mo) / Team ($49/mo). Webhook updates `user_subscriptions`. Gate unlimited AI, export, heat scores, and acceptance data.
+
+- [ ] **Deadline alerts**
+  30d / 7d / 24h warnings when readiness is high enough. Email via Supabase Edge Function + Resend.
+
+- [ ] **Outcome tracking**
+  User logs accepted/rejected/waitlisted. Feeds future calibration.
+
+- [ ] **Recruiter agent**
+  Scheduled job scans new programs against user profile and alerts on high-fit matches.
+
+- [ ] **GitHub/traction integrations**
+  Pull public repo stars, commits, contributors, and traction context into answer drafting and fit scoring.
+
+- [ ] **Team mode**
+  Shared answer library and multi-seat workflow.
+
+- [ ] **Public API / Question Databank as a service**
+  Open the program/question graph to partners and power users.
+
+---
+
+## Vision Tier
+
+These remain alive, but they should not clog launch execution:
+
+- Application Hub Fund
+- Founder Ranking / MoatScore / FundScore
+- Golden Opportunities premium rail
+- Host applications directly for partner programs
+- Application ranking + feedback
+- Live application updates after submission
+- Application automation with user approval
+- Outcome/cohort intelligence dataset
+- RNS/CIVITAE/MO§ES research differentiation: SDOT, SigTune, answer fidelity certificates, governed scrapers, commitment conservation metrics
+
+---
+
+## Archive Policy
+
+Completed, outdated, duplicate, or exploratory planning files should move to `docs/archive/` instead of staying in the active planning lane.
+
+Use this rule:
+
+- **Active direction**: `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `VISION.md`, `SCRATCH.md`, `AGENTS.md`.
+- **Reference docs**: keep in `docs/` if they are still linked by active work.
+- **Historical docs**: move to `docs/archive/` with a short note in `docs/archive/README.md` explaining why it moved.
+
+Do not delete historical thinking unless Deric explicitly asks. Old plans are still useful context; they just should not masquerade as current marching orders.
