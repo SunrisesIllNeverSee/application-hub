@@ -53,6 +53,9 @@ export default async function HubPage({
   }))
 
   // Sort
+  const now = Date.now()
+  const MS_PER_DAY = 86_400_000
+
   const sort = searchParams.sort ?? 'composite'
   const sorted = [...programsWithFit].sort((a, b) => {
     if (sort === 'heat') return b.heat_score - a.heat_score
@@ -61,7 +64,13 @@ export default async function HubPage({
       const db = b.deadline_at ?? '9999-12-31'
       return da.localeCompare(db)
     }
-    // composite: fit * value, fall back to heat
+    // composite default: programs closing <=60 days always surface first
+    const daysA = a.deadline_at ? (new Date(a.deadline_at).getTime() - now) / MS_PER_DAY : Infinity
+    const daysB = b.deadline_at ? (new Date(b.deadline_at).getTime() - now) / MS_PER_DAY : Infinity
+    const urgentA = daysA > 0 && daysA <= 60
+    const urgentB = daysB > 0 && daysB <= 60
+    if (urgentA !== urgentB) return urgentA ? -1 : 1
+    if (urgentA && urgentB) return daysA - daysB
     const scoreA = a.fit ? a.fit.composite_score : a.heat_score
     const scoreB = b.fit ? b.fit.composite_score : b.heat_score
     return scoreB - scoreA
