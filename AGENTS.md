@@ -78,6 +78,16 @@ This is the coordination contract. **Do not edit files owned by the other agent 
 | `SECURITY.md` | **Codex** | Security policy |
 | `README.md` | **Shared** | Coordinate via commit messages |
 | `CONTRIBUTING.md` | **Shared** | Coordinate via commit messages |
+| `VISION.md` | **Cowork** | Product roadmap and aspirations |
+| `SCRATCH.md` | **Shared** | Active work claims — both agents must read before starting |
+
+---
+
+## Active work coordination — `SCRATCH.md`
+
+Before picking up any task from `TASKS.md`, both agents **must** check `SCRATCH.md` to see what the other is currently working on. Claim by appending to "Currently claimed" + commit; release by removing your row when done.
+
+This prevents the duplicate work we hit on 2026-05-10 (both agents independently writing migration 009). See `SCRATCH.md` for full protocol.
 
 ---
 
