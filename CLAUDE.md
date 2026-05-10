@@ -7,7 +7,7 @@
 
 ## What this project is
 
-**Application Hub** — a platform that helps founders apply to accelerators, grants, and fellowships.
+**Application Hub** — a platform that helps anyone apply to **opportunities that need essays**: accelerators, grants, jobs, schools, and fellowships.
 
 The core asset is a **question archive**: every question ever asked by any program, stored once, scored by significance. Users build a profile answer bank that pre-fills across multiple applications. The intelligence layer computes fit scores, program DNA weights, and opportunity rankings.
 

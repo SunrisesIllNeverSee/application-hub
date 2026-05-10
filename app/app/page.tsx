@@ -38,15 +38,15 @@ export default async function RootPage() {
         <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
-            AI-native infrastructure for founder applications
+            AI-native infrastructure for the applications you actually have to write
           </div>
           <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
             The question archive
             <br />
-            <span className="text-neutral-400">for founders.</span>
+            <span className="text-neutral-400">for every application you&apos;ll ever write.</span>
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg text-neutral-300 leading-relaxed">
-            Founders apply to 10+ programs and answer the same questions 10+ times. Application Hub archives every question, scores it by significance, and lets you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Techstars, SBIR</span>, and 27 more.
+            <span className="text-neutral-100">Every applicant faces the same problem</span>: 10 applications, the same 10 essays. Application Hub archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/login" className="btn-primary px-5 py-2.5 text-sm">
@@ -71,7 +71,7 @@ export default async function RootPage() {
               <div className="grid grid-cols-12 text-left">
                 <aside className="col-span-3 hidden md:flex flex-col gap-1 p-4 border-r border-neutral-800 bg-neutral-950/40 text-xs">
                   <p className="text-neutral-400 uppercase tracking-wide mb-2 px-2">Archive</p>
-                  {['Universal questions', 'Team & founders', 'Traction & metrics', 'Vision & market', 'Financials'].map((cat, i) => (
+                  {['Universal questions', 'Team & leadership', 'Traction & metrics', 'Vision & market', 'Financials'].map((cat, i) => (
                     <div key={cat} className={`px-2 py-1.5 rounded ${i === 0 ? 'bg-brand-600/15 text-brand-300' : 'text-neutral-400'}`}>{cat}</div>
                   ))}
                 </aside>
@@ -146,7 +146,7 @@ export default async function RootPage() {
               <p className="mt-1 text-xs text-neutral-400 uppercase tracking-wide">Questions archived</p>
             </div>
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center">
-              <p className="text-4xl font-semibold text-neutral-100">30</p>
+              <p className="text-4xl font-semibold text-neutral-100">800+</p>
               <p className="mt-1 text-xs text-neutral-400 uppercase tracking-wide">Programs indexed</p>
             </div>
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center">
@@ -159,7 +159,7 @@ export default async function RootPage() {
               <div>
                 <p className="text-xs uppercase tracking-wide text-neutral-400 mb-2">Sample archived question</p>
                 <p className="text-lg text-neutral-100 font-medium">Tell us about your team.</p>
-                <p className="mt-2 text-sm text-neutral-300">Asked by 28 of 30 programs · Universal across stages and sectors</p>
+                <p className="mt-2 text-sm text-neutral-300">Asked by 28 of 800+ programs · Universal across stages and sectors</p>
               </div>
               <div className="shrink-0 text-right">
                 <p className="text-xs text-neutral-400">Significance</p>
@@ -195,9 +195,9 @@ export default async function RootPage() {
         <section id="compare" className="max-w-5xl mx-auto px-6 py-20">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">How we compare</p>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The other ways founders try to do this.</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The other ways applicants try to do this.</h2>
             <p className="mt-4 text-neutral-300 max-w-2xl mx-auto">
-              Most founders hack together a workflow from generic tools. Here&apos;s why none of them solve the actual problem.
+              Most applicants hack together a workflow from generic tools. Here&apos;s why none of them solve the actual problem.
             </p>
           </div>
           <div className="overflow-hidden rounded-2xl border border-neutral-800">
@@ -263,7 +263,7 @@ export default async function RootPage() {
         <section id="pricing" className="max-w-5xl mx-auto px-6 py-20">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Simple. Founder-friendly.</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Simple. Applicant-friendly.</h2>
             <p className="mt-4 text-neutral-300">No usage traps. No contact-us tier.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -274,7 +274,7 @@ export default async function RootPage() {
               <ul className="space-y-2 text-sm text-neutral-300">
                 <li>· 10 AI drafts/month</li>
                 <li>· 2–5 unlocks daily</li>
-                <li>· Access to all 30 programs</li>
+                <li>· Access to all 800+ programs</li>
                 <li>· Answer bank with drip cap</li>
               </ul>
             </div>
@@ -282,7 +282,7 @@ export default async function RootPage() {
               <span className="absolute -top-2 left-8 px-2 py-0.5 rounded-full bg-brand-700 text-xs font-medium text-white">Most popular</span>
               <p className="text-sm font-semibold text-brand-300">Pro</p>
               <p className="mt-2 text-4xl font-semibold">$19<span className="text-base text-neutral-400 font-normal">/mo</span></p>
-              <p className="text-xs text-neutral-400 mb-6">per founder</p>
+              <p className="text-xs text-neutral-400 mb-6">per applicant</p>
               <ul className="space-y-2 text-sm text-neutral-200">
                 <li>· Unlimited AI drafts</li>
                 <li>· All 225 questions unlocked</li>
@@ -308,7 +308,7 @@ export default async function RootPage() {
         <section className="max-w-3xl mx-auto px-6 py-20">
           <div className="text-center mb-10">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Questions</p>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The ones founders actually ask.</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The ones applicants actually ask.</h2>
           </div>
           <div className="space-y-4">
             {[
@@ -318,7 +318,7 @@ export default async function RootPage() {
               },
               {
                 q: 'Where does the question data come from?',
-                a: "Manually curated from public application forms across 30 programs (YC, Techstars, a16z, SBIR, NSF, and more). New programs added monthly. Submissions from users with first-hand application screenshots are credited and reviewed.",
+                a: "Manually curated from public application forms across 800+ programs (YC, Techstars, a16z, SBIR, NSF, and more). New programs added monthly. Submissions from users with first-hand application screenshots are credited and reviewed.",
               },
               {
                 q: 'What about my answers — is my data private?',
@@ -334,7 +334,7 @@ export default async function RootPage() {
               },
               {
                 q: 'Is the free tier actually free?',
-                a: "Yes — 10 AI drafts/month and full read access to all 30 programs and 225 questions. No credit card required. The drip mechanic on the answer bank is the natural ceiling — you grow it daily, or upgrade to unlock everything.",
+                a: "Yes — 10 AI drafts/month and full read access to all 800+ programs and 225 questions. No credit card required. The drip mechanic on the answer bank is the natural ceiling — you grow it daily, or upgrade to unlock everything.",
               },
             ].map((item) => (
               <details key={item.q} className="group rounded-xl border border-neutral-800 bg-neutral-900/40 open:bg-neutral-900/60 transition-colors">

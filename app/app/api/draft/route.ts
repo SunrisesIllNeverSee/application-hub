@@ -7,6 +7,101 @@ const MODEL = 'claude-haiku-4-5-20251001'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
 const PLATFORM_PROVIDER = 'platform_anthropic'
 
+type CoachProfile = {
+  voice: string
+  audience: string
+  tone_guidance: string
+}
+
+type OpportunityKind =
+  | 'accelerator'
+  | 'vc'
+  | 'grant'
+  | 'fellowship'
+  | 'job_fulltime'
+  | 'job_internship'
+  | 'job_contract'
+  | 'school_undergrad'
+  | 'school_grad'
+  | 'school_professional'
+  | 'other'
+
+const KIND_COACH_PROFILE: Record<OpportunityKind, CoachProfile> = {
+  accelerator: {
+    voice: 'expert startup application coach',
+    audience: 'accelerator partners and program selection committees',
+    tone_guidance:
+      'Strong drafts are written in first-person founder voice — direct, confident, and metric-driven. Lead with traction, insight, and a sharp wedge; avoid generic vision-speak.',
+  },
+  vc: {
+    voice: 'seasoned venture pitch coach',
+    audience: 'venture capital investors evaluating a potential investment',
+    tone_guidance:
+      'Strong drafts emphasize market size, defensibility, traction, and team edge. First-person founder voice, concrete numbers over adjectives, and a clear why-now.',
+  },
+  grant: {
+    voice: 'grant-writing specialist',
+    audience: 'grant review panels and program officers',
+    tone_guidance:
+      'Strong drafts are structured, evidence-based, and tied to the funder\'s stated priorities. Specify problem, approach, deliverables, and measurable impact; avoid marketing language.',
+  },
+  fellowship: {
+    voice: 'fellowship application coach',
+    audience: 'fellowship selection committees evaluating candidates and their projects',
+    tone_guidance:
+      'Strong drafts blend personal narrative with concrete accomplishments and a clear plan for the fellowship period. Show motivation, fit, and what only this candidate would do.',
+  },
+  job_fulltime: {
+    voice: 'experienced job-search advisor and résumé editor',
+    audience: 'hiring managers and recruiters screening candidates',
+    tone_guidance:
+      'Strong drafts are first-person, results-oriented, and quantified (impact, scope, scale). Map directly to the role\'s competencies; cut buzzwords and clichés.',
+  },
+  job_internship: {
+    voice: 'early-career coach for internship applicants',
+    audience: 'hiring managers and university recruiters reviewing internship candidates',
+    tone_guidance:
+      'Strong drafts highlight learning trajectory, relevant projects/coursework, and concrete contributions. First-person, eager but specific — no filler enthusiasm.',
+  },
+  job_contract: {
+    voice: 'independent-contractor proposal coach',
+    audience: 'clients evaluating a contractor or freelancer for a defined engagement',
+    tone_guidance:
+      'Strong drafts are scoped, outcome-focused, and demonstrate relevant past delivery. Be specific about approach, timeline, and value; avoid generic agency speak.',
+  },
+  school_undergrad: {
+    voice: 'undergraduate admissions essay editor',
+    audience: 'undergraduate admissions committees reading hundreds of essays',
+    tone_guidance:
+      'Strong drafts are personal, reflective, and show character through specific scenes and decisions. First-person student voice, no résumé recitation, no clichés about overcoming adversity.',
+  },
+  school_grad: {
+    voice: 'graduate admissions essay editor',
+    audience: 'graduate admissions committees evaluating academic and research fit',
+    tone_guidance:
+      'Strong drafts demonstrate intellectual trajectory, research/professional motivation, and fit with the program\'s faculty or focus. Specific, rigorous, and forward-looking.',
+  },
+  school_professional: {
+    voice: 'professional-school admissions essay editor (MBA, JD, MD, etc.)',
+    audience: 'professional-school admissions committees evaluating career fit and leadership',
+    tone_guidance:
+      'Strong drafts connect lived professional experience to concrete future goals, with the school as the bridge. First-person, results-driven, self-aware about strengths and gaps.',
+  },
+  other: {
+    voice: 'application writing coach',
+    audience: 'the review committee evaluating this application',
+    tone_guidance:
+      'Strong drafts are specific, evidence-based, and tailored to what this opportunity actually cares about. Cut filler, lead with substance.',
+  },
+}
+
+function resolveKind(raw: string | null | undefined): OpportunityKind {
+  if (raw && raw in KIND_COACH_PROFILE) {
+    return raw as OpportunityKind
+  }
+  return 'accelerator'
+}
+
 function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length
 }
@@ -114,7 +209,35 @@ export async function POST(req: NextRequest) {
 
     // 2. Fetch program DNA if program_id provided
     let dnaContext = ''
+    let opportunityKind: OpportunityKind = 'accelerator'
     if (program_id) {
+      // Resolve opportunity kind (graceful fallback chain: kind → program_type → 'accelerator')
+      // We select with a broad column list and tolerate missing columns by querying
+      // each candidate separately so a missing migration does not crash the route.
+      let kindCandidate: string | null = null
+      const { data: programKindRow } = await supabase
+        .from('programs')
+        .select('kind')
+        .eq('id', program_id)
+        .maybeSingle()
+      if (programKindRow && typeof (programKindRow as { kind?: unknown }).kind === 'string') {
+        kindCandidate = (programKindRow as { kind: string }).kind
+      }
+      if (!kindCandidate) {
+        const { data: programTypeRow } = await supabase
+          .from('programs')
+          .select('program_type')
+          .eq('id', program_id)
+          .maybeSingle()
+        if (
+          programTypeRow &&
+          typeof (programTypeRow as { program_type?: unknown }).program_type === 'string'
+        ) {
+          kindCandidate = (programTypeRow as { program_type: string }).program_type
+        }
+      }
+      opportunityKind = resolveKind(kindCandidate)
+
       const { data: dna } = await supabase
         .from('program_dna')
         .select('theme, weight_pct, question_count')
@@ -124,7 +247,7 @@ export async function POST(req: NextRequest) {
 
       if (dna && dna.length > 0) {
         const top = dna.map((d) => `${d.theme} (${Math.round(d.weight_pct)}%)`).join(', ')
-        dnaContext = `\nThis program weights these themes most heavily: ${top}.`
+        dnaContext = `\nThis opportunity weights these themes most heavily: ${top}.`
       }
 
       // Also fetch exact phrasing + word limit for this program
@@ -180,15 +303,17 @@ export async function POST(req: NextRequest) {
     const wordLimit = question.typical_word_limit ?? 300
     const targetWords = Math.round(wordLimit * 0.85)
 
-    const systemPrompt = `You are an expert startup application coach. You draft compelling, specific application answers that help founders get into top accelerators and programs.
+    const coach = KIND_COACH_PROFILE[opportunityKind]
+    const systemPrompt = `You are an ${coach.voice}. You draft compelling, specific application answers that read well to ${coach.audience}.
+
+${coach.tone_guidance}
 
 Your drafts are:
-- Written in first-person founder voice — direct, confident, specific
-- Concrete and metric-driven (not vague or generic)
-- Tailored to what this specific program cares about
+- Concrete and evidence-driven (not vague or generic)
+- Tailored to what this specific opportunity cares about
 - Exactly within word limits (target ${targetWords} words, hard max ${wordLimit})
 
-Never use filler phrases like "In conclusion", "We are excited to", or "Our innovative solution". Cut straight to substance.`
+Never use filler phrases like "In conclusion", "I am excited to", or "innovative solution". Cut straight to substance.`
 
     const userPrompt = `Draft a strong application answer for this question:
 

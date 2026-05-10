@@ -25,7 +25,9 @@ We are **nonlinear and temporal** — no calendar deadlines. The roadmap is prio
 
 ## What it is
 
-Application Hub is a platform for founders applying to programs. It solves one specific problem: the same questions show up everywhere, answered slightly differently each time, losing context and quality with every copy-paste.
+Application Hub is a platform for **anyone applying** to programs, jobs, schools, or grants. It solves one specific problem: the same questions show up everywhere, answered slightly differently each time, losing context and quality with every copy-paste.
+
+**Audience**: Founders applying to accelerators. Job-seekers applying to roles. Students applying to schools. Researchers applying to grants. One answer bank for all of them.
 
 The product is built around a **question archive** — every question asked by every program, stored once. When you answer a question on one application, that answer lives in your profile and pre-fills every future application that asks something similar. The intelligence layer tells you which questions are most valuable to answer (significance score), which programs are the best fit for where you are right now (composite score), and exactly what's left before you're ready to apply (readiness check).
 

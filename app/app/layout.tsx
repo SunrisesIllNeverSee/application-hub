@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: '%s — Application Hub',
   },
   description:
-    'Apply smarter. Build a reusable answer bank, track every program deadline, and get AI-matched to the accelerators and grants that fit your startup.',
+    'Apply smarter. Build a reusable answer bank, track every deadline, and get AI-matched to the accelerators, jobs, schools, and grants that fit you.',
   keywords: ['accelerator', 'grants', 'fellowship', 'startup', 'applications', 'YC', 'Techstars'],
   authors: [{ name: 'Ello Cello LLC' }],
   openGraph: {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'Application Hub',
     title: 'Application Hub — Apply to accelerators and grants, smarter',
     description:
-      'One place to research programs, manage applications, and reuse answers across every program you apply to.',
+      'Apply smarter. Build a reusable answer bank, track every deadline, and get AI-matched to the accelerators, jobs, schools, and grants that fit you.',
   },
 }
 
