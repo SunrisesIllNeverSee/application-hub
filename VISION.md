@@ -102,12 +102,15 @@ When users log "got in" / "rejected" / "waitlisted":
 
 ### Question Bank as a first-class surface
 
-User feedback (2026-05-10): "where is the question bank?" — pointed out a real gap. The 225 archived questions exist in DB but have no user-facing browse surface today.
+This is **not a new concept** — it's been the foundation of the platform from day one. Documented in `docs/04_question_intelligence.md` as "the moat," planned in `docs/02_build_plan.md` Phase 4 ("answer universal questions first"), implemented as the MCP tool `hub_get_universal_questions`, and supported by the schema (`archived_questions.is_universal`, `significance_score`). The 225 archived questions are scored, the universal flag is computed, the data is ready.
 
-The Question Bank is **the same surface as the Drip mechanic**. It becomes:
+**What's missing is only the user-facing UI layer.** The Drip mechanic (user idea, 2026-05-10) is the missing *delivery mechanism* for the Question Bank — converting a static "here's all 225 questions" into an active daily-engagement loop.
+
+The Question Bank surface combines both:
 - The page where users see what's unlocked + what's locked + what unlocks tomorrow
 - The natural daily landing page for engaged free users (more compelling than an empty Answer Bank)
 - The discovery layer for the question archive itself — searchable, filterable by theme, sortable by significance
+- The onboarding flow surface (per `04_question_intelligence.md` mockup): "Answer these 5 questions and you'll be ready for 60% of open programs"
 
 Information architecture:
 - `/bank` (or `/questions`) — unlocked questions ready to answer + locked previews + drip schedule
@@ -115,7 +118,7 @@ Information architecture:
 - `/hub` — programs that aggregate questions (what we have today)
 - A user's daily flow: open Bank → answer 1–2 newly-unlocked questions → check Hub for any timely programs
 
-This collapses the "show me my answers" / "show me program questions" / "show me everything" mental model into one coherent loop.
+This collapses the "show me my answers" / "show me program questions" / "show me everything" mental model into one coherent loop — and finally renders the question intelligence layer that already exists in the database and MCP server.
 
 ### Companies / Funders / Programs — three-layer schema
 

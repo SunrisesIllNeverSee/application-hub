@@ -125,9 +125,14 @@ Active matching used prefix `startsWith('/hub/')` which matched both. Now picks 
 
 ### [ ] Build the Question Bank UI surface
 **Owner**: Cowork
-**Priority**: P1 — user explicitly asked "where is the question bank?" The 225 archived questions have no browse UI today.
+**Priority**: P1 — the *concept* is foundational and well-documented (`docs/04_question_intelligence.md`, `02_build_plan.md` Phase 4). The MCP tool `hub_get_universal_questions` already exists and works. The 225 archived questions are scored. **Only the Next.js UI is missing.**
 
-This is the same surface as the Drip mechanic — combine them. New `/bank` route shows unlocked questions ready to answer + locked previews + countdown to next unlock. Replaces or augments `/profile` (Answer Bank) as the daily landing page.
+What to build:
+- `/bank` route — unlocked questions ready to answer + locked previews + drip schedule
+- Onboarding flow per `04_question_intelligence.md` mockup: "Answer these 5 questions and you'll be ready for 60% of open programs"
+- Calls the existing `hub_get_universal_questions` MCP tool (or replicates the query directly via Supabase)
+- Combines with the Drip mechanic: free tier sees N unlocked + M locked previews
+- Replaces or augments `/profile` (Answer Bank) as the daily landing page
 
 ### [ ] Three-layer schema — Funders / Programs / Applications
 **Owner**: Cowork (data) + future migration
@@ -155,9 +160,9 @@ Schema: new `user_profiles` table or expand. Routes split: `/profile/answers` (c
 
 Plus three smaller layout bugs spotted: `overflow-hidden` on root flex (`(app)/layout.tsx:20`) prevents page-scroll fallback, stat cells in program detail (`hub/[slug]/page.tsx:118`) lack `truncate`, sidebar internal nav lacks min-height guard.
 
-### [ ] Bug — word counter (likely user-input confusion, code is sound)
+### [x] Bug — word counter (resolved by user; was input-mode confusion)
 **Owner**: Cowork
-**Priority**: P3 — agent investigation found no plausible code path where the counter would fail to update. `AnswerEditor.tsx:50,156-157` correctly wires `value={content}` + `onChange`, `countWords` is straightforward, both components are `'use client'`. Most likely cause: user typed in login form (no counter by design) or in AnswerEditor's read-only view mode (no textarea — only `<p>`). Awaiting user clarification on which page/field. If real bug surfaces, escalate.
+User confirmed working after retest. Agent investigation had already found no plausible code path where it would fail. Likely cause was typing in login form or AnswerEditor view mode (no textarea). Closing.
 
 ### [ ] Heat scores + applicant counts populating as 0
 **Owner**: Cowork (data) + Codex (compute)
