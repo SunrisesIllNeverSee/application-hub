@@ -104,5 +104,5 @@ RNS is the planned additive judgment layer, not a launch blocker.
 1. Smoke-test live Supabase app routes in browser.
 2. Keep architecture/status docs synced as schema-facing column names settle.
 3. Expand MCP app-support tools only when they remove server-side app duplication.
-4. Resolve remaining app build/typecheck issues as part of live data integration.
+4. Smoke-test `POST /api/draft` with a real authenticated session and valid Anthropic key.
 5. After app routes are live-data backed, move to production deployment work.

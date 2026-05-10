@@ -26,10 +26,10 @@ MCP Server (TypeScript)            ← intelligence layer, 18 tools
   ↕
 Claude Desktop / Cursor / Windsurf ← AI drafting interface (current)
   ↕
-Next.js app (planned Phase 2)      ← user-facing product
+Next.js app (app/)                 ← user-facing product, live-data wired
 ```
 
-**Current phase: Phase 2 — building seed data + Next.js app**
+**Current phase: Phase 2 — live app smoke testing + launch hardening**
 **MCP server: complete, clean build**
 
 ---
@@ -58,7 +58,7 @@ application-hub/
 │   ├── dist/                          ← compiled output (run npm run build first)
 │   └── README.md
 │
-└── seed/                              ← (planned) seed SQL for 30 real programs
+└── seed/                              ← seed SQL for 30 real programs
 ```
 
 ---
@@ -196,11 +196,10 @@ Recommended MCPs to add for this project:
 
 See `TASKS.md` for the prioritized task list.
 
-**Current P0**: Run `cd app && npm run build` — the column audit is complete and all live-data
-wiring is done. This verifies there are no remaining TypeScript errors before testing in browser.
+**Current P0**: Smoke-test the live-data app flows in browser:
+`/hub`, `/hub/[slug]`, `/workspace/[program_id]`, `/profile`, and `POST /api/draft`.
 
-**P1 after build passes**: Smoke-test `POST /api/draft` from the workspace UI and confirm
-draft generation logs usage cleanly.
+`cd app && npm run type-check` and `cd app && npm run build` are passing as of 2026-05-10.
 
 ---
 

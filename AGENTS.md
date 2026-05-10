@@ -21,7 +21,7 @@ Core asset: a **question archive** — every question ever asked by any program,
 ```
 Supabase (PostgreSQL + pgvector)   ← single source of truth
   ↕                                   project: betcyfbzsgusaghriptz
-MCP Server (TypeScript)            ← intelligence layer, 16 tools
+MCP Server (TypeScript)            ← intelligence layer, 18 tools
   ↕
 Next.js app (app/)                 ← user-facing product (Phase 2)
 ```
@@ -33,13 +33,13 @@ Next.js app (app/)                 ← user-facing product (Phase 2)
 | Component | Status | Owner |
 |---|---|---|
 | Schema + migrations 001–008 | ✅ Done | — |
-| MCP server (16 tools) | ✅ Done | — |
+| MCP server (18 tools) | ✅ Done | — |
 | 30 programs seeded to Supabase | ✅ Done | Cowork |
 | Intelligence layer (significance + DNA) | ✅ Done | Cowork |
 | Next.js app scaffold | ✅ Done | Codex |
-| Hub UI (mock data) | ✅ Done | Codex |
-| Application Workspace (mock data) | ✅ Done | Codex |
-| Wire app to live Supabase data | 🔄 Active | Cowork |
+| Hub UI (live data) | ✅ Build verified | Cowork |
+| Application Workspace (live data) | ✅ Build verified | Cowork |
+| Wire app to live Supabase data | ✅ Build verified | Cowork |
 | CI workflow | ✅ Done | Codex |
 
 ---
@@ -50,7 +50,7 @@ This is the coordination contract. **Do not edit files owned by the other agent 
 
 | Path | Owner | Notes |
 |---|---|---|
-| `app/` (all Next.js) | **Cowork** | Currently wiring to live data |
+| `app/` (all Next.js) | **Cowork** | Live data wiring is build-verified; smoke testing AI draft flow next |
 | `migrations/` | **Cowork** | Schema changes only |
 | `seed/` | **Cowork** | All 30 programs done |
 | `application-hub-mcp-server/src/` | **Shared** | Coordinate via commit messages |
