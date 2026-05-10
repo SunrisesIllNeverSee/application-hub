@@ -53,7 +53,10 @@ application-hub/
 │   ├── 007_monetization.sql
 │   ├── 008_intelligence_layer_v2.sql   ← adds program_dna, user_program_fit, RPCs
 │   ├── 009_fix_auth_trigger_search_path.sql ← fixes magic-link signup trigger search_path
-│   └── 012_launch_hardening.sql        ← BYOK metadata + answer stress-test persistence
+│   ├── 012_launch_hardening.sql        ← BYOK metadata + answer stress-test persistence
+│   ├── 013_cohort_context.sql          ← cohort metadata on programs
+│   ├── 014_question_bank_drip.sql      ← Question Bank unlocks + daily drip
+│   └── 015_byok_key_storage.sql        ← encrypted BYOK key storage column
 │
 ├── application-hub-mcp-server/        ← TypeScript MCP server (20 tools, 7 resources, 3 prompts)
 │   ├── src/
@@ -119,7 +122,7 @@ Connect to Claude Desktop — add to `~/Library/Application Support/Claude/claud
 }
 ```
 
-**The MCP server will not function until migrations 001-010 have been applied to Supabase.**
+**The MCP server will not function until migrations 001-015 have been applied to Supabase.**
 
 ---
 
@@ -132,10 +135,11 @@ This file is gitignored. Claude Code needs it to run `npm run dev` and `npm run 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://betcyfbzsgusaghriptz.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your anon key>
-ANTHROPIC_API_KEY=<your Anthropic API key>
+ANTHROPIC_API_KEY=<optional platform fallback key>
+INTEGRATION_ENCRYPTION_KEY=<required for BYOK key storage>
 ```
 
-The anon key is safe to use client-side (it's public). `ANTHROPIC_API_KEY` is server-side only — used by `POST /api/draft`. Never put the service role key in `.env.local`.
+The anon key is safe to use client-side (it's public). `INTEGRATION_ENCRYPTION_KEY` is required for encrypted BYOK storage. `ANTHROPIC_API_KEY` is optional and only used if platform fallback is intentionally enabled. Never put the service role key in `.env.local`.
 
 ### MCP server (`application-hub-mcp-server/`)
 
@@ -181,20 +185,21 @@ Recommended MCPs to add for this project:
 | Component | Status |
 |---|---|
 | v3 schema design | ✅ Done |
-| Supabase migrations 001-010 | ✅ Done |
+| Supabase migrations 001-015 | ✅ Done |
 | MCP server (20 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
 | 30 programs seeded | ✅ Done — all in Supabase `betcyfbzsgusaghriptz` |
 | Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
 | Next.js app scaffold | ✅ Done — auth, app router, Supabase SSR client, layouts |
 | Auth callback path | ✅ Done — magic links land at real `/auth/callback` route |
 | Hub UI (program directory + timeline) | ✅ Done — all column refs fixed, wired to live DB |
+| Question Bank (`/bank`) | ✅ Done — unlocked questions, locked previews, daily drip |
 | Application workspace | ✅ Done — column refs fixed, wired to live DB |
-| Answer Bank (profile page) | ✅ Done — column refs fixed, wired to live DB |
+| Profile split (`about`, `answers`, `settings`, `integrations`) | ✅ Done |
 | AnswerEditor (save/upsert) | ✅ Done — uses real confidence enum (draft/solid/locked) |
 | Build verification | ✅ Done — zero TypeScript errors (`npx tsc --noEmit` passes) |
 | AI draft button | ✅ Done — POST /api/draft wired, AnswerEditor "Draft with AI" button live |
 | Hosted draft metering | ✅ Done — successful hosted drafts log to `ai_draft_runs` |
-| Hosted draft policy | ✅ Done — route fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true` |
+| BYOK draft routing | ✅ Done — `/api/draft` prefers user key; `/profile/integrations` saves encrypted provider keys |
 | Stripe integration | ⬜ Phase 3 |
 
 ---
@@ -205,8 +210,8 @@ See `TASKS.md` for the prioritized task list.
 
 **Current launch sequence**:
 1. Ship today to 10–20 power users through MCP/web app with clear BYOK/hosted-AI caveats.
-2. MVP: Question Bank UI (`/bank`), Drip mechanic, BYOK, hosted draft policy/gating.
-3. Polished public launch: real deadlines, program TL;DR/pros/cons, profile split, custom SMTP, draft smoke test.
+2. MVP pieces are in repo: Question Bank, drip mechanic, profile split, BYOK integrations.
+3. Polished public launch: live BYOK draft validation, real deadlines, program TL;DR/pros/cons, heat/applicant polish.
 
 `cd app && npm run type-check` and `cd app && npm run build` are passing as of 2026-05-10.
 

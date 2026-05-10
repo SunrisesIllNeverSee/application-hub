@@ -33,12 +33,12 @@ Just as important: the spine should stay portable across adjacent application do
 
 ## Current state
 
-**Launch hardening** — the spine is built; the next work is cold-start, BYOK, and public-launch polish.
+**Launch hardening** — the spine is built; the next work is polish, live validation, and tightening the founder workflow.
 
 | Component | Status |
 |---|---|
 | Database schema (v3) | ✅ Complete |
-| Supabase migrations | ✅ 010 migrations, apply in order |
+| Supabase migrations | ✅ 015 migrations, apply in order |
 | MCP server (20 tools) | ✅ Complete, clean build |
 | Seed data (30 programs) | ✅ Done |
 | Next.js app | ✅ Live data wired, build verified |
@@ -48,8 +48,8 @@ The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the 
 Current launch frame:
 
 - **Ship today**: soft launch to 10–20 power users through MCP/web app.
-- **MVP**: add `/bank`, Drip mechanic, BYOK, and hosted draft policy/gating.
-- **Polished launch**: real deadlines, program TL;DR/pros/cons, profile split, custom SMTP, and full draft smoke test.
+- **MVP**: `/bank`, Drip mechanic, BYOK integrations, profile split, and workspace tracking are now in the product.
+- **Polished launch**: focus shifts to live BYOK validation, richer program context, heat/urgency quality, and final workflow polish.
 
 ---
 
@@ -81,7 +81,7 @@ npm run build
 
 See `application-hub-mcp-server/README.md` for full setup, including Claude Desktop and Cursor config.
 
-**Prerequisites**: Supabase project with all 10 migrations applied.
+**Prerequisites**: Supabase project with all 15 migrations applied.
 
 ### Local Codex / Cowork connection
 

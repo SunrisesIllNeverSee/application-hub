@@ -21,7 +21,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `013` are the canonical migration chain.
+- Migrations `001` through `015` are the canonical migration chain.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -36,8 +36,10 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `migrations/011_user_profiles.sql` is present and adds the user profiles table.
 - `migrations/012_launch_hardening.sql` is present and adds the BYOK metadata contract plus persisted answer stress-test runs.
 - `migrations/013_cohort_context.sql` is present and adds `cohort_name`, `program_start_date`, and `cohort_size` to programs. Seeds known values for 8 programs.
-- Migrations 010, 011, and 012 have been applied to production Supabase.
-- The current strategy is to keep migrations `001` through `013` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
+- `migrations/014_question_bank_drip.sql` is present and adds `user_question_unlocks`, signup seed logic, and daily drip mechanics.
+- `migrations/015_byok_key_storage.sql` is present and adds `key_encrypted` for BYOK key storage.
+- Migrations through `015` are now the expected app chain.
+- The current strategy is to keep migrations `001` through `015` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
 
 ### SMTP / Email
 - Resend SMTP is wired to Supabase Auth and confirmed working.
@@ -68,14 +70,16 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - Package and lockfile are present.
 - Current app surfaces include:
   - Hub directory
+  - Question Bank route
   - Program detail route
   - Workspace route
-  - Profile route
+  - Profile split routes (`/profile/about`, `/profile/answers`, `/profile/settings`, `/profile/integrations`)
   - Supabase auth callback/login scaffolding
 - Magic-link redirects now land at real path `/auth/callback`; Cowork moved the callback route out of the `(auth)` route group during live smoke testing.
 - Live Supabase data wiring is present and build-verified.
 - Hosted AI drafting is wired through `POST /api/draft`; successful drafts are logged to `ai_draft_runs` so the database trigger updates `ai_usage`.
-- Hosted AI drafting now fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true` and `ANTHROPIC_API_KEY` is configured.
+- BYOK integrations are implemented through `/profile/integrations` plus `/api/integrations`.
+- `/api/draft` now routes BYOK-first and returns a provider-required error when no user key is available and platform drafting is disabled.
 - Deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
 - The active launch roadmap is `ROADMAP.md`; older duplicate planning docs have been moved to `docs/archive/`.
@@ -104,22 +108,24 @@ This file is the current GitHub-visible source of truth. It separates what is co
 
 ---
 
-## Milestone 3 status (as of 2026-05-10 smoke test)
+## Current product status
 
-Most of Milestone 3 is done. Remaining gaps:
+The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 
 | Item | Status |
 |---|---|
 | App live at vercel | Done |
-| Migrations 010/011/012 applied to prod | Done |
 | Resend SMTP wired and confirmed | Done |
 | Auth (magic link + password escape hatch) | Done on live site |
 | Smoke test | Done 2026-05-10 |
-| Question Bank `/bank` route UI | Not built — P0 |
-| BYOK `/profile/integrations` UI | Not built — P0 |
-| Workspace index (user_applications query) | Bug being fixed |
+| Question Bank `/bank` route UI | Done |
+| Drip mechanic | Done |
+| BYOK `/profile/integrations` UI | Done |
+| Workspace index (`user_applications` query) | Done |
+| Profile split | Done |
+| Sidebar IA redesign | Done |
 | Heat scores + applicant counts | Still 0 — synthetic compute job needed |
-| Sidebar IA redesign | Not done |
+| Live BYOK draft verification | Still needs final end-to-end validation |
 
 ---
 
@@ -150,17 +156,16 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 ## Immediate priorities (launch roadmap)
 
-1. **Question Bank UI (`/bank`)** — biggest web-app gap; 225 scored questions exist, drip mechanic designed, only UI missing
-2. **BYOK `/profile/integrations` UI** — schema in migration 012, UI not built; P0 because user can't subsidize AI calls at scale
-3. **Workspace index bug** — being fixed; querying `user_applications` table
-4. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
-5. **Sidebar IA redesign** — applications list below divider, sorted by status tags
-6. **Seed real deadlines + urgency sort**
-7. **Program detail TL;DR / pros & cons block**
-8. **Build proper user profile split**
-9. **Stripe integration** — Phase 3
+1. **Live BYOK draft verification** — save a real provider key, draft from workspace, confirm live end-to-end success
+2. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
+3. **Copy button on answer boxes** — workspace and bank UX polish
+4. **OTP 6-digit login path** — support code-entry flow in addition to magic link click
+5. **Seed real deadlines + urgency sort**
+6. **Program detail TL;DR / pros & cons block**
+7. **Cohort context polish** — ensure workspace/header consistently shows cohort metadata
+8. **Stripe integration** — Phase 3
 
-## What landed during the 2026-05-10 smoke session
+## What landed during the 2026-05-10 hardening burst
 
 - `migrations/009_fix_auth_trigger_search_path.sql` — fixed Supabase auth signup
 - `app/app/auth/callback/route.ts` — moved out of `(auth)` route group
@@ -170,8 +175,10 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `app/app/(app)/layout.tsx` — reverted experimental dynamic export (cookies trigger dynamic on their own)
 - `app/package.json` — bumped Next.js 14.2.0 → 14.2.35 (CVE chain + dev-mode regressions)
 - `app/app/api/draft/route.ts` — hosted draft metering through `ai_draft_runs`
-- `app/app/api/draft/route.ts` — hosted draft fail-closed policy until explicitly enabled
-- `migrations/010_launch_hardening.sql` — BYOK metadata + stress-test persistence
+- `app/app/api/draft/route.ts` — BYOK-first routing and provider-required failure path
+- `migrations/012_launch_hardening.sql` — BYOK metadata + stress-test persistence
+- `migrations/014_question_bank_drip.sql` — Question Bank unlocks + daily drip
+- `migrations/015_byok_key_storage.sql` — encrypted BYOK key storage column
 - `seed/01_deadline_updates_template.sql` — source-verified deadline update helper
 - `docs/09_launch_checklist.md` through `docs/13_smtp_launch_handoff.md` — Milestone 3 handoff docs
 - `VISION.md` — new product vision doc

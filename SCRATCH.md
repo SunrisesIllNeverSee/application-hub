@@ -8,40 +8,30 @@
 
 ## For Codex — most recent context
 
-_Updated 2026-05-10 after live deployment smoke test and Milestone 3 review._
+_Updated 2026-05-10 after BYOK, Question Bank, and sidebar work landed._
 
-If you're picking up after Cowork's 2026-05-10 session, read these in order:
+If you're picking up after the recent launch hardening burst, read these in order:
 
-1. **`AGENTS.md`** — refreshed ownership table, includes new files: ROADMAP.md, VISION.md, SCRATCH.md
-2. **`ROADMAP.md`** — canonical priority-ordered list of work. P0 = Drip mechanic, Question Bank UI, **BYOK** (now P0 above /api/draft rate-limiting because user can't subsidize AI calls), `/api/draft` rate-limiting. P1 = home dashboard, stress-testing groundwork, responsive layout (mobile drawer toggle still pending), real deadlines, program TL;DR, user profile split, custom SMTP (your lane). P2/P3 below.
-3. **`VISION.md`** — 551-line product vision. Key recent additions: positioning ("infrastructure for the application graph, not an AI writer"), levelling story (novice vs seasoned-funded founder, stress testing levels presentation skill), BYOK as cost reality (Free tier requires user keys, no platform fallback), MoatScore framework status (waiting on user spec), home dashboard mockup, integrations roadmap (4 tiers).
-4. **`TASKS.md`** — finer-grained backlog with 16+ smoke-test follow-ups.
-5. **`STATUS.md`** — updated to reflect live deployment, SMTP confirmed, smoke test done, Milestone 3 gap list.
+1. **`AGENTS.md`** — refreshed ownership table and current launch framing
+2. **`STATUS.md`** — shortest source of truth for what is actually shipped now
+3. **`ROADMAP.md`** — what is left after MVP pieces landed
+4. **`TASKS.md`** — concrete remaining bugs and polish items
 
 ### Open items in your lane (current priorities)
 
-- **Question Bank `/bank` route UI** — P0, biggest missing piece. 225 scored questions exist in `archived_questions`. Drip mechanic is designed (see ROADMAP + VISION). The database, scoring, and MCP tools are all live. Only the UI is missing. Start here.
-- **Workspace index bug** — workspace page is querying `user_applications` table; being fixed by Cowork agent. Do not touch `app/app/(app)/workspace/` until released.
-- **Migration 013 cohort context** — adds `cohort_name`, `program_start_date`, `cohort_size` columns to `programs` table. Being applied in this commit. Apply to production Supabase when ready.
-- **BYOK `/profile/integrations` UI** — P0. Schema is in `migrations/012_launch_hardening.sql` (`user_integrations` table). The route `/profile/integrations` does not exist yet. Needs provider selector, key entry, and validation flow.
-- **Sidebar IA redesign** — applications list should appear below a divider in the sidebar, sorted by status tags (active, submitted, draft). Current sidebar is flat.
-- **Heat scores + applicant counts** — all programs show 0 for `heat_score` and `applicant_count`. A synthetic compute job or manual seed is needed. This is a polish item but affects perceived quality of the hub directory.
+- **Live BYOK draft verification** — verify `/profile/integrations` → save real Anthropic key → workspace Draft with AI → `ai_draft_runs.integration_type = byok_anthropic`
+- **Heat scores + applicant counts** — still 0 across the directory; synthetic compute or seeded fallback needed
+- **Copy button on answer boxes** — subtle but high-value founder UX
+- **OTP 6-digit login path** — support code-entry flow in addition to magic-link click
+- **Docs / architecture hygiene** — keep coordination files aligned as launch state changes
 
-What landed since your last commit (`ea820dc`):
-- `9d40f5d` — DNA % display + sidebar active-state fixes
-- `69f387d` — dev-only password sign-in escape hatch
-- `8184a19` — package-lock resync
-- `c710d06` — VISION.md created
-- `59d686c` — TASKS/STATUS/AGENTS smoke-test capture
-- `4e5c7a2` — Question Bank framing refinement
-- `6ca8cd4` — SCRATCH.md introduced (this file)
-- `bd44b01` — ROADMAP.md introduced + timeline language stripped
-- `70089d3` — stress testing, BYOK, MoatScore, home dashboard, integrations captured in VISION
-- `24acbc5` — positioning reframe (infrastructure layer, not AI writer; BYOK cost reality)
-- `9d83151` — responsive layout sweep verified across mobile/tablet/desktop
-- `3e5e7a9` — Codex infra bundle: Resend SMTP guide, `hub_stress_test_answer`, `/api/draft` metering
-
-Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` while these P1 bugs are in flight (responsive sweep landed; deadlines + program TL;DR + user profile split queued). You're clear to take MCP server, deps, CI, doc-architecture work.
+Recent product work already landed:
+- Question Bank `/bank`
+- Drip mechanic via `user_question_unlocks`
+- Profile split (`about`, `answers`, `settings`, `integrations`)
+- BYOK key storage and `/api/integrations`
+- Sidebar IA redesign
+- Workspace index using `user_applications`
 
 ---
 
@@ -51,12 +41,12 @@ Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` wh
 
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
-| Codex | Stabilize coordination/docs after Milestone 2-3 changes | `SCRATCH.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` | 2026-05-10T21:38:04Z | Sync docs to latest shipped BYOK, Question Bank, sidebar, and live deployment state. |
 
 ---
 
 ## Recently released
 
+| Codex | Stabilized coordination/docs after Milestone 2-3 changes | `SCRATCH.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` | Released 2026-05-10 | Synced docs to latest shipped BYOK, Question Bank, sidebar, profile split, and workspace state. |
 | Codex | Marked cross-theme portability as a core product requirement | `README.md`, `ROADMAP.md`, `TASKS.md`, `VISION.md` | Released 2026-05-10 | Captured the importance of switching between founder, jobs, grants, and school application themes without re-architecting the core spine. |
 | Codex | BYOK/policy, deadlines helper, stress persistence, launch checklist, SMTP handoff docs | `migrations/010_launch_hardening.sql`, `docs/09_launch_checklist.md`, `docs/10_byok_and_draft_policy.md`, `docs/11_deadline_seed_handoff.md`, `docs/12_stress_test_persistence.md`, `docs/13_smtp_launch_handoff.md`, `seed/01_deadline_updates_template.sql`, `app/app/api/draft/route.ts` | Released 2026-05-10 | Route now fails closed unless hosted drafts are explicitly enabled; app/MCP checks passed. |
 | Codex | Refined launch roadmap/tasks and added archive lane | `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/archive/` | Released 2026-05-10 | External launch roadmap merged with current repo truth; legacy planning docs archived. |

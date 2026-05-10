@@ -37,7 +37,7 @@ Next.js app (app/)                 ← user-facing product, live-data wired
 
 | Component | Status | Owner |
 |---|---|---|
-| Schema + migrations 001–010 | ✅ Done (010 = launch hardening contracts, 2026-05-10) | Cowork/Codex |
+| Schema + migrations 001–015 | ✅ Done (015 = BYOK key storage, 2026-05-10) | Cowork/Codex |
 | MCP server (20 tools) | ✅ Done | — |
 | 30 programs seeded to Supabase | ✅ Done | Cowork |
 | Intelligence layer (significance + DNA) | ✅ Done | Cowork |
@@ -51,8 +51,10 @@ Next.js app (app/)                 ← user-facing product, live-data wired
 | CI workflow | ✅ Done | Codex |
 | Next.js bumped to 14.2.35 | ✅ Done | Cowork |
 | Hosted draft metering | ✅ Done | Codex |
-| Hosted draft fail-closed policy | ✅ Done | Codex |
-| BYOK/stress-test schema contracts | ✅ Done | Codex |
+| BYOK integrations UI + route | ✅ Done | Cowork/Codex |
+| Question Bank + drip mechanic | ✅ Done | Cowork |
+| Sidebar IA redesign | ✅ Done | Cowork |
+| Workspace index source-of-truth fix | ✅ Done | Cowork |
 
 ## What's open next
 
@@ -60,8 +62,8 @@ See `ROADMAP.md` for the canonical launch sequence and `TASKS.md` for implementa
 
 Current launch frame:
 1. **Milestone 1 — Ship today to power users** through MCP/web app with clear BYOK/hosted-AI caveats.
-2. **Milestone 2 — MVP**: Question Bank UI, Drip mechanic, BYOK, hosted draft policy/gating.
-3. **Milestone 3 — Polished public launch**: real deadlines, program TL;DR/pros/cons, profile split, custom SMTP, draft smoke test.
+2. **Milestone 2 — MVP**: now represented in repo. Focus is live validation and polish.
+3. **Milestone 3 — Polished public launch**: real deadlines, program TL;DR/pros/cons, live BYOK smoke test, heat/applicant polish.
 
 Cowork owns most user-facing `app/` work. Codex should prefer MCP server, CI, docs, security, metering, cron, webhook, and architecture work unless explicitly coordinating through `SCRATCH.md`.
 
@@ -116,7 +118,7 @@ This prevents the duplicate work we hit on 2026-05-10 (both agents independently
 
 - **Project ID**: `betcyfbzsgusaghriptz`
 - **URL**: `https://betcyfbzsgusaghriptz.supabase.co`
-- **Migrations applied**: 001–010 ✅
+- **Migrations applied**: 001–015 ✅
 - **Programs seeded**: 30 ✅
 - **Intelligence layer**: live ✅ (225 questions scored, DNA weights computed)
 

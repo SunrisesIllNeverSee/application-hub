@@ -12,10 +12,10 @@
 
 Application Hub already has a shippable spine:
 
-- **Database**: Supabase migrations `001` through `010`, 30 programs, 225 archived questions.
+- **Database**: Supabase migrations `001` through `015`, 30 programs, 225 archived questions.
 - **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
 - **MCP server**: 20 tools, 7 resources, 3 prompts. Power-user path is real today.
-- **Next.js app**: Hub, program detail, workspace, profile/answer bank, live Supabase wiring.
+- **Next.js app**: Hub, timeline-in-Hub, Question Bank, workspace, profile split, BYOK integrations, live Supabase wiring.
 - **Auth**: magic links plus a dev-only password escape hatch.
 - **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, and fails closed unless explicitly enabled.
 - **RNS direction**: additive intelligence layer above the current Supabase/MCP/app spine, not a launch blocker.
@@ -24,7 +24,7 @@ Application Hub already has a shippable spine:
 The refined external roadmap was built outside the repo, so keep these corrections in mind:
 
 - MCP is **20 tools**, not 19.
-- Rate logging for hosted `/api/draft` is already implemented; BYOK and user-facing provider policy are still open.
+- Rate logging for hosted `/api/draft` is already implemented, and BYOK routing is now in repo.
 - Responsive layout has had a first sweep committed; continue testing real devices, but do not treat it as untouched.
 - Custom SMTP is documented; remaining work is manual Resend domain verification and Supabase dashboard configuration.
 
@@ -32,7 +32,7 @@ The refined external roadmap was built outside the repo, so keep these correctio
 
 ## Launch Milestone 1 — Ship Today
 
-**Verdict**: Ship to 10–20 power users today through MCP and the web app, with clear expectations.
+**Verdict**: Soft launch is not the blocker anymore. The product now has the MVP spine; what remains is polish and live validation.
 
 Best users for this milestone:
 
@@ -50,33 +50,32 @@ What is already good enough:
 
 Launch caveats:
 
-- New web users can still land on a thin/empty Answer Bank.
-- `/bank` does not exist yet.
-- BYOK is not built, so platform-paid hosted drafts need strict policy.
-- Custom SMTP is not configured in Supabase yet, though Supabase default email works for low-volume testing.
+- Heat/applicant signals are still thin.
+- Program urgency and cohort context still need more polish.
+- Live BYOK drafting should be validated end to end on deployed app.
 
 ---
 
 ## Launch Milestone 2 — MVP
 
-**Verdict**: This is the real 100-founder launch point.
+**Verdict**: This milestone is now represented in the repo.
 
 These are the minimum additions that make the app work for non-technical founders:
 
-- [ ] **Question Bank UI (`/bank`)** — *Cowork*
-  Daily landing surface for unlocked questions, locked previews, and high-significance answer prompts. Uses existing question archive/scoring.
+- [x] **Question Bank UI (`/bank`)** — *Cowork*
+  Daily landing surface for unlocked questions, locked previews, and high-significance answer prompts is built.
 
-- [ ] **Answer Bank drip mechanic** — *Cowork*
-  New `user_question_unlocks` flow. Pre-load 5–10 high-signal questions for new users, then drip 2–5/day for free users. Pro unlocks the full bank.
+- [x] **Answer Bank drip mechanic** — *Cowork*
+  `user_question_unlocks` flow is in place via migration `014`; signup seeding and daily drip now back the Question Bank.
 
-- [ ] **BYOK AI provider integration** — *Cowork + Codex*
-  `user_integrations` schema contract exists in migration `010`. Remaining work: `/profile/integrations` UI, server-side secret storage route, and `/api/draft` routing that prefers the user's key.
+- [x] **BYOK AI provider integration** — *Cowork + Codex*
+  `/profile/integrations`, encrypted key storage, and BYOK-first `/api/draft` routing are now in repo. Remaining work is live runtime verification.
 
 - [x] **Hosted draft rate logging** — *Codex*
   `/api/draft` inserts successful Anthropic calls into `ai_draft_runs`; the trigger updates `ai_usage`.
 
-- [ ] **Hosted draft UI gating** — *Cowork + Codex*
-  Backend now fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true`. Remaining work: surface provider status, remaining draft count, and BYOK CTA in the UI.
+- [ ] **Hosted draft UX polish** — *Cowork + Codex*
+  Backend now supports BYOK-first routing and clean provider-required failures. Remaining work: improve runtime messaging around provider state and draft limits.
 
 ---
 
@@ -93,14 +92,14 @@ These are the minimum additions that make the app work for non-technical founder
 - [ ] **Program detail TL;DR / pros / cons / best-for block** — *Cowork*
   Program pages need scannable judgment, not only long descriptions. Static seed columns ship faster; AI generation can come later.
 
-- [ ] **Proper user profile split** — *Cowork*
-  Split current `/profile` Answer Bank into `/profile/answers`, `/profile/about`, `/profile/settings`, and `/profile/integrations`.
+- [x] **Proper user profile split** — *Cowork*
+  `/profile/answers`, `/profile/about`, `/profile/settings`, and `/profile/integrations` now exist.
 
-- [ ] **Custom SMTP through Resend** — *Deric/Codex docs support*
-  Setup guide exists at `docs/08_resend_smtp_setup.md`; handoff checklist exists at `docs/13_smtp_launch_handoff.md`. Remaining work: verify domain in Resend, enter SMTP settings in Supabase Auth, run magic-link tests.
+- [x] **Custom SMTP through Resend** — *Deric/Codex docs support*
+  SMTP is documented and wired; live auth mail flow has already been smoke-tested.
 
 - [ ] **AI draft end-to-end smoke test** — *Cowork*
-  With a valid Anthropic key/session, verify workspace button → `/api/draft` → response inserted into the editor → usage row logged.
+  Final check: verify live BYOK flow from `/profile/integrations` through Draft with AI on deployed app.
 
 ---
 
@@ -113,7 +112,7 @@ These are not launch blockers, but they are still part of the current roadmap an
 - [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
 - [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.
 - [ ] **Heat scores + applicant counts** — Replace zeros with synthetic MVP heat from prestige/cohort exclusivity, then real signals later.
-- [ ] **Workspace discoverability** — Align “Workspace” vs. “My Applications” naming across sidebar/docs/routes.
+- [x] **Workspace discoverability / sidebar IA** — Sidebar now carries the founder workflow more clearly, including My Applications below the main nav. Further naming polish can happen later.
 - [ ] **Dev-only password sign-in decision** — Gate behind development/feature flag or remove before public launch once SMTP is reliable.
 - [ ] **Residual dependency audit** — Next 14.2.35 is in place; remaining advisories should be handled as a deliberate upgrade path, not blind `--force`.
 

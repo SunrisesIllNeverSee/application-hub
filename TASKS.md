@@ -8,13 +8,13 @@ This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` 
 
 ---
 
-## Smoke Test Findings — 2026-05-10 Live Deployment
+## Live State
 
-App is live at `https://application-hub-chi.vercel.app`. Migrations 010/011/012 applied, Resend SMTP wired, user profiles backfilled. Full smoke test completed. Issues and decisions captured below.
+App is live at `https://application-hub-chi.vercel.app`. The repo now includes migrations through `015`, Question Bank, drip mechanic, profile split, BYOK integrations, and sidebar IA updates. Remaining work is polish, runtime validation, and quality of signal.
 
 ### Bugs to fix
 
-- [ ] **Workspace index doesn't show saved apps until re-visited** — `/workspace` uses `user_program_fit` as proxy for "started". Now that `user_applications` is being written, the index should query that directly.
+- [x] **Workspace index source-of-truth fix** — `/workspace` now queries `user_applications` directly instead of using `user_program_fit` as a proxy.
 
 - [ ] **Copy button on answer boxes** — every answer in Bank and workspace needs a clipboard icon. Inline or subtle popup at end of text. Founders need quick copy for pasting into actual application portals.
 
@@ -24,13 +24,13 @@ App is live at `https://application-hub-chi.vercel.app`. Migrations 010/011/012 
 
 ### IA decisions made
 
-- [ ] **Timeline → fold into Hub as view tab** *(sidebar placeholder done)* — Timeline is redundant standalone. Becomes a toggle/tab within `/hub`. Route lives on, sidebar entry removed.
+- [x] **Timeline → fold into Hub as view tab** — Timeline remains as a route, but sidebar navigation has been folded back into the main Hub flow.
 
 - [ ] **Answer Bank and Profile are fully separate** — Answer Bank = user's ammunition/memory (what they've written). Profile = who they are (metadata, stage, company). Different routes, different jobs, different UI.
 
-- [ ] **Sidebar IA redesign** — Target: Hub / Bank / Profile at top, then a divider, then user's applications list sorted by status tags (todo / started / done). LLM-interface pattern. Applications are the "chat history."
+- [x] **Sidebar IA redesign** — Hub / Bank / Answer Bank / Profile at top, then a divider, then user's applications list sorted by status.
 
-- [ ] **Question Bank (`/bank`) — still not built** — P0 per roadmap. 225 scored questions exist. Drip mechanic designed. UI surface missing. Biggest visible gap.
+- [x] **Question Bank (`/bank`)** — built. Uses `user_question_unlocks`, significance ordering, locked previews, and daily drip.
 
 - [ ] **Companies/Funders index** — users want an org-level index (YC, Techstars, NEA) separate from program cycles. Needs three-layer schema. P2.
 
@@ -68,11 +68,11 @@ These are the facts that make a soft launch possible now.
 
 This is the 100-founder launch bar.
 
-### [ ] Question Bank UI (`/bank`)
+### [x] Question Bank UI (`/bank`)
 **Owner**: Cowork
 **Priority**: P0
 
-Build the missing Next.js surface for the question archive. This should become the daily landing area for new users.
+Built as the daily landing area for unlocked questions, locked previews, and answer editing.
 
 Implementation:
 - `/bank` route
@@ -82,11 +82,11 @@ Implementation:
 - Calls existing query/MCP pattern behind `hub_get_universal_questions` or direct Supabase equivalent
 - Empty state that makes the archive valuable immediately
 
-### [ ] Answer Bank drip mechanic
+### [x] Answer Bank drip mechanic
 **Owner**: Cowork
 **Priority**: P0
 
-Pre-load 5–10 high-signal questions on signup, then drip 2–5/day for free users. Pro unlocks the full question bank.
+Implemented through migration `014_question_bank_drip.sql`. Signup seeding and daily drip are now in place.
 
 Implementation:
 - New table `user_question_unlocks`
@@ -102,19 +102,22 @@ Why this matters:
 - Makes the user feel their answer bank is accumulating value
 - Creates a clean Pro upgrade hook
 
-### [ ] BYOK AI provider integration
+### [x] BYOK AI provider integration
 **Owner**: Cowork + Codex
 **Priority**: P0
 
-Users bring their own AI keys so Deric is not subsidizing every draft.
+Users can now connect their own provider keys through `/profile/integrations`, and `/api/draft` routes BYOK-first.
 
 Implementation:
-- `user_integrations` metadata table exists in `migrations/010_launch_hardening.sql`
-- `/profile/integrations` UI
-- Server-side secret storage for Anthropic/OpenAI/Google keys
-- `/api/draft` routing prefers user key
-- Platform pooled key policy for Free/Pro/Admin decided explicitly
-- UI shows provider status and any draft limits
+- `user_integrations` exists in migrations `012` and `015`
+- `/profile/integrations` UI exists
+- AES-256-GCM server-side encryption is in place
+- `/api/draft` prefers the user's Anthropic key
+
+Remaining runtime check:
+- Save a real key on deployed app
+- Draft successfully from workspace
+- Confirm `ai_draft_runs.integration_type = byok_anthropic`
 
 ### [x] Hosted draft rate logging
 **Owner**: Codex
@@ -123,22 +126,16 @@ Implementation:
 
 `POST /api/draft` now logs successful hosted Anthropic calls into `ai_draft_runs`; the database trigger updates `ai_usage`.
 
-### [ ] Hosted draft UI policy/gating
+### [ ] Hosted draft UX polish
 **Owner**: Cowork + Codex
 **Priority**: P0
 
-Rate logging exists, and the route now fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true`. The product still needs provider UI and clear user-facing policy.
+Rate logging exists, BYOK routing exists, and the route fails cleanly when no provider is available. The remaining work is clearer user-facing messaging and draft-limit display.
 
 Options to settle:
-- Free users must BYOK
-- Free users get a tiny hosted trial
-- Pro users get pooled fallback
-- Hosted route is disabled until BYOK exists
-
-UI needs:
-- Drafts remaining
-- Provider source: user key vs. platform key
-- Clear error state when no provider is available
+- Provider status in workspace
+- Drafts remaining when platform fallback is ever enabled
+- Clear “connect provider” CTA from failed draft state
 
 ---
 
@@ -185,39 +182,33 @@ Program pages need judgment. Add scannable context:
 
 Static seed columns ship faster. AI-generated summaries can follow later.
 
-### [ ] Proper user profile split
+### [x] Proper user profile split
 **Owner**: Cowork
 **Priority**: P1
 
-`/profile` is currently the Answer Bank. Split it into:
+Built as:
 - `/profile/answers`
 - `/profile/about`
 - `/profile/settings`
 - `/profile/integrations`
 
-This unblocks better fit scoring, smarter drip, Founder Ranking, BYOK, and future billing.
+This now unblocks better fit scoring, smarter drip, BYOK, and future billing.
 
-### [ ] Custom SMTP completion
+### [x] Custom SMTP completion
 **Owner**: Deric + Codex support
 **Priority**: P1
 
-Documentation is done at `docs/08_resend_smtp_setup.md`. Remaining work is manual:
-- Verify sending domain in Resend
-- Enter SMTP credentials in Supabase Auth
-- Confirm `/auth/callback` magic links work
-- Test signup, login, resend, and rate behavior
+Documented, configured, and confirmed during live smoke test.
 
-Short handoff: `docs/13_smtp_launch_handoff.md`.
-
-### [ ] AI draft UI smoke test
+### [ ] AI draft live smoke test
 **Owner**: Cowork
 **Priority**: P1
 
-With a valid authenticated session and valid Anthropic key:
+With a valid authenticated session and a real BYOK Anthropic key:
 - Click workspace "Draft with AI"
-- Confirm `POST /api/draft` returns text
+- Confirm `POST /api/draft` returns text using the saved BYOK key
 - Confirm text inserts into editor
-- Confirm `ai_draft_runs` row exists
+- Confirm `ai_draft_runs` row exists with `integration_type = byok_anthropic`
 - Confirm `ai_usage` updates via trigger
 
 ---
@@ -241,7 +232,7 @@ Sidebar target: Today / Hub / Bank / Apps or Workspace / Profile.
 **Owner**: Cowork + Codex
 **Priority**: P2
 
-MCP groundwork exists through `hub_stress_test_answer`, and persistence exists in `migrations/010_launch_hardening.sql`. Next layer:
+MCP groundwork exists through `hub_stress_test_answer`, and persistence exists in `migrations/012_launch_hardening.sql`. Next layer:
 - Quota policy
 - UI entry point from Answer Bank/workspace
 - Later: BYOK/LLM-backed RNS-style challenge generation
@@ -384,7 +375,7 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 ## Done
 
 - [x] v3 schema design — global question archive as core asset
-- [x] Supabase migrations 001–010
+- [x] Supabase migrations 001–015
 - [x] MCP server — 20 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README for Claude Desktop, Cursor, Windsurf
 - [x] CI workflow for MCP server and Next.js app
@@ -396,13 +387,20 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 - [x] Next.js app scaffold
 - [x] Hub UI
 - [x] Hub Timeline
+- [x] Question Bank `/bank`
+- [x] Drip mechanic via `user_question_unlocks`
 - [x] Program detail route
 - [x] Application Workspace
 - [x] Answer History
 - [x] Answer Bank/profile surface
+- [x] Profile split (`about`, `answers`, `settings`, `integrations`)
+- [x] Sidebar IA redesign
+- [x] Workspace index uses `user_applications`
 - [x] Auth callback moved to real `/auth/callback`
 - [x] Migration 009 auth trigger search_path fix
-- [x] Migration 010 launch hardening: BYOK metadata + answer stress-test persistence
+- [x] Migration 012 launch hardening: BYOK metadata + answer stress-test persistence
+- [x] Migration 014 question bank drip mechanic
+- [x] Migration 015 BYOK encrypted key storage column
 - [x] Next.js 14.2.35 bump
 - [x] Agent-side review/comment contract: `docs/07_agent_review_contract.md`
 - [x] MCP `hub_get_answer_review_context`
@@ -410,6 +408,7 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 - [x] Resend/Supabase SMTP guide: `docs/08_resend_smtp_setup.md`
 - [x] Hosted `/api/draft` metering through `ai_draft_runs`
 - [x] Hosted `/api/draft` fail-closed policy
+- [x] BYOK `/api/draft` routing and `/profile/integrations`
 - [x] Launch checklist: `docs/09_launch_checklist.md`
 - [x] BYOK/draft policy doc: `docs/10_byok_and_draft_policy.md`
 - [x] Deadline seed helper: `seed/01_deadline_updates_template.sql`
