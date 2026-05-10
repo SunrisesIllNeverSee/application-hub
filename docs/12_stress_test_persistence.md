@@ -1,6 +1,6 @@
 # Stress-Test Persistence
 
-`hub_stress_test_answer` already provides deterministic answer review context. Migration `010_launch_hardening.sql` adds the persistence table for saving those runs.
+`hub_stress_test_answer` already provides deterministic answer review context. Migration `012_launch_hardening.sql` adds the persistence table for saving those runs.
 
 ## Table
 

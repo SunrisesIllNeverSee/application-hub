@@ -29,7 +29,7 @@ Launch recommendation:
 
 ## Migration 010 Contract
 
-`migrations/010_launch_hardening.sql` adds:
+`migrations/012_launch_hardening.sql` adds:
 
 - `user_integrations`: provider metadata for BYOK.
 - `answer_stress_tests`: persisted stress-test/review outputs.

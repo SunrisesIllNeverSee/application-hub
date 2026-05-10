@@ -53,7 +53,7 @@ application-hub/
 │   ├── 007_monetization.sql
 │   ├── 008_intelligence_layer_v2.sql   ← adds program_dna, user_program_fit, RPCs
 │   ├── 009_fix_auth_trigger_search_path.sql ← fixes magic-link signup trigger search_path
-│   └── 010_launch_hardening.sql        ← BYOK metadata + answer stress-test persistence
+│   └── 012_launch_hardening.sql        ← BYOK metadata + answer stress-test persistence
 │
 ├── application-hub-mcp-server/        ← TypeScript MCP server (20 tools, 7 resources, 3 prompts)
 │   ├── src/

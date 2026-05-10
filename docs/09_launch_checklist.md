@@ -81,7 +81,7 @@ Ship/no-ship:
 
 Minimum before enabling user-paid AI:
 
-- Migration `010_launch_hardening.sql` applied.
+- Migration `012_launch_hardening.sql` applied.
 - `user_integrations` rows are metadata only; raw keys are stored in a server-side secret store.
 - `/profile/integrations` can create/update provider metadata.
 - A server route can store/verify a user key without exposing it client-side.
