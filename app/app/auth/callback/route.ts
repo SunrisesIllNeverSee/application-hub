@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
@@ -7,9 +8,12 @@ type CookieToSet = { name: string; value: string; options: CookieOptions }
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const tokenHash = requestUrl.searchParams.get('token_hash')
+  const type = requestUrl.searchParams.get('type') as EmailOtpType | null
   const next = requestUrl.searchParams.get('next') ?? '/hub'
+  const safeNext = next.startsWith('/') ? next : '/hub'
 
-  if (code) {
+  if (code || (tokenHash && type)) {
     const cookieStore = cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,10 +36,15 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = code
+      ? await supabase.auth.exchangeCodeForSession(code)
+      : await supabase.auth.verifyOtp({
+          token_hash: tokenHash!,
+          type: type!,
+        })
 
     if (!error) {
-      return NextResponse.redirect(new URL(next, requestUrl.origin))
+      return NextResponse.redirect(new URL(safeNext, requestUrl.origin))
     }
   }
 
