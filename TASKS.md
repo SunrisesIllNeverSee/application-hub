@@ -58,7 +58,7 @@ These are the facts that make a soft launch possible now.
 
 - Confirm which users are comfortable with MCP/Cursor/Claude/Windsurf
 - Provide MCP setup instructions from `application-hub-mcp-server/README.md`
-- Explain that BYOK is not in the web app yet
+- Explain that web drafting is BYOK-first and that users should connect their provider in `/profile/integrations`
 - Decide whether hosted AI drafting is enabled, admin-only, or disabled until BYOK
 - Collect first feedback on program usefulness, missing programs, and answer-bank workflow
 
@@ -156,7 +156,7 @@ Verify mobile/tablet/desktop routes:
 - `/hub/[slug]`
 - `/workspace/[program_id]`
 - `/profile`
-- future `/bank`
+- `/bank`
 
 ### [ ] Seed real deadlines + urgency sort
 **Owner**: Cowork
