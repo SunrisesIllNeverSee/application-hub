@@ -1,10 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,6 +34,29 @@ export default function LoginPage() {
       setError(error.message)
     } else {
       setSubmitted(true)
+    }
+  }
+
+  async function handlePasswordSignIn(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email.trim() || !password) return
+
+    setLoading(true)
+    setError(null)
+
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    })
+
+    setLoading(false)
+
+    if (error) {
+      setError(error.message)
+    } else {
+      router.push('/hub')
+      router.refresh()
     }
   }
 
@@ -165,6 +191,34 @@ export default function LoginPage() {
                   )}
                 </button>
               </form>
+
+              {/* Dev/testing path — password sign-in. Remove or gate before launch. */}
+              <div className="mt-4 pt-4 border-t border-neutral-800">
+                <form onSubmit={handlePasswordSignIn} className="space-y-3">
+                  <div>
+                    <label htmlFor="password" className="label text-neutral-300 text-xs">
+                      Or sign in with password (dev only)
+                    </label>
+                    <input
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Password"
+                      className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500
+                        focus:ring-brand-500"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loading || !email.trim() || !password}
+                    className="w-full btn-secondary py-2 text-sm"
+                  >
+                    Sign in with password
+                  </button>
+                </form>
+              </div>
 
               <p className="mt-6 text-xs text-neutral-500 text-center">
                 By signing in you agree to our{' '}
