@@ -32,15 +32,29 @@ Next.js app (app/)                 ← user-facing product (Phase 2)
 
 | Component | Status | Owner |
 |---|---|---|
-| Schema + migrations 001–009 | ✅ Done | — |
+| Schema + migrations 001–009 | ✅ Done (009 = auth trigger fix, 2026-05-10) | Cowork (009) |
 | MCP server (19 tools) | ✅ Done | — |
 | 30 programs seeded to Supabase | ✅ Done | Cowork |
 | Intelligence layer (significance + DNA) | ✅ Done | Cowork |
 | Next.js app scaffold | ✅ Done | Codex |
-| Hub UI (live data) | ✅ Build verified | Cowork |
-| Application Workspace (live data) | ✅ Build verified | Cowork |
-| Wire app to live Supabase data | ✅ Build verified | Cowork |
+| Hub UI (live data) | ✅ Smoke-tested 2026-05-10 | Cowork |
+| Application Workspace (live data) | ✅ Smoke-tested 2026-05-10 | Cowork |
+| Auth flow (magic link + dev password) | ✅ Working | Cowork |
+| `/auth/callback` route fix | ✅ Done | Cowork |
+| DNA % display bug | ✅ Fixed | Cowork |
+| Sidebar active-state bug | ✅ Fixed | Cowork |
 | CI workflow | ✅ Done | Codex |
+| Next.js bumped to 14.2.35 | ✅ Done | Cowork |
+
+## What's open for Codex
+
+See `TASKS.md` "Tonight's follow-ups" — but specifically Codex's lane:
+
+1. **P1 — Agent-side review/comment contract** (assigned to Codex + Deric in commit `d5c2587`)
+2. **Custom SMTP setup** — Resend integration, Supabase auth Email config
+3. **Doc sync** — STATUS.md / ARCHITECTURE.md were updated by Cowork tonight; if Codex wants to refine them, coordinate via commit messages
+
+Cowork is going to attack the P1 bugs (responsive layout, Question Bank UI, real deadlines, program TL;DR). Codex shouldn't touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` until those land — to avoid merge conflicts.
 
 ---
 

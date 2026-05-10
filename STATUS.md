@@ -103,10 +103,26 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 ---
 
-## Immediate priorities
+## Immediate priorities (post 2026-05-10 smoke test)
 
-1. Continue smoke-testing live Supabase app routes in browser.
-2. Keep architecture/status docs synced as schema-facing column names settle.
-3. Expand MCP app-support tools only when they remove server-side app duplication.
-4. Smoke-test `POST /api/draft` with a real authenticated session and valid Anthropic key.
-5. Define the agent-side review/comment contract for saved answers before embedding RNS review directly into the app UI.
+1. **Build the Question Bank UI** — biggest gap surfaced by smoke test; merges with the Drip mechanic
+2. **Fix responsive layout** — sidebar/main padding/program-detail squeeze at <1024px viewports
+3. **Seed real deadlines** — every program currently shows "Rolling" because seed lacks dates
+4. **Program detail TL;DR / pros & cons block** — user feedback: pages are too blob-y
+5. **Build proper user profile section** — `/profile` is currently the Answer Bank, no actual profile page
+6. **Set up custom SMTP** (Resend/SendGrid) — Supabase free tier is rate-limited and unreliable
+7. **Define agent-side review/comment contract** for saved answers (Codex's existing P1)
+8. **Smoke-test `POST /api/draft`** with valid Anthropic key (deferred — user doesn't have one yet)
+
+## What landed during the 2026-05-10 smoke session
+
+- `migrations/009_fix_auth_trigger_search_path.sql` — fixed Supabase auth signup
+- `app/app/auth/callback/route.ts` — moved out of `(auth)` route group
+- `app/components/ThemeBar.tsx` — fixed DNA % display (was showing 2290%)
+- `app/components/Sidebar.tsx` — fixed active-state matching for child routes
+- `app/app/(auth)/login/page.tsx` — added dev-only password sign-in escape hatch
+- `app/app/(app)/layout.tsx` — reverted experimental dynamic export (cookies trigger dynamic on their own)
+- `app/package.json` — bumped Next.js 14.2.0 → 14.2.35 (CVE chain + dev-mode regressions)
+- `VISION.md` — new product vision doc
+- `TASKS.md` — captured 16 follow-ups from smoke test
+- `app/.env.local` (worktree + main) — populated with Supabase URL + publishable key
