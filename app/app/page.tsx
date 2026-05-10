@@ -56,7 +56,7 @@ export default async function RootPage() {
               Connect via MCP
             </a>
           </div>
-          <p className="mt-5 text-xs text-neutral-500">
+          <p className="mt-5 text-xs text-neutral-400">
             Free tier · 10 AI drafts/month · No credit card
           </p>
 
@@ -99,15 +99,15 @@ export default async function RootPage() {
                 </div>
               </div>
             </div>
-            <p className="mt-3 text-xs text-neutral-500">Live preview · Data from the production archive</p>
+            <p className="mt-3 text-xs text-neutral-400">Live preview · Data from the production archive</p>
           </div>
         </section>
 
         <section className="max-w-5xl mx-auto px-6 pb-16">
-          <p className="text-center text-xs uppercase tracking-wider text-neutral-500 mb-5">Indexed across</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-neutral-400">
+          <p className="text-center text-xs uppercase tracking-wider text-neutral-400 mb-5">Indexed across</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-neutral-300">
             {['Y Combinator', 'Techstars', 'a16z', 'SBIR', 'NSF', 'MassChallenge', 'Echoing Green', 'First Round', 'Pear VC', 'Hustle Fund', '+ 20 more'].map((p, i) => (
-              <span key={p} className={i === 10 ? 'text-neutral-500 font-mono text-xs' : 'hover:text-neutral-200 transition-colors'}>
+              <span key={p} className={i === 10 ? 'text-neutral-400 font-mono text-xs' : 'hover:text-neutral-100 transition-colors'}>
                 {p}
               </span>
             ))}
@@ -400,7 +400,7 @@ export default async function RootPage() {
           </div>
         </div>
         <div className="border-t border-neutral-800/60">
-          <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between text-xs text-neutral-500">
+          <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between text-xs text-neutral-400">
             <p>© 2026 Ello Cello LLC. All rights reserved.</p>
             <p>Built in the open · <Link href="/login" className="hover:text-neutral-200 transition-colors">Sign in →</Link></p>
           </div>
