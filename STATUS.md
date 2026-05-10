@@ -16,7 +16,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `008` are documented as the canonical migration chain.
+- Migrations `001` through `009` are documented as the canonical migration chain.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -26,13 +26,14 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `user_program_fit`
   - pgvector matching RPC
   - nightly cron refresh jobs
-- The current strategy is to keep migrations `001` through `008` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
+- `migrations/009_fix_auth_trigger_search_path.sql` is present. Cowork added it during live smoke testing to pin search_path on the signup trigger chain and fix magic-link signup failures.
+- The current strategy is to keep migrations `001` through `009` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
 
 ### MCP server
 - `application-hub-mcp-server/` exists.
 - TypeScript MCP server is present.
 - Server registers:
-  - 18 tools
+  - 19 tools
   - 7 resources
   - 3 prompts
 - Supports two transports:
@@ -44,6 +45,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - New app-support tools are present:
   - `hub_get_program_by_slug`
   - `hub_save_answer`
+  - `hub_get_answer_review_context`
 
 ### Next.js app
 - `app/` exists as a Next.js App Router application.
@@ -54,6 +56,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - Workspace route
   - Profile route
   - Supabase auth callback/login scaffolding
+- Magic-link redirects now land at real path `/auth/callback`; Cowork moved the callback route out of the `(auth)` route group during live smoke testing.
 - Live Supabase data wiring is present and build-verified.
 - Hosted AI drafting is wired through `POST /api/draft`; deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
@@ -102,7 +105,7 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 ## Immediate priorities
 
-1. Smoke-test live Supabase app routes in browser.
+1. Continue smoke-testing live Supabase app routes in browser.
 2. Keep architecture/status docs synced as schema-facing column names settle.
 3. Expand MCP app-support tools only when they remove server-side app duplication.
 4. Smoke-test `POST /api/draft` with a real authenticated session and valid Anthropic key.

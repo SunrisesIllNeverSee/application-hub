@@ -21,12 +21,12 @@ The product is built around a **question archive** — every question asked by e
 | Component | Status |
 |---|---|
 | Database schema (v3) | ✅ Complete |
-| Supabase migrations | ✅ 008 migrations, apply in order |
-| MCP server (18 tools) | ✅ Complete, clean build |
+| Supabase migrations | ✅ 009 migrations, apply in order |
+| MCP server (19 tools) | ✅ Complete, clean build |
 | Seed data (30 programs) | ✅ Done |
 | Next.js app | ✅ Live data wired, build verified |
 
-The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 18 tools, 7 resources, and 3 prompts.
+The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 19 tools, 7 resources, and 3 prompts.
 
 ---
 
@@ -58,7 +58,7 @@ npm run build
 
 See `application-hub-mcp-server/README.md` for full setup, including Claude Desktop and Cursor config.
 
-**Prerequisites**: Supabase project with all 8 migrations applied.
+**Prerequisites**: Supabase project with all 9 migrations applied.
 
 ### Local Codex / Cowork connection
 

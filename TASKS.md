@@ -36,15 +36,24 @@ hub/timeline/page.tsx). Key fixes:
 **Owner**: Codex
 **Priority**: P1 — confirm workspace button calls `POST /api/draft` and inserts returned draft text
 
-### [ ] Agent-side review/comment contract
+### [x] Agent-side review/comment contract
 **Owner**: Codex + Deric
-**Priority**: P1 — document the saved-answer context needed for RNS/CIVITAE/MO§ES review workflows
+**Priority**: P1 — documented the saved-answer context needed for RNS/CIVITAE/MO§ES review workflows
 
 Keep this separate from `/api/draft`: hosted drafting creates first-pass text, while review/comments/certification can run from Deric's side through MCP/RNS workflows over saved answers.
+
+Output:
+- `docs/07_agent_review_contract.md`
+- MCP tool stub: `hub_get_answer_review_context(answer_id)`
 
 ---
 
 ## Next
+
+### [ ] Residual dependency audit follow-up
+- Next.js is bumped from `14.2.0` to `14.2.35` and builds cleanly.
+- `npm audit --omit=dev --audit-level=moderate` still reports advisories for `next`, `postcss`, and `@supabase/ssr` transitive `cookie`.
+- `npm audit fix --force` currently wants breaking upgrades (`next@16.2.6`, `@supabase/ssr@0.10.3`), so handle this as a deliberate upgrade track instead of a blind force fix.
 
 ### [ ] Significance score display
 - Show `importance_score` as star rating (1–5) on each question in Workspace
@@ -106,8 +115,8 @@ Keep this separate from `/api/draft`: hosted drafting creates first-pass text, w
 ## Done ✅
 
 - [x] v3 schema design — global question archive as core asset
-- [x] Supabase migrations 001–008 (core schema, intelligence, monetization, DNA layer)
-- [x] MCP server — 18 tools, 7 resources, 3 prompts, clean TypeScript build
+- [x] Supabase migrations 001–009 (core schema, intelligence, monetization, DNA layer, auth trigger hardening)
+- [x] MCP server — 19 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README (Claude Desktop, Cursor, Windsurf configs)
 - [x] CI workflow for MCP server (`.github/workflows/ci.yml`)
 - [x] SECURITY.md, ARCHITECTURE.md, STATUS.md docs

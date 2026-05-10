@@ -2,7 +2,7 @@
 
 Application Hub should ship as a practical product first: a question archive, answer bank, program workspace, hosted drafting, and external apply path. RNS is not a reason to restart or simplify the current repo. It is the deeper intelligence layer that can sit on top of the existing Supabase + MCP + Next.js spine.
 
-The older "migrations 001-002 only" path is useful for understanding the minimum viable mechanism, but it is outdated for this repository. Application Hub already has migrations 001-008, seeded programs, MCP tools, and live app wiring in progress. Keep that spine. Hide or defer advanced scoring in the product UI when needed, but do not roll back the architecture.
+The older "migrations 001-002 only" path is useful for understanding the minimum viable mechanism, but it is outdated for this repository. Application Hub already has migrations 001-009, seeded programs, MCP tools, and live app wiring in progress. Keep that spine. Hide or defer advanced scoring in the product UI when needed, but do not roll back the architecture.
 
 ---
 

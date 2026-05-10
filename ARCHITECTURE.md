@@ -44,6 +44,7 @@ Responsibilities:
 - AI draft usage tracking
 - Subscription-tier support
 - Scheduled recomputation jobs
+- Signup trigger search_path hardening in migration `009`
 
 The database is the source of truth. MCP tools and future UI surfaces should read from it rather than duplicating scoring logic client-side.
 
@@ -79,7 +80,7 @@ application-hub-mcp-server/src/index.ts
 
 The server registers:
 
-- 18 MCP tools
+- 19 MCP tools
 - 7 MCP resources
 - 3 MCP prompts
 
@@ -100,11 +101,14 @@ Application layer:
 - Application workspace
 - Answer bank/profile surfaces
 - Supabase auth via magic link
+- Real auth callback route at `/auth/callback`
 - Hosted draft generation through `POST /api/draft`
 
-The app is live-data wired and build-verified. Cowork owns the `app/` surface; Codex-owned parallel work should stay in CI, docs, and MCP server changes unless explicitly reassigned.
+The app is live-data wired and build-verified. During live smoke testing, Cowork moved the callback handler out of the `(auth)` route group so magic-link redirects land at the real `/auth/callback` path. Codex-owned parallel work should stay in CI, docs, and MCP server changes unless explicitly reassigned.
 
 Drafting and reviewing are intentionally separate responsibilities. The app can generate a first-pass draft through a server-side Anthropic call, then save the answer state. Review comments, RNS signal analysis, answer fidelity checks, and certification can run later from Deric's side through MCP/agent workflows using the saved question, program, draft, answer history, and confidence enum.
+
+The first MCP bridge for that review path is `hub_get_answer_review_context(answer_id)`, which returns the saved answer, canonical archived question, program usage, program DNA, answer history, and review contract slots without performing the review itself.
 
 ---
 
@@ -212,5 +216,5 @@ The safe operating assumption is:
 
 ```text
 Database + MCP intelligence layer = confirmed.
-Next.js app = present, active live-data integration in progress.
+Next.js app = present, live-data wired, smoke testing in progress.
 ```

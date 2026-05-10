@@ -28,6 +28,7 @@ import { registerFindBestPrograms } from "./tools/user/hub_find_best_programs.js
 import { registerRankMyAnswers } from "./tools/user/hub_rank_my_answers.js";
 import { registerLogDraftRun } from "./tools/user/hub_log_draft_run.js";
 import { registerSaveAnswer } from "./tools/user/hub_save_answer.js";
+import { registerGetAnswerReviewContext } from "./tools/user/hub_get_answer_review_context.js";
 
 // ── Resources ───────────────────────────────────────────────────────────────
 import { registerProgramResources } from "./resources/programs.js";
@@ -68,6 +69,7 @@ async function main() {
   registerRankMyAnswers(server);
   registerLogDraftRun(server);
   registerSaveAnswer(server);
+  registerGetAnswerReviewContext(server);
 
   // Register resources
   registerProgramResources(server);
