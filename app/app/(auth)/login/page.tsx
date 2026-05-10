@@ -11,6 +11,9 @@ export default function LoginPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [otpError, setOtpError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,6 +37,31 @@ export default function LoginPage() {
       setError(error.message)
     } else {
       setSubmitted(true)
+    }
+  }
+
+  async function handleOtpSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!otpCode.trim() || otpCode.length !== 6) return
+
+    setOtpLoading(true)
+    setOtpError(null)
+
+    const supabase = createClient()
+
+    const { error } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: otpCode.trim(),
+      type: 'email',
+    })
+
+    setOtpLoading(false)
+
+    if (error) {
+      setOtpError(error.message)
+    } else {
+      router.push('/hub')
+      router.refresh()
     }
   }
 
@@ -115,10 +143,56 @@ export default function LoginPage() {
                 <span className="text-neutral-200 font-medium">{email}</span>. Click it to sign in
                 — no password needed.
               </p>
+
+              {/* OTP entry — secondary path */}
+              <div className="mt-8 pt-6 border-t border-neutral-800 text-left">
+                <p className="text-xs text-neutral-500 text-center mb-4">
+                  Or enter the 6-digit code from your email
+                </p>
+                <form onSubmit={handleOtpSubmit} className="space-y-3">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-600
+                      focus:ring-brand-500 text-center tracking-widest text-lg font-mono"
+                    aria-label="6-digit verification code"
+                  />
+                  {otpError && (
+                    <p className="text-sm text-danger-500 bg-danger-50/10 border border-danger-500/20 rounded-lg px-3 py-2">
+                      {otpError}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={otpLoading || otpCode.length !== 6}
+                    className="w-full btn-secondary py-2 text-sm"
+                  >
+                    {otpLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Verifying…
+                      </span>
+                    ) : (
+                      'Verify code'
+                    )}
+                  </button>
+                </form>
+              </div>
+
               <button
                 onClick={() => {
                   setSubmitted(false)
                   setEmail('')
+                  setOtpCode('')
+                  setOtpError(null)
                 }}
                 className="mt-6 text-sm text-brand-400 hover:text-brand-300 transition-colors"
               >

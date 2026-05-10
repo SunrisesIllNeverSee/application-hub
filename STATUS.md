@@ -14,9 +14,14 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - Root project documentation is present.
 - Root `.gitignore` is present and excludes dependency folders, build output, `.next`, local env files, and editor artifacts.
 
+### Deployment
+- App is deployed live at `https://application-hub-chi.vercel.app`
+- Auth (magic link + password escape hatch) confirmed working on live site.
+- Smoke test completed 2026-05-10. All core routes load against live Supabase.
+
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `010` are documented as the canonical migration chain.
+- Migrations `001` through `013` are the canonical migration chain.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -27,8 +32,17 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - pgvector matching RPC
   - nightly cron refresh jobs
 - `migrations/009_fix_auth_trigger_search_path.sql` is present. Cowork added it during live smoke testing to pin search_path on the signup trigger chain and fix magic-link signup failures.
-- `migrations/010_launch_hardening.sql` is present and adds the BYOK metadata contract plus persisted answer stress-test runs.
-- The current strategy is to keep migrations `001` through `010` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
+- `migrations/010_deadlines_and_program_detail.sql` is present and adds deadline fields and program detail columns.
+- `migrations/011_user_profiles.sql` is present and adds the user profiles table.
+- `migrations/012_launch_hardening.sql` is present and adds the BYOK metadata contract plus persisted answer stress-test runs.
+- `migrations/013_cohort_context.sql` is present and adds `cohort_name`, `program_start_date`, and `cohort_size` to programs. Seeds known values for 8 programs.
+- Migrations 010, 011, and 012 have been applied to production Supabase.
+- The current strategy is to keep migrations `001` through `013` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
+
+### SMTP / Email
+- Resend SMTP is wired to Supabase Auth and confirmed working.
+- Magic-link emails are delivered via Resend.
+- Supabase Auth custom SMTP setup is documented at `docs/08_resend_smtp_setup.md`.
 
 ### MCP server
 - `application-hub-mcp-server/` exists.
@@ -90,14 +104,32 @@ This file is the current GitHub-visible source of truth. It separates what is co
 
 ---
 
+## Milestone 3 status (as of 2026-05-10 smoke test)
+
+Most of Milestone 3 is done. Remaining gaps:
+
+| Item | Status |
+|---|---|
+| App live at vercel | Done |
+| Migrations 010/011/012 applied to prod | Done |
+| Resend SMTP wired and confirmed | Done |
+| Auth (magic link + password escape hatch) | Done on live site |
+| Smoke test | Done 2026-05-10 |
+| Question Bank `/bank` route UI | Not built — P0 |
+| BYOK `/profile/integrations` UI | Not built — P0 |
+| Workspace index (user_applications query) | Bug being fixed |
+| Heat scores + applicant counts | Still 0 — synthetic compute job needed |
+| Sidebar IA redesign | Not done |
+
+---
+
 ## Not currently confirmed in GitHub
 
 These may exist locally, but are not confirmed by the current GitHub-visible repository state:
 
 - Root `package.json`
-- Production deployment configuration
 - Stripe webhook implementation
-- Browser smoke testing against real Supabase credentials
+- Browser smoke testing beyond 2026-05-10 session
 
 ---
 
@@ -107,7 +139,9 @@ The GitHub-visible repo should be treated as:
 
 ```text
 Database schema + seed data + MCP server are present.
-Next.js app is present, wired to live data, and build-verified.
+Next.js app is present, wired to live data, build-verified, and deployed.
+Auth is confirmed working on the live site.
+SMTP is confirmed working via Resend.
 CI covers MCP and app packages separately.
 RNS is the planned additive judgment layer, not a launch blocker.
 ```
@@ -116,16 +150,15 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 ## Immediate priorities (launch roadmap)
 
-1. **Soft-launch checklist for 10–20 power users** — MCP/web app can ship now with clear BYOK/hosted-AI caveats
-2. **Build the Question Bank UI** — biggest web-app gap; pairs with Drip mechanic
-3. **Answer Bank drip mechanic** — pre-load 5–10 questions, drip 2–5/day, Pro unlocks all
-4. **BYOK AI provider integration UI/routing** — `user_integrations` schema exists; `/profile/integrations` and provider routing remain
-5. **Hosted draft policy/gating UI** — route now fails closed; product still needs provider/limit UX
+1. **Question Bank UI (`/bank`)** — biggest web-app gap; 225 scored questions exist, drip mechanic designed, only UI missing
+2. **BYOK `/profile/integrations` UI** — schema in migration 012, UI not built; P0 because user can't subsidize AI calls at scale
+3. **Workspace index bug** — being fixed; querying `user_applications` table
+4. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
+5. **Sidebar IA redesign** — applications list below divider, sorted by status tags
 6. **Seed real deadlines + urgency sort**
 7. **Program detail TL;DR / pros & cons block**
 8. **Build proper user profile split**
-9. **Custom SMTP completion** — docs done; dashboard/DNS work remains manual
-10. **Smoke-test `POST /api/draft`** with valid Anthropic key/session
+9. **Stripe integration** — Phase 3
 
 ## What landed during the 2026-05-10 smoke session
 
