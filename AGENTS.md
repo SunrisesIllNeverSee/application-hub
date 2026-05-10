@@ -37,7 +37,7 @@ Next.js app (app/)                 ← user-facing product, live-data wired
 
 | Component | Status | Owner |
 |---|---|---|
-| Schema + migrations 001–009 | ✅ Done (009 = auth trigger fix, 2026-05-10) | Cowork (009) |
+| Schema + migrations 001–010 | ✅ Done (010 = launch hardening contracts, 2026-05-10) | Cowork/Codex |
 | MCP server (20 tools) | ✅ Done | — |
 | 30 programs seeded to Supabase | ✅ Done | Cowork |
 | Intelligence layer (significance + DNA) | ✅ Done | Cowork |
@@ -51,6 +51,8 @@ Next.js app (app/)                 ← user-facing product, live-data wired
 | CI workflow | ✅ Done | Codex |
 | Next.js bumped to 14.2.35 | ✅ Done | Cowork |
 | Hosted draft metering | ✅ Done | Codex |
+| Hosted draft fail-closed policy | ✅ Done | Codex |
+| BYOK/stress-test schema contracts | ✅ Done | Codex |
 
 ## What's open next
 
@@ -114,7 +116,7 @@ This prevents the duplicate work we hit on 2026-05-10 (both agents independently
 
 - **Project ID**: `betcyfbzsgusaghriptz`
 - **URL**: `https://betcyfbzsgusaghriptz.supabase.co`
-- **Migrations applied**: 001–009 ✅
+- **Migrations applied**: 001–010 ✅
 - **Programs seeded**: 30 ✅
 - **Intelligence layer**: live ✅ (225 questions scored, DNA weights computed)
 

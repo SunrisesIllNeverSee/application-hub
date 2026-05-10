@@ -51,12 +51,17 @@ export default async function ProgramDetailPage({ params }: Props) {
   const questions = questionRows ?? []
   const deadline = formatDeadline(program.deadline_at)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const p = program as any
-  const tldr: string | null = p.tldr ?? null
+  type ProgramPresentationFields = {
+    tldr?: unknown
+    pros?: unknown
+    cons?: unknown
+    best_for?: unknown
+  }
+  const p = program as ProgramPresentationFields
+  const tldr: string | null = typeof p.tldr === 'string' ? p.tldr : null
   const pros: string[] = Array.isArray(p.pros) ? p.pros : []
   const cons: string[] = Array.isArray(p.cons) ? p.cons : []
-  const bestFor: string | null = p.best_for ?? null
+  const bestFor: string | null = typeof p.best_for === 'string' ? p.best_for : null
 
   // Group questions by section
   const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {

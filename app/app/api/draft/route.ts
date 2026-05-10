@@ -2,11 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
-
 const MODEL = 'claude-haiku-4-5-20251001'
+const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
+const PLATFORM_PROVIDER = 'platform_anthropic'
 
 function countWords(text: string) {
   return text.trim().split(/\s+/).filter(Boolean).length
@@ -27,6 +25,31 @@ export async function POST(req: NextRequest) {
     if (!archived_question_id) {
       return NextResponse.json({ error: 'archived_question_id is required' }, { status: 400 })
     }
+
+    if (!PLATFORM_DRAFTS_ENABLED) {
+      return NextResponse.json(
+        {
+          error: 'Hosted AI drafts are disabled until BYOK provider routing is enabled.',
+          code: 'hosted_ai_disabled',
+          provider_required: true,
+        },
+        { status: 403 }
+      )
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          error: 'Hosted AI provider is not configured.',
+          code: 'hosted_ai_unconfigured',
+          provider_required: true,
+        },
+        { status: 503 }
+      )
+    }
+
+    const anthropic = new Anthropic({ apiKey })
 
     // Best-effort preflight so free-tier users do not burn provider tokens
     // before the database trigger gets a chance to reject over-limit usage.
@@ -54,6 +77,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: `Monthly AI draft limit (${monthlyLimit}) reached. Upgrade or connect your own AI provider.`,
+          code: 'draft_limit_reached',
           drafts_remaining: 0,
         },
         { status: 429 }
@@ -180,7 +204,7 @@ Write the draft answer only — no preamble, no explanation, no word count at th
         user_id: user.id,
         program_id: program_id ?? null,
         archived_question_id,
-        integration_type: 'claude',
+        integration_type: PLATFORM_PROVIDER,
         model_used: MODEL,
         prompt_used: `${systemPrompt}\n\n${userPrompt}`,
         output_content: draft,

@@ -52,7 +52,8 @@ application-hub/
 │   ├── 006_edge_functions_cron.sql
 │   ├── 007_monetization.sql
 │   ├── 008_intelligence_layer_v2.sql   ← adds program_dna, user_program_fit, RPCs
-│   └── 009_fix_auth_trigger_search_path.sql ← fixes magic-link signup trigger search_path
+│   ├── 009_fix_auth_trigger_search_path.sql ← fixes magic-link signup trigger search_path
+│   └── 010_launch_hardening.sql        ← BYOK metadata + answer stress-test persistence
 │
 ├── application-hub-mcp-server/        ← TypeScript MCP server (20 tools, 7 resources, 3 prompts)
 │   ├── src/
@@ -76,6 +77,8 @@ application-hub/
 | `user_program_fit` | Pre-computed fit scores per (user, program) pair — refreshed nightly |
 | `ai_usage` | Draft run tracking for rate limiting |
 | `user_subscriptions` | Stripe-linked subscription tier per user |
+| `user_integrations` | BYOK provider metadata; raw keys stay in server-side secret storage |
+| `answer_stress_tests` | Persisted answer stress-test/review runs |
 
 **Scoring formulas (reference)**:
 
@@ -116,7 +119,7 @@ Connect to Claude Desktop — add to `~/Library/Application Support/Claude/claud
 }
 ```
 
-**The MCP server will not function until migrations 001-009 have been applied to Supabase.**
+**The MCP server will not function until migrations 001-010 have been applied to Supabase.**
 
 ---
 
@@ -178,7 +181,7 @@ Recommended MCPs to add for this project:
 | Component | Status |
 |---|---|
 | v3 schema design | ✅ Done |
-| Supabase migrations 001-009 | ✅ Done |
+| Supabase migrations 001-010 | ✅ Done |
 | MCP server (20 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
 | 30 programs seeded | ✅ Done — all in Supabase `betcyfbzsgusaghriptz` |
 | Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
@@ -191,6 +194,7 @@ Recommended MCPs to add for this project:
 | Build verification | ✅ Done — zero TypeScript errors (`npx tsc --noEmit` passes) |
 | AI draft button | ✅ Done — POST /api/draft wired, AnswerEditor "Draft with AI" button live |
 | Hosted draft metering | ✅ Done — successful hosted drafts log to `ai_draft_runs` |
+| Hosted draft policy | ✅ Done — route fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true` |
 | Stripe integration | ⬜ Phase 3 |
 
 ---

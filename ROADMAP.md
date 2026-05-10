@@ -12,12 +12,12 @@
 
 Application Hub already has a shippable spine:
 
-- **Database**: Supabase migrations `001` through `009`, 30 programs, 225 archived questions.
+- **Database**: Supabase migrations `001` through `010`, 30 programs, 225 archived questions.
 - **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
 - **MCP server**: 20 tools, 7 resources, 3 prompts. Power-user path is real today.
 - **Next.js app**: Hub, program detail, workspace, profile/answer bank, live Supabase wiring.
 - **Auth**: magic links plus a dev-only password escape hatch.
-- **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, which drives `ai_usage` through the database trigger.
+- **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, and fails closed unless explicitly enabled.
 - **RNS direction**: additive intelligence layer above the current Supabase/MCP/app spine, not a launch blocker.
 
 The refined external roadmap was built outside the repo, so keep these corrections in mind:
@@ -69,13 +69,13 @@ These are the minimum additions that make the app work for non-technical founder
   New `user_question_unlocks` flow. Pre-load 5–10 high-signal questions for new users, then drip 2–5/day for free users. Pro unlocks the full bank.
 
 - [ ] **BYOK AI provider integration** — *Cowork + Codex*
-  `user_integrations` table, `/profile/integrations` UI, encrypted provider keys, and `/api/draft` routing that prefers the user's key. Free tier should not make Deric pay for unbounded hosted AI.
+  `user_integrations` schema contract exists in migration `010`. Remaining work: `/profile/integrations` UI, server-side secret storage route, and `/api/draft` routing that prefers the user's key.
 
 - [x] **Hosted draft rate logging** — *Codex*
   `/api/draft` inserts successful Anthropic calls into `ai_draft_runs`; the trigger updates `ai_usage`.
 
-- [ ] **Hosted draft policy + UI gating** — *Cowork + Codex*
-  Decide when platform pooled keys are allowed: free trial, Pro fallback, disabled until BYOK, or admin-only. Surface remaining draft count in the UI.
+- [ ] **Hosted draft UI gating** — *Cowork + Codex*
+  Backend now fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true`. Remaining work: surface provider status, remaining draft count, and BYOK CTA in the UI.
 
 ---
 
@@ -87,7 +87,7 @@ These are the minimum additions that make the app work for non-technical founder
   Commit `9d83151` landed sidebar, padding, and tablet squeeze work. Keep device/browser testing open as polish, but the first pass is done.
 
 - [ ] **Real deadlines + urgency sort** — *Cowork*
-  Seed real upcoming deadlines where available. Default sort should prefer closest non-rolling deadline, then composite score within rolling programs.
+  Seed real upcoming deadlines where available using `seed/01_deadline_updates_template.sql`. Default sort should prefer closest non-rolling deadline, then composite score within rolling programs.
 
 - [ ] **Program detail TL;DR / pros / cons / best-for block** — *Cowork*
   Program pages need scannable judgment, not only long descriptions. Static seed columns ship faster; AI generation can come later.
@@ -96,7 +96,7 @@ These are the minimum additions that make the app work for non-technical founder
   Split current `/profile` Answer Bank into `/profile/answers`, `/profile/about`, `/profile/settings`, and `/profile/integrations`.
 
 - [ ] **Custom SMTP through Resend** — *Deric/Codex docs support*
-  Setup guide exists at `docs/08_resend_smtp_setup.md`. Remaining work: verify domain in Resend, enter SMTP settings in Supabase Auth, run magic-link tests.
+  Setup guide exists at `docs/08_resend_smtp_setup.md`; handoff checklist exists at `docs/13_smtp_launch_handoff.md`. Remaining work: verify domain in Resend, enter SMTP settings in Supabase Auth, run magic-link tests.
 
 - [ ] **AI draft end-to-end smoke test** — *Cowork*
   With a valid Anthropic key/session, verify workspace button → `/api/draft` → response inserted into the editor → usage row logged.
@@ -108,7 +108,7 @@ These are the minimum additions that make the app work for non-technical founder
 These are not launch blockers, but they are still part of the current roadmap and should not be lost.
 
 - [ ] **Home dashboard + sidebar IA** — Today view with unlocked questions, closest deadlines, in-progress applications, answers needing review/stress tests, and MoatScore/FundScore surface.
-- [ ] **Stress-test saved answers UI/persistence** — MCP stub exists. Add `answer_stress_tests`, quota policy, UI, and eventual BYOK/LLM-backed generation.
+- [ ] **Stress-test saved answers UI/scoring** — MCP stub and `answer_stress_tests` table exist. Add quota policy, UI, and eventual BYOK/LLM-backed generation.
 - [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
 - [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.
 - [ ] **Heat scores + applicant counts** — Replace zeros with synthetic MVP heat from prestige/cohort exclusivity, then real signals later.

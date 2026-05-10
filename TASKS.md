@@ -81,9 +81,9 @@ Why this matters:
 Users bring their own AI keys so Deric is not subsidizing every draft.
 
 Implementation:
-- `user_integrations` table for provider keys and metadata
+- `user_integrations` metadata table exists in `migrations/010_launch_hardening.sql`
 - `/profile/integrations` UI
-- Encrypted storage for Anthropic/OpenAI/Google keys
+- Server-side secret storage for Anthropic/OpenAI/Google keys
 - `/api/draft` routing prefers user key
 - Platform pooled key policy for Free/Pro/Admin decided explicitly
 - UI shows provider status and any draft limits
@@ -99,7 +99,7 @@ Implementation:
 **Owner**: Cowork + Codex
 **Priority**: P0
 
-Rate logging exists, but the product still needs to decide and display policy.
+Rate logging exists, and the route now fails closed unless `PLATFORM_AI_DRAFTS_ENABLED=true`. The product still needs provider UI and clear user-facing policy.
 
 Options to settle:
 - Free users must BYOK
@@ -140,7 +140,7 @@ Verify mobile/tablet/desktop routes:
 Every program currently appears as "Rolling" unless seeded otherwise. Add real deadlines where available and sort by urgency.
 
 Implementation:
-- Add dates for YC, Techstars, SBIR cycles, and other known programs
+- Add dates for YC, Techstars, SBIR cycles, and other known programs using `seed/01_deadline_updates_template.sql`
 - Default sort: closest non-rolling deadline first, then composite score among rolling programs
 - Keep unknown dates as rolling/unknown instead of fake specificity
 
@@ -179,6 +179,8 @@ Documentation is done at `docs/08_resend_smtp_setup.md`. Remaining work is manua
 - Confirm `/auth/callback` magic links work
 - Test signup, login, resend, and rate behavior
 
+Short handoff: `docs/13_smtp_launch_handoff.md`.
+
 ### [ ] AI draft UI smoke test
 **Owner**: Cowork
 **Priority**: P1
@@ -207,13 +209,11 @@ Create a Today surface:
 
 Sidebar target: Today / Hub / Bank / Apps or Workspace / Profile.
 
-### [ ] Stress-test saved answers UI/persistence
+### [ ] Stress-test saved answers UI/scoring
 **Owner**: Cowork + Codex
 **Priority**: P2
 
-MCP groundwork exists through `hub_stress_test_answer`. Next layer:
-- `answer_stress_tests` table
-- Persist test runs and follow-up prompts
+MCP groundwork exists through `hub_stress_test_answer`, and persistence exists in `migrations/010_launch_hardening.sql`. Next layer:
 - Quota policy
 - UI entry point from Answer Bank/workspace
 - Later: BYOK/LLM-backed RNS-style challenge generation
@@ -344,7 +344,7 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 ## Done
 
 - [x] v3 schema design — global question archive as core asset
-- [x] Supabase migrations 001–009
+- [x] Supabase migrations 001–010
 - [x] MCP server — 20 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README for Claude Desktop, Cursor, Windsurf
 - [x] CI workflow for MCP server and Next.js app
@@ -362,12 +362,19 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 - [x] Answer Bank/profile surface
 - [x] Auth callback moved to real `/auth/callback`
 - [x] Migration 009 auth trigger search_path fix
+- [x] Migration 010 launch hardening: BYOK metadata + answer stress-test persistence
 - [x] Next.js 14.2.35 bump
 - [x] Agent-side review/comment contract: `docs/07_agent_review_contract.md`
 - [x] MCP `hub_get_answer_review_context`
 - [x] MCP `hub_stress_test_answer`
 - [x] Resend/Supabase SMTP guide: `docs/08_resend_smtp_setup.md`
 - [x] Hosted `/api/draft` metering through `ai_draft_runs`
+- [x] Hosted `/api/draft` fail-closed policy
+- [x] Launch checklist: `docs/09_launch_checklist.md`
+- [x] BYOK/draft policy doc: `docs/10_byok_and_draft_policy.md`
+- [x] Deadline seed helper: `seed/01_deadline_updates_template.sql`
+- [x] Stress-test persistence doc: `docs/12_stress_test_persistence.md`
+- [x] SMTP launch handoff: `docs/13_smtp_launch_handoff.md`
 
 ---
 

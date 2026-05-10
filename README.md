@@ -15,6 +15,8 @@ Built by Ello Cello LLC.
 - **`AGENTS.md`** — Cowork (Claude) + Codex coordination contract, file ownership
 - **`SCRATCH.md`** — active work-in-progress claims (what each agent is touching right now)
 - **`docs/08_resend_smtp_setup.md`** — practical Supabase Auth custom SMTP setup with Resend
+- **`docs/09_launch_checklist.md`** — Milestone 3 ship/no-ship checklist
+- **`docs/10_byok_and_draft_policy.md`** — BYOK and hosted draft policy contract
 - **`docs/archive/`** — historical/superseded planning docs that are useful context but no longer active direction
 
 We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
@@ -34,7 +36,7 @@ The product is built around a **question archive** — every question asked by e
 | Component | Status |
 |---|---|
 | Database schema (v3) | ✅ Complete |
-| Supabase migrations | ✅ 009 migrations, apply in order |
+| Supabase migrations | ✅ 010 migrations, apply in order |
 | MCP server (20 tools) | ✅ Complete, clean build |
 | Seed data (30 programs) | ✅ Done |
 | Next.js app | ✅ Live data wired, build verified |
@@ -77,7 +79,7 @@ npm run build
 
 See `application-hub-mcp-server/README.md` for full setup, including Claude Desktop and Cursor config.
 
-**Prerequisites**: Supabase project with all 9 migrations applied.
+**Prerequisites**: Supabase project with all 10 migrations applied.
 
 ### Local Codex / Cowork connection
 
