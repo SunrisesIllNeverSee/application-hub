@@ -2,7 +2,40 @@
 
 > **Both agents check this BEFORE picking up a task from `TASKS.md`.**
 > Claim by appending your line. Release by removing it (or moving to "recently released").
-> Stale claims (>24h with no commits) get auto-pruned.
+> Stale claims = no commits touching the claimed paths since the claim landed.
+
+---
+
+## For Codex — most recent context
+
+If you're picking up after Cowork's 2026-05-10 session, read these in order:
+
+1. **`AGENTS.md`** — refreshed ownership table, includes new files: ROADMAP.md, VISION.md, SCRATCH.md
+2. **`ROADMAP.md`** — canonical priority-ordered list of work. P0 = Drip mechanic, Question Bank UI, **BYOK** (now P0 above /api/draft rate-limiting because user can't subsidize AI calls), `/api/draft` rate-limiting. P1 = home dashboard, stress-testing groundwork, responsive layout (mobile drawer toggle still pending), real deadlines, program TL;DR, user profile split, custom SMTP (your lane). P2/P3 below.
+3. **`VISION.md`** — 551-line product vision. Key recent additions: positioning ("infrastructure for the application graph, not an AI writer"), levelling story (novice vs seasoned-funded founder, stress testing levels presentation skill), BYOK as cost reality (Free tier requires user keys, no platform fallback), MoatScore framework status (waiting on user spec), home dashboard mockup, integrations roadmap (4 tiers).
+4. **`TASKS.md`** — finer-grained backlog with 16+ smoke-test follow-ups.
+
+What landed since your last commit (`ea820dc`):
+- `9d40f5d` — DNA % display + sidebar active-state fixes
+- `69f387d` — dev-only password sign-in escape hatch
+- `8184a19` — package-lock resync
+- `c710d06` — VISION.md created
+- `59d686c` — TASKS/STATUS/AGENTS smoke-test capture
+- `4e5c7a2` — Question Bank framing refinement
+- `6ca8cd4` — SCRATCH.md introduced (this file)
+- `bd44b01` — ROADMAP.md introduced + timeline language stripped
+- `70089d3` — stress testing, BYOK, MoatScore, home dashboard, integrations captured in VISION
+- `24acbc5` — positioning reframe (infrastructure layer, not AI writer; BYOK cost reality)
+- `9d83151` — responsive layout sweep verified across mobile/tablet/desktop
+
+Open items in your lane (from ROADMAP):
+- **P1 — Custom SMTP setup (Resend integration)** — Supabase email is rate-limited, blocks reliable magic-link auth
+- **P3 — Heat scores compute job, recruiter agent cron, Stripe webhook handler**
+- The agent review contract you shipped in `ea820dc` is good — Cowork extended it with stress-testing concepts. See VISION.md "Stress testing" section. If you build the `hub_stress_test_answer` MCP tool, that pairs with your existing `hub_get_answer_review_context`.
+
+Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` while these P1 bugs are in flight (responsive sweep landed; deadlines + program TL;DR + user profile split queued). You're clear to take MCP server, deps, CI, doc-architecture work.
+
+---
 
 ---
 
@@ -13,7 +46,7 @@
 
 ---
 
-## Recently released (last 24h)
+## Recently released
 
 _(empty)_
 
@@ -41,9 +74,9 @@ Commit the SCRATCH.md change BEFORE starting work. That's the claim.
 ### When you see a conflict
 
 If you want to start a task but someone else has it claimed:
-1. Check the claim's "Claimed at" — if it's >24h old, ping in commit message and reclaim
+1. Run `git log --since="<claim's claimed at>" -- <their claimed paths>` — if no commits, the claim is stale and you can take it (leave a one-line note in commit message)
 2. Otherwise, pick a different task from TASKS.md
-3. If the work is genuinely urgent and the other agent's claim is recent, leave a note in their row's "Notes" column
+3. If the work is genuinely urgent and the other agent's claim has recent commits, leave a note in their row's "Notes" column
 
 ### What goes here vs TASKS.md
 
