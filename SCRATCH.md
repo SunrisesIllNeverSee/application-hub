@@ -51,6 +51,7 @@ Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` wh
 
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
+| Codex | Stabilize coordination/docs after Milestone 2-3 changes | `SCRATCH.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` | 2026-05-10T21:38:04Z | Sync docs to latest shipped BYOK, Question Bank, sidebar, and live deployment state. |
 
 ---
 
