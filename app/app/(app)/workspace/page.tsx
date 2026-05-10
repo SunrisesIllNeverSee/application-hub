@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import type { Program, UserProgramFit } from '@/lib/database.types'
+import type { Program, UserProgramFit, UserApplication } from '@/lib/database.types'
 import { formatDeadline, programTypeLabel } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
@@ -17,15 +17,15 @@ export default async function WorkspacePage() {
 
   if (!user) return null
 
-  // Get programs where user has a fit score (proxy for "started tracking")
-  const { data: fitRows } = await supabase
-    .from('user_program_fit')
+  // Query user_applications directly — this is the source of truth for programs
+  // the user has touched. user_program_fit may not exist yet for new applications.
+  const { data: appRows } = await supabase
+    .from('user_applications')
     .select('*')
     .eq('user_id', user.id)
-    .order('composite_score', { ascending: false })
-    .returns<UserProgramFit[]>()
+    .returns<UserApplication[]>()
 
-  const programIds = fitRows?.map((f) => f.program_id) ?? []
+  const programIds = appRows?.map((a) => a.program_id) ?? []
 
   let programs: Program[] = []
   if (programIds.length > 0) {
@@ -37,7 +37,18 @@ export default async function WorkspacePage() {
     programs = data ?? []
   }
 
-  const fitMap = Object.fromEntries((fitRows ?? []).map((f) => [f.program_id, f]))
+  // Fetch fit scores separately — optional display enhancement, not the gating query
+  let fitMap: Record<string, UserProgramFit> = {}
+  if (programIds.length > 0) {
+    const { data: fitRows } = await supabase
+      .from('user_program_fit')
+      .select('*')
+      .eq('user_id', user.id)
+      .in('program_id', programIds)
+      .returns<UserProgramFit[]>()
+    fitMap = Object.fromEntries((fitRows ?? []).map((f) => [f.program_id, f]))
+  }
+
   const programsWithFit = programs.map((p) => ({ ...p, fit: fitMap[p.id] }))
 
   return (
@@ -85,25 +96,27 @@ export default async function WorkspacePage() {
                     {program.name}
                   </h3>
 
-                  {/* Progress bar */}
-                  <div className="mt-2 flex items-center gap-3">
-                    <div className="flex-1 bg-neutral-200 dark:bg-neutral-700 rounded-full h-1.5">
-                      <div
-                        className={cn(
-                          'h-1.5 rounded-full transition-all',
-                          coverage >= 80
-                            ? 'bg-success-500'
-                            : coverage >= 50
-                            ? 'bg-brand-500'
-                            : 'bg-warning-500'
-                        )}
-                        style={{ width: `${coverage}%` }}
-                      />
+                  {/* Progress bar — only shown when fit score is available */}
+                  {fit && (
+                    <div className="mt-2 flex items-center gap-3">
+                      <div className="flex-1 bg-neutral-200 dark:bg-neutral-700 rounded-full h-1.5">
+                        <div
+                          className={cn(
+                            'h-1.5 rounded-full transition-all',
+                            coverage >= 80
+                              ? 'bg-success-500'
+                              : coverage >= 50
+                              ? 'bg-brand-500'
+                              : 'bg-warning-500'
+                          )}
+                          style={{ width: `${coverage}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0">
+                        {coverage}% answered
+                      </span>
                     </div>
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400 flex-shrink-0">
-                      {coverage}% answered
-                    </span>
-                  </div>
+                  )}
                 </div>
 
                 <div className="flex-shrink-0 text-right">
