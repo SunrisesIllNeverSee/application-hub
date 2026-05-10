@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     // BYOK-first routing: prefer user's own key, fall back to platform key for Pro
     let resolvedApiKey: string | null = null
-    let integrationProvider = 'byok'
+    let integrationProvider = 'byok_anthropic'
 
     // Check user's stored integrations for an Anthropic key
     const { data: integration } = await supabase
@@ -221,7 +221,7 @@ Write the draft answer only — no preamble, no explanation, no word count at th
         user_id: user.id,
         program_id: program_id ?? null,
         archived_question_id,
-        integration_type: PLATFORM_PROVIDER,
+        integration_type: integrationProvider,
         model_used: MODEL,
         prompt_used: `${systemPrompt}\n\n${userPrompt}`,
         output_content: draft,
