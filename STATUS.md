@@ -183,8 +183,10 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `migrations/015_byok_key_storage.sql` — encrypted BYOK key storage column
 - `seed/01_deadline_updates_template.sql` — source-verified deadline update helper
 - `docs/09_launch_checklist.md` through `docs/13_smtp_launch_handoff.md` — Milestone 3 handoff docs
+- `docs/15_curated_ingest_lane.md` — narrow curation contract for application/funding/question targets
 - `VISION.md` — new product vision doc
 - `TASKS.md` — captured 16 follow-ups from smoke test
 - `ROADMAP.md` — reframed around Launch Milestones 1/2/3
 - `docs/archive/` — created for superseded planning docs
+- `seed/staging/application_targets_watchlist.csv` — staging lane for candidate targets before seed promotion
 - `app/.env.local` (worktree + main) — populated with Supabase URL + publishable key

@@ -212,6 +212,18 @@ With a valid authenticated session and a real BYOK Anthropic key:
 **Owner**: Cowork
 **Priority**: P2
 
+### [ ] Curated ingest lane for new targets
+**Owner**: Codex
+**Priority**: P2
+
+Keep dataset growth tightly focused on application/funding/question surfaces.
+
+Implementation:
+- Maintain `seed/staging/application_targets_watchlist.csv`
+- Use Firecrawl as an on-demand research layer, not as direct production truth
+- Promote only targets with real application pages, reusable question signal, or meaningful funding workflow data
+- Keep generic VC prestige tracking out of the active ingest lane
+
 ### [ ] Heat/applicant synthetic compute job
 **Owner**: Codex + Cowork
 **Priority**: P2

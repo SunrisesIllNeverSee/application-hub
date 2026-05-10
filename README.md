@@ -18,6 +18,7 @@ Built by Ello Cello LLC.
 - **`docs/09_launch_checklist.md`** — Milestone 3 ship/no-ship checklist
 - **`docs/10_byok_and_draft_policy.md`** — BYOK and hosted draft policy contract
 - **`docs/14_launch_surface_polish.md`** — honest heat/applicant fallbacks, cohort context, and BYOK-first draft UX notes
+- **`docs/15_curated_ingest_lane.md`** — narrow curation contract for application/funding/question targets
 - **`docs/archive/`** — historical/superseded planning docs that are useful context but no longer active direction
 
 We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
@@ -29,6 +30,8 @@ Application Hub is a platform for founders applying to programs. It solves one s
 The product is built around a **question archive** — every question asked by every program, stored once. When you answer a question on one application, that answer lives in your profile and pre-fills every future application that asks something similar. The intelligence layer tells you which questions are most valuable to answer (significance score), which programs are the best fit for where you are right now (composite score), and exactly what's left before you're ready to apply (readiness check).
 
 Just as important: the spine should stay portable across adjacent application domains. The same archive/reuse/intelligence model should be able to switch themes into **jobs, grants, and school applications** without a ground-up rebuild. That portability is part of the moat, not a side quest.
+
+Just as important in the near term: additions to the dataset stay tightly scoped to things that create a real application, funding, or reusable question surface. We are not building a generic startup ecosystem index.
 
 ---
 
