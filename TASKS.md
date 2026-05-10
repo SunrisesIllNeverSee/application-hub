@@ -36,6 +36,12 @@ hub/timeline/page.tsx). Key fixes:
 **Owner**: Codex
 **Priority**: P1 — confirm workspace button calls `POST /api/draft` and inserts returned draft text
 
+### [ ] Agent-side review/comment contract
+**Owner**: Codex + Deric
+**Priority**: P1 — document the saved-answer context needed for RNS/CIVITAE/MO§ES review workflows
+
+Keep this separate from `/api/draft`: hosted drafting creates first-pass text, while review/comments/certification can run from Deric's side through MCP/RNS workflows over saved answers.
+
 ---
 
 ## Next

@@ -100,8 +100,11 @@ Application layer:
 - Application workspace
 - Answer bank/profile surfaces
 - Supabase auth via magic link
+- Hosted draft generation through `POST /api/draft`
 
-The app is currently moving from mock data to live Supabase data. Cowork owns the active `app/` integration work; Codex-owned parallel work should stay in CI, docs, and MCP server changes unless explicitly reassigned.
+The app is live-data wired and build-verified. Cowork owns the `app/` surface; Codex-owned parallel work should stay in CI, docs, and MCP server changes unless explicitly reassigned.
+
+Drafting and reviewing are intentionally separate responsibilities. The app can generate a first-pass draft through a server-side Anthropic call, then save the answer state. Review comments, RNS signal analysis, answer fidelity checks, and certification can run later from Deric's side through MCP/agent workflows using the saved question, program, draft, answer history, and confidence enum.
 
 ---
 
@@ -148,6 +151,8 @@ composite_score = fit_score × program_value_score / 100
 
 RNS is the planned judgment layer above this scaffolding, not a replacement for the Supabase/MCP/app spine. pgvector remains useful for retrieval and similarity; RNS should evaluate signal purity, answer fidelity, commitment conservation, and question significance once the core product loop is usable.
 
+The hosted draft route is not the whole intelligence system. It is a product convenience for creating text. The deeper review/comment layer can remain agent-side until it is proven, then graduate into first-class app surfaces.
+
 ---
 
 ## Boundary rules
@@ -161,6 +166,7 @@ RNS is the planned judgment layer above this scaffolding, not a replacement for 
 - Treat the question archive as the core product asset.
 - Treat seed data quality as more important than visual polish.
 - Keep app-facing MCP helpers narrow and server-friendly, such as slug lookups and validated answer upserts.
+- Keep drafting, review, and certification separable so the launch app stays simple while RNS can mature outside the request path.
 
 ### Do not
 

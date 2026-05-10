@@ -24,7 +24,7 @@ The product is built around a **question archive** — every question asked by e
 | Supabase migrations | ✅ 008 migrations, apply in order |
 | MCP server (18 tools) | ✅ Complete, clean build |
 | Seed data (30 programs) | ✅ Done |
-| Next.js app | 🔄 Live data wiring + hardening |
+| Next.js app | ✅ Live data wired, build verified |
 
 The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 18 tools, 7 resources, and 3 prompts.
 
@@ -32,7 +32,9 @@ The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the 
 
 ## Current strategy
 
-Application Hub ships first as a practical application operating system: question archive, reusable answer bank, program workspace, and external apply paths. RNS is additive over that spine. The current scoring layer is useful scaffolding; RNS turns it into signal intelligence for question significance, answer fidelity, and opportunity matching without blocking the launch path.
+Application Hub ships first as a practical application operating system: question archive, reusable answer bank, program workspace, hosted AI drafting, and external apply paths. RNS is additive over that spine. The current scoring layer is useful scaffolding; RNS turns it into signal intelligence for question significance, answer fidelity, and opportunity matching without blocking the launch path.
+
+The hosted app can generate drafts through `POST /api/draft`, but review, comments, certification, and deeper answer judgment do not have to live in that route on day one. Those can come from Deric's side through RNS/CIVITAE/MO§ES workflows and MCP tools after the app has saved the question, program, draft, answer history, and confidence state.
 
 See `docs/06_rns_integrated_build_path.md` for the build sequence.
 
@@ -82,7 +84,7 @@ npm run build
 |---|---|
 | Database | Supabase (PostgreSQL + pgvector) |
 | MCP server | TypeScript + `@modelcontextprotocol/sdk` |
-| Frontend | Next.js App Router (planned) |
+| Frontend | Next.js App Router |
 | Payments | Stripe (planned) |
 | AI drafting | Claude API — Haiku for speed, Sonnet for quality |
 | Hosting | Vercel (frontend) + Railway or Fly (MCP HTTP mode) |
