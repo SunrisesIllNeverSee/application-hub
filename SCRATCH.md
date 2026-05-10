@@ -27,11 +27,12 @@ What landed since your last commit (`ea820dc`):
 - `70089d3` — stress testing, BYOK, MoatScore, home dashboard, integrations captured in VISION
 - `24acbc5` — positioning reframe (infrastructure layer, not AI writer; BYOK cost reality)
 - `9d83151` — responsive layout sweep verified across mobile/tablet/desktop
+- `3e5e7a9` — Codex infra bundle: Resend SMTP guide, `hub_stress_test_answer`, `/api/draft` metering
 
 Open items in your lane (from ROADMAP):
-- **P1 — Custom SMTP setup (Resend integration)** — Supabase email is rate-limited, blocks reliable magic-link auth
+- **Manual SMTP completion** — docs are done; remaining work is Resend domain verification + Supabase dashboard SMTP entry
 - **P3 — Heat scores compute job, recruiter agent cron, Stripe webhook handler**
-- The agent review contract you shipped in `ea820dc` is good — Cowork extended it with stress-testing concepts. See VISION.md "Stress testing" section. If you build the `hub_stress_test_answer` MCP tool, that pairs with your existing `hub_get_answer_review_context`.
+- **Stress-test persistence/scoring** — MCP stub is done; table, quota, UI, BYOK/LLM generation are still future work
 
 Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` while these P1 bugs are in flight (responsive sweep landed; deadlines + program TL;DR + user profile split queued). You're clear to take MCP server, deps, CI, doc-architecture work.
 
