@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
@@ -87,8 +88,13 @@ export function Sidebar({ user }: SidebarProps) {
     ? user.email.slice(0, 2).toUpperCase()
     : 'U'
 
-  return (
-    <nav className="hidden md:flex w-56 flex-shrink-0 h-full flex-col bg-neutral-900 dark:bg-neutral-950 border-r border-neutral-800">
+  const [mobileOpen, setMobileOpen] = React.useState(false)
+
+  // Close drawer on navigation
+  React.useEffect(() => { setMobileOpen(false) }, [pathname])
+
+  const navContent = (
+    <>
       {/* Logo */}
       <div className="px-5 py-5 border-b border-neutral-800">
         <Link href="/hub" className="flex items-center gap-2.5">
@@ -110,8 +116,6 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Nav */}
       <div className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {NAV.map((item) => {
-          // Pick the best (longest) matching href so /hub/timeline highlights
-          // Timeline, not Program Hub.
           const matches = NAV.filter(
             (i) => pathname === i.href || pathname.startsWith(i.href + '/')
           )
@@ -166,6 +170,67 @@ export function Sidebar({ user }: SidebarProps) {
           </button>
         </div>
       </div>
-    </nav>
+    </>
+  )
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <nav className="hidden md:flex w-56 flex-shrink-0 h-full flex-col bg-neutral-900 dark:bg-neutral-950 border-r border-neutral-800">
+        {navContent}
+      </nav>
+
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-14 bg-neutral-900 border-b border-neutral-800">
+        <Link href="/hub" className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center flex-shrink-0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <span className="text-sm font-semibold text-white">Application Hub</span>
+        </Link>
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="text-neutral-400 hover:text-white p-1"
+          aria-label="Open menu"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile offset so content doesn't hide under top bar */}
+      <div className="md:hidden h-14 flex-shrink-0" aria-hidden />
+
+      {/* Mobile drawer overlay */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Scrim */}
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Drawer */}
+          <nav className="relative w-72 max-w-[85vw] flex flex-col h-full bg-neutral-900 border-r border-neutral-800 shadow-2xl">
+            <div className="flex items-center justify-end px-4 py-3 border-b border-neutral-800">
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="text-neutral-400 hover:text-white p-1"
+                aria-label="Close menu"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            {navContent}
+          </nav>
+        </div>
+      )}
+
+      {/* Spacer for main content below mobile top bar — handled in layout via pt */}
+    </>
   )
 }
