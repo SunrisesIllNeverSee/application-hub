@@ -8,6 +8,34 @@ This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` 
 
 ---
 
+## Smoke Test Findings — 2026-05-10 Live Deployment
+
+App is live at `https://application-hub-chi.vercel.app`. Migrations 010/011/012 applied, Resend SMTP wired, user profiles backfilled. Full smoke test completed. Issues and decisions captured below.
+
+### Bugs to fix
+
+- [ ] **Workspace index doesn't show saved apps until re-visited** — `/workspace` uses `user_program_fit` as proxy for "started". Now that `user_applications` is being written, the index should query that directly.
+
+- [ ] **Copy button on answer boxes** — every answer in Bank and workspace needs a clipboard icon. Inline or subtle popup at end of text. Founders need quick copy for pasting into actual application portals.
+
+- [ ] **OTP 6-digit code input on login page** — Supabase sends both magic link and 6-digit OTP. Our login handles link click but not code entry. Add OTP input field that appears after email submit.
+
+- [ ] **Program cohort context missing in workspace header** — no cohort label ("YC W26"), program start date, or cohort size shown. Needs migration 013 + seed data.
+
+### IA decisions made
+
+- [ ] **Timeline → fold into Hub as view tab** *(sidebar placeholder done)* — Timeline is redundant standalone. Becomes a toggle/tab within `/hub`. Route lives on, sidebar entry removed.
+
+- [ ] **Answer Bank and Profile are fully separate** — Answer Bank = user's ammunition/memory (what they've written). Profile = who they are (metadata, stage, company). Different routes, different jobs, different UI.
+
+- [ ] **Sidebar IA redesign** — Target: Hub / Bank / Profile at top, then a divider, then user's applications list sorted by status tags (todo / started / done). LLM-interface pattern. Applications are the "chat history."
+
+- [ ] **Question Bank (`/bank`) — still not built** — P0 per roadmap. 225 scored questions exist. Drip mechanic designed. UI surface missing. Biggest visible gap.
+
+- [ ] **Companies/Funders index** — users want an org-level index (YC, Techstars, NEA) separate from program cycles. Needs three-layer schema. P2.
+
+---
+
 ## Launch Milestone 1 — Ship Today
 
 These are the facts that make a soft launch possible now.

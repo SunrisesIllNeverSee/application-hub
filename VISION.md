@@ -164,6 +164,22 @@ When a user gets accepted to a program through the platform, two new flows becom
 - Becomes the canonical schema layer for "the application graph"
 - Revenue: tiered API access for high-volume consumers
 
+### Answer Bank — the user's ammunition
+
+The Answer Bank is not a history log or an archive. It is **the user's invaluable memory** — built storage that compounds over time. Every answer a founder has ever written becomes reusable ammunition for the next application. The bank is their loadout: the stronger it is, the faster and more accurately they can fire at any new program.
+
+This reframing matters for the UI, the copy, and the product philosophy:
+- The bank **grows in value** with every answer added — it's an appreciating asset, not a filing cabinet
+- Every time a user opens a new program workspace, the bank pre-loads what they already have — they never start from zero again
+- The drip mechanic isn't just "here are questions to answer" — it's **loading new ammunition** into the bank daily
+- Pro tier unlocking all 225 questions immediately means unlocking a full arsenal, not just more content
+
+The Answer Bank and the user's profile are **completely separate things**:
+- **Answer Bank** = what you've said, how you've framed your story, your actual answers — the working material
+- **Profile** = who you are, what stage you're at, what you're building — the metadata that shapes fit scores and drip matching
+
+They live at different routes and serve different purposes. The Answer Bank is a tool. The Profile is your identity.
+
 ### Question Bank as a first-class surface
 
 This is **not a new concept** — it's been the foundation of the platform from day one. Documented in `docs/04_question_intelligence.md` as "the moat," planned in `docs/02_build_plan.md` Phase 4 ("answer universal questions first"), implemented as the MCP tool `hub_get_universal_questions`, and supported by the schema (`archived_questions.is_universal`, `significance_score`). The 225 archived questions are scored, the universal flag is computed, the data is ready.
