@@ -28,6 +28,24 @@ The AI writing space is saturated. The application intelligence space is empty. 
 
 **The moat is the application graph itself.** Questions as reusable assets. Answers as permanent capital. Programs as discoverable nodes. The AI is plumbing — bring your own.
 
+### Why cross-theme portability matters
+
+This cannot calcify into a founder-only product at the architecture layer.
+
+The deeper asset is not "accelerator applications." The deeper asset is a **portable application graph**: questions, answers, fit signals, review loops, and reusable identity material that can move across adjacent domains. If we preserve that portability, the same spine can support:
+
+- startup programs and accelerators
+- grants and fellowships
+- job applications
+- school and scholarship applications
+
+That matters strategically because it changes the size of the moat. A question archive that only works for one niche is useful. A question graph that can switch themes without a rebuild is infrastructure.
+
+Product implication:
+- the founder/program use case is the wedge
+- the architecture should stay broad enough that we are choosing a first vertical, not trapping ourselves in the only one
+- copy and UI can stay founder-focused for now, while schema and intelligence layers remain portable underneath
+
 ### AI native — not AI-augmented
 
 This isn't a product that added AI features. AI is the spine of the architecture:

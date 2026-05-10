@@ -19,6 +19,7 @@ Application Hub already has a shippable spine:
 - **Auth**: magic links plus a dev-only password escape hatch.
 - **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, and fails closed unless explicitly enabled.
 - **RNS direction**: additive intelligence layer above the current Supabase/MCP/app spine, not a launch blocker.
+- **Portability requirement**: the underlying question graph must stay flexible enough to switch themes into jobs, grants, and school applications without re-architecting the core data model.
 
 The refined external roadmap was built outside the repo, so keep these corrections in mind:
 
@@ -119,6 +120,9 @@ These are not launch blockers, but they are still part of the current roadmap an
 ---
 
 ## Platform Layer
+
+- [ ] **Cross-theme portability guardrail**
+  Keep schema, copy, and product architecture general enough that the same spine can support founder programs, jobs, grants, and school applications. This is strategically important: the reusable question graph becomes much more valuable if we can swap verticals without rebuilding the engine.
 
 - [ ] **Three-layer schema: Funders / Programs / Applications**
   Split YC the funder from YC W26/S26 programs. Add `funders`, `programs.funder_id`, and a future `/funders` index.

@@ -292,6 +292,18 @@ Next.js is bumped to `14.2.35` and builds cleanly. Remaining advisories should b
 
 ## Platform Layer
 
+### [ ] Cross-theme portability guardrail
+**Owner**: Codex + Cowork
+**Priority**: P3
+
+Mark and protect the architectural decision that this system should be able to switch themes across founder programs, jobs, grants, and school applications.
+
+What this means in practice:
+- Keep schema naming as application-graph friendly as possible
+- Avoid founder-only assumptions in reusable intelligence layers
+- Separate domain-specific copy from reusable workflow primitives
+- Treat question archive + answer bank + fit/review engine as portable infrastructure
+
 ### [ ] Three-layer schema: Funders / Programs / Applications
 **Owner**: Cowork + future migration
 **Priority**: P3

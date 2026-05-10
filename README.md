@@ -27,6 +27,8 @@ Application Hub is a platform for founders applying to programs. It solves one s
 
 The product is built around a **question archive** — every question asked by every program, stored once. When you answer a question on one application, that answer lives in your profile and pre-fills every future application that asks something similar. The intelligence layer tells you which questions are most valuable to answer (significance score), which programs are the best fit for where you are right now (composite score), and exactly what's left before you're ready to apply (readiness check).
 
+Just as important: the spine should stay portable across adjacent application domains. The same archive/reuse/intelligence model should be able to switch themes into **jobs, grants, and school applications** without a ground-up rebuild. That portability is part of the moat, not a side quest.
+
 ---
 
 ## Current state
