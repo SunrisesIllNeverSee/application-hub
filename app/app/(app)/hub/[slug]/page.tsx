@@ -115,7 +115,7 @@ export default async function ProgramDetailPage({ params }: Props) {
         </div>
 
         {/* Key stats */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-neutral-100 dark:border-neutral-800 min-w-0">
           <Stat
             label="Equity"
             value={formatEquity(program.equity_taken)}
@@ -149,7 +149,7 @@ export default async function ProgramDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
         {/* DNA */}
         {dna.length > 0 && (
           <div className="card p-5">
@@ -201,9 +201,9 @@ export default async function ProgramDetailPage({ params }: Props) {
 
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div>
-      <p className="text-xs text-neutral-500 dark:text-neutral-500 mb-0.5">{label}</p>
-      <p className="text-sm font-medium text-neutral-900 dark:text-white">{value}</p>
+    <div className="min-w-0">
+      <p className="text-xs text-neutral-500 dark:text-neutral-500 mb-0.5 truncate">{label}</p>
+      <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">{value}</p>
     </div>
   )
 }

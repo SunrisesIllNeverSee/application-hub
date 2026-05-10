@@ -88,7 +88,7 @@ export function Sidebar({ user }: SidebarProps) {
     : 'U'
 
   return (
-    <nav className="w-56 flex-shrink-0 h-full flex flex-col bg-neutral-900 dark:bg-neutral-950 border-r border-neutral-800">
+    <nav className="hidden md:flex w-56 flex-shrink-0 h-full flex-col bg-neutral-900 dark:bg-neutral-950 border-r border-neutral-800">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-neutral-800">
         <Link href="/hub" className="flex items-center gap-2.5">
