@@ -1,6 +1,6 @@
 # Application Hub — Architecture
 
-_Last updated: 2026-05-09_
+_Last updated: 2026-05-10_
 
 Application Hub is a database-first, MCP-first platform for founders applying to accelerators, grants, fellowships, and similar programs.
 
@@ -15,14 +15,14 @@ Supabase PostgreSQL + pgvector
   ↓
 Application Hub MCP Server
   ↓
-Claude Desktop / Cursor / Windsurf / future app clients
+Claude Desktop / Cursor / Windsurf / server-side app integrations
   ↓
 Next.js frontend and paid SaaS layer
 ```
 
 ---
 
-## Current GitHub-visible architecture
+## Current architecture
 
 ### 1. Database layer
 
@@ -79,29 +79,29 @@ application-hub-mcp-server/src/index.ts
 
 The server registers:
 
-- 16 MCP tools
+- 18 MCP tools
 - 7 MCP resources
 - 3 MCP prompts
 
 ---
 
-### 3. Client layer
+### 3. Client and app layer
 
-Current verified clients:
+Current local clients:
 
 - Claude Desktop via local MCP config
 - Cursor via MCP config
 - Windsurf via MCP config
 
-Planned / unverified in current GitHub state:
+Application layer:
 
-- Next.js App Router frontend
+- Next.js App Router frontend in `app/`
 - Hub directory UI
 - Application workspace
-- Answer bank UI
-- Stripe-gated SaaS surfaces
+- Answer bank/profile surfaces
+- Supabase auth via magic link
 
-If these exist locally, they need to be pushed before the remote repository can be treated as frontend-complete.
+The app is currently moving from mock data to live Supabase data. Cowork owns the active `app/` integration work; Codex-owned parallel work should stay in CI, docs, and MCP server changes unless explicitly reassigned.
 
 ---
 
@@ -158,6 +158,7 @@ composite_score = fit_score × program_value_score / 100
 - Keep reusable logic out of UI components.
 - Treat the question archive as the core product asset.
 - Treat seed data quality as more important than visual polish.
+- Keep app-facing MCP helpers narrow and server-friendly, such as slug lookups and validated answer upserts.
 
 ### Do not
 
@@ -197,10 +198,11 @@ Expected deployment split:
 
 ## Current architecture risk
 
-The remote repository currently verifies the database and MCP layers but does not verify the frontend layer. `TASKS.md` also contains status drift between blocking tasks and completed tasks.
+The repository now includes the database, MCP server, seed data, and Next.js app scaffolding, but the app is actively being wired to live Supabase data. CI runs the MCP server checks and the Next.js app checks separately so failures identify the layer that needs attention.
 
-Until the local work is pushed, the safe operating assumption is:
+The safe operating assumption is:
 
 ```text
-Remote GitHub state = backend/intelligence layer confirmed; frontend status unverified.
+Database + MCP intelligence layer = confirmed.
+Next.js app = present, active live-data integration in progress.
 ```

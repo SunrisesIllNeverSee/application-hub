@@ -1,6 +1,6 @@
 # Application Hub — Status
 
-_Last updated: 2026-05-09_
+_Last updated: 2026-05-10_
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 
@@ -31,14 +31,35 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `application-hub-mcp-server/` exists.
 - TypeScript MCP server is present.
 - Server registers:
-  - 16 tools
+  - 18 tools
   - 7 resources
   - 3 prompts
 - Supports two transports:
   - `stdio` for Claude Desktop / Cursor / Windsurf
   - `http` for remote deployment
 - Build script exists: `npm run build`.
+- Typecheck script exists: `npm run typecheck`.
 - Strict TypeScript config exists.
+- New app-support tools are present:
+  - `hub_get_program_by_slug`
+  - `hub_save_answer`
+
+### Next.js app
+- `app/` exists as a Next.js App Router application.
+- Package and lockfile are present.
+- Current app surfaces include:
+  - Hub directory
+  - Program detail route
+  - Workspace route
+  - Profile route
+  - Supabase auth callback/login scaffolding
+- Live Supabase data wiring is active and owned by Cowork.
+
+### CI
+- GitHub Actions workflow exists at `.github/workflows/ci.yml`.
+- CI has separate jobs for:
+  - MCP server install, typecheck, build
+  - Next.js app install, typecheck, build
 
 ### Environment documentation
 - `application-hub-mcp-server/.env.example` exists.
@@ -56,16 +77,10 @@ This file is the current GitHub-visible source of truth. It separates what is co
 These may exist locally, but are not confirmed by the current GitHub-visible repository state:
 
 - Root `package.json`
-- Next.js app package
-- App Router routes
-- Hub UI implementation
-- Application workspace UI
-- Answer history UI
-- Answer bank UI
 - `application-hub-roadmap.md`
-- GitHub Actions CI workflow
-- ESLint / Biome / Prettier config
-- Dedicated `typecheck`, `lint`, or `check` scripts
+- Production deployment configuration
+- Stripe webhook implementation
+- Live app data integration completion
 
 ---
 
@@ -74,18 +89,17 @@ These may exist locally, but are not confirmed by the current GitHub-visible rep
 The GitHub-visible repo should be treated as:
 
 ```text
-Database schema + MCP server are present.
-Frontend status is unverified remotely.
-Seed data status is unclear because TASKS.md contains conflicting statements.
-Tooling and CI need to be added.
+Database schema + seed data + MCP server are present.
+Next.js app is present and moving from mock data to live Supabase data.
+CI covers MCP and app packages separately.
 ```
 
 ---
 
 ## Immediate priorities
 
-1. Resolve `TASKS.md` contradiction.
-2. Add baseline CI for the MCP server.
-3. Add repo-level architecture and security documentation.
-4. Confirm whether the locally built frontend/seed-data gap needs to be pushed.
-5. After remote state is synchronized, continue with frontend and production deployment work.
+1. Finish live Supabase wiring in the Next.js app.
+2. Keep architecture/status docs synced as schema-facing column names settle.
+3. Expand MCP app-support tools only when they remove server-side app duplication.
+4. Resolve remaining app build/typecheck issues as part of live data integration.
+5. After app routes are live-data backed, move to production deployment work.
