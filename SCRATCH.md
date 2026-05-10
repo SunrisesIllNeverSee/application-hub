@@ -8,12 +8,24 @@
 
 ## For Codex — most recent context
 
+_Updated 2026-05-10 after live deployment smoke test and Milestone 3 review._
+
 If you're picking up after Cowork's 2026-05-10 session, read these in order:
 
 1. **`AGENTS.md`** — refreshed ownership table, includes new files: ROADMAP.md, VISION.md, SCRATCH.md
 2. **`ROADMAP.md`** — canonical priority-ordered list of work. P0 = Drip mechanic, Question Bank UI, **BYOK** (now P0 above /api/draft rate-limiting because user can't subsidize AI calls), `/api/draft` rate-limiting. P1 = home dashboard, stress-testing groundwork, responsive layout (mobile drawer toggle still pending), real deadlines, program TL;DR, user profile split, custom SMTP (your lane). P2/P3 below.
 3. **`VISION.md`** — 551-line product vision. Key recent additions: positioning ("infrastructure for the application graph, not an AI writer"), levelling story (novice vs seasoned-funded founder, stress testing levels presentation skill), BYOK as cost reality (Free tier requires user keys, no platform fallback), MoatScore framework status (waiting on user spec), home dashboard mockup, integrations roadmap (4 tiers).
 4. **`TASKS.md`** — finer-grained backlog with 16+ smoke-test follow-ups.
+5. **`STATUS.md`** — updated to reflect live deployment, SMTP confirmed, smoke test done, Milestone 3 gap list.
+
+### Open items in your lane (current priorities)
+
+- **Question Bank `/bank` route UI** — P0, biggest missing piece. 225 scored questions exist in `archived_questions`. Drip mechanic is designed (see ROADMAP + VISION). The database, scoring, and MCP tools are all live. Only the UI is missing. Start here.
+- **Workspace index bug** — workspace page is querying `user_applications` table; being fixed by Cowork agent. Do not touch `app/app/(app)/workspace/` until released.
+- **Migration 013 cohort context** — adds `cohort_name`, `program_start_date`, `cohort_size` columns to `programs` table. Being applied in this commit. Apply to production Supabase when ready.
+- **BYOK `/profile/integrations` UI** — P0. Schema is in `migrations/012_launch_hardening.sql` (`user_integrations` table). The route `/profile/integrations` does not exist yet. Needs provider selector, key entry, and validation flow.
+- **Sidebar IA redesign** — applications list should appear below a divider in the sidebar, sorted by status tags (active, submitted, draft). Current sidebar is flat.
+- **Heat scores + applicant counts** — all programs show 0 for `heat_score` and `applicant_count`. A synthetic compute job or manual seed is needed. This is a polish item but affects perceived quality of the hub directory.
 
 What landed since your last commit (`ea820dc`):
 - `9d40f5d` — DNA % display + sidebar active-state fixes
@@ -28,11 +40,6 @@ What landed since your last commit (`ea820dc`):
 - `24acbc5` — positioning reframe (infrastructure layer, not AI writer; BYOK cost reality)
 - `9d83151` — responsive layout sweep verified across mobile/tablet/desktop
 - `3e5e7a9` — Codex infra bundle: Resend SMTP guide, `hub_stress_test_answer`, `/api/draft` metering
-
-Open items in your lane (from ROADMAP):
-- **Manual SMTP completion** — docs are done; remaining work is Resend domain verification + Supabase dashboard SMTP entry
-- **P3 — Heat scores compute job, recruiter agent cron, Stripe webhook handler**
-- **Stress-test persistence/scoring** — MCP stub is done; table, quota, UI, BYOK/LLM generation are still future work
 
 Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` while these P1 bugs are in flight (responsive sweep landed; deadlines + program TL;DR + user profile split queued). You're clear to take MCP server, deps, CI, doc-architecture work.
 
