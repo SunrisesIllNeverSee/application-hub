@@ -244,6 +244,198 @@ This is the **founder credit score** play — and if we own the data, programs e
 
 ---
 
+### Stress testing — the core differentiator
+
+User insight (2026-05-10): "i ran into a lot of brick walls in my applications... they are static... i am looking to end that by creating in RT follow ups... a sort of stress test type of thing."
+
+**The problem**: applications today are one-shot static artifacts. A founder writes 200 words about traction, the program reads it, decides. Two failure modes:
+1. **Hidden gem buried in bad presentation** — a great answer with weak phrasing gets bounced because nobody surfaces the actual signal underneath
+2. **Polished surface with no substance** — a beautifully-written answer that falls apart on any follow-up makes it through to interview, wastes everyone's time
+
+**The fix**: stress-test every answer in real time. After a user saves an answer (or after submission), the platform asks 3–5 probing follow-ups to validate the claim, surface what's underneath, or expose what's missing.
+
+Mechanically:
+- User saves answer to "What's your traction?" — claims "$50k MRR, 30% MoM growth"
+- Platform fires stress-test: "Where is that revenue coming from? How many customers? What's churn? What's CAC? When did you hit that MRR?"
+- User answers (or skips, or marks "won't share")
+- Original answer + stress responses become a **stress-tested artifact** with a confidence layer
+- Programs see the original 200 words AND the validation depth — richer signal than either alone
+
+**Two outputs from a stress test**:
+- For the founder: discovers what's actually strong vs. what they were bluffing about. Actionable feedback that leads to better answers.
+- For the program: a confidence score on each claim. Stress-tested traction at 0.92 confidence is more credible than untested traction at 1.0 polish.
+
+**Connection to moatscore** (see below): stress-tested answers feed the moat assessment. A claim that survives stress contributes to moat strength; a claim that collapses signals overstatement.
+
+**Connection to the Application Hub Fund**: the fund needs to assess merit. Stress-tested applications give the fund a defensible signal beyond polish.
+
+This is **the most differentiated thing about the product**. Every other application platform accepts what's submitted and stops. Stress testing turns the platform into a truth machine — for everyone's benefit, not just one side.
+
+Implementation tiers:
+- **Free**: 3 stress tests per month, AI-driven follow-ups
+- **Pro**: unlimited stress tests, choice of stress depth (light/medium/deep), can re-stress same answer over time
+- **Pro+**: stress test is gated by a community panel (other founders or mentors) for premium signal
+- **Funder side** (later): programs pay to have applicants stress-tested as part of the program's intake
+
+### Floating Moat / Standing / FundScore / MoatScore
+
+User has an existing framework — exact specifics TBD. This expands the **Founder Ranking** concept from earlier.
+
+The platform computes a real-time, multi-dimensional score for each founder/company that travels across applications and updates as new data lands.
+
+**Floating** = updates continuously as new evidence comes in (new applications submitted, stress tests completed, traction signals from connected platforms, outcomes logged).
+
+**Moat** = composite measure of competitive defensibility, derived from:
+- Answer Bank quality across moat-relevant themes (problem, vision, technical depth, team)
+- Stress-test survival rate (claims that hold up under probing)
+- External signals (GitHub activity, Stripe MRR if connected, social proof)
+- Outcome track record (acceptances, follow-on rounds, exits)
+
+**Standing** = where you rank against other founders (by category, stage, geography, etc.)
+
+**FundScore / MoatScore** = the headline number. A single 0–100 (or 0–1000?) figure that programs and funders can use as a quick assessment.
+
+UI implications:
+- Founder profile page surfaces standing + score with breakdown
+- Hub list can be sorted by "founders most likely to fit" (uses applicant moat score)
+- Program detail page shows distribution: "founders applying to this program have moatscores ranging X–Y"
+- Premium: see your delta to the next standing tier ("answer 3 more questions in Vision and you'd jump 12 places")
+
+**Open question for the user**: do you want this built using the Founder Ranking concept already in VISION.md, or do you have an existing framework definition you'd like to bring in? If existing, share the schema/weights/algorithm.
+
+### Bring Your Own Key (BYOK) — AI provider integrations
+
+User direction (2026-05-10): "users will be able to plug in their own key... my key will be added later or we will find another solution."
+
+**Architectural shift**: today `/api/draft` uses a platform-owned `ANTHROPIC_API_KEY`. Going forward, users bring their own keys.
+
+Why this is right:
+- Removes the platform's largest variable cost (Anthropic API spend per draft)
+- Lets users pick their preferred provider — Claude, GPT-5, Gemini, Mistral, local Ollama
+- Premium users who don't want to manage keys can use the platform's pooled key (Pro feature)
+- Privacy story: power users keep their answers entirely under their own provider's terms
+
+**Schema** (future migration):
+```sql
+CREATE TABLE user_integrations (
+  user_id          UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  provider         TEXT NOT NULL,       -- 'anthropic' | 'openai' | 'google' | 'ollama' | etc
+  encrypted_key    TEXT NOT NULL,       -- pgsodium or vault-encrypted
+  default_for      TEXT[],              -- ['draft', 'stress_test', 'critique']
+  added_at         TIMESTAMPTZ DEFAULT NOW(),
+  last_used_at     TIMESTAMPTZ,
+  PRIMARY KEY (user_id, provider)
+);
+```
+
+**Routing logic in `/api/draft`**:
+1. Check user's `user_integrations` for a key matching the request type
+2. If found, decrypt + use
+3. If not found AND user is Pro/Team, fall back to platform pooled key (rate-limited)
+4. If not found AND user is Free, return 402 with "add a key in Settings or upgrade to Pro"
+
+**UI**: new `/profile/integrations` page where users paste API keys for whichever providers they want. Visible "test connection" button per provider.
+
+**Free tier policy** (TBD with user):
+- Option A: Free tier requires user to BYOK (no platform fallback)
+- Option B: Free tier gets 5–10 platform-key drafts/month, then must BYOK
+- Option C: Free tier has zero AI access, BYOK gives 10/month free + Pro = unlimited
+
+Premium pricing matrix needs to reflect this — see Free vs Paid Philosophy section below.
+
+### Integration roadmap — what to connect, in what order
+
+User insight: "how to connect this with other platforms... vs code github llms what other ideas do we have"
+
+Ranked by leverage and proximity to ship:
+
+**Tier 1 — connects directly to the moat thesis (highest priority)**
+
+| Integration | What it does | Why first |
+|---|---|---|
+| **GitHub App** | Pull stars, commits, contributors, public repo activity for a connected company | Auto-populates traction questions, feeds moatscore |
+| **BYOK AI providers** | Anthropic, OpenAI, Google, Ollama (local) | Architectural prerequisite for `/api/draft` going forward |
+| **MCP server (existing)** | Founders connect their own Claude/Cursor/Windsurf to query archive + draft answers | Already partly built — power-user surface |
+| **Stripe** | Subscription billing for Pro/Team | Monetization unlock |
+| **Resend (or equivalent SMTP)** | Transactional email — magic link, deadline alerts, drip notifications | Removes Supabase free-tier email dependency |
+
+**Tier 2 — enriches the data and reduces user friction**
+
+| Integration | What it does | Why |
+|---|---|---|
+| **VS Code / Cursor extension** | Founders see and answer application questions inside their editor | "Power user lives in their dev environment" — same MCP backend |
+| **LinkedIn import** | Auto-pull founder profile, company experience | Reduces manual profile setup |
+| **Crunchbase / AngelList** | Auto-populate company data (founding date, team size, stage) | Saves user time |
+| **Notion sync** | Read/write Answer Bank to a Notion database | Power users keep their stuff in Notion |
+| **Google Calendar** | Deadline alerts as calendar events | Surfaces app outside the app |
+| **Stripe data integration** | Read live revenue/MRR from connected Stripe accounts | Auto-validates traction claims, feeds stress-test |
+
+**Tier 3 — workflow and team features**
+
+| Integration | What it does | Why |
+|---|---|---|
+| **Slack** | Notifications: new program matches user, deadline alerts, team-mode comments | Engaged co-founder teams live in Slack |
+| **Linear / Jira / Asana** | Track applications as tasks | Some founders prefer their existing PM tool |
+| **Zapier / Make / n8n** | "When I save an answer, sync to Notion" type automations | Long-tail integrations without building each one |
+| **Dropbox / Google Drive** | Export applications as PDF / Markdown | Backup, sharing |
+
+**Tier 4 — specialized verticals**
+
+| Integration | What it does |
+|---|---|
+| **Grants.gov / SAM.gov APIs** | Auto-pull federal grant opportunities |
+| **Carta** | Cap table data for fundraising-themed questions |
+| **Mercury / Ramp** | Banking data for runway/burn-rate questions |
+| **HubSpot / Mixpanel / Amplitude** | Product analytics for traction validation |
+| **Twitter/X, LinkedIn social** | Mention/sentiment signal for moatscore |
+
+**Funder-side (later)**:
+- Direct partnerships with accelerators (YC, Techstars) for hosted submissions
+- Webhooks programs subscribe to ("notify me when high-fit founder applies")
+
+### Home dashboard — fixing the IA
+
+User direction (2026-05-10): "want to make sure we address the home dashboard... the program hub and timeline thing"
+
+**Current sidebar**: Program Hub / Timeline / My Applications / Answer Bank — four entries, none of which is a "home."
+
+**Problems**:
+- New user lands on `/hub` (programs) but doesn't know what to do
+- Timeline is a sort/view of programs, not a separate destination
+- Engaged user has no place that synthesizes "what should I focus on today"
+
+**Proposed home dashboard** (`/` or `/home` or `/today`):
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ Today                                          [moatscore] │
+│                                                             │
+│ ▸ 3 new questions unlocked in your Question Bank →          │
+│ ▸ 2 deadlines in the next 14 days (Y Combinator W26, …)     │
+│ ▸ Your application to Pear VC is 60% complete →             │
+│ ▸ One of your saved answers needs a stress test →           │
+│                                                             │
+│ ────────── Suggested next steps ──────────                  │
+│                                                             │
+│ [Answer 3 questions]   [Open Pear VC app]   [Stress test]   │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Sidebar reorg** (proposal):
+
+| Today | Sidebar entry | Proposed | Lives at |
+|---|---|---|---|
+| Program Hub | Programs | Hub | `/hub` (with view tabs: Cards / Timeline / Map) |
+| Timeline | (folded into Hub view tabs) | — | — |
+| My Applications | Applications | Apps | `/apps` |
+| Answer Bank | (split) | Bank | `/bank` (Question Bank + Drip + Answer Bank merged) |
+| (none) | (new) | Today | `/` (home dashboard, default) |
+| (none) | (new) | Profile | `/profile` (real profile, not Answer Bank) |
+
+This reduces cognitive load (4 entries → 5 but each has a clearer job), gives engaged users a daily landing page, and folds Timeline into a more natural place.
+
+---
+
 ## Free vs Paid Philosophy
 
 The pricing matrix is downstream of a principle. Naming the principle helps:

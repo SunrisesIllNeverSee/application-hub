@@ -45,6 +45,9 @@ These are the things that change the product's trajectory, not just polish it.
 - [ ] **Question Bank UI surface** — *Cowork*  
   `/bank` route. Combines with the Drip mechanic. Shows unlocked questions ready to answer + locked previews + countdown to next unlock. Calls existing MCP tool `hub_get_universal_questions`. Becomes the natural daily landing page. **Backend already exists; only the Next.js page is missing.**
 
+- [ ] **BYOK (Bring Your Own Key) AI provider integration** — *Cowork*  
+  User direction: founders bring their own keys (Anthropic, OpenAI, Google, local Ollama). New `user_integrations` table (encrypted keys), `/profile/integrations` UI, routing logic in `/api/draft` that picks user's key first, falls back to platform pooled key for Pro tier (TBD whether Free gets any platform key access). **Architectural prerequisite** for `/api/draft` going forward — current code uses platform-only `ANTHROPIC_API_KEY`. See VISION.md "BYOK" section.
+
 - [ ] **Rate-limit `/api/draft` properly** — *Cowork or Codex*  
   Insert into `ai_draft_runs` after each successful Anthropic call. The existing trigger `track_ai_usage_on_draft` will then enforce monthly limits per `subscription_plans.ai_drafts_per_month`. Without this, every draft costs Anthropic spend with no ceiling.
 
@@ -71,6 +74,12 @@ Bug fixes and feature gaps that, once fixed, raise the launch-readiness percepti
 
 - [ ] **Set up custom SMTP (Resend)** — *Codex*  
   Supabase Authentication → Emails → "Set up custom SMTP." Resend is the path of least resistance — 3,000 emails/month free, zero-config integration. Unblocks reliable magic-link auth + future transactional emails.
+
+- [ ] **Home dashboard + sidebar IA** — *Cowork*  
+  New `/` (or `/today`) home dashboard: "Today" view synthesizing — questions unlocked today, closest deadlines, in-progress applications, answers needing stress tests, moatscore. Sidebar reorganized: Today / Hub / Bank / Apps / Profile (Timeline folds into Hub view tabs). See VISION.md "Home dashboard" section.
+
+- [ ] **Stress-testing groundwork** — *Cowork (data) + Codex (MCP tool)*  
+  New table `answer_stress_tests` (answer_id, follow_up_questions, responses, confidence_score, run_at). New MCP tool `hub_stress_test_answer` that takes an answer + question + program DNA and returns 3–5 probing follow-ups. UI on AnswerEditor: "Stress test this answer" button after save. Free: 3 stress tests/month. Pro: unlimited. **The most differentiated thing about the product** — see VISION.md "Stress testing" section.
 
 - [ ] **Smoke-test `POST /api/draft` end-to-end** — *Cowork*  
   Deferred until user has an Anthropic key. Verify the AnswerEditor "Draft with AI" button → `/api/draft` → Anthropic → response → text inserted flow.
@@ -104,6 +113,9 @@ Bug fixes and feature gaps that, once fixed, raise the launch-readiness percepti
 - [ ] **"Golden Opportunities" premium rail** — *Cowork (design) + Codex (data)*  
   Combines days-until-deadline (urgency), applicant count (low competition), DNA-fit (high match), recency. Pro-only rail at top of `/hub`.
 
+- [ ] **MoatScore / FundScore / Standing surface** — *Cowork*  
+  User has a "Floating Moat / Standing / FundScore / MoatScore" framework — exact definition TBD with user. Composite score from Answer Bank quality, stress-test survival rate, external integrations, outcome track record. Surfaces on founder profile, Hub list sort, program detail. See VISION.md "Floating Moat" section. **Open question**: is there an existing framework spec to import, or are we deriving from Founder Ranking?
+
 - [ ] **Significance score display** — *Cowork*  
   Star rating (1–5) on each question. Sort questions by significance within each section. "Asked by N programs" tooltip.
 
@@ -125,6 +137,9 @@ Bug fixes and feature gaps that, once fixed, raise the launch-readiness percepti
 ---
 
 ## Vision tier — the platform plays (see VISION.md for full detail)
+
+- [ ] **Integrations roadmap** (see VISION.md for full tiered list)  
+  Tier 1: GitHub App (traction signals), BYOK AI, Stripe billing, Resend SMTP. Tier 2: VS Code/Cursor extension, LinkedIn import, Notion sync, Google Calendar, Stripe data. Tier 3: Slack, Linear/Jira, Zapier. Tier 4: Grants.gov, Carta, Mercury, social signals. Each tier ships independently when its anchor user appears.
 
 - [ ] **Question Databank as a service**  
   Already partially built (MCP server). Founders connect their own Claude/Cursor/Windsurf, query the question archive programmatically. Power-user flow. *(A) MCP/API endpoint or (B) embeddable widget for partner sites — both worth pursuing.*
