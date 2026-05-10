@@ -51,6 +51,13 @@ export default async function ProgramDetailPage({ params }: Props) {
   const questions = questionRows ?? []
   const deadline = formatDeadline(program.deadline_at)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = program as any
+  const tldr: string | null = p.tldr ?? null
+  const pros: string[] = Array.isArray(p.pros) ? p.pros : []
+  const cons: string[] = Array.isArray(p.cons) ? p.cons : []
+  const bestFor: string | null = p.best_for ?? null
+
   // Group questions by section
   const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {
     const section = q.section ?? 'General'
@@ -148,6 +155,53 @@ export default async function ProgramDetailPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {/* TL;DR / Pros / Cons / Best For */}
+      {(tldr || pros.length > 0 || cons.length > 0 || bestFor) && (
+        <div className="card p-6 mb-6">
+          {tldr && (
+            <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed mb-5 font-medium">
+              {tldr}
+            </p>
+          )}
+          {(pros.length > 0 || cons.length > 0) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              {pros.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-success-700 dark:text-success-400 uppercase tracking-wider mb-2">Strengths</p>
+                  <ul className="space-y-1.5">
+                    {pros.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+                        <span className="mt-0.5 text-success-500 flex-shrink-0">+</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {cons.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-warning-700 dark:text-warning-400 uppercase tracking-wider mb-2">Watch out for</p>
+                  <ul className="space-y-1.5">
+                    {cons.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+                        <span className="mt-0.5 text-warning-500 flex-shrink-0">&minus;</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+          {bestFor && (
+            <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
+              <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Best for </span>
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">{bestFor}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0">
         {/* DNA */}
