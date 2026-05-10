@@ -26,7 +26,7 @@ Core asset: a **question archive** — every question ever asked by any program,
 ```
 Supabase (PostgreSQL + pgvector)   ← single source of truth
   ↕                                   project: betcyfbzsgusaghriptz
-MCP Server (TypeScript)            ← intelligence layer, 19 tools
+MCP Server (TypeScript)            ← intelligence layer, 20 tools
   ↕
 Next.js app (app/)                 ← user-facing product (Phase 2)
 ```
@@ -38,7 +38,7 @@ Next.js app (app/)                 ← user-facing product (Phase 2)
 | Component | Status | Owner |
 |---|---|---|
 | Schema + migrations 001–009 | ✅ Done (009 = auth trigger fix, 2026-05-10) | Cowork (009) |
-| MCP server (19 tools) | ✅ Done | — |
+| MCP server (20 tools) | ✅ Done | — |
 | 30 programs seeded to Supabase | ✅ Done | Cowork |
 | Intelligence layer (significance + DNA) | ✅ Done | Cowork |
 | Next.js app scaffold | ✅ Done | Codex |

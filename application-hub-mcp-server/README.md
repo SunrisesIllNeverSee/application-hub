@@ -2,7 +2,7 @@
 
 MCP server for the Application Hub — a platform that helps founders track, compare, and apply to accelerators, grants, and fellowships.
 
-Exposes 19 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
+Exposes 20 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
 
 ---
 
@@ -167,6 +167,7 @@ For remote Claude connections, point the MCP config at your deployed URL:
 | `hub_log_draft_run` | Track AI draft usage (rate-limited by tier) |
 | `hub_save_answer` | Validate and upsert one reusable profile answer |
 | `hub_get_answer_review_context` | Gather saved-answer context for agent-side RNS/CIVITAE/MO§ES review |
+| `hub_stress_test_answer` | Return read-only follow-up prompts and checklist for saved-answer stress testing |
 
 ---
 

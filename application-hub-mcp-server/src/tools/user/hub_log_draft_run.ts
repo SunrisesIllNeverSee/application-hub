@@ -34,26 +34,23 @@ Requires valid user_token.`,
 
     const month = new Date().toISOString().slice(0, 7);
 
-    // Upsert usage row
-    const { error } = await supabase.rpc("increment_draft_count", {
-      p_user_id: user_id,
-      p_month_year: month
-    });
-
-    if (error) {
-      return { content: [{ type: "text", text: `Error logging draft: ${error.message}` }] };
-    }
-
-    // Log to ai_draft_runs audit table if it exists
-    await supabase.from("ai_draft_runs").insert({
+    // ai_draft_runs has a database trigger that increments ai_usage.
+    // Do not call increment_draft_count here, or the same draft is counted twice.
+    const { error } = await supabase.from("ai_draft_runs").insert({
       user_id,
       program_id,
       archived_question_id,
       integration_type,
       model_used: model_used ?? null,
       prompt_tokens: prompt_tokens ?? null,
-      completion_tokens: completion_tokens ?? null
+      completion_tokens: completion_tokens ?? null,
+      output_content: "[logged externally]",
+      word_count: 0
     }).select();
+
+    if (error) {
+      return { content: [{ type: "text", text: `Error logging draft: ${error.message}` }] };
+    }
 
     // Get updated count
     const { data: usage } = await supabase

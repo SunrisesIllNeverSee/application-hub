@@ -29,6 +29,7 @@ import { registerRankMyAnswers } from "./tools/user/hub_rank_my_answers.js";
 import { registerLogDraftRun } from "./tools/user/hub_log_draft_run.js";
 import { registerSaveAnswer } from "./tools/user/hub_save_answer.js";
 import { registerGetAnswerReviewContext } from "./tools/user/hub_get_answer_review_context.js";
+import { registerStressTestAnswer } from "./tools/user/hub_stress_test_answer.js";
 
 // ── Resources ───────────────────────────────────────────────────────────────
 import { registerProgramResources } from "./resources/programs.js";
@@ -70,6 +71,7 @@ async function main() {
   registerLogDraftRun(server);
   registerSaveAnswer(server);
   registerGetAnswerReviewContext(server);
+  registerStressTestAnswer(server);
 
   // Register resources
   registerProgramResources(server);

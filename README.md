@@ -14,6 +14,7 @@ Built by Ello Cello LLC.
 - **`STATUS.md`** — current confirmed state of the GitHub-visible repo
 - **`AGENTS.md`** — Cowork (Claude) + Codex coordination contract, file ownership
 - **`SCRATCH.md`** — active work-in-progress claims (what each agent is touching right now)
+- **`docs/08_resend_smtp_setup.md`** — practical Supabase Auth custom SMTP setup with Resend
 
 We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
 
@@ -33,11 +34,11 @@ The product is built around a **question archive** — every question asked by e
 |---|---|
 | Database schema (v3) | ✅ Complete |
 | Supabase migrations | ✅ 009 migrations, apply in order |
-| MCP server (19 tools) | ✅ Complete, clean build |
+| MCP server (20 tools) | ✅ Complete, clean build |
 | Seed data (30 programs) | ✅ Done |
 | Next.js app | ✅ Live data wired, build verified |
 
-The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 19 tools, 7 resources, and 3 prompts.
+The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 20 tools, 7 resources, and 3 prompts.
 
 ---
 

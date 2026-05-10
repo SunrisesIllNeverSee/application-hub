@@ -43,6 +43,22 @@ The tool should return:
 - `answer_history`: recent saved versions for answer evolution review.
 - `review_contract`: named slots expected from an RNS/CIVITAE/MO§ES reviewer.
 
+The first stress-testing surface is:
+
+```text
+hub_stress_test_answer(user_token, answer_id, program_id?, stress_depth?)
+```
+
+This tool uses the same saved-answer context pattern as `hub_get_answer_review_context`: validate the user's Supabase JWT, load the saved answer by `profile_answers.id`, load the canonical archived question, load matching program usage, and load program DNA rows for the programs asking that question. It is read-only and deterministic in this phase. It does not call an LLM, score confidence, or persist to `answer_stress_tests` yet.
+
+`stress_depth` controls the number of follow-ups returned:
+
+- `light`: 3 prompts
+- `medium`: 4 prompts
+- `deep`: 5 prompts
+
+The optional `program_id` narrows program usage and DNA to one program, which lets the prompts stress the answer against a specific application instead of all programs that ask the same archived question.
+
 ---
 
 ## Review Output Shape
@@ -81,6 +97,70 @@ This output does not have to be persisted in Phase 2. The first goal is to make 
 
 ---
 
+## Stress-Test Output Shape
+
+`hub_stress_test_answer` should return a structured object with these fields:
+
+```json
+{
+  "answer_id": "uuid",
+  "mode": "stub_no_llm",
+  "stress_depth": "light | medium | deep",
+  "persisted": false,
+  "scoring_performed": false,
+  "answer": {
+    "id": "uuid",
+    "archived_question_id": "uuid",
+    "question_text": "Question text",
+    "theme": "traction",
+    "answer_content": "Saved answer text",
+    "confidence": "draft | solid | locked",
+    "word_count": 120,
+    "version": 3,
+    "updated_at": "timestamp"
+  },
+  "archived_question": {},
+  "program_scope": {
+    "requested_program_id": "uuid or null",
+    "matched_program_count": 3,
+    "program_usage": [],
+    "program_dna": []
+  },
+  "detected_signals": {
+    "word_count_estimate": 120,
+    "numeric_claims": ["$50k", "30%"],
+    "likely_urls": []
+  },
+  "follow_up_prompts": [
+    {
+      "id": "stress_follow_up_1",
+      "focus": "metric provenance",
+      "prompt": "Where did the traction number in this answer come from, and what source would verify it?",
+      "expected_evidence": ["analytics export", "Stripe or bank record", "CRM or customer list"],
+      "risk_if_unanswered": "The answer may read as polished but unverifiable.",
+      "response_type": "free_text",
+      "founder_response": null
+    }
+  ],
+  "checklist": [
+    {
+      "id": "claim_specificity",
+      "label": "Every major claim names a number, customer, date, artifact, or observable outcome.",
+      "status": "not_checked"
+    }
+  ],
+  "future_persistence_contract": {
+    "table": "answer_stress_tests",
+    "fields": ["answer_id", "follow_up_questions", "responses", "confidence_score", "run_at"],
+    "note": "Not written by this stub."
+  }
+}
+```
+
+The prompt set is intentionally conservative groundwork. It should help an external agent or UI ask useful follow-ups today, while leaving deeper claim extraction, confidence scoring, and persistence for a later schema-backed phase.
+
+---
+
 ## RNS Mapping
 
 Use the current app fields as launch scaffolding:
@@ -96,9 +176,12 @@ RNS adds deeper judgment without replacing those fields immediately:
 - Commitment conservation: does the answer make stable claims across versions and contexts?
 - SigToken scoring: is the answer specific, grounded, and reusable?
 - Fidelity certificate: is the answer strong enough to reuse across high-value applications?
+- Stress-test survival: can the answer withstand follow-up prompts without exposing unverifiable, overstated, or generic claims?
 
 ---
 
 ## Launch Rule
 
 Do not put the full RNS review system inside `POST /api/draft`. Keep first-pass drafting fast. Let the agent-side review path mature through MCP before promoting it into first-class app UI.
+
+Likewise, keep stress testing out of hosted drafting for now. The MCP tool can generate the follow-up contract without subsidizing model calls or blocking the answer editor. LLM follow-up generation, monthly quota checks, `answer_stress_tests` persistence, and confidence scoring can land after BYOK and the stress-test table are in place.

@@ -22,7 +22,7 @@ The core asset is a **question archive**: every question ever asked by any progr
 ```
 Supabase (PostgreSQL + pgvector)   ← single source of truth
   ↕
-MCP Server (TypeScript)            ← intelligence layer, 19 tools
+MCP Server (TypeScript)            ← intelligence layer, 20 tools
   ↕
 Claude Desktop / Cursor / Windsurf ← AI drafting interface (current)
   ↕
@@ -54,7 +54,7 @@ application-hub/
 │   ├── 008_intelligence_layer_v2.sql   ← adds program_dna, user_program_fit, RPCs
 │   └── 009_fix_auth_trigger_search_path.sql ← fixes magic-link signup trigger search_path
 │
-├── application-hub-mcp-server/        ← TypeScript MCP server (19 tools, 7 resources, 3 prompts)
+├── application-hub-mcp-server/        ← TypeScript MCP server (20 tools, 7 resources, 3 prompts)
 │   ├── src/
 │   ├── dist/                          ← compiled output (run npm run build first)
 │   └── README.md
@@ -179,7 +179,7 @@ Recommended MCPs to add for this project:
 |---|---|
 | v3 schema design | ✅ Done |
 | Supabase migrations 001-009 | ✅ Done |
-| MCP server (19 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
+| MCP server (20 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
 | 30 programs seeded | ✅ Done — all in Supabase `betcyfbzsgusaghriptz` |
 | Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
 | Next.js app scaffold | ✅ Done — auth, app router, Supabase SSR client, layouts |

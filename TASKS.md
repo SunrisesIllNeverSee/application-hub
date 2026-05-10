@@ -73,10 +73,12 @@ Output:
 
 ### [ ] Set up custom SMTP for Supabase auth emails
 **Owner**: Codex or Deric
-**Priority**: P1 — Supabase free-tier email is rate-limited (~3/hr per address, also IP-throttled). Magic-link signups are unreliable for any real user testing.
+**Priority**: P1 — Supabase's default Auth email sender is rate-limited and not intended for real user testing; current Supabase docs list the default limit as 2 messages/hour. Magic-link signups are unreliable until custom SMTP is configured.
 
 Option set: Resend (cheapest, 100/day free), Mailgun, SendGrid, AWS SES. Resend is the most Supabase-friendly and they have a setup guide.
 Flow: Supabase Dashboard → Authentication → Emails → "Set up custom SMTP" → paste provider creds.
+
+Documentation added: `docs/08_resend_smtp_setup.md`. Remaining work is manual dashboard/DNS setup: verify the sending domain in Resend, paste SMTP credentials into Supabase Auth, then run the magic-link testing checklist.
 
 ### [ ] Commit migration 009 + auth/callback route move
 **Owner**: Cowork
@@ -201,7 +203,7 @@ User confirmed working after retest. Agent investigation had already found no pl
 ### [ ] Stripe integration
 - Products: Free / Pro ($19/mo) / Team ($49/mo)
 - Webhook handler: update `user_subscriptions` on payment events
-- Rate limiting wired via `ai_usage` + `increment_draft_count`
+- Rate limiting wired via `ai_draft_runs` inserts + `track_ai_usage_on_draft`
 - Gate: unlimited AI, export, heat scores, acceptance rates behind Pro
 
 ### [ ] Deadline alerts
@@ -238,7 +240,7 @@ User confirmed working after retest. Agent investigation had already found no pl
 
 - [x] v3 schema design — global question archive as core asset
 - [x] Supabase migrations 001–009 (core schema, intelligence, monetization, DNA layer, auth trigger hardening)
-- [x] MCP server — 19 tools, 7 resources, 3 prompts, clean TypeScript build
+- [x] MCP server — 20 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README (Claude Desktop, Cursor, Windsurf configs)
 - [x] CI workflow for MCP server (`.github/workflows/ci.yml`)
 - [x] SECURITY.md, ARCHITECTURE.md, STATUS.md docs

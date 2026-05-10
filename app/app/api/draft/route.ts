@@ -6,6 +6,12 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
+const MODEL = 'claude-haiku-4-5-20251001'
+
+function countWords(text: string) {
+  return text.trim().split(/\s+/).filter(Boolean).length
+}
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = createClient()
@@ -20,6 +26,38 @@ export async function POST(req: NextRequest) {
 
     if (!archived_question_id) {
       return NextResponse.json({ error: 'archived_question_id is required' }, { status: 400 })
+    }
+
+    // Best-effort preflight so free-tier users do not burn provider tokens
+    // before the database trigger gets a chance to reject over-limit usage.
+    const month = new Date().toISOString().slice(0, 7)
+    const [{ data: subscription }, { data: usage }] = await Promise.all([
+      supabase
+        .from('user_subscriptions')
+        .select('tier, monthly_draft_limit')
+        .eq('user_id', user.id)
+        .single(),
+      supabase
+        .from('ai_usage')
+        .select('draft_count')
+        .eq('user_id', user.id)
+        .eq('month_year', month)
+        .maybeSingle(),
+    ])
+
+    const monthlyLimit = subscription?.monthly_draft_limit
+    if (
+      typeof monthlyLimit === 'number' &&
+      monthlyLimit >= 0 &&
+      (usage?.draft_count ?? 0) >= monthlyLimit
+    ) {
+      return NextResponse.json(
+        {
+          error: `Monthly AI draft limit (${monthlyLimit}) reached. Upgrade or connect your own AI provider.`,
+          drafts_remaining: 0,
+        },
+        { status: 429 }
+      )
     }
 
     // 1. Fetch the question
@@ -44,7 +82,7 @@ export async function POST(req: NextRequest) {
         .limit(5)
 
       if (dna && dna.length > 0) {
-        const top = dna.map((d) => `${d.theme} (${Math.round(d.weight_pct * 100)}%)`).join(', ')
+        const top = dna.map((d) => `${d.theme} (${Math.round(d.weight_pct)}%)`).join(', ')
         dnaContext = `\nThis program weights these themes most heavily: ${top}.`
       }
 
@@ -121,24 +159,70 @@ Write the draft answer only — no preamble, no explanation, no word count at th
 
     // 6. Call Anthropic
     const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: MODEL,
       max_tokens: 1024,
       messages: [{ role: 'user', content: userPrompt }],
       system: systemPrompt,
     })
 
     const draft = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
+    if (!draft) {
+      return NextResponse.json({ error: 'AI draft response was empty' }, { status: 502 })
+    }
+
+    const wordCount = countWords(draft)
+    const promptTokens = message.usage?.input_tokens ?? null
+    const completionTokens = message.usage?.output_tokens ?? null
+
+    const { data: draftRun, error: draftRunError } = await supabase
+      .from('ai_draft_runs')
+      .insert({
+        user_id: user.id,
+        program_id: program_id ?? null,
+        archived_question_id,
+        integration_type: 'claude',
+        model_used: MODEL,
+        prompt_used: `${systemPrompt}\n\n${userPrompt}`,
+        output_content: draft,
+        word_count: wordCount,
+        prompt_tokens: promptTokens,
+        completion_tokens: completionTokens,
+      })
+      .select('id')
+      .single()
+
+    if (draftRunError) {
+      console.error('[/api/draft] usage log error:', draftRunError)
+      const isLimitError = draftRunError.message.toLowerCase().includes('draft limit')
+      return NextResponse.json(
+        { error: isLimitError ? 'Monthly AI draft limit reached.' : 'Unable to record AI draft usage.' },
+        { status: isLimitError ? 429 : 500 }
+      )
+    }
+
+    const { data: updatedUsage } = await supabase
+      .from('ai_usage')
+      .select('draft_count')
+      .eq('user_id', user.id)
+      .eq('month_year', month)
+      .maybeSingle()
+
+    const draftsRemaining = typeof monthlyLimit === 'number' && monthlyLimit >= 0
+      ? Math.max(0, monthlyLimit - (updatedUsage?.draft_count ?? 0))
+      : 'unlimited'
 
     return NextResponse.json({
       draft,
       question_theme: question.theme,
       word_limit: wordLimit,
+      draft_run_id: draftRun?.id,
+      drafts_remaining: draftsRemaining,
     })
 
   } catch (err) {
     console.error('[/api/draft] error:', err)
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

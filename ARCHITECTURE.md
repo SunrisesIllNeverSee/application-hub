@@ -108,7 +108,7 @@ The app is live-data wired and build-verified. During live smoke testing, Cowork
 
 Drafting and reviewing are intentionally separate responsibilities. The app can generate a first-pass draft through a server-side Anthropic call, then save the answer state. Review comments, RNS signal analysis, answer fidelity checks, and certification can run later from Deric's side through MCP/agent workflows using the saved question, program, draft, answer history, and confidence enum.
 
-The first MCP bridge for that review path is `hub_get_answer_review_context(answer_id)`, which returns the saved answer, canonical archived question, program usage, program DNA, answer history, and review contract slots without performing the review itself.
+The first MCP bridge for that review path is `hub_get_answer_review_context(answer_id)`, which returns the saved answer, canonical archived question, program usage, program DNA, answer history, and review contract slots without performing the review itself. Stress-testing groundwork now sits next to it in `hub_stress_test_answer(user_token, answer_id, program_id?, stress_depth?)`, a read-only stub that returns deterministic follow-up prompts and a checklist without calling an LLM, scoring confidence, or persisting a run.
 
 ---
 

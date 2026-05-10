@@ -33,7 +33,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `application-hub-mcp-server/` exists.
 - TypeScript MCP server is present.
 - Server registers:
-  - 19 tools
+  - 20 tools
   - 7 resources
   - 3 prompts
 - Supports two transports:
@@ -46,6 +46,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `hub_get_program_by_slug`
   - `hub_save_answer`
   - `hub_get_answer_review_context`
+  - `hub_stress_test_answer`
 
 ### Next.js app
 - `app/` exists as a Next.js App Router application.
@@ -58,7 +59,8 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - Supabase auth callback/login scaffolding
 - Magic-link redirects now land at real path `/auth/callback`; Cowork moved the callback route out of the `(auth)` route group during live smoke testing.
 - Live Supabase data wiring is present and build-verified.
-- Hosted AI drafting is wired through `POST /api/draft`; deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
+- Hosted AI drafting is wired through `POST /api/draft`; successful drafts are logged to `ai_draft_runs` so the database trigger updates `ai_usage`.
+- Deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
 
 ### CI
@@ -75,6 +77,8 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `SUPABASE_ANON_KEY`
   - `TRANSPORT`
   - `PORT`
+- Supabase Auth custom SMTP setup is documented at `docs/08_resend_smtp_setup.md`.
+- Resend SMTP credentials are dashboard secrets, not frontend environment variables.
 
 ---
 
@@ -110,8 +114,8 @@ RNS is the planned additive judgment layer, not a launch blocker.
 3. **Seed real deadlines** — every program currently shows "Rolling" because seed lacks dates
 4. **Program detail TL;DR / pros & cons block** — user feedback: pages are too blob-y
 5. **Build proper user profile section** — `/profile` is currently the Answer Bank, no actual profile page
-6. **Set up custom SMTP** (Resend/SendGrid) — Supabase free tier is rate-limited and unreliable
-7. **Define agent-side review/comment contract** for saved answers (Codex's existing P1)
+6. **Set up custom SMTP** (Resend recommended) — setup guide is documented; dashboard/DNS configuration remains manual
+7. **Stress-test saved answers through MCP groundwork** — UI/persistence still pending
 8. **Smoke-test `POST /api/draft`** with valid Anthropic key (deferred — user doesn't have one yet)
 
 ## What landed during the 2026-05-10 smoke session

@@ -17,7 +17,7 @@
 - **Schema**: Migrations 001–009 applied to Supabase. Auth trigger gotcha fixed.
 - **Seed**: 30 programs, 225 questions. Significance scores + DNA weights computed.
 - **Intelligence layer**: live — `program_dna`, `user_program_fit`, fit scoring, significance scoring.
-- **MCP server**: 19 tools, 7 resources, 3 prompts. Including `hub_get_universal_questions`, `hub_get_answer_review_context`, `hub_save_answer`.
+- **MCP server**: 20 tools, 7 resources, 3 prompts. Including `hub_get_universal_questions`, `hub_get_answer_review_context`, `hub_stress_test_answer`, `hub_save_answer`.
 - **Next.js app**: Phase 2 complete. Builds clean on 14.2.35. All public routes wired to live Supabase.
 - **Auth**: magic link (works) + dev-only password sign-in (escape hatch).
 - **CI**: MCP + app jobs in `.github/workflows/ci.yml`.
@@ -31,7 +31,7 @@
 - **Program detail page** — long blob description, no TL;DR / pros / cons / "best for X founder" block.
 - **User profile** — `/profile` is the Answer Bank; no actual profile page (company, stage, bio, social).
 - **Email reliability** — Supabase free-tier rate-limited; needs custom SMTP (Resend/SendGrid).
-- **AI draft rate limiting** — `/api/draft` has no enforcement against `ai_usage` / `subscription_plans.ai_drafts_per_month`. Real launch blocker.
+- **AI draft BYOK/rate-limit policy** — `/api/draft` now logs successful hosted drafts to `ai_draft_runs`, but BYOK routing and user-facing provider gating remain open.
 
 ---
 
@@ -48,8 +48,8 @@ These are the things that change the product's trajectory, not just polish it.
 - [ ] **BYOK (Bring Your Own Key) AI provider integration** — *Cowork*  
   User direction: founders bring their own keys (Anthropic, OpenAI, Google, local Ollama). New `user_integrations` table (encrypted keys), `/profile/integrations` UI, routing logic in `/api/draft` that picks user's key first, falls back to platform pooled key for Pro tier (TBD whether Free gets any platform key access). **Architectural prerequisite** for `/api/draft` going forward — current code uses platform-only `ANTHROPIC_API_KEY`. See VISION.md "BYOK" section.
 
-- [ ] **Rate-limit `/api/draft` properly** — *Cowork or Codex*  
-  Insert into `ai_draft_runs` after each successful Anthropic call. The existing trigger `track_ai_usage_on_draft` will then enforce monthly limits per `subscription_plans.ai_drafts_per_month`. Without this, every draft costs Anthropic spend with no ceiling.
+- [x] **Rate-limit `/api/draft` properly** — *Codex*
+  Insert into `ai_draft_runs` after each successful Anthropic call. The existing trigger `track_ai_usage_on_draft` then updates monthly `ai_usage`. BYOK routing remains the larger policy layer.
 
 ---
 
@@ -73,13 +73,13 @@ Bug fixes and feature gaps that, once fixed, raise the launch-readiness percepti
   Split `/profile` into `/profile/answers` (current Answer Bank) + `/profile/about` (real profile: company, stage, bio, industry tags, social) + `/profile/settings` (account, billing, integrations). Unblocks: better fit scores, smarter drip, Founder Ranking, Application Hub Fund eligibility.
 
 - [ ] **Set up custom SMTP (Resend)** — *Codex*  
-  Supabase Authentication → Emails → "Set up custom SMTP." Resend is the path of least resistance — 3,000 emails/month free, zero-config integration. Unblocks reliable magic-link auth + future transactional emails.
+  Supabase Authentication → Emails → "Set up custom SMTP." Resend is the path of least resistance. Setup guide exists at `docs/08_resend_smtp_setup.md`; remaining work is manual Resend domain verification, Supabase SMTP entry, and magic-link testing. Unblocks reliable magic-link auth + future transactional emails.
 
 - [ ] **Home dashboard + sidebar IA** — *Cowork*  
   New `/` (or `/today`) home dashboard: "Today" view synthesizing — questions unlocked today, closest deadlines, in-progress applications, answers needing stress tests, moatscore. Sidebar reorganized: Today / Hub / Bank / Apps / Profile (Timeline folds into Hub view tabs). See VISION.md "Home dashboard" section.
 
-- [ ] **Stress-testing groundwork** — *Cowork (data) + Codex (MCP tool)*  
-  New table `answer_stress_tests` (answer_id, follow_up_questions, responses, confidence_score, run_at). New MCP tool `hub_stress_test_answer` that takes an answer + question + program DNA and returns 3–5 probing follow-ups. UI on AnswerEditor: "Stress test this answer" button after save. Free: 3 stress tests/month. Pro: unlimited. **The most differentiated thing about the product** — see VISION.md "Stress testing" section.
+- [x] **Stress-testing MCP groundwork** — *Codex*
+  New MCP tool `hub_stress_test_answer` returns deterministic follow-up prompts from a saved answer, question theme, static risk flags, and optional program DNA. UI, quota, `answer_stress_tests` persistence, and LLM/BYOK generation remain follow-up work.
 
 - [ ] **Smoke-test `POST /api/draft` end-to-end** — *Cowork*  
   Deferred until user has an Anthropic key. Verify the AnswerEditor "Draft with AI" button → `/api/draft` → Anthropic → response → text inserted flow.
