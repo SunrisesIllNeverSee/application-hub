@@ -3,7 +3,8 @@ import { themeLabel, cn } from '@/lib/utils'
 
 interface ThemeBarProps {
   theme: QuestionTheme
-  weight: number // 0–1
+  /** Percentage value 0-100 as stored in program_dna.weight_pct */
+  weight: number
   questionCount?: number
 }
 
@@ -23,7 +24,7 @@ const THEME_COLORS: Record<QuestionTheme, string> = {
 }
 
 export function ThemeBar({ theme, weight, questionCount }: ThemeBarProps) {
-  const pct = Math.round(weight * 100)
+  const pct = Math.max(0, Math.min(100, Math.round(weight)))
   const barColor = THEME_COLORS[theme] ?? 'bg-neutral-400'
 
   return (
@@ -43,7 +44,7 @@ export function ThemeBar({ theme, weight, questionCount }: ThemeBarProps) {
           </span>
         </div>
       </div>
-      <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
+      <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
         <div
           className={cn('h-2 rounded-full transition-all', barColor)}
           style={{ width: `${pct}%` }}

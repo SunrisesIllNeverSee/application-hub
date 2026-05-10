@@ -110,7 +110,13 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Nav */}
       <div className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {NAV.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + '/')
+          // Pick the best (longest) matching href so /hub/timeline highlights
+          // Timeline, not Program Hub.
+          const matches = NAV.filter(
+            (i) => pathname === i.href || pathname.startsWith(i.href + '/')
+          )
+          const best = matches.sort((a, b) => b.href.length - a.href.length)[0]
+          const active = best?.href === item.href
           return (
             <Link
               key={item.href}
