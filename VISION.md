@@ -245,6 +245,53 @@ Schema additions (future migration):
 
 This unblocks: better fit scores, smarter drip, Founder Ranking, the Application Hub Fund (need profile data to assess grant eligibility), public founder pages.
 
+### Community program submission — submit a link, get fit back
+
+User submits a URL to a program they found (accelerator, grant, fellowship) that isn't in the Hub yet.
+
+**What happens:**
+- Platform fetches/scrapes the application page
+- Extracts questions, word limits, deadlines, equity terms
+- Maps questions to existing archived questions (dedup) or creates new entries
+- Program appears in the Hub (pending review flag until verified)
+- **Submitter gets back immediately**: fit score for this program + which of their banked answers already apply + what's missing
+
+**Why this is the right flywheel:**
+- User gets immediate personal value (gap analysis, fit score) — not a charity contribution
+- Platform gets a new program in the archive with zero manual curation effort
+- The import_queue table (migration 003) already exists for exactly this
+- Scales the archive from 30 programs to 300+ without a data team
+
+**Implementation:**
+- `/submit` or a "Submit a program" button in the Hub
+- Simple form: URL + optional notes
+- Background job (Supabase Edge Function or MCP tool) scrapes + extracts
+- Maps to `import_queue` with `status = 'pending_review'`
+- Returns fit analysis to the submitter immediately
+
+**Quality control:** admin reviews queue before programs go live. Submitter gets notified when their program is approved and live.
+
+### Application indexing — reverse-engineer your history
+
+User uploads or pastes an old application they already submitted (PDF, doc, plain text). Platform reverse-engineers it into the Answer Bank.
+
+**What happens:**
+- Parse Q&A pairs out of the document
+- Map each answer to the closest archived question using significance scoring + semantic similarity
+- Populate the user's Answer Bank with answers they already wrote
+- Tag confidence based on whether the program accepted them (if they tell us)
+
+**Why this matters:**
+- Cold-start problem solved instantly for anyone who's applied before
+- User wakes up with a pre-filled Answer Bank from work they already did
+- The platform gets richer answer data, which feeds stress-testing and signal scoring
+- Pairs directly with the VS Code extension (paste from editor, import to bank)
+
+**The agent play:**
+When the agent layer (RNS + MCP) is mature, this becomes intelligent — not just mapping answers to questions, but scoring them against program DNA, flagging weak spots, and suggesting where to stress-test first. Upload a rejected YC app and get back: "here's why it likely didn't land, here's what to fix."
+
+**Priority:** P1 for the simple paste/import version. Full document parsing + agent analysis is P2.
+
 ### Question Databank as a service (interpretation TBD)
 
 User idea: "a databank of questions that a user would plug their system into to get answer."
