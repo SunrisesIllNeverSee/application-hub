@@ -24,14 +24,16 @@ export default async function AppLayout({
     .order('updated_at', { ascending: false })
     .limit(20)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const applications = (appRows ?? []).map((a: any) => ({
-    id: a.id as string,
-    program_id: a.program_id as string,
-    status: a.status as string,
-    program_name: (Array.isArray(a.programs) ? a.programs[0]?.name : a.programs?.name) as string ?? 'Unknown',
-    program_slug: (Array.isArray(a.programs) ? a.programs[0]?.slug : a.programs?.slug) as string ?? '',
-  }))
+  const applications = (appRows ?? []).map((a) => {
+    const prog = (Array.isArray(a.programs) ? a.programs[0] : a.programs) as unknown as { name?: string; slug?: string } | null
+    return {
+      id: a.id as string,
+      program_id: a.program_id as string,
+      status: a.status as string,
+      program_name: prog?.name ?? 'Unknown',
+      program_slug: prog?.slug ?? '',
+    }
+  })
 
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
