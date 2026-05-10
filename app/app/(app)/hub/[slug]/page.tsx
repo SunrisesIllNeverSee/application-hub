@@ -8,7 +8,15 @@ import type {
 } from '@/lib/database.types'
 import { ThemeBar } from '@/components/ThemeBar'
 import { ThemeTag } from '@/components/ThemeTag'
-import { formatCheckSize, formatEquity, formatDeadline, programTypeLabel } from '@/lib/utils'
+import {
+  formatCheckSize,
+  formatEquity,
+  formatDeadline,
+  formatProgramStartDate,
+  getApplicantSignal,
+  getHeatSignal,
+  programTypeLabel,
+} from '@/lib/utils'
 
 interface Props {
   params: { slug: string }
@@ -50,18 +58,13 @@ export default async function ProgramDetailPage({ params }: Props) {
   const dna = dnaRows ?? []
   const questions = questionRows ?? []
   const deadline = formatDeadline(program.deadline_at)
-
-  type ProgramPresentationFields = {
-    tldr?: unknown
-    pros?: unknown
-    cons?: unknown
-    best_for?: unknown
-  }
-  const p = program as ProgramPresentationFields
-  const tldr: string | null = typeof p.tldr === 'string' ? p.tldr : null
-  const pros: string[] = Array.isArray(p.pros) ? p.pros : []
-  const cons: string[] = Array.isArray(p.cons) ? p.cons : []
-  const bestFor: string | null = typeof p.best_for === 'string' ? p.best_for : null
+  const heat = getHeatSignal(program.heat_score, program.program_value_score)
+  const applicants = getApplicantSignal(program.applicant_count, program.cohort_size)
+  const tldr = program.tldr
+  const pros = Array.isArray(program.pros) ? program.pros : []
+  const cons = Array.isArray(program.cons) ? program.cons : []
+  const bestFor = program.best_for
+  const cohortStart = formatProgramStartDate(program.program_start_date)
 
   // Group questions by section
   const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {
@@ -148,13 +151,23 @@ export default async function ProgramDetailPage({ params }: Props) {
               </span>
             }
           />
-          <Stat label="Heat score" value={`${program.heat_score}/100`} />
+          <Stat
+            label={heat.provisional ? 'Heat signal' : 'Heat score'}
+            value={heat.label}
+            hint={heat.detail}
+          />
           {program.program_value_score != null && (
             <Stat label="Value score" value={`${Math.round(program.program_value_score)}/100`} />
           )}
-          {program.applicant_count != null && (
-            <Stat label="Applicants" value={program.applicant_count.toLocaleString()} />
+          {(program.applicant_count != null || program.cohort_size != null) && (
+            <Stat
+              label={applicants.detail}
+              value={applicants.label}
+              hint={applicants.provisional ? 'Provisional' : undefined}
+            />
           )}
+          {program.cohort_name && <Stat label="Cohort" value={program.cohort_name} />}
+          {cohortStart && <Stat label="Starts" value={cohortStart} />}
           {program.industry_tags?.length > 0 && (
             <Stat label="Industries" value={program.industry_tags.slice(0, 2).join(', ')} />
           )}
@@ -258,11 +271,20 @@ export default async function ProgramDetailPage({ params }: Props) {
   )
 }
 
-function Stat({ label, value }: { label: string; value: React.ReactNode }) {
+function Stat({
+  label,
+  value,
+  hint,
+}: {
+  label: string
+  value: React.ReactNode
+  hint?: string
+}) {
   return (
     <div className="min-w-0">
       <p className="text-xs text-neutral-500 dark:text-neutral-500 mb-0.5 truncate">{label}</p>
       <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">{value}</p>
+      {hint && <p className="text-[11px] text-neutral-400 dark:text-neutral-500 truncate">{hint}</p>}
     </div>
   )
 }

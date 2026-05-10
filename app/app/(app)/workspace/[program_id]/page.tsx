@@ -11,7 +11,7 @@ import type {
 import { AnswerEditor } from '@/components/AnswerEditor'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ApplicationStatusTracker } from '@/components/ApplicationStatusTracker'
-import { formatDeadline } from '@/lib/utils'
+import { formatDeadline, formatProgramStartDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -83,6 +83,7 @@ export default async function WorkspaceDetailPage({ params }: Props) {
   ).length
   const progressPct = requiredCount > 0 ? Math.round((answeredRequired / requiredCount) * 100) : 0
   const deadline = formatDeadline(program.deadline_at)
+  const cohortStart = formatProgramStartDate(program.program_start_date)
 
   // User's application status for this program
   const { data: userApplication } = await supabase
@@ -128,6 +129,25 @@ export default async function WorkspaceDetailPage({ params }: Props) {
               <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">
                 {program.description}
               </p>
+            )}
+            {(program.cohort_name || cohortStart || program.cohort_size) && (
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
+                {program.cohort_name && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300">
+                    {program.cohort_name}
+                  </span>
+                )}
+                {cohortStart && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
+                    Starts {cohortStart}
+                  </span>
+                )}
+                {program.cohort_size != null && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
+                    ~{program.cohort_size} seats
+                  </span>
+                )}
+              </div>
             )}
           </div>
           <div className="flex-shrink-0 text-right">

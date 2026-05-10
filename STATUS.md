@@ -80,8 +80,10 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - Hosted AI drafting is wired through `POST /api/draft`; successful drafts are logged to `ai_draft_runs` so the database trigger updates `ai_usage`.
 - BYOK integrations are implemented through `/profile/integrations` plus `/api/integrations`.
 - `/api/draft` now routes BYOK-first and returns a provider-required error when no user key is available and platform drafting is disabled.
+- Draft UX now links founders directly to `/profile/integrations` when no provider is connected, and confirms when drafting used the founder's own Anthropic key.
 - Deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
+- Launch-surface polish notes are documented at `docs/14_launch_surface_polish.md`.
 - The active launch roadmap is `ROADMAP.md`; older duplicate planning docs have been moved to `docs/archive/`.
 
 ### CI
@@ -124,8 +126,11 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | Workspace index (`user_applications` query) | Done |
 | Profile split | Done |
 | Sidebar IA redesign | Done |
-| Heat scores + applicant counts | Still 0 — synthetic compute job needed |
+| Heat scores + applicant counts | Launch-surface fallback labels landed; deeper synthetic compute job still needed |
 | Live BYOK draft verification | Still needs final end-to-end validation |
+| Copy actions in bank/workspace | Done |
+| OTP code-entry login path | Done |
+| Cohort context in workspace/detail | Done |
 
 ---
 
@@ -158,12 +163,9 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 1. **Live BYOK draft verification** — save a real provider key, draft from workspace, confirm live end-to-end success
 2. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
-3. **Copy button on answer boxes** — workspace and bank UX polish
-4. **OTP 6-digit login path** — support code-entry flow in addition to magic link click
-5. **Seed real deadlines + urgency sort**
-6. **Program detail TL;DR / pros & cons block**
-7. **Cohort context polish** — ensure workspace/header consistently shows cohort metadata
-8. **Stripe integration** — Phase 3
+3. **Seed real deadlines + urgency sort**
+4. **Heat/applicant synthetic compute job** — replace provisional fallbacks with better estimated signal
+5. **Stripe integration** — Phase 3
 
 ## What landed during the 2026-05-10 hardening burst
 

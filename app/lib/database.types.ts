@@ -62,6 +62,13 @@ export interface Program {
   brand_score: number | null
   follow_on_rate_pct: number | null
   is_rolling: boolean
+  cohort_name: string | null
+  program_start_date: string | null
+  cohort_size: number | null
+  tldr: string | null
+  pros: string[] | null
+  cons: string[] | null
+  best_for: string | null
 }
 
 export interface ArchivedQuestion {

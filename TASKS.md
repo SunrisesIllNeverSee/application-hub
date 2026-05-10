@@ -16,11 +16,11 @@ App is live at `https://application-hub-chi.vercel.app`. The repo now includes m
 
 - [x] **Workspace index source-of-truth fix** — `/workspace` now queries `user_applications` directly instead of using `user_program_fit` as a proxy.
 
-- [ ] **Copy button on answer boxes** — every answer in Bank and workspace needs a clipboard icon. Inline or subtle popup at end of text. Founders need quick copy for pasting into actual application portals.
+- [x] **Copy button on answer boxes** — read-only answers and active editors now both expose copy actions so founders can paste into external application portals quickly.
 
-- [ ] **OTP 6-digit code input on login page** — Supabase sends both magic link and 6-digit OTP. Our login handles link click but not code entry. Add OTP input field that appears after email submit.
+- [x] **OTP 6-digit code input on login page** — login now supports the 6-digit email code path in addition to magic-link clickthrough.
 
-- [ ] **Program cohort context missing in workspace header** — no cohort label ("YC W26"), program start date, or cohort size shown. Needs migration 013 + seed data.
+- [x] **Program cohort context missing in workspace header** — workspace and detail views now surface cohort name, start timing, and cohort size when present.
 
 ### IA decisions made
 
@@ -126,16 +126,16 @@ Remaining runtime check:
 
 `POST /api/draft` now logs successful hosted Anthropic calls into `ai_draft_runs`; the database trigger updates `ai_usage`.
 
-### [ ] Hosted draft UX polish
+### [x] Hosted draft UX polish
 **Owner**: Cowork + Codex
 **Priority**: P0
 
-Rate logging exists, BYOK routing exists, and the route fails cleanly when no provider is available. The remaining work is clearer user-facing messaging and draft-limit display.
+Rate logging exists, BYOK routing exists, and the route now gives clearer founder-facing feedback:
 
-Options to settle:
-- Provider status in workspace
-- Drafts remaining when platform fallback is ever enabled
-- Clear “connect provider” CTA from failed draft state
+- direct provider-required messaging
+- link to `/profile/integrations`
+- cleaner draft-limit messaging
+- confirmation when the founder's own Anthropic key was used
 
 ---
 
@@ -169,18 +169,11 @@ Implementation:
 - Default sort: closest non-rolling deadline first, then composite score among rolling programs
 - Keep unknown dates as rolling/unknown instead of fake specificity
 
-### [ ] Program detail TL;DR / pros / cons / best-for block
+### [x] Program detail TL;DR / pros / cons / best-for block
 **Owner**: Cowork
 **Priority**: P1
 
-Program pages need judgment. Add scannable context:
-- TL;DR
-- Pros
-- Cons
-- Best for this founder type
-- Deal/value notes when available
-
-Static seed columns ship faster. AI-generated summaries can follow later.
+Program pages now ship with scannable judgment blocks backed by seeded columns.
 
 ### [x] Proper user profile split
 **Owner**: Cowork
@@ -218,6 +211,16 @@ With a valid authenticated session and a real BYOK Anthropic key:
 ### [ ] Home dashboard + sidebar IA
 **Owner**: Cowork
 **Priority**: P2
+
+### [ ] Heat/applicant synthetic compute job
+**Owner**: Codex + Cowork
+**Priority**: P2
+
+Launch-surface fallback labels are now in place, but the deeper job still needs to exist:
+
+- compute better synthetic heat when real usage data is absent
+- move beyond provisional value-score-based fallback labels
+- eventually replace synthetic estimates with observed demand and outcome data
 
 Create a Today surface:
 - Questions unlocked today

@@ -10,6 +10,15 @@ interface DraftResponse {
   draft: string
   question_theme: string
   word_limit: number
+  drafts_remaining?: number | 'unlimited'
+  integration_type?: string
+}
+
+interface DraftFeedback {
+  type: 'error' | 'info'
+  message: string
+  actionHref?: string
+  actionLabel?: string
 }
 
 interface AnswerEditorProps {
@@ -43,7 +52,7 @@ export function AnswerEditor({
   const [isPending, startTransition] = useTransition()
   const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error'>('idle')
   const [isDrafting, setIsDrafting] = useState(false)
-  const [draftError, setDraftError] = useState<string | null>(null)
+  const [draftFeedback, setDraftFeedback] = useState<DraftFeedback | null>(null)
   const [copied, setCopied] = useState(false)
 
   const supabase = createClient()
@@ -63,7 +72,7 @@ export function AnswerEditor({
 
   const handleDraft = useCallback(async () => {
     setIsDrafting(true)
-    setDraftError(null)
+    setDraftFeedback(null)
     try {
       const res = await fetch('/api/draft', {
         method: 'POST',
@@ -74,15 +83,59 @@ export function AnswerEditor({
         }),
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err?.error ?? `Draft request failed (${res.status})`)
+        const err = await res.json().catch(() => ({} as Record<string, unknown>))
+
+        if (err?.provider_required) {
+          setDraftFeedback({
+            type: 'error',
+            message: 'Connect Anthropic in Profile -> Integrations, then come back here to draft.',
+            actionHref: '/profile/integrations',
+            actionLabel: 'Open integrations',
+          })
+          return
+        }
+
+        if (err?.code === 'draft_limit_reached') {
+          setDraftFeedback({
+            type: 'error',
+            message:
+              typeof err?.error === 'string'
+                ? err.error
+                : 'Monthly draft limit reached. Connect your own key to keep drafting.',
+            actionHref: '/profile/integrations',
+            actionLabel: 'Use your own key',
+          })
+          return
+        }
+
+        throw new Error(
+          typeof err?.error === 'string' ? err.error : `Draft request failed (${res.status})`
+        )
       }
       const data: DraftResponse = await res.json()
       setContent(data.draft)
       setIsEditing(true)
+      if (data.integration_type === 'byok_anthropic') {
+        setDraftFeedback({
+          type: 'info',
+          message: 'Drafted with your connected Anthropic key.',
+        })
+      } else if (typeof data.drafts_remaining === 'number') {
+        setDraftFeedback({
+          type: 'info',
+          message: `${data.drafts_remaining} hosted draft${data.drafts_remaining === 1 ? '' : 's'} remaining this month.`,
+        })
+      } else if (data.drafts_remaining === 'unlimited') {
+        setDraftFeedback({
+          type: 'info',
+          message: 'Hosted drafting is available for this account.',
+        })
+      }
     } catch (e) {
-      setDraftError(e instanceof Error ? e.message : 'Draft failed')
-      setTimeout(() => setDraftError(null), 4000)
+      setDraftFeedback({
+        type: 'error',
+        message: e instanceof Error ? e.message : 'Draft failed',
+      })
     } finally {
       setIsDrafting(false)
     }
@@ -277,10 +330,69 @@ export function AnswerEditor({
           )}
           {isDrafting ? 'Drafting…' : 'Draft with AI'}
         </button>
-        {draftError && (
-          <span className="text-xs text-danger-600 dark:text-danger-500">{draftError}</span>
+        {!!content.trim() && (
+          <button
+            onClick={handleCopy}
+            title={copied ? 'Copied!' : 'Copy to clipboard'}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs transition-colors border',
+              copied
+                ? 'border-success-300 dark:border-success-800 text-success-700 dark:text-success-400'
+                : 'border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'
+            )}
+          >
+            {copied ? (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M20 6L9 17l-5-5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Copied
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Copy
+              </>
+            )}
+          </button>
         )}
       </div>
+
+      {draftFeedback && (
+        <div
+          className={cn(
+            'rounded-lg border px-3 py-2 text-xs flex items-center justify-between gap-3 flex-wrap',
+            draftFeedback.type === 'error'
+              ? 'border-danger-500/20 bg-danger-50/10 text-danger-600 dark:text-danger-400'
+              : 'border-brand-500/20 bg-brand-50/40 dark:bg-brand-950/20 text-brand-700 dark:text-brand-300'
+          )}
+        >
+          <span>{draftFeedback.message}</span>
+          {draftFeedback.actionHref && draftFeedback.actionLabel && (
+            <a
+              href={draftFeedback.actionHref}
+              className="font-medium underline underline-offset-2"
+            >
+              {draftFeedback.actionLabel}
+            </a>
+          )}
+        </div>
+      )}
 
       {/* Action row */}
       <div className="flex items-center gap-2 justify-end">

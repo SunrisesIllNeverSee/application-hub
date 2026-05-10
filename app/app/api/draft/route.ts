@@ -258,6 +258,7 @@ Write the draft answer only — no preamble, no explanation, no word count at th
       word_limit: wordLimit,
       draft_run_id: draftRun?.id,
       drafts_remaining: draftsRemaining,
+      integration_type: integrationProvider,
     })
 
   } catch (err) {

@@ -50,8 +50,7 @@ What is already good enough:
 
 Launch caveats:
 
-- Heat/applicant signals are still thin.
-- Program urgency and cohort context still need more polish.
+- Heat/applicant signals still rely on provisional fallback labels until the synthetic compute job lands.
 - Live BYOK drafting should be validated end to end on deployed app.
 
 ---
@@ -74,8 +73,8 @@ These are the minimum additions that make the app work for non-technical founder
 - [x] **Hosted draft rate logging** — *Codex*
   `/api/draft` inserts successful Anthropic calls into `ai_draft_runs`; the trigger updates `ai_usage`.
 
-- [ ] **Hosted draft UX polish** — *Cowork + Codex*
-  Backend now supports BYOK-first routing and clean provider-required failures. Remaining work: improve runtime messaging around provider state and draft limits.
+- [x] **Hosted draft UX polish** — *Cowork + Codex*
+  Backend now supports BYOK-first routing, clean provider-required failures, direct integrations CTA, and clearer runtime messaging around draft source/limits.
 
 ---
 
@@ -89,8 +88,8 @@ These are the minimum additions that make the app work for non-technical founder
 - [ ] **Real deadlines + urgency sort** — *Cowork*
   Seed real upcoming deadlines where available using `seed/01_deadline_updates_template.sql`. Default sort should prefer closest non-rolling deadline, then composite score within rolling programs.
 
-- [ ] **Program detail TL;DR / pros / cons / best-for block** — *Cowork*
-  Program pages need scannable judgment, not only long descriptions. Static seed columns ship faster; AI generation can come later.
+- [x] **Program detail TL;DR / pros / cons / best-for block** — *Cowork*
+  Program pages now have seeded scannable judgment blocks.
 
 - [x] **Proper user profile split** — *Cowork*
   `/profile/answers`, `/profile/about`, `/profile/settings`, and `/profile/integrations` now exist.
@@ -112,6 +111,8 @@ These are not launch blockers, but they are still part of the current roadmap an
 - [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
 - [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.
 - [ ] **Heat scores + applicant counts** — Replace zeros with synthetic MVP heat from prestige/cohort exclusivity, then real signals later.
+- [x] **Launch-surface signal fallback** — *Codex*
+  Replace embarrassing zeros in the UI with honest provisional labels while we wait for deeper synthetic/observed signal jobs.
 - [x] **Workspace discoverability / sidebar IA** — Sidebar now carries the founder workflow more clearly, including My Applications below the main nav. Further naming polish can happen later.
 - [ ] **Dev-only password sign-in decision** — Gate behind development/feature flag or remove before public launch once SMTP is reliable.
 - [ ] **Residual dependency audit** — Next 14.2.35 is in place; remaining advisories should be handled as a deliberate upgrade path, not blind `--force`.

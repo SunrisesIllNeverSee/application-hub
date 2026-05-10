@@ -98,3 +98,58 @@ export function themeLabel(theme: string): string {
   }
   return labels[theme] ?? theme
 }
+
+export function formatProgramStartDate(dateStr: string | null | undefined): string | null {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+}
+
+export function getHeatSignal(
+  heatScore: number | null | undefined,
+  programValueScore: number | null | undefined
+): {
+  label: string
+  detail: string
+  tone: 'neutral' | 'brand' | 'success'
+  provisional: boolean
+} {
+  if (typeof heatScore === 'number' && heatScore > 0) {
+    return {
+      label: `${Math.round(heatScore)}/100`,
+      detail: 'Live signal',
+      tone: heatScore >= 70 ? 'success' : heatScore >= 45 ? 'brand' : 'neutral',
+      provisional: false,
+    }
+  }
+
+  if (typeof programValueScore === 'number') {
+    if (programValueScore >= 80) {
+      return { label: 'High potential', detail: 'Provisional', tone: 'success', provisional: true }
+    }
+    if (programValueScore >= 60) {
+      return { label: 'Promising', detail: 'Provisional', tone: 'brand', provisional: true }
+    }
+  }
+
+  return { label: 'Early signal', detail: 'Provisional', tone: 'neutral', provisional: true }
+}
+
+export function getApplicantSignal(
+  applicantCount: number | null | undefined,
+  cohortSize: number | null | undefined
+): {
+  label: string
+  detail: string
+  provisional: boolean
+} {
+  if (typeof applicantCount === 'number' && applicantCount > 0) {
+    return { label: applicantCount.toLocaleString(), detail: 'Applicants', provisional: false }
+  }
+
+  if (typeof cohortSize === 'number' && cohortSize > 0) {
+    return { label: `~${cohortSize} seats`, detail: 'Cohort size', provisional: true }
+  }
+
+  return { label: 'Unpublished', detail: 'Applicant volume', provisional: true }
+}

@@ -17,6 +17,7 @@ Built by Ello Cello LLC.
 - **`docs/08_resend_smtp_setup.md`** — practical Supabase Auth custom SMTP setup with Resend
 - **`docs/09_launch_checklist.md`** — Milestone 3 ship/no-ship checklist
 - **`docs/10_byok_and_draft_policy.md`** — BYOK and hosted draft policy contract
+- **`docs/14_launch_surface_polish.md`** — honest heat/applicant fallbacks, cohort context, and BYOK-first draft UX notes
 - **`docs/archive/`** — historical/superseded planning docs that are useful context but no longer active direction
 
 We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
@@ -49,7 +50,7 @@ Current launch frame:
 
 - **Ship today**: soft launch to 10–20 power users through MCP/web app.
 - **MVP**: `/bank`, Drip mechanic, BYOK integrations, profile split, and workspace tracking are now in the product.
-- **Polished launch**: focus shifts to live BYOK validation, richer program context, heat/urgency quality, and final workflow polish.
+- **Polished launch**: focus shifts to live BYOK validation, deeper heat signal computation, deadline quality, and final workflow polish.
 
 ---
 
