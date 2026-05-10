@@ -44,6 +44,7 @@ Cowork will not touch `app/components/`, `app/app/(app)/`, or `app/app/auth/` wh
 
 | Agent | Task | Files / paths | Claimed at | Notes |
 |---|---|---|---|---|
+| Codex | BYOK/policy, deadlines helper, stress persistence, launch checklist, SMTP handoff docs | `migrations/`, `docs/`, `app/app/api/draft/route.ts`, `TASKS.md`, `STATUS.md`, `SCRATCH.md` | 2026-05-10T15:57:37Z | No subagents; keeping app UI paths untouched except draft API policy. |
 
 ---
 
