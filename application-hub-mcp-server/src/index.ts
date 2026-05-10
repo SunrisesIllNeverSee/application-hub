@@ -6,6 +6,7 @@ import express from "express";
 // ── Public tools: programs ──────────────────────────────────────────────────
 import { registerSearchPrograms } from "./tools/programs/hub_search_programs.js";
 import { registerGetProgramDetail } from "./tools/programs/hub_get_program_detail.js";
+import { registerGetProgramBySlug } from "./tools/programs/hub_get_program_by_slug.js";
 import { registerGetProgramRankings } from "./tools/programs/hub_get_program_rankings.js";
 import { registerGetHeatScores } from "./tools/programs/hub_get_heat_scores.js";
 
@@ -26,6 +27,7 @@ import { registerGetFitScore } from "./tools/user/hub_get_fit_score.js";
 import { registerFindBestPrograms } from "./tools/user/hub_find_best_programs.js";
 import { registerRankMyAnswers } from "./tools/user/hub_rank_my_answers.js";
 import { registerLogDraftRun } from "./tools/user/hub_log_draft_run.js";
+import { registerSaveAnswer } from "./tools/user/hub_save_answer.js";
 
 // ── Resources ───────────────────────────────────────────────────────────────
 import { registerProgramResources } from "./resources/programs.js";
@@ -48,6 +50,7 @@ async function main() {
   // Register all public tools
   registerSearchPrograms(server);
   registerGetProgramDetail(server);
+  registerGetProgramBySlug(server);
   registerGetProgramRankings(server);
   registerGetHeatScores(server);
   registerGetProgramQuestions(server);
@@ -64,6 +67,7 @@ async function main() {
   registerFindBestPrograms(server);
   registerRankMyAnswers(server);
   registerLogDraftRun(server);
+  registerSaveAnswer(server);
 
   // Register resources
   registerProgramResources(server);

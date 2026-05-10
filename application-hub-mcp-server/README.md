@@ -2,7 +2,7 @@
 
 MCP server for the Application Hub — a platform that helps founders track, compare, and apply to accelerators, grants, and fellowships.
 
-Exposes 16 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
+Exposes 18 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
 
 ---
 
@@ -145,6 +145,7 @@ For remote Claude connections, point the MCP config at your deployed URL:
 |---|---|
 | `hub_search_programs` | Search/filter programs by type, equity cap, deadline, cash, etc. |
 | `hub_get_program_detail` | Full detail for one program (by UUID or slug) |
+| `hub_get_program_by_slug` | Server-friendly program detail lookup by slug, including stats and DNA rows |
 | `hub_get_program_rankings` | Programs ranked by value score (ROI) |
 | `hub_get_heat_scores` | Trending programs by applicant interest |
 | `hub_get_program_questions` | All questions for a specific program with significance scores |
@@ -164,6 +165,7 @@ For remote Claude connections, point the MCP config at your deployed URL:
 | `hub_find_best_programs` | Top programs ranked by composite score for this user |
 | `hub_rank_my_answers` | Which answers unlock the most programs |
 | `hub_log_draft_run` | Track AI draft usage (rate-limited by tier) |
+| `hub_save_answer` | Validate and upsert one reusable profile answer |
 
 ---
 
