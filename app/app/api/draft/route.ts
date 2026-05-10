@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { decryptKey } from '@/lib/encryption'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
@@ -26,30 +27,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'archived_question_id is required' }, { status: 400 })
     }
 
-    if (!PLATFORM_DRAFTS_ENABLED) {
-      return NextResponse.json(
-        {
-          error: 'Hosted AI drafts are disabled until BYOK provider routing is enabled.',
-          code: 'hosted_ai_disabled',
-          provider_required: true,
-        },
-        { status: 403 }
-      )
+    // BYOK-first routing: prefer user's own key, fall back to platform key for Pro
+    let resolvedApiKey: string | null = null
+    let integrationProvider = 'byok'
+
+    // Check user's stored integrations for an Anthropic key
+    const { data: integration } = await supabase
+      .from('user_integrations')
+      .select('id, key_encrypted, key_storage_ref, status')
+      .eq('user_id', user.id)
+      .eq('provider', 'anthropic')
+      .eq('status', 'active')
+      .maybeSingle()
+
+    if (integration?.key_encrypted && integration?.key_storage_ref) {
+      try {
+        resolvedApiKey = decryptKey(integration.key_encrypted, integration.key_storage_ref)
+      } catch (e) {
+        console.error('[/api/draft] key decryption failed:', e)
+      }
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) {
-      return NextResponse.json(
-        {
-          error: 'Hosted AI provider is not configured.',
-          code: 'hosted_ai_unconfigured',
-          provider_required: true,
-        },
-        { status: 503 }
-      )
+    // Fall back to platform key if BYOK not set and platform drafts enabled
+    if (!resolvedApiKey) {
+      if (PLATFORM_DRAFTS_ENABLED && process.env.ANTHROPIC_API_KEY) {
+        resolvedApiKey = process.env.ANTHROPIC_API_KEY
+        integrationProvider = PLATFORM_PROVIDER
+      } else {
+        return NextResponse.json(
+          {
+            error: 'Connect an AI provider in Profile → Integrations to enable drafting.',
+            code: 'provider_required',
+            provider_required: true,
+          },
+          { status: 402 }
+        )
+      }
     }
 
-    const anthropic = new Anthropic({ apiKey })
+    const anthropic = new Anthropic({ apiKey: resolvedApiKey })
+    void integrationProvider // used in ai_draft_runs insert below
 
     // Best-effort preflight so free-tier users do not burn provider tokens
     // before the database trigger gets a chance to reject over-limit usage.
