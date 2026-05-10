@@ -14,7 +14,7 @@ export function registerGetProgramDetail(server: McpServer) {
     title: "Get Program Detail",
     description: `Full details for a single program. Use program_id (UUID) or slug.
 
-Returns all fields: name, type, status, description, website, equity, cash, credits, length, deadlines, rolling/cohort, network score, brand score, follow-on rate, acceptance rate, question count, listing tier.
+Returns all fields: name, type, status, description, website, equity, cash, credits, deadlines, rolling/cohort, network score, brand score, follow-on rate, acceptance rate, and listing tier.
 
 Use hub_get_program_questions to get the actual questions for this program.`,
     inputSchema: Schema,
@@ -22,7 +22,7 @@ Use hub_get_program_questions to get the actual questions for this program.`,
   }, async ({ program_id, slug, response_format }) => {
     let q = supabase
       .from("programs")
-      .select(`*, program_stats(acceptance_rate_pct, total_applications, total_accepted, last_cohort_label)`);
+      .select(`*, program_stats(acceptance_rate, application_count, updated_at)`);
 
     if (program_id) q = q.eq("id", program_id);
     else if (slug) q = q.eq("slug", slug);
@@ -54,18 +54,16 @@ Use hub_get_program_questions to get the actual questions for this program.`,
       `- Follow-on funding rate: ${data.follow_on_rate_pct ? `${data.follow_on_rate_pct}%` : "unknown"}`,
       "",
       `## Program Details`,
-      `- Length: ${data.program_length_weeks ? `${data.program_length_weeks} weeks` : "n/a"}`,
       `- Rolling: ${data.is_rolling ? "Yes" : "No (cohort)"}`,
       `- Deadline: ${data.deadline_at ?? "rolling"}`,
-      `- Exclusivity: ${data.exclusivity_days ? `${data.exclusivity_days} days` : "none"}`,
-      data.website_url ? `- Website: ${data.website_url}` : "",
+      data.url ? `- Website: ${data.url}` : "",
       "",
       `## Program Value Score`,
       `${data.program_value_score?.toFixed(1) ?? "not yet computed"}`,
       "",
       `## Acceptance Stats`,
       stats
-        ? `- Acceptance rate: ${stats.acceptance_rate_pct?.toFixed(1) ?? "?"}%\n- Total reports: ${stats.total_applications ?? 0}`
+        ? `- Acceptance rate: ${stats.acceptance_rate != null ? `${(stats.acceptance_rate * 100).toFixed(1)}%` : "?"}\n- Total applications: ${stats.application_count ?? 0}`
         : "No acceptance data yet — be the first to report.",
     ];
 

@@ -14,7 +14,7 @@ export function registerGetProgramQuestions(server: McpServer) {
     title: "Get Program Questions",
     description: `All application questions for a specific program, ordered by display order.
 
-Returns: exact_phrasing, theme, word_limit, char_limit, is_required, is_universal, significance_score (from archive), asked_by_count (how many other programs ask the same question).
+Returns: asked_as, theme, word_limit, char_limit, is_required, is_universal, significance_score (from archive), asked_by_count (how many other programs ask the same question).
 
 The significance_score tells you how much this question matters across the platform — high significance = answer this well and it works for many programs.`,
     inputSchema: Schema,
@@ -22,8 +22,8 @@ The significance_score tells you how much this question matters across the platf
   }, async ({ program_id, include_optional, response_format }) => {
     let q = supabase
       .from("program_questions")
-      .select(`id, exact_phrasing, theme, word_limit, char_limit, is_required, order_index,
-               archived_questions(id, is_universal, significance_score, asked_by_count)`)
+      .select(`id, asked_as, word_limit, char_limit, is_required, order_index,
+               archived_questions(id, theme, is_universal, significance_score, asked_by_count)`)
       .eq("program_id", program_id)
       .order("order_index");
 
@@ -33,15 +33,21 @@ The significance_score tells you how much this question matters across the platf
     if (error) return { content: [{ type: "text", text: `Error: ${error.message}` }] };
     if (!data?.length) return { content: [{ type: "text", text: "No questions found for this program." }] };
 
-    type AqJoin = { id: unknown; is_universal: boolean | null; significance_score: number | null; asked_by_count: number | null } | null;
+    type AqJoin = {
+      id: unknown;
+      theme: string | null;
+      is_universal: boolean | null;
+      significance_score: number | null;
+      asked_by_count: number | null;
+    } | null;
 
     const questions = data.map(q => {
       // Supabase returns joined rows as array for one-to-many; we use single archived_question per question
       const aq = (Array.isArray(q.archived_questions) ? q.archived_questions[0] : q.archived_questions) as AqJoin;
       return {
         id: q.id,
-        text: q.exact_phrasing,
-        theme: q.theme,
+        text: q.asked_as,
+        theme: aq?.theme ?? null,
         word_limit: q.word_limit,
         char_limit: q.char_limit,
         is_required: q.is_required,
@@ -63,7 +69,8 @@ The significance_score tells you how much this question matters across the platf
 
     const stars = (score: number | null) => {
       if (!score) return "☆☆☆☆☆";
-      return "★".repeat(Math.min(5, Math.round(score / 20))) + "☆".repeat(Math.max(0, 5 - Math.round(score / 20)));
+      const filled = Math.min(5, Math.round(score * 5));
+      return "★".repeat(filled) + "☆".repeat(Math.max(0, 5 - filled));
     };
 
     const lines: string[] = [`# Questions for Program\n`, `${questions.length} questions\n`];

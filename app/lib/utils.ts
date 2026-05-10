@@ -12,9 +12,20 @@ export function formatCurrency(value: number | null | undefined): string {
   return `$${value.toLocaleString()}`
 }
 
-export function formatEquity(pct: number | null | undefined): string {
-  if (pct == null) return '—'
-  return `${pct}%`
+/** Format check_size stored in cents → "$150k" */
+export function formatCheckSize(cents: number | null | undefined): string {
+  if (cents == null) return '—'
+  const usd = cents / 100
+  if (usd >= 1_000_000) return `$${(usd / 1_000_000).toFixed(1)}M`
+  if (usd >= 1_000) return `$${(usd / 1_000).toFixed(0)}k`
+  return `$${usd.toFixed(0)}`
+}
+
+/** Format equity_taken decimal (0.06) → "6%" */
+export function formatEquity(val: number | null | undefined): string {
+  if (val == null) return '—'
+  const pct = val <= 1 ? val * 100 : val
+  return `${pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1)}%`
 }
 
 export function formatDeadline(dateStr: string | null | undefined): {
@@ -53,12 +64,17 @@ export function truncate(str: string, maxLength: number): string {
 
 export function programTypeLabel(type: string): string {
   const labels: Record<string, string> = {
-    accelerator: 'Accelerator',
+    accel: 'Accelerator',
     grant: 'Grant',
     fellowship: 'Fellowship',
+    vc: 'VC Fund',
+    corp: 'Corporate',
+    uni: 'University',
+    job: 'Job',
+    other: 'Other',
+    // legacy aliases
+    accelerator: 'Accelerator',
     vc_fund: 'VC Fund',
-    incubator: 'Incubator',
-    studio: 'Studio',
   }
   return labels[type] ?? type
 }

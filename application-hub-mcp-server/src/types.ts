@@ -14,16 +14,14 @@ export interface Program {
   network_score: number | null;
   brand_score: number | null;
   description: string | null;
-  website_url: string | null;
-  program_length_weeks: number | null;
+  url: string | null;
   follow_on_rate_pct: number | null;
-  exclusivity_days: number | null;
 }
 
 export interface ProgramQuestion {
   id: string;
   archived_question_id: string | null;
-  exact_phrasing: string;
+  asked_as: string;
   theme: string | null;
   word_limit: number | null;
   char_limit: number | null;
@@ -71,5 +69,4 @@ export interface ProfileAnswer {
 export interface AcceptanceStats {
   acceptance_rate_pct: number | null;
   total_reports: number;
-  verified_reports: number;
 }

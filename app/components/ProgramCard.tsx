@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { ProgramWithFit } from '@/lib/database.types'
-import { formatCurrency, formatEquity, formatDeadline, programTypeLabel, cn } from '@/lib/utils'
+import { formatCheckSize, formatEquity, formatDeadline, programTypeLabel, cn } from '@/lib/utils'
 
 interface ProgramCardProps {
   program: ProgramWithFit
@@ -8,12 +8,16 @@ interface ProgramCardProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
+  accel: 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300',
   accelerator: 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300',
   grant: 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400',
   fellowship: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
+  vc: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
   vc_fund: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  incubator: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
-  studio: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300',
+  corp: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+  uni: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300',
+  job: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
+  other: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300',
 }
 
 export function ProgramCard({ program, rank }: ProgramCardProps) {
@@ -62,7 +66,7 @@ export function ProgramCard({ program, rank }: ProgramCardProps) {
               Rolling
             </span>
           )}
-          {program.tags?.slice(0, 2).map((tag) => (
+          {program.industry_tags?.slice(0, 2).map((tag) => (
             <span
               key={tag}
               className="hidden sm:inline-flex px-2 py-0.5 rounded-md text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
@@ -101,13 +105,13 @@ export function ProgramCard({ program, rank }: ProgramCardProps) {
         <div className="hidden sm:block">
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-0.5">Equity</p>
           <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-            {formatEquity(program.equity_pct)}
+            {formatEquity(program.equity_taken)}
           </p>
         </div>
         <div className="hidden sm:block">
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-0.5">Value</p>
           <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-            {formatCurrency(program.cash_value_usd)}
+            {formatCheckSize(program.check_size_max)}
           </p>
         </div>
         <div>

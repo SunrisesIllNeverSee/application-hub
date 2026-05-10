@@ -146,6 +146,8 @@ fit_score = coverage_pct × 0.40
 composite_score = fit_score × program_value_score / 100
 ```
 
+RNS is the planned judgment layer above this scaffolding, not a replacement for the Supabase/MCP/app spine. pgvector remains useful for retrieval and similarity; RNS should evaluate signal purity, answer fidelity, commitment conservation, and question significance once the core product loop is usable.
+
 ---
 
 ## Boundary rules

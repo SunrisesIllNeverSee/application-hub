@@ -52,9 +52,9 @@ export default async function ProfilePage() {
   const uncategorized = allAnswers.filter((a) => !a.archived_question?.theme)
 
   const totalAnswers = allAnswers.length
-  const canonicalCount = allAnswers.filter((a) => a.is_canonical).length
-  const aiCount = allAnswers.filter((a) => a.source === 'ai_generated').length
-  const humanCount = allAnswers.filter((a) => a.source === 'human_written').length
+  const lockedCount = allAnswers.filter((a) => a.confidence === 'locked').length
+  const solidCount = allAnswers.filter((a) => a.confidence === 'solid').length
+  const draftCount = allAnswers.filter((a) => a.confidence === 'draft').length
 
   return (
     <div>
@@ -68,9 +68,9 @@ export default async function ProfilePage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total answers" value={totalAnswers} />
-        <StatCard label="Canonical" value={canonicalCount} />
-        <StatCard label="Human-written" value={humanCount} />
-        <StatCard label="AI-generated" value={aiCount} />
+        <StatCard label="Locked" value={lockedCount} />
+        <StatCard label="Solid" value={solidCount} />
+        <StatCard label="Drafts" value={draftCount} />
       </div>
 
       {/* Empty state */}
@@ -153,38 +153,25 @@ function StatCard({ label, value }: { label: string; value: number }) {
 function AnswerBankCard({ answer }: { answer: ProfileAnswerWithQuestion }) {
   const question = answer.archived_question
 
-  const sourceBadge = {
-    ai_generated: { label: 'AI', className: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
-    human_written: { label: 'Human', className: 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400' },
-    curated: { label: 'Curated', className: 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300' },
-  }[answer.source] ?? { label: answer.source, className: 'bg-neutral-100 text-neutral-600' }
+  const confidenceBadge = {
+    draft: { label: 'Draft', className: 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300' },
+    solid: { label: 'Solid', className: 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400' },
+    locked: { label: 'Locked', className: 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300' },
+  }[answer.confidence ?? 'draft']
 
   return (
     <div className="card overflow-hidden">
       {/* Question header */}
       <div className="px-5 py-3 bg-neutral-50 dark:bg-neutral-800/40 border-b border-neutral-100 dark:border-neutral-800">
         <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
-          {question?.question_text ?? 'Question not found'}
+          {question?.text ?? 'Question not found'}
         </p>
         <div className="flex items-center gap-3 mt-2">
           <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${sourceBadge.className}`}
+            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${confidenceBadge.className}`}
           >
-            {sourceBadge.label}
+            {confidenceBadge.label}
           </span>
-          {answer.is_canonical && (
-            <span className="inline-flex items-center gap-1 text-xs text-brand-600 dark:text-brand-400 font-medium">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Canonical
-            </span>
-          )}
-          {answer.confidence_score != null && (
-            <span className="text-xs text-neutral-400 dark:text-neutral-500">
-              {Math.round(answer.confidence_score * 100)}% confidence
-            </span>
-          )}
           <span className="text-xs text-neutral-400 dark:text-neutral-500 ml-auto">
             {answer.word_count} words
           </span>

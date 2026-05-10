@@ -49,7 +49,7 @@ export default async function WorkspaceDetailPage({ params }: Props) {
     .from('program_questions')
     .select('*, archived_question:archived_questions(*)')
     .eq('program_id', program.id)
-    .order('display_order', { ascending: true })
+    .order('order_index', { ascending: true })
     .returns<ProgramQuestionWithArchived[]>()
 
   // Profile answers for this user
@@ -84,7 +84,7 @@ export default async function WorkspaceDetailPage({ params }: Props) {
 
   // Group by section
   const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {
-    const section = q.section_name ?? 'General'
+    const section = q.section ?? 'General'
     if (!acc[section]) acc[section] = []
     acc[section].push(q)
     return acc
@@ -197,14 +197,14 @@ export default async function WorkspaceDetailPage({ params }: Props) {
                                 Optional
                               </span>
                             )}
-                            {sig > 70 && (
+                            {sig > 0.70 && (
                               <span className="text-xs font-medium text-brand-600 dark:text-brand-400">
                                 High significance
                               </span>
                             )}
                           </div>
                           <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                            {q.exact_phrasing}
+                            {q.asked_as}
                           </p>
                           {(q.word_limit || q.char_limit) && (
                             <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">

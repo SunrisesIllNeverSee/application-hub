@@ -26,6 +26,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `user_program_fit`
   - pgvector matching RPC
   - nightly cron refresh jobs
+- The current strategy is to keep migrations `001` through `008` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
 
 ### MCP server
 - `application-hub-mcp-server/` exists.
@@ -53,7 +54,8 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - Workspace route
   - Profile route
   - Supabase auth callback/login scaffolding
-- Live Supabase data wiring is active and owned by Cowork.
+- Live Supabase data wiring is present and build-verified.
+- RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
 
 ### CI
 - GitHub Actions workflow exists at `.github/workflows/ci.yml`.
@@ -80,7 +82,7 @@ These may exist locally, but are not confirmed by the current GitHub-visible rep
 - `application-hub-roadmap.md`
 - Production deployment configuration
 - Stripe webhook implementation
-- Live app data integration completion
+- Browser smoke testing against real Supabase credentials
 
 ---
 
@@ -90,15 +92,16 @@ The GitHub-visible repo should be treated as:
 
 ```text
 Database schema + seed data + MCP server are present.
-Next.js app is present and moving from mock data to live Supabase data.
+Next.js app is present, wired to live data, and build-verified.
 CI covers MCP and app packages separately.
+RNS is the planned additive judgment layer, not a launch blocker.
 ```
 
 ---
 
 ## Immediate priorities
 
-1. Finish live Supabase wiring in the Next.js app.
+1. Smoke-test live Supabase app routes in browser.
 2. Keep architecture/status docs synced as schema-facing column names settle.
 3. Expand MCP app-support tools only when they remove server-side app duplication.
 4. Resolve remaining app build/typecheck issues as part of live data integration.

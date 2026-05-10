@@ -8,7 +8,7 @@ import type {
 } from '@/lib/database.types'
 import { ThemeBar } from '@/components/ThemeBar'
 import { ThemeTag } from '@/components/ThemeTag'
-import { formatCurrency, formatEquity, formatDeadline, programTypeLabel, themeLabel } from '@/lib/utils'
+import { formatCheckSize, formatEquity, formatDeadline, programTypeLabel } from '@/lib/utils'
 
 interface Props {
   params: { slug: string }
@@ -36,7 +36,7 @@ export default async function ProgramDetailPage({ params }: Props) {
     .from('program_dna')
     .select('*')
     .eq('program_id', program.id)
-    .order('weight', { ascending: false })
+    .order('weight_pct', { ascending: false })
     .returns<ProgramDna[]>()
 
   // Fetch questions with archived data
@@ -44,7 +44,7 @@ export default async function ProgramDetailPage({ params }: Props) {
     .from('program_questions')
     .select('*, archived_question:archived_questions(*)')
     .eq('program_id', program.id)
-    .order('display_order', { ascending: true })
+    .order('order_index', { ascending: true })
     .returns<ProgramQuestionWithArchived[]>()
 
   const dna = dnaRows ?? []
@@ -53,7 +53,7 @@ export default async function ProgramDetailPage({ params }: Props) {
 
   // Group questions by section
   const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {
-    const section = q.section_name ?? 'General'
+    const section = q.section ?? 'General'
     if (!acc[section]) acc[section] = []
     acc[section].push(q)
     return acc
@@ -101,9 +101,9 @@ export default async function ProgramDetailPage({ params }: Props) {
             >
               Start Application
             </Link>
-            {program.website_url && (
+            {program.url && (
               <a
-                href={program.website_url}
+                href={program.url}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-secondary text-center"
@@ -118,21 +118,16 @@ export default async function ProgramDetailPage({ params }: Props) {
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-neutral-100 dark:border-neutral-800">
           <Stat
             label="Equity"
-            value={program.equity_pct != null ? formatEquity(program.equity_pct) : program.equity_taken != null ? `${program.equity_taken}` : '—'}
+            value={formatEquity(program.equity_taken)}
           />
           <Stat
             label="Investment"
-            value={formatCurrency(program.cash_value_usd ?? (program.check_size_min ?? null))}
+            value={formatCheckSize(program.check_size_max ?? program.check_size_min)}
           />
           <Stat
-            label="Cohort size"
-            value={program.cohort_size != null ? `~${program.cohort_size} companies` : '—'}
+            label="Focus"
+            value={program.geo_focus?.length > 0 ? program.geo_focus.join(', ') : '—'}
           />
-          <Stat
-            label="Acceptance rate"
-            value={program.acceptance_rate != null ? `${(program.acceptance_rate * 100).toFixed(1)}%` : '—'}
-          />
-          <Stat label="Location" value={program.location ?? (program.remote_ok ? 'Remote' : '—')} />
           <Stat
             label="Deadline"
             value={
@@ -142,7 +137,15 @@ export default async function ProgramDetailPage({ params }: Props) {
             }
           />
           <Stat label="Heat score" value={`${program.heat_score}/100`} />
-          <Stat label="Value score" value={`${program.value_score}/100`} />
+          {program.program_value_score != null && (
+            <Stat label="Value score" value={`${Math.round(program.program_value_score)}/100`} />
+          )}
+          {program.applicant_count != null && (
+            <Stat label="Applicants" value={program.applicant_count.toLocaleString()} />
+          )}
+          {program.industry_tags?.length > 0 && (
+            <Stat label="Industries" value={program.industry_tags.slice(0, 2).join(', ')} />
+          )}
         </div>
       </div>
 
@@ -158,7 +161,7 @@ export default async function ProgramDetailPage({ params }: Props) {
                 <ThemeBar
                   key={d.id}
                   theme={d.theme}
-                  weight={d.weight}
+                  weight={d.weight_pct}
                   questionCount={d.question_count}
                 />
               ))}
@@ -207,13 +210,13 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
 
 function QuestionRow({ q }: { q: ProgramQuestionWithArchived }) {
   const sig = q.archived_question?.significance_score ?? 0
-  const stars = Math.round((sig / 100) * 5)
+  const stars = Math.round(sig * 5)  // significance_score is 0–1
 
   return (
     <div className="px-5 py-4 flex items-start gap-3">
       <div className="flex-1 min-w-0">
         <p className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed">
-          {q.exact_phrasing}
+          {q.asked_as}
         </p>
         <div className="mt-2 flex items-center gap-3 flex-wrap">
           <ThemeTag theme={q.archived_question?.theme} />

@@ -22,7 +22,7 @@ The core asset is a **question archive**: every question ever asked by any progr
 ```
 Supabase (PostgreSQL + pgvector)   ← single source of truth
   ↕
-MCP Server (TypeScript)            ← intelligence layer, 16 tools
+MCP Server (TypeScript)            ← intelligence layer, 18 tools
   ↕
 Claude Desktop / Cursor / Windsurf ← AI drafting interface (current)
   ↕
@@ -53,7 +53,7 @@ application-hub/
 │   ├── 007_monetization.sql
 │   └── 008_intelligence_layer_v2.sql   ← APPLY THIS — adds program_dna, user_program_fit, RPCs
 │
-├── application-hub-mcp-server/        ← TypeScript MCP server (16 tools, 7 resources, 3 prompts)
+├── application-hub-mcp-server/        ← TypeScript MCP server (18 tools, 7 resources, 3 prompts)
 │   ├── src/
 │   ├── dist/                          ← compiled output (run npm run build first)
 │   └── README.md
@@ -121,13 +121,54 @@ Connect to Claude Desktop — add to `~/Library/Application Support/Claude/claud
 
 ## Environment variables
 
+### Next.js app (`app/.env.local`)
+
+This file is gitignored. Claude Code needs it to run `npm run dev` and `npm run build`.
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://betcyfbzsgusaghriptz.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your anon key>
+ANTHROPIC_API_KEY=<your Anthropic API key>
+```
+
+The anon key is safe to use client-side (it's public). `ANTHROPIC_API_KEY` is server-side only — used by `POST /api/draft`. Never put the service role key in `.env.local`.
+
+### MCP server (`application-hub-mcp-server/`)
+
+Set these in your shell or in `claude_desktop_config.json` env block:
+
 | Variable | Required | What it is |
 |---|---|---|
-| `SUPABASE_URL` | Yes | Your Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Service role key (server-side only, never expose) |
+| `SUPABASE_URL` | Yes | `https://betcyfbzsgusaghriptz.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Service role key — server-side only, never expose to client |
 | `SUPABASE_ANON_KEY` | Yes | Anon key (used for user JWT validation) |
 | `TRANSPORT` | No | `stdio` (default) or `http` |
 | `PORT` | No | HTTP mode port (default 3000) |
+
+### Claude Code MCP config (`~/.claude/claude_desktop_config.json`)
+
+Recommended MCPs to add for this project:
+
+```json
+{
+  "mcpServers": {
+    "application-hub": {
+      "command": "node",
+      "args": ["/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js"],
+      "env": {
+        "SUPABASE_URL": "https://betcyfbzsgusaghriptz.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "<service role key>",
+        "SUPABASE_ANON_KEY": "<anon key>"
+      }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref", "betcyfbzsgusaghriptz"],
+      "env": { "SUPABASE_ACCESS_TOKEN": "<your personal access token>" }
+    }
+  }
+}
+```
 
 ---
 
@@ -137,11 +178,16 @@ Connect to Claude Desktop — add to `~/Library/Application Support/Claude/claud
 |---|---|
 | v3 schema design | ✅ Done |
 | Supabase migrations 001-008 | ✅ Done |
-| MCP server (16 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
-| 30 programs seeded | ⬜ Not started |
-| Next.js app scaffold | ⬜ Not started |
-| Hub UI (program directory) | ⬜ Not started |
-| Application workspace | ⬜ Not started |
+| MCP server (18 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
+| 30 programs seeded | ✅ Done — all in Supabase `betcyfbzsgusaghriptz` |
+| Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
+| Next.js app scaffold | ✅ Done — auth, app router, Supabase SSR client, layouts |
+| Hub UI (program directory + timeline) | ✅ Done — all column refs fixed, wired to live DB |
+| Application workspace | ✅ Done — column refs fixed, wired to live DB |
+| Answer Bank (profile page) | ✅ Done — column refs fixed, wired to live DB |
+| AnswerEditor (save/upsert) | ✅ Done — uses real confidence enum (draft/solid/locked) |
+| Build verification | ✅ Done — zero TypeScript errors (`npx tsc --noEmit` passes) |
+| AI draft button | ✅ Done — POST /api/draft wired, AnswerEditor "Draft with AI" button live |
 | Stripe integration | ⬜ Phase 3 |
 
 ---
@@ -150,9 +196,11 @@ Connect to Claude Desktop — add to `~/Library/Application Support/Claude/claud
 
 See `TASKS.md` for the prioritized task list.
 
-The blocking task right now: **seed 30 real programs** (`seed/` directory). Without real data, significance scores and DNA weights are theoretical — the intelligence layer isn't meaningful until the archive has substance.
+**Current P0**: Run `cd app && npm run build` — the column audit is complete and all live-data
+wiring is done. This verifies there are no remaining TypeScript errors before testing in browser.
 
-After seeding: scaffold the Next.js app (Task #3 in TASKS.md).
+**P1 after build passes**: Smoke-test `POST /api/draft` from the workspace UI and confirm
+draft generation logs usage cleanly.
 
 ---
 

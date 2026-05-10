@@ -15,7 +15,7 @@ export function registerGetAcceptanceStats(server: McpServer) {
 
 Data is contributed by applicants who report their outcomes (accepted, rejected, waitlisted) after each cycle.
 
-Returns: acceptance_rate_pct, total_reports, verified_reports, cohort breakdown.
+Returns: acceptance_rate_pct, total_reports, cohort breakdown.
 
 Note: Low report counts mean less statistical reliability — treat as directional.`,
     inputSchema: Schema,
@@ -23,13 +23,13 @@ Note: Low report counts mean less statistical reliability — treat as direction
   }, async ({ program_id, response_format }) => {
     const [statsRes, cohortRes] = await Promise.all([
       supabase.from("program_stats")
-        .select("acceptance_rate_pct, total_applications, total_accepted, last_cohort_label, updated_at")
+        .select("acceptance_rate, application_count, updated_at")
         .eq("program_id", program_id)
         .single(),
       supabase.from("acceptance_reports")
-        .select("cohort_label, outcome")
+        .select("cohort_round, outcome")
         .eq("program_id", program_id)
-        .order("created_at", { ascending: false })
+        .order("reported_at", { ascending: false })
         .limit(100)
     ]);
 
@@ -41,21 +41,19 @@ Note: Low report counts mean less statistical reliability — treat as direction
     const reports = cohortRes.data ?? [];
 
     // Aggregate by cohort
-    const byCohort: Record<string, { accepted: number; rejected: number; waitlisted: number }> = {};
+    const byCohort: Record<string, { accepted: number; rejected: number; waitlist: number }> = {};
     for (const r of reports) {
-      const label = r.cohort_label ?? "unknown";
-      if (!byCohort[label]) byCohort[label] = { accepted: 0, rejected: 0, waitlisted: 0 };
+      const label = r.cohort_round ?? "unknown";
+      if (!byCohort[label]) byCohort[label] = { accepted: 0, rejected: 0, waitlist: 0 };
       if (r.outcome === "accepted") byCohort[label].accepted++;
       else if (r.outcome === "rejected") byCohort[label].rejected++;
-      else if (r.outcome === "waitlisted") byCohort[label].waitlisted++;
+      else if (r.outcome === "waitlist") byCohort[label].waitlist++;
     }
 
     const output = {
       program_id,
-      acceptance_rate_pct: stats.acceptance_rate_pct,
-      total_reports: stats.total_applications ?? 0,
-      verified_reports: stats.total_accepted ?? 0,
-      last_cohort: stats.last_cohort_label,
+      acceptance_rate_pct: stats.acceptance_rate != null ? stats.acceptance_rate * 100 : null,
+      total_reports: stats.application_count ?? 0,
       cohort_breakdown: Object.entries(byCohort).map(([label, counts]) => ({ label, ...counts }))
     };
 
@@ -74,15 +72,14 @@ Note: Low report counts mean less statistical reliability — treat as direction
 
     const lines = [
       `# Acceptance Stats`,
-      `**Acceptance Rate**: ${stats.acceptance_rate_pct?.toFixed(1) ?? "?"}%${reliability}`,
+      `**Acceptance Rate**: ${output.acceptance_rate_pct?.toFixed(1) ?? "?"}%${reliability}`,
       `**Total Reports**: ${output.total_reports}`,
-      `**Last Cohort**: ${stats.last_cohort_label ?? "unknown"}`,
     ];
 
     if (output.cohort_breakdown.length) {
       lines.push("\n## By Cohort");
       for (const c of output.cohort_breakdown) {
-        lines.push(`- **${c.label}**: ${c.accepted} accepted, ${c.rejected} rejected, ${c.waitlisted} waitlisted`);
+        lines.push(`- **${c.label}**: ${c.accepted} accepted, ${c.rejected} rejected, ${c.waitlist} waitlisted`);
       }
     }
 

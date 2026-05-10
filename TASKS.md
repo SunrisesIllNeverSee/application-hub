@@ -8,21 +8,33 @@ Last updated: 2026-05-10
 
 ## Now (active)
 
-### [ ] Wire Next.js app to live Supabase data
+### [x] Wire Next.js app to live Supabase data — Column audit complete
 **Owner**: Cowork (Claude)
-**Priority**: P0 — app is scaffolded but uses mock/placeholder data
+**Priority**: P0
 
-- [ ] Hub page: fetch programs from `programs` table with significance + DNA weights
-- [ ] Hub detail page (`/hub/[slug]`): fetch program + questions + DNA breakdown
-- [ ] Workspace page: fetch `program_questions` joined to `archived_questions`
-- [ ] Profile page: fetch `profile_answers` for authenticated user
-- [ ] Fit scores: display `user_program_fit` scores on Hub cards (requires auth)
-- [ ] Answer editor: wire save/update to `profile_answers` via Supabase client
-- [ ] AI draft button: wire to MCP `draft_answer` tool via API route
+Column fixes applied across 7 files (database.types.ts, utils.ts, ProgramCard.tsx,
+workspace/[program_id]/page.tsx, profile/page.tsx, AnswerEditor.tsx, hub/[slug]/page.tsx,
+hub/timeline/page.tsx). Key fixes:
+- `program_dna.weight` → `weight_pct`; `program_questions.section_name` → `section`
+- `program_questions.display_order` → `order_index`; `exact_phrasing` → `asked_as`
+- `archived_questions.question_text` → `text`; `programs.website_url` → `url`
+- `programs.tags` → `industry_tags`; `significance_score` thresholds corrected (0–1 not 0–100)
+- `profile_answers`: removed non-existent `source`, `is_canonical`, `confidence_score` columns
+- `AnswerEditor` confidence: was number slider 0–100, now enum toggle draft/solid/locked
 
-### [ ] Update AGENTS.md and TASKS.md ownership table
-**Owner**: Cowork (Claude)  
-**Status**: ✅ Done (this file)
+**Verified**: `npm run type-check` and `npm run build` pass in the Next.js app.
+
+### [x] Next.js build verification
+**Owner**: Codex (or manual)
+**Priority**: P0 — `cd app && npm run build` passes after column fixes
+
+### [x] AI draft API route
+**Owner**: Codex
+**Priority**: P1 — `POST /api/draft` calls Anthropic directly and returns draft text
+
+### [ ] AI draft UI smoke test
+**Owner**: Codex
+**Priority**: P1 — confirm workspace button calls `POST /api/draft` and inserts returned draft text
 
 ---
 
@@ -89,7 +101,7 @@ Last updated: 2026-05-10
 
 - [x] v3 schema design — global question archive as core asset
 - [x] Supabase migrations 001–008 (core schema, intelligence, monetization, DNA layer)
-- [x] MCP server — 16 tools, 7 resources, 3 prompts, clean TypeScript build
+- [x] MCP server — 18 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README (Claude Desktop, Cursor, Windsurf configs)
 - [x] CI workflow for MCP server (`.github/workflows/ci.yml`)
 - [x] SECURITY.md, ARCHITECTURE.md, STATUS.md docs
@@ -108,7 +120,7 @@ Last updated: 2026-05-10
 - [x] Hub Timeline — open/closed status, deadline countdown bars, rolling programs
 - [x] Application Workspace — per-program Q&A, readiness progress, answer editor
 - [x] Answer History — diff view component with word-level highlights, restore button
-- [x] Answer Bank (profile) — grouped by theme, source badges, inline editor
+- [x] Answer Bank (profile) — grouped by theme, confidence badges, inline editor
 
 ---
 
@@ -118,7 +130,7 @@ Last updated: 2026-05-10
 |---|---|---|
 | MCP server production-ready | Week 3 | ✅ Done |
 | 30 programs seeded + intelligence live | Week 5 | ✅ Done |
-| Hub UI live (real data) | Week 6 | 🔄 In progress |
+| Hub UI live (real data) | Week 6 | ✅ Build verified |
 | First paying user | Week 8 | ⬜ Not started |
 | 30 draft runs logged | Week 9 | ⬜ Not started |
 | Recalibration checkpoint | Week 10 | ⬜ Not started |

@@ -12,12 +12,14 @@ const SORT_OPTIONS = [
 
 const TYPE_OPTIONS = [
   { value: '', label: 'All types' },
-  { value: 'accelerator', label: 'Accelerator' },
+  { value: 'accel', label: 'Accelerator' },
   { value: 'grant', label: 'Grant' },
   { value: 'fellowship', label: 'Fellowship' },
-  { value: 'vc_fund', label: 'VC Fund' },
-  { value: 'incubator', label: 'Incubator' },
-  { value: 'studio', label: 'Studio' },
+  { value: 'vc', label: 'VC Fund' },
+  { value: 'corp', label: 'Corporate' },
+  { value: 'uni', label: 'University' },
+  { value: 'job', label: 'Job' },
+  { value: 'other', label: 'Other' },
 ]
 
 interface HubFiltersProps {

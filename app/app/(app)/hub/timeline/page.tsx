@@ -199,9 +199,9 @@ function TimelineRow({
             {programTypeLabel(program.type)}
           </span>
         </div>
-        {program.tags?.length > 0 && (
+        {program.industry_tags?.length > 0 && (
           <div className="mt-1 flex gap-1.5 flex-wrap">
-            {program.tags.slice(0, 3).map((tag) => (
+            {program.industry_tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
                 className="text-xs px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"

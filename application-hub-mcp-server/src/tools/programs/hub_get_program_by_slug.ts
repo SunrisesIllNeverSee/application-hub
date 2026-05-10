@@ -64,7 +64,7 @@ Returns the full program row plus program_stats and program_dna rows so a detail
       "## Scores",
       `- Heat: ${program.heat_score?.toFixed(1) ?? "not computed"}`,
       `- Value: ${program.program_value_score?.toFixed(1) ?? "not computed"}`,
-      `- Acceptance: ${stats?.acceptance_rate_pct?.toFixed(1) ?? "unknown"}%`,
+      `- Acceptance: ${stats?.acceptance_rate != null ? `${(stats.acceptance_rate * 100).toFixed(1)}%` : "unknown"}`,
       "",
       "## Program DNA",
       ...(dna.length

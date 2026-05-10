@@ -2,9 +2,15 @@
 
 import { useState, useTransition, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { ProfileAnswer, AnswerSource } from '@/lib/database.types'
+import type { ProfileAnswer, AnswerConfidence } from '@/lib/database.types'
 import { WordCount } from './WordCount'
 import { countWords, cn } from '@/lib/utils'
+
+interface DraftResponse {
+  draft: string
+  question_theme: string
+  word_limit: number
+}
 
 interface AnswerEditorProps {
   archivedQuestionId: string
@@ -15,10 +21,10 @@ interface AnswerEditorProps {
   compact?: boolean
 }
 
-const SOURCE_OPTIONS: { value: AnswerSource; label: string }[] = [
-  { value: 'human_written', label: 'Human' },
-  { value: 'ai_generated', label: 'AI' },
-  { value: 'curated', label: 'Curated' },
+const CONFIDENCE_OPTIONS: { value: AnswerConfidence; label: string }[] = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'locked', label: 'Locked' },
 ]
 
 export function AnswerEditor({
@@ -30,47 +36,76 @@ export function AnswerEditor({
   compact = false,
 }: AnswerEditorProps) {
   const [content, setContent] = useState(initialAnswer?.content ?? '')
-  const [source, setSource] = useState<AnswerSource>(initialAnswer?.source ?? 'human_written')
-  const [isCanonical, setIsCanonical] = useState(initialAnswer?.is_canonical ?? false)
-  const [confidence, setConfidence] = useState(
-    initialAnswer?.confidence_score != null ? Math.round(initialAnswer.confidence_score * 100) : 80
+  const [confidence, setConfidence] = useState<AnswerConfidence>(
+    initialAnswer?.confidence ?? 'draft'
   )
   const [isEditing, setIsEditing] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error'>('idle')
+  const [isDrafting, setIsDrafting] = useState(false)
+  const [draftError, setDraftError] = useState<string | null>(null)
 
   const supabase = createClient()
 
   const wordCount = countWords(content)
   const charCount = content.length
 
+  const handleDraft = useCallback(async () => {
+    setIsDrafting(true)
+    setDraftError(null)
+    try {
+      const res = await fetch('/api/draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          archived_question_id: archivedQuestionId,
+          ...(programId ? { program_id: programId } : {}),
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error ?? `Draft request failed (${res.status})`)
+      }
+      const data: DraftResponse = await res.json()
+      setContent(data.draft)
+      setIsEditing(true)
+    } catch (e) {
+      setDraftError(e instanceof Error ? e.message : 'Draft failed')
+      setTimeout(() => setDraftError(null), 4000)
+    } finally {
+      setIsDrafting(false)
+    }
+  }, [archivedQuestionId, programId])
+
   const handleSave = useCallback(async () => {
     if (!content.trim()) return
 
     startTransition(async () => {
-      const payload: Partial<ProfileAnswer> & {
-        archived_question_id: string
-        content: string
-        source: AnswerSource
-        is_canonical: boolean
-        confidence_score: number
-        word_count: number
-      } = {
-        archived_question_id: archivedQuestionId,
-        content,
-        source,
-        is_canonical: isCanonical,
-        confidence_score: confidence / 100,
-        word_count: wordCount,
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        setSaveState('error')
+        setTimeout(() => setSaveState('idle'), 3000)
+        return
       }
 
-      const { error } = await supabase.from('profile_answers').upsert(
-        {
-          ...payload,
-          ...(initialAnswer?.id ? { id: initialAnswer.id } : {}),
-        },
-        { onConflict: 'user_id,archived_question_id' }
-      )
+      const payload = {
+        user_id: user.id,
+        archived_question_id: archivedQuestionId,
+        content,
+        answer_content: content,
+        confidence,
+        word_count: wordCount,
+        updated_at: new Date().toISOString(),
+        last_updated: new Date().toISOString(),
+        ...(initialAnswer?.id ? { id: initialAnswer.id } : {}),
+      }
+
+      const { error } = await supabase
+        .from('profile_answers')
+        .upsert(payload, { onConflict: 'user_id,archived_question_id' })
 
       if (error) {
         setSaveState('error')
@@ -81,7 +116,7 @@ export function AnswerEditor({
         setTimeout(() => setSaveState('idle'), 2000)
       }
     })
-  }, [content, source, isCanonical, confidence, wordCount, archivedQuestionId, initialAnswer, supabase])
+  }, [content, confidence, wordCount, archivedQuestionId, initialAnswer, supabase])
 
   if (!isEditing && !compact) {
     return (
@@ -141,84 +176,60 @@ export function AnswerEditor({
 
       {/* Controls row */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Source toggle */}
-        <div className="flex rounded-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-          {SOURCE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setSource(opt.value)}
-              className={cn(
-                'px-3 py-1 text-xs transition-colors',
-                source === opt.value
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium'
-                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
+        {/* Confidence toggle */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-neutral-500 dark:text-neutral-400">Confidence</span>
+          <div className="flex rounded-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+            {CONFIDENCE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setConfidence(opt.value)}
+                className={cn(
+                  'px-3 py-1 text-xs transition-colors',
+                  confidence === opt.value
+                    ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium'
+                    : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Canonical toggle */}
+        {/* AI draft button */}
         <button
-          onClick={() => setIsCanonical(!isCanonical)}
+          onClick={handleDraft}
+          disabled={isDrafting}
+          title="AI-draft an answer using your profile answers as context"
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs border transition-colors',
-            isCanonical
-              ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300'
-              : 'border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600'
+            'ml-auto flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs transition-colors',
+            isDrafting
+              ? 'border border-neutral-200 dark:border-neutral-700 text-neutral-400 dark:text-neutral-600 cursor-wait opacity-70'
+              : 'border border-brand-300 dark:border-brand-700 text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950'
           )}
         >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill={isCanonical ? 'currentColor' : 'none'}
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Canonical
+          {isDrafting ? (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="animate-spin">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
+              <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+          {isDrafting ? 'Drafting…' : 'Draft with AI'}
         </button>
-
-        {/* Confidence */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">Confidence</span>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            step={5}
-            value={confidence}
-            onChange={(e) => setConfidence(Number(e.target.value))}
-            className="w-20 accent-brand-600"
-          />
-          <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300 tabular-nums w-8">
-            {confidence}%
-          </span>
-        </div>
-
-        {/* Suggest from profile (future) */}
-        <button
-          disabled
-          title="Coming soon — will pull from your answer bank"
-          className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs
-            border border-neutral-200 dark:border-neutral-700
-            text-neutral-400 dark:text-neutral-600
-            cursor-not-allowed opacity-60"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Suggest from profile
-        </button>
+        {draftError && (
+          <span className="text-xs text-danger-600 dark:text-danger-500">{draftError}</span>
+        )}
       </div>
 
       {/* Action row */}
@@ -227,7 +238,7 @@ export function AnswerEditor({
           <span className="text-xs text-success-600 dark:text-success-400">Saved</span>
         )}
         {saveState === 'error' && (
-          <span className="text-xs text-danger-600 dark:text-danger-500">Save failed</span>
+          <span className="text-xs text-danger-600 dark:text-danger-500">Save failed — check console</span>
         )}
 
         {(isEditing || compact) && (

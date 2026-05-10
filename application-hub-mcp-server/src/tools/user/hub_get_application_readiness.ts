@@ -32,7 +32,7 @@ Requires valid user_token.`,
     // Get required questions for this program
     const { data: allQuestions, error: qErr } = await supabase
       .from("program_questions")
-      .select(`id, exact_phrasing, theme, word_limit, archived_question_id`)
+      .select(`id, asked_as, word_limit, archived_question_id, archived_questions(theme)`)
       .eq("program_id", program_id)
       .eq("is_required", true)
       .order("order_index");
@@ -71,8 +71,8 @@ Requires valid user_token.`,
       total_required_questions: questions.length,
       days_remaining,
       missing_questions: missing.map(q => ({
-        question_text: q.exact_phrasing,
-        theme: q.theme,
+        question_text: q.asked_as,
+        theme: (Array.isArray(q.archived_questions) ? q.archived_questions[0] : q.archived_questions)?.theme ?? null,
         word_limit: q.word_limit
       }))
     };

@@ -16,17 +16,25 @@ The product is built around a **question archive** — every question asked by e
 
 ## Current state
 
-**Phase 2** — building seed data and core UI.
+**Phase 2** — live data integration and launch hardening.
 
 | Component | Status |
 |---|---|
 | Database schema (v3) | ✅ Complete |
 | Supabase migrations | ✅ 008 migrations, apply in order |
-| MCP server (16 tools) | ✅ Complete, clean build |
-| Seed data (30 programs) | ⬜ Not started |
-| Next.js app | ⬜ Not started |
+| MCP server (18 tools) | ✅ Complete, clean build |
+| Seed data (30 programs) | ✅ Done |
+| Next.js app | 🔄 Live data wiring + hardening |
 
-The MCP server is the working interface right now. It connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 16 tools, 7 resources, and 3 prompts.
+The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 18 tools, 7 resources, and 3 prompts.
+
+---
+
+## Current strategy
+
+Application Hub ships first as a practical application operating system: question archive, reusable answer bank, program workspace, and external apply paths. RNS is additive over that spine. The current scoring layer is useful scaffolding; RNS turns it into signal intelligence for question significance, answer fidelity, and opportunity matching without blocking the launch path.
+
+See `docs/06_rns_integrated_build_path.md` for the build sequence.
 
 ---
 
