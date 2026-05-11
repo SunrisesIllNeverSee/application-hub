@@ -10,15 +10,17 @@ _Implementation order: after repo cleanup (issue #1) is complete._
 - [x] **Home dashboard / Today view** — unlocked questions today, closest deadlines, in-progress apps, answers needing review. All data live.
 - [x] **Stress-test UI** — button in AnswerEditor → structured pushback + scores. Backend fully done (Codex). Just needs UI wire-up.
 - [x] **Significance stars on questions** — star/importance indicator on question cards in `/bank` and workspace. `significance_score` computed for all 225 questions. ScoreTooltip already built. One afternoon.
-- [ ] **Application ranking** — rank founders per program by composite_score, show position. Data exists. Needs enough user volume to be meaningful, but UI can be built now.
-- [ ] **Recruiter agent** — nightly job: query `user_program_fit` for high composite_score matches, email via Resend. Infrastructure (pg_cron, Resend, fit scores) all live. Just needs the job + template.
+- [x] **Application ranking** — rank founders per program by composite_score, show position. Data exists. Needs enough user volume to be meaningful, but UI can be built now.
+- [x] **Recruiter agent** — nightly job: query `user_program_fit` for high composite_score matches, email via Resend. Infrastructure (pg_cron, Resend, fit scores) all live. Just needs the job + template.
 - [x] **DNA radar/chart** — radar or bar chart of `program_dna` theme weights vs user profile coverage on program detail. 183 DNA rows in DB.
-- [ ] **Floating Moat Standard / MoatScore / FundScore** — Deric's spec incoming. `/about/scoring` page has placeholder. Architecture is ready to receive it.
+- [ ] **Floating Moat Standard / MoatScore / FundScore** ← moved to P2 — Deric's spec incoming. `/about/scoring` page has placeholder. Architecture is ready to receive it.
 
 ---
 
 ## P2 — Needs scale, partnerships, or real data first
 
+- [ ] **Floating Moat Standard / MoatScore / FundScore** — Deric spec incoming. `/about/scoring` placeholder ready.
+- [ ] **Internal applicant ranking** — "Where do you rank among applicants?" Requires platform to host applications. Defer until first program partner.
 - [ ] **Heat scores from observed data** — replace provisional labels with real acceptance rates, applicant volumes, social signals. Requires data pipeline + partnerships.
 - [ ] **GitHub traction integration** — repo stars, commits, contributors into profile + fit scoring. Needs OAuth.
 - [ ] **Public API** — formalize MCP HTTP as a documented partner API. REST wrapper or MCP-native. Build when first partner asks for it.
@@ -59,6 +61,9 @@ Flagged for separate deep dive. Reference: mirror GitHub (SunrisesIllNeverSee/MO
 
 ## Done (reference)
 
+- [x] Opportunity ranking — workspace index scored by opp score (fit × program value + urgency); ranked badges; "Best unopened" section
+- [x] Recruiter agent — `/api/cron/recruiter` + `recruiter-agent` edge function; weekly Resend email with top 3 matches per user; `recruiter_alerts` dedup table
+- [x] Migration 027 — `recruiter_alerts` table with RLS + pg_cron schedule stub
 - [x] Today dashboard (`/today`) — stat cards, in-progress apps, deadline alerts, top matches
 - [x] Stress-test UI — `/api/stress-test` + `StressTestPanel` in AnswerEditor
 - [x] Significance stars — shared `SignificanceStars` component, wired in Bank, Workspace, Program Detail
