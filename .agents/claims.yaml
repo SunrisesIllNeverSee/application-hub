@@ -52,7 +52,7 @@ claims:
     purpose: answer_reviews table
     acquired_at: 2026-05-11T15:00:00Z
     released_at: 2026-05-11T16:30:00Z
-    landed_in_commit: "3635f40"
+    landed_commits: ["3635f40"]
 
   - id: claim-2026-05-11-003
     session: codex-2026-05-11
