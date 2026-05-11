@@ -122,31 +122,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'archived_question_id is required' }, { status: 400 })
     }
 
-    // BYOK-first routing: prefer user's own key, fall back to platform key for Pro
+    // BYOK-first routing: check providers in priority order
     let resolvedApiKey: string | null = null
+    let resolvedProvider: string | null = null
+    let resolvedBaseUrl: string | null = null
     let integrationProvider = 'byok_anthropic'
 
-    // Check user's stored integrations for an Anthropic key
-    const { data: integration } = await supabase
-      .from('user_integrations')
-      .select('id, key_encrypted, key_storage_ref, status')
-      .eq('user_id', user.id)
-      .eq('provider', 'anthropic')
-      .eq('status', 'active')
-      .maybeSingle()
+    // Priority: anthropic → openai → ollama → google
+    const PROVIDER_PRIORITY = ['anthropic', 'openai', 'ollama', 'google']
 
-    if (integration?.key_encrypted && integration?.key_storage_ref) {
-      try {
-        resolvedApiKey = decryptKey(integration.key_encrypted, integration.key_storage_ref)
-      } catch (e) {
-        console.error('[/api/draft] key decryption failed:', e)
+    const { data: integrations } = await supabase
+      .from('user_integrations')
+      .select('id, provider, key_encrypted, key_storage_ref, base_url, model_preference, status')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+
+    if (integrations?.length) {
+      const sorted = [...integrations].sort(
+        (a, b) => PROVIDER_PRIORITY.indexOf(a.provider) - PROVIDER_PRIORITY.indexOf(b.provider)
+      )
+      const best = sorted[0]
+      if (best?.key_encrypted && best?.key_storage_ref) {
+        try {
+          resolvedApiKey = decryptKey(best.key_encrypted, best.key_storage_ref)
+          resolvedProvider = best.provider
+          resolvedBaseUrl = best.base_url ?? null
+          integrationProvider = `byok_${best.provider}`
+        } catch (e) {
+          console.error('[/api/draft] key decryption failed:', e)
+        }
       }
     }
 
-    // Fall back to platform key if BYOK not set and platform drafts enabled
+    // Fall back to platform Anthropic key
     if (!resolvedApiKey) {
       if (PLATFORM_DRAFTS_ENABLED && process.env.ANTHROPIC_API_KEY) {
         resolvedApiKey = process.env.ANTHROPIC_API_KEY
+        resolvedProvider = 'anthropic'
         integrationProvider = PLATFORM_PROVIDER
       } else {
         return NextResponse.json(
@@ -160,7 +172,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const anthropic = new Anthropic({ apiKey: resolvedApiKey })
+    // Init Anthropic client only if needed
+    const anthropic = resolvedProvider === 'anthropic'
+      ? new Anthropic({ apiKey: resolvedApiKey! })
+      : null
     void integrationProvider // used in ai_draft_runs insert below
 
     // Best-effort preflight so free-tier users do not burn provider tokens
@@ -323,22 +338,66 @@ Never use filler phrases like "In conclusion", "I am excited to", or "innovative
 
 Write the draft answer only — no preamble, no explanation, no word count at the end. Just the answer text.`
 
-    // 6. Call Anthropic
-    const message = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: userPrompt }],
-      system: systemPrompt,
-    })
+    // 6. Call AI provider
+    let draft = ''
+    let promptTokens: number | null = null
+    let completionTokens: number | null = null
 
-    const draft = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
+    if (resolvedProvider === 'anthropic' && anthropic) {
+      const message = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: userPrompt }],
+        system: systemPrompt,
+      })
+      draft = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
+      promptTokens = message.usage?.input_tokens ?? null
+      completionTokens = message.usage?.output_tokens ?? null
+
+    } else if (resolvedProvider === 'openai' || resolvedProvider === 'ollama') {
+      // OpenAI-compatible API (works for OpenAI, Ollama, Groq, etc.)
+      const baseUrl = resolvedProvider === 'ollama'
+        ? (resolvedBaseUrl ?? resolvedApiKey ?? 'http://localhost:11434').replace(/\/$/, '') + '/v1'
+        : 'https://api.openai.com/v1'
+      const apiKey = resolvedProvider === 'ollama' ? 'ollama' : resolvedApiKey!
+      const model = resolvedProvider === 'ollama' ? 'llama3.2' : 'gpt-4o-mini'
+
+      const resp = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1024,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+        }),
+      })
+      if (!resp.ok) {
+        const err = await resp.text()
+        return NextResponse.json({ error: `Provider error: ${err}` }, { status: 502 })
+      }
+      const json = await resp.json() as {
+        choices?: Array<{ message?: { content?: string } }>
+        usage?: { prompt_tokens?: number; completion_tokens?: number }
+      }
+      draft = json.choices?.[0]?.message?.content?.trim() ?? ''
+      promptTokens = json.usage?.prompt_tokens ?? null
+      completionTokens = json.usage?.completion_tokens ?? null
+
+    } else {
+      return NextResponse.json({ error: 'Unsupported AI provider' }, { status: 400 })
+    }
+
     if (!draft) {
       return NextResponse.json({ error: 'AI draft response was empty' }, { status: 502 })
     }
 
     const wordCount = countWords(draft)
-    const promptTokens = message.usage?.input_tokens ?? null
-    const completionTokens = message.usage?.output_tokens ?? null
 
     const { data: draftRun, error: draftRunError } = await supabase
       .from('ai_draft_runs')
