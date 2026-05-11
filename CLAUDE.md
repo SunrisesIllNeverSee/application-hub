@@ -22,7 +22,7 @@ The core asset is a **question archive**: every question ever asked by any progr
 ```
 Supabase (PostgreSQL + pgvector)   ← single source of truth
   ↕
-MCP Server (TypeScript)            ← intelligence layer, 20 tools
+MCP Server (TypeScript)            ← intelligence layer, 21 tools
   ↕
 Claude Desktop / Cursor / Windsurf ← AI drafting interface (current)
   ↕
@@ -205,7 +205,7 @@ Recommended MCPs to add for this project:
 | BYOK draft routing | ✅ Done — `/api/draft` prefers user key; `/profile/integrations` saves encrypted provider keys |
 | Agent review persistence | ✅ Done — `answer_reviews` + `hub_save_answer_review` |
 | Stress-test persistence | ✅ Done — `hub_stress_test_answer` supports `persist_result=true` |
-| First reviewer agent | ✅ Done — `.claude/agents/rns-answer-reviewer.md` + `.claude/commands/review-answer.md` |
+| Reviewer agent family | ✅ Done — RNS reviewer, program-fit reviewer, fidelity certifier, stress-test conductor + command entrypoints |
 | Stripe integration | ⬜ Phase 3 |
 
 ---

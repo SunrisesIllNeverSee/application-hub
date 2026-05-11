@@ -19,12 +19,13 @@ What is already real:
 - `answer_reviews` table exists
 - `answer_stress_tests` table exists
 - review/stress-test boundary is documented
-- first checked-in reviewer agent exists
+- reviewer agent family exists
 
 What is still actually missing:
 
 - local measurement/evaluation workflow for the MCP bundle
 - broader governed reviewer families beyond the first concrete agent
+- measurement and governance conventions across the growing reviewer family
 
 ---
 
@@ -92,7 +93,7 @@ Current state:
 - `.claude/agents/rns-answer-reviewer.md` is now checked in
 - broader RNS/CIVITAE/MO§ES family still does not exist yet
 
-That means the architecture now has a real first agent, but not yet the full family of governed reviewers.
+That means the architecture now has a usable starter family of reviewers, but not yet the full governed RNS/CIVITAE/MO§ES system.
 
 ### 3. Review/stress-test contract drift
 
@@ -216,7 +217,7 @@ Status: done
 
 Start with one concrete reviewed path, not a full ecosystem:
 
-- one RNS/CIVITAE-style reviewer agent
+- one general RNS/CIVITAE-style reviewer agent
 - input: `hub_get_answer_review_context`
 - output: contract-compliant review object
 - persistence: `hub_save_answer_review`
@@ -241,7 +242,7 @@ It now has:
 
 - review-result persistence
 - review-result write-back tools
-- one checked-in reviewer agent
+- a checked-in starter reviewer family
 
 The remaining line between “first real agent loop” and “full agent interaction” is:
 

@@ -14,7 +14,7 @@ Application Hub already has a shippable spine:
 
 - **Database**: Supabase migrations `001` through `015`, 30 programs, 225 archived questions.
 - **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
-- **MCP server**: 20 tools, 7 resources, 3 prompts. Power-user path is real today.
+- **MCP server**: 21 tools, 7 resources, 3 prompts. Power-user path is real today.
 - **Next.js app**: Hub, timeline-in-Hub, Question Bank, workspace, profile split, BYOK integrations, live Supabase wiring.
 - **Auth**: magic links plus a dev-only password escape hatch.
 - **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, and fails closed unless explicitly enabled.
@@ -23,7 +23,7 @@ Application Hub already has a shippable spine:
 
 The refined external roadmap was built outside the repo, so keep these corrections in mind:
 
-- MCP is **20 tools**, not 19.
+- MCP is **21 tools**, not 19.
 - Rate logging for hosted `/api/draft` is already implemented, and BYOK routing is now in repo.
 - Responsive layout has had a first sweep committed; continue testing real devices, but do not treat it as untouched.
 - Custom SMTP is documented; remaining work is manual Resend domain verification and Supabase dashboard configuration.
@@ -110,6 +110,7 @@ These are not launch blockers, but they are still part of the current roadmap an
 - [ ] **Stress-test saved answers UI/scoring** — MCP persistence path now exists. Add quota policy, UI, and eventual BYOK/LLM-backed generation.
 - [x] **Review write-back path** — persisted review flow now exists through `answer_reviews` + `hub_save_answer_review`.
 - [x] **First checked-in reviewer agent** — `rns-answer-reviewer` plus `/review-answer` entrypoint are now checked in.
+- [x] **Broader reviewer/agent family** — program-fit, fidelity-certifier, and stress-test-conductor agents plus command entrypoints are now checked in.
 - [ ] **Plugin-eval measurement baseline** — benchmark MCP/agent bundle with observed usage, not just static analysis.
 - [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
 - [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.

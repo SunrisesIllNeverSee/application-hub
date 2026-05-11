@@ -148,7 +148,7 @@ Rate logging exists, BYOK routing exists, and the route now gives clearer founde
 Sidebar, app padding, and tablet squeeze work landed. Keep real-device testing open, but the first implementation pass is complete.
 
 ### [ ] Browser/device responsive QA
-**Owner**: Cowork
+**Owner**: Cowork + Codex
 **Priority**: P1
 
 Verify mobile/tablet/desktop routes:
@@ -157,6 +157,16 @@ Verify mobile/tablet/desktop routes:
 - `/workspace/[program_id]`
 - `/profile`
 - `/bank`
+
+Latest pass completed on:
+- `/` landing page
+
+Landing-page fixes shipped:
+- mobile anchor access restored with small-screen quick links
+- compare table now scrolls horizontally instead of clipping
+- archive stat cards stack cleanly on narrow screens
+- footer/legal row wraps cleanly on smaller viewports
+- stale MCP count copy updated from `20` to `21`
 
 ### [ ] Seed real deadlines + urgency sort
 **Owner**: Cowork
@@ -285,6 +295,24 @@ Implementation:
 - input from `hub_get_answer_review_context`
 - output matching review contract
 - write-back via review persistence path
+
+### [x] Broader reviewer/agent family beyond the first one
+**Owner**: Codex
+**Priority**: P2
+
+Checked in:
+- `.claude/agents/program-fit-reviewer.md`
+- `.claude/agents/fidelity-certifier.md`
+- `.claude/agents/stress-test-conductor.md`
+- `.claude/commands/review-answer-fit.md`
+- `.claude/commands/certify-answer.md`
+- `.claude/commands/stress-test-answer.md`
+
+Implementation:
+- specialize one lane for program-specific fit review
+- specialize one lane for answer fidelity/certification
+- specialize one lane for deterministic stress-test orchestration
+- keep all three aligned to the existing MCP review/stress-test bridge
 
 ### [ ] Plugin-eval benchmark for MCP/agent layer
 **Owner**: Codex

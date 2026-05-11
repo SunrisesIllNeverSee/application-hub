@@ -68,7 +68,11 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `hub_stress_test_answer`
 - The stress-test MCP bridge is implemented and registered; the missing layer is persistence/use of results, not tool existence.
 - Agent review output now has a persisted write-back path through `answer_reviews` plus MCP tool `hub_save_answer_review`.
-- First checked-in reviewer agent now exists at `.claude/agents/rns-answer-reviewer.md`.
+- Reviewer agent family now includes:
+  - `.claude/agents/rns-answer-reviewer.md`
+  - `.claude/agents/program-fit-reviewer.md`
+  - `.claude/agents/fidelity-certifier.md`
+  - `.claude/agents/stress-test-conductor.md`
 
 ### Next.js app
 - `app/` exists as a Next.js App Router application.
@@ -193,7 +197,11 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `docs/16_mcp_agent_plugin_gap_review.md` — current MCP/agent/plugin gap review, installed tooling, and next implementation plan
 - `migrations/026_answer_reviews.sql` — append-only persisted review output for agent workflows
 - `application-hub-mcp-server/src/tools/user/hub_save_answer_review.ts` — authenticated MCP write-back tool for answer reviews
-- `.claude/agents/rns-answer-reviewer.md` — first checked-in reviewer agent for saved-answer review and persistence
+- `.claude/agents/rns-answer-reviewer.md` — general saved-answer review and persistence
+- `.claude/agents/program-fit-reviewer.md` — program-specific fit review and persisted scoring
+- `.claude/agents/fidelity-certifier.md` — answer fidelity/certification review
+- `.claude/agents/stress-test-conductor.md` — deterministic stress-test orchestration and persistence
+- `.claude/commands/review-answer.md`, `.claude/commands/review-answer-fit.md`, `.claude/commands/certify-answer.md`, `.claude/commands/stress-test-answer.md` — command entrypoints for the reviewer family
 - `VISION.md` — new product vision doc
 - `TASKS.md` — captured 16 follow-ups from smoke test
 - `ROADMAP.md` — reframed around Launch Milestones 1/2/3

@@ -15,7 +15,7 @@ export default async function RootPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
       <header className="border-b border-neutral-800/60 sticky top-0 z-30 bg-neutral-950/80 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-brand-600">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
@@ -24,7 +24,7 @@ export default async function RootPage() {
             </span>
             <span className="text-sm font-semibold tracking-tight">Application Hub</span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-4 sm:gap-6 text-sm">
             <a href="#archive" className="text-neutral-400 hover:text-neutral-100 transition-colors hidden sm:inline">Archive</a>
             <a href="#compare" className="text-neutral-400 hover:text-neutral-100 transition-colors hidden sm:inline">Compare</a>
             <a href="#mcp" className="text-neutral-400 hover:text-neutral-100 transition-colors hidden sm:inline">MCP</a>
@@ -35,17 +35,33 @@ export default async function RootPage() {
       </header>
 
       <main>
-        <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-20 pb-16 text-center">
+          <div className="sm:hidden -mt-4 mb-8 flex items-center gap-2 overflow-x-auto pb-1 text-xs text-neutral-300">
+            {[
+              ['Archive', '#archive'],
+              ['Compare', '#compare'],
+              ['MCP', '#mcp'],
+              ['Pricing', '#pricing'],
+            ].map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                className="shrink-0 rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1.5 hover:border-neutral-700 hover:text-neutral-100 transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
             AI-native infrastructure for the applications you actually have to write
           </div>
-          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
             The question archive
             <br />
             <span className="text-neutral-400">for every application you&apos;ll ever write.</span>
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg text-neutral-300 leading-relaxed">
+          <p className="mt-6 max-w-2xl mx-auto text-base sm:text-lg text-neutral-300 leading-relaxed">
             <span className="text-neutral-100">Every applicant faces the same problem</span>: 10 applications, the same 10 essays. Application Hub archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -68,14 +84,14 @@ export default async function RootPage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
                 <span className="ml-3 text-xs text-neutral-400 font-mono">mos2es.xyz/hub</span>
               </div>
-              <div className="grid grid-cols-12 text-left">
-                <aside className="col-span-3 hidden md:flex flex-col gap-1 p-4 border-r border-neutral-800 bg-neutral-950/40 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-12 text-left">
+                <aside className="col-span-3 hidden lg:flex flex-col gap-1 p-4 border-r border-neutral-800 bg-neutral-950/40 text-xs">
                   <p className="text-neutral-400 uppercase tracking-wide mb-2 px-2">Archive</p>
                   {['Universal questions', 'Team & leadership', 'Traction & metrics', 'Vision & market', 'Financials'].map((cat, i) => (
                     <div key={cat} className={`px-2 py-1.5 rounded ${i === 0 ? 'bg-brand-600/15 text-brand-300' : 'text-neutral-400'}`}>{cat}</div>
                   ))}
                 </aside>
-                <div className="col-span-12 md:col-span-9 p-5 space-y-2.5">
+                <div className="col-span-12 lg:col-span-9 p-4 sm:p-5 space-y-2.5">
                   {[
                     { q: 'Tell us about your team.', programs: 28, score: 0.92 },
                     { q: 'What problem are you solving and for whom?', programs: 26, score: 0.89 },
@@ -83,13 +99,13 @@ export default async function RootPage() {
                     { q: 'What is your traction so far?', programs: 21, score: 0.78 },
                     { q: 'How will you spend the funding?', programs: 18, score: 0.71 },
                   ].map((row) => (
-                    <div key={row.q} className="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900/60 px-4 py-3 hover:border-neutral-700 transition-colors">
+                    <div key={row.q} className="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900/60 px-3 sm:px-4 py-3 hover:border-neutral-700 transition-colors gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm text-neutral-100 truncate">{row.q}</p>
+                        <p className="text-sm text-neutral-100 leading-snug sm:truncate">{row.q}</p>
                         <p className="text-xs text-neutral-400 mt-0.5">{row.programs} programs ask this</p>
                       </div>
-                      <div className="ml-4 shrink-0 flex items-center gap-3">
-                        <div className="w-20 h-1.5 rounded-full bg-neutral-800 overflow-hidden">
+                      <div className="shrink-0 flex items-center gap-2 sm:gap-3">
+                        <div className="w-14 sm:w-20 h-1.5 rounded-full bg-neutral-800 overflow-hidden">
                           <div className="h-full bg-brand-500" style={{ width: `${row.score * 100}%` }} />
                         </div>
                         <span className="text-xs font-mono text-brand-300 w-9 text-right">{row.score.toFixed(2)}</span>
@@ -132,7 +148,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="archive" className="max-w-5xl mx-auto px-6 py-20">
+        <section id="archive" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">The archive</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Questions are data. Answers are capital.</h2>
@@ -140,7 +156,7 @@ export default async function RootPage() {
               Every question ever asked by any program, stored once and scored by significance. The questions YC actually cares about — and the ones that are filler.
             </p>
           </div>
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center">
               <p className="text-4xl font-semibold text-neutral-100">225</p>
               <p className="mt-1 text-xs text-neutral-400 uppercase tracking-wide">Questions archived</p>
@@ -169,7 +185,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-6 py-20">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Answer bank</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Your bank grows every time you show up.</h2>
@@ -192,7 +208,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="compare" className="max-w-5xl mx-auto px-6 py-20">
+        <section id="compare" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">How we compare</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The other ways applicants try to do this.</h2>
@@ -200,8 +216,8 @@ export default async function RootPage() {
               Most applicants hack together a workflow from generic tools. Here&apos;s why none of them solve the actual problem.
             </p>
           </div>
-          <div className="overflow-hidden rounded-2xl border border-neutral-800">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-2xl border border-neutral-800">
+            <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="bg-neutral-900/60 border-b border-neutral-800">
                   <th className="text-left p-4 font-medium text-neutral-300">Feature</th>
@@ -234,7 +250,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="mcp" className="max-w-5xl mx-auto px-6 py-20">
+        <section id="mcp" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
           <div className="rounded-3xl border border-neutral-800 bg-gradient-to-br from-neutral-900/80 to-neutral-950 p-10 md:p-14">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
@@ -244,7 +260,7 @@ export default async function RootPage() {
                   Use Claude Desktop, Cursor, or Windsurf to query the archive directly. Draft answers in your editor. Save to your bank. Never touch our UI if you don&apos;t want to.
                 </p>
                 <p className="mt-4 text-sm text-neutral-400">
-                  20 tools · 7 resources · 3 prompts · Source on GitHub
+                  21 tools · 7 resources · 3 prompts · Source on GitHub
                 </p>
               </div>
               <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5 font-mono text-sm">
@@ -260,7 +276,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="pricing" className="max-w-5xl mx-auto px-6 py-20">
+        <section id="pricing" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Pricing</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Simple. Applicant-friendly.</h2>
@@ -305,7 +321,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section className="max-w-3xl mx-auto px-6 py-20">
+        <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center mb-10">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Questions</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The ones applicants actually ask.</h2>
@@ -348,7 +364,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section className="max-w-3xl mx-auto px-6 py-24 text-center">
+        <section className="max-w-3xl mx-auto px-4 sm:px-6 py-24 text-center">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Answer once. Apply everywhere.</h2>
           <p className="mt-4 text-neutral-300">Build your answer bank in 10 minutes. Use it for the next decade.</p>
           <div className="mt-8">
@@ -360,7 +376,7 @@ export default async function RootPage() {
       </main>
 
       <footer className="border-t border-neutral-800/60 mt-12">
-        <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-3">
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-brand-600">
@@ -401,7 +417,7 @@ export default async function RootPage() {
           </div>
         </div>
         <div className="border-t border-neutral-800/60">
-          <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between text-xs text-neutral-400">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-neutral-400">
             <p>© 2026 Ello Cello LLC. All rights reserved.</p>
             <p>Built in the open · <Link href="/login" className="hover:text-neutral-200 transition-colors">Sign in →</Link></p>
           </div>
