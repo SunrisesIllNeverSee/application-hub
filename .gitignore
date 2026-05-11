@@ -35,3 +35,4 @@ Thumbs.db
 .claude/*.jpg
 .claude/*.webp
 .claude/worktrees/
+supabase/.temp/
