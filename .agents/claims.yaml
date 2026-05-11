@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-11T23:59:00Z
+updated_at: 2026-05-11T23:30:00Z
 
 note: >
   Phase A scaffold. This file is the machine-readable claim ledger. Sessions and
@@ -31,6 +31,12 @@ sessions:
     started_at: 2026-05-11T20:00:00Z
     heartbeat: 2026-05-11T20:30:00Z
     status: wrapped
+  - id: vscode-claude-2026-05-11-b
+    surface: vscode-claude
+    started_at: 2026-05-11T22:00:00Z
+    heartbeat: 2026-05-11T23:30:00Z
+    status: active
+    note: continuation session — Phase B/C enforcement work + strict-mode opt-in
 
 claims:
   - id: claim-2026-05-11-001
@@ -103,3 +109,25 @@ claims:
       - 3d81666  # match-question API + embedding seeder + portal audit + Solofounders
       - c02299b  # Ollama-first embeddings + 768d resize
       - f2c8fdd  # BYOK consolidation
+
+  - id: claim-2026-05-11-005
+    session: vscode-claude-2026-05-11-b
+    type: file_lane
+    paths:
+      - .agents/check.py
+      - .agents/stripe-smoke.sh
+      - .agents/install-hook.sh
+      - .agents/REGISTRY_GAPS.md
+      - .agents/PROTOCOL.md
+      - .github/workflows/agents-check.yml
+    purpose: >
+      Phase B + Phase C enforcement layer — automated registry/claims/STATUS
+      validator (check.py), Stripe env smoke helper, pre-commit hook installer,
+      CI workflow, gap reconciliation punch list, and PROTOCOL.md updates
+      documenting Phase B/C/D.
+    acquired_at: 2026-05-11T22:00:00Z
+    released_at: 2026-05-11T23:30:00Z
+    landed_commits:
+      - 8e92cd0  # Phase B — check.py + stripe-smoke.sh
+      - 41380f3  # Phase C — install-hook.sh + agents-check.yml
+      - 0260291  # registry gaps reconciliation doc
