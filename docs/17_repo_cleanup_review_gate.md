@@ -115,8 +115,8 @@ Reduce clutter and duplication in docs.
 
 The current obvious cleanup target is the duplicate `docs/15_*` pair:
 
-- `docs/15_application_intake_taxonomy.md`
-- `docs/15_curated_ingest_lane.md`
+- `docs/15_portable_application_taxonomy.md`
+- `docs/21_curated_ingest_lane.md`
 
 Review should decide one of:
 
@@ -157,9 +157,9 @@ Review should decide whether any of these are stale enough to:
 
 Likely review targets:
 
-- `ARCHITECTURE.md`
-- `PROGRAMS.md`
-- `SECURITY.md`
+- `docs/ARCHITECTURE.md`
+- `docs/archive/program_directory_30_programs_legacy.md`
+- `docs/SECURITY.md`
 
 ### 4. README redesign
 

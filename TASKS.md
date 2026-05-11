@@ -468,7 +468,7 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 - [x] MCP server — 21 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README for Claude Desktop, Cursor, Windsurf
 - [x] CI workflow for MCP server and Next.js app
-- [x] `SECURITY.md`, `ARCHITECTURE.md`, `STATUS.md`
+- [x] `docs/SECURITY.md`, `docs/ARCHITECTURE.md`, `STATUS.md`
 - [x] 842 programs available in Supabase
 - [x] 225 questions archived
 - [x] `compute_significance_scores()` executed

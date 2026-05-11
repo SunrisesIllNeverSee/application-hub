@@ -193,7 +193,8 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `migrations/015_byok_key_storage.sql` — encrypted BYOK key storage column
 - `seed/01_deadline_updates_template.sql` — source-verified deadline update helper
 - `docs/09_launch_checklist.md` through `docs/13_smtp_launch_handoff.md` — Milestone 3 handoff docs
-- `docs/15_curated_ingest_lane.md` — narrow curation contract for application/funding/question targets
+- `docs/21_curated_ingest_lane.md` — narrow curation contract for application/funding/question targets
+- `docs/MIGRATIONS.md` — policy for the logical 001–026 chain and duplicate numeric prefixes
 - `docs/16_mcp_agent_plugin_gap_review.md` — current MCP/agent/plugin gap review, installed tooling, and next implementation plan
 - `migrations/026_answer_reviews.sql` — append-only persisted review output for agent workflows
 - `application-hub-mcp-server/src/tools/user/hub_save_answer_review.ts` — authenticated MCP write-back tool for answer reviews
