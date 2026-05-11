@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install pyyaml
+        run: pip install pyyaml
       - name: Run strict registry check
         run: python3 .agents/check.py --strict
 
