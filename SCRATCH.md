@@ -12,7 +12,8 @@
 
 P1 sprint complete. Migrations 001-027 applied to Supabase. Build is clean. Site live at mos2es.xyz.
 
-**What's actually deployed:**
+### What's actually deployed
+
 - Hub (842 programs), Question Bank + drip, BYOK, draft routing, import flows
 - Stripe skeleton (code done — Deric needs to add price IDs to Vercel)
 - Dark mode, outcome tracking, funders schema (026 applied), deadline alerts (cron live)
@@ -21,7 +22,8 @@ P1 sprint complete. Migrations 001-027 applied to Supabase. Build is clean. Site
 - Reviewer family: `.claude/agents/rns-answer-reviewer.md`, `program-fit-reviewer`, `fidelity-certifier`, `stress-test-conductor`
 - **NEW (2026-05-11 second session)**: Home dashboard `/today`, StressTestPanel, DnaRadarChart, SignificanceStars, workspace opportunity ranking, recruiter agent (migrations/027 + /api/cron/recruiter + edge function)
 
-**Remaining open work:**
+### Remaining open work
+
 - Funders index UI `/funders` (Cowork)
 - Stripe activation (Deric: add price IDs to Vercel env vars)
 - CRON_SECRET to Supabase edge function env vars (Deric: manual — recruiter agent step 2)
@@ -35,7 +37,7 @@ P1 sprint complete. Migrations 001-027 applied to Supabase. Build is clean. Site
 
 ## For Codex — most recent context
 
-_Updated 2026-05-11 — plugin-eval complete, CI green_
+Updated 2026-05-11 — plugin-eval complete, CI green.
 
 Read in order:
 1. `~/Desktop/MULTI_CLAUDE.md` — cross-workspace state, what's live, what's next
