@@ -65,7 +65,7 @@ application-hub/
 │   ├── dist/                          ← compiled output (run npm run build first)
 │   └── README.md
 │
-└── seed/                              ← seed SQL for 30 real programs
+└── seed/                              ← seed SQL, staging lanes, and import promotion helpers
 ```
 
 ---
@@ -190,7 +190,7 @@ Recommended MCPs to add for this project:
 | v3 schema design | ✅ Done |
 | Supabase migrations through 026 | ✅ Done |
 | MCP server (21 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
-| 30 programs seeded | ✅ Done — all in Supabase `betcyfbzsgusaghriptz` |
+| Program archive | ✅ Done — 842 programs in Supabase `betcyfbzsgusaghriptz` |
 | Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
 | Next.js app scaffold | ✅ Done — auth, app router, Supabase SSR client, layouts |
 | Auth callback path | ✅ Done — magic links land at real `/auth/callback` route |
@@ -215,9 +215,9 @@ Recommended MCPs to add for this project:
 See `TASKS.md` for the prioritized task list.
 
 **Current launch sequence**:
-1. Ship today to 10–20 power users through MCP/web app with clear BYOK/hosted-AI caveats.
-2. MVP pieces are in repo: Question Bank, drip mechanic, profile split, BYOK integrations.
-3. Polished public launch: live BYOK draft validation, real deadlines, program TL;DR/pros/cons, heat/applicant polish.
+1. Founder-first public product is live: Hub, Bank, workspace, profile split, imports, BYOK.
+2. Portable application-graph infrastructure is in repo: taxonomy, import flows, question archive, reviewer persistence.
+3. Current work is polish, signal quality, reviewer breadth, and truthful docs.
 
 `cd app && npm run type-check`, `cd app && npm run build`, and `cd application-hub-mcp-server && npm run check` are passing.
 
@@ -238,5 +238,5 @@ See `TASKS.md` for the prioritized task list.
 
 - Don't run migrations out of order — they depend on each other
 - Don't use the service role key client-side or expose it in any frontend code
-- Don't add community/social features until the data layer has real programs seeded (noise before signal)
+- Don't add community/social features before the data layer and review loop are genuinely useful (noise before signal)
 - Don't auto-submit applications — this is a preparation layer, not a submission layer

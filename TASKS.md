@@ -44,7 +44,7 @@ These are the facts that make a soft launch possible now.
 **Owner**: Cowork + Codex
 **Status**: Done
 
-- 30 programs seeded
+- 842 programs archived
 - 225 questions archived/scored
 - Significance scoring and program DNA live
 - MCP server: 21 tools, 7 resources, 3 prompts
@@ -464,12 +464,12 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 ## Done
 
 - [x] v3 schema design — global question archive as core asset
-- [x] Supabase migrations 001–015
+- [x] Supabase migrations through 026
 - [x] MCP server — 21 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README for Claude Desktop, Cursor, Windsurf
 - [x] CI workflow for MCP server and Next.js app
 - [x] `SECURITY.md`, `ARCHITECTURE.md`, `STATUS.md`
-- [x] 30 programs seeded to Supabase
+- [x] 842 programs available in Supabase
 - [x] 225 questions archived
 - [x] `compute_significance_scores()` executed
 - [x] `compute_program_dna()` executed

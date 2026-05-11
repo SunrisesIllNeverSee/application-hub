@@ -1,6 +1,6 @@
 # Competitive Research — Application Hub
 
-> Last updated: May 2026. Revisit after 30 programs seeded.
+> Last updated: May 2026. Revisit after the next archive-quality pass, not after a fixed seed-count milestone.
 
 ---
 

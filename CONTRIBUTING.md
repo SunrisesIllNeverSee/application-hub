@@ -1,6 +1,6 @@
 # Contributing to Application Hub
 
-The highest-leverage contribution right now is **seed data** — real programs with real questions. The intelligence layer (significance scores, DNA weights, fit scores) isn't meaningful until the archive has substance. Adding 30 well-researched programs is worth more than any UI feature.
+The highest-leverage contribution right now is **curated program and question enrichment** — verified programs, better question mappings, cleaner deadlines, and stronger intake evidence. The archive now has scale; the next leverage is quality and promotion discipline.
 
 ---
 
@@ -149,7 +149,7 @@ Use one of these exact theme values when inserting archived questions:
 
 ## Universal questions
 
-Set `is_universal = TRUE` for any question asked by 80% or more of programs in the archive. At <30 programs seeded, be conservative — mark universal only the ones you've verified appear in 5+ programs.
+Set `is_universal = TRUE` for any question asked by 80% or more of programs in the archive. Even with the larger imported archive, stay conservative — only mark universal when the wording is clearly reused across many real application surfaces, not just brand-adjacent shells.
 
 Universal questions surface first in profile onboarding. They're the highest-leverage answers to write first.
 

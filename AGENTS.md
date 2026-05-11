@@ -1,170 +1,126 @@
 # Application Hub — Agent Coordination
 
-> Read this before touching anything. Both Cowork (Claude) and Codex must read this file at the start of every session.
-> Check the ownership table before editing files — don't create merge conflicts.
-> Then check `SCRATCH.md` for active claims before picking up work.
-> Then read `ROADMAP.md` for what's next in priority order.
->
-> **We are nonlinear and temporal.** No calendar deadlines. Work happens when Deric is engaged.
-> The roadmap is priority-ordered, not time-ordered.
+> Read this before touching anything. Both Cowork (Claude) and Codex should read this file at the start of every session.
+> Then check `SCRATCH.md` for active claims before editing.
+> Then check `ROADMAP.md` for sequence and `TASKS.md` for implementation detail.
 
 ---
 
 ## What this project is
 
-**Application Hub** — a platform that helps founders apply to accelerators, grants, and fellowships.
+**Application Hub** is a founder-first application operating system built on a portable application graph.
 
-Core asset: a **question archive** — every question ever asked by any program, stored once, scored by significance. Users build a profile answer bank that pre-fills across multiple applications.
+Publicly, the product starts with founders applying to accelerators, grants, fellowships, and adjacent startup programs.
+Under the hood, the same question archive / answer bank / fit / review spine is being kept broad enough to support jobs, school applications, and grants without a ground-up rebuild.
 
-**Business model**: Freemium SaaS. Free = 10 AI drafts/month. Pro = $19/mo unlimited. Team = $49/mo multi-seat.  
-**Company**: Ello Cello LLC — Deric McHenry (deric.mchenry@gmail.com)
+Core asset: a **question archive** plus reusable **answer bank**.
+
+Business model:
+- Free: 10 AI drafts/month
+- Pro: $19/mo unlimited
+- Team: $49/mo shared answer library + multi-seat
+
+Company:
+- Ello Cello LLC
+- Deric McHenry — deric.mchenry@gmail.com
 
 ---
 
 ## Architecture
 
-```
-Supabase (PostgreSQL + pgvector)   ← single source of truth
-  ↕                                   project: betcyfbzsgusaghriptz
-MCP Server (TypeScript)            ← intelligence layer, 20 tools
+```text
+Supabase (PostgreSQL + pgvector)   ← source of truth, project: betcyfbzsgusaghriptz
   ↕
-Next.js app (app/)                 ← user-facing product, live-data wired
+MCP Server (TypeScript)            ← intelligence layer, 21 tools / 7 resources / 3 prompts
+  ↕
+Next.js app (app/)                 ← live product on Vercel
 ```
 
 ---
 
-## Current Phase: Launch hardening
+## Current phase
 
-| Component | Status | Owner |
-|---|---|---|
-| Schema + migrations 001–015 | ✅ Done (015 = BYOK key storage, 2026-05-10) | Cowork/Codex |
-| MCP server (20 tools) | ✅ Done | — |
-| 30 programs seeded to Supabase | ✅ Done | Cowork |
-| Intelligence layer (significance + DNA) | ✅ Done | Cowork |
-| Next.js app scaffold | ✅ Done | Codex |
-| Hub UI (live data) | ✅ Smoke-tested 2026-05-10 | Cowork |
-| Application Workspace (live data) | ✅ Smoke-tested 2026-05-10 | Cowork |
-| Auth flow (magic link + dev password) | ✅ Working | Cowork |
-| `/auth/callback` route fix | ✅ Done | Cowork |
-| DNA % display bug | ✅ Fixed | Cowork |
-| Sidebar active-state bug | ✅ Fixed | Cowork |
-| CI workflow | ✅ Done | Codex |
-| Next.js bumped to 14.2.35 | ✅ Done | Cowork |
-| Hosted draft metering | ✅ Done | Codex |
-| BYOK integrations UI + route | ✅ Done | Cowork/Codex |
-| Question Bank + drip mechanic | ✅ Done | Cowork |
-| Sidebar IA redesign | ✅ Done | Cowork |
-| Workspace index source-of-truth fix | ✅ Done | Cowork |
+**Launch hardening + repo cleanup sync**
 
-## What's open next
-
-See `ROADMAP.md` for the canonical launch sequence and `TASKS.md` for implementation details.
-
-Current launch frame:
-1. **Milestone 1 — Ship today to power users** through MCP/web app with clear BYOK/hosted-AI caveats.
-2. **Milestone 2 — MVP**: now represented in repo. Focus is live validation and polish.
-3. **Milestone 3 — Polished public launch**: real deadlines, program TL;DR/pros/cons, live BYOK smoke test, heat/applicant polish.
-
-Cowork owns most user-facing `app/` work. Codex should prefer MCP server, CI, docs, security, metering, cron, webhook, and architecture work unless explicitly coordinating through `SCRATCH.md`.
+The product spine is already live. Current work is:
+- polish and QA
+- reviewer/agent expansion
+- signal-layer iteration
+- repo/docs cleanup so all sessions work from the same truth
 
 ---
 
-## File Ownership Table
+## Current truth
 
-This is the coordination contract. **Do not edit files owned by the other agent without flagging it in a commit message.**
-
-| Path | Owner | Notes |
+| Component | Status | Notes |
 |---|---|---|
-| `app/` (all Next.js) | **Cowork** | Live data wiring is build-verified; smoke testing AI draft flow next |
-| `migrations/` | **Cowork** | Schema changes only; 009 fixes auth trigger search_path from smoke testing |
-| `seed/` | **Cowork** | All 30 programs done |
-| `application-hub-mcp-server/src/` | **Shared** | Coordinate via commit messages |
-| `application-hub-mcp-server/package.json` | **Codex** | Build scripts, deps |
+| Supabase migrations | ✅ Through `026` | Duplicate numeric prefixes exist for parallel-track history; see migration policy docs |
+| Program archive | ✅ 842 programs | 30 manually seeded + large imported archive |
+| Question archive | ✅ 225 scored questions | significance + DNA live |
+| MCP server | ✅ 21 tools | review persistence + stress-test persistence included |
+| Next.js app | ✅ live-data wired | Hub, `/bank`, workspace, profile split, import flows |
+| BYOK | ✅ shipped | Anthropic/OpenAI/Ollama/Google path in repo |
+| Reviewer family | ✅ starter set shipped | RNS reviewer, fit reviewer, fidelity certifier, stress-test conductor |
+| Stripe | ⏳ code-ready | env / dashboard activation still partly manual |
+
+---
+
+## Active ownership defaults
+
+These are defaults, not walls. Shared files are fine when the commit scope is clear.
+
+| Path | Default owner | Notes |
+|---|---|---|
+| `app/` | **Cowork** | user-facing product surfaces, browser QA, wiring |
+| `migrations/` | **Cowork** | schema changes; document duplicate-prefix convention, do not rename applied files casually |
+| `seed/` | **Shared** | seed promotion and staging lane both active now |
+| `application-hub-mcp-server/src/` | **Shared** | coordinate through commit messages |
+| `application-hub-mcp-server/package.json` | **Shared** | may change from MCP or eval work |
 | `.github/workflows/` | **Codex** | CI/CD |
-| `CLAUDE.md` | **Cowork** | Cowork session context |
-| `AGENTS.md` | **Cowork** | This file — coordination contract |
-| `TASKS.md` | **Cowork** | Task tracking |
-| `ARCHITECTURE.md` | **Codex** | Architecture docs |
-| `STATUS.md` | **Codex** | Repo status doc |
-| `SECURITY.md` | **Codex** | Security policy |
-| `README.md` | **Shared** | Coordinate via commit messages |
-| `CONTRIBUTING.md` | **Shared** | Coordinate via commit messages |
-| `VISION.md` | **Cowork** | Product vision — the why and the future aspirations |
-| `ROADMAP.md` | **Shared** | Priority-ordered list of work — read at session start |
-| `SCRATCH.md` | **Shared** | Active work claims — both agents must read before starting |
-| `docs/archive/` | **Shared** | Superseded/completed planning files; update archive README when moving files |
+| `README.md` | **Shared** | public-facing repo surface |
+| `ROADMAP.md`, `TASKS.md`, `STATUS.md` | **Shared** | canonical planning/state docs |
+| `CLAUDE.md`, `AGENTS.md`, `SCRATCH.md` | **Shared** | coordination/memory layer |
+| `VISION.md` | **Shared** | product thesis and portability story |
+| `docs/` | **Shared** | active operational docs + archive policy |
+
+If a shared file is touched, keep the commit tight and explicit.
 
 ---
 
-## Active work coordination — `SCRATCH.md`
+## Coordination rules
 
-Before picking up any task from `TASKS.md`, both agents **must** check `SCRATCH.md` to see what the other is currently working on. Claim by appending to "Currently claimed" + commit; release by removing your row when done.
+1. **Read `SCRATCH.md` first.**
+2. **Pull before starting.**
+3. **Prefer small commits with clear scope.**
+4. **Do not “helpfully” rewrite unrelated files.**
+5. **If a file is already in flight, either avoid it or make the overlap explicit in the commit message.**
 
-This prevents the duplicate work we hit on 2026-05-10 (both agents independently writing migration 009). See `SCRATCH.md` for full protocol.
+Cross-workspace session state belongs in:
+- `~/Desktop/MULTI_CLAUDE.md`
 
----
-
-## How we avoid merge conflicts
-
-1. **Pull before every session.** Always `git pull origin main` before starting work.
-2. **Small, frequent commits.** Commit after each logical unit — don't batch huge changesets.
-3. **Commit messages declare scope.** Start with the area: `app/hub:`, `mcp:`, `seed:`, `docs:` etc.
-4. **Don't reformat files you don't own.** Whitespace/formatting changes cause spurious conflicts.
-5. **If you touch a shared file, say so.** Add `[shared]` to the commit subject.
+Repo-local active claims belong in:
+- `SCRATCH.md`
 
 ---
 
-## Supabase project
+## Important live facts
 
-- **Project ID**: `betcyfbzsgusaghriptz`
-- **URL**: `https://betcyfbzsgusaghriptz.supabase.co`
-- **Migrations applied**: 001–015 ✅
-- **Programs seeded**: 30 ✅
-- **Intelligence layer**: live ✅ (225 questions scored, DNA weights computed)
-
----
-
-## MCP server — local setup
-
-```bash
-cd application-hub-mcp-server
-npm install
-npm run build
-```
-
-Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "application-hub": {
-      "command": "node",
-      "args": ["/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js"],
-      "env": {
-        "SUPABASE_URL": "https://betcyfbzsgusaghriptz.supabase.co",
-        "SUPABASE_SERVICE_ROLE_KEY": "YOUR_SERVICE_ROLE_KEY",
-        "SUPABASE_ANON_KEY": "YOUR_ANON_KEY"
-      }
-    }
-  }
-}
-```
-
-`dist/` is gitignored — always run `npm run build` after cloning or pulling MCP server changes.
+- Site: `https://mos2es.xyz`
+- Supabase project: `betcyfbzsgusaghriptz`
+- MCP server local rebuild path:
+  - `/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js`
+- App builds currently use:
+  - `cd app && npm run type-check`
+  - `cd app && npm run build`
+- MCP verification uses:
+  - `cd application-hub-mcp-server && npm run check`
 
 ---
 
-## Conventions
+## Do not do these things
 
-- **TypeScript throughout** — no plain JS in `src/`
-- **Zod for all input schemas** — `z.object({...}).strict()`
-- **Supabase join pattern**: `Array.isArray(row.joined) ? row.joined[0] : row.joined` then cast `as unknown as T`
-- **CHARACTER_LIMIT = 25_000** — all tool text responses sliced at this
-- **Response format**: tools accept `response_format: "markdown" | "json"` — default markdown
-
-## Don't do these things
-
-- Don't run migrations out of order
-- Don't expose `SUPABASE_SERVICE_ROLE_KEY` in any frontend code
-- Don't add community/social features until outcomes data exists (noise before signal)
-- Don't auto-submit applications — preparation layer only
+- Do not expose `SUPABASE_SERVICE_ROLE_KEY` in frontend code.
+- Do not rename already-applied migration files lightly.
+- Do not treat Firecrawl output as production truth without review.
+- Do not let founder-first copy harden the underlying architecture into founder-only assumptions.
+- Do not auto-submit applications; this is still a preparation and intelligence layer.

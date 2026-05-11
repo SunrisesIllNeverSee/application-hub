@@ -6,7 +6,7 @@ _Written 2026-05-11. Implementation blocked on repo cleanup (issue #1) first._
 
 ## Problem statement
 
-The question archive has 225 manually seeded questions across 30 programs. 800+ additional programs were imported from FundingCake but have zero questions mapped to them — they're shells. Founders who open workspaces for those programs see empty question lists.
+The question archive has 225 manually seeded questions backed by a much larger 842-program opportunity graph. Many imported programs still have zero questions mapped — they are directory shells until the question pipeline catches up. Users who open workspaces for those programs still see thin or empty question coverage.
 
 There is no UI for browsing the question archive directly.
 

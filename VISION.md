@@ -51,7 +51,7 @@ Product implication:
 This isn't a product that added AI features. AI is the spine of the architecture:
 
 - **The database computes intelligence** — significance scores, program DNA, fit scores, composite rankings are SQL functions running in Postgres, not API calls to a model
-- **The MCP server is a first-class surface** — 19 tools, 7 resources, 3 prompts. The web app is one client; Claude Desktop, Cursor, and Windsurf are others. Power users may never touch the web UI.
+- **The MCP server is a first-class surface** — 21 tools, 7 resources, 3 prompts. The web app is one client; Claude Desktop, Cursor, and Windsurf are others. Power users may never touch the web UI.
 - **Drafting and review are architecturally separate** — hosted drafting (`/api/draft`) is synchronous convenience. Agent-side review (RNS/MO§ES judgment layer) is asynchronous intelligence that runs after the fact over saved answers, not in the request path.
 - **RNS is additive, not replacement** — the current scoring formulas are scaffolding. RNS signal purity, commitment conservation metrics, and SigToken contextual scoring layer on top as the answer corpus grows. The database columns become display aliases while the deeper measurement system matures.
 
@@ -64,7 +64,7 @@ User insight (2026-05-10): "i start at ground zero so the question is how do i h
 A novice founder with no AI tools and no money should be able to compete with a polished funded founder with a stack of subscriptions. The platform makes that possible because:
 
 - **The question archive levels the unknown-unknowns** — both founders see the same 225 questions ranked by significance, so the novice can't be tricked by an obscure question the seasoned founder happens to know
-- **The answer bank levels the time investment** — the novice answers once, that answer is reusable across 30+ programs; the seasoned founder doesn't get a multiplier for being faster
+- **The answer bank levels the time investment** — the novice answers once, that answer is reusable across hundreds of opportunities; the seasoned founder doesn't get a multiplier for being faster
 - **Stress testing levels presentation skill** — the seasoned founder's polished surface gets probed for substance; the novice's rough draft gets its hidden gems surfaced. Both get evaluated on what's actually there, not on writing quality.
 - **MoatScore levels the brand-name advantage** — score is computed from quality + survival under stress + outcomes, not from who you know or where you went to school
 
@@ -294,7 +294,7 @@ User submits a URL to a program they found (accelerator, grant, fellowship) that
 - User gets immediate personal value (gap analysis, fit score) — not a charity contribution
 - Platform gets a new program in the archive with zero manual curation effort
 - The import_queue table (migration 003) already exists for exactly this
-- Scales the archive from 30 programs to 300+ without a data team
+- Scales the archive from the manually-seeded core into a much larger multi-hundred-program graph without needing a data team
 
 **Implementation:**
 - `/submit` or a "Submit a program" button in the Hub
@@ -627,7 +627,7 @@ The pricing matrix is downstream of a principle. Naming the principle helps:
 **Free tier exists to make the founder's life materially better even without paying.** A founder using only the free tier should still have:
 - Their own growing answer bank (drip mechanic)
 - AI drafts (10/mo — enough to draft a single full application)
-- Access to all 30+ programs with full descriptions, DNA, and links
+- Access to the live archive of opportunities with full descriptions, DNA, and links
 - Their own application progress tracking
 - Magic-link sign-in, no credit card required
 

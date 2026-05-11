@@ -12,7 +12,7 @@
 
 Application Hub already has a shippable spine:
 
-- **Database**: Supabase migrations `001` through `015`, 30 programs, 225 archived questions.
+- **Database**: Supabase migrations are applied through `026`; the live archive has 842 programs and 225 archived questions.
 - **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
 - **MCP server**: 21 tools, 7 resources, 3 prompts. Power-user path is real today.
 - **Next.js app**: Hub, timeline-in-Hub, Question Bank, workspace, profile split, BYOK integrations, live Supabase wiring.
@@ -38,11 +38,11 @@ Best users for this milestone:
 
 - They are comfortable in Claude/Cursor/Windsurf.
 - They understand the value of the question archive without a guided drip loop.
-- They can tolerate BYOK being unfinished or AI drafting being limited.
+- They can tolerate some runtime rough edges and still get value from the archive/MCP path.
 
 What is already good enough:
 
-- 30 programs and 225 scored questions.
+- 842 programs and 225 scored questions.
 - Program discovery, detail, workspace, and saved answers.
 - MCP access to the intelligence layer.
 - Live Supabase wiring and clean builds.
