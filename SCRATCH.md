@@ -4,6 +4,7 @@
 > Claim by appending your line. Release by removing it (or moving to "recently released").
 > Stale claims = no commits touching the claimed paths since the claim landed.
 > See also: `~/Desktop/MULTI_CLAUDE.md` for cross-workspace coordination.
+> `SCRATCH.md` is for repo-local active claims only. It is not the main status doc; factual current-state truth lives in `STATUS.md`.
 
 ---
 
@@ -72,6 +73,10 @@ Read in order:
 
 ### When you start a task
 Append a row to "Currently claimed". Commit SCRATCH.md BEFORE starting work.
+
+If the task includes a new migration:
+- claim the next migration number here before writing the SQL file
+- this is the lightweight guardrail against duplicate numeric prefixes from parallel sessions
 
 ### When you finish
 Remove your row, move to "Recently released", commit with the work.

@@ -4,6 +4,14 @@ _Last updated: 2026-05-11_
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 
+Use this as the canonical fact source for:
+- counts
+- migration chain
+- shipped feature state
+- remote/live truth
+
+Other coordination docs should point here rather than restating these facts unless they have a specific reason to do so.
+
 ---
 
 ## Confirmed in GitHub
@@ -172,7 +180,7 @@ RNS is the planned additive judgment layer, not a launch blocker.
 ## Immediate priorities (launch roadmap)
 
 1. **Live BYOK draft verification** — save a real provider key, draft from workspace, confirm live end-to-end success
-2. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
+2. **Heat scores + applicant counts** — synthetic compute job still needed; launch-surface fallbacks landed, but deeper computed signal is still open
 3. **Seed real deadlines + urgency sort**
 4. **Stress-test UI and quota policy** — `hub_stress_test_answer` can now persist runs, but there is still no first-class app entry point or quota layer
 5. **Plugin-eval observed benchmark baseline** — static analysis is installed; observed-usage benchmarking still needs setup

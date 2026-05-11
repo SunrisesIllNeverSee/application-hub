@@ -3,6 +3,7 @@
 > Read this before touching anything. Both Cowork (Claude) and Codex should read this file at the start of every session.
 > Then check `SCRATCH.md` for active claims before editing.
 > Then check `ROADMAP.md` for sequence and `TASKS.md` for implementation detail.
+> For factual counts/state, treat `STATUS.md` as the single fact source and link back to it instead of restating counts in multiple places.
 
 ---
 
@@ -94,12 +95,24 @@ If a shared file is touched, keep the commit tight and explicit.
 3. **Prefer small commits with clear scope.**
 4. **Do not “helpfully” rewrite unrelated files.**
 5. **If a file is already in flight, either avoid it or make the overlap explicit in the commit message.**
+6. **Before writing a migration, claim the next migration number in `SCRATCH.md`.**
 
 Cross-workspace session state belongs in:
 - `~/Desktop/MULTI_CLAUDE.md`
 
 Repo-local active claims belong in:
 - `SCRATCH.md`
+
+Cold-start note:
+- if a session lands without desktop context, tell it that cross-workspace coordination lives at `~/Desktop/MULTI_CLAUDE.md` on the operator machine and ask for it if needed
+
+Fact-source rule:
+- `STATUS.md` is the canonical source for counts, migration chain, shipped features, and current remote truth
+- `README.md`, `AGENTS.md`, and `CLAUDE.md` should summarize and link, not maintain their own competing fact tables unless there is a good reason
+
+Review-gate rule:
+- use a review gate when a change crosses repo docs + desktop coordination + README/public framing + active memory at the same time
+- do not require a multi-reviewer gate for small archive-only or single-doc cleanup passes
 
 ---
 
