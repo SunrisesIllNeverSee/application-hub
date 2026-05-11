@@ -147,7 +147,7 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | Profile split | Done |
 | Sidebar IA redesign | Done |
 | Heat scores + applicant counts | Launch-surface fallback labels landed; deeper synthetic compute job still needed |
-| Live BYOK draft verification | Still needs final end-to-end validation |
+| Live BYOK draft verification | Done — confirmed live |
 | Copy actions in bank/workspace | Done |
 | OTP code-entry login path | Done |
 | Cohort context in workspace/detail | Done |

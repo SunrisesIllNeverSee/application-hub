@@ -65,7 +65,8 @@ features:
   agent_reviews: shipped
   reviewer_family: shipped
   stripe_webhook_code: shipped
-  stripe_env_keys: pending_deric
+  stripe_env_keys: shipped
+  stripe_live: shipped
   custom_smtp: shipped
   recruiter_agent: shipped
   recruiter_agent_activation: pending_deric
