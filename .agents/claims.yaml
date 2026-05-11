@@ -65,3 +65,41 @@ claims:
     acquired_at: 2026-05-11T17:00:00Z
     released_at: 2026-05-11T22:00:00Z
     landed_commits: [eaf439f, 2796b96]
+
+  - id: claim-2026-05-11-004
+    session: cowork-2026-05-11
+    type: file_lane
+    paths:
+      - app/app/(app)/today/page.tsx
+      - app/components/DnaRadarChart.tsx
+      - app/components/SignificanceStars.tsx
+      - app/components/StressTestPanel.tsx
+      - app/app/api/stress-test/route.ts
+      - app/app/api/cron/recruiter/route.ts
+      - app/app/api/match-question/route.ts
+      - app/app/(app)/workspace/page.tsx
+      - app/components/Sidebar.tsx
+      - app/components/AnswerEditor.tsx
+      - supabase/functions/recruiter-agent/index.ts
+      - scripts/seed-question-embeddings.ts
+      - migrations/027_recruiter_alerts.sql
+      - migrations/028_solofounders_seed.sql
+      - migrations/029_embedding_resize_768.sql
+      - docs/22_recruiter_agent.md
+      - docs/23_v1_automation_plan.md
+      - docs/24_portal_tos_audit.md
+    purpose: >
+      P1 sprint (Today dashboard, stress-test UI, DNA radar, significance stars,
+      opportunity ranking, recruiter agent) + V1 automation foundation
+      (match-question API, embedding seeder, portal audit, Solofounders seed,
+      embedding resize to 768d for Ollama/nomic-embed-text)
+    acquired_at: 2026-05-11T15:00:00Z
+    released_at: 2026-05-11T22:00:00Z
+    landed_commits:
+      - cee8f0b  # Today dashboard + DNA radar + sidebar
+      - ed4dc74  # stress-test UI
+      - 4ac7fd6  # SignificanceStars
+      - 296f6ef  # recruiter agent + opportunity ranking
+      - 3d81666  # match-question API + embedding seeder + portal audit + Solofounders
+      - c02299b  # Ollama-first embeddings + 768d resize
+      - f2c8fdd  # BYOK consolidation

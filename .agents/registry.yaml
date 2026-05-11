@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-11T23:59:00Z
+updated_at: 2026-05-11T22:00:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
@@ -9,8 +9,11 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 027
+  next: 030
   applied:
+    - { n: 29, file: 029_embedding_resize_768.sql, commit: "c02299b", landed: 2026-05-11 }
+    - { n: 28, file: 028_solofounders_seed.sql, commit: "3d81666", landed: 2026-05-11 }
+    - { n: 27, file: 027_recruiter_alerts.sql, commit: "296f6ef", landed: 2026-05-11 }
     - { n: 26, file: 026_answer_reviews.sql, commit: "3635f40", landed: 2026-05-11 }
     - { n: 25, file: 025_teams_schema.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 24, file: 024_deadline_alerts.sql, commit: "unknown", landed: 2026-05-11 }
@@ -41,23 +44,39 @@ mcp:
   transports: [stdio, http]
 
 programs:
-  total: 842
-  with_questions_mapped: 30
+  total: 843
+  seeded_with_questions: 31
   shells: 812
+  note: Solofounders added in migration 028
 
 questions:
   archived_total: 225
+  embeddings_seeded: 0
+  embedding_model: nomic-embed-text
+  embedding_dims: 768
+  embedding_note: >
+    Run scripts/seed-question-embeddings.ts (Ollama default) to populate.
+    RPC match_archived_questions updated for vector(768) in migration 029.
 
 features:
   byok: shipped
   stress_test_writeback: shipped
-  stress_test_ui: pending
+  stress_test_ui: shipped
   agent_reviews: shipped
   reviewer_family: shipped
   stripe_webhook_code: shipped
   stripe_env_keys: pending_deric
   custom_smtp: shipped
-  recruiter_agent: pending
+  recruiter_agent: shipped
+  recruiter_agent_activation: pending_deric
+  today_dashboard: shipped
+  dna_radar_chart: shipped
+  significance_stars: shipped
+  opportunity_ranking: shipped
+  match_question_api: shipped
+  embedding_seeder_script: shipped
+  browser_extension: not_started
+  v1_automation_docs: shipped
 
 coordination:
   claims_file: .agents/claims.yaml
