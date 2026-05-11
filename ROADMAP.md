@@ -12,10 +12,10 @@
 
 Application Hub already has a shippable spine:
 
-- **Database**: Supabase migrations are applied through `026`; the live archive has 842 programs and 225 archived questions.
+- **Database**: Supabase migrations are applied through `027`; the live archive has 842 programs and 225 archived questions.
 - **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
 - **MCP server**: 21 tools, 7 resources, 3 prompts. Power-user path is real today.
-- **Next.js app**: Hub, timeline-in-Hub, Question Bank, workspace, profile split, BYOK integrations, live Supabase wiring.
+- **Next.js app**: Hub, timeline-in-Hub, Question Bank, workspace (/workspace with opportunity ranking), profile split, BYOK integrations, live Supabase wiring, home dashboard (`/today`), stress-test UI, DNA radar chart, significance stars display.
 - **Auth**: magic links plus a dev-only password escape hatch.
 - **AI drafts**: hosted `/api/draft` route logs successful drafts to `ai_draft_runs`, and fails closed unless explicitly enabled.
 - **RNS direction**: additive intelligence layer above the current Supabase/MCP/app spine, not a launch blocker.
@@ -23,7 +23,7 @@ Application Hub already has a shippable spine:
 
 The refined external roadmap was built outside the repo, so keep these corrections in mind:
 
-- MCP is **21 tools**, not 19.
+- MCP is **21 tools**, not 19. New routes: `/today`, `/api/stress-test`, `/api/cron/recruiter`.
 - Rate logging for hosted `/api/draft` is already implemented, and BYOK routing is now in repo.
 - Responsive layout has had a first sweep committed; continue testing real devices, but do not treat it as untouched.
 - Custom SMTP is documented; remaining work is manual Resend domain verification and Supabase dashboard configuration.
@@ -106,14 +106,16 @@ These are the minimum additions that make the app work for non-technical founder
 
 These are not launch blockers, but they are still part of the current roadmap and should not be lost.
 
-- [ ] **Home dashboard + sidebar IA** — Today view with unlocked questions, closest deadlines, in-progress applications, answers needing review/stress tests, and MoatScore/FundScore surface.
-- [ ] **Stress-test saved answers UI/scoring** — MCP persistence path now exists. Add quota policy, UI, and eventual BYOK/LLM-backed generation.
+- [x] **Home dashboard + sidebar IA** — `/today` route ships stat cards, in-progress apps, deadline alerts, top program matches, and pro upsell. MoatScore/FundScore placeholder cards present; signal computation is P2.
+- [x] **Stress-test saved answers UI/scoring** — `StressTestPanel` is live. Calls deterministic `/api/stress-test`. Wired into `AnswerEditor`. Quota policy and LLM-backed generation remain P2+.
 - [x] **Review write-back path** — persisted review flow now exists through `answer_reviews` + `hub_save_answer_review`.
 - [x] **First checked-in reviewer agent** — `rns-answer-reviewer` plus `/review-answer` entrypoint are now checked in.
 - [x] **Broader reviewer/agent family** — program-fit, fidelity-certifier, and stress-test-conductor agents plus command entrypoints are now checked in.
 - [ ] **Plugin-eval measurement baseline** — benchmark MCP/agent bundle with observed usage, not just static analysis.
+- [ ] **MoatScore / FundScore signal** — placeholder cards are on the Today dashboard. Needs scoring formula, data inputs, and compute job or RPC.
+- [ ] **Internal applicant ranking** — show where a founder likely ranks among applicants for a given program. Depends on outcome tracking and more applied-user data.
 - [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
-- [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.
+- [x] **DNA radar/chart comparison** — `DnaRadarChart` (pure SVG) is live on program detail pages when 4+ themes have weight.
 - [ ] **Heat scores + applicant counts** — Replace zeros with synthetic MVP heat from prestige/cohort exclusivity, then real signals later.
 - [x] **Launch-surface signal fallback** — *Codex*
   Replace embarrassing zeros in the UI with honest provisional labels while we wait for deeper synthetic/observed signal jobs.
@@ -140,8 +142,8 @@ These are not launch blockers, but they are still part of the current roadmap an
 - [ ] **Outcome tracking**
   User logs accepted/rejected/waitlisted. Feeds future calibration.
 
-- [ ] **Recruiter agent**
-  Scheduled job scans new programs against user profile and alerts on high-fit matches.
+- [x] **Recruiter agent**
+  Weekly email job (Monday 9am UTC). `migrations/027` + `/api/cron/recruiter` + Deno edge function. Dedup via `recruiter_alerts`. See `docs/22_recruiter_agent.md` for deployment steps.
 
 - [ ] **GitHub/traction integrations**
   Pull public repo stars, commits, contributors, and traction context into answer drafting and fit scoring.

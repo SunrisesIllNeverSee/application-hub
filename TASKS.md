@@ -2,7 +2,7 @@
 
 Current phase: **Launch hardening — ship the spine, layer RNS**
 
-Last updated: 2026-05-10
+Last updated: 2026-05-11
 
 This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` is who is touching what right now.
 
@@ -10,7 +10,7 @@ This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` 
 
 ## Live State
 
-App is live at `https://application-hub-chi.vercel.app`. The repo now includes migrations through `026`, Question Bank, drip mechanic, profile split, BYOK integrations, reviewer persistence, and sidebar IA updates. Remaining work is polish, runtime validation, and quality of signal.
+App is live at `https://mos2es.xyz`. The repo now includes migrations through `027`, Question Bank, drip mechanic, profile split, BYOK integrations, reviewer persistence, sidebar IA updates, home dashboard, stress-test UI, DNA visualization, significance stars, opportunity ranking, and recruiter agent. P1 sprint complete as of 2026-05-11. Moving to P2.
 
 ### Bugs to fix
 
@@ -218,7 +218,7 @@ With a valid authenticated session and a real BYOK Anthropic key:
 
 ## Next Product Layer
 
-### [ ] Home dashboard + sidebar IA
+### [x] Home dashboard + sidebar IA
 **Owner**: Cowork
 **Priority**: P2
 
@@ -253,14 +253,11 @@ Create a Today surface:
 
 Sidebar target: Today / Hub / Bank / Apps or Workspace / Profile.
 
-### [ ] Stress-test saved answers UI/scoring
+### [x] Stress-test saved answers UI/scoring
 **Owner**: Cowork + Codex
 **Priority**: P2
 
-MCP groundwork exists through `hub_stress_test_answer`, and the tool can now persist runs into `answer_stress_tests`. Next layer:
-- Quota policy
-- UI entry point from Answer Bank/workspace
-- Later: BYOK/LLM-backed RNS-style challenge generation
+`StressTestPanel` component is now live in the app. Wired into `AnswerEditor` in both view and editing modes. Calls `/api/stress-test` (deterministic, no LLM). Quota policy and BYOK/LLM-backed generation remain open for P2+.
 
 ### [x] Review-output persistence + write-back path
 **Owner**: Codex
@@ -326,26 +323,35 @@ Implementation:
 - rerun `plugin-eval analyze` with usage evidence
 - use output to trim deferred/token-heavy agent instructions
 
-### [ ] Significance score display
+### [x] Significance score display
 **Owner**: Cowork
 **Priority**: P2
 
-- Star or importance indicator on questions
-- Tooltip: "Asked by N programs"
-- Sort questions by significance within sections
+`SignificanceStars` component ships a 0-1 score to 1-5 stars display. Used in Bank, Workspace, and Program Detail. Replaces 3 inline implementations.
 
-### [ ] DNA visualization on program detail
+### [x] DNA visualization on program detail
 **Owner**: Cowork
 **Priority**: P2
 
-- Radar/bar chart of `program_dna`
-- Compare user's profile coverage against program DNA
+`DnaRadarChart` is a pure SVG radar/polygon chart on program detail pages. Renders when 4+ themes have weight. Supports optional `userCoverage` overlay.
 
 ### [ ] Heat scores + applicant counts
 **Owner**: Cowork data + Codex compute
 **Priority**: P2
 
 Current UI can show zeros. MVP heat can be synthetic from prestige and cohort exclusivity; later heat can use acceptance rates, social mentions, partner/applicant telemetry, and GitHub/company signals.
+
+### [ ] MoatScore / FundScore placeholder signal
+**Owner**: Cowork + Codex
+**Priority**: P2
+
+Today dashboard has placeholder cards. Needs: scoring formula, data inputs, and a compute job or RPC. Forward reference from Vision tier.
+
+### [ ] Internal applicant ranking (founder-to-program)
+**Owner**: Cowork
+**Priority**: P2
+
+Opportunity ranking (`opportunityScore()`) is now in the Workspace. Next layer: show where a founder likely ranks among applicants for a given program. Requires hosted application data (user-submitted answers + program acceptance signals). Dependent on outcome tracking and more applied-user data.
 
 ### [ ] Workspace naming alignment
 **Owner**: Cowork
@@ -418,11 +424,11 @@ Future migration:
 
 User logs accepted/rejected/waitlisted. This closes the feedback loop for fit scores and DNA calibration.
 
-### [ ] Recruiter agent
+### [x] Recruiter agent
 **Owner**: Codex
 **Priority**: P3
 
-Scheduled job scans new programs against user profiles and alerts on high-fit matches.
+Weekly email job (Monday 9am UTC) sending top 3 high-fit program matches per user. Dedup via `recruiter_alerts` table with `week_bucket` UNIQUE constraint. See `docs/22_recruiter_agent.md`. Activation requires: apply migration 027, deploy edge function, set env vars, activate schedule.
 
 ### [ ] GitHub traction integration
 **Owner**: Codex + Cowork
@@ -463,6 +469,12 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 
 ## Done
 
+- [x] Home dashboard (`/today`) — stat cards, in-progress apps, deadline alerts, program matches, pro upsell
+- [x] Stress-test UI (`StressTestPanel`) — depth selector, deterministic follow-ups, wired into AnswerEditor
+- [x] DNA radar chart on program detail (`DnaRadarChart`)
+- [x] Significance stars display (`SignificanceStars`) — shared component across Bank, Workspace, Program Detail
+- [x] Workspace opportunity ranking — `opportunityScore()` ranks active apps; best-unopened section shows top 5 unapplied
+- [x] Recruiter agent — weekly match email with dedup (`migrations/027`, edge function, `/api/cron/recruiter`)
 - [x] v3 schema design — global question archive as core asset
 - [x] Supabase migrations through 026
 - [x] MCP server — 21 tools, 7 resources, 3 prompts, clean TypeScript build

@@ -7,7 +7,7 @@ _Last updated: 2026-05-11_
 The logical migration chain is:
 
 ```text
-001 → 026
+001 → 027
 ```
 
 ## Why duplicate numeric prefixes exist
@@ -22,10 +22,16 @@ These are historical artifacts from parallel feature work that landed on the sam
 
 ## Policy
 
-- Treat the logical chain as `001` through `026`.
+- Treat the logical chain as `001` through `027`.
 - Do **not** rename already-applied migration files casually just to make the numbers prettier.
 - When documenting state, say “migrations through 026” rather than implying there are only 26 physical files with perfect numbering.
 - When adding new work, use the next clear numeric prefix rather than trying to retroactively normalize old collisions.
+
+## Migration 027
+
+`027_recruiter_alerts.sql` adds the `recruiter_alerts` dedup table for the weekly
+recruiter email agent. No duplicate prefix — it is the only `027` file. See
+`docs/22_recruiter_agent.md` for deployment and activation steps.
 
 ## Practical guidance
 

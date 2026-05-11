@@ -1,6 +1,6 @@
 # Application Hub — Status
 
-_Last updated: 2026-05-11_
+_Last updated: 2026-05-11 (second session)_
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 
@@ -29,7 +29,7 @@ Other coordination docs should point here rather than restating these facts unle
 
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `026` are the canonical migration chain, despite a few duplicated numeric prefixes in filenames.
+- Migrations `001` through `027` are the canonical migration chain, despite a few duplicated numeric prefixes in filenames.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -47,7 +47,8 @@ Other coordination docs should point here rather than restating these facts unle
 - `migrations/014_question_bank_drip.sql` is present and adds `user_question_unlocks`, signup seed logic, and daily drip mechanics.
 - `migrations/015_byok_key_storage.sql` is present and adds `key_encrypted` for BYOK key storage.
 - `migrations/026_answer_reviews.sql` is present and adds append-only persistence for agent review output plus owner-scoped RLS.
-- Migrations through `026` are now the expected app chain.
+- `migrations/027_recruiter_alerts.sql` is present and adds the `recruiter_alerts` dedup table for the weekly recruiter email agent.
+- Migrations through `027` are now the expected app chain.
 - The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
 
 ### SMTP / Email
@@ -74,7 +75,7 @@ Other coordination docs should point here rather than restating these facts unle
   - `hub_get_answer_review_context`
   - `hub_save_answer_review`
   - `hub_stress_test_answer`
-- The stress-test MCP bridge is implemented and registered; the missing layer is persistence/use of results, not tool existence.
+- The stress-test MCP bridge is implemented and registered. The web UI (`StressTestPanel`) is now live in the app.
 - Agent review output now has a persisted write-back path through `answer_reviews` plus MCP tool `hub_save_answer_review`.
 - Reviewer agent family now includes:
   - `.claude/agents/rns-answer-reviewer.md`
@@ -91,6 +92,7 @@ Other coordination docs should point here rather than restating these facts unle
   - Program detail route
   - Workspace route
   - Profile split routes (`/profile/about`, `/profile/answers`, `/profile/settings`, `/profile/integrations`)
+  - Home dashboard (`/today`)
   - Supabase auth callback/login scaffolding
 - Magic-link redirects now land at real path `/auth/callback`; Cowork moved the callback route out of the `(auth)` route group during live smoke testing.
 - Live Supabase data wiring is present and build-verified.
@@ -149,6 +151,12 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | Copy actions in bank/workspace | Done |
 | OTP code-entry login path | Done |
 | Cohort context in workspace/detail | Done |
+| Home dashboard (`/today`) | Done |
+| Stress-test UI (`StressTestPanel`) | Done |
+| DNA radar chart on program detail | Done |
+| Significance stars display | Done |
+| Workspace opportunity ranking | Done |
+| Recruiter agent (weekly email + dedup) | Done |
 
 ---
 
@@ -179,11 +187,33 @@ RNS is the planned additive judgment layer, not a launch blocker.
 
 ## Immediate priorities (launch roadmap)
 
+P1 sprint is complete as of 2026-05-11 (second session). Moving to P2:
+
 1. **Live BYOK draft verification** — save a real provider key, draft from workspace, confirm live end-to-end success
 2. **Heat scores + applicant counts** — synthetic compute job still needed; launch-surface fallbacks landed, but deeper computed signal is still open
 3. **Seed real deadlines + urgency sort**
-4. **Stress-test UI and quota policy** — `hub_stress_test_answer` can now persist runs, but there is still no first-class app entry point or quota layer
+4. **MoatScore / FundScore** — placeholder cards are in the Today dashboard; signal computation still open
 5. **Plugin-eval observed benchmark baseline** — static analysis is installed; observed-usage benchmarking still needs setup
+6. **Recruiter agent activation** — migration 027 applied, edge function deployed; Deric needs to add `CRON_SECRET` to edge function env and activate the schedule
+
+## What landed 2026-05-11 (P1 sprint, second session)
+
+- `app/app/(app)/today/page.tsx` — Home dashboard at `/today`: greeting, 4 stat cards, in-progress apps, deadline alerts, question bank nudge, top program matches, pro upsell
+- `app/components/DnaRadarChart.tsx` — Pure SVG radar chart for `program_dna` themes; renders when 4+ themes have weight
+- `app/components/SignificanceStars.tsx` — Shared 0-1 score to 1-5 stars component; replaces 3 inline implementations
+- `app/components/StressTestPanel.tsx` — Stress-test UI: depth selector, calls `/api/stress-test`, shows follow-up cards
+- `app/app/api/stress-test/route.ts` — Deterministic stress-test POST route; fetches question + DNA, returns themed follow-ups
+- `app/app/api/cron/recruiter/route.ts` — Recruiter email cron route, CRON_SECRET auth, dedup via `recruiter_alerts`
+- `supabase/functions/recruiter-agent/index.ts` — Deno edge function trigger for recruiter agent (Monday 9am UTC)
+- `migrations/027_recruiter_alerts.sql` — Dedup table + RLS for recruiter agent
+- `app/data/stress_test_follow_ups.json` — Theme-specific follow-up templates used by `/api/stress-test`
+- `app/components/Sidebar.tsx` — "Today" added as first nav item; logo and mobile links updated to `/today`
+- `app/components/AnswerEditor.tsx` — `StressTestPanel` wired into view + editing mode when answer has content
+- `app/app/(app)/hub/[slug]/page.tsx` — `DnaRadarChart` added to DNA card; `SignificanceStars` replaces inline SVG loop
+- `app/app/(app)/bank/page.tsx` — Uses shared `SignificanceStars`
+- `app/app/(app)/workspace/page.tsx` — Rewritten with opportunity ranking (`opportunityScore()`), `OppScoreBadge`, ranked active apps, best-unopened section
+- `app/app/(app)/workspace/[program_id]/page.tsx` — `SignificanceStars` replaces text badge on question rows
+- `docs/22_recruiter_agent.md` — Deployment and operations guide for the recruiter agent
 
 ## What landed during the 2026-05-10 hardening burst
 
