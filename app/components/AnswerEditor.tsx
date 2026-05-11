@@ -4,6 +4,7 @@ import { useState, useTransition, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { ProfileAnswer, AnswerConfidence } from '@/lib/database.types'
 import { WordCount } from './WordCount'
+import { StressTestPanel } from './StressTestPanel'
 import { countWords, cn } from '@/lib/utils'
 
 interface DraftResponse {
@@ -184,6 +185,7 @@ export function AnswerEditor({
 
   if (!isEditing && !compact) {
     return (
+      <>
       <div className="space-y-2">
         {content ? (
           <div className="group relative">
@@ -250,6 +252,15 @@ export function AnswerEditor({
           </button>
         )}
       </div>
+      {/* Stress test — only when answer is saved and has content */}
+      {initialAnswer?.id && content.trim() && (
+        <StressTestPanel
+          answerId={initialAnswer.id}
+          programId={programId}
+          compact={compact}
+        />
+      )}
+      </>
     )
   }
 
@@ -422,6 +433,14 @@ export function AnswerEditor({
           {isPending ? 'Saving…' : 'Save answer'}
         </button>
       </div>
+      {/* Stress test — only when a saved answer exists */}
+      {initialAnswer?.id && content.trim() && (
+        <StressTestPanel
+          answerId={initialAnswer.id}
+          programId={programId}
+          compact={compact}
+        />
+      )}
     </div>
   )
 }
