@@ -1,6 +1,6 @@
 # Stripe setup checklist — Application Hub
 
-> Walkthrough to wire up Stripe Billing for the freemium SaaS model. Test mode first, then production.
+> Walkthrough to wire up Stripe Billing for the freemium SaaS model.
 >
 > Pricing model (per `CLAUDE.md`):
 > - **Free** — $0, 10 AI drafts/month, drip cap
@@ -9,44 +9,69 @@
 
 ---
 
+## Shared Stripe account — important
+
+This Stripe account is shared with another app. The integration is isolated by:
+
+| Isolation surface | Owned by | Notes |
+|---|---|---|
+| **Product IDs** | This app | Application Hub products only |
+| **Price IDs** | This app | The 4 IDs listed in Part 1.1 below |
+| **Webhook endpoint** | This app | `https://mos2es.xyz/api/stripe/webhook` — only Application Hub events route here |
+| **Webhook handler price filter** | This app | `webhook/route.ts` filters every `customer.subscription.*` and `invoice.*` event by Application Hub price ID before mutating `user_subscriptions`. Events from the other app's subscriptions are skipped with a `[webhook] skip ... shared-account isolation` log line. |
+| **API keys** | **SHARED** | Same `sk_live_…` / `pk_live_…` powers both apps. Restricted keys can isolate later if needed. |
+| **Customer Portal config** | **SHARED account-wide policy** | See Part 1.3 — do not blindly toggle, inspect what the other app depends on first. |
+| **Payment methods toggle** | **SHARED account-wide policy** | See Part 1.2 — usually safe to enable more methods, but still shared. |
+
+**Bottom line**: webhook + price IDs + product IDs are safely isolated. Portal + payment methods + API keys are not — touch the dashboard for those with care.
+
+---
+
 ## Part 1 — Stripe Dashboard (~10 min)
 
 ### 1.1 Create products + prices
 
-Go to https://dashboard.stripe.com → **Test mode** → **Products** → **+ Add product**.
+> ✅ **Already done — live mode.** The four Application Hub price IDs below are created in the shared Stripe account. Re-use these when adding env vars in Part 3.
 
-Create **two products**:
+```env
+STRIPE_PRO_MONTHLY_PRICE_ID=price_1TVibhF3nomgD2vdeLrLomqM
+STRIPE_PRO_ANNUAL_PRICE_ID=price_1TVibiF3nomgD2vd8pdU6Nsw
+STRIPE_TEAM_MONTHLY_PRICE_ID=price_1TVibkF3nomgD2vdXmoI1cUa
+STRIPE_TEAM_ANNUAL_PRICE_ID=price_1TVibmF3nomgD2vdK5QdO6z0
+```
 
-#### Product A: "Application Hub Pro"
-- Description: "Unlimited AI drafts, all questions unlocked, fit scores"
-- Add price 1: **$19/month**, recurring (monthly) → save the price ID (`price_...`)
-- Add price 2: **$190/year**, recurring (annual) → save the price ID
+If you ever need to recreate them (e.g. spinning up a test-mode parallel), the original recipe was:
 
-#### Product B: "Application Hub Team"
-- Description: "Pro + shared answer library + multi-seat"
-- Add price 1: **$49/month per seat**, recurring (monthly) → save the price ID
-- Add price 2: **$490/year per seat**, recurring (annual) → save the price ID
-
-> 💡 You'll end up with **4 price IDs** total. Keep them handy for the next step.
+| Product | Monthly | Annual |
+|---|---|---|
+| Application Hub Pro | $19/mo | $190/yr (≈30% off) |
+| Application Hub Team | $49/mo per seat | $490/yr per seat |
 
 ### 1.2 Enable dynamic payment methods
 
-Stripe Dashboard → **Settings** → **Payment methods**. Toggle ON:
+> ⚠️ **Shared account-wide policy.** This page applies to every app sharing the Stripe account. Adding payment methods is usually safe and additive (the other app simply gets the new methods too), but inspect first if the other app pins a specific surface.
+
+Stripe Dashboard → **Settings** → **Payment methods**. Toggle ON (or confirm already on):
+
 - ✅ Cards
-- ✅ Apple Pay
+- ✅ Apple Pay (often on by default)
 - ✅ Google Pay
 - ✅ Link
 - (Optional) Klarna, Affirm, Cash App Pay — for US
 
-This lets Stripe pick the best payment method per customer automatically. Our `checkout/route.ts` deliberately doesn't pass `payment_method_types` for this reason.
+Modern Stripe Checkout uses **dynamic payment methods** by default — Stripe picks the best methods per customer based on country, currency, and Dashboard settings. Some methods won't appear as explicit on/off toggles because they aren't supported for your account country or flow; that's expected, not blocked. Our `checkout/route.ts` deliberately doesn't pass `payment_method_types` so it stays compatible with whatever Dashboard surfaces.
 
 ### 1.3 Configure the Customer Portal
 
+> ⚠️ **Shared account-wide policy.** Customer Portal configuration is global. Changes here affect the other app's billing UX too. **Inspect the current settings first.** Only change a toggle if you're sure the other app doesn't depend on the existing behavior.
+
 Stripe Dashboard → **Settings** → **Billing** → **Customer portal**.
+
+Recommended for Application Hub:
 
 - ✅ Allow customers to update payment method
 - ✅ Allow customers to update billing address
-- ✅ Allow customers to cancel subscriptions (recommend: at period end, not immediately)
+- ✅ Allow customers to cancel subscriptions (recommend: at period end, not immediately) — the webhook now reads `cancel_at_period_end` and surfaces a "Cancellation scheduled" banner in `/profile/settings`
 - ✅ Allow customers to switch plans (between Pro Monthly ↔ Pro Annual etc)
 - Cancellation reason: optional but useful
 
@@ -65,6 +90,8 @@ Copy these:
 ## Part 2 — Configure the webhook (~5 min)
 
 ### 2.1 Add the endpoint in Stripe
+
+> ✅ **Safe to add alongside the other app.** Webhook endpoints are per-URL — adding `mos2es.xyz/api/stripe/webhook` does not affect the other app's endpoint. The Application Hub handler also filters every subscription/invoice event by Application Hub price ID, so even if a shared Stripe customer's event is delivered, the handler will skip events whose price ID doesn't belong to this app.
 
 Stripe Dashboard → **Developers** → **Webhooks** → **+ Add endpoint**.
 

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProfileSettingsForm } from '@/components/ProfileSettingsForm'
 import { PricingCards } from '@/components/PricingCards'
+import { BillingAlerts } from '@/components/BillingAlerts'
 import { TeamSection } from '@/components/TeamSection'
 import type { SubscriptionTier } from '@/lib/database.types'
 
@@ -8,14 +9,24 @@ export const metadata = {
   title: 'Settings — Profile',
 }
 
-export default async function ProfileSettingsPage() {
+type SearchParams = {
+  upgraded?: string
+  upgrade_cancelled?: string
+  session_id?: string
+}
+
+export default async function ProfileSettingsPage({
+  searchParams,
+}: {
+  searchParams?: SearchParams
+}) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
   const { data: subscription } = await supabase
     .from('user_subscriptions')
-    .select('tier, status, current_period_end')
+    .select('tier, status, current_period_end, cancel_at_period_end')
     .eq('user_id', user.id)
     .single()
 
@@ -65,8 +76,20 @@ export default async function ProfileSettingsPage() {
     }
   }
 
+  const showUpgradeSuccess = searchParams?.upgraded === 'true'
+  const showUpgradeCancelled = searchParams?.upgrade_cancelled === 'true'
+
   return (
     <div className="space-y-10">
+      <BillingAlerts
+        showUpgradeSuccess={showUpgradeSuccess}
+        showUpgradeCancelled={showUpgradeCancelled}
+        subscriptionStatus={subscription?.status ?? null}
+        cancelAtPeriodEnd={subscription?.cancel_at_period_end ?? false}
+        currentPeriodEnd={subscription?.current_period_end ?? null}
+        currentTier={currentTier}
+      />
+
       <div className="max-w-2xl">
         <ProfileSettingsForm
           subscription={subscription}

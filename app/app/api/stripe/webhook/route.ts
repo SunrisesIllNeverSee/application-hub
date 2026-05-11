@@ -54,6 +54,21 @@ function tierFromPriceId(priceId: string): 'pro' | 'team' | null {
   return priceMap[priceId] ?? null
 }
 
+/**
+ * Shared-Stripe-account safety: returns true iff the given price ID is one
+ * of our 4 Application Hub prices. Events whose underlying subscription is
+ * on a different price (i.e. belongs to a different app sharing this Stripe
+ * account) must NOT mutate our user_subscriptions rows.
+ *
+ * Without this filter, a customer.subscription.updated event from the other
+ * app on a shared Stripe customer would overwrite our stripe_subscription_id
+ * and current_period_end — corrupting tier state silently.
+ */
+function isApplicationHubPriceId(priceId: string | null | undefined): boolean {
+  if (!priceId) return false
+  return tierFromPriceId(priceId) !== null
+}
+
 export async function POST(req: NextRequest) {
   const rawBody = await req.text()
   const sig = req.headers.get('stripe-signature')
@@ -136,13 +151,24 @@ export async function POST(req: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
         const priceId = subscription.items.data[0]?.price?.id
-        const tier = priceId ? tierFromPriceId(priceId) : null
 
+        if (!isApplicationHubPriceId(priceId)) {
+          console.log(`[webhook] skip ${event.type} for non-app-hub priceId=${priceId} (shared-account isolation)`)
+          break
+        }
+
+        const tier = tierFromPriceId(priceId!)
+        // Period dates moved from subscription root to subscription items
+        // in API version 2025-03-31.basil. Reading from items.data[0] is
+        // the post-migration canonical path. Application Hub subscriptions
+        // are single-item (one plan), so items[0] always carries the dates.
+        const item = subscription.items.data[0]
         const updatePayload: Record<string, unknown> = {
           status: subscription.status,
           stripe_subscription_id: subscription.id,
-          current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_start: new Date(item.current_period_start * 1000).toISOString(),
+          current_period_end: new Date(item.current_period_end * 1000).toISOString(),
+          cancel_at_period_end: subscription.cancel_at_period_end ?? false,
         }
         if (tier) {
           updatePayload.tier = tier
@@ -161,6 +187,12 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
+        const priceId = subscription.items.data[0]?.price?.id
+
+        if (!isApplicationHubPriceId(priceId)) {
+          console.log(`[webhook] skip customer.subscription.deleted for non-app-hub priceId=${priceId} (shared-account isolation)`)
+          break
+        }
 
         await supabase
           .from('user_subscriptions')
@@ -169,6 +201,7 @@ export async function POST(req: NextRequest) {
             status: 'active',
             stripe_subscription_id: null,
             current_period_end: null,
+            cancel_at_period_end: false,
           })
           .eq('stripe_customer_id', customerId)
         break
@@ -187,13 +220,21 @@ export async function POST(req: NextRequest) {
 
         const stripe = getStripe()
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const priceId = subscription.items.data[0]?.price?.id
 
+        if (!isApplicationHubPriceId(priceId)) {
+          console.log(`[webhook] skip ${event.type} for non-app-hub priceId=${priceId} (shared-account isolation)`)
+          break
+        }
+
+        const item = subscription.items.data[0]
         await supabase
           .from('user_subscriptions')
           .update({
             status: subscription.status,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_start: new Date(item.current_period_start * 1000).toISOString(),
+            current_period_end: new Date(item.current_period_end * 1000).toISOString(),
+            cancel_at_period_end: subscription.cancel_at_period_end ?? false,
           })
           .eq('stripe_customer_id', customerId)
         break
@@ -210,6 +251,20 @@ export async function POST(req: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
         const customerId = invoice.customer as string
+        const subscriptionId = (invoice as Stripe.Invoice & { subscription?: string }).subscription
+        if (!subscriptionId) break
+
+        // Fetch subscription to confirm this invoice belongs to an Application Hub price.
+        // In a shared Stripe account, a payment_failed for the other app's subscription
+        // must not flip our row to past_due.
+        const stripe = getStripe()
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const priceId = subscription.items.data[0]?.price?.id
+
+        if (!isApplicationHubPriceId(priceId)) {
+          console.log(`[webhook] skip invoice.payment_failed for non-app-hub priceId=${priceId} (shared-account isolation)`)
+          break
+        }
 
         await supabase
           .from('user_subscriptions')

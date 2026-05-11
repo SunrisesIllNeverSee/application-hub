@@ -11,10 +11,17 @@ export function getStripe(): Stripe {
     // NOTE: pinning a specific apiVersion is Stripe best practice — it shields
     // you from breaking changes when Stripe rolls forward. Bump deliberately
     // alongside SDK upgrades. See https://docs.stripe.com/api/versioning.
-    // SDK version comes from package.json (stripe@^16) which targets
-    // '2024-06-20' as its baseline; that's the minimum we should pin.
+    //
+    // We pin to the SDK's typed default (Stripe.LatestApiVersion) so the
+    // TypeScript Stripe.* types match what API calls return.
+    //
+    // The webhook endpoint on the Dashboard may be configured to a slightly
+    // different api_version (e.g. 2026-03-25.dahlia). Stripe sends webhook
+    // payloads in the endpoint's configured version, not this one. Our handler
+    // is written against shapes that are common to both — period dates read
+    // from subscription.items[0], not the deprecated root-level fields.
     _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-06-20',
+      apiVersion: '2026-04-22.dahlia',
     })
   }
   return _stripe
