@@ -22,6 +22,12 @@ export type AnswerSource = 'ai_generated' | 'human_written' | 'curated'
 export type AnswerConfidence = 'draft' | 'solid' | 'locked'
 export type SubscriptionTier = 'free' | 'pro' | 'team'
 
+// Migration 027 — applicant modes for cross-theme positioning.
+// Each mode is a way the user identifies (founder, job_seeker, student,
+// researcher). The active mode scopes the Hub view; the mapping from
+// mode → opportunity_kind[] lives in lib/applicantMode.ts.
+export type ApplicantMode = 'founder' | 'job_seeker' | 'student' | 'researcher'
+
 // ─── Core tables ──────────────────────────────────────────────────────────────
 
 export interface Program {
@@ -206,6 +212,25 @@ export function formatCheckSize(cents: number | null): string {
   if (usd >= 1_000_000) return `$${(usd / 1_000_000).toFixed(1)}M`
   if (usd >= 1_000) return `$${(usd / 1_000).toFixed(0)}k`
   return `$${usd.toFixed(0)}`
+}
+
+// ─── Contributions (migration 027) ────────────────────────────────────────────
+
+export interface UserContribution {
+  id: string
+  user_id: string
+  import_queue_id: string
+  credit_type: 'drip_unlock'
+  credit_amount: number
+  kind: string | null
+  awarded_at: string
+}
+
+export interface UserContributionSummary {
+  user_id: string
+  contribution_count: number
+  total_credits_earned: number
+  last_awarded_at: string | null
 }
 
 // ─── Teams (migration 025) ─────────────────────────────────────────────────────

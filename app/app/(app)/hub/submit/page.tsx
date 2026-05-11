@@ -121,7 +121,7 @@ function hostname(url: string | null | undefined): string {
 export default async function SubmitProgramPage({
   searchParams,
 }: {
-  searchParams: { queued?: string }
+  searchParams: { queued?: string; kind?: string }
 }) {
   const supabase = createClient()
 
@@ -154,7 +154,9 @@ export default async function SubmitProgramPage({
         <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
           Know a program that isn&apos;t in the archive yet? Drop the URL.
           We&apos;ll scrape the questions, score them, and add them to the
-          directory. Every submission earns you a profile boost.
+          directory. <span className="text-amber-700 dark:text-amber-300 font-medium">Earn 5 drip unlocks</span>{' '}
+          for each submission accepted into the archive — especially valuable for
+          under-developed verticals (jobs, schools, grants).
         </p>
       </div>
 
@@ -169,7 +171,7 @@ export default async function SubmitProgramPage({
       )}
 
       <div className="card p-6 mb-8">
-        <SubmitProgramForm />
+        <SubmitProgramForm defaultKind={searchParams.kind} />
       </div>
 
       <section>

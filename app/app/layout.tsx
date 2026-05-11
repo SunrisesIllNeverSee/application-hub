@@ -16,16 +16,31 @@ export const metadata: Metadata = {
     template: '%s — Application Hub',
   },
   description:
-    'Apply smarter. Build a reusable answer bank, track every deadline, and get AI-matched to the accelerators, jobs, schools, and grants that fit you.',
-  keywords: ['accelerator', 'grants', 'fellowship', 'startup', 'applications', 'YC', 'Techstars'],
+    'One answer bank for every application you write. Built deep on tech startup applications first; jobs, schools, and grants run on the same engine. Switch modes to apply to anything.',
+  keywords: [
+    'accelerator',
+    'grants',
+    'fellowship',
+    'startup',
+    'applications',
+    'YC',
+    'Techstars',
+    'job applications',
+    'school applications',
+    'common app',
+    'NSF',
+    'NIH',
+    'university applications',
+    'graduate school',
+  ],
   authors: [{ name: 'Ello Cello LLC' }],
   openGraph: {
     type: 'website',
     url: 'https://mos2es.xyz',
     siteName: 'Application Hub',
-    title: 'Application Hub — Apply to accelerators and grants, smarter',
+    title: 'Application Hub — Apply to startups, jobs, schools, and grants, smarter',
     description:
-      'Apply smarter. Build a reusable answer bank, track every deadline, and get AI-matched to the accelerators, jobs, schools, and grants that fit you.',
+      'One answer bank for every application you write. Built deep on tech startup applications first; jobs, schools, and grants run on the same engine. Switch modes to apply to anything.',
   },
 }
 
