@@ -2,13 +2,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
+import { cohortBreakdown, reliabilityLabel } from "./hub_get_acceptance_stats.logic.js";
 
 const Schema = z.object({
   program_id: z.string().uuid().describe("Program UUID"),
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
-
-type CohortCounts = { accepted: number; rejected: number; waitlist: number };
 
 async function fetchStatsAndReports(program_id: string): Promise<any> {
   return Promise.all([
@@ -24,36 +23,13 @@ async function fetchStatsAndReports(program_id: string): Promise<any> {
   ]);
 }
 
-function tallyOutcome(counts: CohortCounts, outcome: string): void {
-  if (outcome === "accepted") counts.accepted++;
-  else if (outcome === "rejected") counts.rejected++;
-  else if (outcome === "waitlist") counts.waitlist++;
-}
-
-function aggregateByCohort(reports: any[]): Record<string, CohortCounts> {
-  const byCohort: Record<string, CohortCounts> = {};
-  for (const r of reports) {
-    const label = r.cohort_round ?? "unknown";
-    if (!byCohort[label]) byCohort[label] = { accepted: 0, rejected: 0, waitlist: 0 };
-    tallyOutcome(byCohort[label], r.outcome);
-  }
-  return byCohort;
-}
-
 function buildOutput(program_id: string, stats: any, reports: any[]): any {
-  const byCohort = aggregateByCohort(reports);
   return {
     program_id,
     acceptance_rate_pct: stats.acceptance_rate != null ? stats.acceptance_rate * 100 : null,
     total_reports: stats.application_count ?? 0,
-    cohort_breakdown: Object.entries(byCohort).map(([label, counts]) => ({ label, ...counts }))
+    cohort_breakdown: cohortBreakdown(reports)
   };
-}
-
-function reliabilityLabel(total: number): string {
-  if (total < 10) return " _(low confidence — fewer than 10 reports)_";
-  if (total < 30) return " _(moderate confidence)_";
-  return " _(high confidence)_";
 }
 
 function formatCohortLine(c: any): string {

@@ -1,0 +1,50 @@
+{
+  "name": "application-hub-mcp-server",
+  "version": "1.0.0",
+  "displayName": "Application Hub MCP Server",
+  "description": "MCP server for the Application Hub — programs, questions, rankings, and applicant intelligence tools for startup funding and fellowship applications",
+  "author": {
+    "name": "Deric McHenry",
+    "email": "deric.mchenry@gmail.com"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "applications",
+    "programs",
+    "grants",
+    "accelerators",
+    "fellowships",
+    "startup",
+    "funding",
+    "intelligence"
+  ],
+  "categories": [
+    "Development & Technical",
+    "Productivity"
+  ],
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Application Hub",
+    "shortDescription": "Search programs, explore questions, and get applicant intelligence for grants, accelerators, and fellowships.",
+    "longDescription": "Application Hub gives AI agents structured access to funding programs, application questions, rankings, and applicant intelligence. Tools cover program search and detail, question DNA and themes, fit scoring, answer review, and readiness assessment — all backed by real-time Supabase data.",
+    "developerName": "Deric McHenry",
+    "category": "Productivity",
+    "capabilities": [
+      "Search and filter funding programs by type, status, and deadline",
+      "Retrieve program questions, themes, and DNA weights",
+      "Score applicant fit against programs",
+      "Review and stress-test application answers",
+      "Assess application readiness and rank answers"
+    ],
+    "websiteURL": "https://github.com/dericmchenry/application-hub",
+    "privacyPolicyURL": "https://github.com/dericmchenry/application-hub",
+    "termsOfServiceURL": "https://github.com/dericmchenry/application-hub",
+    "defaultPrompt": [
+      "Search for open grant and accelerator programs and show me the top results.",
+      "What questions does this program ask and what themes do they weight most heavily?",
+      "How ready is my application and which answers need the most work?"
+    ]
+  }
+}

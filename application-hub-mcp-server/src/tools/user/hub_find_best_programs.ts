@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { CHARACTER_LIMIT, ResponseFormat, PROGRAM_TYPES } from "../../constants.js";
+import { rankPrograms, daysUntil } from "./hub_find_best_programs.logic.js";
 
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT"),
@@ -11,13 +12,6 @@ const Schema = z.object({
   type: z.array(z.enum(PROGRAM_TYPES)).optional(),
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
-
-type ProgramRow = {
-  name: string; slug: string; type: string; status: string;
-  deadline_at: string | null; equity_pct: number | null;
-  cash_value_usd: number | null; program_value_score: number | null;
-  is_rolling: boolean;
-};
 
 async function fetchFitRows(user_id: string, limit: number): Promise<any> {
   return supabase
@@ -31,54 +25,6 @@ async function fetchFitRows(user_id: string, limit: number): Promise<any> {
     .not("fit_score", "is", null)
     .order("fit_score", { ascending: false })
     .limit(limit * 4);
-}
-
-function extractProgram(r: any): ProgramRow {
-  const raw = Array.isArray(r.programs) ? r.programs[0] : r.programs;
-  return raw as unknown as ProgramRow;
-}
-
-function rowToRanked(r: any): any {
-  const p = extractProgram(r);
-  return {
-    name: p.name, slug: p.slug, type: p.type, status: p.status,
-    deadline_at: p.deadline_at, equity_pct: p.equity_pct,
-    cash_value_usd: p.cash_value_usd, program_value_score: p.program_value_score,
-    is_rolling: p.is_rolling,
-    fit_score: r.fit_score,
-    composite: ((r.fit_score ?? 0) * (p.program_value_score ?? 50)) / 100
-  };
-}
-
-function passesEquity(p: any, equity_max_pct: number | undefined): boolean {
-  if (equity_max_pct === undefined) return true;
-  if (p.equity_pct == null) return true;
-  return p.equity_pct <= equity_max_pct;
-}
-
-function passesType(p: any, type: string[] | undefined): boolean {
-  if (!type) return true;
-  return type.includes(p.type);
-}
-
-function rankPrograms(
-  rows: any[],
-  equity_max_pct: number | undefined,
-  type: string[] | undefined,
-  limit: number
-): any[] {
-  return rows
-    .filter(r => r.programs)
-    .map(rowToRanked)
-    .filter(p => passesEquity(p, equity_max_pct))
-    .filter(p => passesType(p, type))
-    .sort((a, b) => b.composite - a.composite)
-    .slice(0, limit);
-}
-
-function daysUntil(deadline_at: string | null): number | null {
-  if (!deadline_at) return null;
-  return Math.ceil((new Date(deadline_at).getTime() - Date.now()) / 86_400_000);
 }
 
 function formatScoreLine(p: any): string {

@@ -1,4 +1,4 @@
-import followUpData from "../../data/stress_test_follow_ups.json" assert { type: "json" };
+import followUpData from "../../data/stress_test_follow_ups.json" with { type: "json" };
 
 export const STRESS_DEPTHS = ["light", "medium", "deep"] as const;
 
