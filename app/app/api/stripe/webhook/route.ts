@@ -125,20 +125,28 @@ export async function POST(req: NextRequest) {
         const userId = session.metadata?.user_id
         const tier = session.metadata?.tier as 'pro' | 'team' | undefined
 
+        console.log(`[webhook] checkout.session.completed session=${session.id} userId=${userId} tier=${tier}`)
+
         if (!userId || !tier) {
           console.error('[webhook] checkout.session.completed: missing metadata', session.id)
           break
         }
 
-        await supabase
+        const { error: updateErr } = await supabase
           .from('user_subscriptions')
           .update({
             tier,
-            status: 'active',
+            status: 'trialing',
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: session.subscription as string,
           })
           .eq('user_id', userId)
+
+        if (updateErr) {
+          console.error('[webhook] checkout.session.completed: update failed', updateErr)
+          throw updateErr
+        }
+        console.log(`[webhook] checkout.session.completed: user ${userId} upgraded to ${tier}`)
         break
       }
 

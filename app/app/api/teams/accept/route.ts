@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/teams/accept?token=... — accept a team invite
 // The user must be authenticated. After acceptance, redirect to /profile/settings
 // or return JSON if called from a client component.
