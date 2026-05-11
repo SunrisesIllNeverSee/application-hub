@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getStripe, getPriceId, type SubscriptionTier, type BillingInterval } from '@/lib/stripe'
+
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) throw new Error('Supabase service role env vars not set')
+  return createAdminClient(url, key)
+}
 
 const VALID_TIERS = ['pro', 'team'] as const
 const VALID_INTERVALS = ['monthly', 'annual'] as const
@@ -61,8 +69,10 @@ export async function POST(req: NextRequest) {
       })
       stripeCustomerId = customer.id
 
-      // Persist customer ID so we can look it up on future requests and webhooks
-      await supabase
+      // Persist customer ID — must use service-role client because
+      // user_subscriptions RLS only allows service_role writes.
+      const adminClient = getAdminClient()
+      await adminClient
         .from('user_subscriptions')
         .update({ stripe_customer_id: stripeCustomerId })
         .eq('user_id', user.id)
