@@ -7,6 +7,7 @@ import type {
   ProgramQuestionWithArchived,
 } from '@/lib/database.types'
 import { ThemeBar } from '@/components/ThemeBar'
+import { SignificanceStars } from '@/components/SignificanceStars'
 import { DnaRadarChart } from '@/components/DnaRadarChart'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
@@ -321,7 +322,6 @@ function Stat({
 
 function QuestionRow({ q }: { q: ProgramQuestionWithArchived }) {
   const sig = q.archived_question?.significance_score ?? 0
-  const stars = Math.round(sig * 5)  // significance_score is 0–1
 
   return (
     <div className="px-5 py-4 flex items-start gap-3">
@@ -346,23 +346,8 @@ function QuestionRow({ q }: { q: ProgramQuestionWithArchived }) {
           )}
         </div>
       </div>
-      {stars > 0 && (
-        <div className="flex-shrink-0 flex gap-0.5" title={`Significance: ${sig}/100`}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <svg
-              key={i}
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              className={i < stars ? 'text-warning-500' : 'text-neutral-200 dark:text-neutral-700'}
-            >
-              <path
-                fill="currentColor"
-                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-              />
-            </svg>
-          ))}
-        </div>
+      {sig > 0 && (
+        <SignificanceStars score={sig} />
       )}
     </div>
   )

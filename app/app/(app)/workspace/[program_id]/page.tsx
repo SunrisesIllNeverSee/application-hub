@@ -14,6 +14,7 @@ import { ApplicationStatusTracker } from '@/components/ApplicationStatusTracker'
 import { OutcomeTracker } from '@/components/OutcomeTracker'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
 import { formatDeadline, formatProgramStartDate } from '@/lib/utils'
+import { SignificanceStars } from '@/components/SignificanceStars'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -248,10 +249,8 @@ export default async function WorkspaceDetailPage({ params }: Props) {
                                 Optional
                               </span>
                             )}
-                            {sig > 0.70 && (
-                              <span className="text-xs font-medium text-brand-600 dark:text-brand-400">
-                                High significance
-                              </span>
+                            {sig > 0 && (
+                              <SignificanceStars score={sig} size="xs" />
                             )}
                           </div>
                           <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">

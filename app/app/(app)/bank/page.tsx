@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ThemeTag } from '@/components/ThemeTag'
 import { AnswerEditor } from '@/components/AnswerEditor'
 import type { ProfileAnswer } from '@/lib/database.types'
+import { SignificanceStars } from '@/components/SignificanceStars'
 import { cn } from '@/lib/utils'
 
 export const metadata = { title: 'Question Bank' }
@@ -196,7 +197,7 @@ export default async function BankPage() {
                                   New
                                 </span>
                               )}
-                              <SignificanceStars score={q.significance_score} />
+                              <SignificanceStars score={q.significance_score} size="xs" />
                             </div>
                           </div>
                           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
@@ -279,20 +280,4 @@ export default async function BankPage() {
   )
 }
 
-function SignificanceStars({ score }: { score: number }) {
-  // Score range is roughly 1–4.5, map to 1–5 stars
-  const stars = Math.min(5, Math.max(1, Math.round(score)))
-  return (
-    <div className="flex gap-0.5" title={`Significance: ${score.toFixed(1)}`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} width="10" height="10" viewBox="0 0 24 24"
-          className={cn(i < stars ? 'text-warning-500' : 'text-neutral-200 dark:text-neutral-700')}
-        >
-          <path fill="currentColor"
-            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-          />
-        </svg>
-      ))}
-    </div>
-  )
-}
+
