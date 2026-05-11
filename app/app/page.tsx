@@ -52,15 +52,34 @@ export default async function RootPage() {
               </a>
             ))}
           </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
-            AI-native infrastructure for the applications you actually have to write
+            One answer bank — for every application you&apos;ll ever write
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
             The question archive
             <br />
             <span className="text-neutral-400">for every application you&apos;ll ever write.</span>
           </h1>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-600 text-white text-xs font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-white" />
+              Founder mode
+              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] uppercase tracking-wider">Live</span>
+            </span>
+            {['Job-seeker', 'Student', 'Researcher'].map((label) => (
+              <span
+                key={label}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-medium"
+              >
+                {label} mode
+                <span className="ml-1 px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 text-[10px] uppercase tracking-wider">Soon</span>
+              </span>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-neutral-500">
+            Built deep on tech startup applications first. Same archive/answer-bank engine across all modes — jobs, schools, and grants ship next.
+          </p>
           <p className="mt-6 max-w-2xl mx-auto text-base sm:text-lg text-neutral-300 leading-relaxed">
             <span className="text-neutral-100">Every applicant faces the same problem</span>: 10 applications, the same 10 essays. Application Hub archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
           </p>
@@ -83,6 +102,10 @@ export default async function RootPage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
                 <span className="w-2.5 h-2.5 rounded-full bg-neutral-700" />
                 <span className="ml-3 text-xs text-neutral-400 font-mono">mos2es.xyz/hub</span>
+                <span className="ml-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-brand-600/15 text-brand-300 text-[10px] font-medium">
+                  <span className="w-1 h-1 rounded-full bg-brand-400" />
+                  Founder mode · 225 curated questions
+                </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-12 text-left">
                 <aside className="col-span-3 hidden lg:flex flex-col gap-1 p-4 border-r border-neutral-800 bg-neutral-950/40 text-xs">
@@ -120,7 +143,7 @@ export default async function RootPage() {
         </section>
 
         <section className="max-w-5xl mx-auto px-6 pb-16">
-          <p className="text-center text-xs uppercase tracking-wider text-neutral-400 mb-5">Indexed across</p>
+          <p className="text-center text-xs uppercase tracking-wider text-neutral-400 mb-5">Indexed across · Founder mode</p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-neutral-300">
             {['Y Combinator', 'Techstars', 'a16z', 'SBIR', 'NSF', 'MassChallenge', 'Echoing Green', 'First Round', 'Pear VC', 'Hustle Fund', '+ 20 more'].map((p, i) => (
               <span key={p} className={i === 10 ? 'text-neutral-400 font-mono text-xs' : 'hover:text-neutral-100 transition-colors'}>
@@ -128,6 +151,19 @@ export default async function RootPage() {
               </span>
             ))}
           </div>
+          <p className="mt-8 text-center text-xs uppercase tracking-wider text-neutral-500 mb-3">Coming next · other modes</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-neutral-500">
+            <span><span className="text-neutral-400">Job-seeker:</span> Greenhouse · Lever · Ashby</span>
+            <span className="text-neutral-700">·</span>
+            <span><span className="text-neutral-400">Student:</span> Common App · LSAC · AMCAS</span>
+            <span className="text-neutral-700">·</span>
+            <span><span className="text-neutral-400">Researcher:</span> Grants.gov · NIH · NSF</span>
+          </div>
+          <p className="mt-3 text-center text-xs text-neutral-500">
+            Same engine, different vertical. Help us build them out —{' '}
+            <Link href="/login" className="text-brand-400 hover:text-brand-300 underline">submit a program</Link>{' '}
+            and earn 5 drip unlocks per accepted submission.
+          </p>
         </section>
 
         <section className="max-w-5xl mx-auto px-6 py-16">
@@ -343,6 +379,10 @@ export default async function RootPage() {
               {
                 q: 'Do you auto-submit applications for me?',
                 a: "No. This is a preparation layer, not a submission layer. You still hit Submit on the program's own portal — we just make the work to get there 10× faster.",
+              },
+              {
+                q: 'Does this only work for tech startup applications?',
+                a: "No — the engine is general-purpose. Tech startup applications are the first deeply-curated mode (225 questions, 30 programs scored, 800+ indexed). Job-seeker, Student, and Researcher modes run on the same archive/answer-bank/significance-score architecture; full curation for those modes ships next. Submit programs in those verticals today and earn drip unlocks toward your answer bank — the same answer you write for one mode is reusable in every other.",
               },
               {
                 q: 'Why MCP instead of a chat sidebar?',

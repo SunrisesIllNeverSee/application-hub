@@ -1,7 +1,22 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import type { Program, UserProgramFit, UserApplication, ProgramWithFit } from '@/lib/database.types'
+import type {
+  Program,
+  UserProgramFit,
+  UserApplication,
+  ProgramWithFit,
+  ApplicantMode,
+} from '@/lib/database.types'
 import { ProgramCard } from '@/components/ProgramCard'
+import { ModeSelector } from '@/components/ModeSelector'
+import {
+  DEFAULT_MODE,
+  defaultSubmitKindForMode,
+  isModeDeeplyCurated,
+  modeContextLabel,
+  modeLabel,
+  modeToLegacyTypes,
+} from '@/lib/applicantMode'
 import { HubFilters } from './HubFilters'
 
 export const metadata = {
@@ -19,7 +34,22 @@ export default async function HubPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Fetch programs
+  // Fetch the user's active applicant mode + claimed identities. Falls back
+  // to founder for users on profiles created before migration 027.
+  let activeIdentity: ApplicantMode = DEFAULT_MODE
+  let identities: ApplicantMode[] = [DEFAULT_MODE]
+  if (user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('active_identity, identities')
+      .eq('user_id', user.id)
+      .single<{ active_identity: ApplicantMode | null; identities: ApplicantMode[] | null }>()
+    activeIdentity = profile?.active_identity ?? DEFAULT_MODE
+    identities = profile?.identities ?? [DEFAULT_MODE]
+  }
+
+  // Fetch programs. If the user hasn't explicitly filtered by type, scope to
+  // the legacy program_type values mapped from their active applicant mode.
   let query = supabase
     .from('programs')
     .select('*')
@@ -27,6 +57,11 @@ export default async function HubPage({
 
   if (searchParams.type) {
     query = query.eq('type', searchParams.type)
+  } else {
+    const allowedTypes = modeToLegacyTypes(activeIdentity)
+    if (allowedTypes.length > 0) {
+      query = query.in('type', allowedTypes as unknown as string[])
+    }
   }
   if (searchParams.rolling === 'true') {
     query = query.eq('is_rolling', true)
@@ -95,13 +130,16 @@ export default async function HubPage({
 
   return (
     <div>
+      <div className="mb-4">
+        <ModeSelector activeIdentity={activeIdentity} identities={identities} />
+      </div>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Hub</h1>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             {sorted.length > 0
-              ? `${sorted.length} programs ranked by fit and opportunity value`
-              : 'Discover accelerators, grants, and fellowships matched to your startup'}
+              ? `${sorted.length} ${modeContextLabel(activeIdentity).toLowerCase()} ranked by fit and opportunity value`
+              : `Discover ${modeContextLabel(activeIdentity).toLowerCase()} matched to your profile`}
             {' '}
             <Link
               href="/about/scoring"
@@ -138,7 +176,7 @@ export default async function HubPage({
           </aside>
           <div className="flex-1 min-w-0">
             {sorted.length === 0 ? (
-              <EmptyState />
+              <EmptyState activeIdentity={activeIdentity} />
             ) : (
               <div className="space-y-3">
                 {sorted.map((program, i) => (
@@ -153,7 +191,54 @@ export default async function HubPage({
   )
 }
 
-function EmptyState() {
+function EmptyState({ activeIdentity }: { activeIdentity: ApplicantMode }) {
+  const sparse = !isModeDeeplyCurated(activeIdentity)
+  const submitHref = `/hub/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`
+  const contextLabel = modeContextLabel(activeIdentity).toLowerCase()
+  const identityLabel = modeLabel(activeIdentity).toLowerCase()
+
+  if (sparse) {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-amber-300/60 dark:border-amber-700/40 bg-amber-50/40 dark:bg-amber-950/20 p-10 text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-900/30 mb-4 text-amber-700 dark:text-amber-300">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <h3 className="text-base font-semibold text-neutral-900 dark:text-white mb-2">
+          The {contextLabel} vertical is still being built
+        </h3>
+        <p className="text-sm text-neutral-600 dark:text-neutral-300 max-w-md mx-auto">
+          The engine works for {identityLabel}s today — the curated program data
+          isn&apos;t there yet. Help us build it: submit a {contextLabel.replace(/s$/, '')}{' '}
+          program URL and earn{' '}
+          <span className="font-medium text-amber-700 dark:text-amber-300">5 drip unlocks</span>{' '}
+          when it&apos;s accepted.
+        </p>
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2">
+          <Link
+            href={submitHref}
+            className="px-4 py-2 rounded-md bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition-colors"
+          >
+            Submit a {contextLabel.replace(/s$/, '')} program
+          </Link>
+          <Link
+            href="/hub?type="
+            className="px-4 py-2 rounded-md text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+          >
+            View all programs
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="card p-12 text-center">
       <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-800 mb-4">

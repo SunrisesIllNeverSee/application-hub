@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import type { ApplicantMode } from '@/lib/database.types'
+import { APPLICANT_MODES, DEFAULT_MODE, modeContextLabel, modeLabel } from '@/lib/applicantMode'
 
 const STAGE_OPTIONS = [
   { value: 'idea', label: 'Idea' },
@@ -48,6 +50,40 @@ export function ProfileAboutForm({ profile: initialProfile, userEmail }: Props) 
   const [githubUrl, setGithubUrl] = useState<string>((p?.github_url as string) ?? '')
   const [twitterUrl, setTwitterUrl] = useState<string>((p?.twitter_url as string) ?? '')
 
+  const initialIdentities: ApplicantMode[] = (() => {
+    const raw = p?.identities
+    if (Array.isArray(raw)) {
+      return raw.filter((m): m is ApplicantMode =>
+        APPLICANT_MODES.includes(m as ApplicantMode)
+      )
+    }
+    return [DEFAULT_MODE]
+  })()
+  const initialActive: ApplicantMode =
+    typeof p?.active_identity === 'string' && APPLICANT_MODES.includes(p.active_identity as ApplicantMode)
+      ? (p.active_identity as ApplicantMode)
+      : (initialIdentities[0] ?? DEFAULT_MODE)
+
+  const [identities, setIdentities] = useState<ApplicantMode[]>(
+    initialIdentities.length > 0 ? initialIdentities : [DEFAULT_MODE]
+  )
+  const [activeIdentity, setActiveIdentity] = useState<ApplicantMode>(initialActive)
+
+  function toggleIdentity(mode: ApplicantMode) {
+    setIdentities((prev) => {
+      if (prev.includes(mode)) {
+        // Don't allow removing the last identity; also don't strand active_identity
+        if (prev.length === 1) return prev
+        const next = prev.filter((m) => m !== mode)
+        if (mode === activeIdentity) {
+          setActiveIdentity(next[0])
+        }
+        return next
+      }
+      return [...prev, mode]
+    })
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -62,6 +98,12 @@ export function ProfileAboutForm({ profile: initialProfile, userEmail }: Props) 
       .split(',')
       .map((t) => t.trim().toLowerCase().replace(/\s+/g, '_'))
       .filter(Boolean)
+
+    const safeIdentities =
+      identities.length > 0 ? identities : [DEFAULT_MODE]
+    const safeActive = safeIdentities.includes(activeIdentity)
+      ? activeIdentity
+      : safeIdentities[0]
 
     const payload = {
       user_id: user.id,
@@ -79,6 +121,8 @@ export function ProfileAboutForm({ profile: initialProfile, userEmail }: Props) 
       linkedin_url: linkedinUrl || null,
       github_url: githubUrl || null,
       twitter_url: twitterUrl || null,
+      identities: safeIdentities,
+      active_identity: safeActive,
     }
 
     const { error: upsertError } = await supabase
@@ -103,6 +147,53 @@ export function ProfileAboutForm({ profile: initialProfile, userEmail }: Props) 
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-0.5">Email</p>
           <p className="text-sm text-neutral-800 dark:text-neutral-200">{userEmail}</p>
         </div>
+      </section>
+
+      {/* Applicant identities (migration 027) */}
+      <section>
+        <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">I am a…</h2>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-3">
+          Pick all that apply. The Hub will scope to your <strong>active</strong> identity — you can switch at the top of the Hub at any time. Modes other than Founder are still being built; submitting programs in them earns drip unlocks.
+        </p>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {APPLICANT_MODES.map((mode) => {
+            const checked = identities.includes(mode)
+            return (
+              <label
+                key={mode}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs cursor-pointer transition-colors ${
+                  checked
+                    ? 'bg-brand-50 dark:bg-brand-900/30 border-brand-300 dark:border-brand-700 text-brand-800 dark:text-brand-200'
+                    : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleIdentity(mode)}
+                  className="w-3.5 h-3.5 accent-brand-600"
+                />
+                <span>{modeLabel(mode)}</span>
+                <span className="text-neutral-400 dark:text-neutral-500">
+                  → {modeContextLabel(mode)}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+        <Field label="Active identity" hint="Which one is in focus right now? Drives the Hub view and recommended programs.">
+          <select
+            value={activeIdentity}
+            onChange={(e) => setActiveIdentity(e.target.value as ApplicantMode)}
+            className="input"
+          >
+            {identities.map((mode) => (
+              <option key={mode} value={mode}>
+                {modeLabel(mode)} · {modeContextLabel(mode)}
+              </option>
+            ))}
+          </select>
+        </Field>
       </section>
 
       {/* Founder identity */}

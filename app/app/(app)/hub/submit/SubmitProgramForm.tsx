@@ -19,6 +19,8 @@ const KIND_OPTIONS = [
 
 type KindValue = (typeof KIND_OPTIONS)[number]['value']
 
+const KIND_VALUES = new Set<KindValue>(KIND_OPTIONS.map((o) => o.value))
+
 interface NoticeState {
   tone: 'success' | 'info' | 'error'
   message: string
@@ -28,13 +30,23 @@ interface NoticeState {
 
 const NOTES_MAX = 2000
 
-export function SubmitProgramForm() {
+interface SubmitProgramFormProps {
+  /** Default kind preselected when the form mounts. Falls back to 'accelerator'. */
+  defaultKind?: string
+}
+
+export function SubmitProgramForm({ defaultKind }: SubmitProgramFormProps = {}) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [, startTransition] = useTransition()
 
+  const initialKind: KindValue =
+    defaultKind && KIND_VALUES.has(defaultKind as KindValue)
+      ? (defaultKind as KindValue)
+      : 'accelerator'
+
   const [programUrl, setProgramUrl] = useState('')
-  const [kind, setKind] = useState<KindValue>('accelerator')
+  const [kind, setKind] = useState<KindValue>(initialKind)
   const [notes, setNotes] = useState('')
   const [notice, setNotice] = useState<NoticeState | null>(null)
 
@@ -128,7 +140,7 @@ export function SubmitProgramForm() {
       // Clear form and redirect to ?queued= so the page can show a success banner
       setProgramUrl('')
       setNotes('')
-      setKind('accelerator')
+      setKind(initialKind)
       startTransition(() => {
         router.push(`/hub/submit?queued=${encodeURIComponent(queueId)}`)
         router.refresh()

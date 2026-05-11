@@ -67,7 +67,7 @@ npm run check
 ```
 
 Prerequisites:
-- live Supabase project with migrations through `026`
+- live Supabase project with migrations through `027`
 - app env vars for Supabase
 - MCP env vars for Supabase service-role + anon access
 
