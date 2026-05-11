@@ -103,10 +103,34 @@ Suggested workflow: run `python3 .agents/check.py` before opening a PR. Pipe to 
 
 `.agents/stripe-smoke.sh` checks that all 8 Stripe + cron env vars are set in Vercel production and prints the next-step manual verification steps (test card flow + SQL to confirm subscription sync). Run any time you want to confirm the env layer is intact without making real charges.
 
-## Phase C — possible next ratchet
+## Phase C — Hardening (landed 2026-05-11)
 
-If Phase B proves useful:
+The Phase B checker is now wired into both git and CI.
 
-- pre-commit hook installer (`.agents/install-hook.sh`) so every commit runs `check.py`
-- CI workflow (`.github/workflows/agents-check.yml`) running `check.py --strict`
-- auto-detected stale-session sweep with a 1-week archive cutoff
+### Pre-commit hook
+
+Install once per clone:
+
+```bash
+.agents/install-hook.sh             # default — only blockers fail
+.agents/install-hook.sh --strict    # warnings also fail
+.agents/install-hook.sh --uninstall # remove
+```
+
+The hook runs `python3 .agents/check.py` before every commit. Skip for a single commit with `git commit --no-verify` (use sparingly — that's how the registry drifts in the first place).
+
+### CI workflow
+
+`.github/workflows/agents-check.yml` runs on every PR + push to main. Currently in advisory mode (blockers fail, warnings annotate). Once the existing warnings are reconciled by the registry owner, flip the workflow step from `python3 .agents/check.py` to `python3 .agents/check.py --strict` and warnings become blockers.
+
+### Stale-session policy
+
+The checker flags `active` sessions with heartbeat older than 24h. By policy: any session may mark another session `wrapped` if its heartbeat is more than 7 days stale, with a short note in the YAML comment. Not auto-corrected (intentionally human-in-the-loop).
+
+### Phase D — possible next ratchet
+
+If Phase C proves useful:
+
+- auto-reconcile mode (`check.py --fix`) that rewrites `registry.yaml.migrations.applied` to match the filesystem
+- registry-as-canonical pre-commit hook that refuses commits introducing migrations not claimed in `claims.yaml`
+- session activity heatmap in a Grafana-style status page

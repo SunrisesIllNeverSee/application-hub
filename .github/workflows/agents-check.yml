@@ -1,0 +1,44 @@
+name: agents-check
+
+# Security note: this workflow does NOT consume any user-controlled github.event.*
+# fields inside run: commands. The only github expression used is `github.ref`
+# in the concurrency group, which is a safe context (treated as a yaml value,
+# not interpolated into shell). No injection surface.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: agents-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: .agents coordination check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pyyaml
+        run: pip3 install pyyaml
+
+      - name: Run .agents/check.py (default — blockers fail, warnings advisory)
+        # Once the existing warnings are reconciled by the registry owner,
+        # flip this step to `--strict` so warnings also fail the build.
+        run: python3 .agents/check.py
+
+      - name: Print JSON report (advisory)
+        if: always()
+        run: python3 .agents/check.py --json || true
