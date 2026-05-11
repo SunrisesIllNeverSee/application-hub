@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { useTheme } from '@/components/ThemeProvider'
 
 interface Application {
   id: string
@@ -79,6 +80,7 @@ export function Sidebar({ user, applications }: SidebarProps) {
   const router = useRouter()
   const supabase = createClient()
   const [mobileOpen, setMobileOpen] = React.useState(false)
+  const { theme, toggle } = useTheme()
 
   React.useEffect(() => { setMobileOpen(false) }, [pathname])
 
@@ -157,7 +159,7 @@ export function Sidebar({ user, applications }: SidebarProps) {
             <p className="text-xs text-neutral-600 dark:text-neutral-600">
               No applications yet.{' '}
               <Link href="/hub" className="text-brand-500 hover:text-brand-400">
-                Browse Hub →
+                Browse Hub &rarr;
               </Link>
             </p>
           </div>
@@ -196,6 +198,28 @@ export function Sidebar({ user, applications }: SidebarProps) {
             <p className="text-xs font-medium text-neutral-200 truncate">{user.email}</p>
             <p className="text-xs text-neutral-500">Free plan</p>
           </div>
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="text-neutral-600 hover:text-neutral-300 transition-colors flex-shrink-0"
+          >
+            {theme === 'dark' ? (
+              /* Sun icon — shown in dark mode to switch to light */
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            ) : (
+              /* Moon icon — shown in light mode to switch to dark */
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+          {/* Sign out */}
           <button onClick={signOut} title="Sign out"
             className="text-neutral-600 hover:text-neutral-300 transition-colors flex-shrink-0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">

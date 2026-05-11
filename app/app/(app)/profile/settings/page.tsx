@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProfileSettingsForm } from '@/components/ProfileSettingsForm'
 import { PricingCards } from '@/components/PricingCards'
+import { TeamSection } from '@/components/TeamSection'
 import type { SubscriptionTier } from '@/lib/database.types'
 
 export const metadata = {
@@ -26,6 +27,44 @@ export default async function ProfileSettingsPage() {
 
   const currentTier = (subscription?.tier ?? 'free') as SubscriptionTier
 
+  // Load team data for the TeamSection (only meaningful on team tier, but fetch always)
+  let teamData: {
+    id: string
+    name: string
+    slug: string
+    owner_id: string
+    plan: string
+    created_at: string
+    member_role?: string
+  } | null = null
+  let memberCount = 0
+
+  if (currentTier === 'team') {
+    const { data: memberships } = await supabase
+      .from('team_members')
+      .select('role, joined_at, team:teams(id, name, slug, owner_id, plan, created_at)')
+      .eq('user_id', user.id)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+
+    if (memberships && memberships.length > 0) {
+      const m = memberships[0]
+      const t = Array.isArray(m.team) ? m.team[0] : m.team
+      const raw = t as { id: string; name: string; slug: string; owner_id: string; plan: string; created_at: string } | null
+
+      if (raw) {
+        teamData = { ...raw, member_role: m.role }
+
+        const { count } = await supabase
+          .from('team_members')
+          .select('id', { count: 'exact', head: true })
+          .eq('team_id', raw.id)
+
+        memberCount = count ?? 0
+      }
+    }
+  }
+
   return (
     <div className="space-y-10">
       <div className="max-w-2xl">
@@ -43,6 +82,13 @@ export default async function ProfileSettingsPage() {
         </h2>
         <PricingCards currentTier={currentTier} />
       </section>
+
+      {/* Team */}
+      <TeamSection
+        tier={currentTier}
+        initialTeam={teamData}
+        initialMemberCount={memberCount}
+      />
     </div>
   )
 }

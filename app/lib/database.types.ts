@@ -207,3 +207,52 @@ export function formatCheckSize(cents: number | null): string {
   if (usd >= 1_000) return `$${(usd / 1_000).toFixed(0)}k`
   return `$${usd.toFixed(0)}`
 }
+
+// ─── Teams (migration 025) ─────────────────────────────────────────────────────
+
+export type TeamRole = 'owner' | 'admin' | 'member'
+export type TeamPlan = 'team' | 'enterprise'
+
+export interface Team {
+  id: string
+  name: string
+  slug: string
+  owner_id: string
+  plan: TeamPlan
+  created_at: string
+  updated_at: string
+}
+
+export interface TeamMember {
+  id: string
+  team_id: string
+  user_id: string
+  role: TeamRole
+  invited_by: string | null
+  joined_at: string | null
+  invited_at: string
+}
+
+export interface TeamInvite {
+  id: string
+  team_id: string
+  email: string
+  token: string
+  role: TeamRole
+  invited_by: string
+  accepted_at: string | null
+  expires_at: string
+  created_at: string
+}
+
+export interface TeamAnswer {
+  id: string
+  team_id: string
+  archived_question_id: string
+  content: string
+  confidence: AnswerConfidence
+  created_by: string
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}

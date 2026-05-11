@@ -11,6 +11,7 @@ import type {
 import { AnswerEditor } from '@/components/AnswerEditor'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ApplicationStatusTracker } from '@/components/ApplicationStatusTracker'
+import { OutcomeTracker } from '@/components/OutcomeTracker'
 import { formatDeadline, formatProgramStartDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
@@ -273,6 +274,17 @@ export default async function WorkspaceDetailPage({ params }: Props) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Application Outcome */}
+      {userApplication && (
+        <div className="mt-4">
+          <OutcomeTracker
+            applicationId={userApplication.id}
+            currentStatus={userApplication.status}
+            programName={program.name}
+          />
         </div>
       )}
     </div>
