@@ -7,7 +7,8 @@ export function registerRankingResources(server: McpServer) {
     "Top Programs by Value (ROI)",
     "hub://rankings/value",
     {
-      description: "Open programs ranked by program_value_score — what you get vs what you give up vs application effort.",
+      description: "Open programs ranked by program_value_score —" +
+        " what you get vs what you give up vs application effort.",
       mimeType: "application/json"
     },
     async (_uri) => {
@@ -17,7 +18,10 @@ export function registerRankingResources(server: McpServer) {
 
       const { data } = await supabase
         .from("programs")
-        .select("id, name, slug, type, equity_pct, cash_value_usd, credit_value_usd, program_value_score, network_score, brand_score")
+        .select(
+          "id, name, slug, type, equity_pct, cash_value_usd, credit_value_usd," +
+          " program_value_score, network_score, brand_score"
+        )
         .eq("status", "open")
         .not("program_value_score", "is", null)
         .order("program_value_score", { ascending: false })

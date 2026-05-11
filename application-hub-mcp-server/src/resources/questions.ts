@@ -14,7 +14,9 @@ export function registerQuestionResources(server: McpServer) {
     async (_uri) => {
       const cacheKey = "resource:questions:universal";
       const cached = cache.get<string>(cacheKey);
-      if (cached) return { contents: [{ uri: "hub://questions/universal", mimeType: "application/json", text: cached }] };
+      if (cached) return {
+        contents: [{ uri: "hub://questions/universal", mimeType: "application/json", text: cached }]
+      };
 
       const { data } = await supabase
         .from("archived_questions")

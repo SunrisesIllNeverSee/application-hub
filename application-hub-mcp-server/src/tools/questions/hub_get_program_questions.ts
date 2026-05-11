@@ -14,9 +14,11 @@ export function registerGetProgramQuestions(server: McpServer) {
     title: "Get Program Questions",
     description: `All application questions for a specific program, ordered by display order.
 
-Returns: asked_as, theme, word_limit, char_limit, is_required, is_universal, significance_score (from archive), asked_by_count (how many other programs ask the same question).
+Returns: asked_as, theme, word_limit, char_limit, is_required, is_universal, significance_score (from archive),
+asked_by_count (how many other programs ask the same question).
 
-The significance_score tells you how much this question matters across the platform — high significance = answer this well and it works for many programs.`,
+The significance_score tells you how much this question matters across the platform —
+high significance = answer this well and it works for many programs.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ program_id, include_optional, response_format }) => {
@@ -77,8 +79,12 @@ The significance_score tells you how much this question matters across the platf
     for (const q of questions) {
       lines.push(`### ${q.order_index + 1}. ${q.text}`);
       lines.push(`- **Required**: ${q.is_required ? "Yes" : "No"} | **Theme**: ${q.theme ?? "?"}`);
-      lines.push(`- **Limit**: ${q.word_limit ? `${q.word_limit} words` : q.char_limit ? `${q.char_limit} chars` : "none"}`);
-      lines.push(`- **Significance**: ${stars(q.significance_score)} | **Asked by**: ${q.asked_by_count} programs${q.is_universal ? " ⭐ Universal" : ""}`);
+      const limitStr = q.word_limit ? `${q.word_limit} words` : q.char_limit ? `${q.char_limit} chars` : "none";
+      lines.push(`- **Limit**: ${limitStr}`);
+      lines.push(
+        `- **Significance**: ${stars(q.significance_score)}` +
+        ` | **Asked by**: ${q.asked_by_count} programs${q.is_universal ? " ⭐ Universal" : ""}`
+      );
       lines.push("");
     }
 

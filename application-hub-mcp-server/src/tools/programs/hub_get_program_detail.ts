@@ -14,7 +14,8 @@ export function registerGetProgramDetail(server: McpServer) {
     title: "Get Program Detail",
     description: `Full details for a single program. Use program_id (UUID) or slug.
 
-Returns all fields: name, type, status, description, website, equity, cash, credits, deadlines, rolling/cohort, network score, brand score, follow-on rate, acceptance rate, and listing tier.
+Returns all fields: name, type, status, description, website, equity, cash, credits, deadlines,
+rolling/cohort, network score, brand score, follow-on rate, acceptance rate, and listing tier.
 
 Use hub_get_program_questions to get the actual questions for this program.`,
     inputSchema: Schema,
@@ -29,7 +30,9 @@ Use hub_get_program_questions to get the actual questions for this program.`,
 
     const { data, error } = await q.single();
     if (error || !data) {
-      return { content: [{ type: "text", text: `Program not found. Try hub_search_programs to find a valid slug or ID.` }] };
+      return {
+        content: [{ type: "text", text: `Program not found. Try hub_search_programs to find a valid slug or ID.` }]
+      };
     }
 
     if (response_format === ResponseFormat.JSON) {
@@ -63,7 +66,8 @@ Use hub_get_program_questions to get the actual questions for this program.`,
       "",
       `## Acceptance Stats`,
       stats
-        ? `- Acceptance rate: ${stats.acceptance_rate != null ? `${(stats.acceptance_rate * 100).toFixed(1)}%` : "?"}\n- Total applications: ${stats.application_count ?? 0}`
+        ? `- Acceptance rate: ${stats.acceptance_rate != null ? `${(stats.acceptance_rate * 100).toFixed(1)}%` : "?"}` +
+          `\n- Total applications: ${stats.application_count ?? 0}`
         : "No acceptance data yet — be the first to report.",
     ];
 

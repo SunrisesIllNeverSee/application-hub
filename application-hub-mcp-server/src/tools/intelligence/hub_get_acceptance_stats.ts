@@ -34,7 +34,12 @@ Note: Low report counts mean less statistical reliability — treat as direction
     ]);
 
     if (statsRes.error || !statsRes.data) {
-      return { content: [{ type: "text", text: "No acceptance data yet for this program. Be the first to report your outcome." }] };
+      return {
+        content: [{
+          type: "text",
+          text: "No acceptance data yet for this program. Be the first to report your outcome."
+        }]
+      };
     }
 
     const stats = statsRes.data;

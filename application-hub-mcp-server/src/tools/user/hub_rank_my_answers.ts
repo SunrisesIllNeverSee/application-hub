@@ -16,7 +16,8 @@ export function registerRankMyAnswers(server: McpServer) {
 
 "Your traction answer covers 47 programs. Your team answer covers 39 programs."
 
-Use this to understand which answers are the most leveraged — and which missing answers would unlock the most programs if written.
+Use this to understand which answers are the most leveraged — and which missing answers would unlock
+the most programs if written.
 
 Requires valid user_token.`,
     inputSchema: Schema,
@@ -33,7 +34,11 @@ Requires valid user_token.`,
 
     if (error) return { content: [{ type: "text", text: `Error: ${error.message}` }] };
 
-    type AqJoin = { asked_by_count: number | null; significance_score: number | null; is_universal: boolean | null } | null;
+    type AqJoin = {
+      asked_by_count: number | null;
+      significance_score: number | null;
+      is_universal: boolean | null;
+    } | null;
 
     const answers = (data ?? [])
       .map(a => {
@@ -68,7 +73,10 @@ Requires valid user_token.`,
 
     answers.forEach((a, i) => {
       lines.push(`${i + 1}. **${a.question_text.slice(0, 80)}${a.question_text.length > 80 ? "…" : ""}**`);
-      lines.push(`   Covers **${a.asked_by_count} programs** | Theme: ${a.theme ?? "?"} | ${confidenceIcon[a.confidence] ?? ""} ${a.confidence}${a.is_universal ? " ⭐" : ""}`);
+      lines.push(
+        `   Covers **${a.asked_by_count} programs** | Theme: ${a.theme ?? "?"} |` +
+        ` ${confidenceIcon[a.confidence] ?? ""} ${a.confidence}${a.is_universal ? " ⭐" : ""}`
+      );
     });
 
     return {

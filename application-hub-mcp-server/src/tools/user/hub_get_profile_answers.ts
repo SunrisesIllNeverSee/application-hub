@@ -17,7 +17,8 @@ export function registerGetProfileAnswers(server: McpServer) {
     title: "Get Profile Answers (authenticated)",
     description: `Returns the user's stored profile answers — their reusable answer bank.
 
-Profile answers are the canonical versions of their responses, stored once and reused across multiple applications. Higher confidence = more polished.
+Profile answers are the canonical versions of their responses, stored once and reused across multiple applications.
+Higher confidence = more polished.
 
 Confidence levels:
 - draft: rough, needs work
@@ -61,7 +62,10 @@ Requires valid user_token (Supabase JWT).`,
     const lines: string[] = [`# Your Profile Answers (${answers.length})\n`];
     for (const a of answers) {
       lines.push(`## ${a.question_text}`);
-      lines.push(`**Theme**: ${a.theme ?? "?"} | **Confidence**: ${confidenceEmoji[a.confidence] ?? ""} ${a.confidence} | **Words**: ${a.word_count ?? "?"}`);
+      lines.push(
+        `**Theme**: ${a.theme ?? "?"} | **Confidence**: ${confidenceEmoji[a.confidence] ?? ""} ${a.confidence}` +
+        ` | **Words**: ${a.word_count ?? "?"}`
+      );
       lines.push("");
       lines.push(a.answer_content.slice(0, 500) + (a.answer_content.length > 500 ? "…" : ""));
       lines.push("\n---\n");

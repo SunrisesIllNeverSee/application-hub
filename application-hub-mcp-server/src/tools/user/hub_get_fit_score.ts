@@ -13,7 +13,8 @@ const Schema = z.object({
 export function registerGetFitScore(server: McpServer) {
   server.registerTool("hub_get_fit_score", {
     title: "Get Fit Score (authenticated)",
-    description: `How well does this user match a specific program? Returns a 0–100 fit score broken into four components:
+    description: `How well does this user match a specific program?
+Returns a 0–100 fit score broken into four components:
 
 - coverage_pct (40% weight): % of required questions the user has profile answers for
 - theme_alignment (35% weight): do the user's strongest answers match the program's highest-weighted themes?
@@ -41,7 +42,8 @@ Requires valid user_token.`,
       return {
         content: [{
           type: "text",
-          text: "Fit score not yet computed. It's recalculated daily — check back after saving profile answers, or use hub_get_application_readiness for a quick coverage check."
+          text: "Fit score not yet computed. It's recalculated daily — check back after saving profile answers," +
+            " or use hub_get_application_readiness for a quick coverage check."
         }]
       };
     }
@@ -66,10 +68,14 @@ Requires valid user_token.`,
       ``,
       `**${data.fit_score?.toFixed(0) ?? "?"}/100** overall fit`,
       ``,
-      `${scoreBar(data.coverage_pct)} Coverage       ${data.coverage_pct?.toFixed(0) ?? "?"}%  (40% weight) — required questions answered`,
-      `${scoreBar(data.theme_alignment)} Theme Match    ${data.theme_alignment?.toFixed(0) ?? "?"}%  (35% weight) — your answers match what this program values`,
-      `${scoreBar(data.criteria_match)} Criteria Match ${data.criteria_match?.toFixed(0) ?? "?"}%  (15% weight) — stage/sector/geo requirements`,
-      `${scoreBar(data.quality_signal)} Quality Signal ${data.quality_signal?.toFixed(0) ?? "?"}%  (10% weight) — answer length and confidence`,
+      `${scoreBar(data.coverage_pct)} Coverage       ${data.coverage_pct?.toFixed(0) ?? "?"}%` +
+        `  (40% weight) — required questions answered`,
+      `${scoreBar(data.theme_alignment)} Theme Match    ${data.theme_alignment?.toFixed(0) ?? "?"}%` +
+        `  (35% weight) — your answers match what this program values`,
+      `${scoreBar(data.criteria_match)} Criteria Match ${data.criteria_match?.toFixed(0) ?? "?"}%` +
+        `  (15% weight) — stage/sector/geo requirements`,
+      `${scoreBar(data.quality_signal)} Quality Signal ${data.quality_signal?.toFixed(0) ?? "?"}%` +
+        `  (10% weight) — answer length and confidence`,
       ``,
       `_Computed: ${data.computed_at}_`
     ];

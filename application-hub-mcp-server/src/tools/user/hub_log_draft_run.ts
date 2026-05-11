@@ -8,7 +8,8 @@ const Schema = z.object({
   user_token: z.string().describe("Supabase JWT"),
   program_id: z.string().uuid().describe("Program the draft is for"),
   archived_question_id: z.string().uuid().describe("Question being drafted"),
-  integration_type: z.enum(["claude", "openai", "custom_agent", "mcp"]).describe("Which integration generated the draft"),
+  integration_type: z.enum(["claude", "openai", "custom_agent", "mcp"])
+    .describe("Which integration generated the draft"),
   model_used: z.string().optional().describe("Model identifier (e.g. claude-sonnet-4-6)"),
   prompt_tokens: z.number().int().optional(),
   completion_tokens: z.number().int().optional()
@@ -19,7 +20,8 @@ export function registerLogDraftRun(server: McpServer) {
     title: "Log Draft Run (authenticated, write)",
     description: `Records that an AI assistant generated a draft answer. Enforces usage limits by subscription tier.
 
-Call this after successfully generating a draft answer via any integration. Returns how many drafts remain in the current billing period.
+Call this after successfully generating a draft answer via any integration.
+Returns how many drafts remain in the current billing period.
 
 Returns: { success: true, drafts_remaining: number | "unlimited" }
 
@@ -28,7 +30,8 @@ Will throw if the user has exceeded their monthly draft limit.
 Requires valid user_token.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
-  }, async ({ user_token, program_id, archived_question_id, integration_type, model_used, prompt_tokens, completion_tokens }) => {
+  }, async ({ user_token, program_id, archived_question_id, integration_type,
+              model_used, prompt_tokens, completion_tokens }) => {
     const user_id = await validateUserToken(user_token);
     await checkRateLimit(user_id);
 

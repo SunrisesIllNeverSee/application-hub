@@ -4,7 +4,9 @@ import { supabase } from "../../services/supabase.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
 const Schema = z.object({
-  text: z.string().min(3).describe("Question text or concept to search for (e.g. 'describe your traction', 'why are you the right team')"),
+  text: z.string().min(3).describe(
+    "Question text or concept to search for (e.g. 'describe your traction', 'why are you the right team')"
+  ),
   theme: z.string().optional().describe("Filter by theme (traction, team, market, etc.)"),
   threshold: z.number().min(0).max(1).default(0.7).describe("Cosine similarity threshold (0–1). Default 0.7."),
   limit: z.number().int().min(1).max(20).default(10),
@@ -67,7 +69,10 @@ Returns: question text, theme, significance score, asked_by_count, is_universal,
     const lines: string[] = [`# Questions Similar to: "${text}"\n`];
     for (const q of questions) {
       lines.push(`**${q.text}**`);
-      lines.push(`- Theme: ${q.theme ?? "?"} | Significance: ${q.significance_score?.toFixed(0) ?? "?"} | Asked by: ${q.asked_by_count} programs${q.is_universal ? " ⭐" : ""}`);
+      lines.push(
+        `- Theme: ${q.theme ?? "?"} | Significance: ${q.significance_score?.toFixed(0) ?? "?"}` +
+        ` | Asked by: ${q.asked_by_count} programs${q.is_universal ? " ⭐" : ""}`
+      );
       lines.push("");
     }
 

@@ -1,0 +1,142 @@
+{
+  "themeFollowUps": {
+    "traction": [
+      {
+        "focus": "metric provenance",
+        "prompt": "Where did the traction number in this answer come from, and what source would verify it?",
+        "expected_evidence": ["analytics export", "Stripe or bank record", "CRM or customer list"],
+        "risk_if_unanswered": "The answer may read as polished but unverifiable."
+      },
+      {
+        "focus": "customer quality",
+        "prompt": "How many distinct customers or users produced this traction, and how concentrated is it?",
+        "expected_evidence": ["customer count", "top customer concentration", "repeat usage or renewal data"],
+        "risk_if_unanswered": "A strong topline number may hide fragile demand."
+      },
+      {
+        "focus": "trend durability",
+        "prompt": "What changed over the last 30 to 90 days, and what explains the change?",
+        "expected_evidence": ["growth chart", "cohort trend", "specific launch or sales activity"],
+        "risk_if_unanswered": "The claim may be a snapshot rather than a durable signal."
+      }
+    ],
+    "market": [
+      {
+        "focus": "buyer specificity",
+        "prompt": "Who is the exact buyer or user, and what painful event makes them seek this now?",
+        "expected_evidence": ["ICP definition", "buyer interview", "use-case frequency"],
+        "risk_if_unanswered": "The market may be described too broadly to prove urgency."
+      },
+      {
+        "focus": "market entry",
+        "prompt": "Which narrow wedge lets this company win before it has broad market power?",
+        "expected_evidence": ["beachhead segment", "distribution channel", "early adopter proof"],
+        "risk_if_unanswered": "The answer may rely on a big-market claim without a credible entry point."
+      }
+    ],
+    "problem": [
+      {
+        "focus": "pain evidence",
+        "prompt": "What direct evidence shows this problem is urgent enough for someone to change behavior?",
+        "expected_evidence": ["customer quotes", "failed workaround", "time or money lost"],
+        "risk_if_unanswered": "The problem may sound plausible but not painful."
+      },
+      {
+        "focus": "current alternative",
+        "prompt": "What do people do today instead, and why is that alternative breaking down?",
+        "expected_evidence": ["manual workflow", "incumbent tool", "measured inefficiency"],
+        "risk_if_unanswered": "The answer may not prove why now is the moment to switch."
+      }
+    ],
+    "solution": [
+      {
+        "focus": "mechanism",
+        "prompt": "What is the core mechanism that makes the solution work better than the current alternative?",
+        "expected_evidence": ["workflow comparison", "technical insight", "before/after result"],
+        "risk_if_unanswered": "The solution may read as a feature list instead of a defensible approach."
+      },
+      {
+        "focus": "adoption friction",
+        "prompt": "What must a user change to adopt this, and how are you reducing that friction?",
+        "expected_evidence": ["onboarding steps", "integration plan", "time-to-value metric"],
+        "risk_if_unanswered": "The answer may underestimate implementation risk."
+      }
+    ],
+    "team": [
+      {
+        "focus": "founder-market fit",
+        "prompt": "What lived experience, technical edge, or network gives this team unusual access to the problem?",
+        "expected_evidence": ["past work", "domain relationship", "earned insight"],
+        "risk_if_unanswered": "The team claim may sound generic against stronger founder-market-fit narratives."
+      },
+      {
+        "focus": "execution proof",
+        "prompt": "What has this team already shipped, sold, or learned together?",
+        "expected_evidence": ["launched product", "customer result", "operating milestone"],
+        "risk_if_unanswered": "The answer may assert capability without showing execution."
+      }
+    ],
+    "financials": [
+      {
+        "focus": "unit economics",
+        "prompt": "What does one healthy customer or transaction look like in revenue, cost, margin, and payback?",
+        "expected_evidence": ["gross margin", "CAC or acquisition path", "payback estimate"],
+        "risk_if_unanswered": "Financial claims may not show whether growth is economically healthy."
+      },
+      {
+        "focus": "assumption quality",
+        "prompt": "Which financial assumption would most change the story if it were wrong?",
+        "expected_evidence": ["sensitivity model", "cost driver", "conversion assumption"],
+        "risk_if_unanswered": "The answer may depend on an untested projection."
+      }
+    ],
+    "impact": [
+      {
+        "focus": "beneficiary proof",
+        "prompt": "Who benefits, how much do they benefit, and how do you know?",
+        "expected_evidence": ["outcome metric", "beneficiary interview", "baseline comparison"],
+        "risk_if_unanswered": "The impact claim may be morally compelling but hard to validate."
+      },
+      {
+        "focus": "measurement",
+        "prompt": "What metric would prove the impact is happening without relying on your own narrative?",
+        "expected_evidence": ["third-party metric", "pre/post measurement", "auditable result"],
+        "risk_if_unanswered": "The answer may not separate intention from measurable effect."
+      }
+    ],
+    "fit": [
+      {
+        "focus": "program fit",
+        "prompt": "Why is this specific program the right next constraint, network, or validation point?",
+        "expected_evidence": ["program thesis match", "mentor or network relevance", "next milestone"],
+        "risk_if_unanswered": "The answer may sound like a generic application reused everywhere."
+      },
+      {
+        "focus": "mutual value",
+        "prompt": "What would this founder bring to the cohort or program beyond needing help?",
+        "expected_evidence": ["peer contribution", "domain expertise", "community or ecosystem value"],
+        "risk_if_unanswered": "The application may read as extractive rather than mutually valuable."
+      }
+    ]
+  },
+  "generalFollowUps": [
+    {
+      "focus": "specificity",
+      "prompt": "Which claim in this answer is most important, and what concrete evidence supports it?",
+      "expected_evidence": ["named metric", "customer example", "date or time window"],
+      "risk_if_unanswered": "The answer may stay persuasive at the sentence level but weak at the evidence level."
+    },
+    {
+      "focus": "falsifiability",
+      "prompt": "What would have to be true for this answer to be overstated or wrong?",
+      "expected_evidence": ["counterexample", "risk condition", "missing validation"],
+      "risk_if_unanswered": "The answer may not expose the assumptions a reviewer will probe."
+    },
+    {
+      "focus": "next proof",
+      "prompt": "What is the next proof point this founder can produce within 30 days?",
+      "expected_evidence": ["customer action", "product milestone", "measurable experiment"],
+      "risk_if_unanswered": "The answer may not translate into an actionable readiness path."
+    }
+  ]
+}

@@ -6,7 +6,8 @@ export function registerProgramComparison(server: McpServer) {
     "program_comparison",
     {
       title: "Program Comparison",
-      description: "Side-by-side comparison of two programs — what you get, what you give up, acceptance rates, and DNA.",
+      description: "Side-by-side comparison of two programs — what you get, what you give up," +
+        " acceptance rates, and DNA.",
       argsSchema: {
         program_id_a: z.string().describe("First program UUID or slug"),
         program_id_b: z.string().describe("Second program UUID or slug"),

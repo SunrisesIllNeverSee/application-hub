@@ -14,7 +14,8 @@ export function registerGetUniversalQuestions(server: McpServer) {
     title: "Get Universal Questions",
     description: `Questions asked by 80%+ of programs — the ones to answer first.
 
-These are the highest-leverage questions in the platform. Answer them well and you've covered the majority of most applications without starting from scratch.
+These are the highest-leverage questions in the platform. Answer them well and you've covered
+the majority of most applications without starting from scratch.
 
 Ranked by significance_score descending. Use theme to filter to a specific category.`,
     inputSchema: Schema,
@@ -49,7 +50,10 @@ Ranked by significance_score descending. Use theme to filter to a specific categ
 
     questions.forEach((q, i) => {
       lines.push(`### ${i + 1}. ${q.text}`);
-      lines.push(`- **Theme**: ${q.theme ?? "?"} | **Significance**: ${q.significance_score?.toFixed(0) ?? "?"} | **Programs**: ${q.asked_by_count}`);
+      lines.push(
+        `- **Theme**: ${q.theme ?? "?"} | **Significance**: ${q.significance_score?.toFixed(0) ?? "?"}` +
+        ` | **Programs**: ${q.asked_by_count}`
+      );
       lines.push(`- **Avg word limit**: ${q.avg_word_limit ?? "varies"}`);
       lines.push("");
     });

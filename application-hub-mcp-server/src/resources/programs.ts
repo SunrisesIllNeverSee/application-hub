@@ -18,7 +18,10 @@ export function registerProgramResources(server: McpServer) {
 
       const { data } = await supabase
         .from("programs")
-        .select("id, name, slug, type, status, deadline_at, heat_score, program_value_score, is_rolling, equity_pct, cash_value_usd")
+        .select(
+          "id, name, slug, type, status, deadline_at, heat_score, program_value_score," +
+          " is_rolling, equity_pct, cash_value_usd"
+        )
         .eq("status", "open")
         .order("heat_score", { ascending: false })
         .limit(100);

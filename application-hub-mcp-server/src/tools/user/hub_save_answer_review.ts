@@ -42,6 +42,89 @@ const Schema = z.object({
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
 
+async function validateAnswerOwnership(client: any, answer_id: string, user_id: string): Promise<any> {
+  const { data, error } = await client
+    .from("profile_answers")
+    .select("id, user_id, archived_question_id, question_text, theme, answer_content, confidence, word_count, version, updated_at")
+    .eq("id", answer_id)
+    .eq("user_id", user_id)
+    .single();
+  if (error || !data) return null;
+  return data;
+}
+
+async function fetchProgram(client: any, program_id: string): Promise<{ id: string; name: string | null; slug: string | null } | null> {
+  const { data, error } = await client
+    .from("programs")
+    .select("id, name, slug")
+    .eq("id", program_id)
+    .single();
+  if (error || !data) return null;
+  return data;
+}
+
+async function insertReview(client: any, payload: any): Promise<any> {
+  const { data, error } = await client
+    .from("answer_reviews")
+    .insert(payload)
+    .select(`
+      id,
+      profile_answer_id,
+      program_id,
+      archived_question_id,
+      reviewer_name,
+      reviewer_type,
+      reviewer_version,
+      provider,
+      model_used,
+      overall_status,
+      summary,
+      comments,
+      scores,
+      certification,
+      source_tool,
+      created_at
+    `)
+    .single();
+  if (error || !data) return { review: null, error };
+  return { review: data, error: null };
+}
+
+function buildReviewInsert(user_id: string, answer: any, program: any, params: any): any {
+  return {
+    user_id,
+    profile_answer_id: answer.id,
+    program_id: program?.id ?? null,
+    archived_question_id: answer.archived_question_id,
+    reviewer_name: params.reviewer_name,
+    reviewer_type: params.reviewer_type,
+    reviewer_version: params.reviewer_version ?? null,
+    provider: params.provider ?? null,
+    model_used: params.model_used ?? null,
+    overall_status: params.overall_status,
+    summary: params.summary,
+    comments: params.comments,
+    scores: params.scores,
+    certification: params.certification ?? null,
+    source_tool: "hub_save_answer_review"
+  };
+}
+
+function formatMarkdown(review: any, answer: any, program: any, summary: string): string {
+  const lines = [
+    "# Answer Review Saved",
+    `**Answer**: ${answer.question_text}`,
+    `**Theme**: ${answer.theme ?? "unknown"}`,
+    `**Status**: ${review.overall_status}`,
+    `**Reviewer**: ${review.reviewer_name} (${review.reviewer_type})`,
+    program ? `**Program**: ${program.name ?? program.slug ?? program.id}` : "**Program**: all matching usage",
+    `**Comments**: ${Array.isArray(review.comments) ? review.comments.length : 0}`,
+    "",
+    summary
+  ];
+  return lines.join("\n").slice(0, CHARACTER_LIMIT);
+}
+
 export function registerSaveAnswerReview(server: McpServer) {
   server.registerTool("hub_save_answer_review", {
     title: "Save Answer Review (authenticated)",
@@ -71,83 +154,30 @@ drafting separate from review comments, scores, and certification metadata.`,
     const user_id = await validateUserToken(user_token);
     const client = userClient(user_token);
 
-    const { data: answer, error: answerError } = await client
-      .from("profile_answers")
-      .select("id, user_id, archived_question_id, question_text, theme, answer_content, confidence, word_count, version, updated_at")
-      .eq("id", answer_id)
-      .eq("user_id", user_id)
-      .single();
-
-    if (answerError || !answer) {
+    const answer = await validateAnswerOwnership(client, answer_id, user_id);
+    if (!answer) {
       return { content: [{ type: "text", text: "Saved answer not found or not readable." }] };
     }
 
     let program: { id: string; name: string | null; slug: string | null } | null = null;
-
     if (program_id) {
-      const { data: programRow, error: programError } = await client
-        .from("programs")
-        .select("id, name, slug")
-        .eq("id", program_id)
-        .single();
-
-      if (programError || !programRow) {
+      program = await fetchProgram(client, program_id);
+      if (!program) {
         return { content: [{ type: "text", text: "Program not found or not readable." }] };
       }
-
-      program = programRow;
     }
 
-    const reviewInsert = {
-      user_id,
-      profile_answer_id: answer.id,
-      program_id: program?.id ?? null,
-      archived_question_id: answer.archived_question_id,
-      reviewer_name,
-      reviewer_type,
-      reviewer_version: reviewer_version ?? null,
-      provider: provider ?? null,
-      model_used: model_used ?? null,
-      overall_status,
-      summary,
-      comments,
-      scores,
-      certification: certification ?? null,
-      source_tool: "hub_save_answer_review"
-    };
+    const reviewInsert = buildReviewInsert(user_id, answer, program, {
+      reviewer_name, reviewer_type, reviewer_version, provider, model_used,
+      overall_status, summary, comments, scores, certification
+    });
 
-    const { data: review, error: reviewError } = await client
-      .from("answer_reviews")
-      .insert(reviewInsert)
-      .select(`
-        id,
-        profile_answer_id,
-        program_id,
-        archived_question_id,
-        reviewer_name,
-        reviewer_type,
-        reviewer_version,
-        provider,
-        model_used,
-        overall_status,
-        summary,
-        comments,
-        scores,
-        certification,
-        source_tool,
-        created_at
-      `)
-      .single();
-
-    if (reviewError || !review) {
+    const { review, error: reviewError } = await insertReview(client, reviewInsert);
+    if (!review) {
       return { content: [{ type: "text", text: `Error saving answer review: ${reviewError?.message ?? "unknown error"}` }] };
     }
 
-    const output = {
-      review,
-      answer,
-      program
-    };
+    const output = { review, answer, program };
 
     if (response_format === ResponseFormat.JSON) {
       return {
@@ -156,20 +186,8 @@ drafting separate from review comments, scores, and certification metadata.`,
       };
     }
 
-    const lines = [
-      "# Answer Review Saved",
-      `**Answer**: ${answer.question_text}`,
-      `**Theme**: ${answer.theme ?? "unknown"}`,
-      `**Status**: ${review.overall_status}`,
-      `**Reviewer**: ${review.reviewer_name} (${review.reviewer_type})`,
-      program ? `**Program**: ${program.name ?? program.slug ?? program.id}` : "**Program**: all matching usage",
-      `**Comments**: ${Array.isArray(review.comments) ? review.comments.length : 0}`,
-      "",
-      summary
-    ];
-
     return {
-      content: [{ type: "text", text: lines.join("\n").slice(0, CHARACTER_LIMIT) }],
+      content: [{ type: "text", text: formatMarkdown(review, answer, program, summary) }],
       structuredContent: output
     };
   });

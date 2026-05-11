@@ -15,9 +15,11 @@ const Schema = z.object({
 export function registerFindBestPrograms(server: McpServer) {
   server.registerTool("hub_find_best_programs", {
     title: "Find Best Programs For User (authenticated)",
-    description: `The Opportunity Scout in tool form. Ranks all currently open programs by (fit_score × program_value_score) for this specific user.
+    description: `The Opportunity Scout in tool form.
+Ranks all currently open programs by (fit_score × program_value_score) for this specific user.
 
-This is the primary discovery tool — proactively finds the best match between what this user has written and what programs actually want.
+This is the primary discovery tool — proactively finds the best match between
+what this user has written and what programs actually want.
 
 Composite score = fit_score × program_value_score / 100
 - High fit + high value = apply immediately
@@ -34,8 +36,10 @@ Requires valid user_token.`,
 
     const { data, error } = await supabase
       .from("user_program_fit")
-      .select(`fit_score, program_id,
-               programs(name, slug, type, status, deadline_at, equity_pct, cash_value_usd, program_value_score, is_rolling)`)
+      .select(
+        "fit_score, program_id," +
+        "programs(name, slug, type, status, deadline_at, equity_pct, cash_value_usd, program_value_score, is_rolling)"
+      )
       .eq("user_id", user_id)
       .eq("programs.status", "open")
       .not("fit_score", "is", null)
@@ -85,8 +89,15 @@ Requires valid user_token.`,
         ? Math.ceil((new Date(p.deadline_at).getTime() - Date.now()) / 86_400_000)
         : null;
       lines.push(`## ${i + 1}. ${p.name}`);
-      lines.push(`**Fit**: ${p.fit_score?.toFixed(0) ?? "?"}%  ·  **Value**: ${p.program_value_score?.toFixed(0) ?? "?"}  ·  **Composite**: ${p.composite?.toFixed(0)}`);
-      lines.push(`${p.equity_pct != null ? `${p.equity_pct}% equity` : "No equity"} · ${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "no cash"} · ${p.is_rolling ? "Rolling" : "Cohort"}`);
+      lines.push(
+        `**Fit**: ${p.fit_score?.toFixed(0) ?? "?"}%  ·` +
+        `  **Value**: ${p.program_value_score?.toFixed(0) ?? "?"}  ·  **Composite**: ${p.composite?.toFixed(0)}`
+      );
+      lines.push(
+        `${p.equity_pct != null ? `${p.equity_pct}% equity` : "No equity"} · ` +
+        `${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "no cash"} · ` +
+        `${p.is_rolling ? "Rolling" : "Cohort"}`
+      );
       if (days != null) lines.push(`⏱ ${days} days left · \`/apply ${p.slug}\``);
       lines.push("");
     });

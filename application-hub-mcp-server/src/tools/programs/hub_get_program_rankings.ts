@@ -14,7 +14,9 @@ const Schema = z.object({
 export function registerGetProgramRankings(server: McpServer) {
   server.registerTool("hub_get_program_rankings", {
     title: "Get Program Rankings (by Value/ROI)",
-    description: `Programs ranked by program_value_score — a composite of what you get (cash, credits, network, brand value) minus what you give up (equity, exclusivity), divided by application difficulty.
+    description: `Programs ranked by program_value_score — a composite of what you get
+(cash, credits, network, brand value) minus what you give up (equity, exclusivity),
+divided by application difficulty.
 
 Higher score = better ROI for the effort of applying.
 
@@ -54,8 +56,14 @@ Use filters to narrow by type or equity tolerance. Best for answering "what shou
     programs.forEach((p, i) => {
       lines.push(`## ${i + 1}. ${p.name} — Score: ${p.program_value_score?.toFixed(1)}`);
       lines.push(`- Type: ${p.type} | Equity: ${p.equity_pct != null ? `${p.equity_pct}%` : "none"}`);
-      lines.push(`- Cash: ${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "—"} | Credits: ${p.credit_value_usd ? `$${p.credit_value_usd.toLocaleString()}` : "—"}`);
-      lines.push(`- Network: ${p.network_score ?? "?"}/10 | Brand: ${p.brand_score ?? "?"}/10 | Follow-on: ${p.follow_on_rate_pct ? `${p.follow_on_rate_pct}%` : "?"}`);
+      lines.push(
+        `- Cash: ${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "—"}` +
+        ` | Credits: ${p.credit_value_usd ? `$${p.credit_value_usd.toLocaleString()}` : "—"}`
+      );
+      lines.push(
+        `- Network: ${p.network_score ?? "?"}/10 | Brand: ${p.brand_score ?? "?"}/10` +
+        ` | Follow-on: ${p.follow_on_rate_pct ? `${p.follow_on_rate_pct}%` : "?"}`
+      );
       lines.push(`- Rolling: ${p.is_rolling ? "Yes" : "No"} | Deadline: ${p.deadline_at ?? "n/a"}\n`);
     });
 

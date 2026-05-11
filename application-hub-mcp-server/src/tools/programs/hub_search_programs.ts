@@ -20,11 +20,14 @@ const Schema = z.object({
 export function registerSearchPrograms(server: McpServer) {
   server.registerTool("hub_search_programs", {
     title: "Search Programs",
-    description: `Search the Application Hub for startup programs — accelerators, grants, fellowships, VC programs, corporate programs, university programs, jobs.
+    description: `Search the Application Hub for startup programs —
+accelerators, grants, fellowships, VC programs, corporate programs, university programs, jobs.
 
-Supports filtering by type, status, equity %, minimum cash, rolling vs cohort, and deadline window. Sort by heat score (trending), value score (ROI), deadline, or acceptance rate.
+Supports filtering by type, status, equity %, minimum cash, rolling vs cohort, and deadline window.
+Sort by heat score (trending), value score (ROI), deadline, or acceptance rate.
 
-Returns: id, name, slug, type, status, deadline, equity_pct, cash_value_usd, heat_score, program_value_score, is_rolling.
+Returns: id, name, slug, type, status, deadline, equity_pct, cash_value_usd,
+heat_score, program_value_score, is_rolling.
 
 Use hub_get_program_detail for full details on a specific program.`,
     inputSchema: Schema,
@@ -79,14 +82,23 @@ Use hub_get_program_detail for full details on a specific program.`,
         : null;
       lines.push(`## ${p.name}`);
       lines.push(`- **Type**: ${p.type} | **Status**: ${p.status}`);
-      lines.push(`- **Equity**: ${p.equity_pct != null ? `${p.equity_pct}%` : "none"} | **Cash**: ${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "n/a"}`);
-      lines.push(`- **Heat**: ${p.heat_score?.toFixed(1) ?? "—"} | **Value Score**: ${p.program_value_score?.toFixed(1) ?? "—"}`);
+      lines.push(
+        `- **Equity**: ${p.equity_pct != null ? `${p.equity_pct}%` : "none"}` +
+        ` | **Cash**: ${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "n/a"}`
+      );
+      lines.push(
+        `- **Heat**: ${p.heat_score?.toFixed(1) ?? "—"}` +
+        ` | **Value Score**: ${p.program_value_score?.toFixed(1) ?? "—"}`
+      );
       lines.push(`- **Rolling**: ${p.is_rolling ? "Yes" : "No"}${days != null ? ` | **Deadline**: ${days} days` : ""}`);
       lines.push(`- **Slug**: ${p.slug}\n`);
     }
 
     if (output.has_more) {
-      lines.push(`_Showing ${params.offset + 1}–${params.offset + programs.length} of ${output.total}. Use offset to paginate._`);
+      lines.push(
+        `_Showing ${params.offset + 1}–${params.offset + programs.length} of ${output.total}.` +
+        ` Use offset to paginate._`
+      );
     }
 
     return {

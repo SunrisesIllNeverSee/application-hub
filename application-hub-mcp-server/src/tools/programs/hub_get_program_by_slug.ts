@@ -13,7 +13,8 @@ export function registerGetProgramBySlug(server: McpServer) {
     title: "Get Program By Slug",
     description: `Fetches one program by slug for server-side app routes.
 
-Returns the full program row plus program_stats and program_dna rows so a detail page can render headline facts, acceptance/heat context, and theme weights in one call.`,
+Returns the full program row plus program_stats and program_dna rows so a detail page can render
+headline facts, acceptance/heat context, and theme weights in one call.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ slug, response_format }) => {

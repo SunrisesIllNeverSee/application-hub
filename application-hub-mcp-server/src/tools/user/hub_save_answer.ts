@@ -4,6 +4,10 @@ import { userClient } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { ANSWER_CONFIDENCES, CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
+const SAVE_ANSWER_FIELDS =
+  "id, user_id, archived_question_id, question_text, theme, answer_content," +
+  " confidence, word_count, version, updated_at, last_updated";
+
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT from client auth"),
   archived_question_id: z.string().uuid().describe("Archived question UUID this profile answer answers"),
@@ -17,7 +21,8 @@ export function registerSaveAnswer(server: McpServer) {
     title: "Save Profile Answer (authenticated)",
     description: `Upserts one reusable profile answer for the authenticated user.
 
-Validates that archived_question_id exists, then writes profile_answers using the user's Supabase JWT. The database trigger keeps content/answer_content, question_text, theme, word_count, and updated_at aligned.`,
+Validates that archived_question_id exists, then writes profile_answers using the user's Supabase JWT.
+The database trigger keeps content/answer_content, question_text, theme, word_count, and updated_at aligned.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ user_token, archived_question_id, answer_content, confidence, response_format }) => {
@@ -42,7 +47,7 @@ Validates that archived_question_id exists, then writes profile_answers using th
         answer_content,
         confidence
       }, { onConflict: "user_id,archived_question_id" })
-      .select("id, user_id, archived_question_id, question_text, theme, answer_content, confidence, word_count, version, updated_at, last_updated")
+      .select(SAVE_ANSWER_FIELDS)
       .single();
 
     if (error || !answer) {

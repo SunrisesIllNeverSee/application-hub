@@ -21,14 +21,19 @@ export function registerOpportunityScout(server: McpServer) {
         type ? `Filter to types: ${type}.` : ""
       ].filter(Boolean).join(" ");
 
+      const findBestCall = `hub_find_best_programs with user_token="${user_token}", limit=${n}` +
+        (equity_max_pct ? `, equity_max_pct=${equity_max_pct}` : "") +
+        (type ? `, type=${JSON.stringify(type.split(","))}` : "");
+
       return {
         messages: [{
           role: "user",
           content: {
             type: "text",
-            text: `You are the Opportunity Scout for the Application Hub. Your job: find the best programs for this user right now.
+            text: `You are the Opportunity Scout for the Application Hub.
+Your job: find the best programs for this user right now.
 
-1. Call hub_find_best_programs with user_token="${user_token}", limit=${n}${equity_max_pct ? `, equity_max_pct=${equity_max_pct}` : ""}${type ? `, type=${JSON.stringify(type.split(","))}` : ""}.
+1. Call ${findBestCall}.
 2. For each program in the result, call hub_get_application_readiness to show exactly what's missing.
 3. Present the results clearly:
    - Program name, composite score, fit %, value score

@@ -11,11 +11,13 @@ const Schema = z.object({
 export function registerGetQuestionSignificance(server: McpServer) {
   server.registerTool("hub_get_question_significance", {
     title: "Get Question Significance",
-    description: `Returns the significance score for a question in the archive — how much this question matters across all programs that ask it.
+    description: `Returns the significance score for a question in the archive —
+how much this question matters across all programs that ask it.
 
 Significance = asked_by_count × avg_word_limit_weight × theme_prestige × universal_bonus
 
-High significance = this question appears in many programs with high word limits → answering it well covers a lot of ground.
+High significance = this question appears in many programs with high word limits →
+answering it well covers a lot of ground.
 
 Also returns which programs weight this question highest (by theme match).`,
     inputSchema: Schema,

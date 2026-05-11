@@ -12,9 +12,11 @@ const Schema = z.object({
 export function registerGetProgramDna(server: McpServer) {
   server.registerTool("hub_get_program_dna", {
     title: "Get Program DNA",
-    description: `Returns the theme weight breakdown for a program — what it actually cares about, inferred from its questions.
+    description: `Returns the theme weight breakdown for a program —
+what it actually cares about, inferred from its questions.
 
-Each theme (traction, team, product, market, mission, impact, financials, etc.) is weighted by question count × word limits × order priority.
+Each theme (traction, team, product, market, mission, impact, financials, etc.) is weighted by
+question count × word limits × order priority.
 
 Example:
   YC: traction 35%, team 25%, product 20%, market 10%, ask 10%
@@ -39,7 +41,12 @@ Use this to understand what to emphasize in your application, or to compare prog
     ]);
 
     if (dnaRes.error || !dnaRes.data?.length) {
-      return { content: [{ type: "text", text: "DNA not yet computed for this program. Check back after the daily recompute runs." }] };
+      return {
+        content: [{
+          type: "text",
+          text: "DNA not yet computed for this program. Check back after the daily recompute runs."
+        }]
+      };
     }
 
     const themes = dnaRes.data;
