@@ -131,7 +131,7 @@ export default async function HubPage({
   return (
     <div>
       <div className="mb-4">
-        <ModeSelector activeIdentity={activeIdentity} identities={identities} />
+        {user && <ModeSelector activeIdentity={activeIdentity} identities={identities} />}
       </div>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
