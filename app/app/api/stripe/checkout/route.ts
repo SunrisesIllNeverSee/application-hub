@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
       metadata: { user_id: user.id, tier },
       subscription_data: {
         metadata: { user_id: user.id, tier },
+        trial_period_days: 7,
       },
       // Optional but recommended for SaaS — allow promo codes at checkout
       allow_promotion_codes: true,
