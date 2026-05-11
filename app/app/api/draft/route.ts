@@ -126,6 +126,7 @@ export async function POST(req: NextRequest) {
     let resolvedApiKey: string | null = null
     let resolvedProvider: string | null = null
     let resolvedBaseUrl: string | null = null
+    let resolvedModelPreference: string | null = null
     let integrationProvider = 'byok_anthropic'
 
     // Priority: anthropic → openai → ollama → google
@@ -147,6 +148,7 @@ export async function POST(req: NextRequest) {
           resolvedApiKey = decryptKey(best.key_encrypted, best.key_storage_ref)
           resolvedProvider = best.provider
           resolvedBaseUrl = best.base_url ?? null
+          resolvedModelPreference = best.model_preference ?? null
           integrationProvider = `byok_${best.provider}`
         } catch (e) {
           console.error('[/api/draft] key decryption failed:', e)
@@ -360,7 +362,11 @@ Write the draft answer only — no preamble, no explanation, no word count at th
         ? (resolvedBaseUrl ?? resolvedApiKey ?? 'http://localhost:11434').replace(/\/$/, '') + '/v1'
         : 'https://api.openai.com/v1'
       const apiKey = resolvedProvider === 'ollama' ? 'ollama' : resolvedApiKey!
-      const model = resolvedProvider === 'ollama' ? 'llama3.2' : 'gpt-4o-mini'
+      // Respect the user's saved model_preference; fall back to a sensible default per provider.
+      // For Ollama, the default 'llama3.2' will fail if that model isn't pulled — savvy users
+      // should save their pulled model name (e.g. 'llama3.1:8b', 'qwen2.5:3b') as model_preference.
+      const model = resolvedModelPreference
+        ?? (resolvedProvider === 'ollama' ? 'llama3.2' : 'gpt-4o-mini')
 
       const resp = await fetch(`${baseUrl}/chat/completions`, {
         method: 'POST',
