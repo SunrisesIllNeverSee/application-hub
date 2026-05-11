@@ -138,15 +138,15 @@ export async function POST(req: Request) {
   )
 
   // ── 1. Try to get an embedding ────────────────────────────────────────────
-  // Priority: BYOK Ollama → platform OpenAI key → BYOK OpenAI key
+  // Priority: BYOK Ollama → BYOK OpenAI → platform OpenAI key (last resort)
 
   let embedding: number[] | null = null
-  let embeddingSource: 'ollama' | 'platform' | 'byok' | null = null
+  let embeddingSource: 'ollama' | 'byok_openai' | 'platform' | null = null
 
-  // Check for BYOK Ollama integration first (free, user-owned)
+  // 1a. BYOK Ollama (user's local instance — free)
   const { data: ollamaIntegration } = await supabase
     .from('user_integrations')
-    .select('key_encrypted, base_url, model_preference')
+    .select('base_url, model_preference')
     .eq('user_id', user.id)
     .eq('provider', 'ollama')
     .eq('is_active', true)
@@ -158,13 +158,7 @@ export async function POST(req: Request) {
     if (embedding) embeddingSource = 'ollama'
   }
 
-  // Platform OpenAI key
-  if (!embedding) {
-    embedding = await embedText(text.trim())
-    if (embedding) embeddingSource = 'platform'
-  }
-
-  // BYOK OpenAI key
+  // 1b. BYOK OpenAI (user's own key)
   if (!embedding) {
     const { data: openaiIntegration } = await supabase
       .from('user_integrations')
@@ -181,9 +175,15 @@ export async function POST(req: Request) {
       })
       if (decrypted) {
         embedding = await embedWithBYOK(text.trim(), decrypted)
-        if (embedding) embeddingSource = 'byok'
+        if (embedding) embeddingSource = 'byok_openai'
       }
     }
+  }
+
+  // 1c. Platform OpenAI key (Deric's key — last resort backstop)
+  if (!embedding) {
+    embedding = await embedText(text.trim())
+    if (embedding) embeddingSource = 'platform'
   }
 
   // ── 2. Vector search (if we have an embedding) ────────────────────────────
