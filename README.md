@@ -1,133 +1,116 @@
 # Application Hub
 
-**The canonical database of what accelerators, grants, and fellowships actually ask — and what winning answers look like.**
+**Founder-first application infrastructure for accelerators, grants, jobs, schools, and fellowships.**
 
-Built by Ello Cello LLC.
+[![CI](https://github.com/SunrisesIllNeverSee/application-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/SunrisesIllNeverSee/application-hub/actions/workflows/ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-14.2.35-black)
+![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3ECF8E)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6)
+![MCP](https://img.shields.io/badge/MCP-21%20tools-6E56CF)
+![Vercel](https://img.shields.io/badge/Vercel-Live-black)
 
----
+Application Hub is a founder-first product built on a portable application graph. It turns recurring application questions into reusable assets, helps users build an answer bank that compounds over time, and exposes the full intelligence layer through both a web app and an MCP server.
 
-## Where we're at
+The public wedge is startup opportunities. The underlying spine is broad enough to support grants, jobs, and school applications without a ground-up rebuild.
 
-- **`ROADMAP.md`** — priority-ordered list of work, what's next, the visionary backlog
-- **`VISION.md`** — product vision, the why, premium pricing structure, future aspirations
-- **`TASKS.md`** — granular task list with smoke-test feedback and follow-ups
-- **`STATUS.md`** — current confirmed state of the GitHub-visible repo
-- **`AGENTS.md`** — Cowork (Claude) + Codex coordination contract, file ownership
-- **`SCRATCH.md`** — active work-in-progress claims (what each agent is touching right now)
-- **`docs/08_resend_smtp_setup.md`** — practical Supabase Auth custom SMTP setup with Resend
-- **`docs/09_launch_checklist.md`** — Milestone 3 ship/no-ship checklist
-- **`docs/10_byok_and_draft_policy.md`** — BYOK and hosted draft policy contract
-- **`docs/14_launch_surface_polish.md`** — honest heat/applicant fallbacks, cohort context, and BYOK-first draft UX notes
-- **`docs/15_curated_ingest_lane.md`** — narrow curation contract for application/funding/question targets
-- **`docs/16_mcp_agent_plugin_gap_review.md`** — MCP/agent/plugin review, current gaps, and next implementation plan
-- **`docs/archive/`** — historical/superseded planning docs that are useful context but no longer active direction
+## What It Does
 
-We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.
+- Archives reusable application questions and scores them by significance
+- Builds a reusable answer bank so one strong answer can travel across many opportunities
+- Ranks opportunities with program DNA, fit scoring, and readiness signals
+- Supports BYOK drafting, review persistence, and agent-side critique through MCP
 
-## What it is
+## Who It’s For
 
-Application Hub is a platform for **anyone applying** to programs, jobs, schools, or grants. It solves one specific problem: the same questions show up everywhere, answered slightly differently each time, losing context and quality with every copy-paste.
+- Founders applying to accelerators, fellowships, grants, and venture programs
+- Power users working directly in Claude, Cursor, or Windsurf through MCP
+- Future adjacent users in jobs, schools, and grants once those public surfaces expand
 
-**Audience**: Founders applying to accelerators. Job-seekers applying to roles. Students applying to schools. Researchers applying to grants. One answer bank for all of them.
+## Current State
 
-The product is built around a **question archive** — every question asked by every program, stored once. When you answer a question on one application, that answer lives in your profile and pre-fills every future application that asks something similar. The intelligence layer tells you which questions are most valuable to answer (significance score), which programs are the best fit for where you are right now (composite score), and exactly what's left before you're ready to apply (readiness check).
-
-Just as important: the spine should stay portable across adjacent application domains. The same archive/reuse/intelligence model should be able to switch themes into **jobs, grants, and school applications** without a ground-up rebuild. That portability is part of the moat, not a side quest.
-
-Just as important in the near term: additions to the dataset stay tightly scoped to things that create a real application, funding, or reusable question surface. We are not building a generic startup ecosystem index.
-
----
-
-## Current state
-
-**Launch hardening** — the spine is built; the next work is polish, live validation, and tightening the founder workflow.
-
-| Component | Status |
+| Surface | State |
 |---|---|
-| Database schema (v3) | ✅ Complete |
-| Supabase migrations | ✅ 026 migrations, apply in order |
-| MCP server (21 tools) | ✅ Complete, clean build |
-| Seed data (30 programs) | ✅ Done |
-| Next.js app | ✅ Live data wired, build verified |
+| Live app | `https://mos2es.xyz` |
+| Opportunity archive | 842 programs/opportunities |
+| Question archive | 225 scored questions |
+| MCP server | 21 tools, 7 resources, 3 prompts |
+| Web product | Hub, Bank, workspace, profile split, imports, BYOK |
+| Review layer | persisted reviews + stress tests + starter reviewer family |
 
-The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 21 tools, 7 resources, and 3 prompts.
+## Architecture At A Glance
 
-Current launch frame:
+```mermaid
+flowchart TD
+    A["Next.js app on Vercel"] --> B["App APIs + MCP server"]
+    B --> C["Supabase<br/>842 programs<br/>225 archived questions<br/>RLS + scoring"]
+    B --> D["BYOK providers<br/>Anthropic / OpenAI / Ollama / Google"]
+    B --> E["Stripe"]
+```
 
-- **Ship today**: soft launch to 10–20 power users through MCP/web app.
-- **MVP**: `/bank`, Drip mechanic, BYOK integrations, profile split, and workspace tracking are now in the product.
-- **Polished launch**: focus shifts to live BYOK validation, deeper heat signal computation, deadline quality, and final workflow polish.
+## Quick Start
 
----
+### App
 
-## Current strategy
+```bash
+cd app
+npm install
+npm run type-check
+npm run build
+```
 
-Application Hub ships first as a practical application operating system: question archive, reusable answer bank, program workspace, hosted AI drafting, and external apply paths. RNS is additive over that spine. The current scoring layer is useful scaffolding; RNS turns it into signal intelligence for question significance, answer fidelity, and opportunity matching without blocking the launch path.
-
-The hosted app can generate drafts through `POST /api/draft`, but review, comments, certification, and deeper answer judgment do not have to live in that route on day one. Those can come from Deric's side through RNS/CIVITAE/MO§ES workflows and MCP tools after the app has saved the question, program, draft, answer history, and confidence state.
-
-See `docs/06_rns_integrated_build_path.md` for the build sequence.
-
----
-
-## For Claude / Cowork sessions
-
-Read `CLAUDE.md` first — it has the architecture, schema overview, current status, and conventions. It's the single source of context for any AI session on this project.
-
-Check `TASKS.md` for what's current and what's blocked.
-
----
-
-## Quick start — MCP server
+### MCP server
 
 ```bash
 cd application-hub-mcp-server
 npm install
-npm run build
+npm run check
 ```
 
-See `application-hub-mcp-server/README.md` for full setup, including Claude Desktop and Cursor config.
+Prerequisites:
+- live Supabase project with migrations through `026`
+- app env vars for Supabase
+- MCP env vars for Supabase service-role + anon access
 
-**Prerequisites**: Supabase project with all migrations through `026` applied.
+## Repo Guide
 
-### Local Codex / Cowork connection
+- `ROADMAP.md` — sequence and leverage
+- `TASKS.md` — implementation list
+- `STATUS.md` — confirmed repo state
+- `VISION.md` — product thesis and future shape
+- `CLAUDE.md` / `AGENTS.md` / `SCRATCH.md` — active coordination layer
+- `docs/ARCHITECTURE.md` — architecture overview
+- `docs/MIGRATIONS.md` — migration chain and duplicate-prefix policy
+- `docs/STRIPE_SETUP.md` — Stripe activation walkthrough
+- `docs/BYOK_OLLAMA.md` — verified Ollama tunnel path
+- `docs/21_curated_ingest_lane.md` — narrow staging/promotion rule for new targets
+- `docs/archive/` — superseded and dated historical material
 
-This repository can be public on GitHub while the local MCP connection still points at the local compiled server:
+## MCP And Agents
 
-```text
-/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js
-```
+Application Hub is not just a web app. The MCP server is a first-class product surface.
 
-The `dist/` directory is intentionally ignored and not pushed to GitHub. If Codex, Cowork, Claude Desktop, Cursor, or Windsurf cannot connect after a fresh clone or cleanup, rebuild it locally:
+Current capabilities include:
+- answer save/retrieval
+- fit and ranking tools
+- review-context bridge
+- review write-back
+- persisted stress tests
 
-```bash
-cd /Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server
-npm install
-npm run build
-```
+Checked-in reviewer family:
+- `rns-answer-reviewer`
+- `program-fit-reviewer`
+- `fidelity-certifier`
+- `stress-test-conductor`
 
----
+## Contributing And Operating
 
-## Tech stack
+- See `CONTRIBUTING.md` for seed promotion and contribution guidance
+- See `docs/09_launch_checklist.md` for launch validation
+- See `docs/10_byok_and_draft_policy.md` for BYOK/runtime behavior
+- See `docs/SECURITY.md` for security posture and secret-handling rules
 
-| Layer | Choice |
-|---|---|
-| Database | Supabase (PostgreSQL + pgvector) |
-| MCP server | TypeScript + `@modelcontextprotocol/sdk` |
-| Frontend | Next.js App Router |
-| Payments | Stripe (planned) |
-| AI drafting | Claude API — Haiku for speed, Sonnet for quality |
-| Hosting | Vercel (frontend) + Railway or Fly (MCP HTTP mode) |
-| Cron | Supabase pg_cron |
+## Vision
 
----
+The point is not to build yet another AI writer. The point is to build infrastructure for the application graph: questions, answers, fit signals, review loops, and reusable identity material that gets stronger with use.
 
-## Roadmap
-
-See `ROADMAP.md` for the launch milestones and `TASKS.md` for implementation details. Older duplicate planning docs live in `docs/archive/` so they remain referenceable without clogging the active pipeline.
-
----
-
-## Contributing
-
-See `CONTRIBUTING.md` — especially the section on adding program seed data, which is the highest-leverage contribution right now.
+Founder applications are the wedge. Portability across adjacent application domains is the deeper moat.
