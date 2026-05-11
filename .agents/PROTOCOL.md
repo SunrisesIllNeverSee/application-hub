@@ -75,12 +75,38 @@ Use a review gate when a change crosses:
 
 Do not require a heavy multi-reviewer gate for every archive move or tiny doc cleanup.
 
-## Future ratchet
+## Phase B — Enforcement (landed 2026-05-11)
 
-If this protocol proves useful, the next step is an automated checker such as `.agents/check.py` that can validate:
-- overlapping file claims
-- duplicate unreleased migration claims
-- stale sessions
-- registry consistency
+`.agents/check.py` is the automated checker. Run from repo root:
 
-That enforcement is intentionally deferred for now.
+```bash
+python3 .agents/check.py             # human-readable report
+python3 .agents/check.py --strict    # treat warnings as blockers (CI mode)
+python3 .agents/check.py --json      # machine-readable
+```
+
+What it validates:
+
+- migrations on disk match `registry.yaml.migrations.applied`
+- `migrations.next` is one greater than the highest applied number
+- no two active claims hold the same file lane
+- no active migration-number claim duplicates an applied number
+- sessions marked `active` have heartbeat within 24h
+- released claims have at least one `landed_commits` entry
+- `STATUS.md` migration chain reference matches the registry high-water mark
+
+Exit codes: `0` clean, `1` warnings (advisory), `2` blockers (CI red).
+
+Suggested workflow: run `python3 .agents/check.py` before opening a PR. Pipe to `--strict` in CI once the registry is brought fully into sync with the filesystem.
+
+## Stripe smoke helper
+
+`.agents/stripe-smoke.sh` checks that all 8 Stripe + cron env vars are set in Vercel production and prints the next-step manual verification steps (test card flow + SQL to confirm subscription sync). Run any time you want to confirm the env layer is intact without making real charges.
+
+## Phase C — possible next ratchet
+
+If Phase B proves useful:
+
+- pre-commit hook installer (`.agents/install-hook.sh`) so every commit runs `check.py`
+- CI workflow (`.github/workflows/agents-check.yml`) running `check.py --strict`
+- auto-detected stale-session sweep with a 1-week archive cutoff
