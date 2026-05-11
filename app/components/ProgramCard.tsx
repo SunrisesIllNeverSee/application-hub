@@ -10,6 +10,7 @@ import {
   programTypeLabel,
   cn,
 } from '@/lib/utils'
+import { ScoreTooltip } from '@/components/ScoreTooltip'
 
 interface ProgramCardProps {
   program: ProgramWithFit
@@ -156,7 +157,7 @@ export function ProgramCard({ program, rank }: ProgramCardProps) {
         <div className="mt-1.5 flex items-center gap-3 flex-wrap">
           <span
             className={cn(
-              'text-xs font-medium',
+              'inline-flex items-center text-xs font-medium',
               heat.tone === 'success'
                 ? 'text-success-600 dark:text-success-400'
                 : heat.tone === 'brand'
@@ -168,6 +169,11 @@ export function ProgramCard({ program, rank }: ProgramCardProps) {
             <span className="ml-1 font-normal text-neutral-400 dark:text-neutral-500">
               {heat.detail}
             </span>
+            <ScoreTooltip
+              label="Heat Score"
+              description="Program desirability signal based on prestige, cohort size, and follow-on rate. Provisional until validated with longitudinal data."
+              scoreId="heat"
+            />
           </span>
 
           <span className="text-neutral-300 dark:text-neutral-700 text-xs">·</span>
@@ -185,7 +191,14 @@ export function ProgramCard({ program, rank }: ProgramCardProps) {
       <div className="flex-shrink-0 flex items-center gap-3">
         {fitScore != null && (
           <div className="text-right">
-            <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-0.5">Fit</p>
+            <p className="inline-flex items-center text-xs text-neutral-400 dark:text-neutral-500 mb-0.5">
+              Fit
+              <ScoreTooltip
+                label="Fit Score"
+                description="How well your profile aligns to this program's DNA across coverage, theme alignment, criteria match, and answer quality."
+                scoreId="fit"
+              />
+            </p>
             <p
               className={cn(
                 'text-sm font-semibold tabular-nums',

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Program, UserProgramFit, UserApplication, ProgramWithFit } from '@/lib/database.types'
 import { ProgramCard } from '@/components/ProgramCard'
@@ -101,6 +102,13 @@ export default async function HubPage({
             {sorted.length > 0
               ? `${sorted.length} programs ranked by fit and opportunity value`
               : 'Discover accelerators, grants, and fellowships matched to your startup'}
+            {' '}
+            <Link
+              href="/about/scoring"
+              className="text-neutral-400 dark:text-neutral-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors whitespace-nowrap"
+            >
+              How scores work
+            </Link>
           </p>
         </div>
 
@@ -232,7 +240,6 @@ function TimelineSection({ title, subtitle, urgent, dimmed, children }: {
   )
 }
 
-import Link from 'next/link'
 
 function TimelineRow({ program, days }: { program: ProgramWithFit; days: number | null }) {
   const pct = days === null ? 0

@@ -378,6 +378,7 @@ export default async function RootPage() {
               <li><a href="#archive" className="hover:text-neutral-100 transition-colors">Archive</a></li>
               <li><a href="#mcp" className="hover:text-neutral-100 transition-colors">MCP server</a></li>
               <li><a href="#pricing" className="hover:text-neutral-100 transition-colors">Pricing</a></li>
+              <li><Link href="/about/scoring" className="hover:text-neutral-100 transition-colors">How scores work</Link></li>
               <li><Link href="/login" className="hover:text-neutral-100 transition-colors">Sign in</Link></li>
             </ul>
           </div>

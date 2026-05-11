@@ -8,6 +8,7 @@ import type {
 } from '@/lib/database.types'
 import { ThemeBar } from '@/components/ThemeBar'
 import { ThemeTag } from '@/components/ThemeTag'
+import { ScoreTooltip } from '@/components/ScoreTooltip'
 import {
   formatCheckSize,
   formatEquity,
@@ -155,9 +156,26 @@ export default async function ProgramDetailPage({ params }: Props) {
             label={heat.provisional ? 'Heat signal' : 'Heat score'}
             value={heat.label}
             hint={heat.detail}
+            tooltip={
+              <ScoreTooltip
+                label="Heat Score"
+                description="Program desirability signal based on prestige, cohort size, and follow-on rate. Provisional until validated with longitudinal data."
+                scoreId="heat"
+              />
+            }
           />
           {program.program_value_score != null && (
-            <Stat label="Value score" value={`${Math.round(program.program_value_score)}/100`} />
+            <Stat
+              label="Value score"
+              value={`${Math.round(program.program_value_score)}/100`}
+              tooltip={
+                <ScoreTooltip
+                  label="Program Value Score"
+                  description="Estimated opportunity value based on brand weight, network quality, check size, and equity terms."
+                  scoreId="program-value"
+                />
+              }
+            />
           )}
           {(program.applicant_count != null || program.cohort_size != null) && (
             <Stat
@@ -275,14 +293,16 @@ function Stat({
   label,
   value,
   hint,
+  tooltip,
 }: {
   label: string
   value: React.ReactNode
   hint?: string
+  tooltip?: React.ReactNode
 }) {
   return (
     <div className="min-w-0">
-      <p className="text-xs text-neutral-500 dark:text-neutral-500 mb-0.5 truncate">{label}</p>
+      <p className="inline-flex items-center text-xs text-neutral-500 dark:text-neutral-500 mb-0.5 truncate">{label}{tooltip}</p>
       <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">{value}</p>
       {hint && <p className="text-[11px] text-neutral-400 dark:text-neutral-500 truncate">{hint}</p>}
     </div>

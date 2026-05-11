@@ -12,6 +12,7 @@ import { AnswerEditor } from '@/components/AnswerEditor'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ApplicationStatusTracker } from '@/components/ApplicationStatusTracker'
 import { OutcomeTracker } from '@/components/OutcomeTracker'
+import { ScoreTooltip } from '@/components/ScoreTooltip'
 import { formatDeadline, formatProgramStartDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
@@ -163,8 +164,13 @@ export default async function WorkspaceDetailPage({ params }: Props) {
               {deadline.label}
             </p>
             {fit && (
-              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
+              <p className="inline-flex items-center text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
                 {Math.round(fit.fit_score * 100)}% fit
+                <ScoreTooltip
+                  label="Fit Score"
+                  description="How well your profile aligns to this program's DNA across coverage, theme alignment, criteria match, and answer quality."
+                  scoreId="fit"
+                />
               </p>
             )}
           </div>
