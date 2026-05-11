@@ -36,3 +36,5 @@ Thumbs.db
 .claude/*.webp
 .claude/worktrees/
 supabase/.temp/
+application-hub-mcp-server/.codex-plugin/
+application-hub-mcp-server/.plugin-eval/
