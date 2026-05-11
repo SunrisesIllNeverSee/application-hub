@@ -1,6 +1,6 @@
 # Stress-Test Persistence
 
-`hub_stress_test_answer` already provides deterministic answer review context. Migration `012_launch_hardening.sql` adds the persistence table for saving those runs.
+`hub_stress_test_answer` already provides deterministic answer review context and can now persist generated runs when `persist_result=true`. Migration `012_launch_hardening.sql` provides the backing table.
 
 ## Table
 
@@ -29,9 +29,9 @@ Milestone 3 can ship without the UI for this table. The important part is that t
 
 Next implementation step:
 
-1. UI calls `hub_stress_test_answer` or app-side equivalent.
+1. UI or agent calls `hub_stress_test_answer`.
 2. User reviews suggested follow-up prompts.
-3. App persists the run to `answer_stress_tests`.
+3. Pass `persist_result=true` to save the run to `answer_stress_tests`.
 4. Later RNS/CIVITAE/MO§ES workflows write richer scores and fidelity certificates into the JSONB fields.
 
 ## RNS Upgrade Path

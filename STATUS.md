@@ -170,7 +170,7 @@ RNS is the planned additive judgment layer, not a launch blocker.
 1. **Live BYOK draft verification** — save a real provider key, draft from workspace, confirm live end-to-end success
 2. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
 3. **Seed real deadlines + urgency sort**
-4. **Persist stress-test runs from MCP/app flow** — `answer_stress_tests` table exists, but `hub_stress_test_answer` is still read-only
+4. **Stress-test UI and quota policy** — `hub_stress_test_answer` can now persist runs, but there is still no first-class app entry point or quota layer
 5. **Plugin-eval observed benchmark baseline** — static analysis is installed; observed-usage benchmarking still needs setup
 
 ## What landed during the 2026-05-10 hardening burst

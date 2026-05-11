@@ -23,8 +23,8 @@ What is already real:
 
 What is still actually missing:
 
-- persistence from `hub_stress_test_answer` into `answer_stress_tests`
 - local measurement/evaluation workflow for the MCP bundle
+- broader governed reviewer families beyond the first concrete agent
 
 ---
 
@@ -61,7 +61,7 @@ Confirmed in `application-hub-mcp-server/src/tools/user/hub_stress_test_answer.t
 - deterministic prompt generation
 - theme-aware follow-up prompts
 - no LLM dependency
-- no persistence yet from the tool itself
+- optional persistence via `persist_result=true`
 
 Confirmed in `migrations/012_launch_hardening.sql`:
 
@@ -69,15 +69,15 @@ Confirmed in `migrations/012_launch_hardening.sql`:
 - append-oriented storage contract exists
 - RLS is in place
 
-So the tool is implemented, but the stress-test tool and persistence contract have not yet been joined.
+So the tool is implemented and now joined to persistence, but it is still a deterministic stub rather than a scored LLM-backed challenge path.
 
 ---
 
 ## Real gaps
 
-### 1. Stress-test persistence is still not wired from the MCP tool
+### 1. Stress-test persistence is wired, but app UX is still missing
 
-Agent review can now save output, but `hub_stress_test_answer` remains read-only. The table exists; the save path for stress-test runs does not.
+`hub_stress_test_answer` can now persist runs, but the product still lacks a first-class app surface and quota policy around those saved stress tests.
 
 ### 2. Only the first reviewer agent is checked in
 
@@ -88,7 +88,7 @@ Current state:
 - contract exists
 - bridge exists
 - persisted review write-back exists
-- persistence for stress-test runs exists
+- persistence for stress-test runs exists and can be triggered from the MCP tool
 - `.claude/agents/rns-answer-reviewer.md` is now checked in
 - broader RNS/CIVITAE/MO§ES family still does not exist yet
 
@@ -245,6 +245,6 @@ It now has:
 
 The remaining line between “first real agent loop” and “full agent interaction” is:
 
-- persistence from the stress-test tool itself
 - broader governed reviewer families
 - observed-usage benchmarking
+- app/product surfaces for invoking the saved review and stress-test paths

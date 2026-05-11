@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
+import { userClient } from "../../services/supabase.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
 const STRESS_DEPTHS = ["light", "medium", "deep"] as const;
@@ -11,6 +12,7 @@ const Schema = z.object({
   answer_id: z.string().uuid().describe("profile_answers.id for the saved answer to stress-test"),
   program_id: z.string().uuid().optional().describe("Optional program scope for program-specific DNA and phrasing"),
   stress_depth: z.enum(STRESS_DEPTHS).default("medium").describe("How many follow-ups to return: light=3, medium=4, deep=5"),
+  persist_result: z.boolean().default(false).describe("When true, saves the generated stress-test plan to answer_stress_tests"),
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
 
@@ -239,11 +241,12 @@ export function registerStressTestAnswer(server: McpServer) {
     title: "Stress Test Answer (authenticated)",
     description: `Returns a deterministic stress-test plan for a saved answer.
 
-This is a read-only groundwork tool. It gathers the same saved-answer context used by hub_get_answer_review_context, then returns 3-5 probing follow-up prompts, evidence expectations, and a checklist. It does not call an LLM, score confidence, or persist results yet.`,
+This gathers the same saved-answer context used by hub_get_answer_review_context, then returns 3-5 probing follow-up prompts, evidence expectations, and a checklist. It does not call an LLM or score confidence. When persist_result=true, it also saves the run to answer_stress_tests.`,
     inputSchema: Schema,
-    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
-  }, async ({ user_token, answer_id, program_id, stress_depth, response_format }) => {
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+  }, async ({ user_token, answer_id, program_id, stress_depth, persist_result, response_format }) => {
     const user_id = await validateUserToken(user_token);
+    const client = userClient(user_token);
 
     const { data: answer, error: answerError } = await supabase
       .from("profile_answers")
@@ -295,12 +298,68 @@ This is a read-only groundwork tool. It gathers the same saved-answer context us
     const theme = answer.theme ?? archivedQuestion?.theme ?? null;
     const topDnaThemes = Array.from(new Set(normalizedDna.slice(0, 5).map((dna) => dna.theme)));
     const followUps = buildFollowUps(theme, topDnaThemes, stress_depth);
+    const checklist = [
+      {
+        id: "claim_specificity",
+        label: "Every major claim names a number, customer, date, artifact, or observable outcome.",
+        status: "not_checked"
+      },
+      {
+        id: "evidence_trace",
+        label: "The founder can point to evidence for the strongest claim without rewriting the story.",
+        status: "not_checked"
+      },
+      {
+        id: "program_fit",
+        label: "The answer survives the top program-DNA theme instead of only answering the generic question.",
+        status: "not_checked"
+      },
+      {
+        id: "risk_disclosure",
+        label: "The answer can name the weakest assumption and what would prove or disprove it.",
+        status: "not_checked"
+      },
+      {
+        id: "next_validation",
+        label: "The founder has a concrete next validation step after the stress-test.",
+        status: "not_checked"
+      }
+    ];
+    const detectedSignals = compactSignals(answerContent);
+    let persistedRun: { id: string; created_at: string } | null = null;
+
+    if (persist_result) {
+      const { data: insertedRun, error: insertError } = await client
+        .from("answer_stress_tests")
+        .insert({
+          user_id,
+          profile_answer_id: answer.id,
+          program_id: program_id ?? null,
+          archived_question_id: answer.archived_question_id,
+          depth: stress_depth,
+          mode: "stub_no_llm",
+          detected_signals: detectedSignals,
+          follow_up_prompts: followUps,
+          checklist,
+          risk_flags: [],
+          persisted_from_tool: "hub_stress_test_answer"
+        })
+        .select("id, created_at")
+        .single();
+
+      if (insertError) {
+        return { content: [{ type: "text", text: `Error saving stress-test run: ${insertError.message}` }] };
+      }
+
+      persistedRun = insertedRun;
+    }
 
     const output = {
       answer_id: answer.id,
+      stress_test_id: persistedRun?.id ?? null,
       mode: "stub_no_llm",
       stress_depth,
-      persisted: false,
+      persisted: Boolean(persistedRun),
       scoring_performed: false,
       answer: {
         id: answer.id,
@@ -322,39 +381,14 @@ This is a read-only groundwork tool. It gathers the same saved-answer context us
         program_usage: normalizedProgramQuestions,
         program_dna: normalizedDna
       },
-      detected_signals: compactSignals(answerContent),
+      detected_signals: detectedSignals,
       follow_up_prompts: followUps,
-      checklist: [
-        {
-          id: "claim_specificity",
-          label: "Every major claim names a number, customer, date, artifact, or observable outcome.",
-          status: "not_checked"
-        },
-        {
-          id: "evidence_trace",
-          label: "The founder can point to evidence for the strongest claim without rewriting the story.",
-          status: "not_checked"
-        },
-        {
-          id: "program_fit",
-          label: "The answer survives the top program-DNA theme instead of only answering the generic question.",
-          status: "not_checked"
-        },
-        {
-          id: "risk_disclosure",
-          label: "The answer can name the weakest assumption and what would prove or disprove it.",
-          status: "not_checked"
-        },
-        {
-          id: "next_validation",
-          label: "The founder has a concrete next validation step after the stress-test.",
-          status: "not_checked"
-        }
-      ],
-      future_persistence_contract: {
+      checklist,
+      persistence: {
+        requested: persist_result,
+        saved: Boolean(persistedRun),
         table: "answer_stress_tests",
-        fields: ["answer_id", "follow_up_questions", "responses", "confidence_score", "run_at"],
-        note: "Not written by this stub. Persist only after the schema and scoring behavior land."
+        persisted_at: persistedRun?.created_at ?? null
       }
     };
 
@@ -372,6 +406,7 @@ This is a read-only groundwork tool. It gathers the same saved-answer context us
       `**Theme**: ${output.answer.theme ?? "unknown"}`,
       `**Depth**: ${stress_depth}`,
       `**Program scope**: ${program_id ?? "all programs asking this question"}`,
+      `**Persisted**: ${output.persisted ? `yes (${output.stress_test_id})` : "no"}`,
       "",
       "## Follow-Up Prompts",
       ...followUps.map((item, index) => [
@@ -384,8 +419,10 @@ This is a read-only groundwork tool. It gathers the same saved-answer context us
       ...output.checklist.map((item) => `- [ ] ${item.label}`),
       "",
       "## Notes",
-      "- This tool does not call an LLM, score confidence, or persist a stress-test run yet.",
-      "- Future persistence target: answer_stress_tests(answer_id, follow_up_questions, responses, confidence_score, run_at)."
+      "- This tool does not call an LLM or score confidence yet.",
+      persist_result
+        ? "- The generated plan was saved to answer_stress_tests."
+        : "- Pass `persist_result=true` to save the generated plan to answer_stress_tests."
     ];
 
     return {

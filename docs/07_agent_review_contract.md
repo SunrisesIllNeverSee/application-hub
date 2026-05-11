@@ -49,7 +49,7 @@ The first stress-testing surface is:
 hub_stress_test_answer(user_token, answer_id, program_id?, stress_depth?)
 ```
 
-This tool uses the same saved-answer context pattern as `hub_get_answer_review_context`: validate the user's Supabase JWT, load the saved answer by `profile_answers.id`, load the canonical archived question, load matching program usage, and load program DNA rows for the programs asking that question. It is read-only and deterministic in this phase. It does not call an LLM, score confidence, or persist to `answer_stress_tests` yet.
+This tool uses the same saved-answer context pattern as `hub_get_answer_review_context`: validate the user's Supabase JWT, load the saved answer by `profile_answers.id`, load the canonical archived question, load matching program usage, and load program DNA rows for the programs asking that question. It is deterministic in this phase. It does not call an LLM or score confidence. When `persist_result=true`, it saves the generated plan to `answer_stress_tests`.
 
 `stress_depth` controls the number of follow-ups returned:
 
@@ -117,6 +117,7 @@ Hosted drafting still does not need to own that review lifecycle.
 ```json
 {
   "answer_id": "uuid",
+  "stress_test_id": "uuid or null",
   "mode": "stub_no_llm",
   "stress_depth": "light | medium | deep",
   "persisted": false,
@@ -162,23 +163,11 @@ Hosted drafting still does not need to own that review lifecycle.
       "status": "not_checked"
     }
   ],
-  "future_persistence_contract": {
+  "persistence": {
+    "requested": false,
+    "saved": false,
     "table": "answer_stress_tests",
-    "fields": [
-      "profile_answer_id",
-      "program_id",
-      "archived_question_id",
-      "depth",
-      "mode",
-      "detected_signals",
-      "follow_up_prompts",
-      "checklist",
-      "risk_flags",
-      "score_payload",
-      "fidelity_certificate",
-      "created_at"
-    ],
-    "note": "Not written by this stub."
+    "persisted_at": null
   }
 }
 ```
@@ -210,4 +199,4 @@ RNS adds deeper judgment without replacing those fields immediately:
 
 Do not put the full RNS review system inside `POST /api/draft`. Keep first-pass drafting fast. Let the agent-side review path mature through MCP before promoting it into first-class app UI.
 
-Likewise, keep stress testing out of hosted drafting for now. The MCP tool can generate the follow-up contract without subsidizing model calls or blocking the answer editor. LLM follow-up generation, monthly quota checks, persistence from `hub_stress_test_answer` into `answer_stress_tests`, and confidence scoring can land after BYOK and the current stub path are in place.
+Likewise, keep stress testing out of hosted drafting for now. The MCP tool can generate and optionally persist the follow-up contract without subsidizing model calls or blocking the answer editor. LLM follow-up generation, monthly quota checks, and confidence scoring can land after BYOK and the current stub path are in place.

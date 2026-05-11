@@ -63,7 +63,7 @@ Read in order:
 ## Recently released
 
 | Cowork | Migration 026 applied, MULTI_CLAUDE.md created, SCRATCH.md synced | `SCRATCH.md`, `MULTI_CLAUDE.md` | 2026-05-11 | Full cross-agent sync after major feature burst |
-| Codex | Answer review persistence + reviewer agent + Stripe hardening | `migrations/026_answer_reviews.sql`, `.claude/agents/rns-answer-reviewer.md`, `app/app/api/stripe/webhook/route.ts`, `docs/16_mcp_agent_plugin_gap_review.md` | Released 2026-05-11 | |
+| Codex | Answer review persistence + reviewer agent + stress-test persistence + review command | `migrations/026_answer_reviews.sql`, `.claude/agents/rns-answer-reviewer.md`, `.claude/commands/review-answer.md`, `application-hub-mcp-server/src/tools/user/hub_stress_test_answer.ts`, `docs/07_agent_review_contract.md`, `docs/12_stress_test_persistence.md`, `docs/16_mcp_agent_plugin_gap_review.md` | Released 2026-05-11 | |
 | Cowork | Dark mode, outcome tracking, funders, deadline alerts, team mode | `app/components/ThemeProvider.tsx`, `app/components/OutcomeTracker.tsx`, `migrations/023-025`, `supabase/functions/deadline-alerts/` | Released 2026-05-11 | |
 
 ---

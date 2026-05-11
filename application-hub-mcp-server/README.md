@@ -168,7 +168,7 @@ For remote Claude connections, point the MCP config at your deployed URL:
 | `hub_save_answer` | Validate and upsert one reusable profile answer |
 | `hub_get_answer_review_context` | Gather saved-answer context for agent-side RNS/CIVITAE/MO§ES review |
 | `hub_save_answer_review` | Persist structured agent-side review output for one saved answer |
-| `hub_stress_test_answer` | Return read-only follow-up prompts and checklist for saved-answer stress testing |
+| `hub_stress_test_answer` | Return deterministic follow-up prompts/checklist and optionally persist the run |
 
 ---
 

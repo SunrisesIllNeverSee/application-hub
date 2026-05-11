@@ -53,14 +53,17 @@ CREATE INDEX IF NOT EXISTS idx_answer_reviews_program_created
 
 ALTER TABLE answer_reviews ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "answer_reviews_owner_select" ON answer_reviews;
 CREATE POLICY "answer_reviews_owner_select"
   ON answer_reviews FOR SELECT
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "answer_reviews_owner_insert" ON answer_reviews;
 CREATE POLICY "answer_reviews_owner_insert"
   ON answer_reviews FOR INSERT
   WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "answer_reviews_service_all" ON answer_reviews;
 CREATE POLICY "answer_reviews_service_all"
   ON answer_reviews FOR ALL
   USING (auth.role() = 'service_role')

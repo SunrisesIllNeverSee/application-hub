@@ -247,7 +247,7 @@ Sidebar target: Today / Hub / Bank / Apps or Workspace / Profile.
 **Owner**: Cowork + Codex
 **Priority**: P2
 
-MCP groundwork exists through `hub_stress_test_answer`, and persistence exists in `migrations/012_launch_hardening.sql`. Next layer:
+MCP groundwork exists through `hub_stress_test_answer`, and the tool can now persist runs into `answer_stress_tests`. Next layer:
 - Quota policy
 - UI entry point from Answer Bank/workspace
 - Later: BYOK/LLM-backed RNS-style challenge generation
