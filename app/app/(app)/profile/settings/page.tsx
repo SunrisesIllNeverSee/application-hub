@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProfileSettingsForm } from '@/components/ProfileSettingsForm'
+import { PricingCards } from '@/components/PricingCards'
+import type { SubscriptionTier } from '@/lib/database.types'
 
 export const metadata = {
   title: 'Settings — Profile',
@@ -22,13 +24,25 @@ export default async function ProfileSettingsPage() {
     .eq('user_id', user.id)
     .single()
 
+  const currentTier = (subscription?.tier ?? 'free') as SubscriptionTier
+
   return (
-    <div className="max-w-2xl">
-      <ProfileSettingsForm
-        subscription={subscription}
-        profile={profile}
-        userEmail={user.email ?? ''}
-      />
+    <div className="space-y-10">
+      <div className="max-w-2xl">
+        <ProfileSettingsForm
+          subscription={subscription}
+          profile={profile}
+          userEmail={user.email ?? ''}
+        />
+      </div>
+
+      {/* Pricing */}
+      <section>
+        <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-4">
+          Plans
+        </h2>
+        <PricingCards currentTier={currentTier} />
+      </section>
     </div>
   )
 }
