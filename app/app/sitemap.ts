@@ -1,17 +1,27 @@
 import type { MetadataRoute } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+
+const BASE_URL = 'https://mos2es.xyz'
+
+function supabasePublic() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => [], setAll: () => {} } }
+  )
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = createClient()
+  const supabase = supabasePublic()
 
   const { data: programs } = await supabase
     .from('programs')
     .select('slug, updated_at')
     .order('heat_score', { ascending: false })
-    .limit(200)
+    .limit(500)
 
   const programUrls: MetadataRoute.Sitemap = (programs ?? []).map((p) => ({
-    url: `https://mos2es.xyz/hub/${p.slug}`,
+    url: `${BASE_URL}/hub/${p.slug}`,
     lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
     changeFrequency: 'weekly',
     priority: 0.7,
@@ -19,16 +29,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: 'https://mos2es.xyz',
+      url: BASE_URL,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1.0,
     },
     {
-      url: 'https://mos2es.xyz/hub',
+      url: `${BASE_URL}/hub`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/hub/timeline`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
     },
     ...programUrls,
   ]
