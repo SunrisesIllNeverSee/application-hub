@@ -56,9 +56,11 @@ application-hub/
 │   ├── 012_launch_hardening.sql        ← BYOK metadata + answer stress-test persistence
 │   ├── 013_cohort_context.sql          ← cohort metadata on programs
 │   ├── 014_question_bank_drip.sql      ← Question Bank unlocks + daily drip
-│   └── 015_byok_key_storage.sql        ← encrypted BYOK key storage column
+│   ├── 015_byok_key_storage.sql        ← encrypted BYOK key storage column
+│   ├── 026_answer_reviews.sql          ← append-only persisted agent review output
+│   └── ...
 │
-├── application-hub-mcp-server/        ← TypeScript MCP server (20 tools, 7 resources, 3 prompts)
+├── application-hub-mcp-server/        ← TypeScript MCP server (21 tools, 7 resources, 3 prompts)
 │   ├── src/
 │   ├── dist/                          ← compiled output (run npm run build first)
 │   └── README.md
@@ -82,6 +84,7 @@ application-hub/
 | `user_subscriptions` | Stripe-linked subscription tier per user |
 | `user_integrations` | BYOK provider metadata; raw keys stay in server-side secret storage |
 | `answer_stress_tests` | Persisted answer stress-test/review runs |
+| `answer_reviews` | Append-only persisted review output from agent/human reviewer workflows |
 
 **Scoring formulas (reference)**:
 
@@ -122,7 +125,7 @@ Connect to Claude Desktop — add to `~/Library/Application Support/Claude/claud
 }
 ```
 
-**The MCP server will not function until migrations 001-015 have been applied to Supabase.**
+**The MCP server will not function correctly until the live Supabase project has the current migration chain applied, including `026_answer_reviews.sql`.**
 
 ---
 
@@ -185,8 +188,8 @@ Recommended MCPs to add for this project:
 | Component | Status |
 |---|---|
 | v3 schema design | ✅ Done |
-| Supabase migrations 001-015 | ✅ Done |
-| MCP server (20 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
+| Supabase migrations through 026 | ✅ Done |
+| MCP server (21 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
 | 30 programs seeded | ✅ Done — all in Supabase `betcyfbzsgusaghriptz` |
 | Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
 | Next.js app scaffold | ✅ Done — auth, app router, Supabase SSR client, layouts |
@@ -200,6 +203,9 @@ Recommended MCPs to add for this project:
 | AI draft button | ✅ Done — POST /api/draft wired, AnswerEditor "Draft with AI" button live |
 | Hosted draft metering | ✅ Done — successful hosted drafts log to `ai_draft_runs` |
 | BYOK draft routing | ✅ Done — `/api/draft` prefers user key; `/profile/integrations` saves encrypted provider keys |
+| Agent review persistence | ✅ Done — `answer_reviews` + `hub_save_answer_review` |
+| Stress-test persistence | ✅ Done — `hub_stress_test_answer` supports `persist_result=true` |
+| First reviewer agent | ✅ Done — `.claude/agents/rns-answer-reviewer.md` + `.claude/commands/review-answer.md` |
 | Stripe integration | ⬜ Phase 3 |
 
 ---
@@ -213,7 +219,7 @@ See `TASKS.md` for the prioritized task list.
 2. MVP pieces are in repo: Question Bank, drip mechanic, profile split, BYOK integrations.
 3. Polished public launch: live BYOK draft validation, real deadlines, program TL;DR/pros/cons, heat/applicant polish.
 
-`cd app && npm run type-check` and `cd app && npm run build` are passing as of 2026-05-10.
+`cd app && npm run type-check`, `cd app && npm run build`, and `cd application-hub-mcp-server && npm run check` are passing.
 
 ---
 
