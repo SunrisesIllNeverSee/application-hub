@@ -138,50 +138,37 @@ export async function POST(req: Request) {
   )
 
   // ── 1. Try to get an embedding ────────────────────────────────────────────
-  // Priority: BYOK Ollama → BYOK OpenAI → platform OpenAI key (last resort)
+  // Priority: BYOK (user's connected key, any provider) → platform → full-text
+  // Ollama and OpenAI-compatible are both BYOK — just different call patterns.
 
   let embedding: number[] | null = null
-  let embeddingSource: 'ollama' | 'byok' | 'platform' | null = null
+  let embeddingSource: 'byok' | 'platform' | null = null
 
-  // 1a. BYOK Ollama (user's local instance — free)
-  const { data: ollamaIntegration } = await supabase
+  // BYOK — try all active user integrations that support embeddings
+  const { data: integrations } = await supabase
     .from('user_integrations')
-    .select('base_url, model_preference')
+    .select('provider, key_encrypted, base_url, model_preference')
     .eq('user_id', user.id)
-    .eq('provider', 'ollama')
     .eq('is_active', true)
-    .single()
+    .in('provider', ['ollama', 'openai'])
 
-  if (ollamaIntegration?.base_url) {
-    const model = ollamaIntegration.model_preference ?? 'nomic-embed-text'
-    embedding = await embedOllama(text.trim(), ollamaIntegration.base_url, model)
-    if (embedding) embeddingSource = 'ollama'
-  }
+  for (const integration of integrations ?? []) {
+    if (embedding) break
 
-  // 1b. BYOK — any OpenAI-compatible key the user has connected
-  //     (OpenAI, or any provider mirroring /v1/embeddings)
-  if (!embedding) {
-    const { data: openaiIntegration } = await supabase
-      .from('user_integrations')
-      .select('key_encrypted')
-      .eq('user_id', user.id)
-      .eq('provider', 'openai')
-      .eq('is_active', true)
-      .single()
-
-    if (openaiIntegration?.key_encrypted) {
+    if (integration.provider === 'ollama' && integration.base_url) {
+      const model = integration.model_preference ?? 'nomic-embed-text'
+      embedding = await embedOllama(text.trim(), integration.base_url, model)
+    } else if (integration.provider === 'openai' && integration.key_encrypted) {
       const { data: decrypted } = await adminClient.rpc('decrypt_integration_key', {
         p_user_id: user.id,
         p_provider: 'openai',
       })
-      if (decrypted) {
-        embedding = await embedWithBYOK(text.trim(), decrypted)
-        if (embedding) embeddingSource = 'byok'
-      }
+      if (decrypted) embedding = await embedWithBYOK(text.trim(), decrypted)
     }
   }
+  if (embedding) embeddingSource = 'byok'
 
-  // 1c. Platform OpenAI key (Deric's key — last resort backstop)
+  // Platform key — backstop when user has no compatible integration connected
   if (!embedding) {
     embedding = await embedText(text.trim())
     if (embedding) embeddingSource = 'platform'
