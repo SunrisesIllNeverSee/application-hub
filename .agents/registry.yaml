@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-11T22:00:00Z
+updated_at: 2026-05-11T23:00:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
@@ -9,8 +9,9 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 030
+  next: 31
   applied:
+    - { n: 30, file: 030_applicant_modes_and_contributions.sql, commit: "codex", landed: 2026-05-11, note: "Codex — applicant_mode enum, identities[], contribution rewards trigger" }
     - { n: 29, file: 029_embedding_resize_768.sql, commit: "c02299b", landed: 2026-05-11 }
     - { n: 28, file: 028_solofounders_seed.sql, commit: "3d81666", landed: 2026-05-11 }
     - { n: 27, file: 027_recruiter_alerts.sql, commit: "296f6ef", landed: 2026-05-11 }
@@ -33,9 +34,19 @@ migrations:
     - { n: 12, file: 012_launch_hardening.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 11, file: 011_user_profiles.sql, commit: "unknown", landed: 2026-05-10 }
     - { n: 10, file: 010_deadlines_and_program_detail.sql, commit: "unknown", landed: 2026-05-10 }
-    - { n: 9, file: 009_fix_auth_trigger_search_path.sql, commit: "unknown", landed: 2026-05-10 }
-    - { n: 8, file: 008_intelligence_layer_v2.sql, commit: "unknown", landed: 2026-05-10 }
+    - { n: 9,  file: 009_fix_auth_trigger_search_path.sql, commit: "unknown", landed: 2026-05-10 }
+    - { n: 8,  file: 008_intelligence_layer_v2.sql, commit: "unknown", landed: 2026-05-10 }
+    - { n: 7,  file: 007_monetization.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
+    - { n: 6,  file: 006_edge_functions_cron.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
+    - { n: 5,  file: 005_rls_policies.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
+    - { n: 4,  file: 004_functions_and_triggers.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
+    - { n: 3,  file: 003_intelligence_and_integrations.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
+    - { n: 2,  file: 002_core_tables.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
+    - { n: 1,  file: 001_enums_and_extensions.sql, commit: "unknown", landed: 2026-05-10, note: "predates registry" }
   duplicate_prefixes: [18, 22]
+  collision_note: >
+    Migrations 027_recruiter_alerts (cowork) and 027_applicant_modes (codex) both
+    claimed n=27. Codex file renamed to 030. Lesson: claim in claims.yaml first.
 
 mcp:
   tool_count: 21
@@ -47,16 +58,13 @@ programs:
   total: 843
   seeded_with_questions: 31
   shells: 812
-  note: Solofounders added in migration 028
 
 questions:
   archived_total: 225
   embeddings_seeded: 0
   embedding_model: nomic-embed-text
   embedding_dims: 768
-  embedding_note: >
-    Run scripts/seed-question-embeddings.ts (Ollama default) to populate.
-    RPC match_archived_questions updated for vector(768) in migration 029.
+  embedding_note: Run scripts/seed-question-embeddings.ts to populate
 
 features:
   byok: shipped
@@ -64,8 +72,6 @@ features:
   stress_test_ui: shipped
   agent_reviews: shipped
   reviewer_family: shipped
-  stripe_webhook_code: shipped
-  stripe_env_keys: shipped
   stripe_live: shipped
   custom_smtp: shipped
   recruiter_agent: shipped
@@ -78,6 +84,8 @@ features:
   embedding_seeder_script: shipped
   browser_extension: not_started
   v1_automation_docs: shipped
+  applicant_modes: shipped
+  contribution_rewards: shipped
 
 coordination:
   claims_file: .agents/claims.yaml
