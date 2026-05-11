@@ -1,6 +1,6 @@
 # Application Hub — Status
 
-_Last updated: 2026-05-10_
+_Last updated: 2026-05-11_
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 
@@ -21,7 +21,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `015` are the canonical migration chain.
+- Migrations `001` through `026` are the canonical migration chain, despite a few duplicated numeric prefixes in filenames.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -38,8 +38,9 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `migrations/013_cohort_context.sql` is present and adds `cohort_name`, `program_start_date`, and `cohort_size` to programs. Seeds known values for 8 programs.
 - `migrations/014_question_bank_drip.sql` is present and adds `user_question_unlocks`, signup seed logic, and daily drip mechanics.
 - `migrations/015_byok_key_storage.sql` is present and adds `key_encrypted` for BYOK key storage.
-- Migrations through `015` are now the expected app chain.
-- The current strategy is to keep migrations `001` through `015` and layer RNS-backed intelligence above the existing scoring fields rather than rolling back to a minimal schema.
+- `migrations/026_answer_reviews.sql` is present and adds append-only persistence for agent review output plus owner-scoped RLS.
+- Migrations through `026` are now the expected app chain.
+- The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
 
 ### SMTP / Email
 - Resend SMTP is wired to Supabase Auth and confirmed working.
@@ -50,7 +51,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `application-hub-mcp-server/` exists.
 - TypeScript MCP server is present.
 - Server registers:
-  - 20 tools
+  - 21 tools
   - 7 resources
   - 3 prompts
 - Supports two transports:
@@ -63,8 +64,11 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `hub_get_program_by_slug`
   - `hub_save_answer`
   - `hub_get_answer_review_context`
+  - `hub_save_answer_review`
   - `hub_stress_test_answer`
 - The stress-test MCP bridge is implemented and registered; the missing layer is persistence/use of results, not tool existence.
+- Agent review output now has a persisted write-back path through `answer_reviews` plus MCP tool `hub_save_answer_review`.
+- First checked-in reviewer agent now exists at `.claude/agents/rns-answer-reviewer.md`.
 
 ### Next.js app
 - `app/` exists as a Next.js App Router application.
@@ -83,7 +87,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `/api/draft` now routes BYOK-first and returns a provider-required error when no user key is available and platform drafting is disabled.
 - Draft UX now links founders directly to `/profile/integrations` when no provider is connected, and confirms when drafting used the founder's own Anthropic key.
 - Deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
-- Review context is readable through MCP today, but there is not yet a persisted write-back path for agent review results such as comments, scores, or certification metadata.
+- Review context is readable through MCP today, and agent-side review results can now be persisted through `answer_reviews` using `hub_save_answer_review`.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
 - Launch-surface polish notes are documented at `docs/14_launch_surface_polish.md`.
 - The active launch roadmap is `ROADMAP.md`; older duplicate planning docs have been moved to `docs/archive/`.
@@ -166,8 +170,8 @@ RNS is the planned additive judgment layer, not a launch blocker.
 1. **Live BYOK draft verification** — save a real provider key, draft from workspace, confirm live end-to-end success
 2. **Heat scores + applicant counts** — synthetic compute job needed; currently 0 across all programs
 3. **Seed real deadlines + urgency sort**
-4. **Heat/applicant synthetic compute job** — replace provisional fallbacks with better estimated signal
-5. **Stripe integration** — Phase 3
+4. **Persist stress-test runs from MCP/app flow** — `answer_stress_tests` table exists, but `hub_stress_test_answer` is still read-only
+5. **Plugin-eval observed benchmark baseline** — static analysis is installed; observed-usage benchmarking still needs setup
 
 ## What landed during the 2026-05-10 hardening burst
 
@@ -187,6 +191,9 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `docs/09_launch_checklist.md` through `docs/13_smtp_launch_handoff.md` — Milestone 3 handoff docs
 - `docs/15_curated_ingest_lane.md` — narrow curation contract for application/funding/question targets
 - `docs/16_mcp_agent_plugin_gap_review.md` — current MCP/agent/plugin gap review, installed tooling, and next implementation plan
+- `migrations/026_answer_reviews.sql` — append-only persisted review output for agent workflows
+- `application-hub-mcp-server/src/tools/user/hub_save_answer_review.ts` — authenticated MCP write-back tool for answer reviews
+- `.claude/agents/rns-answer-reviewer.md` — first checked-in reviewer agent for saved-answer review and persistence
 - `VISION.md` — new product vision doc
 - `TASKS.md` — captured 16 follow-ups from smoke test
 - `ROADMAP.md` — reframed around Launch Milestones 1/2/3

@@ -14,15 +14,16 @@ What is already real:
 
 - MCP server is implemented and registered
 - `hub_get_answer_review_context` exists
+- `hub_save_answer_review` exists
 - `hub_stress_test_answer` exists
+- `answer_reviews` table exists
 - `answer_stress_tests` table exists
 - review/stress-test boundary is documented
+- first checked-in reviewer agent exists
 
 What is still actually missing:
 
-- a write-back path for agent review results
-- concrete checked-in RNS/CIVITAE/MO§ES agent implementations
-- reconciliation between the documented future stress-test persistence contract and the schema that now exists
+- persistence from `hub_stress_test_answer` into `answer_stress_tests`
 - local measurement/evaluation workflow for the MCP bundle
 
 ---
@@ -34,8 +35,9 @@ What is still actually missing:
 Confirmed in `application-hub-mcp-server/src/index.ts`:
 
 - `hub_get_answer_review_context`
+- `hub_save_answer_review`
 - `hub_stress_test_answer`
-- 20 registered tools total
+- 21 registered tools total
 
 This means the “stress test MCP tool is still missing” note is stale. The missing layer is no longer MCP exposure; it is persistence, scoring, UI, and agent implementation.
 
@@ -67,64 +69,34 @@ Confirmed in `migrations/012_launch_hardening.sql`:
 - append-oriented storage contract exists
 - RLS is in place
 
-So the tool is implemented, but the tool and persistence contract have not yet been joined.
+So the tool is implemented, but the stress-test tool and persistence contract have not yet been joined.
 
 ---
 
 ## Real gaps
 
-### 1. No review-output write-back path
+### 1. Stress-test persistence is still not wired from the MCP tool
 
-Agents can read answer review context, but they cannot save:
+Agent review can now save output, but `hub_stress_test_answer` remains read-only. The table exists; the save path for stress-test runs does not.
 
-- comments
-- scores
-- certification payload
-- reviewer identity / run metadata
+### 2. Only the first reviewer agent is checked in
 
-Without that, agent review is observational only.
-
-The repo needs either:
-
-- an `answer_reviews` table plus MCP/app save path, or
-- a constrained JSON review column strategy
-
-The first option is cleaner.
-
-### 2. No checked-in agent implementations
-
-The repo documents RNS/CIVITAE/MO§ES review behavior, but does not contain first-class agent implementations for it.
+The original gap is now partially closed.
 
 Current state:
 
 - contract exists
 - bridge exists
+- persisted review write-back exists
 - persistence for stress-test runs exists
-- actual reviewer agents do not appear to be checked into the repo
+- `.claude/agents/rns-answer-reviewer.md` is now checked in
+- broader RNS/CIVITAE/MO§ES family still does not exist yet
 
-That means the architecture is ready for agent interaction, but the agent layer itself is not yet productized.
+That means the architecture now has a real first agent, but not yet the full family of governed reviewers.
 
 ### 3. Review/stress-test contract drift
 
-`docs/07_agent_review_contract.md` still describes a future persistence contract that does not match the schema now present in `answer_stress_tests`.
-
-Doc says future fields like:
-
-- `answer_id`
-- `follow_up_questions`
-- `responses`
-- `confidence_score`
-- `run_at`
-
-Schema actually has:
-
-- `profile_answer_id`
-- `follow_up_prompts`
-- `checklist`
-- `score_payload`
-- `created_at`
-
-This should be reconciled before downstream agent work begins.
+This gap has been closed in `docs/07_agent_review_contract.md`.
 
 ### 4. No local plugin-eval benchmarking baseline for the MCP bundle
 
@@ -205,11 +177,15 @@ The bottleneck is now persistence + concrete agents, not another surface descrip
 
 ### Phase 1 — Reconcile the contract
 
+Status: done
+
 - Update `docs/07_agent_review_contract.md` so the stress-test persistence contract matches `answer_stress_tests`
 - Document clearly that `hub_stress_test_answer` exists and is the current groundwork tool
 - Remove stale roadmap/task language that implies the tool is unbuilt
 
 ### Phase 2 — Add review persistence
+
+Status: done
 
 - Create `answer_reviews` table
 - Store:
@@ -226,6 +202,8 @@ The bottleneck is now persistence + concrete agents, not another surface descrip
 
 ### Phase 3 — Add a write path
 
+Status: done
+
 - MCP tool for saving review output, likely:
   - `hub_save_answer_review`
 - keep strict validation
@@ -233,6 +211,8 @@ The bottleneck is now persistence + concrete agents, not another surface descrip
 - allow external agents to write back structured review results
 
 ### Phase 4 — Build the first real agent
+
+Status: done
 
 Start with one concrete reviewed path, not a full ecosystem:
 
@@ -257,10 +237,14 @@ Start with one full loop.
 
 Application Hub already has the read side of agent interaction and the beginnings of stress-test infrastructure.
 
-It does **not** yet have:
+It now has:
 
 - review-result persistence
 - review-result write-back tools
-- checked-in reviewer agents
+- one checked-in reviewer agent
 
-That is the real line between “agent-ready architecture” and “full agent interaction.”
+The remaining line between “first real agent loop” and “full agent interaction” is:
+
+- persistence from the stress-test tool itself
+- broader governed reviewer families
+- observed-usage benchmarking

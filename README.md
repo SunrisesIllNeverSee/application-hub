@@ -45,12 +45,12 @@ Just as important in the near term: additions to the dataset stay tightly scoped
 | Component | Status |
 |---|---|
 | Database schema (v3) | ✅ Complete |
-| Supabase migrations | ✅ 015 migrations, apply in order |
-| MCP server (20 tools) | ✅ Complete, clean build |
+| Supabase migrations | ✅ 026 migrations, apply in order |
+| MCP server (21 tools) | ✅ Complete, clean build |
 | Seed data (30 programs) | ✅ Done |
 | Next.js app | ✅ Live data wired, build verified |
 
-The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 20 tools, 7 resources, and 3 prompts.
+The MCP server connects to Claude Desktop, Cursor, and Windsurf and exposes the full intelligence layer as 21 tools, 7 resources, and 3 prompts.
 
 Current launch frame:
 
@@ -88,7 +88,7 @@ npm run build
 
 See `application-hub-mcp-server/README.md` for full setup, including Claude Desktop and Cursor config.
 
-**Prerequisites**: Supabase project with all 15 migrations applied.
+**Prerequisites**: Supabase project with all migrations through `026` applied.
 
 ### Local Codex / Cowork connection
 

@@ -93,7 +93,20 @@ Reviewers should produce a structured object with these fields:
 }
 ```
 
-This output does not have to be persisted in Phase 2. The first goal is to make review context easy to retrieve and reason over. Persistence can come later through a dedicated `answer_reviews` table or JSON metadata column once the review shape stabilizes.
+This output is now persisted through:
+
+```text
+hub_save_answer_review(user_token, answer_id, ...)
+```
+
+The write path stores append-only rows in `answer_reviews`, scoped by the authenticated user's Supabase JWT. That keeps first-pass drafting fast while giving external RNS/CIVITAE/MO§ES workflows a durable place to save:
+
+- comments
+- scores
+- certification payload
+- reviewer identity and model metadata
+
+Hosted drafting still does not need to own that review lifecycle.
 
 ---
 
@@ -151,7 +164,20 @@ This output does not have to be persisted in Phase 2. The first goal is to make 
   ],
   "future_persistence_contract": {
     "table": "answer_stress_tests",
-    "fields": ["answer_id", "follow_up_questions", "responses", "confidence_score", "run_at"],
+    "fields": [
+      "profile_answer_id",
+      "program_id",
+      "archived_question_id",
+      "depth",
+      "mode",
+      "detected_signals",
+      "follow_up_prompts",
+      "checklist",
+      "risk_flags",
+      "score_payload",
+      "fidelity_certificate",
+      "created_at"
+    ],
     "note": "Not written by this stub."
   }
 }
@@ -184,4 +210,4 @@ RNS adds deeper judgment without replacing those fields immediately:
 
 Do not put the full RNS review system inside `POST /api/draft`. Keep first-pass drafting fast. Let the agent-side review path mature through MCP before promoting it into first-class app UI.
 
-Likewise, keep stress testing out of hosted drafting for now. The MCP tool can generate the follow-up contract without subsidizing model calls or blocking the answer editor. LLM follow-up generation, monthly quota checks, `answer_stress_tests` persistence, and confidence scoring can land after BYOK and the stress-test table are in place.
+Likewise, keep stress testing out of hosted drafting for now. The MCP tool can generate the follow-up contract without subsidizing model calls or blocking the answer editor. LLM follow-up generation, monthly quota checks, persistence from `hub_stress_test_answer` into `answer_stress_tests`, and confidence scoring can land after BYOK and the current stub path are in place.

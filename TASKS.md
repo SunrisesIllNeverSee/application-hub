@@ -10,7 +10,7 @@ This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` 
 
 ## Live State
 
-App is live at `https://application-hub-chi.vercel.app`. The repo now includes migrations through `015`, Question Bank, drip mechanic, profile split, BYOK integrations, and sidebar IA updates. Remaining work is polish, runtime validation, and quality of signal.
+App is live at `https://application-hub-chi.vercel.app`. The repo now includes migrations through `026`, Question Bank, drip mechanic, profile split, BYOK integrations, reviewer persistence, and sidebar IA updates. Remaining work is polish, runtime validation, and quality of signal.
 
 ### Bugs to fix
 
@@ -47,7 +47,7 @@ These are the facts that make a soft launch possible now.
 - 30 programs seeded
 - 225 questions archived/scored
 - Significance scoring and program DNA live
-- MCP server: 20 tools, 7 resources, 3 prompts
+- MCP server: 21 tools, 7 resources, 3 prompts
 - Next.js app: Hub, program detail, workspace, profile/answer bank
 - Live Supabase wiring
 - Clean MCP/app build verification
@@ -252,33 +252,33 @@ MCP groundwork exists through `hub_stress_test_answer`, and persistence exists i
 - UI entry point from Answer Bank/workspace
 - Later: BYOK/LLM-backed RNS-style challenge generation
 
-### [ ] Review-output persistence + write-back path
+### [x] Review-output persistence + write-back path
 **Owner**: Codex
 **Priority**: P2
 
-Current state: agents can read review context, but they cannot persist comments, scores, or certification metadata.
+Done through `migrations/026_answer_reviews.sql` and MCP tool `hub_save_answer_review`.
 
 Implementation:
 - add `answer_reviews` persistence contract
 - add MCP write-back tool for structured review results
 - keep hosted drafting separate from review/certification
 
-### [ ] Reconcile agent review/stress-test contract docs
+### [x] Reconcile agent review/stress-test contract docs
 **Owner**: Codex
 **Priority**: P2
 
-Current docs still describe a future stress-test persistence shape that no longer matches `answer_stress_tests`.
+Done in `docs/07_agent_review_contract.md`.
 
 Implementation:
 - sync `docs/07_agent_review_contract.md` with actual schema
 - remove stale language implying `hub_stress_test_answer` is not implemented
 - keep README/ROADMAP/STATUS aligned
 
-### [ ] First checked-in reviewer agent
+### [x] First checked-in reviewer agent
 **Owner**: Codex + Deric
 **Priority**: P2
 
-Build one concrete RNS/CIVITAE-style reviewer loop before broadening governance posture.
+Built at `.claude/agents/rns-answer-reviewer.md`.
 
 Implementation:
 - one reviewer agent implementation
@@ -437,7 +437,7 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 
 - [x] v3 schema design — global question archive as core asset
 - [x] Supabase migrations 001–015
-- [x] MCP server — 20 tools, 7 resources, 3 prompts, clean TypeScript build
+- [x] MCP server — 21 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README for Claude Desktop, Cursor, Windsurf
 - [x] CI workflow for MCP server and Next.js app
 - [x] `SECURITY.md`, `ARCHITECTURE.md`, `STATUS.md`
