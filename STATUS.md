@@ -29,7 +29,7 @@ Other coordination docs should point here rather than restating these facts unle
 
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `027` are the canonical migration chain, despite a few duplicated numeric prefixes in filenames.
+- Migrations `001` through `030` are the canonical migration chain, despite a few duplicated numeric prefixes in filenames.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -48,7 +48,7 @@ Other coordination docs should point here rather than restating these facts unle
 - `migrations/015_byok_key_storage.sql` is present and adds `key_encrypted` for BYOK key storage.
 - `migrations/026_answer_reviews.sql` is present and adds append-only persistence for agent review output plus owner-scoped RLS.
 - `migrations/027_recruiter_alerts.sql` is present and adds the `recruiter_alerts` dedup table for the weekly recruiter email agent.
-- Migrations through `027` are now the expected app chain.
+- Migrations through `030` are now the expected app chain.
 - The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
 
 ### SMTP / Email
@@ -232,7 +232,7 @@ P1 sprint is complete as of 2026-05-11 (second session). Moving to P2:
 - `seed/01_deadline_updates_template.sql` — source-verified deadline update helper
 - `docs/09_launch_checklist.md` through `docs/13_smtp_launch_handoff.md` — Milestone 3 handoff docs
 - `docs/21_curated_ingest_lane.md` — narrow curation contract for application/funding/question targets
-- `docs/MIGRATIONS.md` — policy for the logical 001–026 chain and duplicate numeric prefixes
+- `docs/MIGRATIONS.md` — policy for the logical 001–030 chain and duplicate numeric prefixes
 - `docs/16_mcp_agent_plugin_gap_review.md` — current MCP/agent/plugin gap review, installed tooling, and next implementation plan
 - `migrations/026_answer_reviews.sql` — append-only persisted review output for agent workflows
 - `application-hub-mcp-server/src/tools/user/hub_save_answer_review.ts` — authenticated MCP write-back tool for answer reviews
