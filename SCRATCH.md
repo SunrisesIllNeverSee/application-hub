@@ -16,16 +16,16 @@ Migrations 001–026 applied to Supabase. Build is clean. Site live at mos2es.xy
 - Stripe skeleton (code done — Deric needs to add price IDs to Vercel)
 - Dark mode, outcome tracking, funders schema (026 applied), deadline alerts (cron live)
 - Team mode (schema + API — no UI beyond settings tab)
-- Answer review persistence (migration 026, hub_save_answer_review MCP tool)
-- First reviewer agent: .claude/agents/rns-answer-reviewer.md
+- Answer review persistence + stress-test persistence
+- Reviewer family: `.claude/agents/rns-answer-reviewer.md`, `program-fit-reviewer`, `fidelity-certifier`, `stress-test-conductor`
 
 **Remaining open work:**
-- Stress-test persistence: hub_stress_test_answer → answer_stress_tests (Codex)
 - Funders index UI `/funders` (Cowork)
 - Home dashboard / Today view (Cowork)
 - DNA radar chart on program detail (Cowork)
 - Stripe activation (Deric: add price IDs to Vercel env vars)
 - CRON_SECRET to Vercel env vars (Deric: manual)
+- MCP token-budget / plugin-eval follow-through (Codex)
 
 ---
 
@@ -40,8 +40,8 @@ Read in order:
 4. `docs/16_mcp_agent_plugin_gap_review.md` — your own gap audit
 
 ### Your open lane
-- **Stress-test persistence** — `hub_stress_test_answer` calls the tool but results don't persist to `answer_stress_tests`. This is the next MCP layer gap to close.
-- **rns-answer-reviewer agent** — first agent is checked in. Next: run it on a real answer, validate the review contract, improve the scoring rubric.
+- **Reviewer-family follow-through** — run the fit/certification/stress-test agents on real saved answers and tighten the rubric.
+- **MCP token budget** — follow up on plugin-eval findings and trim context bloat where it matters.
 - **MCP server rebuild** — 21 tools now, rebuild dist before any power users connect.
 
 ### What Cowork (Claude) landed today
@@ -63,7 +63,7 @@ Read in order:
 ## Recently released
 
 | Cowork | Migration 026 applied, MULTI_CLAUDE.md created, SCRATCH.md synced | `SCRATCH.md`, `MULTI_CLAUDE.md` | 2026-05-11 | Full cross-agent sync after major feature burst |
-| Codex | Answer review persistence + reviewer agent + stress-test persistence + review command | `migrations/026_answer_reviews.sql`, `.claude/agents/rns-answer-reviewer.md`, `.claude/commands/review-answer.md`, `application-hub-mcp-server/src/tools/user/hub_stress_test_answer.ts`, `docs/07_agent_review_contract.md`, `docs/12_stress_test_persistence.md`, `docs/16_mcp_agent_plugin_gap_review.md` | Released 2026-05-11 | |
+| Codex | Answer review persistence + reviewer family + stress-test persistence + repo cleanup pass | `migrations/026_answer_reviews.sql`, `.claude/agents/`, `.claude/commands/`, `application-hub-mcp-server/src/tools/user/hub_stress_test_answer.ts`, `docs/07_agent_review_contract.md`, `docs/12_stress_test_persistence.md`, `docs/16_mcp_agent_plugin_gap_review.md`, `README.md`, `docs/MIGRATIONS.md` | Released 2026-05-11 | |
 | Cowork | Dark mode, outcome tracking, funders, deadline alerts, team mode | `app/components/ThemeProvider.tsx`, `app/components/OutcomeTracker.tsx`, `migrations/023-025`, `supabase/functions/deadline-alerts/` | Released 2026-05-11 | |
 
 ---

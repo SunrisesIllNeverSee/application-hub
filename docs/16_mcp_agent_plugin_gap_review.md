@@ -80,9 +80,9 @@ So the tool is implemented and now joined to persistence, but it is still a dete
 
 `hub_stress_test_answer` can now persist runs, but the product still lacks a first-class app surface and quota policy around those saved stress tests.
 
-### 2. Only the first reviewer agent is checked in
+### 2. Reviewer family exists, but governance and measurement still lag
 
-The original gap is now partially closed.
+The original gap is now materially smaller, but not fully closed.
 
 Current state:
 
@@ -90,8 +90,11 @@ Current state:
 - bridge exists
 - persisted review write-back exists
 - persistence for stress-test runs exists and can be triggered from the MCP tool
-- `.claude/agents/rns-answer-reviewer.md` is now checked in
-- broader RNS/CIVITAE/MO§ES family still does not exist yet
+- `.claude/agents/rns-answer-reviewer.md` is checked in
+- `.claude/agents/program-fit-reviewer.md` is checked in
+- `.claude/agents/fidelity-certifier.md` is checked in
+- `.claude/agents/stress-test-conductor.md` is checked in
+- broader governed RNS/CIVITAE/MO§ES orchestration still does not exist yet
 
 That means the architecture now has a usable starter family of reviewers, but not yet the full governed RNS/CIVITAE/MO§ES system.
 
