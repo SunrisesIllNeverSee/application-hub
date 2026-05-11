@@ -2,6 +2,7 @@
 
 > This file is the persistent context for any Claude or Cowork session working on this project.
 > Read it first. Every time. It's short on purpose.
+> Then read `.agents/PROTOCOL.md` and use `.agents/registry.yaml` / `.agents/claims.yaml` for machine-readable truth and claims.
 
 ---
 
@@ -14,6 +15,25 @@ The core asset is a **question archive**: every question ever asked by any progr
 **Business model**: Freemium SaaS. Free tier gets 10 AI drafts/month. Pro ($19/mo) is unlimited. Team ($49/mo) adds multi-seat and shared answer library.
 
 **Company**: Ello Cello LLC (sole proprietor — Deric McHenry, deric.mchenry@gmail.com)
+
+---
+
+## Coordination first
+
+Before doing any work that mentions:
+- counts
+- migration numbers
+- shipped feature state
+- active file lanes
+
+use these files first:
+
+- `.agents/PROTOCOL.md` — session procedure
+- `.agents/registry.yaml` — machine-readable truth
+- `.agents/claims.yaml` — machine-readable session and claim ledger
+- `STATUS.md` — human-readable truth report
+
+If your commit changes counts, migrations, or shipped-state truth, update `.agents/registry.yaml` in the same commit.
 
 ---
 
