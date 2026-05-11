@@ -79,17 +79,43 @@ export async function POST(req: NextRequest) {
     const systemPrompt =
       'You are an expert at parsing startup accelerator applications. Extract question-answer pairs from application text.'
 
-    const userPrompt = `Extract all question-answer pairs from the following application text. For each pair return a JSON object with:
+    // Detect domain from text signals
+    const domainHints = {
+      founder: ['startup', 'funding', 'equity', 'cohort', 'accelerator', 'mvp', 'traction', 'investors', 'co-founder'],
+      jobs: ['role', 'salary', 'responsibilities', 'qualifications', 'team', 'compensation', 'cover letter', 'resume'],
+      education: ['degree', 'gpa', 'campus', 'research', 'thesis', 'advisor', 'program', 'graduate', 'undergraduate', 'college'],
+      grants: ['budget', 'deliverables', 'irb', 'principal investigator', 'award period', 'grant', 'funding period'],
+    }
+    const textLower = text.toLowerCase()
+    const domainScores = Object.entries(domainHints).map(([domain, hints]) => ({
+      domain,
+      score: hints.filter(h => textLower.includes(h)).length,
+    }))
+    const detectedDomain = domainScores.reduce((a, b) => b.score > a.score ? b : a).domain as string || 'general'
+
+    const userPrompt = `First, classify this application. Based on the text, the domain is most likely: ${detectedDomain}.
+
+Extract all question-answer pairs. For each pair return a JSON object with:
 - "question": the original question text exactly as asked
-- "answer": the founder's full answer
-- "theme": one of: team, traction, problem, solution, market, vision, personal, fit, other
+- "answer": the applicant's full answer
+- "universal_theme": one of: background, competency, problem, approach, impact, motivation, personal, fit, general
 - "archived_question_id": if the question closely matches one of the archived questions below with confidence > 0.7, put that question's ID here; otherwise null
 
-Archived questions for matching:
+Universal theme guide:
+- background: who you/your team are, experience, qualifications
+- competency: what you've built or achieved, skills, traction
+- problem: what problem you're solving or challenge faced
+- approach: how you solve it, methodology, solution
+- impact: market size, scope, contribution, outcomes
+- motivation: why this program/role/school, vision, goals
+- personal: personal story, background, values
+- fit: why this specific opportunity, alignment
+
+Archived questions for matching (founder domain):
 ${questionsContext}
 
-Return ONLY a JSON array of objects — no markdown, no preamble, no explanation. Example format:
-[{"question":"What does your company do?","answer":"We build...","theme":"solution","archived_question_id":"uuid-or-null"}]
+Return ONLY a JSON array of objects — no markdown, no preamble. Example:
+[{"question":"What does your company do?","answer":"We build...","universal_theme":"approach","archived_question_id":"uuid-or-null"}]
 
 Application text to parse:
 ${text}`
@@ -107,7 +133,7 @@ ${text}`
     let pairs: Array<{
       question: string
       answer: string
-      theme: string
+      universal_theme: string
       archived_question_id: string | null
     }> = []
 
@@ -137,6 +163,7 @@ ${text}`
         program_name: program_name ?? null,
         status: 'processing',
         extracted_pairs: pairs,
+        domain: detectedDomain,
       })
       .select('id')
       .single()
@@ -150,6 +177,7 @@ ${text}`
       session_id: session.id,
       pairs,
       count: pairs.length,
+      domain: detectedDomain,
     })
   } catch (err) {
     console.error('[/api/import/application] error:', err)
