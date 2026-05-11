@@ -56,6 +56,8 @@ export function IntegrationsForm({ integrations: initial }: Props) {
   const [integrations, setIntegrations] = useState<Integration[]>(initial)
   const [activeProvider, setActiveProvider] = useState<ProviderKey | null>(null)
   const [apiKey, setApiKey] = useState('')
+  const [baseUrl, setBaseUrl] = useState('')
+  const [model, setModel] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [removing, setRemoving] = useState<string | null>(null)
@@ -63,14 +65,42 @@ export function IntegrationsForm({ integrations: initial }: Props) {
   const integrationMap = Object.fromEntries(integrations.map(i => [i.provider, i]))
 
   async function handleSave(providerId: ProviderKey) {
-    if (!apiKey.trim()) return
+    // Ollama is special — the "API key" field doesn't matter (Ollama ignores
+    // bearer tokens). What matters is the base URL + model name. So for Ollama
+    // we accept either: (a) base URL typed into the URL field, or (b) base URL
+    // typed into the api-key field as a fallback for users following old hints.
+    const isOllama = providerId === 'ollama'
+    const ollamaUrl = (baseUrl.trim() || apiKey.trim()) || 'http://localhost:11434'
+
+    if (isOllama) {
+      // need at least a URL OR the default
+      if (!ollamaUrl) return
+    } else {
+      // every other provider requires an actual api key
+      if (!apiKey.trim()) return
+    }
+
     setSaving(true)
     setError(null)
+
+    const body: Record<string, string> = {
+      provider: providerId,
+      api_key: isOllama ? 'ollama' : apiKey.trim(),
+    }
+    if (isOllama) {
+      body.base_url = ollamaUrl
+      body.model_preference = model.trim() || 'llama3.1:8b'
+    } else if (baseUrl.trim()) {
+      body.base_url = baseUrl.trim()
+    }
+    if (!isOllama && model.trim()) {
+      body.model_preference = model.trim()
+    }
 
     const res = await fetch('/api/integrations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider: providerId, api_key: apiKey.trim() }),
+      body: JSON.stringify(body),
     })
 
     const data = await res.json()
@@ -79,9 +109,19 @@ export function IntegrationsForm({ integrations: initial }: Props) {
     } else {
       setIntegrations(prev => {
         const filtered = prev.filter(i => i.provider !== providerId)
-        return [...filtered, { ...data.integration, base_url: null, model_preference: null, is_default: true }]
+        return [
+          ...filtered,
+          {
+            ...data.integration,
+            base_url: body.base_url ?? null,
+            model_preference: body.model_preference ?? null,
+            is_default: true,
+          },
+        ]
       })
       setApiKey('')
+      setBaseUrl('')
+      setModel('')
       setActiveProvider(null)
     }
     setSaving(false)
@@ -171,28 +211,64 @@ export function IntegrationsForm({ integrations: initial }: Props) {
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 pt-3">
                     {provider.hint}
                   </p>
-                  <input
-                    type="password"
-                    value={apiKey}
-                    onChange={e => setApiKey(e.target.value)}
-                    placeholder={provider.placeholder}
-                    className="input w-full font-mono text-sm"
-                    autoComplete="off"
-                    autoFocus
-                  />
+
+                  {provider.id === 'ollama' ? (
+                    <>
+                      <div>
+                        <label className="label text-xs">Base URL</label>
+                        <input
+                          type="text"
+                          value={baseUrl}
+                          onChange={e => setBaseUrl(e.target.value)}
+                          placeholder="http://localhost:11434"
+                          className="input w-full font-mono text-sm"
+                          autoComplete="off"
+                          autoFocus
+                        />
+                      </div>
+                      <div>
+                        <label className="label text-xs">Model</label>
+                        <input
+                          type="text"
+                          value={model}
+                          onChange={e => setModel(e.target.value)}
+                          placeholder="llama3.1:8b"
+                          className="input w-full font-mono text-sm"
+                          autoComplete="off"
+                        />
+                        <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                          Must be a model you&apos;ve pulled (e.g. <code>llama3.1:8b</code>, <code>qwen2.5:3b</code>, <code>llama3.2</code>). Defaults to <code>llama3.1:8b</code> if blank.
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <input
+                      type="password"
+                      value={apiKey}
+                      onChange={e => setApiKey(e.target.value)}
+                      placeholder={provider.placeholder}
+                      className="input w-full font-mono text-sm"
+                      autoComplete="off"
+                      autoFocus
+                    />
+                  )}
+
                   {error && (
                     <p className="text-xs text-danger-600 dark:text-danger-400">{error}</p>
                   )}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleSave(provider.id)}
-                      disabled={saving || !apiKey.trim()}
+                      disabled={
+                        saving ||
+                        (provider.id === 'ollama' ? false : !apiKey.trim())
+                      }
                       className="btn-primary text-sm"
                     >
-                      {saving ? 'Saving…' : 'Save key'}
+                      {saving ? 'Saving…' : 'Save'}
                     </button>
                     <button
-                      onClick={() => { setActiveProvider(null); setApiKey(''); setError(null) }}
+                      onClick={() => { setActiveProvider(null); setApiKey(''); setBaseUrl(''); setModel(''); setError(null) }}
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
                     >
                       Cancel
