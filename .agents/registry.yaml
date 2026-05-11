@@ -1,0 +1,65 @@
+schema_version: 1
+updated_at: 2026-05-11T23:59:00Z
+
+truth_policy:
+  machine_source: .agents/registry.yaml
+  human_report: STATUS.md
+  note: >
+    Quantitative and shipped-state facts should originate here and be rendered or
+    summarized elsewhere. Human-readable context lives in STATUS.md.
+
+migrations:
+  next: 027
+  applied:
+    - { n: 26, file: 026_answer_reviews.sql, commit: "3635f40", landed: 2026-05-11 }
+    - { n: 25, file: 025_teams_schema.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 24, file: 024_deadline_alerts.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 23, file: 023_funders_schema.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 22, file: 022_stripe_events.sql, commit: "d649251", landed: 2026-05-11 }
+    - { n: 22, file: 022_user_integrations_unique_provider.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 21, file: 021_import_queue_extensions.sql, commit: "a111dc9", landed: 2026-05-11 }
+    - { n: 20, file: 020_app_import_sessions.sql, commit: "a111dc9", landed: 2026-05-11 }
+    - { n: 19, file: 019_fundingcake_seed.sql, commit: "a111dc9", landed: 2026-05-11 }
+    - { n: 18, file: 018_opportunity_taxonomy.sql, commit: "05b93f9", landed: 2026-05-11 }
+    - { n: 18, file: 018_portable_taxonomy.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 17, file: 017_app_import_sessions.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 16, file: 016_program_content_and_scores.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 15, file: 015_byok_key_storage.sql, commit: "464455e", landed: 2026-05-11 }
+    - { n: 14, file: 014_question_bank_drip.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 13, file: 013_cohort_context.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 12, file: 012_launch_hardening.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 11, file: 011_user_profiles.sql, commit: "unknown", landed: 2026-05-10 }
+    - { n: 10, file: 010_deadlines_and_program_detail.sql, commit: "unknown", landed: 2026-05-10 }
+    - { n: 9, file: 009_fix_auth_trigger_search_path.sql, commit: "unknown", landed: 2026-05-10 }
+    - { n: 8, file: 008_intelligence_layer_v2.sql, commit: "unknown", landed: 2026-05-10 }
+  duplicate_prefixes: [18, 22]
+
+mcp:
+  tool_count: 21
+  resource_count: 7
+  prompt_count: 3
+  transports: [stdio, http]
+
+programs:
+  total: 842
+  with_questions_mapped: 30
+  shells: 812
+
+questions:
+  archived_total: 225
+
+features:
+  byok: shipped
+  stress_test_writeback: shipped
+  stress_test_ui: pending
+  agent_reviews: shipped
+  reviewer_family: shipped
+  stripe_webhook_code: shipped
+  stripe_env_keys: pending_deric
+  custom_smtp: shipped
+  recruiter_agent: pending
+
+coordination:
+  claims_file: .agents/claims.yaml
+  protocol_file: .agents/PROTOCOL.md
+  desktop_bus: ~/Desktop/MULTI_CLAUDE.md

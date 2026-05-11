@@ -1,0 +1,67 @@
+schema_version: 1
+updated_at: 2026-05-11T23:59:00Z
+
+note: >
+  Phase A scaffold. This file is the machine-readable claim ledger. Sessions and
+  claims are tracked here even before automated enforcement exists.
+
+sessions:
+  - id: cowork-2026-05-11
+    surface: cowork
+    started_at: 2026-05-11T08:00:00Z
+    heartbeat: 2026-05-11T23:00:00Z
+    status: active
+  - id: vscode-claude-2026-05-11
+    surface: vscode-claude
+    started_at: 2026-05-11T10:00:00Z
+    heartbeat: 2026-05-11T21:00:00Z
+    status: wrapped
+  - id: codex-2026-05-11
+    surface: codex
+    started_at: 2026-05-11T12:00:00Z
+    heartbeat: 2026-05-11T23:59:00Z
+    status: active
+  - id: mcp-eval-2026-05-11
+    surface: mcp-eval
+    started_at: 2026-05-11T14:00:00Z
+    heartbeat: 2026-05-11T18:30:00Z
+    status: wrapped
+  - id: devin-2026-05-11
+    surface: devin-review
+    started_at: 2026-05-11T20:00:00Z
+    heartbeat: 2026-05-11T20:30:00Z
+    status: wrapped
+
+claims:
+  - id: claim-2026-05-11-001
+    session: vscode-claude-2026-05-11
+    type: file_lane
+    paths:
+      - app/app/api/stripe/
+      - app/app/api/draft/route.ts
+      - app/lib/stripe.ts
+    purpose: stripe hardening plus ollama byok verification
+    acquired_at: 2026-05-11T10:00:00Z
+    released_at: 2026-05-11T21:00:00Z
+    landed_commits: [d649251, e058207, be71026]
+
+  - id: claim-2026-05-11-002
+    session: codex-2026-05-11
+    type: migration_number
+    value: 26
+    purpose: answer_reviews table
+    acquired_at: 2026-05-11T15:00:00Z
+    released_at: 2026-05-11T16:30:00Z
+    landed_in_commit: "3635f40"
+
+  - id: claim-2026-05-11-003
+    session: codex-2026-05-11
+    type: file_lane
+    paths:
+      - .claude/agents/
+      - .claude/commands/
+      - docs/16_mcp_agent_plugin_gap_review.md
+    purpose: reviewer family expansion and review-lane cleanup
+    acquired_at: 2026-05-11T17:00:00Z
+    released_at: 2026-05-11T22:00:00Z
+    landed_commits: [eaf439f, 2796b96]

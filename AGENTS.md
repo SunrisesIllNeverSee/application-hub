@@ -1,6 +1,7 @@
 # Application Hub — Agent Coordination
 
 > Read this before touching anything. Both Cowork (Claude) and Codex should read this file at the start of every session.
+> Then read `.agents/PROTOCOL.md` for the machine-readable coordination workflow.
 > Then check `SCRATCH.md` for active claims before editing.
 > Then check `ROADMAP.md` for sequence and `TASKS.md` for implementation detail.
 > For factual counts/state, treat `STATUS.md` as the single fact source and link back to it instead of restating counts in multiple places.
@@ -96,6 +97,7 @@ If a shared file is touched, keep the commit tight and explicit.
 4. **Do not “helpfully” rewrite unrelated files.**
 5. **If a file is already in flight, either avoid it or make the overlap explicit in the commit message.**
 6. **Before writing a migration, claim the next migration number in `SCRATCH.md`.**
+7. **Prefer `.agents/registry.yaml` and `.agents/claims.yaml` for machine-readable state and claims.**
 
 Cross-workspace session state belongs in:
 - `~/Desktop/MULTI_CLAUDE.md`
@@ -109,10 +111,16 @@ Cold-start note:
 Fact-source rule:
 - `STATUS.md` is the canonical source for counts, migration chain, shipped features, and current remote truth
 - `README.md`, `AGENTS.md`, and `CLAUDE.md` should summarize and link, not maintain their own competing fact tables unless there is a good reason
+- `.agents/registry.yaml` is the machine-readable truth ledger that future tooling can validate against
 
 Review-gate rule:
 - use a review gate when a change crosses repo docs + desktop coordination + README/public framing + active memory at the same time
 - do not require a multi-reviewer gate for small archive-only or single-doc cleanup passes
+
+Protocol files:
+- `.agents/registry.yaml` — machine-readable truth ledger
+- `.agents/claims.yaml` — machine-readable session/claim ledger
+- `.agents/PROTOCOL.md` — procedure for sessions
 
 ---
 
