@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr'
 
 const BASE_URL = 'https://mos2es.xyz'
 
+export const dynamic = 'force-dynamic'
+
 function supabasePublic() {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
