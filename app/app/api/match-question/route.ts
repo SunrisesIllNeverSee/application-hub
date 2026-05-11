@@ -141,7 +141,7 @@ export async function POST(req: Request) {
   // Priority: BYOK Ollama → BYOK OpenAI → platform OpenAI key (last resort)
 
   let embedding: number[] | null = null
-  let embeddingSource: 'ollama' | 'byok_openai' | 'platform' | null = null
+  let embeddingSource: 'ollama' | 'byok' | 'platform' | null = null
 
   // 1a. BYOK Ollama (user's local instance — free)
   const { data: ollamaIntegration } = await supabase
@@ -158,7 +158,8 @@ export async function POST(req: Request) {
     if (embedding) embeddingSource = 'ollama'
   }
 
-  // 1b. BYOK OpenAI (user's own key)
+  // 1b. BYOK — any OpenAI-compatible key the user has connected
+  //     (OpenAI, or any provider mirroring /v1/embeddings)
   if (!embedding) {
     const { data: openaiIntegration } = await supabase
       .from('user_integrations')
@@ -175,7 +176,7 @@ export async function POST(req: Request) {
       })
       if (decrypted) {
         embedding = await embedWithBYOK(text.trim(), decrypted)
-        if (embedding) embeddingSource = 'byok_openai'
+        if (embedding) embeddingSource = 'byok'
       }
     }
   }
