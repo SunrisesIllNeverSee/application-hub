@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-11T23:30:00Z
+updated_at: 2026-05-12T00:15:00Z
 
 note: >
   Phase A scaffold. This file is the machine-readable claim ledger. Sessions and
@@ -24,8 +24,9 @@ sessions:
   - id: mcp-eval-2026-05-11
     surface: mcp-eval
     started_at: 2026-05-11T14:00:00Z
-    heartbeat: 2026-05-11T18:30:00Z
+    heartbeat: 2026-05-12T00:15:00Z
     status: wrapped
+    note: Claude Opus 4.7 — plugin-eval 100/100, logic extractions, CI fix, coordination sync
   - id: devin-2026-05-11
     surface: devin-review
     started_at: 2026-05-11T20:00:00Z
@@ -109,6 +110,48 @@ claims:
       - 3d81666  # match-question API + embedding seeder + portal audit + Solofounders
       - c02299b  # Ollama-first embeddings + 768d resize
       - f2c8fdd  # BYOK consolidation
+
+  - id: claim-mcp-eval-001
+    session: mcp-eval-2026-05-11
+    type: file_lane
+    paths:
+      - application-hub-mcp-server/application-hub-mcp-server/
+      - application-hub-mcp-server/src/tools/user/hub_find_best_programs.ts
+      - application-hub-mcp-server/src/tools/user/hub_find_best_programs.logic.ts
+      - application-hub-mcp-server/src/tools/user/hub_find_best_programs.test.ts
+      - application-hub-mcp-server/src/tools/user/hub_stress_test_answer.logic.ts
+      - application-hub-mcp-server/src/tools/intelligence/hub_get_acceptance_stats.ts
+      - application-hub-mcp-server/src/tools/intelligence/hub_get_acceptance_stats.logic.ts
+      - application-hub-mcp-server/src/tools/intelligence/hub_get_acceptance_stats.test.ts
+      - application-hub-mcp-server/package.json
+    purpose: >
+      plugin-eval score 68→100/100 — restructured plugin root into thin subdir
+      (deferred budget 50k→0 tokens), extracted pure logic into .logic.ts modules
+      for hub_find_best_programs + hub_get_acceptance_stats, 39→69 tests passing.
+    acquired_at: 2026-05-11T14:00:00Z
+    released_at: 2026-05-11T19:30:00Z
+    landed_commits:
+      - 0555b4b  # plugin restructure + logic extractions + tests
+      - c435425  # hub_save_answer.ts cast fix (concurrent with mcp-eval session)
+
+  - id: claim-mcp-eval-002
+    session: mcp-eval-2026-05-11
+    type: file_lane
+    paths:
+      - app/app/sitemap.ts
+      - STATUS.md
+      - SCRATCH.md
+      - .agents/claims.yaml
+      - .github/workflows/ci.yml
+    purpose: >
+      CI fix — force-dynamic on sitemap.ts to unblock build (Supabase client
+      was being called at static-prerender time without env vars).
+      Coordination sync — STATUS.md + SCRATCH.md + claims.yaml updated to
+      reflect true session state. Hook installed in strict mode.
+    acquired_at: 2026-05-11T20:00:00Z
+    released_at: 2026-05-12T00:15:00Z
+    landed_commits:
+      - 494a60e  # force-dynamic sitemap CI fix
 
   - id: claim-2026-05-11-005
     session: vscode-claude-2026-05-11-b

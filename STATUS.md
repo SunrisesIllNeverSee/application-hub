@@ -69,6 +69,11 @@ Other coordination docs should point here rather than restating these facts unle
 - Build script exists: `npm run build`.
 - Typecheck script exists: `npm run typecheck`.
 - Strict TypeScript config exists.
+- Plugin-eval score: **100/100 Grade A, Risk Low** (0 fail, 0 warn, 2 info).
+  - Plugin metadata restructured into `application-hub-mcp-server/application-hub-mcp-server/` (thin subdir) — deferred budget 0 tokens.
+  - 3 `.logic.ts` modules extract pure testable logic: `hub_stress_test_answer`, `hub_find_best_programs`, `hub_get_acceptance_stats`.
+  - Test suite: 69 tests, all passing. `vitest` installed.
+  - Codex plugin manifest at `application-hub-mcp-server/.codex-plugin/plugin.json` — see session notes at `~/Desktop/mcp_eval/plugin-eval-session-summary.md`.
 - New app-support tools are present:
   - `hub_get_program_by_slug`
   - `hub_save_answer`
@@ -108,9 +113,13 @@ Other coordination docs should point here rather than restating these facts unle
 
 ### CI
 - GitHub Actions workflow exists at `.github/workflows/ci.yml`.
-- CI has separate jobs for:
-  - MCP server install, typecheck, build
-  - Next.js app install, typecheck, build
+- CI runs three jobs in order:
+  1. `agent-check` — runs `python3 .agents/check.py --strict`; blocks the other two jobs on any registry drift or collision.
+  2. `mcp-server` — install, typecheck, build.
+  3. `next-app` — install, typecheck, build.
+- CI is **green** as of commit `494a60e` (2026-05-11).
+  - `app/app/sitemap.ts` — added `export const dynamic = 'force-dynamic'` so `/sitemap.xml` renders per-request instead of at build time. Fixes Supabase-client-missing-env error during static prerender.
+- Pre-commit hook installed in strict mode via `.agents/install-hook.sh --strict`.
 
 ### Environment documentation
 - `application-hub-mcp-server/.env.example` exists.

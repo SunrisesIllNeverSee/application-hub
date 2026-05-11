@@ -24,28 +24,29 @@ P1 sprint complete. Migrations 001-027 applied to Supabase. Build is clean. Site
 **Remaining open work:**
 - Funders index UI `/funders` (Cowork)
 - Stripe activation (Deric: add price IDs to Vercel env vars)
-- CRON_SECRET to Supabase edge function env vars (Deric: manual — recruiter agent)
-- Recruiter agent schedule activation (Deric: Supabase dashboard or SQL editor after migration 027)
+- CRON_SECRET to Supabase edge function env vars (Deric: manual — recruiter agent step 2)
+- Recruiter agent schedule activation (Deric: Supabase dashboard → Edge Functions → recruiter-agent → Schedule → `0 9 * * 1`)
 - MoatScore / FundScore signal (P2)
 - Internal applicant ranking (P2)
-- MCP token-budget / plugin-eval follow-through (Codex)
+- Plugin sibling layout restructure — defer until after repo clean-out (see `~/Desktop/mcp_eval/plugin-eval-session-summary.md`)
+- ~~MCP token-budget / plugin-eval~~ ✅ 100/100 Grade A, 69 tests, CI green
 
 ---
 
 ## For Codex — most recent context
 
-_Updated 2026-05-11 — major feature burst landed_
+_Updated 2026-05-11 — plugin-eval complete, CI green_
 
 Read in order:
 1. `~/Desktop/MULTI_CLAUDE.md` — cross-workspace state, what's live, what's next
 2. `STATUS.md` — confirmed repo state
 3. `TASKS.md` — concrete remaining items
-4. `docs/16_mcp_agent_plugin_gap_review.md` — your own gap audit
+4. `~/Desktop/mcp_eval/plugin-eval-session-summary.md` — full plugin-eval session notes
 
 ### Your open lane
 - **Reviewer-family follow-through** — run the fit/certification/stress-test agents on real saved answers and tighten the rubric.
-- **MCP token budget** — follow up on plugin-eval findings and trim context bloat where it matters.
 - **MCP server rebuild** — 21 tools now, rebuild dist before any power users connect.
+- ~~MCP token budget~~ — Done. Plugin-eval 100/100. Sibling layout deferred to post-clean-out.
 
 ### What Cowork (Claude) landed today
 - Migrations 013-026 all applied
