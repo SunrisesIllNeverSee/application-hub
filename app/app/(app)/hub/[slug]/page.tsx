@@ -7,6 +7,7 @@ import type {
   ProgramQuestionWithArchived,
 } from '@/lib/database.types'
 import { ThemeBar } from '@/components/ThemeBar'
+import { DnaRadarChart } from '@/components/DnaRadarChart'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
 import {
@@ -246,6 +247,15 @@ export default async function ProgramDetailPage({ params }: Props) {
             <h2 className="text-sm font-semibold text-neutral-900 dark:text-white mb-4">
               What {program.name} cares about
             </h2>
+            {/* Radar chart — shown when 4+ themes have weight */}
+            {dna.filter(d => d.weight_pct > 0).length >= 4 && (
+              <div className="flex justify-center mb-5 pb-5 border-b border-neutral-100 dark:border-neutral-800">
+                <DnaRadarChart
+                  dnaRows={dna.map(d => ({ theme: d.theme, weight: d.weight_pct }))}
+                  size={200}
+                />
+              </div>
+            )}
             <div className="space-y-3">
               {dna.map((d) => (
                 <ThemeBar
