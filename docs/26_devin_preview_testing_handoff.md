@@ -31,6 +31,13 @@ Using Vercel protected fetch access, the preview is reachable and these anon/sta
   - magic-link email flow
   - dev-only password fallback copy
 
+## What Has Changed Since This Doc Was Written
+
+- Migration `027_applicant_modes_and_contributions.sql` has been **applied** (renumbered to 030)
+- Migration `031_fix_contribution_credit_amount.sql` applied — Bug #3 fixed in DB
+- Bug #2 (logged-out 401 on mode selector) fixed in `HubPage` — ModeSelector now only renders when `user` is authenticated
+- PR #2 finding #1 (migration collision) resolved
+
 ## What Is Still Blocked
 
 ### 1. Migration-gated
@@ -88,9 +95,9 @@ Once migration `027` is applied and a login session exists, test these in order:
 
 These are already posted on the PR and should remain in view during testing:
 
-1. migration number collision with existing `027_recruiter_alerts.sql`
-2. logged-out users can click the mode selector but hit `401` on switch
-3. contribution ledger records `5` credits even when fewer than 5 new unlocks may actually be inserted
+1. ~~migration number collision with existing `027_recruiter_alerts.sql`~~ — **Fixed** (Codex file renumbered to 030)
+2. ~~logged-out users can click the mode selector but hit `401` on switch~~ — **Fixed** (ModeSelector guarded behind `{user && ...}`)
+3. ~~contribution ledger records `5` credits even when fewer than 5 new unlocks may actually be inserted~~ — **Fixed** (migration 031)
 
 ## Testing Rules Going Forward
 
