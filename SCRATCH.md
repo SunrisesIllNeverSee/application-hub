@@ -3,37 +3,53 @@
 > **Both agents check this BEFORE picking up a task from `TASKS.md`.**
 > Claim by appending your line. Release by removing it (or moving to "recently released").
 > Stale claims = no commits touching the claimed paths since the claim landed.
+> See also: `~/Desktop/MULTI_CLAUDE.md` for cross-workspace coordination.
+
+---
+
+## Current state (2026-05-11)
+
+Migrations 001–026 applied to Supabase. Build is clean. Site live at mos2es.xyz.
+
+**What's actually deployed:**
+- Hub (842 programs), Question Bank + drip, BYOK, draft routing, import flows
+- Stripe skeleton (code done — Deric needs to add price IDs to Vercel)
+- Dark mode, outcome tracking, funders schema (026 applied), deadline alerts (cron live)
+- Team mode (schema + API — no UI beyond settings tab)
+- Answer review persistence (migration 026, hub_save_answer_review MCP tool)
+- First reviewer agent: .claude/agents/rns-answer-reviewer.md
+
+**Remaining open work:**
+- Stress-test persistence: hub_stress_test_answer → answer_stress_tests (Codex)
+- Funders index UI `/funders` (Cowork)
+- Home dashboard / Today view (Cowork)
+- DNA radar chart on program detail (Cowork)
+- Stripe activation (Deric: add price IDs to Vercel env vars)
+- CRON_SECRET to Vercel env vars (Deric: manual)
 
 ---
 
 ## For Codex — most recent context
 
-_Updated 2026-05-10 after BYOK, Question Bank, and sidebar work landed._
+_Updated 2026-05-11 — major feature burst landed_
 
-If you're picking up after the recent launch hardening burst, read these in order:
+Read in order:
+1. `~/Desktop/MULTI_CLAUDE.md` — cross-workspace state, what's live, what's next
+2. `STATUS.md` — confirmed repo state
+3. `TASKS.md` — concrete remaining items
+4. `docs/16_mcp_agent_plugin_gap_review.md` — your own gap audit
 
-1. **`AGENTS.md`** — refreshed ownership table and current launch framing
-2. **`STATUS.md`** — shortest source of truth for what is actually shipped now
-3. **`ROADMAP.md`** — what is left after MVP pieces landed
-4. **`TASKS.md`** — concrete remaining bugs and polish items
+### Your open lane
+- **Stress-test persistence** — `hub_stress_test_answer` calls the tool but results don't persist to `answer_stress_tests`. This is the next MCP layer gap to close.
+- **rns-answer-reviewer agent** — first agent is checked in. Next: run it on a real answer, validate the review contract, improve the scoring rubric.
+- **MCP server rebuild** — 21 tools now, rebuild dist before any power users connect.
 
-### Open items in your lane (current priorities)
-
-- **Live BYOK draft verification** — verify `/profile/integrations` → save real Anthropic key → workspace Draft with AI → `ai_draft_runs.integration_type = byok_anthropic`
-- **Heat scores + applicant counts** — launch-surface fallback labels are in; deeper synthetic compute still needed
-- **Docs / architecture hygiene** — keep coordination files aligned as launch state changes
-- **Curated ingest lane** — grow targets through staged application/funding/question curation, not broad ecosystem indexing
-- **Agent review layer** — remaining work is write-back persistence, one real reviewer agent, and plugin-eval benchmarking, not another MCP read surface
-
-Recent product work already landed:
-- Question Bank `/bank`
-- Drip mechanic via `user_question_unlocks`
-- Profile split (`about`, `answers`, `settings`, `integrations`)
-- BYOK key storage and `/api/integrations`
-- Sidebar IA redesign
-- Workspace index using `user_applications`
-
----
+### What Cowork (Claude) landed today
+- Migrations 013-026 all applied
+- Multi-provider draft (Anthropic/OpenAI/Ollama), dark mode, outcome tracking
+- Funders schema (30 orgs), deadline alerts (edge fn + pg_cron), team mode
+- Portable taxonomy (domain + universal_theme), application import UI
+- MULTI_CLAUDE.md created at ~/Desktop/
 
 ---
 
@@ -46,58 +62,19 @@ Recent product work already landed:
 
 ## Recently released
 
-| Codex | Stabilized coordination/docs after Milestone 2-3 changes | `SCRATCH.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` | Released 2026-05-10 | Synced docs to latest shipped BYOK, Question Bank, sidebar, profile split, and workspace state. |
-| Codex | Added narrow curated ingest lane and watchlist staging path | `docs/15_curated_ingest_lane.md`, `seed/staging/README.md`, `seed/staging/application_targets_watchlist.csv`, `README.md`, `TASKS.md`, `STATUS.md`, `SCRATCH.md` | Released 2026-05-10 | Locked future dataset growth to application, funding, and reusable question surfaces instead of broad VC ecosystem indexing. |
-| Codex | Installed local `plugin-eval` CLI and documented MCP/agent/plugin gaps | `docs/16_mcp_agent_plugin_gap_review.md`, `README.md`, `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `SCRATCH.md` | Released 2026-05-11 | Clarified that stress-test MCP groundwork already exists; real gaps are review write-back, concrete agents, and measurement. |
-| Codex | Launch-surface polish: honest heat fallbacks, cohort context, copy UX, draft messaging | `app/lib/database.types.ts`, `app/lib/utils.ts`, `app/components/ProgramCard.tsx`, `app/app/(app)/hub/[slug]/page.tsx`, `app/app/(app)/workspace/[program_id]/page.tsx`, `app/components/AnswerEditor.tsx`, `app/app/api/draft/route.ts`, `docs/14_launch_surface_polish.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `SCRATCH.md` | Released 2026-05-10 | Cleared stale “OTP/copy/cohort missing” tasks, made BYOK-first draft UX clearer, and replaced raw zero-signal UI with provisional labels. |
-| Codex | Marked cross-theme portability as a core product requirement | `README.md`, `ROADMAP.md`, `TASKS.md`, `VISION.md` | Released 2026-05-10 | Captured the importance of switching between founder, jobs, grants, and school application themes without re-architecting the core spine. |
-| Codex | BYOK/policy, deadlines helper, stress persistence, launch checklist, SMTP handoff docs | `migrations/010_launch_hardening.sql`, `docs/09_launch_checklist.md`, `docs/10_byok_and_draft_policy.md`, `docs/11_deadline_seed_handoff.md`, `docs/12_stress_test_persistence.md`, `docs/13_smtp_launch_handoff.md`, `seed/01_deadline_updates_template.sql`, `app/app/api/draft/route.ts` | Released 2026-05-10 | Route now fails closed unless hosted drafts are explicitly enabled; app/MCP checks passed. |
-| Codex | Refined launch roadmap/tasks and added archive lane | `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/archive/` | Released 2026-05-10 | External launch roadmap merged with current repo truth; legacy planning docs archived. |
+| Cowork | Migration 026 applied, MULTI_CLAUDE.md created, SCRATCH.md synced | `SCRATCH.md`, `MULTI_CLAUDE.md` | 2026-05-11 | Full cross-agent sync after major feature burst |
+| Codex | Answer review persistence + reviewer agent + Stripe hardening | `migrations/026_answer_reviews.sql`, `.claude/agents/rns-answer-reviewer.md`, `app/app/api/stripe/webhook/route.ts`, `docs/16_mcp_agent_plugin_gap_review.md` | Released 2026-05-11 | |
+| Cowork | Dark mode, outcome tracking, funders, deadline alerts, team mode | `app/components/ThemeProvider.tsx`, `app/components/OutcomeTracker.tsx`, `migrations/023-025`, `supabase/functions/deadline-alerts/` | Released 2026-05-11 | |
 
 ---
 
 ## How to use this file
 
 ### When you start a task
-
-Append a row to "Currently claimed" with:
-- **Agent**: `Cowork` or `Codex`
-- **Task**: short description matching the TASKS.md item
-- **Files / paths**: which directories/files you'll touch
-- **Claimed at**: ISO timestamp (UTC)
-- **Notes**: optional — blockers, expected duration, related issues
-
-Commit the SCRATCH.md change BEFORE starting work. That's the claim.
+Append a row to "Currently claimed". Commit SCRATCH.md BEFORE starting work.
 
 ### When you finish
-
-- Remove your row from "Currently claimed"
-- (Optional) Move to "Recently released" with a note pointing at the commit SHA that landed the work
-- Commit the SCRATCH.md change with the work itself, or in a follow-up commit
-
-### When you see a conflict
-
-If you want to start a task but someone else has it claimed:
-1. Run `git log --since="<claim's claimed at>" -- <their claimed paths>` — if no commits, the claim is stale and you can take it (leave a one-line note in commit message)
-2. Otherwise, pick a different task from TASKS.md
-3. If the work is genuinely urgent and the other agent's claim has recent commits, leave a note in their row's "Notes" column
-
-### What goes here vs TASKS.md
-
-- **TASKS.md** = the canonical roadmap. Items live there until done.
-- **SCRATCH.md** = the working state. Who's doing what RIGHT NOW.
-
-A task lives in TASKS.md whether claimed or not. SCRATCH.md is just the layer on top that says "Cowork is touching `migrations/009` right now, don't grab it."
+Remove your row, move to "Recently released", commit with the work.
 
 ### Stale claims
-
-We are **nonlinear and temporal** — claims don't expire on a schedule. They're stale when:
-- The claiming agent's `git log` shows no commits touching the claimed paths since the claim landed, AND
-- The other agent has work to do that needs those paths
-
-When that happens:
-- Leave a one-line note: "Reclaimed — original claim had no commits since landing"
-- Take the work
-- Update the claim row to your name
-
-Don't argue about claims. Just communicate via commit messages.
+No commits touching claimed paths since claim landed + other agent needs those paths = stale. Take it, leave a one-line note.
