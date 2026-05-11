@@ -10,6 +10,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mos2es.xyz'),
   title: {
     default: 'Application Hub',
     template: '%s — Application Hub',
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Ello Cello LLC' }],
   openGraph: {
     type: 'website',
+    url: 'https://mos2es.xyz',
     siteName: 'Application Hub',
     title: 'Application Hub — Apply to accelerators and grants, smarter',
     description:
