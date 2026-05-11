@@ -252,6 +252,52 @@ MCP groundwork exists through `hub_stress_test_answer`, and persistence exists i
 - UI entry point from Answer Bank/workspace
 - Later: BYOK/LLM-backed RNS-style challenge generation
 
+### [ ] Review-output persistence + write-back path
+**Owner**: Codex
+**Priority**: P2
+
+Current state: agents can read review context, but they cannot persist comments, scores, or certification metadata.
+
+Implementation:
+- add `answer_reviews` persistence contract
+- add MCP write-back tool for structured review results
+- keep hosted drafting separate from review/certification
+
+### [ ] Reconcile agent review/stress-test contract docs
+**Owner**: Codex
+**Priority**: P2
+
+Current docs still describe a future stress-test persistence shape that no longer matches `answer_stress_tests`.
+
+Implementation:
+- sync `docs/07_agent_review_contract.md` with actual schema
+- remove stale language implying `hub_stress_test_answer` is not implemented
+- keep README/ROADMAP/STATUS aligned
+
+### [ ] First checked-in reviewer agent
+**Owner**: Codex + Deric
+**Priority**: P2
+
+Build one concrete RNS/CIVITAE-style reviewer loop before broadening governance posture.
+
+Implementation:
+- one reviewer agent implementation
+- input from `hub_get_answer_review_context`
+- output matching review contract
+- write-back via review persistence path
+
+### [ ] Plugin-eval benchmark for MCP/agent layer
+**Owner**: Codex
+**Priority**: P3
+
+`plugin-eval` CLI is now locally available. Next step is observed-usage evaluation, not just static analysis.
+
+Implementation:
+- initialize benchmark for `application-hub-mcp-server`
+- capture observed usage
+- rerun `plugin-eval analyze` with usage evidence
+- use output to trim deferred/token-heavy agent instructions
+
 ### [ ] Significance score display
 **Owner**: Cowork
 **Priority**: P2

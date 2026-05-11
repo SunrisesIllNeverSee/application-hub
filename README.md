@@ -19,6 +19,7 @@ Built by Ello Cello LLC.
 - **`docs/10_byok_and_draft_policy.md`** — BYOK and hosted draft policy contract
 - **`docs/14_launch_surface_polish.md`** — honest heat/applicant fallbacks, cohort context, and BYOK-first draft UX notes
 - **`docs/15_curated_ingest_lane.md`** — narrow curation contract for application/funding/question targets
+- **`docs/16_mcp_agent_plugin_gap_review.md`** — MCP/agent/plugin review, current gaps, and next implementation plan
 - **`docs/archive/`** — historical/superseded planning docs that are useful context but no longer active direction
 
 We are **nonlinear and temporal** — no calendar deadlines. The roadmap is priority-ordered.

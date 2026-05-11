@@ -23,6 +23,7 @@ If you're picking up after the recent launch hardening burst, read these in orde
 - **Heat scores + applicant counts** — launch-surface fallback labels are in; deeper synthetic compute still needed
 - **Docs / architecture hygiene** — keep coordination files aligned as launch state changes
 - **Curated ingest lane** — grow targets through staged application/funding/question curation, not broad ecosystem indexing
+- **Agent review layer** — remaining work is write-back persistence, one real reviewer agent, and plugin-eval benchmarking, not another MCP read surface
 
 Recent product work already landed:
 - Question Bank `/bank`
@@ -47,6 +48,7 @@ Recent product work already landed:
 
 | Codex | Stabilized coordination/docs after Milestone 2-3 changes | `SCRATCH.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `AGENTS.md`, `CLAUDE.md` | Released 2026-05-10 | Synced docs to latest shipped BYOK, Question Bank, sidebar, profile split, and workspace state. |
 | Codex | Added narrow curated ingest lane and watchlist staging path | `docs/15_curated_ingest_lane.md`, `seed/staging/README.md`, `seed/staging/application_targets_watchlist.csv`, `README.md`, `TASKS.md`, `STATUS.md`, `SCRATCH.md` | Released 2026-05-10 | Locked future dataset growth to application, funding, and reusable question surfaces instead of broad VC ecosystem indexing. |
+| Codex | Installed local `plugin-eval` CLI and documented MCP/agent/plugin gaps | `docs/16_mcp_agent_plugin_gap_review.md`, `README.md`, `ROADMAP.md`, `TASKS.md`, `STATUS.md`, `SCRATCH.md` | Released 2026-05-11 | Clarified that stress-test MCP groundwork already exists; real gaps are review write-back, concrete agents, and measurement. |
 | Codex | Launch-surface polish: honest heat fallbacks, cohort context, copy UX, draft messaging | `app/lib/database.types.ts`, `app/lib/utils.ts`, `app/components/ProgramCard.tsx`, `app/app/(app)/hub/[slug]/page.tsx`, `app/app/(app)/workspace/[program_id]/page.tsx`, `app/components/AnswerEditor.tsx`, `app/app/api/draft/route.ts`, `docs/14_launch_surface_polish.md`, `TASKS.md`, `STATUS.md`, `ROADMAP.md`, `README.md`, `SCRATCH.md` | Released 2026-05-10 | Cleared stale “OTP/copy/cohort missing” tasks, made BYOK-first draft UX clearer, and replaced raw zero-signal UI with provisional labels. |
 | Codex | Marked cross-theme portability as a core product requirement | `README.md`, `ROADMAP.md`, `TASKS.md`, `VISION.md` | Released 2026-05-10 | Captured the importance of switching between founder, jobs, grants, and school application themes without re-architecting the core spine. |
 | Codex | BYOK/policy, deadlines helper, stress persistence, launch checklist, SMTP handoff docs | `migrations/010_launch_hardening.sql`, `docs/09_launch_checklist.md`, `docs/10_byok_and_draft_policy.md`, `docs/11_deadline_seed_handoff.md`, `docs/12_stress_test_persistence.md`, `docs/13_smtp_launch_handoff.md`, `seed/01_deadline_updates_template.sql`, `app/app/api/draft/route.ts` | Released 2026-05-10 | Route now fails closed unless hosted drafts are explicitly enabled; app/MCP checks passed. |

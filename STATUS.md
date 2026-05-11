@@ -64,6 +64,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
   - `hub_save_answer`
   - `hub_get_answer_review_context`
   - `hub_stress_test_answer`
+- The stress-test MCP bridge is implemented and registered; the missing layer is persistence/use of results, not tool existence.
 
 ### Next.js app
 - `app/` exists as a Next.js App Router application.
@@ -82,6 +83,7 @@ This file is the current GitHub-visible source of truth. It separates what is co
 - `/api/draft` now routes BYOK-first and returns a provider-required error when no user key is available and platform drafting is disabled.
 - Draft UX now links founders directly to `/profile/integrations` when no provider is connected, and confirms when drafting used the founder's own Anthropic key.
 - Deeper review/comments are intentionally reserved for agent-side RNS/MCP workflows until the contract is hardened.
+- Review context is readable through MCP today, but there is not yet a persisted write-back path for agent review results such as comments, scores, or certification metadata.
 - RNS-integrated build-path documentation is present at `docs/06_rns_integrated_build_path.md`.
 - Launch-surface polish notes are documented at `docs/14_launch_surface_polish.md`.
 - The active launch roadmap is `ROADMAP.md`; older duplicate planning docs have been moved to `docs/archive/`.
@@ -184,6 +186,7 @@ RNS is the planned additive judgment layer, not a launch blocker.
 - `seed/01_deadline_updates_template.sql` — source-verified deadline update helper
 - `docs/09_launch_checklist.md` through `docs/13_smtp_launch_handoff.md` — Milestone 3 handoff docs
 - `docs/15_curated_ingest_lane.md` — narrow curation contract for application/funding/question targets
+- `docs/16_mcp_agent_plugin_gap_review.md` — current MCP/agent/plugin gap review, installed tooling, and next implementation plan
 - `VISION.md` — new product vision doc
 - `TASKS.md` — captured 16 follow-ups from smoke test
 - `ROADMAP.md` — reframed around Launch Milestones 1/2/3

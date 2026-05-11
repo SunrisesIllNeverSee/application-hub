@@ -108,6 +108,9 @@ These are not launch blockers, but they are still part of the current roadmap an
 
 - [ ] **Home dashboard + sidebar IA** — Today view with unlocked questions, closest deadlines, in-progress applications, answers needing review/stress tests, and MoatScore/FundScore surface.
 - [ ] **Stress-test saved answers UI/scoring** — MCP stub and `answer_stress_tests` table exist. Add quota policy, UI, and eventual BYOK/LLM-backed generation.
+- [ ] **Review write-back path** — add persistence and MCP save flow for agent-side comments, scores, and certification metadata.
+- [ ] **First checked-in reviewer agent** — move from documented RNS/CIVITAE/MO§ES contract to one real reviewer implementation with save path.
+- [ ] **Plugin-eval measurement baseline** — benchmark MCP/agent bundle with observed usage, not just static analysis.
 - [ ] **Significance score display** — Show importance/star rating on questions, “asked by N programs” tooltip, sort by significance.
 - [ ] **DNA radar/chart comparison** — Program detail should show program DNA vs. user coverage.
 - [ ] **Heat scores + applicant counts** — Replace zeros with synthetic MVP heat from prestige/cohort exclusivity, then real signals later.
