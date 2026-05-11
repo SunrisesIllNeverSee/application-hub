@@ -8,6 +8,20 @@ const SAVE_ANSWER_FIELDS =
   "id, user_id, archived_question_id, question_text, theme, answer_content," +
   " confidence, word_count, version, updated_at, last_updated";
 
+type SavedAnswerRow = {
+  id: string;
+  user_id: string;
+  archived_question_id: string;
+  question_text: string | null;
+  theme: string | null;
+  answer_content: string;
+  confidence: string;
+  word_count: number | null;
+  version: number | null;
+  updated_at: string | null;
+  last_updated: string | null;
+};
+
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT from client auth"),
   archived_question_id: z.string().uuid().describe("Archived question UUID this profile answer answers"),
@@ -39,7 +53,7 @@ The database trigger keeps content/answer_content, question_text, theme, word_co
       return { content: [{ type: "text", text: "Archived question not found or not readable." }] };
     }
 
-    const { data: answer, error } = await client
+    const { data, error } = await client
       .from("profile_answers")
       .upsert({
         user_id,
@@ -49,6 +63,8 @@ The database trigger keeps content/answer_content, question_text, theme, word_co
       }, { onConflict: "user_id,archived_question_id" })
       .select(SAVE_ANSWER_FIELDS)
       .single();
+
+    const answer = data as SavedAnswerRow | null;
 
     if (error || !answer) {
       return { content: [{ type: "text", text: `Error saving answer: ${error?.message ?? "unknown error"}` }] };
