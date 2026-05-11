@@ -99,7 +99,7 @@ export default async function ProfileSettingsPage({
       </div>
 
       {/* Pricing */}
-      <section>
+      <section id="plans">
         <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-4">
           Plans
         </h2>

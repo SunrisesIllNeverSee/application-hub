@@ -63,9 +63,12 @@ export function ProfileSettingsForm({ subscription, profile, userEmail }: Props)
             </p>
           </div>
           {tier === 'free' && (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white cursor-not-allowed opacity-60">
-              Upgrade to Pro — coming soon
-            </span>
+            <a
+              href="#plans"
+              className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+            >
+              Upgrade to Pro ↓
+            </a>
           )}
         </div>
       </section>
