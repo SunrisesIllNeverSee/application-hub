@@ -18,9 +18,10 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 // Response: { matches: MatchResult[], mode: 'vector' | 'fulltext' }
 // ============================================================
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? ''
-const EMBEDDING_MODEL = 'text-embedding-3-small'
-const EMBEDDING_DIMS = 1536
+const OPENAI_API_KEY    = process.env.OPENAI_API_KEY ?? ''
+const OLLAMA_URL        = (process.env.OLLAMA_URL ?? 'http://localhost:11434').replace(/\/$/, '')
+const EMBEDDING_MODEL   = 'text-embedding-3-small'
+const EMBED_DIMS        = 768   // matches nomic-embed-text and OpenAI 768d output
 const DEFAULT_THRESHOLD = 0.72
 const AUTO_FILL_THRESHOLD = 0.87  // above this: safe to auto-fill
 
@@ -52,7 +53,7 @@ async function embedText(text: string): Promise<number[] | null> {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ input: text, model: EMBEDDING_MODEL, dimensions: EMBEDDING_DIMS }),
+      body: JSON.stringify({ input: text, model: EMBEDDING_MODEL, dimensions: EMBED_DIMS }),
     })
     if (!res.ok) return null
     const data = await res.json() as { data: [{ embedding: number[] }] }
@@ -72,7 +73,7 @@ async function embedWithBYOK(text: string, apiKey: string): Promise<number[] | n
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ input: text, model: EMBEDDING_MODEL, dimensions: EMBEDDING_DIMS }),
+      body: JSON.stringify({ input: text, model: EMBEDDING_MODEL, dimensions: EMBED_DIMS }),
     })
     if (!res.ok) return null
     const data = await res.json() as { data: [{ embedding: number[] }] }
@@ -80,6 +81,22 @@ async function embedWithBYOK(text: string, apiKey: string): Promise<number[] | n
   } catch {
     return null
   }
+}
+
+// ─── Ollama embedding ─────────────────────────────────────────────────────────
+
+async function embedOllama(text: string, baseUrl: string, model: string): Promise<number[] | null> {
+  try {
+    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, prompt: text }),
+    })
+    if (!res.ok) return null
+    const data = await res.json() as { embedding?: number[] }
+    if (!data.embedding || data.embedding.length !== EMBED_DIMS) return null
+    return data.embedding
+  } catch { return null }
 }
 
 // ─── Full-text fallback ───────────────────────────────────────────────────────
@@ -121,26 +138,43 @@ export async function POST(req: Request) {
   )
 
   // ── 1. Try to get an embedding ────────────────────────────────────────────
+  // Priority: BYOK Ollama → platform OpenAI key → BYOK OpenAI key
 
   let embedding: number[] | null = null
-  let embeddingSource: 'platform' | 'byok' | null = null
+  let embeddingSource: 'ollama' | 'platform' | 'byok' | null = null
 
-  // Platform key first
-  embedding = await embedText(text.trim())
-  if (embedding) embeddingSource = 'platform'
+  // Check for BYOK Ollama integration first (free, user-owned)
+  const { data: ollamaIntegration } = await supabase
+    .from('user_integrations')
+    .select('key_encrypted, base_url, model_preference')
+    .eq('user_id', user.id)
+    .eq('provider', 'ollama')
+    .eq('is_active', true)
+    .single()
 
-  // BYOK OpenAI key if no platform key
+  if (ollamaIntegration?.base_url) {
+    const model = ollamaIntegration.model_preference ?? 'nomic-embed-text'
+    embedding = await embedOllama(text.trim(), ollamaIntegration.base_url, model)
+    if (embedding) embeddingSource = 'ollama'
+  }
+
+  // Platform OpenAI key
   if (!embedding) {
-    const { data: integration } = await supabase
+    embedding = await embedText(text.trim())
+    if (embedding) embeddingSource = 'platform'
+  }
+
+  // BYOK OpenAI key
+  if (!embedding) {
+    const { data: openaiIntegration } = await supabase
       .from('user_integrations')
-      .select('key_encrypted, provider')
+      .select('key_encrypted')
       .eq('user_id', user.id)
       .eq('provider', 'openai')
       .eq('is_active', true)
       .single()
 
-    if (integration?.key_encrypted) {
-      // Decrypt via service client (same pattern as /api/draft)
+    if (openaiIntegration?.key_encrypted) {
       const { data: decrypted } = await adminClient.rpc('decrypt_integration_key', {
         p_user_id: user.id,
         p_provider: 'openai',
