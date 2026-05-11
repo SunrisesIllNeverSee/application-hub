@@ -17,6 +17,110 @@ const Schema = z.object({
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
 
+const SELECT_COLS = `id, name, slug, type, status, deadline_at, equity_pct, cash_value_usd,
+               credit_value_usd, heat_score, program_value_score, is_rolling`;
+
+function buildBaseQuery(params: any): any {
+  return supabase
+    .from("programs")
+    .select(SELECT_COLS, { count: "exact" })
+    .order(params.sort_by === "deadline" ? "deadline_at" : params.sort_by,
+           { ascending: params.sort_by === "deadline" })
+    .range(params.offset, params.offset + params.limit - 1);
+}
+
+function applyDeadlineFilter(q: any, days: number): any {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() + days);
+  return q.lte("deadline_at", cutoff.toISOString()).gte("deadline_at", new Date().toISOString());
+}
+
+function applyEquityFilter(q: any, equity_max_pct: number): any {
+  return q.or(`equity_pct.is.null,equity_pct.lte.${equity_max_pct}`);
+}
+
+function applyFilters(q: any, params: any): any {
+  if (params.status) q = q.in("status", params.status);
+  if (params.type) q = q.in("type", params.type);
+  if (params.equity_max_pct !== undefined) q = applyEquityFilter(q, params.equity_max_pct);
+  if (params.min_cash_usd) q = q.gte("cash_value_usd", params.min_cash_usd);
+  if (params.rolling_only) q = q.eq("is_rolling", true);
+  if (params.query) q = q.ilike("name", `%${params.query}%`);
+  if (params.deadline_within_days) q = applyDeadlineFilter(q, params.deadline_within_days);
+  return q;
+}
+
+function daysUntil(deadline_at: string | null | undefined): number | null {
+  if (!deadline_at) return null;
+  return Math.ceil((new Date(deadline_at).getTime() - Date.now()) / 86_400_000);
+}
+
+function formatEquityCash(p: any): string {
+  const equity = p.equity_pct != null ? `${p.equity_pct}%` : "none";
+  const cash = p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "n/a";
+  return `- **Equity**: ${equity} | **Cash**: ${cash}`;
+}
+
+function formatHeatValue(p: any): string {
+  const heat = p.heat_score?.toFixed(1) ?? "—";
+  const value = p.program_value_score?.toFixed(1) ?? "—";
+  return `- **Heat**: ${heat} | **Value Score**: ${value}`;
+}
+
+function formatRollingDeadline(p: any): string {
+  const days = daysUntil(p.deadline_at);
+  const rolling = p.is_rolling ? "Yes" : "No";
+  const deadline = days != null ? ` | **Deadline**: ${days} days` : "";
+  return `- **Rolling**: ${rolling}${deadline}`;
+}
+
+function formatProgramBlock(p: any): string[] {
+  return [
+    `## ${p.name}`,
+    `- **Type**: ${p.type} | **Status**: ${p.status}`,
+    formatEquityCash(p),
+    formatHeatValue(p),
+    formatRollingDeadline(p),
+    `- **Slug**: ${p.slug}\n`
+  ];
+}
+
+function formatPaginationFooter(params: any, programs: any[], total: number): string {
+  return `_Showing ${params.offset + 1}–${params.offset + programs.length} of ${total}.` +
+    ` Use offset to paginate._`;
+}
+
+function formatMarkdown(output: any, params: any): string {
+  const lines: string[] = [`# Programs (${output.total} found)\n`];
+  for (const p of output.programs) lines.push(...formatProgramBlock(p));
+  if (output.has_more) lines.push(formatPaginationFooter(params, output.programs, output.total));
+  return lines.join("\n").slice(0, CHARACTER_LIMIT);
+}
+
+function buildOutput(params: any, programs: any[], count: number | null): any {
+  return {
+    total: count ?? programs.length,
+    count: programs.length,
+    offset: params.offset,
+    has_more: (count ?? 0) > params.offset + programs.length,
+    programs
+  };
+}
+
+function buildJsonResponse(output: any): any {
+  return {
+    content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
+    structuredContent: output
+  };
+}
+
+function buildMarkdownResponse(output: any, params: any): any {
+  return {
+    content: [{ type: "text", text: formatMarkdown(output, params) }],
+    structuredContent: output
+  };
+}
+
 export function registerSearchPrograms(server: McpServer) {
   server.registerTool("hub_search_programs", {
     title: "Search Programs",
@@ -33,77 +137,11 @@ Use hub_get_program_detail for full details on a specific program.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async (params) => {
-    let q = supabase
-      .from("programs")
-      .select(`id, name, slug, type, status, deadline_at, equity_pct, cash_value_usd,
-               credit_value_usd, heat_score, program_value_score, is_rolling`,
-               { count: "exact" })
-      .order(params.sort_by === "deadline" ? "deadline_at" : params.sort_by,
-             { ascending: params.sort_by === "deadline" })
-      .range(params.offset, params.offset + params.limit - 1);
-
-    if (params.status) q = q.in("status", params.status);
-    if (params.type) q = q.in("type", params.type);
-    if (params.equity_max_pct !== undefined) {
-      q = q.or(`equity_pct.is.null,equity_pct.lte.${params.equity_max_pct}`);
-    }
-    if (params.min_cash_usd) q = q.gte("cash_value_usd", params.min_cash_usd);
-    if (params.rolling_only) q = q.eq("is_rolling", true);
-    if (params.query) q = q.ilike("name", `%${params.query}%`);
-    if (params.deadline_within_days) {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() + params.deadline_within_days);
-      q = q.lte("deadline_at", cutoff.toISOString()).gte("deadline_at", new Date().toISOString());
-    }
-
+    const q = applyFilters(buildBaseQuery(params), params);
     const { data, error, count } = await q;
     if (error) return { content: [{ type: "text", text: `Error searching programs: ${error.message}` }] };
-
-    const programs = data ?? [];
-    const output = {
-      total: count ?? programs.length,
-      count: programs.length,
-      offset: params.offset,
-      has_more: (count ?? 0) > params.offset + programs.length,
-      programs
-    };
-
-    if (params.response_format === ResponseFormat.JSON) {
-      return {
-        content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
-        structuredContent: output
-      };
-    }
-
-    const lines: string[] = [`# Programs (${output.total} found)\n`];
-    for (const p of programs) {
-      const days = p.deadline_at
-        ? Math.ceil((new Date(p.deadline_at).getTime() - Date.now()) / 86_400_000)
-        : null;
-      lines.push(`## ${p.name}`);
-      lines.push(`- **Type**: ${p.type} | **Status**: ${p.status}`);
-      lines.push(
-        `- **Equity**: ${p.equity_pct != null ? `${p.equity_pct}%` : "none"}` +
-        ` | **Cash**: ${p.cash_value_usd ? `$${p.cash_value_usd.toLocaleString()}` : "n/a"}`
-      );
-      lines.push(
-        `- **Heat**: ${p.heat_score?.toFixed(1) ?? "—"}` +
-        ` | **Value Score**: ${p.program_value_score?.toFixed(1) ?? "—"}`
-      );
-      lines.push(`- **Rolling**: ${p.is_rolling ? "Yes" : "No"}${days != null ? ` | **Deadline**: ${days} days` : ""}`);
-      lines.push(`- **Slug**: ${p.slug}\n`);
-    }
-
-    if (output.has_more) {
-      lines.push(
-        `_Showing ${params.offset + 1}–${params.offset + programs.length} of ${output.total}.` +
-        ` Use offset to paginate._`
-      );
-    }
-
-    return {
-      content: [{ type: "text", text: lines.join("\n").slice(0, CHARACTER_LIMIT) }],
-      structuredContent: output
-    };
+    const output = buildOutput(params, data ?? [], count);
+    if (params.response_format === ResponseFormat.JSON) return buildJsonResponse(output);
+    return buildMarkdownResponse(output, params);
   });
 }

@@ -4,6 +4,13 @@ import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
+const ANSWER_FIELDS =
+  "id, user_id, archived_question_id, question_text, theme, answer_content, content, " +
+  "confidence, word_count, version, updated_at, last_updated, created_at";
+const ARCHIVED_QUESTION_FIELDS =
+  "id, text, theme, subtheme, typical_word_limit, asked_by_count, importance_score, " +
+  "significance_score, is_universal, example_programs";
+
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT from client auth"),
   answer_id: z.string().uuid().describe("profile_answers.id for the saved answer to review"),
@@ -37,7 +44,7 @@ type ProgramDnaContext = {
 async function fetchAnswerWithOwnership(answer_id: string, user_id: string): Promise<any> {
   const { data, error } = await supabase
     .from("profile_answers")
-    .select("id, user_id, archived_question_id, question_text, theme, answer_content, content, confidence, word_count, version, updated_at, last_updated, created_at")
+    .select(ANSWER_FIELDS)
     .eq("id", answer_id)
     .eq("user_id", user_id)
     .single();
@@ -48,7 +55,7 @@ async function fetchAnswerWithOwnership(answer_id: string, user_id: string): Pro
 async function fetchArchivedQuestion(archived_question_id: string): Promise<any> {
   const { data } = await supabase
     .from("archived_questions")
-    .select("id, text, theme, subtheme, typical_word_limit, asked_by_count, importance_score, significance_score, is_universal, example_programs")
+    .select(ARCHIVED_QUESTION_FIELDS)
     .eq("id", archived_question_id)
     .single();
   return data ?? null;
@@ -118,13 +125,23 @@ function buildOutput(
       expected_output: "See docs/07_agent_review_contract.md",
       comment_types: ["signal", "fidelity", "commitment", "specificity", "fit", "risk"],
       severity_levels: ["info", "warning", "blocker"],
-      score_fields: ["signal_purity", "answer_fidelity", "commitment_stability", "program_fit_alignment", "specificity"],
+      score_fields: [
+        "signal_purity",
+        "answer_fidelity",
+        "commitment_stability",
+        "program_fit_alignment",
+        "specificity"
+      ],
       certification_fields: ["eligible", "label", "rationale"]
     }
   };
 }
 
-function formatMarkdown(output: any, archivedQuestion: any, normalizedProgramQuestions: ProgramQuestionContext[]): string {
+function formatMarkdown(
+  output: any,
+  archivedQuestion: any,
+  normalizedProgramQuestions: ProgramQuestionContext[]
+): string {
   const lines = [
     "# Answer Review Context",
     `**Question**: ${output.answer.question_text || archivedQuestion?.text || "unknown"}`,
@@ -154,7 +171,11 @@ export function registerGetAnswerReviewContext(server: McpServer) {
     title: "Get Answer Review Context (authenticated)",
     description: `Returns the saved-answer context needed for agent-side RNS/CIVITAE/MO§ES review.
 
-This is a read-only bridge between the launch app and deeper review workflows. It does not grade the answer itself; it gathers the answer, canonical question, program usage, program DNA, and recent answer history so external agents can produce comments, scores, or certification metadata.`,
+` +
+      `This is a read-only bridge between the launch app and deeper review workflows. ` +
+      `It does not grade the answer itself; it gathers the answer, canonical question, ` +
+      `program usage, program DNA, and recent answer history so external agents can ` +
+      `produce comments, scores, or certification metadata.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ user_token, answer_id, response_format }) => {

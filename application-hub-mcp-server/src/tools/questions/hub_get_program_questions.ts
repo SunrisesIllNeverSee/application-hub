@@ -9,6 +9,92 @@ const Schema = z.object({
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
 
+type AqJoin = {
+  id: unknown;
+  theme: string | null;
+  is_universal: boolean | null;
+  significance_score: number | null;
+  asked_by_count: number | null;
+} | null;
+
+async function fetchQuestions(program_id: string, include_optional: boolean): Promise<any> {
+  let q = supabase
+    .from("program_questions")
+    .select(`id, asked_as, word_limit, char_limit, is_required, order_index,
+             archived_questions(id, theme, is_universal, significance_score, asked_by_count)`)
+    .eq("program_id", program_id)
+    .order("order_index");
+  if (!include_optional) q = q.eq("is_required", true);
+  return q;
+}
+
+function extractAq(q: any): AqJoin {
+  return (Array.isArray(q.archived_questions) ? q.archived_questions[0] : q.archived_questions) as AqJoin;
+}
+
+function mapQuestion(q: any): any {
+  const aq = extractAq(q);
+  return {
+    id: q.id,
+    text: q.asked_as,
+    theme: aq?.theme ?? null,
+    word_limit: q.word_limit,
+    char_limit: q.char_limit,
+    is_required: q.is_required,
+    order_index: q.order_index,
+    is_universal: aq?.is_universal ?? false,
+    significance_score: aq?.significance_score ?? null,
+    asked_by_count: aq?.asked_by_count ?? 1
+  };
+}
+
+function stars(score: number | null): string {
+  if (!score) return "☆☆☆☆☆";
+  const filled = Math.min(5, Math.round(score * 5));
+  return "★".repeat(filled) + "☆".repeat(Math.max(0, 5 - filled));
+}
+
+function limitStr(q: any): string {
+  if (q.word_limit) return `${q.word_limit} words`;
+  if (q.char_limit) return `${q.char_limit} chars`;
+  return "none";
+}
+
+function formatSignificanceLine(q: any): string {
+  const universal = q.is_universal ? " ⭐ Universal" : "";
+  return `- **Significance**: ${stars(q.significance_score)} | **Asked by**: ${q.asked_by_count} programs${universal}`;
+}
+
+function formatQuestionBlock(q: any): string[] {
+  return [
+    `### ${q.order_index + 1}. ${q.text}`,
+    `- **Required**: ${q.is_required ? "Yes" : "No"} | **Theme**: ${q.theme ?? "?"}`,
+    `- **Limit**: ${limitStr(q)}`,
+    formatSignificanceLine(q),
+    ""
+  ];
+}
+
+function formatMarkdown(output: any): string {
+  const lines: string[] = [`# Questions for Program\n`, `${output.count} questions\n`];
+  for (const q of output.questions) lines.push(...formatQuestionBlock(q));
+  return lines.join("\n").slice(0, CHARACTER_LIMIT);
+}
+
+function buildJsonResponse(output: any): any {
+  return {
+    content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
+    structuredContent: output
+  };
+}
+
+function buildMarkdownResponse(output: any): any {
+  return {
+    content: [{ type: "text", text: formatMarkdown(output) }],
+    structuredContent: output
+  };
+}
+
 export function registerGetProgramQuestions(server: McpServer) {
   server.registerTool("hub_get_program_questions", {
     title: "Get Program Questions",
@@ -22,75 +108,12 @@ high significance = answer this well and it works for many programs.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ program_id, include_optional, response_format }) => {
-    let q = supabase
-      .from("program_questions")
-      .select(`id, asked_as, word_limit, char_limit, is_required, order_index,
-               archived_questions(id, theme, is_universal, significance_score, asked_by_count)`)
-      .eq("program_id", program_id)
-      .order("order_index");
-
-    if (!include_optional) q = q.eq("is_required", true);
-
-    const { data, error } = await q;
+    const { data, error } = await fetchQuestions(program_id, include_optional);
     if (error) return { content: [{ type: "text", text: `Error: ${error.message}` }] };
     if (!data?.length) return { content: [{ type: "text", text: "No questions found for this program." }] };
-
-    type AqJoin = {
-      id: unknown;
-      theme: string | null;
-      is_universal: boolean | null;
-      significance_score: number | null;
-      asked_by_count: number | null;
-    } | null;
-
-    const questions = data.map(q => {
-      // Supabase returns joined rows as array for one-to-many; we use single archived_question per question
-      const aq = (Array.isArray(q.archived_questions) ? q.archived_questions[0] : q.archived_questions) as AqJoin;
-      return {
-        id: q.id,
-        text: q.asked_as,
-        theme: aq?.theme ?? null,
-        word_limit: q.word_limit,
-        char_limit: q.char_limit,
-        is_required: q.is_required,
-        order_index: q.order_index,
-        is_universal: aq?.is_universal ?? false,
-        significance_score: aq?.significance_score ?? null,
-        asked_by_count: aq?.asked_by_count ?? 1
-      };
-    });
-
+    const questions = data.map(mapQuestion);
     const output = { program_id, count: questions.length, questions };
-
-    if (response_format === ResponseFormat.JSON) {
-      return {
-        content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
-        structuredContent: output
-      };
-    }
-
-    const stars = (score: number | null) => {
-      if (!score) return "☆☆☆☆☆";
-      const filled = Math.min(5, Math.round(score * 5));
-      return "★".repeat(filled) + "☆".repeat(Math.max(0, 5 - filled));
-    };
-
-    const lines: string[] = [`# Questions for Program\n`, `${questions.length} questions\n`];
-    for (const q of questions) {
-      lines.push(`### ${q.order_index + 1}. ${q.text}`);
-      lines.push(`- **Required**: ${q.is_required ? "Yes" : "No"} | **Theme**: ${q.theme ?? "?"}`);
-      const limitStr = q.word_limit ? `${q.word_limit} words` : q.char_limit ? `${q.char_limit} chars` : "none";
-      lines.push(`- **Limit**: ${limitStr}`);
-      lines.push(
-        `- **Significance**: ${stars(q.significance_score)}` +
-        ` | **Asked by**: ${q.asked_by_count} programs${q.is_universal ? " ⭐ Universal" : ""}`
-      );
-      lines.push("");
-    }
-
-    return {
-      content: [{ type: "text", text: lines.join("\n").slice(0, CHARACTER_LIMIT) }],
-      structuredContent: output
-    };
+    if (response_format === ResponseFormat.JSON) return buildJsonResponse(output);
+    return buildMarkdownResponse(output);
   });
 }

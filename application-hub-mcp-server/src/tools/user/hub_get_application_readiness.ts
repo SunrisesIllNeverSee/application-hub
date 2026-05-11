@@ -10,6 +10,133 @@ const Schema = z.object({
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
 
+async function fetchRequiredQuestions(program_id: string): Promise<any> {
+  const { data, error } = await supabase
+    .from("program_questions")
+    .select(`id, asked_as, word_limit, archived_question_id, archived_questions(theme)`)
+    .eq("program_id", program_id)
+    .eq("is_required", true)
+    .order("order_index");
+  return { data: data ?? [], error };
+}
+
+async function fetchAnsweredSet(user_id: string, archiveIds: any[]): Promise<Set<any>> {
+  const { data } = await supabase
+    .from("profile_answers")
+    .select("archived_question_id, confidence")
+    .eq("user_id", user_id)
+    .in("archived_question_id", archiveIds);
+  return new Set((data ?? []).map(a => a.archived_question_id));
+}
+
+async function fetchProgramMeta(program_id: string): Promise<any> {
+  const { data } = await supabase.from("programs")
+    .select("name, deadline_at").eq("id", program_id).single();
+  return data;
+}
+
+function computeDaysRemaining(deadline_at: string | null | undefined): number | null {
+  if (!deadline_at) return null;
+  return Math.ceil((new Date(deadline_at).getTime() - Date.now()) / 86_400_000);
+}
+
+function getQuestionTheme(q: any): string | null {
+  const raw = Array.isArray(q.archived_questions) ? q.archived_questions[0] : q.archived_questions;
+  return raw?.theme ?? null;
+}
+
+function buildMissingList(questions: any[], answeredSet: Set<any>): any[] {
+  return questions
+    .filter(q => !q.archived_question_id || !answeredSet.has(q.archived_question_id))
+    .map(q => ({
+      question_text: q.asked_as,
+      theme: getQuestionTheme(q),
+      word_limit: q.word_limit
+    }));
+}
+
+function progressBar(completion_pct: number): string {
+  const filled = Math.round(completion_pct / 10);
+  return "█".repeat(filled) + "░".repeat(10 - filled);
+}
+
+function formatMissingLine(q: any): string {
+  const themeLabel = q.theme ?? "?";
+  const wordLabel = q.word_limit ? ` _(${q.word_limit}w)_` : "";
+  return `- **[${themeLabel}]** ${q.question_text}${wordLabel}`;
+}
+
+function formatDeadlineLine(days_remaining: number | null): string {
+  if (days_remaining != null) return `⏱ **${days_remaining} days** until deadline`;
+  return "⏱ Rolling — no hard deadline";
+}
+
+function formatMarkdown(output: any): string {
+  const {
+    program_name,
+    completion_pct,
+    answered_questions,
+    total_required_questions,
+    days_remaining,
+    missing_questions
+  } = output;
+  const progress = `${progressBar(completion_pct)} **${completion_pct}%**`;
+  const answered = `${answered_questions}/${total_required_questions} required questions answered`;
+  const lines = [
+    `# Readiness: ${program_name}`,
+    "",
+    `${progress} — ${answered}`,
+    formatDeadlineLine(days_remaining),
+    ""
+  ];
+  if (missing_questions.length) {
+    lines.push("## Still Needed");
+    for (const q of missing_questions) lines.push(formatMissingLine(q));
+  } else {
+    lines.push("✅ All required questions answered. Ready to apply!");
+  }
+  return lines.join("\n").slice(0, CHARACTER_LIMIT);
+}
+
+function buildJsonResponse(output: any): any {
+  return {
+    content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
+    structuredContent: output
+  };
+}
+
+function buildMarkdownResponse(output: any): any {
+  return {
+    content: [{ type: "text", text: formatMarkdown(output) }],
+    structuredContent: output
+  };
+}
+
+async function buildReadinessOutput(user_id: string, program_id: string): Promise<any> {
+  const { data: questions, error } = await fetchRequiredQuestions(program_id);
+  if (error) return { error: error.message };
+
+  const archiveIds = questions.map((q: any) => q.archived_question_id).filter(Boolean);
+  const answeredSet = await fetchAnsweredSet(user_id, archiveIds);
+  const missing_questions = buildMissingList(questions, answeredSet);
+  const answered = questions.length - missing_questions.length;
+  const completion_pct = questions.length > 0 ? Math.round((answered / questions.length) * 100) : 0;
+
+  const program = await fetchProgramMeta(program_id);
+
+  return {
+    output: {
+      program_id,
+      program_name: program?.name ?? "Unknown",
+      completion_pct,
+      answered_questions: answered,
+      total_required_questions: questions.length,
+      days_remaining: computeDaysRemaining(program?.deadline_at),
+      missing_questions
+    }
+  };
+}
+
 export function registerGetApplicationReadiness(server: McpServer) {
   server.registerTool("hub_get_application_readiness", {
     title: "Get Application Readiness (authenticated)",
@@ -28,89 +155,9 @@ Requires valid user_token.`,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ user_token, program_id, response_format }) => {
     const user_id = await validateUserToken(user_token);
-
-    // Get required questions for this program
-    const { data: allQuestions, error: qErr } = await supabase
-      .from("program_questions")
-      .select(`id, asked_as, word_limit, archived_question_id, archived_questions(theme)`)
-      .eq("program_id", program_id)
-      .eq("is_required", true)
-      .order("order_index");
-
-    if (qErr) return { content: [{ type: "text", text: `Error: ${qErr.message}` }] };
-
-    const questions = allQuestions ?? [];
-
-    // Get user's existing answers for this program's archived questions
-    const archiveIds = questions.map(q => q.archived_question_id).filter(Boolean);
-    const { data: profileAnswers } = await supabase
-      .from("profile_answers")
-      .select("archived_question_id, confidence")
-      .eq("user_id", user_id)
-      .in("archived_question_id", archiveIds);
-
-    const answeredSet = new Set((profileAnswers ?? []).map(a => a.archived_question_id));
-
-    const missing = questions.filter(q => !q.archived_question_id || !answeredSet.has(q.archived_question_id));
-    const answered = questions.length - missing.length;
-    const completion_pct = questions.length > 0 ? Math.round((answered / questions.length) * 100) : 0;
-
-    // Get program deadline
-    const { data: program } = await supabase.from("programs")
-      .select("name, deadline_at").eq("id", program_id).single();
-
-    const days_remaining = program?.deadline_at
-      ? Math.ceil((new Date(program.deadline_at).getTime() - Date.now()) / 86_400_000)
-      : null;
-
-    const output = {
-      program_id,
-      program_name: program?.name ?? "Unknown",
-      completion_pct,
-      answered_questions: answered,
-      total_required_questions: questions.length,
-      days_remaining,
-      missing_questions: missing.map(q => ({
-        question_text: q.asked_as,
-        theme: (Array.isArray(q.archived_questions) ? q.archived_questions[0] : q.archived_questions)?.theme ?? null,
-        word_limit: q.word_limit
-      }))
-    };
-
-    if (response_format === ResponseFormat.JSON) {
-      return {
-        content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
-        structuredContent: output
-      };
-    }
-
-    const progressBar = () => {
-      const filled = Math.round(completion_pct / 10);
-      return "█".repeat(filled) + "░".repeat(10 - filled);
-    };
-
-    const lines = [
-      `# Readiness: ${output.program_name}`,
-      "",
-      `${progressBar()} **${completion_pct}%** — ${answered}/${questions.length} required questions answered`,
-      days_remaining != null
-        ? `⏱ **${days_remaining} days** until deadline`
-        : "⏱ Rolling — no hard deadline",
-      ""
-    ];
-
-    if (missing.length) {
-      lines.push("## Still Needed");
-      for (const q of output.missing_questions) {
-        lines.push(`- **[${q.theme ?? "?"}]** ${q.question_text}${q.word_limit ? ` _(${q.word_limit}w)_` : ""}`);
-      }
-    } else {
-      lines.push("✅ All required questions answered. Ready to apply!");
-    }
-
-    return {
-      content: [{ type: "text", text: lines.join("\n").slice(0, CHARACTER_LIMIT) }],
-      structuredContent: output
-    };
+    const result = await buildReadinessOutput(user_id, program_id);
+    if (result.error) return { content: [{ type: "text", text: `Error: ${result.error}` }] };
+    if (response_format === ResponseFormat.JSON) return buildJsonResponse(result.output);
+    return buildMarkdownResponse(result.output);
   });
 }

@@ -4,6 +4,10 @@ import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 import { validateUserToken } from "../../services/auth.js";
 import { userClient } from "../../services/supabase.js";
 
+const ANSWER_FIELDS =
+  "id, user_id, archived_question_id, question_text, theme, answer_content, " +
+  "confidence, word_count, version, updated_at";
+
 const ReviewCommentSchema = z.object({
   type: z.enum(["signal", "fidelity", "commitment", "specificity", "fit", "risk"]),
   severity: z.enum(["info", "warning", "blocker"]),
@@ -45,7 +49,7 @@ const Schema = z.object({
 async function validateAnswerOwnership(client: any, answer_id: string, user_id: string): Promise<any> {
   const { data, error } = await client
     .from("profile_answers")
-    .select("id, user_id, archived_question_id, question_text, theme, answer_content, confidence, word_count, version, updated_at")
+    .select(ANSWER_FIELDS)
     .eq("id", answer_id)
     .eq("user_id", user_id)
     .single();
@@ -53,7 +57,10 @@ async function validateAnswerOwnership(client: any, answer_id: string, user_id: 
   return data;
 }
 
-async function fetchProgram(client: any, program_id: string): Promise<{ id: string; name: string | null; slug: string | null } | null> {
+async function fetchProgram(
+  client: any,
+  program_id: string
+): Promise<{ id: string; name: string | null; slug: string | null } | null> {
   const { data, error } = await client
     .from("programs")
     .select("id, name, slug")
@@ -174,7 +181,8 @@ drafting separate from review comments, scores, and certification metadata.`,
 
     const { review, error: reviewError } = await insertReview(client, reviewInsert);
     if (!review) {
-      return { content: [{ type: "text", text: `Error saving answer review: ${reviewError?.message ?? "unknown error"}` }] };
+      const errorMessage = `Error saving answer review: ${reviewError?.message ?? "unknown error"}`;
+      return { content: [{ type: "text", text: errorMessage }] };
     }
 
     const output = { review, answer, program };
