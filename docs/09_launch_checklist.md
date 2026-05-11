@@ -2,6 +2,8 @@
 
 This is the practical ship/no-ship checklist for a Milestone 3 push.
 
+For preview-specific testing handoff, use [docs/25_preview_test_preconditions.md](/Users/dericmchenry/Desktop/application-hub/docs/25_preview_test_preconditions.md) so agents do not spend time discovering missing migration/auth prerequisites mid-run.
+
 ## Repo Verification
 
 Run from repo root:
