@@ -1,12 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import Stripe from 'stripe'
-
-// Supabase admin client (service role) for webhook writes — bypass RLS
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
-// App Router in Next.js 14 does not use the pages-dir bodyParser config.
-// Instead we read the raw body via req.text() before signature verification.
+// =============================================================================
+// Stripe Webhook Handler — best-practice notes
+// =============================================================================
+// • Signature verification: stripe.webhooks.constructEvent on the raw body.
+//   Required by Stripe — without it, anyone could POST fake events.
+//   https://docs.stripe.com/webhooks/signatures
+//
+// • Raw body access: Next.js App Router uses req.text() (NOT req.json()) so we
+//   get the exact bytes Stripe signed.
+//
+// • Dedup: every event ID is INSERTed into stripe_events BEFORE processing.
+//   Stripe retries failed deliveries (and can replay during outages); without
+//   dedup, a checkout.session.completed could fire twice and double-mutate
+//   subscription state. The UNIQUE PK on event_id makes the second insert fail
+//   cleanly — we return 200 immediately and skip handler logic.
+//   https://docs.stripe.com/webhooks#handle-duplicate-events
+//
+// • Always 200 on success, even for events we don't handle. Returning 4xx/5xx
+//   triggers Stripe retries, which spams the endpoint and can mask bugs.
+//
+// • Service role Supabase client: webhook needs to write across user rows;
+//   the anon-key client would be blocked by RLS. NEVER use service role in
+//   user-facing routes — only in trusted server-only endpoints like this one.
+// =============================================================================
 
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -20,6 +40,9 @@ function getAdminClient() {
 /**
  * Map a Stripe price ID back to a subscription tier.
  * Returns null if the price ID doesn't match a known plan.
+ *
+ * NOTE: env vars are read at module load — if a new price ID is added to
+ * Stripe, you must redeploy the function for tierFromPriceId to recognise it.
  */
 function tierFromPriceId(priceId: string): 'pro' | 'team' | null {
   const priceMap: Record<string, 'pro' | 'team'> = {
@@ -56,8 +79,32 @@ export async function POST(req: NextRequest) {
 
   const supabase = getAdminClient()
 
+  // ===========================================================================
+  // DEDUP — claim the event ID before processing. If another delivery already
+  // claimed it, return 200 immediately so Stripe stops retrying.
+  // ===========================================================================
+  const { error: claimErr } = await supabase.from('stripe_events').insert({
+    event_id: event.id,
+    event_type: event.type,
+    livemode: event.livemode,
+  })
+
+  if (claimErr) {
+    // 23505 = unique_violation in Postgres — means we've seen this event before.
+    // Any other error: log but still return 200 so Stripe doesn't retry forever
+    // on a transient DB hiccup.
+    if (claimErr.code === '23505') {
+      console.log(`[webhook] dedup hit for ${event.id} (${event.type}) — skip`)
+      return NextResponse.json({ received: true, deduped: true })
+    }
+    console.error('[webhook] failed to claim event (continuing):', claimErr)
+  }
+
   try {
     switch (event.type) {
+      // -----------------------------------------------------------------------
+      // Checkout completed — initial subscription activation
+      // -----------------------------------------------------------------------
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.user_id
@@ -77,15 +124,17 @@ export async function POST(req: NextRequest) {
             stripe_subscription_id: session.subscription as string,
           })
           .eq('user_id', userId)
-
         break
       }
 
+      // -----------------------------------------------------------------------
+      // Subscription created — covers cases where a sub is created outside our
+      // checkout flow (e.g. admin-created in Stripe Dashboard, migration import).
+      // -----------------------------------------------------------------------
+      case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
-
-        // Resolve tier from the first line item's price
         const priceId = subscription.items.data[0]?.price?.id
         const tier = priceId ? tierFromPriceId(priceId) : null
 
@@ -103,15 +152,16 @@ export async function POST(req: NextRequest) {
           .from('user_subscriptions')
           .update(updatePayload)
           .eq('stripe_customer_id', customerId)
-
         break
       }
 
+      // -----------------------------------------------------------------------
+      // Subscription deleted — graceful downgrade to free
+      // -----------------------------------------------------------------------
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
 
-        // Graceful downgrade: revert to free tier, keep status active
         await supabase
           .from('user_subscriptions')
           .update({
@@ -121,18 +171,75 @@ export async function POST(req: NextRequest) {
             current_period_end: null,
           })
           .eq('stripe_customer_id', customerId)
+        break
+      }
 
+      // -----------------------------------------------------------------------
+      // Invoice paid — successful renewal. Refresh period dates from the
+      // invoice's parent subscription so we stay synced with Stripe.
+      // -----------------------------------------------------------------------
+      case 'invoice.paid':
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = invoice.customer as string
+        const subscriptionId = (invoice as Stripe.Invoice & { subscription?: string }).subscription
+        if (!subscriptionId) break
+
+        const stripe = getStripe()
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+
+        await supabase
+          .from('user_subscriptions')
+          .update({
+            status: subscription.status,
+            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          })
+          .eq('stripe_customer_id', customerId)
+        break
+      }
+
+      // -----------------------------------------------------------------------
+      // Invoice payment failed — set status to past_due. Stripe's Smart
+      // Retries will reattempt the charge per the customer's dunning settings.
+      // We don't downgrade the tier here — wait for customer.subscription.deleted
+      // or .updated to reflect the final state.
+      // NOTE: For dunning UX, you may want to email the user from here, or surface
+      // an in-app banner gated on status='past_due'.
+      // -----------------------------------------------------------------------
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = invoice.customer as string
+
+        await supabase
+          .from('user_subscriptions')
+          .update({ status: 'past_due' })
+          .eq('stripe_customer_id', customerId)
         break
       }
 
       default:
-        // Unhandled event — return 200 to acknowledge receipt and prevent retries
+        // Unhandled event — log + return 200. Don't retry-spam Stripe on
+        // event types we deliberately ignore.
+        console.log(`[webhook] unhandled event type ${event.type}`)
         break
     }
   } catch (err) {
     console.error('[webhook] handler error:', err)
+    // Mark the event as errored so retries can re-attempt (after dedup row
+    // is cleaned up out-of-band) and we have a paper trail.
+    await supabase
+      .from('stripe_events')
+      .update({ error_text: err instanceof Error ? err.message : String(err) })
+      .eq('event_id', event.id)
     return NextResponse.json({ error: 'Handler error' }, { status: 500 })
   }
+
+  // Mark processed
+  await supabase
+    .from('stripe_events')
+    .update({ processed_at: new Date().toISOString() })
+    .eq('event_id', event.id)
 
   return NextResponse.json({ received: true })
 }

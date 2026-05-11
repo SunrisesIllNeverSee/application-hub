@@ -8,6 +8,11 @@ export function getStripe(): Stripe {
     if (!process.env.STRIPE_SECRET_KEY) {
       throw new Error('STRIPE_SECRET_KEY is not set')
     }
+    // NOTE: pinning a specific apiVersion is Stripe best practice — it shields
+    // you from breaking changes when Stripe rolls forward. Bump deliberately
+    // alongside SDK upgrades. See https://docs.stripe.com/api/versioning.
+    // SDK version comes from package.json (stripe@^16) which targets
+    // '2024-06-20' as its baseline; that's the minimum we should pin.
     _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2024-06-20',
     })

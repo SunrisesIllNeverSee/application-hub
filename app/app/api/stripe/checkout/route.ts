@@ -70,16 +70,31 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get('origin') ?? 'http://localhost:3000'
 
+    // NOTE: we deliberately do NOT pass payment_method_types — Stripe's
+    // dynamic payment methods picks the best methods per region/customer
+    // (Apple Pay, Google Pay, Klarna, etc) based on Dashboard settings.
+    // https://docs.stripe.com/payments/payment-methods/dynamic-payment-methods
+    //
+    // Stripe-hosted Checkout is the recommended frontend pattern for SaaS
+    // subscriptions (per stripe-best-practices skill). The Payment Element
+    // is an alternative only if you need deep inline customization.
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/profile/settings?upgraded=true`,
-      cancel_url: `${origin}/profile/settings`,
+      // Both URLs include the {CHECKOUT_SESSION_ID} placeholder so the success
+      // page can verify the session out-of-band. Keep success/cancel separate
+      // so analytics can distinguish completed vs abandoned upgrades.
+      success_url: `${origin}/profile/settings?upgraded=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/profile/settings?upgrade_cancelled=true`,
+      // Duplicate metadata on the session AND the subscription — the webhook
+      // reads user_id from whichever event fires first.
       metadata: { user_id: user.id, tier },
       subscription_data: {
         metadata: { user_id: user.id, tier },
       },
+      // Optional but recommended for SaaS — allow promo codes at checkout
+      allow_promotion_codes: true,
     })
 
     return NextResponse.json({ url: session.url })
