@@ -351,7 +351,9 @@ export async function POST(req: NextRequest) {
           .insert({
             user_id: user.id,
             archived_question_id: archivedId,
+            answer_content: pair.answer_text,
             content: pair.answer_text,
+            question_text: '',
             word_count: wordCount,
             confidence: pair.confidence,
           })
