@@ -43,17 +43,20 @@ P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration ch
 - Stripe: confirm price IDs in Vercel env
 - Recruiter agent: set CRON_SECRET + APP_URL in Supabase edge function env, activate Monday 9am schedule
 
-### FundingCake programs
+### FundingCake programs — WRAPPED (2026-05-12, mcp-eval)
 
-782/812 have real website URLs. 778 have descriptions. The only gap is `apply_url` — FundingCake captured homepages, not intake pages.
+**What's done:**
 
-**Phase A + B COMPLETE (2026-05-12):**
+- Phase A: 782 homepages scraped → 160 apply_urls staged (`seed/staging/fundingcake_apply_urls.csv`)
+- Phase B: 88 questions extracted, 39 promote-ready (`seed/staging/fundingcake_questions_promote.csv`)
+- `apply_url` now renders on hub program detail with "verify link" badge (`7e2fe35`)
+- 13 JS-gated programs listed as needs-validation: `seed/staging/needs_validation.md`
+- Full methodology: `docs/26_fundingcake_ingest_pipeline.md`
 
-- Phase A: 782 homepages → 160 high-confidence apply_urls → `seed/staging/fundingcake_apply_urls.csv`
-- Phase B: 160 apply pages → 88 questions from 21 programs → `seed/staging/fundingcake_questions.csv`
-- Promote-ready: 39 questions (high confidence archive matches) → `seed/staging/fundingcake_questions_promote.csv`
+**Pending human action:**
 
-**Next step (human review required):** Review `fundingcake_questions_promote.csv` (39 rows), then promote to `program_questions` + update `programs.apply_url`. Phase C (browser extension) handles JS-gated forms organically.
+- Review `fundingcake_questions_promote.csv` (39 rows) then run promotion SQL
+- Spot-check the 13 programs in `needs_validation.md` manually
 
 ---
 
