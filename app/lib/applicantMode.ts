@@ -127,3 +127,19 @@ export function defaultSubmitKindForMode(mode: ApplicantMode): string {
       return 'grant'
   }
 }
+
+/**
+ * Unified label replacing both "Sparse" (ModeSelector) and "Soon" (landing page).
+ * RFC = Request for Community. Signals action and contribution, not absence.
+ */
+export function modeCommunityLabel(mode: ApplicantMode): string {
+  return isModeDeeplyCurated(mode) ? 'Live' : 'RFC'
+}
+
+/**
+ * Tooltip / aria-label for the RFC badge.
+ */
+export function modeCommunityDescription(mode: ApplicantMode): string {
+  const ctx = modeContextLabel(mode).toLowerCase()
+  return `The ${ctx} vertical needs programs. Submit one and earn credits toward your answer bank.`
+}

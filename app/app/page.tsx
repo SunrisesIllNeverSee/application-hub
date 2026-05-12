@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { APPLICANT_MODES, modeLabel, isModeDeeplyCurated, modeCommunityLabel, modeCommunityDescription, defaultSubmitKindForMode } from '@/lib/applicantMode'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
@@ -62,20 +63,26 @@ export default async function RootPage() {
             <span className="text-neutral-400">for every application you&apos;ll ever write.</span>
           </h1>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-600 text-white text-xs font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-white" />
-              Founder mode
-              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] uppercase tracking-wider">Live</span>
-            </span>
-            {['Job-seeker', 'Student', 'Researcher'].map((label) => (
-              <span
-                key={label}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-medium"
-              >
-                {label} mode
-                <span className="ml-1 px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 text-[10px] uppercase tracking-wider">Soon</span>
-              </span>
-            ))}
+            {APPLICANT_MODES.map((mode) => {
+              const curated = isModeDeeplyCurated(mode)
+              return curated ? (
+                <span key={mode} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-600 text-white text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  {modeLabel(mode)} mode
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] uppercase tracking-wider">Live</span>
+                </span>
+              ) : (
+                <Link
+                  key={mode}
+                  href={`/hub/submit?kind=${defaultSubmitKindForMode(mode)}`}
+                  title={modeCommunityDescription(mode)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-medium hover:border-amber-700 hover:text-amber-300 transition-colors"
+                >
+                  {modeLabel(mode)} mode
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 text-[10px] uppercase tracking-wider">{modeCommunityLabel(mode)}</span>
+                </Link>
+              )
+            })}
           </div>
           <p className="mt-3 text-xs text-neutral-500">
             Built deep on tech startup applications first. Same archive/answer-bank engine across all modes — jobs, schools, and grants ship next.

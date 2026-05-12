@@ -9,8 +9,9 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 32
+  next: 33
   applied:
+    - { n: 32, file: 032_credits_and_achievements.sql, commit: "pending", landed: "2026-05-11", note: "credit_events + user_achievements tables, answer/submission triggers" }
     - { n: 31, file: 031_fix_contribution_credit_amount.sql, commit: "pending", landed: 2026-05-11, note: "Fix: credit_amount reflects actual unlocks inserted" }
     - { n: 30, file: 030_applicant_modes_and_contributions.sql, commit: "codex", landed: 2026-05-11, note: "Codex — applicant_mode enum, identities[], contribution rewards trigger" }
     - { n: 29, file: 029_embedding_resize_768.sql, commit: "c02299b", landed: 2026-05-11 }
@@ -84,6 +85,9 @@ features:
   match_question_api: shipped
   embedding_seeder_script: shipped
   browser_extension: not_started
+  credits_ledger: shipped
+  achievements: shipped
+  social_claim_api: shipped
   v1_automation_docs: shipped
   applicant_modes: shipped
   contribution_rewards: shipped

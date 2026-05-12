@@ -9,6 +9,9 @@ import {
   modeLabel,
   modeContextLabel,
   isModeDeeplyCurated,
+  modeCommunityLabel,
+  modeCommunityDescription,
+  defaultSubmitKindForMode,
 } from '@/lib/applicantMode'
 
 interface ModeSelectorProps {
@@ -48,7 +51,8 @@ export function ModeSelector({
         const body = (await res.json().catch(() => null)) as { error?: string } | null
         throw new Error(body?.error ?? `Switch failed (${res.status})`)
       }
-      startTransition(() => router.refresh())
+      // Clear type filter params on mode switch so the new mode's filter applies cleanly
+    startTransition(() => router.push('/hub'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Switch failed')
     } finally {
@@ -96,11 +100,11 @@ export function ModeSelector({
               )}
               {sparse && (
                 <span
-                  aria-label="sparse vertical"
-                  title="This vertical is still being built — submitting programs earns drip unlocks"
+                  aria-label={modeCommunityDescription(mode)}
+                  title={modeCommunityDescription(mode)}
                   className="ml-0.5 inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
                 >
-                  Sparse
+                  {modeCommunityLabel(mode)}
                 </span>
               )}
             </button>
@@ -112,8 +116,14 @@ export function ModeSelector({
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
           Viewing as <span className="font-medium text-neutral-700 dark:text-neutral-300">{modeLabel(activeIdentity)}</span>{' '}
           · {modeContextLabel(activeIdentity)} programs
-          {!isModeDeeplyCurated(activeIdentity) &&
-            ' · sparse, contribute to earn drip unlocks'}
+          {!isModeDeeplyCurated(activeIdentity) && (
+            <> · <a
+              href={`/hub/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`}
+              className="text-amber-600 dark:text-amber-400 hover:underline font-medium"
+            >
+              Submit a program, earn credits
+            </a></>
+          )}
         </p>
       )}
 
