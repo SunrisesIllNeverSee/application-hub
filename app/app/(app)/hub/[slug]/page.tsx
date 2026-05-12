@@ -119,6 +119,20 @@ export default async function ProgramDetailPage({ params }: Props) {
             >
               Start Application
             </Link>
+            {program.apply_url && (
+              <a
+                href={program.apply_url}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-secondary text-center flex items-center justify-center gap-1.5"
+                title="External apply link — verify it's current before submitting"
+              >
+                Apply ↗
+                <span className="text-[10px] font-normal opacity-60 border border-current rounded px-1 py-px">
+                  verify link
+                </span>
+              </a>
+            )}
             {program.url && (
               <a
                 href={program.url}
