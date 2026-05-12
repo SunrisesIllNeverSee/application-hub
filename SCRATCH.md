@@ -8,9 +8,9 @@
 
 ---
 
-## Current state (2026-05-12, vscode-claude session — updated)
+## Current state (2026-05-13, vscode-claude session — updated)
 
-P3 active. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 039, next = 040.
+AQUA Phase shipped. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 040, next = 041.
 
 ### What's shipped (confirmed this session)
 
@@ -42,6 +42,10 @@ P3 active. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain a
 - **Pricing strategy implemented** — Team tier removed from PricingCards UI, Free/Pro only for launch
 - **Migration cleanup baseline** — `seed/000_baseline.sql` placeholder created, regenerate at migration 050
 - **Appfeeder V1** — `appfeeder/` scaffold + `docs/BROWSER_EXTENSION.md` spec + semantic match wired (mcp-eval)
+- **AQUA Phase (8 features)** — rebrand, split-screen workspace, onboarding gate (migration 040), AQUAscore + persona, Dash command center, Answers file tree, Applications merge, Questions tabs
+- **Middleware fixed** — routes updated to AQUA nav, onboarding gate added, post-login redirect → /dash
+- **Appfeeder capture loop** — blur listener + `/api/answers/capture` route (semantic match → save new answer version)
+- **codex/qaapplication/** — sample application files (solo fund, unicorn fund) for archive seeding
 
 ### Remaining open work
 
