@@ -45,10 +45,22 @@ P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration ch
 
 ### FundingCake programs
 
-812 shells — real entities, no apply_url. Fill path: RFC mechanic + targeted ingest for top accelerators.
+782/812 have real website URLs. 778 have descriptions. The only gap is `apply_url` — FundingCake captured homepages, not intake pages.
+
+**IN PROGRESS (mcp_eval session, 2026-05-12):** Phase A — 10 parallel Firecrawl agents scraping all 782 homepages to discover apply_url. Results staging at `seed/staging/apply_url_results/batch_NN.csv`. Phase B (question extraction) follows when Phase A completes.
+
+**Do not touch:** `seed/staging/batches/`, `seed/staging/apply_url_results/` — agents actively writing.
 
 ---
 
 ## For Codex — most recent context
 
-Updated 2026-05-12 (vscode-claude) — auth rebuilt (password+GitHub), security fixes, archive/funders UI, types clean, migration 033 latest, next = 034.
+Updated 2026-05-12 (vscode-claude + mcp-eval) — auth rebuilt (password+GitHub), security fixes, archive/funders UI, types clean, migration 033 latest, next = 034. FundingCake apply_url discovery pipeline active (mcp-eval).
+
+## Currently claimed
+
+- **mcp-eval** — FundingCake apply_url discovery Phase A — `seed/staging/batches/`, `seed/staging/apply_url_results/` — claimed 2026-05-12 — 10 Firecrawl agents running, do not write to these paths
+
+## Recently released
+
+- **mcp-eval** — CI fixes, coordination sync, markdown lint — `.github/workflows/ci.yml`, `SCRATCH.md`, `STATUS.md`, `.agents/claims.yaml` — 2026-05-12
