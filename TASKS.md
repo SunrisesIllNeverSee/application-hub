@@ -1,8 +1,36 @@
 # Application Hub — Task List
 
-Current phase: **Launch hardening — ship the spine, layer RNS**
+Current phase: **AQUA shipped — Phase 2 features all landed (2026-05-12)**
 
 Last updated: 2026-05-12
+
+## AQUA Phase — Shipped 2026-05-12
+
+All 8 features from the AQUA build spec are live in main:
+
+- [x] **AQUA rebrand + 4-pillar nav** (Sidebar, routes, redirects, OG, metadata)
+- [x] **Feature 1** — Split-screen editor at /workspace/[program_id]
+- [x] **Feature 2** — VS Code answer bank at /answers
+- [x] **Feature 3** — Dash command center at /dash (AQUAscore hero + challenges + rewards)
+- [x] **Feature 4** — Workspace into Applications tabs (?tab=discover|mine)
+- [x] **Feature 5** — Funders as filter (?view=funders)
+- [x] **Feature 6** — Archive as Questions tab (?view=archive)
+- [x] **Feature 7** — Onboarding gate (migration 040 applied)
+- [x] **Feature 8** — Persona profile + AQUAscore at /profile/persona
+
+Foundation docs:
+- codex/AQUA_BUILD.md — the full grounding document
+- codex/WORKING_PLAN.md — personal working notes
+- codex/feedbackplan.md — derived from feedback.md / feedback2.md
+- lib/aquascore.ts — additive 3-pillar scoring utility
+
+Open follow-ups (not blockers):
+- Wire FMS classification (manual or AI-assisted) into the persona boost layers
+- Vendor the fundscore CLI from signal-ecosystem/FMS-2.0-Package
+- Portfolio Readiness surrogate for non-tech paths
+- Persona Layer 2 → distilled profile derived from answer patterns (gate: real user data)
+
+
 
 This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` is who is touching what right now.
 

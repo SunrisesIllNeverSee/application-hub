@@ -1,4 +1,4 @@
-# Application Hub — Status
+# AQUA — Status
 
 _Last updated: 2026-05-12 (cowork session)_
 
@@ -51,6 +51,20 @@ Other coordination docs should point here rather than restating these facts unle
 - Migrations through `040` are now the expected app chain (034-035 are renames of duplicate-prefix files; Supabase CLI synced).
 - The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
 
+
+### Shipped 2026-05-12 (AQUA Phase)
+
+- **Rebrand: Application Hub → AQUA** (Applications · Questions · Answers). Sidebar consolidated from 7 items to 4 pillars (Dash · Applications · Questions · Answers). Logo, OG image, page titles, landing, scoring docs all rebranded. Profile demoted to footer (credit badge link remains).
+- **Routes restructured** with permanent redirects: /today→/dash, /hub→/applications (incl. nested), /bank→/questions, /archive/questions→/questions?view=archive, /funders→/applications?view=funders. Workspace stays at /workspace/[program_id] but lights up Applications in nav.
+- **Feature 1 — Split-screen editor**: /workspace/[program_id] rebuilt as left-tree + right-editor. New QuestionTree (collapsible by section, theme tag, significance, answered indicator) and CompiledOutput (inline-markdown render, copy-to-clipboard). Selection state in URL.
+- **Feature 2 — VS Code answer bank**: /answers rebuilt as folder/file tree by theme. New AnswerFileNode shows confidence dot, preview, last-updated, word count. Detail pane shows captured-on / updated-on dates + answer ID provenance footer.
+- **Feature 3 — Dash command center**: /dash now opens with the AQUAscore hero (composite + pillar bars + tier label + breakdown link), Active Challenges derived from nextTierDelta + gap signals, Rewards Unlocked chips from user_achievements, deadlines/in-progress sections preserved.
+- **Feature 4 — Workspace into Applications tabs**: /applications now has Discover / My Applications / Funders top-level tabs via ?tab= and ?view= params. My Applications lists user_applications with status, deadline, fit.
+- **Feature 5 — Funders as filter**: standalone /funders index lifted into FundersDirectory component, rendered under /applications?view=funders. Detail page /funders/[slug] retained.
+- **Feature 6 — Archive as Questions tab**: /questions now has My Questions / Full Archive tabs via ?view=. Archive page logic lifted into QuestionsArchiveView component; standalone /archive/questions removed (redirect handles incoming links).
+- **Feature 7 — Onboarding Gate** (migration 040 applied): hard /onboarding gate before any (app) route opens. Two paths — Starter (≥5 of 8 high-significance archive questions) or Upload (paste in-progress application). Saves to profile_answers / applicant_context, sets active_identity via light heuristic, flips onboarding_completed_at. Legacy users grandfathered via backfill.
+- **Feature 8 — Persona Profile + AQUAscore**: new lib/aquascore.ts (additive 3-pillar composite + nextTierDelta + tier classification). /profile/persona page shows headline AQUAscore with tier, pillar breakdown bars, three-layer status cards (Answer Bank → Persona Profile → Recruiter Surface), theme strengths radar (reuses DnaRadarChart), and boost-layer slots for GitHub / LinkedIn / FMS / FundScore (additive only, never subtractive).
+- **Brand IS the scoring system**: AQUAscore composition maps directly to the three pillars. Applications + Questions + Answers → composite, weighted by active_identity (future). MoatScore = AQUAscore + optional boost layers (FMS + FundScore + Portfolio); V1 ships MoatScore == AQUAscore until FMS/FundScore wire up.
 
 ### Shipped 2026-05-12 (this session)
 
