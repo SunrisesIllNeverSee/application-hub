@@ -8,9 +8,9 @@
 
 ---
 
-## Current state (2026-05-12, vscode-claude session)
+## Current state (2026-05-12, vscode-claude session — updated)
 
-P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 033 (supabase/migrations/), next = 034.
+P3 active. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 039, next = 040.
 
 ### What's shipped (confirmed this session)
 
@@ -29,19 +29,27 @@ P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration ch
 - Question embeddings — 225 questions seeded at 768d via nomic-embed-text
 - Security DEFINER views fixed (migration 033)
 - CI in strict mode, database.types.ts regenerated + aliases
+- Sitemap + robots.txt for mos2es.xyz (Next.js dynamic, 500 program limit, /hub/timeline added)
+- Sitemap + robots.txt for mos2es.com (static XML in mos2es-site repo, Netlify)
+- Next.js 14.2.35 → 15.3.4 — 4 high CVEs resolved, all server clients async
+- Ranking RPC migration 038 — `get_top_programs_by_value()` live in Supabase
+- Portability domain guardrail — hub query + 2 MCP tools now filter by domain
+- AFTER_LAUNCH.md — Architecture Decisions (ADR-001), Pricing Strategy, Migration Cleanup Plan, Data Lifecycle / Cycle Retirement
+- codex/feedback.md — structured + Claude addendum (product commentary, ICP, business model analysis)
+- codex/feedbackplan.md — full sequential build plan from feedback.md
 
 ### Remaining open work
 
-- Real deadlines seeding — most programs show "Rolling"
-- Heat scores — synthetic compute from brand_score + cohort_size
-- MoatScore / FundScore — placeholder cards on Today need actual compute
-- Responsive QA — mobile/tablet viewport pass on hub/bank/workspace/profile
-- Workspace naming locked as "My Applications" (sidebar) / "Workspace" (routes)
+- **FundingCake Phase C** — promote 39 staged questions into `program_questions` (CSV ready at `seed/staging/fundingcake_questions_promote.csv`)
+- **MoatScore / FundScore** — placeholder cards on Today need real formula or removal (MULTI_CLAUDE: pick one)
+- **ROADMAP.md Vision Tier pruning** — move distant future items to AFTER_LAUNCH.md Future Products section
+- **FundingCake questions promotion SQL** — 39 rows ready, Deric to review then promote
 
 ### Deric to drive
 
 - Stripe: confirm price IDs in Vercel env
 - Recruiter agent: set CRON_SECRET + APP_URL in Supabase edge function env, activate Monday 9am schedule
+- Submit `mos2es.xyz/sitemap.xml` and `mos2es.com/sitemap.xml` to Google Search Console
 
 ### FundingCake programs — WRAPPED (2026-05-12, mcp-eval)
 
@@ -62,12 +70,13 @@ P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration ch
 
 ## For Codex — most recent context
 
-Updated 2026-05-12 (vscode-claude + mcp-eval) — auth rebuilt (password+GitHub), security fixes, archive/funders UI, types clean, migration 033 latest, next = 034. FundingCake apply_url discovery pipeline active (mcp-eval).
+Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js 15.3.4, ranking RPC live, domain guardrail wired. AFTER_LAUNCH.md complete (ADR-001, pricing, migration cleanup, data lifecycle). codex/feedbackplan.md added — full build plan mapped from feedback.md. FundingCake Phase C pending (39 rows ready to promote). MoatScore cards need real formula or removal.
 
 ## Currently claimed
 
-- **mcp-eval** — FundingCake pipeline DONE — all staging files committed `aca8a06` — lane released
+- **mcp-eval** — Browser Extension V1 — `browser-extension/`, `docs/BROWSER_EXTENSION.md` — claimed 2026-05-12
 
 ## Recently released
 
+- **vscode-claude** — three infra tasks (ranking RPC, Next.js 15, portability guardrail), AFTER_LAUNCH.md sections, codex/ files — commits `9c15708`, `aba40c5` — 2026-05-12
 - **mcp-eval** — CI fixes, coordination sync, markdown lint — `.github/workflows/ci.yml`, `SCRATCH.md`, `STATUS.md`, `.agents/claims.yaml` — 2026-05-12

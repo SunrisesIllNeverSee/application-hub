@@ -115,3 +115,47 @@ Heavy closed-cycle data doesn't need to live in the hot DB:
 | Archived for 2 years | Export to static archive, delete hot rows |
 
 Gate: needs `programs.is_archived` column (migration) + Hub filter to exclude archived by default.
+
+---
+
+## Architecture Decisions
+
+### ADR-001 — Cross-Theme Portability
+**Decision**: The question archive, answer bank, fit/review engine, and MCP tools are domain-agnostic infrastructure. No founder-only assumptions in reusable layers.
+
+**What's already in place**: `domain` param on `hub_get_universal_questions` and `hub_find_similar_questions`. `applicant_mode` enum separates founder/student/researcher/job-seeker identity. Program types are filterable by mode.
+
+**What's deferred**: Actual seeding of non-founder verticals (jobs, school applications, grants). Do not expand until the founder wedge validates — defined as 100+ active founders with measurable Answer Bank reuse rates.
+
+**Rule**: When building new features, ask "does this work for a job applicant too?" If yes, build it portable. If the answer is "we'd need to refactor," that's the signal to make the layer generic first.
+
+---
+
+## Pricing Strategy
+
+**Launch posture**: Free / Pro only. Keep it simple until we know what people actually pay for.
+
+| Tier | Price | What it unlocks |
+|---|---|---|
+| Free | $0 | 10 AI drafts/mo, drip questions, Hub access |
+| Pro | $19/mo | Unlimited drafts, full archive, fit scores, export |
+| Team | $49/mo | Live in schema + Stripe, not actively marketed |
+| Pro+ | TBD | Defined in VISION, not built |
+
+**Gate**: Revisit after first 100 active founders. If Free→Pro conversion is happening naturally, keep it. If nobody's hitting the free limit, the limit is wrong. If Team has zero subscribers after 6 months of Pro users, cut it.
+
+**Rule**: Don't add more tiers. Add more value to Pro first.
+
+---
+
+## Migration Cleanup Plan
+
+**Problem**: 39 migrations accumulated in ~2 days. Chain is correct but noisy for fresh installs and PR reviews.
+
+**Plan**:
+- At migration **050**: squash migrations 001–020 into a single `000_baseline.sql` for fresh install convenience
+- Migrations 021+ stay incremental — they contain live data transformations and seeds
+- Live Supabase schema is **never touched** — developer ergonomics only
+- `000_baseline.sql` goes in `seed/` as a fresh-install shortcut; `supabase/migrations/` stays canonical
+
+**Owner**: whoever is active when we hit migration 050. Flag it in the commit message.

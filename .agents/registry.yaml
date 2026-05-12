@@ -13,7 +13,7 @@ migrations:
   path: supabase/migrations/  # was: migrations/ (root)
   cli_synced: true  # supabase db push --dry-run confirmed clean 2026-05-11
   applied:
-    - { n: 39, file: 039_program_cycles.sql, commit: "pending", landed: "2026-05-12", note: "Codex — program_cycles Layer 3 schema (funders → programs → program_cycles). On disk, not yet applied." }
+    - { n: 39, file: 039_program_cycles.sql, commit: "4a3dbe1", landed: "2026-05-12", note: "program_cycles Layer 3 schema — confirmed applied to Supabase 2026-05-12." }
     - { n: 38, file: 038_ranking_rpc.sql, commit: "pending", landed: "2026-05-12", note: "Ranking RPC — get_top_programs_by_value() applied to Supabase via MCP 2026-05-12" }
     - { n: 37, file: 037_heat_score_compute.sql, commit: "pending", landed: "2026-05-12", note: "Synthetic heat_score RPC from brand_score + cohort_size + program_value_score" }
     - { n: 36, file: 036_deadline_and_rolling_seed.sql, commit: "pending", landed: "2026-05-12", note: "Rolling status + cycle deadlines for 20 high-value programs" }
@@ -84,9 +84,9 @@ features:
   reviewer_family: shipped
   stripe_live: shipped
   custom_smtp: shipped
-  recruiter_agent: shipped
+  recruiter_agent: active  # confirmed running 12h as of 2026-05-12
   recruiter_agent_edge_fn: shipped
-  recruiter_agent_resend_key: pending_verify
+  recruiter_agent_resend_key: verified
   today_dashboard: shipped
   dna_radar_chart: shipped
   significance_stars: shipped
