@@ -13,12 +13,14 @@ import { ThemeTag } from '@/components/ThemeTag'
 import { ApplicationStatusTracker } from '@/components/ApplicationStatusTracker'
 import { OutcomeTracker } from '@/components/OutcomeTracker'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
-import { formatDeadline, formatProgramStartDate } from '@/lib/utils'
 import { SignificanceStars } from '@/components/SignificanceStars'
-import { cn } from '@/lib/utils'
+import { QuestionTree } from '@/components/QuestionTree'
+import { CompiledOutput } from '@/components/CompiledOutput'
+import { formatDeadline, formatProgramStartDate, cn } from '@/lib/utils'
 
 interface Props {
   params: Promise<{ program_id: string }>
+  searchParams: Promise<{ q?: string; tab?: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -31,12 +33,13 @@ export async function generateMetadata({ params }: Props) {
     .single<Pick<Program, 'name'>>()
 
   return {
-    title: program ? `${program.name} — Workspace` : 'Workspace',
+    title: program ? program.name : 'Application',
   }
 }
 
-export default async function WorkspaceDetailPage({ params }: Props) {
+export default async function WorkspaceDetailPage({ params, searchParams }: Props) {
   const { program_id } = await params
+  const { q: selectedQuestionId = null, tab = 'editor' } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
@@ -51,7 +54,6 @@ export default async function WorkspaceDetailPage({ params }: Props) {
 
   if (!program) notFound()
 
-  // Questions with archived data
   const { data: questionRows } = await supabase
     .from('program_questions')
     .select('*, archived_question:archived_questions(*)')
@@ -59,8 +61,9 @@ export default async function WorkspaceDetailPage({ params }: Props) {
     .order('order_index', { ascending: true })
     .returns<ProgramQuestionWithArchived[]>()
 
-  // Profile answers for this user
-  const archivedIds = (questionRows ?? []).map((q) => q.archived_question_id).filter(Boolean)
+  const questions = questionRows ?? []
+  const archivedIds = questions.map((q) => q.archived_question_id).filter(Boolean)
+
   let answerMap: Record<string, ProfileAnswer> = {}
   if (archivedIds.length > 0) {
     const { data: answers } = await supabase
@@ -72,7 +75,6 @@ export default async function WorkspaceDetailPage({ params }: Props) {
     answerMap = Object.fromEntries((answers ?? []).map((a) => [a.archived_question_id, a]))
   }
 
-  // Fit score
   const { data: fit } = await supabase
     .from('user_program_fit')
     .select('*')
@@ -80,7 +82,13 @@ export default async function WorkspaceDetailPage({ params }: Props) {
     .eq('program_id', program.id)
     .single<UserProgramFit>()
 
-  const questions = questionRows ?? []
+  const { data: userApplication } = await supabase
+    .from('user_applications')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('program_id', program.id)
+    .maybeSingle<UserApplication>()
+
   const answeredCount = questions.filter((q) => answerMap[q.archived_question_id]).length
   const requiredCount = questions.filter((q) => q.is_required).length
   const answeredRequired = questions.filter(
@@ -90,203 +98,200 @@ export default async function WorkspaceDetailPage({ params }: Props) {
   const deadline = formatDeadline(program.deadline_at)
   const cohortStart = formatProgramStartDate(program.program_start_date)
 
-  // User's application status for this program
-  const { data: userApplication } = await supabase
-    .from('user_applications')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('program_id', program.id)
-    .maybeSingle<UserApplication>()
+  // Resolve which question to show in the right panel.
+  // Default = first unanswered required question, then first question, then null.
+  const resolvedSelectedId =
+    selectedQuestionId ||
+    questions.find((q) => q.is_required && !answerMap[q.archived_question_id])?.archived_question_id ||
+    questions[0]?.archived_question_id ||
+    null
 
-  // Group by section
-  const sections = questions.reduce<Record<string, ProgramQuestionWithArchived[]>>((acc, q) => {
-    const section = q.section ?? 'General'
-    if (!acc[section]) acc[section] = []
-    acc[section].push(q)
-    return acc
-  }, {})
+  const selectedQuestion = resolvedSelectedId
+    ? questions.find((q) => q.archived_question_id === resolvedSelectedId) ?? null
+    : null
+  const selectedAnswer = selectedQuestion ? answerMap[selectedQuestion.archived_question_id] : null
+
+  function tabHref(targetTab: string) {
+    const sp = new URLSearchParams()
+    if (resolvedSelectedId) sp.set('q', resolvedSelectedId)
+    sp.set('tab', targetTab)
+    return `/workspace/${program_id}?${sp.toString()}`
+  }
 
   return (
-    <div className="max-w-4xl">
-      {/* Back */}
-      <Link
-        href="/applications"
-        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 mb-6 transition-colors"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M19 12H5M12 5l-7 7 7 7"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        My Applications
-      </Link>
-
-      {/* Header */}
-      <div className="card p-6 mb-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="-mx-4 md:-mx-6 -my-4 md:-my-8 h-[calc(100vh-3.5rem)] md:h-screen flex flex-col">
+      {/* Slim header bar */}
+      <div className="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 md:px-6 py-3">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-semibold text-neutral-900 dark:text-white">{program.name}</h1>
-            {program.description && (
-              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">
-                {program.description}
-              </p>
-            )}
-            {(program.cohort_name || cohortStart || program.cohort_size) && (
-              <div className="mt-3 flex items-center gap-2 flex-wrap">
-                {program.cohort_name && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300">
-                    {program.cohort_name}
-                  </span>
-                )}
-                {cohortStart && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
-                    Starts {cohortStart}
-                  </span>
-                )}
-                {program.cohort_size != null && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
-                    ~{program.cohort_size} seats
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="flex-shrink-0 text-right">
-            <p
-              className={cn(
-                'text-sm font-medium',
-                deadline.urgent
-                  ? 'text-warning-600 dark:text-warning-500'
-                  : 'text-neutral-600 dark:text-neutral-400'
-              )}
+            <Link
+              href="/applications"
+              className="inline-flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 mb-1 transition-colors"
             >
-              {deadline.label}
-            </p>
-            {fit && (
-              <p className="inline-flex items-center text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
-                {Math.round(fit.fit_score * 100)}% fit
-                <ScoreTooltip
-                  label="Fit Score"
-                  description="How well your profile aligns to this program's DNA across coverage, theme alignment, criteria match, and answer quality."
-                  scoreId="fit"
-                />
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Progress */}
-        <div className="mt-5 pt-5 border-t border-neutral-100 dark:border-neutral-800">
-          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 mb-2">
-            <span>Application readiness</span>
-            <span>
-              {answeredRequired}/{requiredCount} required · {answeredCount}/{questions.length} total
-            </span>
-          </div>
-          <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
-            <div
-              className={cn(
-                'h-2 rounded-full transition-all',
-                progressPct >= 80 ? 'bg-success-500' : progressPct >= 50 ? 'bg-brand-500' : 'bg-warning-500'
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Applications
+            </Link>
+            <h1 className="text-base font-semibold text-neutral-900 dark:text-white truncate">{program.name}</h1>
+            <div className="mt-1 flex items-center gap-3 flex-wrap text-xs text-neutral-500 dark:text-neutral-400">
+              <span className={cn(deadline.urgent && 'text-warning-600 dark:text-warning-400 font-medium')}>
+                {deadline.label}
+              </span>
+              {program.cohort_name && <span>· {program.cohort_name}</span>}
+              {cohortStart && <span>· Starts {cohortStart}</span>}
+              {fit && (
+                <span className="inline-flex items-center">
+                  · {Math.round(fit.fit_score * 100)}% fit
+                  <ScoreTooltip
+                    label="Fit Score"
+                    description="How well your profile aligns to this program's DNA across coverage, theme alignment, criteria match, and answer quality."
+                    scoreId="fit"
+                  />
+                </span>
               )}
-              style={{ width: `${progressPct}%` }}
+            </div>
+          </div>
+          <div className="flex-shrink-0 flex items-center gap-3">
+            <div className="hidden md:block min-w-[160px]">
+              <div className="flex items-center justify-between text-[10px] text-neutral-500 dark:text-neutral-500 mb-1">
+                <span>Readiness</span>
+                <span className="tabular-nums">
+                  {answeredRequired}/{requiredCount} required
+                </span>
+              </div>
+              <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-1.5">
+                <div
+                  className={cn(
+                    'h-1.5 rounded-full transition-all',
+                    progressPct >= 80 ? 'bg-success-500' : progressPct >= 50 ? 'bg-brand-500' : 'bg-warning-500'
+                  )}
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            </div>
+            <ApplicationStatusTracker
+              programId={program.id}
+              initialStatus={userApplication?.status ?? null}
+              programName={program.name}
             />
           </div>
-          {progressPct === 100 && (
-            <p className="mt-2 text-xs text-success-600 dark:text-success-400 font-medium">
-              All required questions answered. Ready to submit.
-            </p>
-          )}
-        </div>
-
-        {/* Application status tracker */}
-        <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-4">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            {userApplication?.status === 'submitted'
-              ? `Submitted${userApplication.submitted_at ? ' ' + new Date(userApplication.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}`
-              : 'Track your application status'}
-          </p>
-          <ApplicationStatusTracker
-            programId={program.id}
-            initialStatus={userApplication?.status ?? null}
-            programName={program.name}
-          />
         </div>
       </div>
 
-      {/* Questions */}
+      {/* Split-screen body */}
       {questions.length === 0 ? (
-        <div className="card p-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
-          No questions found for this program yet.
+        <div className="flex-1 flex items-center justify-center text-sm text-neutral-500 dark:text-neutral-400">
+          No questions in this application yet.
         </div>
       ) : (
-        <div className="space-y-4">
-          {Object.entries(sections).map(([section, qs]) => (
-            <div key={section} className="card overflow-hidden">
-              <div className="px-5 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-                <h2 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                  {section}
-                </h2>
-                <span className="text-xs text-neutral-400 dark:text-neutral-500">
-                  {qs.filter((q) => answerMap[q.archived_question_id]).length}/{qs.length} answered
-                </span>
-              </div>
-              <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                {qs.map((q) => {
-                  const existing = answerMap[q.archived_question_id]
-                  const sig = q.archived_question?.significance_score ?? 0
+        <div className="flex-1 flex flex-col md:flex-row min-h-0">
+          {/* Left: Question tree */}
+          <aside className="md:w-80 md:flex-shrink-0 md:border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/40 md:h-full md:overflow-hidden">
+            <QuestionTree
+              programId={program.id}
+              questions={questions}
+              answerMap={answerMap}
+              selectedQuestionId={resolvedSelectedId}
+              currentTab={tab !== 'editor' ? tab : undefined}
+            />
+          </aside>
 
-                  return (
-                    <div key={q.id} className="p-5">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <ThemeTag theme={q.archived_question?.theme} />
-                            {!q.is_required && (
-                              <span className="text-xs text-neutral-400 dark:text-neutral-500 italic">
-                                Optional
-                              </span>
-                            )}
-                            {sig > 0 && (
-                              <SignificanceStars score={sig} size="xs" />
-                            )}
-                          </div>
-                          <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                            {q.asked_as}
-                          </p>
-                          {(q.word_limit || q.char_limit) && (
-                            <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-                              {q.word_limit ? `${q.word_limit} word limit` : ''}
-                              {q.word_limit && q.char_limit ? ' · ' : ''}
-                              {q.char_limit ? `${q.char_limit} character limit` : ''}
-                            </p>
+          {/* Right: Editor + Compiled tabs */}
+          <section className="flex-1 flex flex-col min-h-0 min-w-0">
+            {selectedQuestion ? (
+              <>
+                {/* Tab bar */}
+                <div className="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 px-5 pt-3 flex items-center gap-1">
+                  <Link
+                    href={tabHref('editor')}
+                    className={cn(
+                      'px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors',
+                      tab !== 'compiled'
+                        ? 'border-brand-500 text-brand-700 dark:text-brand-300'
+                        : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
+                    )}
+                  >
+                    Editor
+                  </Link>
+                  <Link
+                    href={tabHref('compiled')}
+                    className={cn(
+                      'px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors',
+                      tab === 'compiled'
+                        ? 'border-brand-500 text-brand-700 dark:text-brand-300'
+                        : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
+                    )}
+                  >
+                    Compiled output
+                  </Link>
+                </div>
+
+                {/* Tab content */}
+                <div className="flex-1 overflow-y-auto min-h-0">
+                  {tab === 'compiled' ? (
+                    <CompiledOutput
+                      question={selectedQuestion.asked_as}
+                      answer={selectedAnswer?.answer_content ?? ''}
+                      wordLimit={selectedQuestion.word_limit}
+                      charLimit={selectedQuestion.char_limit}
+                    />
+                  ) : (
+                    <div className="px-6 py-5">
+                      <div className="max-w-2xl">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <ThemeTag theme={selectedQuestion.archived_question?.theme} />
+                          {(selectedQuestion.archived_question?.significance_score ?? 0) > 0 && (
+                            <SignificanceStars
+                              score={selectedQuestion.archived_question?.significance_score ?? 0}
+                              size="xs"
+                            />
+                          )}
+                          {!selectedQuestion.is_required && (
+                            <span className="text-[10px] text-neutral-400 dark:text-neutral-600 italic">
+                              Optional
+                            </span>
+                          )}
+                          {selectedQuestion.section && (
+                            <span className="text-[10px] text-neutral-400 dark:text-neutral-600 uppercase tracking-wider">
+                              {selectedQuestion.section}
+                            </span>
                           )}
                         </div>
+                        <h2 className="text-sm font-medium text-neutral-900 dark:text-white leading-relaxed mb-1">
+                          {selectedQuestion.asked_as}
+                        </h2>
+                        {(selectedQuestion.word_limit || selectedQuestion.char_limit) && (
+                          <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mb-4">
+                            {selectedQuestion.word_limit ? `${selectedQuestion.word_limit} word limit` : ''}
+                            {selectedQuestion.word_limit && selectedQuestion.char_limit ? ' · ' : ''}
+                            {selectedQuestion.char_limit ? `${selectedQuestion.char_limit} character limit` : ''}
+                          </p>
+                        )}
+                        <AnswerEditor
+                          archivedQuestionId={selectedQuestion.archived_question_id}
+                          programId={program.id}
+                          wordLimit={selectedQuestion.word_limit ?? undefined}
+                          charLimit={selectedQuestion.char_limit ?? undefined}
+                          initialAnswer={selectedAnswer ?? null}
+                        />
                       </div>
-
-                      <AnswerEditor
-                        archivedQuestionId={q.archived_question_id}
-                        programId={program.id}
-                        wordLimit={q.word_limit ?? undefined}
-                        charLimit={q.char_limit ?? undefined}
-                        initialAnswer={existing ?? null}
-                      />
                     </div>
-                  )
-                })}
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-sm text-neutral-500 dark:text-neutral-400">
+                Select a question from the left to begin.
               </div>
-            </div>
-          ))}
+            )}
+          </section>
         </div>
       )}
 
-      {/* Application Outcome */}
+      {/* Outcome — surfaces only when application has been submitted */}
       {userApplication && (
-        <div className="mt-4">
+        <div className="flex-shrink-0 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 md:px-6 py-3">
           <OutcomeTracker
             applicationId={userApplication.id}
             currentStatus={userApplication.status}
