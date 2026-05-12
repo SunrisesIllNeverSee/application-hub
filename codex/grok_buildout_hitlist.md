@@ -216,3 +216,22 @@ Wraps persona in a cryptographically verifiable VC. MO§ES™ `commitment_hash` 
 | Infra | AcceleratorApp | Backend ATS for 500+ programs | You serve their applicants — distribution channel |
 
 > "No true Tier 1 category killer exists yet. Application Hub is pioneering the governed, multi-category answer capital layer. Your biggest competitors are still manual workflows (Notion + raw LLMs) rather than other products."
+
+---
+
+## ⚑ Implementation Flags (added 2026-05-12)
+
+**1. `profiles` table name collision**
+Migration 011 already ships `user_profiles` in the live schema. The `profiles` table in 1.2 will conflict or create dangerous ambiguity. Rename to `persona_profiles` or `applicant_personas` before running any migration derived from Grok's SQL.
+
+**2. `profile_answers` already exists**
+The answer bank is already `profile_answers` in the live schema. Grok's SQL would throw "relation already exists." What's actually needed is an `ALTER TABLE profile_answers ADD COLUMN` for `commitment_hash`, `lineage_hash`, `version`, `superseded_by` — plus a new `profile_persona_enrichments` table. Diff Grok's schema against the live schema and write proper ALTER + CREATE migrations before touching this.
+
+**3. Export button (1.3) should ship before persona tables (1.2)**
+The GDPR JSON export can be built from the *existing* `profile_answers` data today — no enrichment layer needed. Don't block it on persona enrichments being complete. Ship the export button first, layer in the richer persona fields as they arrive.
+
+**4. AcceleratorApp needs dedicated portal testing before the pitch**
+AcceleratorApp forms use iframe-heavy patterns and sometimes multi-step flows. The generic `MutationObserver` approach in 1.1 will need AcceleratorApp-specific label selectors and flow handling. Test on real AcceleratorApp portals before building the pitch around it.
+
+**5. F6S missing from competitive table**
+Grok flagged F6S as the biggest hybrid (discovery + management) and a closer competitor than Norm AI or AutoFill Mate. Belongs in Tier 1 of the competitive table alongside Grantable/Instrumentl/ESAI.
