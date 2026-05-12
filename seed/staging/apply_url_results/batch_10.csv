@@ -1,0 +1,72 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+qhacks,QHacks,other,https://qhacks.io,,not_found,Next.js SPA with Cloudflare challenge; no apply link extractable via static scrape; site describes Feb 2026 hackathon — application likely via MLH or similar platform when open
+queens-startup-summit,Queen's Startup Summit,other,https://qssummit.com,https://qssummit.com,high,Homepage CTA is 'Register Now' linking to site root (TBA date); delegate registration page at same domain
+refresh-miami,Refresh Miami,other,https://refreshmiami.com,https://refreshmiami.com/pricing,medium,Media/community site; 'Sign Up' links to /pricing (membership); no direct program application
+revolution-2,Revolution,other,https://twitter.com/revolution,,not_found,Twitter/X profile only — VC firm social account; no application surface on this URL
+rotaract-mississauga,Rotaract Mississauga,other,https://www.rotaractmiss.com,,not_found,Wix site; heavily JS-rendered; no apply/join link extractable; Rotaract membership typically through local club contact
+saas-connect,SaaS Connect,other,https://www.cloudsoftwareassociation.com/saas-connect,https://www.eventbrite.ca/e/477618779627,high,Eventbrite registration link found directly on page ('Register now' button)
+saas-north,SaaS North,other,https://saasnorth.com,https://saasnorth.com/get-your-saas-pass-2026/,high,Primary CTA 'GET YOUR SAAS PASS' links to /get-your-saas-pass-2026/; also Apply to Exhibit and Apply to Speak
+saas-open,SaaS Open,other,https://saasopen.com,,not_found,Scrape timed out; site may be down or heavily protected
+saastock,SaaStock,other,https://www.saastock.com,https://saastock.typeform.com/to/yb3fdaB1,high,Founder membership apply button links to Typeform; also /founder-membership/ page
+saastr,SaaStr,other,https://www.saastrannual2024.com,https://www.saastrannual.com/buy-tickets-2025,medium,2024 event site; buy tickets CTA redirects to saastrannual.com/buy-tickets-2025 for current year
+saastr-apac,SaaStr APAC,other,https://saastrapac.com,https://saastrapac.com/rsvp,high,Primary CTA 'GRAB TICKETS!' / 'RSVP TO ATTEND' links to /rsvp; Attendee Portal also available
+schulich-startups,Schulich Startups,other,https://schulich.yorku.ca/schulich-startups,,low,York University page; JS-heavy; no direct apply link found in static HTML; programs listed but no application URL visible
+schulich-ventures-club,Schulich Ventures Club,other,https://oneschulich.yorku.ca/svc/home,https://svc-membership-2021-2023.cheddarup.com,medium,JOIN link found pointing to cheddarup.com membership payment page (may be outdated)
+science-entrepreneur-club,Science Entrepreneur Club,other,https://www.science-entrepreneur.com/innovators-club,,low,Heavily JS-rendered page; no extractable apply/join links found in static HTML
+seneca-college-hackathon,Seneca College Hackathon,other,https://www.senecahackathon.com,https://www.senecahackathon.com/register,high,Multiple 'REGISTER NOW' CTAs linking directly to /register
+sf-hacks,SF Hacks,other,https://sfhacks.io,https://app.sfhacks.io/,high,Apply and Register buttons both link to app.sfhacks.io; MLH 2026 badge present
+socialhrcamp,SocialHRCamp,other,https://socialhrcamp.com,,low,Webflow site; ticket/register links appear as image icons only; no extractable href for ticket purchase
+south-florida-aspiring-entrepreneurs,South Florida Aspiring Entrepreneurs,other,https://www.meetup.com/South-Florida-Aspiring-Entrepreneurs,https://www.meetup.com/south-florida-aspiring-entrepreneurs/events/,medium,Meetup group; RSVP via individual event pages; events listing at /events/
+startup-boston,Startup Boston,other,https://www.startupbos.org,https://www.startupbos.org/membership,medium,Mailing list at /join-mailing-list and membership at /membership; also /join-team for volunteers
+startup-boston-week,Startup Boston Week,other,https://www.startupbos.org/startup-week,https://www.startupbos.org/sbw2026,medium,Startup Boston Week 2026 page at /sbw2026; apply to host/speak available from there
+startup-canada,Startup Canada,other,https://www.startupcan.ca,https://www.startupcan.ca/join-our-list/,medium,Join Our List link at /join-our-list/; MemberPress plugin active suggesting membership portal
+startup-colorado,Startup Colorado,other,https://startupcolorado.org,https://startupcolorado.org/join-the-community/,high,COMMUNITY section links to /join-the-community/ as the Start Here page
+startup-denver,Startup Denver,other,https://www.meetup.com/startupdenver,https://www.meetup.com/startupdenver/events/,medium,Meetup group; scrape timed out but standard Meetup pattern; RSVP via event pages
+startup-grind-nyc,Startup Grind NYC,other,https://www.meetup.com/Startup-Grind-NYC,https://www.startupgrind.com/new-york-city/,high,Events RSVP via startupgrind.com; specific event RSVP link found on page
+startup-grind-toronto,Startup Grind Toronto,other,https://www.meetup.com/startup-grind-toronto,https://www.startupgrind.com/events/,medium,Events listed with RSVP links pointing to startupgrind.com/events/
+startup-laurier,Startup Laurier,other,https://www.startuplaurier.ca,,not_found,DNS resolution failed; domain appears to have expired or does not exist
+startup-tnt,Startup TNT,other,https://www.startuptnt.com,https://startuptnt.com/events,medium,Events calendar at /events; no direct application form; community attends via event RSVPs
+startupbarn,Startupbarn,other,https://startupbarn.ca,https://tally.so/r/nPaQ8V,high,Site redirects to buildersclub.ca; Apply button links to Tally form tally.so/r/nPaQ8V
+startupfest,Startupfest,other,https://startupfestival.com,https://startupfestival.com/register,high,Multiple 'Register' links pointing to /register; Angular app with newsletter signup also present
+strikeup-conference,StrikeUP Conference,other,https://strikeup.ca,,low,WordPress site; scrape returned content but no register/apply href links found; likely off-season
+sxsw,SXSW,other,https://www.sxsw.com,https://sxsw.com/apply,high,'Apply to Participate' CTA links directly to sxsw.com/apply; also Apply to Exhibit and Apply to Market
+targeting-quality-conference,Targeting Quality Conference,other,https://kwsqa.org,https://kwsqa.org/tq2026/speaker-information/,medium,KWSQA site; Speaker Information page found for TQ2026; ticket purchase links not found in static scrape
+tech-exit,Tech Exit,other,https://techexit.io,https://techexit.io/toronto/pricing/,medium,Pricing pages per city (Toronto/Calgary/Vancouver); no direct register button found but pricing is the entry point
+tech-tuesdays-miami,Tech Tuesdays Miami,other,https://www.plainsight.app/techtuesdaysmiami,,low,Plainsight event platform; scrape returned JS bundle only; no extractable RSVP link
+techcrunch-disrupt,TechCrunch Disrupt,other,https://techcrunch.com/events/tc-disrupt-2023,https://techcrunch.com/events/techcrunch-disrupt/tickets/,high,Register Now link for TechCrunch Disrupt found; Startup Battlefield also linked at /startup-battlefield/
+techto,TechTO,other,https://www.meetup.com/techto,https://www.meetup.com/techto/events/,medium,Meetup group; join via Meetup sign-up; events at /events/
+techvancouver,TechVancouver,other,https://www.meetup.com/techvancouverorg,https://www.meetup.com/techvancouverorg/events/,medium,Meetup group; upcoming events found; RSVP via Meetup sign-up
+tedxwaterloo,TEDxWaterloo,other,https://www.linkedin.com/company/tedxwaterloo,,not_found,LinkedIn company page only; no application surface; TEDx speaker/attendee applications would be at a separate site
+the-atlantic-technology-summit,The Atlantic Technology Summit,other,https://www.atlantictechsummit.com,https://www.atlantictechsummit.com/#/tickets?lang=en,high,Zoho Backstage event; Tickets tab found in navigation at /#/tickets
+the-commons,The Commons,other,https://thecommons.co,,not_found,Site redirected management to City of Denver; co-working available walk-in; no formal application process; space booking via artsandvenuesdenver.com
+the-firehood,The Firehood,other,https://firehood.net,https://firehood.net/pages/how-we-work-together,high,'Join the Firehood' links to /pages/how-we-work-together; membership product also at /products/firehood-ventures-membership
+the-hip-haus-networking,The Hip Haus Networking,other,https://thehiphaus.com,https://www.thehiphaus.com/circles,high,'Apply Now!' button links to /circles; also Eventbrite for specific events
+the-lab-miami,The Lab Miami,other,https://www.thelabmiami.com,https://www.thelabmiami.com/membership,high,Membership links prominently featured (/membership); also /contact for inquiries
+the-studio-boulder,The Studio Boulder,other,https://www.thestudioboulder.com,,low,Next.js SPA; no extractable membership/apply links found in static HTML
+toronto-cto-meetup,Toronto CTO Meetup,other,https://www.meetup.com/Toronto-CTO-Group,https://www.meetup.com/Toronto-CTO-Group/events/,medium,Meetup group for CTOs; RSVP via Meetup event pages
+toronto-event-hub,Toronto Event Hub,other,https://www.torontoeventhub.com,,low,Site loaded but no apply/register/submit links found; appears to be an events listing site
+toronto-product-management-association,Toronto Product Management Association,other,https://www.tpma.ca,https://www.members.tpma.ca/join,high,Join link at members.tpma.ca/join; also /membership page and member login
+toronto-tech-fest,Toronto Tech Fest,other,https://www.torontotechfest.com,,not_found,Site did not load during scrape window; domain may be inactive
+toronto-womxn-in-data-science,Toronto Womxn in Data Science,other,https://www.womxndsto.com,https://www.joinwoven.com,medium,Site links to joinwoven.com as the community platform; community moved to Woven
+traction-conference,Traction Conference,other,https://www.tractionconf.io,,low,Squarespace site; no ticket/register URL found in static extraction; conference may be dormant (last active content older)
+university-of-san-francisco-data-science-speaker-series,University of San Francisco Data Science Speaker Series,other,https://www.meetup.com/usf-data-science-speaker-series,https://www.meetup.com/usf-data-science-speaker-series/events/,medium,Meetup group; events listing found; RSVP via Meetup
+university-of-toronto-entrepreneurship-week,University of Toronto Entrepreneurship Week,other,https://entrepreneurs.utoronto.ca/events/entrepreneurship-week,,low,UofT entrepreneurship page; Wix-based; no direct register/apply links found in static scrape
+uoft-ai,UofT AI,other,https://www.uoft.ai,,low,React SPA (JavaScript required); static HTML only contains app shell; no links extractable
+uoft-hacks,UofT Hacks,other,https://uofthacks.com,https://dorahacks.io/buidl/21736,high,DoraHacks application link found on page for hackathon submissions
+uottahack,uOttaHack,other,https://uottahack.ca,,low,Wix-based SPA; heavily JS-rendered; no apply links extractable from static HTML
+vancouver-dev,Vancouver dev,other,https://vancouver.dev,,low,Next.js SPA; static HTML is app shell only; no links extractable; likely a developer community hub
+vancouver-entrepreneurs-forum,Vancouver Entrepreneurs Forum,other,https://www.vef.org,https://www.vef.org/member,high,/member page exists; also /membership-community and VEF membership contest; Squarespace site
+vancouver-startup-week,Vancouver Startup Week,other,https://www.vanstartupweek.ca,,low,Site loaded but no register/apply/ticket href links found in static extraction
+vancouver-startups,Vancouver Startups,other,https://www.linkedin.com/company/vancouver-startups,,not_found,LinkedIn company page only; no application surface
+venture-cafe,Venture Cafe,other,https://venturecafecambridge.org,https://venturecafecambridge.org/share/register-your-startup/,high,Register Your Startup link found at /share/register-your-startup/; Thursday Gathering program page also present
+venture-x-canada,Venture X Canada,other,https://venturexcanada.ca/locations/mississauga/heartland,,low,Site loaded but JS-heavy; no book/tour/contact href links found in static extraction
+web-summit-vancouver,Web Summit Vancouver,other,https://vancouver.websummit.com,https://attend.websummit.com/van26,high,Primary CTA links to attend.websummit.com/van26; also /tickets/attendees/ and indigenous attendee program
+wny-venture-association,WNY Venture Association,other,https://www.wnyventure.com,,low,Squarespace site; no apply/register/join links found; links only to Twitter/Facebook and Springboard NY
+women-founders-network,Women Founders Network,other,https://www.womenfoundersnetwork.org,https://www.womenfoundersnetwork.org/joinus,high,Join Us page at /joinus; Fast Pitch competition at /about-fast-pitch; Junior VC and Due Diligence Analyst programs also listed
+women-in-miami-tech,Women in Miami Tech,other,https://www.meetup.com/Women-in-Miami-Tech,https://www.meetup.com/women-in-miami-tech/events/,medium,Meetup group; upcoming events found; RSVP via Meetup event pages
+women-in-payments,Women in Payments,other,https://womeninpayments.silkstart.com/cpages/regions,,low,Silkstart-powered site; regions listing page; no join/register links found pointing to membership; likely requires navigating to a specific regional chapter
+work-bench,Work-Bench,other,https://www.work-bench.com,,low,Webflow site; no apply/founders program links found; links to cofounders.nyc and portfolio; enterprise-focused VC/community
+ylab,YLab,other,https://www.ylab.ca,https://anc.ca.apm.activecommunities.com/richmondhill/membership/search/detail/148,medium,Makerspace in Richmond Hill; membership purchase via City's ActiveNet system at that URL; open house via Eventbrite
+youre-next-career-network,You're Next Career Network University of Toronto,other,https://www.yourenext.ca,,low,React SPA; JavaScript required; only app shell in static HTML; no links extractable
+young-women-in-business,Young Women in Business,other,https://ywib.ca,https://ywib.ca/toronto/membership,medium,Chapter-based org; Toronto membership page at /toronto/membership; chapters include Vancouver/Calgary/UBC
+yvr-startups,YVR Startups,other,https://www.meetup.com/yvr-startups,https://www.meetup.com/yvr-startups/events/,medium,Meetup group; active events found; RSVP via Meetup event pages

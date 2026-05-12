@@ -1,0 +1,17 @@
+slug,program_name,type,apply_url,extracted_question,matched_question_id,matched_question_text,similarity,confidence,recommendation
+startupbarn,Startupbarn,other,https://tally.so/r/nPaQ8V,What are you working on?,2a3d5bfe-157d-4128-9f5c-5c68b056a526,What is your company going to make? Please describe your product and what it does or will do.,0.82,high,include
+startup-colorado,Startup Colorado,other,https://startupcolorado.org/join-the-community/,none_found,,,,high,skip
+startup-grind-nyc,Startup Grind NYC,other,https://www.startupgrind.com/new-york-city/,none_found,,,,high,skip
+startupfest,Startupfest,other,https://startupfestival.com/register,none_found,,,,high,skip
+sxsw,SXSW,other,https://sxsw.com/apply,none_found,,,,high,skip
+techcrunch-disrupt,TechCrunch Disrupt,other,https://techcrunch.com/events/techcrunch-disrupt/tickets/,none_found,,,,high,skip
+the-atlantic-technology-summit,The Atlantic Technology Summit,other,https://www.atlantictechsummit.com/#/tickets?lang=en,none_found,,,,medium,skip
+the-firehood,The Firehood,other,https://firehood.net/pages/how-we-work-together,none_found,,,,high,skip
+the-hip-haus-networking,The Hip Haus Networking,other,https://www.thehiphaus.com/circles,none_found,,,,high,skip
+the-lab-miami,The Lab Miami,other,https://www.thelabmiami.com/membership,none_found,,,,high,skip
+toronto-product-management-association,Toronto Product Management Association,other,https://www.members.tpma.ca/join,none_found,,,,high,skip
+uoft-hacks,UofT Hacks,other,https://dorahacks.io/buidl/21736,none_found,,,,high,skip
+vancouver-entrepreneurs-forum,Vancouver Entrepreneurs Forum,other,https://www.vef.org/member,none_found,,,,high,skip
+venture-cafe,Venture Cafe,other,https://venturecafecambridge.org/share/register-your-startup/,none_found,,,,low,manual_review
+web-summit-vancouver,Web Summit Vancouver,other,https://attend.websummit.com/van26,none_found,,,,medium,skip
+women-founders-network,Women Founders Network,other,https://www.womenfoundersnetwork.org/joinus,none_found,,,,high,skip

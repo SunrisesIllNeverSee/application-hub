@@ -1,0 +1,555 @@
+[
+  {
+    "id": "72c86f6c-f2e9-43b5-b6bf-99354ebea94e",
+    "slug": "earlybird-vc",
+    "name": "Earlybird VC",
+    "type": "vc",
+    "url": "https://earlybird.com"
+  },
+  {
+    "id": "bd888a56-47bc-4cb1-89f0-a58b74b38b76",
+    "slug": "eight-roads",
+    "name": "Eight Roads",
+    "type": "vc",
+    "url": "https://eightroads.com/en"
+  },
+  {
+    "id": "c4df592e-3fb4-49ab-83a7-5611da50b01b",
+    "slug": "elsewhere-partners",
+    "name": "Elsewhere Partners",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/elsewhere-partners"
+  },
+  {
+    "id": "334bef92-7fa6-4141-86a0-478eaf1ce76a",
+    "slug": "embark-ventures",
+    "name": "Embark Ventures",
+    "type": "vc",
+    "url": "https://www.embark.vc"
+  },
+  {
+    "id": "f735d4d1-d4f2-42f1-9d23-7461e67e5b0d",
+    "slug": "energy-impact-partners",
+    "name": "Energy Impact Partners",
+    "type": "vc",
+    "url": "https://www.energyimpactpartners.com"
+  },
+  {
+    "id": "761af97e-598e-427b-90e9-b107cc45c97c",
+    "slug": "eniac-ventures",
+    "name": "Eniac Ventures",
+    "type": "vc",
+    "url": "https://eniac.vc"
+  },
+  {
+    "id": "c3658dc4-d7ea-4e2f-8395-2a2ee3b6b4b4",
+    "slug": "episode-1-ventures",
+    "name": "Episode 1 Ventures",
+    "type": "vc",
+    "url": "https://episode1.com"
+  },
+  {
+    "id": "6e43a161-ba5f-4619-909f-f26f10414ada",
+    "slug": "equal-ventures",
+    "name": "Equal Ventures",
+    "type": "vc",
+    "url": "https://www.equal.vc"
+  },
+  {
+    "id": "09cbbe81-d7e6-4f61-b88e-6d783928addc",
+    "slug": "ethical-capital-partners",
+    "name": "Ethical Capital Partners",
+    "type": "vc",
+    "url": "https://www.ethicalcapitalpartners.com"
+  },
+  {
+    "id": "d8b5caf3-66c9-4fe4-88b3-2eda883a164b",
+    "slug": "everywhere",
+    "name": "Everywhere",
+    "type": "vc",
+    "url": "https://everywhere.vc"
+  },
+  {
+    "id": "4986ddd7-bee7-4221-a5aa-88445cc42b03",
+    "slug": "expansion-venture-capital",
+    "name": "Expansion Venture Capital",
+    "type": "vc",
+    "url": "https://www.expansionvc.com"
+  },
+  {
+    "id": "cbafc32e-2038-4c20-a541-ee0d8c62e9c9",
+    "slug": "extreme-venture-partners",
+    "name": "Extreme Venture Partners",
+    "type": "vc",
+    "url": "https://www.evp.vc"
+  },
+  {
+    "id": "a03aa8bd-94ab-4efe-b9e5-f216a300e313",
+    "slug": "felicis",
+    "name": "Felicis",
+    "type": "vc",
+    "url": "https://www.felicis.com"
+  },
+  {
+    "id": "d5da74a5-af53-4905-b42f-0a6f913816d8",
+    "slug": "ferst-capital-partners",
+    "name": "Ferst Capital Partners",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/ferst-capital-partners/about"
+  },
+  {
+    "id": "e92d66f4-07b2-4c35-abd2-828152d61ef7",
+    "slug": "fifth-wall",
+    "name": "Fifth Wall",
+    "type": "vc",
+    "url": "https://fifthwall.com"
+  },
+  {
+    "id": "9098df09-422e-4c5c-b6e4-a622d7f2ab94",
+    "slug": "firepower-capital",
+    "name": "FirePower Capital",
+    "type": "vc",
+    "url": "https://www.firepowercapital.com"
+  },
+  {
+    "id": "ead7451f-2385-42a1-84f6-4f89a67f9e03",
+    "slug": "first-ascent-ventures",
+    "name": "First Ascent Ventures",
+    "type": "vc",
+    "url": "https://firstascentventures.com"
+  },
+  {
+    "id": "fb391bf9-ac3e-41c2-8b49-bc15baf5a449",
+    "slug": "firstmark-capital",
+    "name": "FirstMark Capital",
+    "type": "vc",
+    "url": "https://firstmarkcap.com"
+  },
+  {
+    "id": "0d05ccfe-2e70-4f36-a731-b408d8506d2a",
+    "slug": "fj-labs",
+    "name": "FJ Labs",
+    "type": "vc",
+    "url": "https://www.fjlabs.com"
+  },
+  {
+    "id": "712fc0db-5a7d-4479-9ada-4624768e9370",
+    "slug": "flybridge",
+    "name": "Flybridge",
+    "type": "vc",
+    "url": "https://www.flybridge.com"
+  },
+  {
+    "id": "68922737-55a6-4bd4-977e-a31817ca5eb7",
+    "slug": "flying-fish-partners",
+    "name": "Flying Fish Partners",
+    "type": "vc",
+    "url": "https://www.flyingfish.vc/home"
+  },
+  {
+    "id": "6b2bf474-8892-4f4d-8b96-0bb8b0949618",
+    "slug": "formic-ventures",
+    "name": "Formic Ventures",
+    "type": "vc",
+    "url": "https://formic.vc"
+  },
+  {
+    "id": "15725c43-7593-4b94-ae4a-b6550b9b5c98",
+    "slug": "forward-partners",
+    "name": "Forward Partners",
+    "type": "vc",
+    "url": "https://forwardpartners.com"
+  },
+  {
+    "id": "e4a90c08-33ac-41e9-9c09-4d9b6861898a",
+    "slug": "founders-fund",
+    "name": "Founders Fund",
+    "type": "vc",
+    "url": "https://foundersfund.com"
+  },
+  {
+    "id": "89671018-dae5-427f-a6b1-1b8522f5617c",
+    "slug": "framework-venture-partners",
+    "name": "Framework Venture Partners",
+    "type": "vc",
+    "url": "https://www.framework.vc"
+  },
+  {
+    "id": "36b3a82b-9152-47ac-9199-31300f62bf51",
+    "slug": "frog-capital",
+    "name": "Frog Capital",
+    "type": "vc",
+    "url": "https://frogcapital.com"
+  },
+  {
+    "id": "1f83acd5-f6d0-4aaa-b8ab-6cffd2e0fcec",
+    "slug": "front-row-ventures",
+    "name": "Front Row Ventures",
+    "type": "vc",
+    "url": "https://frontrow.ventures"
+  },
+  {
+    "id": "64d936f2-72c7-4137-b645-49d984cb0e4d",
+    "slug": "fuel-venture-capital",
+    "name": "Fuel Venture Capital",
+    "type": "vc",
+    "url": "https://fuelventurecapital.com"
+  },
+  {
+    "id": "a31800ea-c37f-4bef-be14-6664565326dd",
+    "slug": "fuel-ventures",
+    "name": "Fuel Ventures",
+    "type": "vc",
+    "url": "https://fuel.ventures"
+  },
+  {
+    "id": "a77890af-a7ca-48e7-9e61-dc6e0b811b02",
+    "slug": "garage-capital",
+    "name": "Garage Capital",
+    "type": "vc",
+    "url": "https://www.garage.vc"
+  },
+  {
+    "id": "f26a66ba-7dc1-4cb2-894e-5c4f4770b29b",
+    "slug": "georgian",
+    "name": "Georgian",
+    "type": "vc",
+    "url": "https://georgian.io"
+  },
+  {
+    "id": "3179752a-bfaa-41e3-b956-533f982ab952",
+    "slug": "gibraltar-company",
+    "name": "Gibraltar & Company",
+    "type": "vc",
+    "url": "https://www.gibraltarcompany.ca"
+  },
+  {
+    "id": "7471d7aa-de85-48f4-9684-e152dde3f871",
+    "slug": "globalive-capital",
+    "name": "Globalive Capital",
+    "type": "vc",
+    "url": "https://www.globalive.com"
+  },
+  {
+    "id": "fed1986b-ee98-4336-8c89-ad8c15fc663d",
+    "slug": "golden-ventures",
+    "name": "Golden Ventures",
+    "type": "vc",
+    "url": "https://www.golden.ventures"
+  },
+  {
+    "id": "4d140ed8-6a3e-49fe-bf26-5f27326e3dcc",
+    "slug": "good-news-ventures",
+    "name": "Good News Ventures",
+    "type": "vc",
+    "url": "https://www.goodnewsventures.com"
+  },
+  {
+    "id": "54633af7-0ed3-4776-b2fd-ba533942e5fb",
+    "slug": "goodwater",
+    "name": "Goodwater",
+    "type": "vc",
+    "url": "https://www.goodwatercap.com"
+  },
+  {
+    "id": "c5cb756b-95b6-4684-a91f-7ac026989506",
+    "slug": "google-ventures",
+    "name": "Google Ventures",
+    "type": "vc",
+    "url": "https://www.gv.com"
+  },
+  {
+    "id": "255a6ada-107c-4a1e-88f4-02b1952bf17b",
+    "slug": "graphite-ventures",
+    "name": "Graphite Ventures",
+    "type": "vc",
+    "url": "https://www.graphitevc.com"
+  },
+  {
+    "id": "ed7c2c9b-8fc9-4d31-8a3b-bb9e7eab41dc",
+    "slug": "greensky-ventures",
+    "name": "GreenSky Ventures",
+    "type": "vc",
+    "url": "https://greensky.vc"
+  },
+  {
+    "id": "e0267232-3f36-4ad5-99dc-9ce1f69267b2",
+    "slug": "greycroft",
+    "name": "Greycroft",
+    "type": "vc",
+    "url": "https://www.greycroft.com"
+  },
+  {
+    "id": "6f66e05c-f068-4cd6-a200-57bfc7931553",
+    "slug": "greylock",
+    "name": "Greylock",
+    "type": "vc",
+    "url": "https://greylock.com"
+  },
+  {
+    "id": "e15f9fac-d18b-4603-98cd-df7f9b03c96c",
+    "slug": "harlem-capital",
+    "name": "Harlem Capital",
+    "type": "vc",
+    "url": "https://harlem.capital"
+  },
+  {
+    "id": "319150d6-cf13-473e-a738-b15fca22c767",
+    "slug": "highland-europe",
+    "name": "Highland Europe",
+    "type": "vc",
+    "url": "https://www.highlandeurope.com"
+  },
+  {
+    "id": "1eb936c9-6e82-46cb-9bec-0ffcb7c61b0a",
+    "slug": "hlm-venture-partners",
+    "name": "HLM Venture Partners",
+    "type": "vc",
+    "url": "https://hlmvp.com"
+  },
+  {
+    "id": "a20b37b8-8d72-4ff0-b5be-ac390677c2a9",
+    "slug": "hoxton-ventures",
+    "name": "Hoxton Ventures",
+    "type": "vc",
+    "url": "https://www.hoxtonventures.com"
+  },
+  {
+    "id": "9d11dc46-5705-4b61-89d6-b978fa8c0aed",
+    "slug": "hyperplane-venture-capital",
+    "name": "Hyperplane Venture Capital",
+    "type": "vc",
+    "url": "https://hyperplane.vc"
+  },
+  {
+    "id": "cb262d52-128c-47bd-ab04-1298aee61a12",
+    "slug": "hyphen-capital",
+    "name": "Hyphen Capital",
+    "type": "vc",
+    "url": "https://www.hyphencap.com"
+  },
+  {
+    "id": "4cf25231-9276-47ca-aa56-04de197accfa",
+    "slug": "igan-partners",
+    "name": "iGan Partners",
+    "type": "vc",
+    "url": "https://iganpartners.com"
+  },
+  {
+    "id": "a242495e-6447-431a-907d-0f39710ab92f",
+    "slug": "impression-ventures",
+    "name": "Impression Ventures",
+    "type": "vc",
+    "url": "https://impression.ventures"
+  },
+  {
+    "id": "11687f6b-dcfd-48ab-a37c-0e8889c1c27f",
+    "slug": "inbc-investment",
+    "name": "InBC Investment",
+    "type": "vc",
+    "url": "https://www.inbcinvestment.ca"
+  },
+  {
+    "id": "e8b0e4d4-b3ec-46dc-a7ee-407333738b1a",
+    "slug": "index-ventures",
+    "name": "Index Ventures",
+    "type": "vc",
+    "url": "https://www.indexventures.com"
+  },
+  {
+    "id": "6106d51e-1714-4bed-92a4-29d13cfc4d04",
+    "slug": "initialized-capital",
+    "name": "Initialized Capital",
+    "type": "vc",
+    "url": "https://initialized.com"
+  },
+  {
+    "id": "45c63ec3-bc6e-4a00-b18b-48eadf98f0dd",
+    "slug": "insight-partners",
+    "name": "Insight Partners",
+    "type": "vc",
+    "url": "https://www.insightpartners.com"
+  },
+  {
+    "id": "3643487d-e307-47a4-a21f-0ca501fe23d4",
+    "slug": "intact-ventures",
+    "name": "Intact Ventures",
+    "type": "vc",
+    "url": "https://www.intactfc.com/English/intact-ventures/default.aspx"
+  },
+  {
+    "id": "fd743461-74a3-4fc6-b2d0-1185fdb39805",
+    "slug": "interlace-ventures",
+    "name": "Interlace Ventures",
+    "type": "vc",
+    "url": "https://www.interlacevc.com"
+  },
+  {
+    "id": "085e425c-c974-43ca-9ba7-709f2f49c8f2",
+    "slug": "ivp",
+    "name": "IVP",
+    "type": "vc",
+    "url": "https://www.ivp.com"
+  },
+  {
+    "id": "989c6c6e-f093-42fd-93c8-667789e513c5",
+    "slug": "ix-labs",
+    "name": "IX Labs",
+    "type": "vc",
+    "url": "https://www.indexexchange.com/about/ix-labs"
+  },
+  {
+    "id": "9537dd38-4151-4150-bd1a-ca9edc07c7fb",
+    "slug": "jamjar-investments",
+    "name": "JamJar Investments",
+    "type": "vc",
+    "url": "https://www.jamjarinvestments.com"
+  },
+  {
+    "id": "8bac7669-378d-4c6f-8ab4-a1cf4a76c1b8",
+    "slug": "jetblue-ventures",
+    "name": "JetBlue Ventures",
+    "type": "vc",
+    "url": "https://www.jetblueventures.com"
+  },
+  {
+    "id": "b15ece09-3361-436f-af4f-e1687df613f5",
+    "slug": "jll-spark",
+    "name": "JLL Spark",
+    "type": "vc",
+    "url": "https://spark.jllt.com"
+  },
+  {
+    "id": "f2c3d12f-802a-4f75-9c01-43d16e7a4a3b",
+    "slug": "junipero-capital",
+    "name": "Junipero Capital",
+    "type": "vc",
+    "url": "https://www.junipero.vc"
+  },
+  {
+    "id": "a2734978-c743-4cea-bbb2-1ef6e8adc17b",
+    "slug": "kinetic-investments",
+    "name": "Kinetic Investments",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/kinetic-investments"
+  },
+  {
+    "id": "7f32f43e-5066-4bdb-ad0d-d829fdc3dd61",
+    "slug": "klass-capital",
+    "name": "Klass Capital",
+    "type": "vc",
+    "url": "https://www.klass.com"
+  },
+  {
+    "id": "47f4d5be-5f8a-4728-b3b5-f0bdcd094387",
+    "slug": "kleiner-perkins",
+    "name": "Kleiner Perkins",
+    "type": "vc",
+    "url": "https://www.kleinerperkins.com"
+  },
+  {
+    "id": "223f4233-5489-4208-86bf-238f49700a07",
+    "slug": "krillion-ventures",
+    "name": "Krillion Ventures",
+    "type": "vc",
+    "url": "https://krillionventures.com"
+  },
+  {
+    "id": "32d5192f-a0c7-4799-b857-9a36aa24e7cf",
+    "slug": "lab-ventures",
+    "name": "LAB Ventures",
+    "type": "vc",
+    "url": "https://www.labventures.co"
+  },
+  {
+    "id": "6a0fdc8b-ef21-4240-9a05-819c55439b61",
+    "slug": "lakelet-capital",
+    "name": "Lakelet Capital",
+    "type": "vc",
+    "url": "https://lakeletcapital.com"
+  },
+  {
+    "id": "fe6c3070-d868-43f8-b82a-989282321bab",
+    "slug": "lakestar",
+    "name": "Lakestar",
+    "type": "vc",
+    "url": "https://lakestar.com"
+  },
+  {
+    "id": "54298fec-1124-4880-94ff-ba92483d532d",
+    "slug": "launch-ventures",
+    "name": "Launch Ventures",
+    "type": "vc",
+    "url": "https://www.launch.vc"
+  },
+  {
+    "id": "3ccad76a-5b3a-4939-afba-2f3928c9cea0",
+    "slug": "ldv-partners",
+    "name": "LDV Partners",
+    "type": "vc",
+    "url": "https://ldvp.com"
+  },
+  {
+    "id": "28fa50c4-c3f8-4c69-b5b7-646a76706d31",
+    "slug": "lerer-hippeau",
+    "name": "Lerer Hippeau",
+    "type": "vc",
+    "url": "https://www.lererhippeau.com"
+  },
+  {
+    "id": "08624c09-3c52-45f5-abd9-450038727e7c",
+    "slug": "lightspeed-venture-partners",
+    "name": "Lightspeed Venture Partners",
+    "type": "vc",
+    "url": "https://lsvp.com"
+  },
+  {
+    "id": "ef6eccd0-0c7b-4f2c-b327-0a72b46d1a56",
+    "slug": "liveoak-venture-partners",
+    "name": "LiveOak Venture Partners",
+    "type": "vc",
+    "url": "https://liveoakvp.com"
+  },
+  {
+    "id": "3a9f0e66-3531-4271-b19f-ae7181cff0e5",
+    "slug": "loi-venture",
+    "name": "LOI Venture",
+    "type": "vc",
+    "url": "https://www.loi.vc"
+  },
+  {
+    "id": "5b22f5f2-20fe-4565-a375-b73a99c519ed",
+    "slug": "lowercarbon-capital",
+    "name": "Lowercarbon Capital",
+    "type": "vc",
+    "url": "https://lowercarboncapital.com"
+  },
+  {
+    "id": "8833edf8-3297-4a25-a506-253a88709d3d",
+    "slug": "loyal-vc",
+    "name": "Loyal VC",
+    "type": "vc",
+    "url": "https://www.loyal.vc"
+  },
+  {
+    "id": "26cd707e-c4b5-480f-b7b4-d3cf42333708",
+    "slug": "luge-capital",
+    "name": "Luge Capital",
+    "type": "vc",
+    "url": "https://www.luge.vc"
+  },
+  {
+    "id": "dacc5a1f-5b3c-4ada-ac71-bdf84a09d976",
+    "slug": "lumira-ventures",
+    "name": "Lumira Ventures",
+    "type": "vc",
+    "url": "https://www.lumiraventures.com"
+  },
+  {
+    "id": "aec1e03f-6960-4ae3-ac94-f0c8cf981e0a",
+    "slug": "lux-capital",
+    "name": "Lux Capital",
+    "type": "vc",
+    "url": "https://www.luxcapital.com"
+  }
+]

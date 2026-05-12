@@ -1,0 +1,555 @@
+[
+  {
+    "id": "464bac7d-527b-4398-85dd-934f7efbdf60",
+    "slug": "acf-investors",
+    "name": "ACF Investors",
+    "type": "vc",
+    "url": "https://www.acfinvestors.com"
+  },
+  {
+    "id": "e473df91-bbed-46fd-a0b9-10f003dfa0af",
+    "slug": "acme-capital",
+    "name": "ACME Capital",
+    "type": "vc",
+    "url": "https://www.acme.vc"
+  },
+  {
+    "id": "6bc43d15-03ef-499f-a03c-20b2d83eedaa",
+    "slug": "acrew-capital",
+    "name": "Acrew Capital",
+    "type": "vc",
+    "url": "https://www.acrewcapital.com"
+  },
+  {
+    "id": "90a2b9b3-e701-4899-a0dc-424df3e532d6",
+    "slug": "active-impact-investments",
+    "name": "Active Impact Investments",
+    "type": "vc",
+    "url": "https://www.activeimpactinvestments.com"
+  },
+  {
+    "id": "80205981-8a60-4cfb-b4cd-6a4d4ae99c5d",
+    "slug": "advent-life-sciences",
+    "name": "Advent Life Sciences",
+    "type": "vc",
+    "url": "https://adventls.com"
+  },
+  {
+    "id": "fbded03f-a36e-4e80-9863-15070778b85c",
+    "slug": "alate-partners",
+    "name": "Alate Partners",
+    "type": "vc",
+    "url": "https://alatepartners.com"
+  },
+  {
+    "id": "892e41bf-d389-4f7c-bcfb-66a7a8c16610",
+    "slug": "allosterx-capital",
+    "name": "AllosteRx Capital",
+    "type": "vc",
+    "url": "https://www.allosterxcapital.com"
+  },
+  {
+    "id": "b31a601e-57ac-4b5c-9119-4712ab9685d0",
+    "slug": "alpha-bridge-ventures",
+    "name": "Alpha Bridge Ventures",
+    "type": "vc",
+    "url": "https://www.alphabridge.vc"
+  },
+  {
+    "id": "e8cc93ef-8bd9-4845-aa0e-57c8e282a24d",
+    "slug": "alpha-partners",
+    "name": "Alpha Partners",
+    "type": "vc",
+    "url": "https://alphapartners.com"
+  },
+  {
+    "id": "506ff7fa-2ff8-404b-b5e2-6f284b42a12e",
+    "slug": "amadeus-capital-partners",
+    "name": "Amadeus Capital Partners",
+    "type": "vc",
+    "url": "https://www.amadeuscapital.com"
+  },
+  {
+    "id": "ecd5bcfc-bcad-4fbe-82ab-9cd1d7703f1a",
+    "slug": "amplifyla",
+    "name": "Amplify.LA",
+    "type": "vc",
+    "url": "https://amplify.la"
+  },
+  {
+    "id": "deeb0c03-fe3e-4595-af77-4730a60990ca",
+    "slug": "apollo-health-ventures",
+    "name": "Apollo Health Ventures",
+    "type": "vc",
+    "url": "https://www.apollo.vc"
+  },
+  {
+    "id": "ca152be0-64de-4e8f-a146-626f08e74429",
+    "slug": "archangel-network-of-funds",
+    "name": "Archangel Network of Funds",
+    "type": "vc",
+    "url": "https://www.archangelnetwork.ca"
+  },
+  {
+    "id": "b7098cbd-4303-4831-bd00-2af8a1bdaf40",
+    "slug": "arctern-ventures",
+    "name": "ArcTern Ventures",
+    "type": "vc",
+    "url": "https://www.arcternventures.com"
+  },
+  {
+    "id": "f987692b-835f-4f83-989f-288e735847fc",
+    "slug": "ascent-venture-partners",
+    "name": "Ascent Venture Partners",
+    "type": "vc",
+    "url": "https://www.ascentvp.com"
+  },
+  {
+    "id": "59e951d5-4ff6-4078-b2ff-c6f260a0a3be",
+    "slug": "astia",
+    "name": "Astia",
+    "type": "vc",
+    "url": "https://www.astia.org"
+  },
+  {
+    "id": "8d0b247d-18fa-4fd3-8bab-59e1be8cda0b",
+    "slug": "atb-ventures",
+    "name": "ATB Ventures",
+    "type": "vc",
+    "url": "https://twitter.com/AtbVentures"
+  },
+  {
+    "id": "f4d2b325-17e9-4526-8f1f-286b591a4039",
+    "slug": "atlas-venture",
+    "name": "Atlas Venture",
+    "type": "vc",
+    "url": "https://atlasventure.com"
+  },
+  {
+    "id": "0aabfae9-420a-4a49-950e-cf9cbeddf228",
+    "slug": "atomico",
+    "name": "Atomico",
+    "type": "vc",
+    "url": "https://atomico.com"
+  },
+  {
+    "id": "a984f5e7-f35e-4242-a67a-2e92b200ef72",
+    "slug": "atx-venture-partners",
+    "name": "ATX Venture Partners",
+    "type": "vc",
+    "url": "https://www.atxventurepartners.com"
+  },
+  {
+    "id": "ca15858a-22cb-4ed6-beda-4ca33d264ab6",
+    "slug": "austin-ventures",
+    "name": "Austin Ventures",
+    "type": "vc",
+    "url": "https://austinventures.com"
+  },
+  {
+    "id": "a676c2d9-b86b-497c-ad5c-78361c403f49",
+    "slug": "bain-capital-ventures",
+    "name": "Bain Capital Ventures",
+    "type": "vc",
+    "url": "https://baincapitalventures.com"
+  },
+  {
+    "id": "688d7d19-bf66-4ec0-9af9-0e7e50606ff3",
+    "slug": "balderton-capital",
+    "name": "Balderton Capital",
+    "type": "vc",
+    "url": "https://www.balderton.com"
+  },
+  {
+    "id": "98293486-b3ec-4b3d-8154-f6770cc88e4c",
+    "slug": "baroda-ventures",
+    "name": "Baroda Ventures",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/baroda-ventures"
+  },
+  {
+    "id": "10239cd0-4d5d-4614-9e26-192ca620c5b9",
+    "slug": "basf-venture-capital",
+    "name": "BASF Venture Capital",
+    "type": "vc",
+    "url": "https://www.basf.com/global/en/who-we-are/organization/group-companies/BASF_Venture-Capital.html"
+  },
+  {
+    "id": "edf557b8-39a9-4e8d-8104-e479a75d5324",
+    "slug": "battery-ventures",
+    "name": "Battery Ventures",
+    "type": "vc",
+    "url": "https://www.battery.com"
+  },
+  {
+    "id": "a0ba8dac-6a3a-4a0d-b4ea-aecba20f6a3b",
+    "slug": "bcf-ventures",
+    "name": "BCF Ventures",
+    "type": "vc",
+    "url": "https://bcfventures.vc"
+  },
+  {
+    "id": "07d040a5-93e5-4029-95f1-a046eec17afd",
+    "slug": "bdmi-fund",
+    "name": "BDMI Fund",
+    "type": "vc",
+    "url": "https://www.bdmifund.com"
+  },
+  {
+    "id": "f027a483-44df-4704-a197-109725f7150f",
+    "slug": "bessemer-venture-partners",
+    "name": "Bessemer Venture Partners",
+    "type": "vc",
+    "url": "https://www.bvp.com"
+  },
+  {
+    "id": "c6b8c04e-74ad-4412-8be5-3cbac999f578",
+    "slug": "betaworks",
+    "name": "betaworks",
+    "type": "vc",
+    "url": "https://www.betaworks.com"
+  },
+  {
+    "id": "e725b980-f34f-4993-b81a-1117c794a00d",
+    "slug": "bethnal-green-ventures",
+    "name": "Bethnal Green Ventures",
+    "type": "vc",
+    "url": "https://www.bethnalgreenventures.com"
+  },
+  {
+    "id": "d194fd71-fa98-422d-bed2-71b1ab201ecc",
+    "slug": "bkr-capital",
+    "name": "BKR capital",
+    "type": "vc",
+    "url": "https://www.bkrcapital.ca"
+  },
+  {
+    "id": "c8097817-f602-4b2b-86be-87bdc1070367",
+    "slug": "blck-vc",
+    "name": "BLCK VC",
+    "type": "vc",
+    "url": "https://www.blckvc.org"
+  },
+  {
+    "id": "3993704c-6c26-493b-9750-88c9150e677e",
+    "slug": "blossom-capital",
+    "name": "Blossom Capital",
+    "type": "vc",
+    "url": "https://www.blossomcap.com"
+  },
+  {
+    "id": "b0091a2d-179d-441e-a654-02b655f3f434",
+    "slug": "blueyard-capital",
+    "name": "BlueYard Capital",
+    "type": "vc",
+    "url": "https://www.blueyard.com"
+  },
+  {
+    "id": "99869a27-2ef4-48f7-93df-3e8bb66261e1",
+    "slug": "bolt",
+    "name": "Bolt",
+    "type": "vc",
+    "url": "https://bolt.io"
+  },
+  {
+    "id": "1bc3d01c-0ac0-4dec-919b-8e5a999d4175",
+    "slug": "boxgroup",
+    "name": "BoxGroup",
+    "type": "vc",
+    "url": "https://www.boxgroup.com"
+  },
+  {
+    "id": "572240a8-dcd1-43ad-8a3c-a2f465a6ed2a",
+    "slug": "braemar-energy-ventures",
+    "name": "Braemar Energy Ventures",
+    "type": "vc",
+    "url": "http://www.braemarenergy.com"
+  },
+  {
+    "id": "e2baf627-f5f4-48c8-96a0-2988ec280d54",
+    "slug": "break-trail-ventures",
+    "name": "Break Trail Ventures",
+    "type": "vc",
+    "url": "https://www.breaktrailventures.com"
+  },
+  {
+    "id": "963a9895-56e6-4d17-b2f8-9bfcfee76e47",
+    "slug": "breed-reply",
+    "name": "Breed Reply",
+    "type": "vc",
+    "url": "https://www.reply.com/breed-reply/en"
+  },
+  {
+    "id": "55753384-0ab0-4c14-9da6-c534874799aa",
+    "slug": "brightspark-ventures",
+    "name": "Brightspark Ventures",
+    "type": "vc",
+    "url": "https://brightspark.com/en"
+  },
+  {
+    "id": "bb3483ef-424d-4ab3-8f89-9a4884a734ba",
+    "slug": "buckley-ventures",
+    "name": "Buckley Ventures",
+    "type": "vc",
+    "url": "https://www.buckleyventures.com"
+  },
+  {
+    "id": "69a9a7d8-4da5-47ea-939f-bed65325a9b5",
+    "slug": "builders-vc",
+    "name": "Builders VC",
+    "type": "vc",
+    "url": "https://www.builders.vc"
+  },
+  {
+    "id": "27936d82-98e8-4cc6-a4fb-9a94dfc329f9",
+    "slug": "camber-creek",
+    "name": "Camber Creek",
+    "type": "vc",
+    "url": "https://cambercreek.com"
+  },
+  {
+    "id": "5677828b-fc71-433e-92db-6204cecae5d8",
+    "slug": "capitalg",
+    "name": "CapitalG",
+    "type": "vc",
+    "url": "https://www.capitalg.com"
+  },
+  {
+    "id": "c68bac21-9059-4535-89b0-53ea53c996e1",
+    "slug": "capitalize-vc",
+    "name": "Capitalize VC",
+    "type": "vc",
+    "url": "https://www.capitalizevc.com"
+  },
+  {
+    "id": "9c296e43-ee5a-4a9c-a928-f550770388a2",
+    "slug": "carbon-direct-capital",
+    "name": "Carbon Direct Capital",
+    "type": "vc",
+    "url": "https://www.carbondirectcapital.com"
+  },
+  {
+    "id": "9e5d66bc-3c46-47d6-8353-d9f44326b4c5",
+    "slug": "cavu-venture-partners",
+    "name": "CAVU Venture Partners",
+    "type": "vc",
+    "url": "https://www.cavuventures.com"
+  },
+  {
+    "id": "78300dc4-d242-4fde-9d92-a1db045f0eb0",
+    "slug": "celtic-house-venture-partners",
+    "name": "Celtic House Venture Partners",
+    "type": "vc",
+    "url": "https://www.celtic.vc"
+  },
+  {
+    "id": "a17f8ffe-1738-4b1a-8863-8be4c11a4f65",
+    "slug": "cherry-ventures",
+    "name": "Cherry Ventures",
+    "type": "vc",
+    "url": "https://www.cherry.vc"
+  },
+  {
+    "id": "715b1535-e98a-4e65-bb90-efa1e2c63849",
+    "slug": "chingona-ventures",
+    "name": "Chingona Ventures",
+    "type": "vc",
+    "url": "https://www.chingona.ventures"
+  },
+  {
+    "id": "f431a355-eef4-48fd-a9a7-ab97935311b7",
+    "slug": "chloe-capital",
+    "name": "Chloe Capital",
+    "type": "vc",
+    "url": "https://chloecapital.com"
+  },
+  {
+    "id": "5b3ad542-72b2-4f9e-aa0a-5acb13a56eca",
+    "slug": "chrysalix-venture-capital",
+    "name": "Chrysalix Venture Capital",
+    "type": "vc",
+    "url": "https://www.chrysalix.com"
+  },
+  {
+    "id": "c80107cb-f884-48e6-8d51-c0716cb925a1",
+    "slug": "collaborative-fund",
+    "name": "Collaborative Fund",
+    "type": "vc",
+    "url": "https://collabfund.com"
+  },
+  {
+    "id": "e472c9f6-a408-47a3-9d19-4694f076c56e",
+    "slug": "compound-vc",
+    "name": "Compound VC",
+    "type": "vc",
+    "url": "https://www.compound.vc"
+  },
+  {
+    "id": "107a8091-b4b2-43bd-b875-b655d9b245f6",
+    "slug": "congruent-ventures",
+    "name": "Congruent Ventures",
+    "type": "vc",
+    "url": "https://www.congruentvc.com"
+  },
+  {
+    "id": "3a8cea34-f4a1-492f-b86b-c7ad2f898ddc",
+    "slug": "connect-ventures",
+    "name": "Connect Ventures",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/connect-ventures"
+  },
+  {
+    "id": "f4646692-1eea-4857-bec5-615c0058deda",
+    "slug": "continuous-ventures",
+    "name": "Continuous Ventures",
+    "type": "vc",
+    "url": "https://www.continuous.vc"
+  },
+  {
+    "id": "23e71055-08c6-49f1-92a0-7312c3e8d572",
+    "slug": "contrary",
+    "name": "Contrary",
+    "type": "vc",
+    "url": "https://contrary.com"
+  },
+  {
+    "id": "678760a7-7781-467a-9150-5127e934588e",
+    "slug": "core-innovation-capital",
+    "name": "Core Innovation Capital",
+    "type": "vc",
+    "url": "http://corevc.com"
+  },
+  {
+    "id": "cbe2155e-5e9c-4c11-b398-f684f24102e6",
+    "slug": "courtside-ventures",
+    "name": "Courtside Ventures",
+    "type": "vc",
+    "url": "https://www.courtsidevc.com"
+  },
+  {
+    "id": "fd2ae7b1-de8b-4f1f-bb13-d832fbbc34b3",
+    "slug": "cowboy-ventures",
+    "name": "Cowboy Ventures",
+    "type": "vc",
+    "url": "https://www.cowboy.vc"
+  },
+  {
+    "id": "3fef2599-a29f-4a06-9c8a-11e61afab087",
+    "slug": "craft-ventures",
+    "name": "Craft Ventures",
+    "type": "vc",
+    "url": "https://www.craftventures.com"
+  },
+  {
+    "id": "0f5c8eb6-e882-4fcc-a1bd-d02b326bc1ef",
+    "slug": "crawley-ventures",
+    "name": "Crawley Ventures",
+    "type": "vc",
+    "url": "http://www.crawleyventures.com"
+  },
+  {
+    "id": "60748521-a133-4e14-9c8a-2ebf02f09698",
+    "slug": "crv",
+    "name": "CRV",
+    "type": "vc",
+    "url": "https://www.crv.com"
+  },
+  {
+    "id": "62747364-2d99-458f-87c1-700041b998ef",
+    "slug": "cycle-capital",
+    "name": "Cycle Capital",
+    "type": "vc",
+    "url": "https://www.cyclecapital.com/en"
+  },
+  {
+    "id": "76476e64-2943-4fdd-a356-0d6bb732b764",
+    "slug": "cylon",
+    "name": "CyLon",
+    "type": "vc",
+    "url": "https://www.cylonventures.com"
+  },
+  {
+    "id": "13c447b7-da4f-4966-9de5-70775f7bc2b4",
+    "slug": "dawn-capital",
+    "name": "Dawn Capital",
+    "type": "vc",
+    "url": "https://dawncapital.com"
+  },
+  {
+    "id": "f80c0c36-5cf9-4379-99be-9a27c250f41b",
+    "slug": "dcvc",
+    "name": "DCVC",
+    "type": "vc",
+    "url": "https://www.dcvc.com"
+  },
+  {
+    "id": "662e2ad8-72ea-4619-9a8f-664e003a4a93",
+    "slug": "defy-vc",
+    "name": "defy.vc",
+    "type": "vc",
+    "url": "https://defy.vc"
+  },
+  {
+    "id": "c015e7d0-0340-4cab-8648-3fcc75f31c92",
+    "slug": "deloitte-ventures",
+    "name": "Deloitte Ventures",
+    "type": "vc",
+    "url": "https://www2.deloitte.com/ca/en/pages/insight/solutions/ventures.html"
+  },
+  {
+    "id": "9dba988a-134c-405e-b509-53688395ebc4",
+    "slug": "deming-center-venture-fund",
+    "name": "Deming Center Venture Fund",
+    "type": "vc",
+    "url": "https://www.colorado.edu/dcvf"
+  },
+  {
+    "id": "a3e29eab-bc6f-4183-a8be-c73a7595b884",
+    "slug": "diagram-ventures",
+    "name": "Diagram Ventures",
+    "type": "vc",
+    "url": "https://diagram.ca"
+  },
+  {
+    "id": "76777ff4-1e57-4f32-bbf0-ae0a62cf5d50",
+    "slug": "differential-vc",
+    "name": "Differential VC",
+    "type": "vc",
+    "url": "https://www.differential.vc"
+  },
+  {
+    "id": "5a9eb6bf-a154-4ee6-a69c-6c598fd6de99",
+    "slug": "district-ventures-capital",
+    "name": "District Ventures Capital",
+    "type": "vc",
+    "url": "https://www.districtventurescapital.com"
+  },
+  {
+    "id": "0d18cc18-5039-4374-b8fe-1e680160075c",
+    "slug": "dmz-ventures",
+    "name": "DMZ Ventures",
+    "type": "vc",
+    "url": "https://dmzventures.com"
+  },
+  {
+    "id": "ec162e7e-db7b-4d77-b84a-abb3f6287063",
+    "slug": "dn-capital",
+    "name": "DN Capital",
+    "type": "vc",
+    "url": "https://dncapital.com"
+  },
+  {
+    "id": "4c836dc0-7163-4641-8dad-b33e9e27e0a0",
+    "slug": "drive-capital",
+    "name": "Drive Capital",
+    "type": "vc",
+    "url": "https://drivecapital.com"
+  },
+  {
+    "id": "21bd6379-ade9-41b2-8d5d-19728dfd9fc8",
+    "slug": "dubai-future-district-fund",
+    "name": "Dubai Future District Fund",
+    "type": "vc",
+    "url": "https://dfdf.vc"
+  }
+]

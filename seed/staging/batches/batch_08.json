@@ -1,0 +1,555 @@
+[
+  {
+    "id": "4f97b942-0f0c-4966-84e6-3c92d82f3dc6",
+    "slug": "silverton-partners",
+    "name": "Silverton Partners",
+    "type": "vc",
+    "url": "https://www.silvertonpartners.com"
+  },
+  {
+    "id": "6d1e36e2-bd95-40cb-8b29-ba77f88be9da",
+    "slug": "slack-fund",
+    "name": "Slack Fund",
+    "type": "vc",
+    "url": "https://slack.com/fund"
+  },
+  {
+    "id": "61196be0-93a5-4707-b3c0-bedc6e76c059",
+    "slug": "spark-capital",
+    "name": "Spark Capital",
+    "type": "vc",
+    "url": "https://www.sparkcapital.com"
+  },
+  {
+    "id": "33efb55a-e653-4fce-a1f8-ed28ee0e3943",
+    "slug": "staircase-ventures",
+    "name": "Staircase Ventures",
+    "type": "vc",
+    "url": "https://staircaseventures.com"
+  },
+  {
+    "id": "e5e1dd86-a89a-429b-807a-7519d36afc27",
+    "slug": "stand-up-ventures",
+    "name": "Stand Up Ventures",
+    "type": "vc",
+    "url": "https://www.standupvc.com"
+  },
+  {
+    "id": "78f42444-9042-4e3d-91d4-151dc5444bda",
+    "slug": "starlight-ventures",
+    "name": "Starlight Ventures",
+    "type": "vc",
+    "url": "https://starlight.vc"
+  },
+  {
+    "id": "b54e748c-e004-45c4-8b26-52d93246836b",
+    "slug": "storm-ventures",
+    "name": "Storm Ventures",
+    "type": "vc",
+    "url": "https://www.stormventures.com"
+  },
+  {
+    "id": "b7935417-1c83-4335-87be-7d5ccec1104b",
+    "slug": "summit-partners",
+    "name": "Summit Partners",
+    "type": "vc",
+    "url": "https://www.summitpartners.com"
+  },
+  {
+    "id": "a573c588-b4e5-49d0-a4fe-d106bd060750",
+    "slug": "sv-angel",
+    "name": "SV Angel",
+    "type": "vc",
+    "url": "https://svangel.com"
+  },
+  {
+    "id": "16f642db-301d-4ea5-9ca5-506175f49a9e",
+    "slug": "tandemlaunch",
+    "name": "TandemLaunch",
+    "type": "vc",
+    "url": "https://www.tandemlaunch.com/en"
+  },
+  {
+    "id": "0c5431e3-2393-4c2b-b5fd-36f617a96bc6",
+    "slug": "team-global",
+    "name": "Team Global",
+    "type": "vc",
+    "url": "https://teamglobal.net"
+  },
+  {
+    "id": "6dc31963-a0be-4ed0-b338-692e119402e2",
+    "slug": "telus-ventures",
+    "name": "Telus Ventures",
+    "type": "vc",
+    "url": "https://www.telus.com/en/ventures"
+  },
+  {
+    "id": "85303889-0b99-4247-b4cb-f54cfe1df842",
+    "slug": "tenity",
+    "name": "Tenity",
+    "type": "vc",
+    "url": "https://www.tenity.com"
+  },
+  {
+    "id": "f4265332-8d5b-47e2-ac05-00688d6ef689",
+    "slug": "theventurefund",
+    "name": "TheVenture.Fund",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/theventurefund"
+  },
+  {
+    "id": "ec2d5dcf-cc76-4973-96f6-01fae4a01b8d",
+    "slug": "threshold-ventures",
+    "name": "Threshold Ventures",
+    "type": "vc",
+    "url": "https://threshold.vc"
+  },
+  {
+    "id": "b6eb4c6e-69a5-4175-bbdb-43d3465e4af9",
+    "slug": "toronto-innovation-acceleration-partners",
+    "name": "Toronto Innovation Acceleration Partners",
+    "type": "vc",
+    "url": "https://tiap.ca"
+  },
+  {
+    "id": "e45423c4-dc7a-4e8e-bf1a-5fff3bff03e4",
+    "slug": "true",
+    "name": "True.",
+    "type": "vc",
+    "url": "https://www.true.global"
+  },
+  {
+    "id": "e81bdf26-d804-4bb4-aff6-ebb2bc480dd7",
+    "slug": "two-sigma-ventures",
+    "name": "Two Sigma Ventures",
+    "type": "vc",
+    "url": "https://twosigmaventures.com"
+  },
+  {
+    "id": "9b519219-c5bb-4ec4-ae35-9c2406176985",
+    "slug": "two-small-fish-ventures",
+    "name": "Two Small Fish Ventures",
+    "type": "vc",
+    "url": "https://twosmallfish.vc"
+  },
+  {
+    "id": "0a68b233-1f1a-4dbc-ae9d-9196f29d03bc",
+    "slug": "underscore-vc",
+    "name": "Underscore VC",
+    "type": "vc",
+    "url": "https://underscore.vc"
+  },
+  {
+    "id": "1d2115cd-858f-4c46-aa1a-3548edb03390",
+    "slug": "union-capital",
+    "name": "Union Capital",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/unionvc"
+  },
+  {
+    "id": "ba223c0a-51ff-4102-8f7a-51e6ca5782b4",
+    "slug": "union-square-ventures",
+    "name": "Union Square Ventures",
+    "type": "vc",
+    "url": "https://www.usv.com"
+  },
+  {
+    "id": "9f308701-681f-4716-b5d0-8f91211d7c5b",
+    "slug": "unreasonable",
+    "name": "Unreasonable",
+    "type": "vc",
+    "url": "https://unreasonablegroup.com"
+  },
+  {
+    "id": "2a6ff6ee-5cc5-4ce1-a095-737e5cddef57",
+    "slug": "valo-ventures",
+    "name": "Valo Ventures",
+    "type": "vc",
+    "url": "https://valoventures.org"
+  },
+  {
+    "id": "ab823c6c-350e-46c1-bd58-2220a833a7c7",
+    "slug": "vanedge-capital",
+    "name": "Vanedge Capital",
+    "type": "vc",
+    "url": "https://www.vanedgecapital.com"
+  },
+  {
+    "id": "a47cc3ba-3b00-4e42-b110-b43130309bc0",
+    "slug": "varia-ventures",
+    "name": "Varia Ventures",
+    "type": "vc",
+    "url": "https://varia.com"
+  },
+  {
+    "id": "36c1eeb7-1960-4a0f-9e0c-3822113aa90f",
+    "slug": "venrock",
+    "name": "Venrock",
+    "type": "vc",
+    "url": "https://www.venrock.com"
+  },
+  {
+    "id": "447b9f89-3d9f-4aa9-8ba5-5ee0c6098e05",
+    "slug": "venture-ontario",
+    "name": "Venture Ontario",
+    "type": "vc",
+    "url": "https://www.ventureontario.ca"
+  },
+  {
+    "id": "90f8322d-2134-4ee0-a972-b7ae9bdbd8fe",
+    "slug": "venturesouq",
+    "name": "VentureSouq",
+    "type": "vc",
+    "url": "https://www.venturesouq.com"
+  },
+  {
+    "id": "a1471a82-5d34-429a-9f76-71f891562151",
+    "slug": "versant-ventures",
+    "name": "Versant Ventures",
+    "type": "vc",
+    "url": "https://www.versantventures.com"
+  },
+  {
+    "id": "9032be0f-bdcc-4103-830a-841a1a6f0c6d",
+    "slug": "version-one",
+    "name": "Version One",
+    "type": "vc",
+    "url": "https://versionone.vc"
+  },
+  {
+    "id": "1b67c5e5-cf95-43af-bb5d-7ccff7c16408",
+    "slug": "vertu-capital",
+    "name": "Vertu Capital",
+    "type": "vc",
+    "url": "https://vertucapital.ca"
+  },
+  {
+    "id": "d4aae2a2-2cec-4ee5-84b2-0b6dbe864c96",
+    "slug": "village-global",
+    "name": "Village Global",
+    "type": "vc",
+    "url": "https://www.villageglobal.vc"
+  },
+  {
+    "id": "8e376a8a-7e2c-4ca7-a995-c0aef06a124e",
+    "slug": "vista-equity-partners",
+    "name": "Vista Equity Partners",
+    "type": "vc",
+    "url": "https://www.vistaequitypartners.com"
+  },
+  {
+    "id": "d50d170a-db28-4e48-b718-505f8a1da2f8",
+    "slug": "vitalize-venture-capital",
+    "name": "VITALIZE Venture Capital",
+    "type": "vc",
+    "url": "https://www.vitalize.vc"
+  },
+  {
+    "id": "51244485-f0e0-4071-866d-ca211b409d52",
+    "slug": "vmg-partners",
+    "name": "VMG Partners",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/vmg-partners"
+  },
+  {
+    "id": "11552209-48a8-4d97-822c-1d89e3c8efe2",
+    "slug": "weekend-fund",
+    "name": "Weekend Fund",
+    "type": "vc",
+    "url": "https://weekend.fund"
+  },
+  {
+    "id": "e8fbfeb4-923b-4c12-bb8e-6eaab8a1658a",
+    "slug": "white-star-capital",
+    "name": "White Star Capital",
+    "type": "vc",
+    "url": "https://whitestarcapital.com"
+  },
+  {
+    "id": "57af4386-a8f6-43dd-8770-4e7d729dd769",
+    "slug": "yaletown-partners",
+    "name": "Yaletown Partners",
+    "type": "vc",
+    "url": "https://yaletown.com"
+  },
+  {
+    "id": "92ed5c91-3453-4910-bca9-3b34041991f2",
+    "slug": "1-million-cups-boulder",
+    "name": "1 Million Cups Boulder",
+    "type": "other",
+    "url": "https://www.meetup.com/1-Million-Cups-Boulder"
+  },
+  {
+    "id": "9ef4fa1b-0c4a-48ba-b499-04db9e9c9630",
+    "slug": "accelerateott",
+    "name": "AccelerateOTT",
+    "type": "other",
+    "url": "https://www.accelerateott.ca"
+  },
+  {
+    "id": "5747cd4a-4ec2-4d14-a40e-1da782e4efde",
+    "slug": "access-silicon-valley-boulder-denver",
+    "name": "Access Silicon Valley Boulder/Denver",
+    "type": "other",
+    "url": "https://www.meetup.com/Access-Silicon-Valley-Boulder-Denver"
+  },
+  {
+    "id": "1d10640c-2348-4db0-a715-b8496f899fcd",
+    "slug": "adweek-social-media-week",
+    "name": "AdWeek Social Media Week",
+    "type": "other",
+    "url": "https://event.adweek.com/social-media-week-2023"
+  },
+  {
+    "id": "58805b14-6110-4783-8b9b-3be14d460566",
+    "slug": "agi-house",
+    "name": "AGI House",
+    "type": "other",
+    "url": "https://agihouse.ai"
+  },
+  {
+    "id": "c9105cff-7470-42de-a07b-d586125f5dbe",
+    "slug": "ai-tinkerers",
+    "name": "AI Tinkerers",
+    "type": "other",
+    "url": "https://tinkerer.ai/p/welcome"
+  },
+  {
+    "id": "b78d87c4-91d7-4699-a4ec-cb1e2a0014ad",
+    "slug": "andrews-tech-mixer",
+    "name": "Andrew\u2019s Tech Mixer",
+    "type": "other",
+    "url": "https://www.andrew.today/p/events"
+  },
+  {
+    "id": "e2b5adf7-1b37-4fed-b39e-508e8c0d17bf",
+    "slug": "asia-tech-x-singapore",
+    "name": "Asia Tech x Singapore",
+    "type": "other",
+    "url": "https://asiatechxsg.com"
+  },
+  {
+    "id": "a170edcc-4e80-4feb-b67e-11e733374863",
+    "slug": "assembly",
+    "name": "Assembly",
+    "type": "other",
+    "url": "https://www.assemblycs.com"
+  },
+  {
+    "id": "091211e1-425e-4e33-891e-b0594665c7a0",
+    "slug": "association-of-chinese-canadian-entrepreneurs",
+    "name": "Association of Chinese Canadian Entrepreneurs",
+    "type": "other",
+    "url": "https://www.acce.ca/new"
+  },
+  {
+    "id": "12cf7352-673b-4868-b6ae-ade3ecc20bb4",
+    "slug": "asugsv-summit",
+    "name": "ASU+GSV Summit",
+    "type": "other",
+    "url": "https://www.asugsvsummit.com"
+  },
+  {
+    "id": "7c4a7d32-0422-4c74-9b18-4efe71fa73e1",
+    "slug": "banff-venture-forum",
+    "name": "Banff Venture Forum",
+    "type": "other",
+    "url": "https://banffventureforum.com"
+  },
+  {
+    "id": "5c585f7b-ff69-4454-ae6d-c2716567bf7e",
+    "slug": "big-data-boston",
+    "name": "Big Data Boston",
+    "type": "other",
+    "url": "https://www.meetup.com/BigDataBoston"
+  },
+  {
+    "id": "15eb0109-cfc7-4ec8-8a0d-05b65a4874d1",
+    "slug": "biotechto",
+    "name": "BiotechTO",
+    "type": "other",
+    "url": "https://biotechto.com"
+  },
+  {
+    "id": "c46d9653-6e89-4ec8-9bf0-9c113e8425cf",
+    "slug": "bits-in-bio",
+    "name": "Bits in Bio",
+    "type": "other",
+    "url": "https://www.bitsinbio.org"
+  },
+  {
+    "id": "1425defe-3868-4542-8512-2bb3fa7ff246",
+    "slug": "blockchain-futurist-conference",
+    "name": "Blockchain Futurist Conference",
+    "type": "other",
+    "url": "https://www.futuristconference.com"
+  },
+  {
+    "id": "438bb2a9-5bd4-4ec6-9d29-0099aefd267a",
+    "slug": "bootsector",
+    "name": "BootSector",
+    "type": "other",
+    "url": "https://joinbootsector.com"
+  },
+  {
+    "id": "7bf2d351-ce9e-4805-9d1a-81c19451cf8a",
+    "slug": "bootstrappers-breakfast-for-san-francisco-startups",
+    "name": "Bootstrappers Breakfast for San Francisco Startups",
+    "type": "other",
+    "url": "https://www.meetup.com/Bootstrappers-Breakfast-San-Francisco"
+  },
+  {
+    "id": "da35bda1-35a8-487f-a265-9205d264ce1b",
+    "slug": "boston-ai-network-com",
+    "name": "Boston AI Network",
+    "type": "other",
+    "url": "https://www.meetup.com/Boston-AI-Network-Artificial-Intelligence-Group"
+  },
+  {
+    "id": "adb594e4-848d-47d9-8b52-317af28d9991",
+    "slug": "boston-fintech",
+    "name": "Boston FinTech",
+    "type": "other",
+    "url": "https://www.meetup.com/Boston-FinTech"
+  },
+  {
+    "id": "80522a85-c33d-4f36-b867-281d53b857e7",
+    "slug": "boston-hardware-meetup",
+    "name": "Boston Hardware Meetup",
+    "type": "other",
+    "url": "https://www.meetup.com/boston-hardware"
+  },
+  {
+    "id": "282d5b8e-a83e-4c6d-b8ce-cd8fa4c50d94",
+    "slug": "boston-new-technology",
+    "name": "Boston New Technology",
+    "type": "other",
+    "url": "https://www.meetup.com/Boston_New_Technology"
+  },
+  {
+    "id": "9e069271-22d7-4caa-a85d-a3e70aef7473",
+    "slug": "boston-startup-idea-to-ipo",
+    "name": "Boston Startup: Idea to IPO",
+    "type": "other",
+    "url": "https://www.meetup.com/Boston-Idea-to-IPO"
+  },
+  {
+    "id": "98c0603d-b117-4c7d-be35-d2e8e382b75c",
+    "slug": "boston-techjam",
+    "name": "Boston TechJam",
+    "type": "other",
+    "url": "https://www.masstlc.org/bostontechjam"
+  },
+  {
+    "id": "c68a73fe-e900-496e-bbc4-eb4cb64f0293",
+    "slug": "bostonhacks",
+    "name": "BostonHacks",
+    "type": "other",
+    "url": "https://bostonhacks.io"
+  },
+  {
+    "id": "b664a741-36b0-4062-8571-7da83239368f",
+    "slug": "boulder-open-coffee",
+    "name": "Boulder Open Coffee",
+    "type": "other",
+    "url": "https://www.meetup.com/boulder-open-coffee"
+  },
+  {
+    "id": "ffe19f11-b289-4175-8d93-62b3a44a5a6d",
+    "slug": "boulder-startup-week",
+    "name": "Boulder Startup Week",
+    "type": "other",
+    "url": "https://boulderstartupweek.com"
+  },
+  {
+    "id": "1df8c367-66b9-4f9f-b015-616b38404048",
+    "slug": "buffalo-startup-week",
+    "name": "Buffalo Startup Week",
+    "type": "other",
+    "url": "https://www.startupweekbuffalo.com"
+  },
+  {
+    "id": "c364106e-f923-4b05-8bd5-822acbf848e3",
+    "slug": "burlington-chamber-of-commerce",
+    "name": "Burlington Chamber of Commerce",
+    "type": "other",
+    "url": "https://www.burlingtonchamber.com"
+  },
+  {
+    "id": "4fe27eb4-b4ff-41af-9835-aac6876817a5",
+    "slug": "business-of-software-conference",
+    "name": "Business of Software Conference",
+    "type": "other",
+    "url": "https://businessofsoftware.org"
+  },
+  {
+    "id": "3abf8e82-5c9a-4206-9d6c-b1fdeaeb8ad9",
+    "slug": "calgary-hackathon",
+    "name": "Calgary Hackathon",
+    "type": "other",
+    "url": "https://www.yychacks.ca"
+  },
+  {
+    "id": "3bb5e1d4-e9da-4e69-8a97-666174ae3064",
+    "slug": "canadian-blockchain-consortium",
+    "name": "Canadian Blockchain Consortium",
+    "type": "other",
+    "url": "https://www.canadablockchain.ca"
+  },
+  {
+    "id": "6049a4f7-c676-4214-b786-03ee0ef3b102",
+    "slug": "canadian-innovation-exchange",
+    "name": "Canadian Innovation Exchange",
+    "type": "other",
+    "url": "https://cixsummit.com"
+  },
+  {
+    "id": "723d0b32-ab9c-4818-b56f-5854c6ac1885",
+    "slug": "canadian-undergraduate-technology-conference",
+    "name": "Canadian Undergraduate Technology Conference",
+    "type": "other",
+    "url": "https://www.cutc.ca/#"
+  },
+  {
+    "id": "01ce60d9-9b75-4188-81ff-b1b0cd4c9356",
+    "slug": "canadian-women-real-estate",
+    "name": "Canadian Women Real Estate",
+    "type": "other",
+    "url": "https://crewa.ca"
+  },
+  {
+    "id": "6be0f7fc-60cf-493f-b84d-7d7295dca8ae",
+    "slug": "canadian-womens-chamber-of-commerce",
+    "name": "Canadian Women's Chamber of Commerce",
+    "type": "other",
+    "url": "https://canwcc.ca"
+  },
+  {
+    "id": "7acf42ba-ffd5-4c11-9e2c-c0f8d617367c",
+    "slug": "centre-for-social-innovation",
+    "name": "Centre for Social Innovation",
+    "type": "other",
+    "url": "https://socialinnovation.org"
+  },
+  {
+    "id": "b812a0be-734f-4dab-997e-cf661a1f46cc",
+    "slug": "chicago-startup-community",
+    "name": "Chicago Startup Community",
+    "type": "other",
+    "url": "https://www.meetup.com/chicago-startup-community"
+  },
+  {
+    "id": "7a744ccc-d9ea-4712-9d79-c5a5d7b16fe9",
+    "slug": "city-of-toronto-business",
+    "name": "City of Toronto Business",
+    "type": "other",
+    "url": "https://www.toronto.ca/business-economy/new-businesses-startups"
+  },
+  {
+    "id": "ac74833f-3325-4455-820e-001c0eece4f3",
+    "slug": "co-labs",
+    "name": "Co.Labs",
+    "type": "other",
+    "url": "https://www.co-labs.ca"
+  }
+]

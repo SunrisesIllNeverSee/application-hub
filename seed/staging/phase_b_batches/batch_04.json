@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "startup-school",
+    "name": "Startup School",
+    "type": "accel",
+    "homepage_url": "https://www.startupschool.org",
+    "discovered_apply_url": "https://www.startupschool.org/users/sign_in?sign_up=true",
+    "confidence": "high",
+    "notes": "YC Startup School is free online course; sign-up page is the apply surface"
+  },
+  {
+    "slug": "startx",
+    "name": "StartX",
+    "type": "accel",
+    "homepage_url": "https://startx.com",
+    "discovered_apply_url": "https://startx.com/apply",
+    "confidence": "high",
+    "notes": "Dedicated apply page with form (login to startx.com required)"
+  },
+  {
+    "slug": "techbuffalo",
+    "name": "TechBuffalo",
+    "type": "accel",
+    "homepage_url": "https://www.techbuffalo.org",
+    "discovered_apply_url": "https://www.techbuffalo.org/apply/",
+    "confidence": "high",
+    "notes": "Dedicated /apply page found"
+  },
+  {
+    "slug": "techrise-chicago",
+    "name": "TechRise Chicago",
+    "type": "accel",
+    "homepage_url": "https://techrise.co",
+    "discovered_apply_url": "https://airtable.com/appfgBVkCSJj3MA6Y/pag5b2FJXvTdvGuHG/form",
+    "confidence": "high",
+    "notes": "Airtable form for pitch competition applications"
+  },
+  {
+    "slug": "the-forge",
+    "name": "The Forge",
+    "type": "accel",
+    "homepage_url": "https://theforge.mcmaster.ca",
+    "discovered_apply_url": "https://theforge.mcmaster.ca/programs/startup-survivor/",
+    "confidence": "high",
+    "notes": "Startup Survivor pitch competition program with apply link; also main incubator apply page visible"
+  },
+  {
+    "slug": "the-forum",
+    "name": "The Forum",
+    "type": "accel",
+    "homepage_url": "https://www.theforum.ca",
+    "discovered_apply_url": "https://www.theforumpitch.ca/",
+    "confidence": "high",
+    "notes": "The Forum Pitch program - applications open year-round"
+  },
+  {
+    "slug": "the-hub",
+    "name": "The Hub University of Toronto",
+    "type": "accel",
+    "homepage_url": "https://www.utsc.utoronto.ca/thehub",
+    "discovered_apply_url": "https://sicieeil.acceleratorapp.co/application/new?program=sicieeil-applications",
+    "confidence": "high",
+    "notes": "AcceleratorApp application form found for UTSC entrepreneurship programs"
+  },
+  {
+    "slug": "transcend-network",
+    "name": "Transcend Network",
+    "type": "accel",
+    "homepage_url": "https://www.transcend-network.com",
+    "discovered_apply_url": "https://form.typeform.com/to/ptlIt8DC",
+    "confidence": "high",
+    "notes": "Typeform application found (Apply now link)"
+  },
+  {
+    "slug": "transmedia-zone",
+    "name": "Transmedia Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/transmediazone",
+    "discovered_apply_url": "https://forms.gle/aEAY4qcNYo3jtVQa7",
+    "confidence": "high",
+    "notes": "Google Form for TZ membership application found"
+  },
+  {
+    "slug": "treefrog-accelerator",
+    "name": "Treefrog Accelerator",
+    "type": "accel",
+    "homepage_url": "https://www.treefrog.biz",
+    "discovered_apply_url": "https://www.treefrog.biz/application-process-form/",
+    "confidence": "high",
+    "notes": "Dedicated application process form page found"
+  },
+  {
+    "slug": "ucla-ventures",
+    "name": "UCLA Ventures",
+    "type": "accel",
+    "homepage_url": "https://ventures.ucla.edu",
+    "discovered_apply_url": "https://tdg.ucla.edu/ucla-researchers/ucla-ventures/pitch-gym",
+    "confidence": "high",
+    "notes": "Pitch Gym program with Google Form application found"
+  },
+  {
+    "slug": "utest",
+    "name": "University of Toronto Early Stage Technology (UTEST)",
+    "type": "accel",
+    "homepage_url": "https://utest.to",
+    "discovered_apply_url": "https://utest.to/apply/",
+    "confidence": "high",
+    "notes": "Dedicated /apply page found"
+  },
+  {
+    "slug": "university-of-toronto-entrepreneurship",
+    "name": "University of Toronto Entrepreneurship",
+    "type": "accel",
+    "homepage_url": "https://entrepreneurs.utoronto.ca",
+    "discovered_apply_url": "https://ute.acceleratorapp.co/application/new?program=onramp%20membership",
+    "confidence": "high",
+    "notes": "AcceleratorApp application form found (OnRamp membership)"
+  },
+  {
+    "slug": "venture-labs",
+    "name": "Venture Labs",
+    "type": "accel",
+    "homepage_url": "https://venturelabs.ca",
+    "discovered_apply_url": "https://venturelabs.ca/apply-for-our-programs/",
+    "confidence": "high",
+    "notes": "Dedicated apply for programs page with GravityForms"
+  },
+  {
+    "slug": "ventureout",
+    "name": "VentureOut",
+    "type": "accel",
+    "homepage_url": "https://ventureoutny.com",
+    "discovered_apply_url": "https://ventureoutny.com/apply/",
+    "confidence": "high",
+    "notes": "Dedicated /apply page found and confirmed accessible"
+  },
+  {
+    "slug": "watson-institute",
+    "name": "Watson Institute",
+    "type": "accel",
+    "homepage_url": "https://watson.is",
+    "discovered_apply_url": "https://watson.is/apply/",
+    "confidence": "high",
+    "notes": "Dedicated /apply page confirmed accessible"
+  }
+]

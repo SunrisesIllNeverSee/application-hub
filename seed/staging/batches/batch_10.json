@@ -1,0 +1,499 @@
+[
+  {
+    "id": "f4e9dbb6-fd96-4717-a297-5503a4e07638",
+    "slug": "qhacks",
+    "name": "QHacks",
+    "type": "other",
+    "url": "https://qhacks.io"
+  },
+  {
+    "id": "363ac2cb-c1e4-4a86-9975-a32337fd54f1",
+    "slug": "queens-startup-summit",
+    "name": "Queen's Startup Summit",
+    "type": "other",
+    "url": "https://qssummit.com"
+  },
+  {
+    "id": "bce7e545-07e8-4fba-8ab5-76ee34bc47b4",
+    "slug": "refresh-miami",
+    "name": "Refresh Miami",
+    "type": "other",
+    "url": "https://refreshmiami.com"
+  },
+  {
+    "id": "518bb0d3-fc13-4dae-b01c-4ca12b7e4378",
+    "slug": "revolution-2",
+    "name": "Revolution",
+    "type": "other",
+    "url": "https://twitter.com/revolution"
+  },
+  {
+    "id": "43db12bc-bc33-4781-a617-361edd52b54f",
+    "slug": "rotaract-mississauga",
+    "name": "Rotaract Mississauga",
+    "type": "other",
+    "url": "https://www.rotaractmiss.com"
+  },
+  {
+    "id": "36a30dbc-ea4e-47cf-9a31-91147352c139",
+    "slug": "saas-connect",
+    "name": "SaaS Connect",
+    "type": "other",
+    "url": "https://www.cloudsoftwareassociation.com/saas-connect"
+  },
+  {
+    "id": "1ae5726f-bfda-4e82-8441-53553b998e51",
+    "slug": "saas-north",
+    "name": "SaaS North",
+    "type": "other",
+    "url": "https://saasnorth.com"
+  },
+  {
+    "id": "fc5dd5f8-180d-4531-933e-06c134674a8a",
+    "slug": "saas-open",
+    "name": "SaaS Open",
+    "type": "other",
+    "url": "https://saasopen.com"
+  },
+  {
+    "id": "0e99dd30-c1db-48ff-a966-dd0e4933f2da",
+    "slug": "saastock",
+    "name": "SaaStock",
+    "type": "other",
+    "url": "https://www.saastock.com"
+  },
+  {
+    "id": "e21442cc-1660-4504-a0b2-896e7b56cf7d",
+    "slug": "saastr",
+    "name": "SaaStr",
+    "type": "other",
+    "url": "https://www.saastrannual2024.com"
+  },
+  {
+    "id": "fe07a27a-244e-4e2b-8952-b1b4409eb360",
+    "slug": "saastr-apac",
+    "name": "SaaStr APAC",
+    "type": "other",
+    "url": "https://saastrapac.com"
+  },
+  {
+    "id": "a0b00b6c-1e89-4b73-b508-4cc3d3cb7bf8",
+    "slug": "schulich-startups",
+    "name": "Schulich Startups",
+    "type": "other",
+    "url": "https://schulich.yorku.ca/schulich-startups"
+  },
+  {
+    "id": "1d154526-24b9-49c6-8aee-a324a7eabb59",
+    "slug": "schulich-ventures-club",
+    "name": "Schulich Ventures Club",
+    "type": "other",
+    "url": "https://oneschulich.yorku.ca/svc/home"
+  },
+  {
+    "id": "3064873d-4731-4739-ac98-8d9ea774e9c4",
+    "slug": "science-entrepreneur-club",
+    "name": "Science Entrepreneur Club",
+    "type": "other",
+    "url": "https://www.science-entrepreneur.com/innovators-club"
+  },
+  {
+    "id": "2c2a7a56-4edf-4147-88b6-77e7ca83babb",
+    "slug": "seneca-college-hackathon",
+    "name": "Seneca College Hackathon",
+    "type": "other",
+    "url": "https://www.senecahackathon.com"
+  },
+  {
+    "id": "c0577226-c6d1-4134-b4f0-0974185eadff",
+    "slug": "sf-hacks",
+    "name": "SF Hacks",
+    "type": "other",
+    "url": "https://sfhacks.io"
+  },
+  {
+    "id": "7a96331e-a910-424e-bb88-70bf52fc71e6",
+    "slug": "socialhrcamp",
+    "name": "SocialHRCamp",
+    "type": "other",
+    "url": "https://socialhrcamp.com"
+  },
+  {
+    "id": "6512c3ad-9b01-41b9-8afe-966403a399ee",
+    "slug": "south-florida-aspiring-entrepreneurs",
+    "name": "South Florida Aspiring Entrepreneurs",
+    "type": "other",
+    "url": "https://www.meetup.com/South-Florida-Aspiring-Entrepreneurs"
+  },
+  {
+    "id": "9318b0ca-6367-44cf-8861-672effdf4b27",
+    "slug": "startup-boston",
+    "name": "Startup Boston",
+    "type": "other",
+    "url": "https://www.startupbos.org"
+  },
+  {
+    "id": "8df90d22-e4cc-41a1-888e-a4c1b3357f6a",
+    "slug": "startup-boston-week",
+    "name": "Startup Boston Week",
+    "type": "other",
+    "url": "https://www.startupbos.org/startup-week"
+  },
+  {
+    "id": "50dfd804-2b44-4425-97a2-04bf8bafab8c",
+    "slug": "startup-canada",
+    "name": "Startup Canada",
+    "type": "other",
+    "url": "https://www.startupcan.ca"
+  },
+  {
+    "id": "d91a67b5-0c55-4784-8614-a330886bf4d7",
+    "slug": "startup-colorado",
+    "name": "Startup Colorado",
+    "type": "other",
+    "url": "https://startupcolorado.org"
+  },
+  {
+    "id": "f56f676d-418f-4393-99e3-9623eea01131",
+    "slug": "startup-denver",
+    "name": "Startup Denver",
+    "type": "other",
+    "url": "https://www.meetup.com/startupdenver"
+  },
+  {
+    "id": "12f4758c-ba43-4c44-bd4b-3cb4dc5b4f2d",
+    "slug": "startup-grind-nyc",
+    "name": "Startup Grind NYC",
+    "type": "other",
+    "url": "https://www.meetup.com/Startup-Grind-NYC"
+  },
+  {
+    "id": "2dbc3322-b990-4d61-b77e-170d5e60871e",
+    "slug": "startup-grind-toronto",
+    "name": "Startup Grind Toronto",
+    "type": "other",
+    "url": "https://www.meetup.com/startup-grind-toronto"
+  },
+  {
+    "id": "5b91d732-5c96-4dc7-914d-0f3c505f1844",
+    "slug": "startup-laurier",
+    "name": "Startup Laurier",
+    "type": "other",
+    "url": "https://www.startuplaurier.ca"
+  },
+  {
+    "id": "327c26cc-6bcd-40d5-99e6-7544e6088b23",
+    "slug": "startup-tnt",
+    "name": "Startup TNT",
+    "type": "other",
+    "url": "https://www.startuptnt.com"
+  },
+  {
+    "id": "a2a9f807-e9ea-4e3b-a7ec-bbbdbb53a517",
+    "slug": "startupbarn",
+    "name": "Startupbarn",
+    "type": "other",
+    "url": "https://startupbarn.ca"
+  },
+  {
+    "id": "9634c798-09f4-4302-96eb-01ba89dd4c02",
+    "slug": "startupfest",
+    "name": "Startupfest",
+    "type": "other",
+    "url": "https://startupfestival.com"
+  },
+  {
+    "id": "9eb844c9-05fb-4fd0-9aa8-cb64fd64da54",
+    "slug": "strikeup-conference",
+    "name": "StrikeUP Conference",
+    "type": "other",
+    "url": "https://strikeup.ca"
+  },
+  {
+    "id": "0574e6c8-7501-47f1-973a-c2c89ace97d4",
+    "slug": "sxsw",
+    "name": "SXSW",
+    "type": "other",
+    "url": "https://www.sxsw.com"
+  },
+  {
+    "id": "314fe244-6b71-40b6-96cd-c2cb4c27c32e",
+    "slug": "targeting-quality-conference",
+    "name": "Targeting Quality Conference",
+    "type": "other",
+    "url": "https://kwsqa.org"
+  },
+  {
+    "id": "edd705cf-623b-419c-b0a2-7885d3b10ec9",
+    "slug": "tech-exit",
+    "name": "Tech Exit",
+    "type": "other",
+    "url": "https://techexit.io"
+  },
+  {
+    "id": "95e7428c-2431-42ae-9c1c-a0e4ab345d61",
+    "slug": "tech-tuesdays-miami",
+    "name": "Tech Tuesdays Miami",
+    "type": "other",
+    "url": "https://www.plainsight.app/techtuesdaysmiami"
+  },
+  {
+    "id": "2f71c62c-5e68-4410-8528-6c0443f32867",
+    "slug": "techcrunch-disrupt",
+    "name": "TechCrunch Disrupt",
+    "type": "other",
+    "url": "https://techcrunch.com/events/tc-disrupt-2023"
+  },
+  {
+    "id": "e3757a59-c0fa-4ee0-a667-ad8cb5b7b759",
+    "slug": "techto",
+    "name": "TechTO",
+    "type": "other",
+    "url": "https://www.meetup.com/techto"
+  },
+  {
+    "id": "1ad04e70-4e98-424e-8534-ee0f1f868653",
+    "slug": "techvancouver",
+    "name": "TechVancouver",
+    "type": "other",
+    "url": "https://www.meetup.com/techvancouverorg"
+  },
+  {
+    "id": "5a778a05-6e4b-43e8-b13f-011ae2b0d12b",
+    "slug": "tedxwaterloo",
+    "name": "TEDxWaterloo",
+    "type": "other",
+    "url": "https://www.linkedin.com/company/tedxwaterloo"
+  },
+  {
+    "id": "4f5e575a-5f73-43bb-b460-e30fe4a0edbc",
+    "slug": "the-atlantic-technology-summit",
+    "name": "The Atlantic Technology Summit",
+    "type": "other",
+    "url": "https://www.atlantictechsummit.com"
+  },
+  {
+    "id": "e1e4a935-d318-46e7-8994-dd2613682e16",
+    "slug": "the-commons",
+    "name": "The Commons",
+    "type": "other",
+    "url": "https://thecommons.co"
+  },
+  {
+    "id": "7664e2c9-b6ad-4719-8780-1ef1a0bdad4f",
+    "slug": "the-firehood",
+    "name": "The Firehood",
+    "type": "other",
+    "url": "https://firehood.net"
+  },
+  {
+    "id": "c31ab040-75c5-4b02-a7cc-5e44820c774f",
+    "slug": "the-hip-haus-networking",
+    "name": "The Hip Haus Networking",
+    "type": "other",
+    "url": "https://thehiphaus.com"
+  },
+  {
+    "id": "6aedde8f-1097-4b18-9fbd-b3eaefac18b4",
+    "slug": "the-lab-miami",
+    "name": "The Lab Miami",
+    "type": "other",
+    "url": "https://www.thelabmiami.com"
+  },
+  {
+    "id": "e23a4bfa-bea5-4012-b14b-a2cd6a58cac9",
+    "slug": "the-studio-boulder",
+    "name": "The Studio Boulder",
+    "type": "other",
+    "url": "https://www.thestudioboulder.com"
+  },
+  {
+    "id": "93909baf-8371-4682-8ce4-cee26f35a396",
+    "slug": "toronto-cto-meetup",
+    "name": "Toronto CTO Meetup",
+    "type": "other",
+    "url": "https://www.meetup.com/Toronto-CTO-Group"
+  },
+  {
+    "id": "8348db8a-0df3-4d52-9a54-673fdbd00132",
+    "slug": "toronto-event-hub",
+    "name": "Toronto Event Hub",
+    "type": "other",
+    "url": "https://www.torontoeventhub.com"
+  },
+  {
+    "id": "64fc5e79-5cb1-40c5-a4d5-51d59913eeef",
+    "slug": "toronto-product-management-association",
+    "name": "Toronto Product Management Association",
+    "type": "other",
+    "url": "https://www.tpma.ca"
+  },
+  {
+    "id": "fd70d07d-5fe3-4618-a4cd-6a7b00ae1a2d",
+    "slug": "toronto-tech-fest",
+    "name": "Toronto Tech Fest",
+    "type": "other",
+    "url": "https://www.torontotechfest.com"
+  },
+  {
+    "id": "cab307ee-8ffe-4270-ad7b-4f5cae232c8a",
+    "slug": "toronto-womxn-in-data-science",
+    "name": "Toronto Womxn in Data Science",
+    "type": "other",
+    "url": "https://www.womxndsto.com"
+  },
+  {
+    "id": "d314922e-a3f2-4a26-9786-7a75f1761bdf",
+    "slug": "traction-conference",
+    "name": "Traction Conference",
+    "type": "other",
+    "url": "https://www.tractionconf.io"
+  },
+  {
+    "id": "da5deb96-052b-42c9-b8da-7bf0007134ba",
+    "slug": "university-of-san-francisco-data-science-speaker-series",
+    "name": "University of San Francisco Data Science Speaker Series",
+    "type": "other",
+    "url": "https://www.meetup.com/usf-data-science-speaker-series"
+  },
+  {
+    "id": "00017336-e798-4cfa-8e6c-a3c5871d657c",
+    "slug": "university-of-toronto-entrepreneurship-week",
+    "name": "University of Toronto Entrepreneurship Week",
+    "type": "other",
+    "url": "https://entrepreneurs.utoronto.ca/events/entrepreneurship-week"
+  },
+  {
+    "id": "3e2b2320-ed37-4b77-8753-d8c7bb0c360f",
+    "slug": "uoft-ai",
+    "name": "UofT AI",
+    "type": "other",
+    "url": "https://www.uoft.ai"
+  },
+  {
+    "id": "3fddbf19-c322-448e-a29c-5180bee87080",
+    "slug": "uoft-hacks",
+    "name": "UofT Hacks",
+    "type": "other",
+    "url": "https://uofthacks.com"
+  },
+  {
+    "id": "59003bf2-4e68-4550-9134-e5db394d7862",
+    "slug": "uottahack",
+    "name": "uOttaHack",
+    "type": "other",
+    "url": "https://uottahack.ca"
+  },
+  {
+    "id": "da1ca20c-d4a6-4367-ba8b-28b02dfb1d90",
+    "slug": "vancouver-dev",
+    "name": "Vancouver dev",
+    "type": "other",
+    "url": "https://vancouver.dev"
+  },
+  {
+    "id": "0f5059e4-040b-462d-8376-9ad72c50a15a",
+    "slug": "vancouver-entrepreneurs-forum",
+    "name": "Vancouver Entrepreneurs Forum",
+    "type": "other",
+    "url": "https://www.vef.org"
+  },
+  {
+    "id": "587c2a7a-9714-47fa-a235-a8b5fd0b3875",
+    "slug": "vancouver-startup-week",
+    "name": "Vancouver Startup Week",
+    "type": "other",
+    "url": "https://www.vanstartupweek.ca"
+  },
+  {
+    "id": "5bfd4403-eea2-49a2-b233-fed642d08cc0",
+    "slug": "vancouver-startups",
+    "name": "Vancouver Startups",
+    "type": "other",
+    "url": "https://www.linkedin.com/company/vancouver-startups"
+  },
+  {
+    "id": "b35ef7da-ce02-4430-88e5-12892867f4e7",
+    "slug": "venture-cafe",
+    "name": "Venture Cafe",
+    "type": "other",
+    "url": "https://venturecafecambridge.org"
+  },
+  {
+    "id": "94c46777-3432-4017-81c4-c9cf4f74b1c4",
+    "slug": "venture-x-canada",
+    "name": "Venture X Canada",
+    "type": "other",
+    "url": "https://venturexcanada.ca/locations/mississauga/heartland"
+  },
+  {
+    "id": "04c4e09e-1e22-458c-848e-e97138e5beee",
+    "slug": "web-summit-vancouver",
+    "name": "Web Summit Vancouver",
+    "type": "other",
+    "url": "https://vancouver.websummit.com"
+  },
+  {
+    "id": "a07b9ce1-4260-494b-89fc-178faa3ce17d",
+    "slug": "wny-venture-association",
+    "name": "WNY Venture Association",
+    "type": "other",
+    "url": "https://www.wnyventure.com"
+  },
+  {
+    "id": "60278953-ee69-48e1-9120-a671dcfcc37a",
+    "slug": "women-founders-network",
+    "name": "Women Founders Network",
+    "type": "other",
+    "url": "https://www.womenfoundersnetwork.org"
+  },
+  {
+    "id": "44553807-3675-4bed-856e-42d93c9e1067",
+    "slug": "women-in-miami-tech",
+    "name": "Women in Miami Tech",
+    "type": "other",
+    "url": "https://www.meetup.com/Women-in-Miami-Tech"
+  },
+  {
+    "id": "1f20d4f4-a8ee-46c0-8b41-ffe72b7fc520",
+    "slug": "women-in-payments",
+    "name": "Women in Payments",
+    "type": "other",
+    "url": "https://womeninpayments.silkstart.com/cpages/regions"
+  },
+  {
+    "id": "09ad8436-0042-4a1b-9d78-b206ebc91e68",
+    "slug": "work-bench",
+    "name": "Work-Bench",
+    "type": "other",
+    "url": "https://www.work-bench.com"
+  },
+  {
+    "id": "a96ea778-2412-400e-a47e-cec20ec0160e",
+    "slug": "ylab",
+    "name": "YLab",
+    "type": "other",
+    "url": "https://www.ylab.ca"
+  },
+  {
+    "id": "969adfd8-312a-4ed1-9449-a89cb43f4e05",
+    "slug": "youre-next-career-network",
+    "name": "You're Next Career Network University of Toronto",
+    "type": "other",
+    "url": "https://www.yourenext.ca"
+  },
+  {
+    "id": "6ec1f021-2474-4721-8ded-627e2e32f397",
+    "slug": "young-women-in-business",
+    "name": "Young Women in Business",
+    "type": "other",
+    "url": "https://ywib.ca"
+  },
+  {
+    "id": "972385b6-7a72-4a9e-b412-c80bea366e17",
+    "slug": "yvr-startups",
+    "name": "YVR Startups",
+    "type": "other",
+    "url": "https://www.meetup.com/yvr-startups"
+  }
+]

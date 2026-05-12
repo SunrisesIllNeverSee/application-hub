@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "everywhere",
+    "name": "Everywhere",
+    "type": "vc",
+    "homepage_url": "https://everywhere.vc",
+    "discovered_apply_url": "https://airtable.com/appeY02X0EMCQQ19G/shrjpNqWOj0SJP1ix",
+    "confidence": "high",
+    "notes": "Airtable application form linked directly from homepage as \"Join our portfolio\""
+  },
+  {
+    "slug": "front-row-ventures",
+    "name": "Front Row Ventures",
+    "type": "vc",
+    "homepage_url": "https://frontrow.ventures",
+    "discovered_apply_url": "https://frontrow.ventures/apply",
+    "confidence": "high",
+    "notes": "Dedicated apply page with intake form for student founders; \"Apply for funding\" and \"Apply now\" CTAs link directly"
+  },
+  {
+    "slug": "fuel-venture-capital",
+    "name": "Fuel Venture Capital",
+    "type": "vc",
+    "homepage_url": "https://fuelventurecapital.com",
+    "discovered_apply_url": "https://fuelventurecapital.com/pitch-us",
+    "confidence": "high",
+    "notes": "Dedicated \"Pitch Us\" page found via nav; fintech growth fund"
+  },
+  {
+    "slug": "fuel-ventures",
+    "name": "Fuel Ventures",
+    "type": "vc",
+    "homepage_url": "https://fuel.ventures",
+    "discovered_apply_url": "https://www.fuel.ventures/submit-pitch",
+    "confidence": "high",
+    "notes": "Dedicated \"Submit Pitch\" page prominently featured in nav and CTA; UK-based early stage VC"
+  },
+  {
+    "slug": "greensky-ventures",
+    "name": "GreenSky Ventures",
+    "type": "vc",
+    "homepage_url": "https://greensky.vc",
+    "discovered_apply_url": "https://greensky.vc/apply/",
+    "confidence": "high",
+    "notes": "Dedicated Apply page with intake form; \"Apply\" prominently in nav and homepage CTAs"
+  },
+  {
+    "slug": "harlem-capital",
+    "name": "Harlem Capital",
+    "type": "vc",
+    "homepage_url": "https://harlem.capital",
+    "discovered_apply_url": "https://harlem.capital/pitch/",
+    "confidence": "high",
+    "notes": "Dedicated Pitch page (harlem.capital/pitch/) found in nav; diversity-focused VC with intake form"
+  },
+  {
+    "slug": "jamjar-investments",
+    "name": "JamJar Investments",
+    "type": "vc",
+    "homepage_url": "https://www.jamjarinvestments.com",
+    "discovered_apply_url": "https://www.jamjarinvestments.com/pitch-to-us",
+    "confidence": "high",
+    "notes": "Dedicated \"Pitch to us\" page with form including deck upload; intake form with criteria listed"
+  },
+  {
+    "slug": "jetblue-ventures",
+    "name": "JetBlue Ventures",
+    "type": "vc",
+    "homepage_url": "https://www.jetblueventures.com",
+    "discovered_apply_url": "https://skyvc.typeform.com/to/CdW5AB8D",
+    "confidence": "high",
+    "notes": "JetBlue Ventures rebranded to SKY VC; homepage at jetblueventures.com now shows SKY VC with Typeform apply link \"Get in Touch\""
+  },
+  {
+    "slug": "loi-venture",
+    "name": "LOI Venture",
+    "type": "vc",
+    "homepage_url": "https://www.loi.vc",
+    "discovered_apply_url": "https://www.loi.vc/pitch/",
+    "confidence": "high",
+    "notes": "Dedicated Pitch page in nav (loi.vc/pitch/); \"tap the pitch button\" CTA; $100K check fund with structured intake"
+  },
+  {
+    "slug": "lvlup-ventures",
+    "name": "LvlUp Ventures",
+    "type": "vc",
+    "homepage_url": "https://www.lvlup.vc",
+    "discovered_apply_url": "https://www.lvlup.vc/apply/funding-application",
+    "confidence": "high",
+    "notes": "Structured multi-question funding application form; also covers 25+ VC ecosystem partners"
+  },
+  {
+    "slug": "mars-investment-accelerator-fund",
+    "name": "MaRS Investment Accelerator Fund",
+    "type": "vc",
+    "homepage_url": "https://www.marsiaf.com",
+    "discovered_apply_url": "https://marsiaf.com/iaf-application/",
+    "confidence": "high",
+    "notes": "Dedicated online application form for founders"
+  },
+  {
+    "slug": "panache-ventures",
+    "name": "Panache Ventures",
+    "type": "vc",
+    "homepage_url": "https://www.panache.vc",
+    "discovered_apply_url": "https://www.panache.vc/pitch-us",
+    "confidence": "high",
+    "notes": "Dedicated pitch submission page; accepts deck from any founder; responds to every submission"
+  },
+  {
+    "slug": "playfair",
+    "name": "Playfair",
+    "type": "vc",
+    "homepage_url": "https://www.playfair.vc",
+    "discovered_apply_url": "https://playfair.vc/pitch-us.php",
+    "confidence": "high",
+    "notes": "Open pitch form on website; pre-seed UK/EU VC; reviews every submission"
+  },
+  {
+    "slug": "silicon-roundabout",
+    "name": "Silicon Roundabout",
+    "type": "vc",
+    "homepage_url": "https://siliconroundabout.tech",
+    "discovered_apply_url": "https://siliconroundabout.tech/startup-application/",
+    "confidence": "high",
+    "notes": "Dedicated startup application page; pre-seed to seed deep tech VC with monthly pitch events"
+  },
+  {
+    "slug": "slack-fund",
+    "name": "Slack Fund",
+    "type": "vc",
+    "homepage_url": "https://slack.com/fund",
+    "discovered_apply_url": "https://airtable.com/app5kO0WaTWMJG0n7/pagIcieB3DVsIxyxp/form",
+    "confidence": "high",
+    "notes": "Redirects to Salesforce Ventures; Airtable contact form found in nav"
+  },
+  {
+    "slug": "storm-ventures",
+    "name": "Storm Ventures",
+    "type": "vc",
+    "homepage_url": "https://www.stormventures.com",
+    "discovered_apply_url": "https://stormventures.typeform.com/to/H6I1Qq",
+    "confidence": "high",
+    "notes": "Typeform intake linked prominently in nav and CTA buttons"
+  }
+]

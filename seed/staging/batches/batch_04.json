@@ -1,0 +1,555 @@
+[
+  {
+    "id": "65f1e93d-cc3c-4acb-b511-1e1a7d8cdccd",
+    "slug": "startx",
+    "name": "StartX",
+    "type": "accel",
+    "url": "https://startx.com"
+  },
+  {
+    "id": "d4f3a969-3dfa-43e8-8f8d-16c21b3879e2",
+    "slug": "surge-mohawk",
+    "name": "Surge Mohawk",
+    "type": "accel",
+    "url": "https://www.mohawkcollege.ca/surge-mohawks-entrepreneurship-resource-space"
+  },
+  {
+    "id": "68757673-7327-42f6-b19f-2cd53045528f",
+    "slug": "sutardja-center-for-entrepreneurship-technology",
+    "name": "Sutardja Center for Entrepreneurship & Technology",
+    "type": "accel",
+    "url": "https://scet.berkeley.edu"
+  },
+  {
+    "id": "04c7f331-2aa1-4249-98ed-864f7e1b18f7",
+    "slug": "synapse-consortium",
+    "name": "Synapse Consortium",
+    "type": "accel",
+    "url": "https://synapseconsortium.com"
+  },
+  {
+    "id": "78f98941-347e-4ba2-97a1-7c73d606b30b",
+    "slug": "tech-mba-venture-studio",
+    "name": "Tech MBA Venture Studio",
+    "type": "accel",
+    "url": "https://schulich.yorku.ca/schulich-startups/venture-studio"
+  },
+  {
+    "id": "4f1bdb52-93db-4e19-8b24-d4dbb9e1b82c",
+    "slug": "techalliance",
+    "name": "TechAlliance",
+    "type": "accel",
+    "url": "https://techalliance.ca"
+  },
+  {
+    "id": "adf08b96-1edd-4b22-9561-bb85a86d6d54",
+    "slug": "techbuffalo",
+    "name": "TechBuffalo",
+    "type": "accel",
+    "url": "https://www.techbuffalo.org"
+  },
+  {
+    "id": "2b8c6d9b-35f8-4f89-9afe-abb80b9d361f",
+    "slug": "technexus",
+    "name": "TechNexus Venture Collaborative",
+    "type": "accel",
+    "url": "https://technexus.com"
+  },
+  {
+    "id": "d1a55489-1d6d-4fc8-8810-c475b513483c",
+    "slug": "techranch",
+    "name": "TechRanch",
+    "type": "accel",
+    "url": "https://techranchaustin.com"
+  },
+  {
+    "id": "079a1fe3-00bc-4fda-9186-523f89aeb53b",
+    "slug": "techrise-chicago",
+    "name": "TechRise Chicago",
+    "type": "accel",
+    "url": "https://techrise.co"
+  },
+  {
+    "id": "07aa814c-5dad-4ca1-ac21-1748e8478900",
+    "slug": "texas-venture-labs",
+    "name": "Texas Venture Labs",
+    "type": "accel",
+    "url": "https://www.mccombs.utexas.edu/centers-and-initiatives/jon-brumley-texas-venture-labs"
+  },
+  {
+    "id": "5d3db8e9-2c53-4347-8b47-8195ab5aa40f",
+    "slug": "the-bridge-university-of-toronto",
+    "name": "The BRIDGE University of Toronto",
+    "type": "accel",
+    "url": "https://www.utsc.utoronto.ca/thebridge/welcome-bridge"
+  },
+  {
+    "id": "89c6b4d0-3aaa-4d9c-864d-b310c4ea2027",
+    "slug": "the-center-for-life-science-ventures",
+    "name": "The Center for Life Science Ventures",
+    "type": "accel",
+    "url": "https://eship.cornell.edu/item/the-mcgovern-center-2"
+  },
+  {
+    "id": "f3e1b6ac-6e13-4091-9e17-49e57ded3b1c",
+    "slug": "the-cornell-food-processing-development-laboratory-fpdl",
+    "name": "The Cornell Food Processing Development Laboratory (FPDL)",
+    "type": "accel",
+    "url": "https://cals.cornell.edu/food-science/outreach-extension/services/food-processing-and-development-laboratory"
+  },
+  {
+    "id": "bc99988f-573d-442e-976d-83bfec8471a0",
+    "slug": "the-eforum",
+    "name": "The eForum",
+    "type": "accel",
+    "url": "https://www.theeforum.org"
+  },
+  {
+    "id": "0290fe52-33fa-4ddc-878f-8bc2d3e7dd61",
+    "slug": "the-forge",
+    "name": "The Forge",
+    "type": "accel",
+    "url": "https://theforge.mcmaster.ca"
+  },
+  {
+    "id": "7173be6f-0d91-4c82-a04d-ea9f8c8869a4",
+    "slug": "the-forum",
+    "name": "The Forum",
+    "type": "accel",
+    "url": "https://www.theforum.ca"
+  },
+  {
+    "id": "a3ddc2b5-ed4f-410a-b24a-d26aacd32fe7",
+    "slug": "the-hive",
+    "name": "The Hive",
+    "type": "accel",
+    "url": "http://hivedata.com"
+  },
+  {
+    "id": "1f819523-93f0-4e68-bf69-88d97cd600a3",
+    "slug": "the-hub",
+    "name": "The Hub University of Toronto",
+    "type": "accel",
+    "url": "https://www.utsc.utoronto.ca/thehub"
+  },
+  {
+    "id": "1166a4e9-c626-4b3c-baa3-d463d5fcda85",
+    "slug": "the-technology-farm",
+    "name": "The Technology Farm",
+    "type": "accel",
+    "url": "https://www.thetechnologyfarm.com"
+  },
+  {
+    "id": "cba004d5-27fd-44bb-a47c-7bb9e747ef8b",
+    "slug": "tie-toronto",
+    "name": "TiE Toronto",
+    "type": "accel",
+    "url": "https://toronto.tie.org"
+  },
+  {
+    "id": "8cc3ee7c-0312-4ff2-8686-70119f33d983",
+    "slug": "toronto-fashion-incubator",
+    "name": "Toronto Fashion Incubator",
+    "type": "accel",
+    "url": "https://fashionincubator.com"
+  },
+  {
+    "id": "62c57b25-883a-442a-ad42-55f7e0b5657e",
+    "slug": "transcend-network",
+    "name": "Transcend Network",
+    "type": "accel",
+    "url": "https://www.transcend-network.com"
+  },
+  {
+    "id": "28291efa-b265-4950-a4f5-e1a6093cbd98",
+    "slug": "transmedia-zone",
+    "name": "Transmedia Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/transmediazone"
+  },
+  {
+    "id": "cad3941a-4eb5-4154-9b3a-91d284437e4f",
+    "slug": "treefrog-accelerator",
+    "name": "Treefrog Accelerator",
+    "type": "accel",
+    "url": "https://www.treefrog.biz"
+  },
+  {
+    "id": "6cfd4412-9bd3-4d2d-a841-6c82e988bf43",
+    "slug": "tufts-launchpad-biolabs",
+    "name": "Tufts Launchpad BioLabs",
+    "type": "accel",
+    "url": "https://viceprovost.tufts.edu/research-services/core-facilities-resources/tufts-launchpad-biolabs"
+  },
+  {
+    "id": "9f44cfac-2296-4535-bd99-9c65b3cd309f",
+    "slug": "ucla-ventures",
+    "name": "UCLA Ventures",
+    "type": "accel",
+    "url": "https://ventures.ucla.edu"
+  },
+  {
+    "id": "41c58592-b4c8-4048-af41-a100f12cd382",
+    "slug": "university-at-buffalo-business-entrepreneur-partnerships",
+    "name": "University at Buffalo Business & Entrepreneur Partnerships",
+    "type": "accel",
+    "url": "https://www.buffalo.edu/partnerships/about/centers-facilities-equipment/incubators.html"
+  },
+  {
+    "id": "086e9c52-d00c-4810-b45c-b773687bf1e9",
+    "slug": "utest",
+    "name": "University of Toronto Early Stage Technology (UTEST)",
+    "type": "accel",
+    "url": "https://utest.to"
+  },
+  {
+    "id": "6b9c6661-fb0b-403c-b5a0-840941426cd7",
+    "slug": "university-of-toronto-entrepreneurship",
+    "name": "University of Toronto Entrepreneurship",
+    "type": "accel",
+    "url": "https://entrepreneurs.utoronto.ca"
+  },
+  {
+    "id": "d15202e3-d970-4ee5-9efb-85c5dd802c11",
+    "slug": "unusual-ventures",
+    "name": "Unusual Ventures",
+    "type": "accel",
+    "url": "https://www.unusual.vc"
+  },
+  {
+    "id": "cc88e75a-16f8-4490-9e51-337b6f59fc6f",
+    "slug": "unyicorps",
+    "name": "UNYicorps",
+    "type": "accel",
+    "url": "https://www.unyicorps.org"
+  },
+  {
+    "id": "291e361e-a7e4-4f68-b865-51ebdcc1369a",
+    "slug": "upscale",
+    "name": "Upscale",
+    "type": "accel",
+    "url": "https://technation.io/programmes/upscale"
+  },
+  {
+    "id": "9f022ab3-bc80-48c6-84c2-9d15efcbbf27",
+    "slug": "urban-future-lab",
+    "name": "Urban Future Lab",
+    "type": "accel",
+    "url": "http://ufl.nyc"
+  },
+  {
+    "id": "4c7044bc-a59f-4e9d-a2a2-0dd395c0f377",
+    "slug": "urbanx",
+    "name": "Urban-x",
+    "type": "accel",
+    "url": "https://www.urban-x.com"
+  },
+  {
+    "id": "cb30984e-7221-42ec-8999-1899e233ead6",
+    "slug": "venture-crush",
+    "name": "Venture Crush",
+    "type": "accel",
+    "url": "https://www.venturecrush.com/fg/index.html"
+  },
+  {
+    "id": "837f7e1d-b902-485f-a0e1-d7a741274a71",
+    "slug": "venture-development-center-umass-boston",
+    "name": "Venture Development Center UMASS Boston",
+    "type": "accel",
+    "url": "https://www.umb.edu/vdc"
+  },
+  {
+    "id": "66900f1d-6236-4ee5-b335-e82ee0b180e1",
+    "slug": "venture-for-canada",
+    "name": "Venture for Canada",
+    "type": "accel",
+    "url": "https://ventureforcanada.ca"
+  },
+  {
+    "id": "008993e5-3e56-4f86-b73a-fc3ff4309a9a",
+    "slug": "venture-labs",
+    "name": "Venture Labs",
+    "type": "accel",
+    "url": "https://venturelabs.ca"
+  },
+  {
+    "id": "b1de75ec-fb9c-4952-bbdc-62469279fad2",
+    "slug": "venture-lane",
+    "name": "Venture Lane",
+    "type": "accel",
+    "url": "https://theventurelane.com"
+  },
+  {
+    "id": "36746ae8-0809-47f6-8add-ceb9d2f6fb3e",
+    "slug": "venture-out",
+    "name": "Venture Out",
+    "type": "accel",
+    "url": "https://ventureoutstartups.com"
+  },
+  {
+    "id": "94d48c4a-5716-447b-ab3c-f1d169ca69a9",
+    "slug": "venturelab",
+    "name": "VentureLAB",
+    "type": "accel",
+    "url": "https://www.venturelab.ca"
+  },
+  {
+    "id": "24e77928-447d-4aa7-ae17-bdf03989dbec",
+    "slug": "ventureout",
+    "name": "VentureOut",
+    "type": "accel",
+    "url": "https://ventureoutny.com"
+  },
+  {
+    "id": "4d9dcba9-5340-4978-9e2d-90ad62df6c90",
+    "slug": "viterbi-startup-garage",
+    "name": "Viterbi Startup Garage",
+    "type": "accel",
+    "url": "https://viterbiinnovation.usc.edu/vsg"
+  },
+  {
+    "id": "e45a5b10-8ba2-4d7e-9508-c7da16dc758d",
+    "slug": "voyager-capital",
+    "name": "Voyager Capital",
+    "type": "accel",
+    "url": "https://www.voyagercapital.com"
+  },
+  {
+    "id": "e2722700-5ec1-4e81-a2d8-3a90e4d66e96",
+    "slug": "watson-institute",
+    "name": "Watson Institute",
+    "type": "accel",
+    "url": "https://watson.is"
+  },
+  {
+    "id": "a2b80ab2-4d87-472a-98ed-4457ab53ac1d",
+    "slug": "webc",
+    "name": "WeBC",
+    "type": "accel",
+    "url": "https://we-bc.ca"
+  },
+  {
+    "id": "b2454073-542e-4b2f-a742-7cbc05acfa93",
+    "slug": "weill-cornell-medicine-bioventure-elab",
+    "name": "Weill Cornell Medicine Bioventure eLab",
+    "type": "accel",
+    "url": "https://elab.weill.cornell.edu"
+  },
+  {
+    "id": "3dab7ee9-7bbb-433f-b7e9-6d068901a9ab",
+    "slug": "western-accelerator",
+    "name": "Western Accelerator",
+    "type": "accel",
+    "url": "https://entrepreneurship.uwo.ca"
+  },
+  {
+    "id": "7ef69dd9-29b8-4f55-9751-a1aa757a836e",
+    "slug": "westmont-enterprise-hub-university-of-west-london",
+    "name": "Westmont Enterprise Hub University of West London",
+    "type": "accel",
+    "url": "https://www.uwl.ac.uk/business/westmont-enterprise-hub"
+  },
+  {
+    "id": "a3a69030-582d-49b4-b861-b99967ce9853",
+    "slug": "weve-acceleration",
+    "name": "WEVE Acceleration",
+    "type": "accel",
+    "url": "https://weveacceleration.com"
+  },
+  {
+    "id": "c2efdc6d-db6b-43c7-8d35-2e40f286f800",
+    "slug": "rbc-women-in-cleantech-accelerator",
+    "name": "Women in Cleantech RBC Accelerator",
+    "type": "accel",
+    "url": "https://www.marsdd.com/service/women-in-cleantech-accelerator"
+  },
+  {
+    "id": "2d822464-9a41-4b9a-a01d-391c43800c7b",
+    "slug": "womens-startup-lab",
+    "name": "Women's Startup Lab",
+    "type": "accel",
+    "url": "https://www.womenstartuplab.com"
+  },
+  {
+    "id": "200e9d40-d6f4-4de2-82ff-6f5127d113d9",
+    "slug": "world-innovation-lab",
+    "name": "World Innovation Lab",
+    "type": "accel",
+    "url": "https://wilab.com"
+  },
+  {
+    "id": "48ceb14e-987e-489f-85a2-8fa58e46873c",
+    "slug": "xlr8-accelerator",
+    "name": "XLR8 Accelerator",
+    "type": "accel",
+    "url": "https://xlr8.raiz.vc"
+  },
+  {
+    "id": "151a0fc5-2fba-4139-9ebd-d85709343d4e",
+    "slug": "xrc-labs",
+    "name": "XRC Labs",
+    "type": "accel",
+    "url": "https://www.xrclabs.com"
+  },
+  {
+    "id": "593db77c-4d21-4be2-95d7-f08add006b5c",
+    "slug": "y-space",
+    "name": "Y Space",
+    "type": "accel",
+    "url": "https://yspace.yorku.ca"
+  },
+  {
+    "id": "8ba95b30-5175-4451-93f3-b83e26184959",
+    "slug": "y2-labs",
+    "name": "Y2 Labs",
+    "type": "accel",
+    "url": "https://y2labs.co"
+  },
+  {
+    "id": "9e063496-1a71-4712-b841-ffc7f851ab5a",
+    "slug": "yedi-incubator",
+    "name": "YEDI Incubator",
+    "type": "accel",
+    "url": "https://yedi.ca"
+  },
+  {
+    "id": "4be6592b-0f74-4801-b75b-72ce94e87d5b",
+    "slug": "zahn-innovation-centre",
+    "name": "Zahn Innovation Centre",
+    "type": "accel",
+    "url": "https://www.ccny.cuny.edu/zahn"
+  },
+  {
+    "id": "9070ba9a-adf6-41c7-b50a-1acb5f7e614c",
+    "slug": "zinc-venture-builder",
+    "name": "Zinc Venture Builder",
+    "type": "accel",
+    "url": "https://www.zinc.vc/programmes/venture-builder"
+  },
+  {
+    "id": "e6ab8249-579e-4cf4-86f8-6507b09e9b9f",
+    "slug": "zx-ventures",
+    "name": "ZX Ventures",
+    "type": "accel",
+    "url": "https://www.zx-ventures.com"
+  },
+  {
+    "id": "6bbc2fdf-3afe-450c-9a96-fd75977331e2",
+    "slug": "mergelane",
+    "name": "MergeLane",
+    "type": "fellowship",
+    "url": "https://www.linkedin.com/company/mergelane/about"
+  },
+  {
+    "id": "b7245bae-9e68-4e7c-8fcf-44811511aa71",
+    "slug": "the-capital-network",
+    "name": "The Capital Network",
+    "type": "fellowship",
+    "url": "https://www.thecapitalnetwork.org"
+  },
+  {
+    "id": "1549743b-b4b9-444c-b914-cae76e116c73",
+    "slug": "the-vinetta-project",
+    "name": "The Vinetta Project",
+    "type": "fellowship",
+    "url": "https://www.vinettaproject.com"
+  },
+  {
+    "id": "b12e46b2-02c8-4e49-a100-819806ce6f48",
+    "slug": "xfactor-ventures",
+    "name": "XFactor Ventures",
+    "type": "fellowship",
+    "url": "https://www.xfactor.ventures"
+  },
+  {
+    "id": "f692fa97-70b1-41de-ac8e-ec87421a103a",
+    "slug": "406-ventures",
+    "name": ".406 Ventures",
+    "type": "vc",
+    "url": "https://www.406ventures.com/approach"
+  },
+  {
+    "id": "bf22a972-b7e6-4507-a8c9-8a3cb27793f5",
+    "slug": "10x-capital",
+    "name": "10X Capital",
+    "type": "vc",
+    "url": "https://www.10xcapital.com"
+  },
+  {
+    "id": "4760bee9-bbce-4bf0-a7b2-73ce3d81e337",
+    "slug": "1414-ventures",
+    "name": "1414 Ventures",
+    "type": "vc",
+    "url": "https://www.1414ventures.com"
+  },
+  {
+    "id": "dae42c27-e846-4b2c-8add-08c1c1cc4900",
+    "slug": "1984-ventures",
+    "name": "1984 Ventures",
+    "type": "vc",
+    "url": "https://1984.vc"
+  },
+  {
+    "id": "a3addb05-e31f-454b-a44d-469da0bd71dc",
+    "slug": "2048-ventures",
+    "name": "2048 Ventures",
+    "type": "vc",
+    "url": "https://www.2048.vc"
+  },
+  {
+    "id": "fbd75c80-87db-4e26-9061-005c801d0519",
+    "slug": "24-haymarket",
+    "name": "24 Haymarket",
+    "type": "vc",
+    "url": "https://24haymarket.com"
+  },
+  {
+    "id": "79b7630b-618e-4177-8d2e-f011c434eaf5",
+    "slug": "5am-ventures",
+    "name": "5AM Ventures",
+    "type": "vc",
+    "url": "https://5amventures.com"
+  },
+  {
+    "id": "2994804c-fbdb-4873-928d-19dd44363397",
+    "slug": "645-ventures",
+    "name": "645 Ventures",
+    "type": "vc",
+    "url": "https://645ventures.com"
+  },
+  {
+    "id": "5ae622e8-7583-4d67-8cbd-4babc9f875f7",
+    "slug": "7-gate-ventures",
+    "name": "7 Gate Ventures",
+    "type": "vc",
+    "url": "https://7gate.vc"
+  },
+  {
+    "id": "f63ff30a-0b3a-462b-84c6-d842b3fed3f5",
+    "slug": "7thirty",
+    "name": "7thirty",
+    "type": "vc",
+    "url": "https://7thirtycapital.com"
+  },
+  {
+    "id": "fcfa72f5-2f23-40ba-8cb8-525947905720",
+    "slug": "8vc",
+    "name": "8VC",
+    "type": "vc",
+    "url": "https://www.8vc.com"
+  },
+  {
+    "id": "4d7a2fc4-9fd9-4454-af05-75c21d3e9b6d",
+    "slug": "abingworth",
+    "name": "Abingworth",
+    "type": "vc",
+    "url": "https://www.abingworth.com"
+  },
+  {
+    "id": "0d0b45ce-0bbe-4d85-a4f3-96feee0b8772",
+    "slug": "accel",
+    "name": "Accel",
+    "type": "vc",
+    "url": "https://www.accel.com"
+  }
+]

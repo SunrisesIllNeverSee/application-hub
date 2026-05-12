@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "startup-colorado",
+    "name": "Startup Colorado",
+    "type": "other",
+    "homepage_url": "https://startupcolorado.org",
+    "discovered_apply_url": "https://startupcolorado.org/join-the-community/",
+    "confidence": "high",
+    "notes": "COMMUNITY section links to /join-the-community/ as the Start Here page"
+  },
+  {
+    "slug": "startup-grind-nyc",
+    "name": "Startup Grind NYC",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/Startup-Grind-NYC",
+    "discovered_apply_url": "https://www.startupgrind.com/new-york-city/",
+    "confidence": "high",
+    "notes": "Events RSVP via startupgrind.com; specific event RSVP link found on page"
+  },
+  {
+    "slug": "startupbarn",
+    "name": "Startupbarn",
+    "type": "other",
+    "homepage_url": "https://startupbarn.ca",
+    "discovered_apply_url": "https://tally.so/r/nPaQ8V",
+    "confidence": "high",
+    "notes": "Site redirects to buildersclub.ca; Apply button links to Tally form tally.so/r/nPaQ8V"
+  },
+  {
+    "slug": "startupfest",
+    "name": "Startupfest",
+    "type": "other",
+    "homepage_url": "https://startupfestival.com",
+    "discovered_apply_url": "https://startupfestival.com/register",
+    "confidence": "high",
+    "notes": "Multiple 'Register' links pointing to /register; Angular app with newsletter signup also present"
+  },
+  {
+    "slug": "sxsw",
+    "name": "SXSW",
+    "type": "other",
+    "homepage_url": "https://www.sxsw.com",
+    "discovered_apply_url": "https://sxsw.com/apply",
+    "confidence": "high",
+    "notes": "'Apply to Participate' CTA links directly to sxsw.com/apply; also Apply to Exhibit and Apply to Market"
+  },
+  {
+    "slug": "techcrunch-disrupt",
+    "name": "TechCrunch Disrupt",
+    "type": "other",
+    "homepage_url": "https://techcrunch.com/events/tc-disrupt-2023",
+    "discovered_apply_url": "https://techcrunch.com/events/techcrunch-disrupt/tickets/",
+    "confidence": "high",
+    "notes": "Register Now link for TechCrunch Disrupt found; Startup Battlefield also linked at /startup-battlefield/"
+  },
+  {
+    "slug": "the-atlantic-technology-summit",
+    "name": "The Atlantic Technology Summit",
+    "type": "other",
+    "homepage_url": "https://www.atlantictechsummit.com",
+    "discovered_apply_url": "https://www.atlantictechsummit.com/#/tickets?lang=en",
+    "confidence": "high",
+    "notes": "Zoho Backstage event; Tickets tab found in navigation at /#/tickets"
+  },
+  {
+    "slug": "the-firehood",
+    "name": "The Firehood",
+    "type": "other",
+    "homepage_url": "https://firehood.net",
+    "discovered_apply_url": "https://firehood.net/pages/how-we-work-together",
+    "confidence": "high",
+    "notes": "'Join the Firehood' links to /pages/how-we-work-together; membership product also at /products/firehood-ventures-membership"
+  },
+  {
+    "slug": "the-hip-haus-networking",
+    "name": "The Hip Haus Networking",
+    "type": "other",
+    "homepage_url": "https://thehiphaus.com",
+    "discovered_apply_url": "https://www.thehiphaus.com/circles",
+    "confidence": "high",
+    "notes": "'Apply Now!' button links to /circles; also Eventbrite for specific events"
+  },
+  {
+    "slug": "the-lab-miami",
+    "name": "The Lab Miami",
+    "type": "other",
+    "homepage_url": "https://www.thelabmiami.com",
+    "discovered_apply_url": "https://www.thelabmiami.com/membership",
+    "confidence": "high",
+    "notes": "Membership links prominently featured (/membership); also /contact for inquiries"
+  },
+  {
+    "slug": "toronto-product-management-association",
+    "name": "Toronto Product Management Association",
+    "type": "other",
+    "homepage_url": "https://www.tpma.ca",
+    "discovered_apply_url": "https://www.members.tpma.ca/join",
+    "confidence": "high",
+    "notes": "Join link at members.tpma.ca/join; also /membership page and member login"
+  },
+  {
+    "slug": "uoft-hacks",
+    "name": "UofT Hacks",
+    "type": "other",
+    "homepage_url": "https://uofthacks.com",
+    "discovered_apply_url": "https://dorahacks.io/buidl/21736",
+    "confidence": "high",
+    "notes": "DoraHacks application link found on page for hackathon submissions"
+  },
+  {
+    "slug": "vancouver-entrepreneurs-forum",
+    "name": "Vancouver Entrepreneurs Forum",
+    "type": "other",
+    "homepage_url": "https://www.vef.org",
+    "discovered_apply_url": "https://www.vef.org/member",
+    "confidence": "high",
+    "notes": "/member page exists; also /membership-community and VEF membership contest; Squarespace site"
+  },
+  {
+    "slug": "venture-cafe",
+    "name": "Venture Cafe",
+    "type": "other",
+    "homepage_url": "https://venturecafecambridge.org",
+    "discovered_apply_url": "https://venturecafecambridge.org/share/register-your-startup/",
+    "confidence": "high",
+    "notes": "Register Your Startup link found at /share/register-your-startup/; Thursday Gathering program page also present"
+  },
+  {
+    "slug": "web-summit-vancouver",
+    "name": "Web Summit Vancouver",
+    "type": "other",
+    "homepage_url": "https://vancouver.websummit.com",
+    "discovered_apply_url": "https://attend.websummit.com/van26",
+    "confidence": "high",
+    "notes": "Primary CTA links to attend.websummit.com/van26; also /tickets/attendees/ and indigenous attendee program"
+  },
+  {
+    "slug": "women-founders-network",
+    "name": "Women Founders Network",
+    "type": "other",
+    "homepage_url": "https://www.womenfoundersnetwork.org",
+    "discovered_apply_url": "https://www.womenfoundersnetwork.org/joinus",
+    "confidence": "high",
+    "notes": "Join Us page at /joinus; Fast Pitch competition at /about-fast-pitch; Junior VC and Due Diligence Analyst programs also listed"
+  }
+]

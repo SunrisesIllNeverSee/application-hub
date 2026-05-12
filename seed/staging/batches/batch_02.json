@@ -1,0 +1,555 @@
+[
+  {
+    "id": "ce7ad538-5244-4193-a86b-20838e2e9060",
+    "slug": "dunin-deshpande-queens-innovation-centre",
+    "name": "Dunin-Deshpande Queen's Innovation Centre",
+    "type": "accel",
+    "url": "https://www.queensu.ca/innovationcentre"
+  },
+  {
+    "id": "55c3d0c1-00e9-4f4d-bc86-2c7e7f0e7b85",
+    "slug": "eckert-life-science-accelerator",
+    "name": "Eckert Life Science Accelerator",
+    "type": "accel",
+    "url": "https://www.elsalifescience.com"
+  },
+  {
+    "id": "7e23bce7-2751-411f-8b51-d06755b4f653",
+    "slug": "ecommerce-north",
+    "name": "eCommerce North",
+    "type": "accel",
+    "url": "https://ecommercenorth.ca"
+  },
+  {
+    "id": "5cf1833c-9b42-417a-9404-ffe37d75ee2a",
+    "slug": "elab-cornell-university",
+    "name": "eLab Cornell University",
+    "type": "accel",
+    "url": "https://www.elabstartup.com"
+  },
+  {
+    "id": "e3d5fe3f-5a75-4e4c-b22c-de80fffe1bdd",
+    "slug": "ella-accelerator-for-women-entrepreneurs",
+    "name": "ELLA Accelerator for Women Entrepreneurs",
+    "type": "accel",
+    "url": "https://www.yorku.ca/ella"
+  },
+  {
+    "id": "07485d4d-0111-4884-926e-de41aca0a3bd",
+    "slug": "empowered-startups",
+    "name": "Empowered Startups",
+    "type": "accel",
+    "url": "http://www.empoweredstartups.com"
+  },
+  {
+    "id": "cc6c5b1e-8c1d-4c96-b1ca-f1385b862b7f",
+    "slug": "entrepreneur-first",
+    "name": "Entrepreneur First",
+    "type": "accel",
+    "url": "https://www.joinef.com"
+  },
+  {
+    "id": "313c7e40-3181-4cda-bdfc-7a1c6d54e676",
+    "slug": "entrepreneurship-at-ubc",
+    "name": "Entrepreneurship at UBC",
+    "type": "accel",
+    "url": "https://entrepreneurship.ubc.ca"
+  },
+  {
+    "id": "d403ab02-6477-4432-abff-827bbe7442cd",
+    "slug": "envisage",
+    "name": "envisAGE",
+    "type": "accel",
+    "url": "https://www.envis-age.ca/en"
+  },
+  {
+    "id": "3da14066-1f6d-400e-bfac-99595b4b1ba0",
+    "slug": "expa",
+    "name": "Expa",
+    "type": "accel",
+    "url": "https://www.expa.com"
+  },
+  {
+    "id": "b048e6b8-a64d-435f-b12e-e4f356a030f9",
+    "slug": "fashion-zone",
+    "name": "Fashion Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/fashion-zone"
+  },
+  {
+    "id": "4ea9304c-707c-4c03-a8f6-cde5f215214a",
+    "slug": "fintech-innovation-lab",
+    "name": "Fintech Innovation Lab",
+    "type": "accel",
+    "url": "https://www.fintechinnovationlab.com"
+  },
+  {
+    "id": "ebab66b1-af6e-4554-97fd-0ce6237f520d",
+    "slug": "food-future-co",
+    "name": "Food Future Co",
+    "type": "accel",
+    "url": "https://www.foodfuture.co/#home-about"
+  },
+  {
+    "id": "c2fc6ba9-2fc1-434a-9d2d-70090ddcb332",
+    "slug": "fordham-foundry",
+    "name": "Fordham Foundry",
+    "type": "accel",
+    "url": "https://www.fordhamfoundry.org"
+  },
+  {
+    "id": "89ac21b3-622e-4393-879f-83503562e8d0",
+    "slug": "forum-ventures",
+    "name": "Forum Ventures",
+    "type": "accel",
+    "url": "https://www.forumvc.com"
+  },
+  {
+    "id": "f20edb71-329d-43b2-aab4-2d73b39a8062",
+    "slug": "founder-fuel",
+    "name": "Founder Fuel",
+    "type": "accel",
+    "url": "https://founderfuel.com"
+  },
+  {
+    "id": "77ea1938-fc07-4a5a-b32e-6471460f1f75",
+    "slug": "founder-institute",
+    "name": "Founder Institute",
+    "type": "accel",
+    "url": "https://fi.co"
+  },
+  {
+    "id": "e63ee709-d786-43c4-a11d-16fa6426f863",
+    "slug": "founders-factory",
+    "name": "Founders Factory",
+    "type": "accel",
+    "url": "https://foundersfactory.com"
+  },
+  {
+    "id": "b6f823ad-4a64-4ac9-aeb9-087b2c443b96",
+    "slug": "founders-space",
+    "name": "Founders Space",
+    "type": "accel",
+    "url": "https://www.foundersspace.com"
+  },
+  {
+    "id": "51a939c3-f042-4b4b-9705-3a71ba2b8ee6",
+    "slug": "foundersboost",
+    "name": "FoundersBoost",
+    "type": "accel",
+    "url": "https://www.foundersboost.com"
+  },
+  {
+    "id": "88a05923-00d6-4ab3-bf41-5ef2144c7784",
+    "slug": "free-ventures",
+    "name": "Free Ventures",
+    "type": "accel",
+    "url": "https://www.freeventures.org"
+  },
+  {
+    "id": "4706440a-089c-480b-9aef-3aa651aa1525",
+    "slug": "further-faster",
+    "name": "Further Faster",
+    "type": "accel",
+    "url": "https://www.furtherfaster.design"
+  },
+  {
+    "id": "3a3c1ec3-1131-4c8b-8b18-a812c329ce95",
+    "slug": "futuresight",
+    "name": "FutureSight",
+    "type": "accel",
+    "url": "https://futuresight.ventures"
+  },
+  {
+    "id": "c3578554-b73b-4eba-83ab-45c30308dab6",
+    "slug": "geovation",
+    "name": "Geovation",
+    "type": "accel",
+    "url": "https://geovation.uk"
+  },
+  {
+    "id": "569a66c1-be00-4c63-9420-3d5cebc29b81",
+    "slug": "good-neighbor-fund",
+    "name": "Good Neighbor Fund",
+    "type": "accel",
+    "url": "https://www.goodneighbor.fund"
+  },
+  {
+    "id": "903e96af-5ec3-494f-b6ea-ddb3e458a2a4",
+    "slug": "google-for-startups-canada",
+    "name": "Google for Startups Canada",
+    "type": "accel",
+    "url": "https://startup.google.com/accelerator/canada"
+  },
+  {
+    "id": "cc3fd882-11af-426e-92b5-c39cfde2512d",
+    "slug": "grebel-peace-incubator",
+    "name": "Grebel Peace Incubator",
+    "type": "accel",
+    "url": "https://uwaterloo.ca/centre-peace-advancement/peace-incubator"
+  },
+  {
+    "id": "94399b54-a4ba-45e2-9184-7350cb87a10b",
+    "slug": "greenhouse",
+    "name": "GreenHouse",
+    "type": "accel",
+    "url": "https://uwaterloo.ca/united-college/greenhouse"
+  },
+  {
+    "id": "cf13fbbf-ea69-4b22-8208-7aa051b00707",
+    "slug": "greentown-labs",
+    "name": "Greentown Labs",
+    "type": "accel",
+    "url": "https://greentownlabs.com"
+  },
+  {
+    "id": "ea00040f-3d66-4630-a70a-03ceadff6c4f",
+    "slug": "halton-region-small-business-centre",
+    "name": "Halton Region Small Business Centre",
+    "type": "accel",
+    "url": "https://www.halton.ca/For-Business/Halton-Region-Small-Business-Centre"
+  },
+  {
+    "id": "9b06ea10-346e-4b56-b732-cd7e29da2a5d",
+    "slug": "hardwaredotco",
+    "name": "Hardwaredotco",
+    "type": "accel",
+    "url": "https://hardware.co"
+  },
+  {
+    "id": "6b52567d-fa95-4bd9-bf8d-50ba40ae45e1",
+    "slug": "harvard-innovation-labs",
+    "name": "Harvard Innovation Labs",
+    "type": "accel",
+    "url": "https://innovationlabs.harvard.edu"
+  },
+  {
+    "id": "2d7025b5-7ce4-48aa-990e-2d9e78c03619",
+    "slug": "hatchery-incubator-university-of-toronto",
+    "name": "Hatchery Incubator University of Toronto",
+    "type": "accel",
+    "url": "https://hatchery.engineering.utoronto.ca"
+  },
+  {
+    "id": "372c0efc-eff3-4dea-9c30-7002d6aae7be",
+    "slug": "health-innovation-hub-university-of-toronto",
+    "name": "Health Innovation Hub University of Toronto",
+    "type": "accel",
+    "url": "https://h2i.utoronto.ca"
+  },
+  {
+    "id": "08ced003-687e-4ef7-aa75-af3c6344187c",
+    "slug": "healthbox",
+    "name": "Healthbox",
+    "type": "accel",
+    "url": "https://www.himss.org/what-we-do-solutions/healthbox"
+  },
+  {
+    "id": "893af87d-487b-49c6-a6ea-92274f5ab23f",
+    "slug": "hearstlab",
+    "name": "HearstLab",
+    "type": "accel",
+    "url": "https://www.hearst.com/hearst-life/hearstlab"
+  },
+  {
+    "id": "91c5426e-defb-4988-b9c9-e47e55017ee3",
+    "slug": "highline-beta",
+    "name": "Highline Beta",
+    "type": "accel",
+    "url": "https://highlinebeta.com"
+  },
+  {
+    "id": "305ab153-df24-458e-a84d-8a1c6ce7caf0",
+    "slug": "highway1",
+    "name": "Highway1",
+    "type": "accel",
+    "url": "https://highway1.io"
+  },
+  {
+    "id": "f084718a-6d90-4498-b6ec-a0ecaf583c3a",
+    "slug": "holtxchange",
+    "name": "HoltXchange",
+    "type": "accel",
+    "url": "https://holtxchange.com"
+  },
+  {
+    "id": "43d01a9d-f08c-44dd-bf87-2a3bbf5e6393",
+    "slug": "huckletree",
+    "name": "Huckletree",
+    "type": "accel",
+    "url": "https://www.huckletree.com/education/alpha"
+  },
+  {
+    "id": "21f16455-826a-40d6-bfdc-169226a7a848",
+    "slug": "icube-incubator",
+    "name": "ICUBE Incubator",
+    "type": "accel",
+    "url": "https://icubeutm.ca"
+  },
+  {
+    "id": "d7fb4d87-7f6f-493e-afef-402dbe219368",
+    "slug": "idea",
+    "name": "IDEA",
+    "type": "accel",
+    "url": "https://www.northeastern.edu/idea"
+  },
+  {
+    "id": "172fa555-1231-4cf1-9438-be204238cc4a",
+    "slug": "idea-mississauga",
+    "name": "Idea Mississauga",
+    "type": "accel",
+    "url": "https://www.ideamississauga.ca"
+  },
+  {
+    "id": "f16d736c-1240-444d-b246-676b4883e5c2",
+    "slug": "ideahub",
+    "name": "ideaHUB",
+    "type": "accel",
+    "url": "https://dalideahub.ca"
+  },
+  {
+    "id": "60bae47a-635c-4995-8369-a14d30c4be93",
+    "slug": "ignite",
+    "name": "Ignite",
+    "type": "accel",
+    "url": "https://ignite.io"
+  },
+  {
+    "id": "0e528330-5924-47b9-acee-fe3f6470faef",
+    "slug": "illinois-science-technology-coalition-and-institute",
+    "name": "Illinois Science & Technology Coalition and Institute",
+    "type": "accel",
+    "url": "https://www.istcoalition.org"
+  },
+  {
+    "id": "efafc3c0-6e9a-449b-98f1-90ea7d95eefa",
+    "slug": "illumina-accelerator",
+    "name": "Illumina Accelerator",
+    "type": "accel",
+    "url": "https://www.illumina.com/company/illumina-for-startups/accelerator-program.html"
+  },
+  {
+    "id": "10375558-ff7c-4682-a577-c2bdaab14abf",
+    "slug": "imagination-catalyst-incubator",
+    "name": "Imagination Catalyst Incubator",
+    "type": "accel",
+    "url": "https://www.ocadu.ca/services/centre-for-emerging-artists-and-designers/imagination-catalyst"
+  },
+  {
+    "id": "5e7d9f7b-3fba-4020-9e61-7bb2b6a8b1f1",
+    "slug": "indie-bio",
+    "name": "Indie Bio",
+    "type": "accel",
+    "url": "https://indiebio.co"
+  },
+  {
+    "id": "73834019-f157-4c30-99b6-0f263c26eba8",
+    "slug": "innosphere-ventures",
+    "name": "Innosphere Ventures",
+    "type": "accel",
+    "url": "https://innosphereventures.org"
+  },
+  {
+    "id": "6d8861d0-5e01-4727-a23a-00b74dec4834",
+    "slug": "innovate-bc",
+    "name": "Innovate BC",
+    "type": "accel",
+    "url": "https://www.innovatebc.ca"
+  },
+  {
+    "id": "1ee9ad38-e381-4cdc-9062-d269907541a5",
+    "slug": "innovate-calgary-incubator",
+    "name": "Innovate Calgary Incubator",
+    "type": "accel",
+    "url": "https://innovatecalgary.com"
+  },
+  {
+    "id": "4b1def7d-9b64-4493-bea8-ab55ad8dab0b",
+    "slug": "innovatebu",
+    "name": "Innovate@BU",
+    "type": "accel",
+    "url": "https://www.bu.edu/innovate"
+  },
+  {
+    "id": "962d4f63-e4a8-4225-b60e-f4128744b0c2",
+    "slug": "innovation-and-entrepreneurship-centre-at-algonquin-college",
+    "name": "Innovation and Entrepreneurship Centre at Algonquin College",
+    "type": "accel",
+    "url": "https://www.algonquincollege.com/alumni/benefits-perks/entrepreneurship-centre"
+  },
+  {
+    "id": "b61afb00-e32b-4b7b-8177-cda61008ccd6",
+    "slug": "innovation-boost-zone",
+    "name": "Innovation Boost Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/innovation-boost-zone"
+  },
+  {
+    "id": "9d141f23-54ae-4d6c-9397-7b98ab8cebf8",
+    "slug": "innovation-factory",
+    "name": "Innovation Factory",
+    "type": "accel",
+    "url": "https://innovationfactory.ca"
+  },
+  {
+    "id": "f61f9554-7337-457b-b3cf-85fff3c5989c",
+    "slug": "innovation-guelph",
+    "name": "Innovation Guelph",
+    "type": "accel",
+    "url": "https://innovationguelph.ca"
+  },
+  {
+    "id": "ea98608e-e30b-4690-8e86-336e617e5afd",
+    "slug": "innovation-hub-at-carleton-university",
+    "name": "Innovation Hub at Carleton University",
+    "type": "accel",
+    "url": "https://carleton.ca/innovationhub"
+  },
+  {
+    "id": "97f72220-497b-4826-8500-6b1f52d5d86b",
+    "slug": "innovation-studio",
+    "name": "Innovation Studio",
+    "type": "accel",
+    "url": "https://www.linkedin.com/company/myinnovationstudio"
+  },
+  {
+    "id": "2764e48e-ebe9-4077-89b6-df2de9ff6082",
+    "slug": "innoved",
+    "name": "InnovED",
+    "type": "accel",
+    "url": "https://www.innoved.oise.utoronto.ca"
+  },
+  {
+    "id": "fc0ac168-57d7-4dc4-a22e-a38eadb98e31",
+    "slug": "intuit-prosperity-accelerator",
+    "name": "Intuit Prosperity Accelerator",
+    "type": "accel",
+    "url": "https://www.intuit.com/ca/prosperity-accelerator"
+  },
+  {
+    "id": "7b921256-8614-456c-a589-75b7d8a25111",
+    "slug": "invest-buffalo-niagara",
+    "name": "Invest Buffalo Niagara",
+    "type": "accel",
+    "url": "https://buffaloniagara.org/grow-your-business/startup-resources"
+  },
+  {
+    "id": "2fba20b4-9ab4-432a-8c17-30ad259572bd",
+    "slug": "invest-kingston",
+    "name": "Invest Kingston",
+    "type": "accel",
+    "url": "https://www.investkingston.ca"
+  },
+  {
+    "id": "a5065443-461f-482a-be27-4dd049910eb2",
+    "slug": "invest-ottawa",
+    "name": "Invest Ottawa",
+    "type": "accel",
+    "url": "https://www.investottawa.ca"
+  },
+  {
+    "id": "f4c1df71-4adf-4582-9cb7-54b13632abbc",
+    "slug": "istarter",
+    "name": "iStarter",
+    "type": "accel",
+    "url": "https://twitter.com/istarteritaly"
+  },
+  {
+    "id": "7723c189-98bc-4c47-94f4-41c50da30f58",
+    "slug": "iterative",
+    "name": "Iterative",
+    "type": "accel",
+    "url": "https://www.iterative.vc"
+  },
+  {
+    "id": "0825eaf0-4100-42cd-9414-c26ab8aefb7b",
+    "slug": "john-wood-centre-for-business-and-student-enterprise",
+    "name": "John Wood Centre for Business and Student Enterprise",
+    "type": "accel",
+    "url": "https://www.uoguelph.ca/johnfwoodcentre/thehub"
+  },
+  {
+    "id": "0ede5656-221b-4cd8-b05d-c7e78b772c05",
+    "slug": "johnson-summer-startup-accelerator",
+    "name": "Johnson Summer Startup Accelerator",
+    "type": "accel",
+    "url": "https://eship.cornell.edu/item/johnson-summer-startup-accelerator"
+  },
+  {
+    "id": "af8d3444-532a-4f11-9488-35552b99dfc0",
+    "slug": "kaplan-institute-for-innovation-and-tech-entrepreneurship",
+    "name": "Kaplan Institute for Innovation and Tech Entrepreneurship",
+    "type": "accel",
+    "url": "https://www.iit.edu/kaplan"
+  },
+  {
+    "id": "48e394a5-6277-46b6-bd98-048db75297aa",
+    "slug": "l-marks",
+    "name": "L Marks",
+    "type": "accel",
+    "url": "https://lmarks.com"
+  },
+  {
+    "id": "c74b0a00-6856-4b26-b1be-5b7b7c99cd17",
+    "slug": "l-spark",
+    "name": "L-Spark",
+    "type": "accel",
+    "url": "https://www.l-spark.com"
+  },
+  {
+    "id": "c74b26d8-274f-415b-b6c5-92a9ec5c466c",
+    "slug": "la-piscine-mtl",
+    "name": "La Piscine MTL",
+    "type": "accel",
+    "url": "https://www.lapiscine.co/en"
+  },
+  {
+    "id": "26d203f2-6320-4fb4-b8a3-1884144b0a05",
+    "slug": "labasehec-montreal",
+    "name": "LabaseHEC Montreal",
+    "type": "accel",
+    "url": "https://labase.hec.ca"
+  },
+  {
+    "id": "3dd03b29-6061-4875-ada5-73774b49510a",
+    "slug": "lair-east-labs",
+    "name": "Lair East Labs",
+    "type": "accel",
+    "url": "https://laireastlabs.com"
+  },
+  {
+    "id": "1ac35dfd-65fb-4d7d-afa8-52da89d7f7bd",
+    "slug": "lassonde-school-of-engineering-best-program",
+    "name": "Lassonde School of Engineering BEST Program",
+    "type": "accel",
+    "url": "https://lassonde.yorku.ca/best/entrepreneurship"
+  },
+  {
+    "id": "93bf3615-9817-40ce-928e-f6ad6ff4a865",
+    "slug": "launch-academy",
+    "name": "Launch Academy",
+    "type": "accel",
+    "url": "https://www.launchacademy.ca"
+  },
+  {
+    "id": "40ca8d57-7a34-4e67-b8d0-456e1268f058",
+    "slug": "launch-accelerator",
+    "name": "Launch Accelerator",
+    "type": "accel",
+    "url": "https://launchaccelerator.co"
+  },
+  {
+    "id": "273192d0-1571-4cbc-baee-10de8962d5ce",
+    "slug": "launch-berkely",
+    "name": "Launch Berkely",
+    "type": "accel",
+    "url": "https://www.uclaunch.com"
+  },
+  {
+    "id": "6ae1d6e0-68bf-4cb1-8f8c-43769e5a19e7",
+    "slug": "launch-lab",
+    "name": "Launch Lab",
+    "type": "accel",
+    "url": "https://www.launchlab.ca"
+  }
+]

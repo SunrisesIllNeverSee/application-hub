@@ -1,0 +1,555 @@
+[
+  {
+    "id": "2db78b05-32b0-4b1d-968d-3d9d792b2680",
+    "slug": "lvlup-ventures",
+    "name": "LvlUp Ventures",
+    "type": "vc",
+    "url": "https://www.lvlup.vc"
+  },
+  {
+    "id": "9a897d8a-9a4b-4cc9-a4e5-1c0f6e7c116e",
+    "slug": "mantella-venture-partners",
+    "name": "Mantella Venture Partners",
+    "type": "vc",
+    "url": "https://www.mantellavp.com"
+  },
+  {
+    "id": "9f329b9b-a738-4546-9b77-582d1e8cade4",
+    "slug": "mars-investment-accelerator-fund",
+    "name": "MaRS Investment Accelerator Fund",
+    "type": "vc",
+    "url": "https://www.marsiaf.com"
+  },
+  {
+    "id": "7306738f-fcd2-4382-a365-258eb96f6334",
+    "slug": "massventures",
+    "name": "MassVentures",
+    "type": "vc",
+    "url": "https://www.mass-ventures.com"
+  },
+  {
+    "id": "f248dd3c-bcf8-48ca-8a5f-bfd2234072b5",
+    "slug": "matbridge",
+    "name": "Matbridge",
+    "type": "vc",
+    "url": "http://www.matbridge.ca"
+  },
+  {
+    "id": "16693562-4eb1-4deb-8266-04bf77ce33c9",
+    "slug": "matrix",
+    "name": "Matrix",
+    "type": "vc",
+    "url": "https://matrix.vc"
+  },
+  {
+    "id": "cd7ec0f2-a7f1-4b8b-b8e7-735930832759",
+    "slug": "mendoza-ventures",
+    "name": "Mendoza Ventures",
+    "type": "vc",
+    "url": "https://mendoza-ventures.com"
+  },
+  {
+    "id": "0c9c1715-8e3b-4e2f-ae05-db125d712670",
+    "slug": "metiquity-ventures",
+    "name": "Metiquity Ventures",
+    "type": "vc",
+    "url": "https://metiquity.ca"
+  },
+  {
+    "id": "02c275e9-cfdc-41dc-8f6b-3d5b57856ede",
+    "slug": "miami-angels",
+    "name": "Miami Angels",
+    "type": "vc",
+    "url": "https://www.miamiangels.vc"
+  },
+  {
+    "id": "ef84421d-f368-4ef5-89b7-7ed3bad69db8",
+    "slug": "m12vc",
+    "name": "Microsoft's Venture Fund: M12",
+    "type": "vc",
+    "url": "https://m12.vc"
+  },
+  {
+    "id": "1fe35e27-56f9-41f8-b8b3-3f170183be87",
+    "slug": "middle-east-venture-partners",
+    "name": "Middle East Venture Partners",
+    "type": "vc",
+    "url": "https://www.mevp.com"
+  },
+  {
+    "id": "1ef1ac64-01e6-437a-a46c-8e2465c58f07",
+    "slug": "mistral-venture-partners",
+    "name": "Mistral Venture Partners",
+    "type": "vc",
+    "url": "https://mistral.vc"
+  },
+  {
+    "id": "90e5c6e3-c49c-4186-b6c4-ca44389a95a1",
+    "slug": "mmc-ventures",
+    "name": "MMC Ventures",
+    "type": "vc",
+    "url": "https://mmc.vc"
+  },
+  {
+    "id": "6b8e3843-b9c6-43e1-a1d2-5a6e2547d057",
+    "slug": "moment-ventures",
+    "name": "Moment Ventures",
+    "type": "vc",
+    "url": "https://www.momentventures.com"
+  },
+  {
+    "id": "44e6a9ec-d706-472c-8e58-be4674b3d932",
+    "slug": "1714",
+    "name": "Montage Ventures is an early stage VC in Menlo Park investing in fintech, commerce, & healthcare",
+    "type": "vc",
+    "url": "https://montageventures.com"
+  },
+  {
+    "id": "d7a63a26-9605-4503-af15-c8741c13a5c6",
+    "slug": "morphais-vc",
+    "name": "Morphais VC",
+    "type": "vc",
+    "url": "https://www.morphais.com"
+  },
+  {
+    "id": "974b056c-1647-455c-9538-9ba4123a8e0a",
+    "slug": "motivate-venture-capital",
+    "name": "Motivate Venture Capital",
+    "type": "vc",
+    "url": "https://motivate.vc"
+  },
+  {
+    "id": "df89f5cc-9119-4180-bed0-f93c9ca925a6",
+    "slug": "motive-ventures",
+    "name": "Motive Ventures",
+    "type": "vc",
+    "url": "https://www.motivepartners.com"
+  },
+  {
+    "id": "6be1ec76-273f-4e39-bc4e-0a30d3d838e5",
+    "slug": "multicoin-capital",
+    "name": "Multicoin Capital",
+    "type": "vc",
+    "url": "https://multicoin.capital"
+  },
+  {
+    "id": "2683038d-1b2e-4d2c-8ee1-71a8f22cfd2a",
+    "slug": "mustard-seed",
+    "name": "Mustard Seed",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/mustard-seed-impact/MustardSeed"
+  },
+  {
+    "id": "5cbb684a-dd03-48e3-89bf-e58a9ccf4705",
+    "slug": "new-stack-ventures",
+    "name": "New Stack Ventures",
+    "type": "vc",
+    "url": "https://www.newstack.com"
+  },
+  {
+    "id": "a21706ad-bf81-4f5c-a8c7-3682db01c881",
+    "slug": "next-coast-ventures",
+    "name": "Next Coast Ventures",
+    "type": "vc",
+    "url": "https://www.nextcoastventures.com"
+  },
+  {
+    "id": "64d3a41f-4e7a-4fe5-96de-c03697d075f3",
+    "slug": "nextview-ventures",
+    "name": "NextView Ventures",
+    "type": "vc",
+    "url": "https://nextview.vc"
+  },
+  {
+    "id": "e4a4fd06-7d81-4ca4-9f60-22212b5525df",
+    "slug": "northzone",
+    "name": "Northzone",
+    "type": "vc",
+    "url": "https://northzone.com"
+  },
+  {
+    "id": "fea2bae1-a46b-49e7-810c-424f4ecaffc9",
+    "slug": "norwest-venture-partners",
+    "name": "Norwest Venture Partners",
+    "type": "vc",
+    "url": "https://www.nvp.com"
+  },
+  {
+    "id": "fc8069fc-ff95-4829-a47d-7e34fdcbae56",
+    "slug": "notion-capital",
+    "name": "Notion Capital",
+    "type": "vc",
+    "url": "https://www.notion.vc"
+  },
+  {
+    "id": "33020a18-5789-4217-a6fd-9cae11479092",
+    "slug": "omers-ventures",
+    "name": "OMERS Ventures",
+    "type": "vc",
+    "url": "https://omersventures.com"
+  },
+  {
+    "id": "b1c6bb93-2fe6-4b28-ac10-400fb154edf3",
+    "slug": "panache-ventures",
+    "name": "Panache Ventures",
+    "type": "vc",
+    "url": "https://www.panache.vc"
+  },
+  {
+    "id": "5d5ad620-c520-45c0-8318-d2956665ae3e",
+    "slug": "pangaea-ventures",
+    "name": "Pangaea Ventures",
+    "type": "vc",
+    "url": "https://www.pangaeaventures.com"
+  },
+  {
+    "id": "028725a1-b3e3-4364-a061-7acdd6aa709e",
+    "slug": "paradigm-capital",
+    "name": "Paradigm Capital",
+    "type": "vc",
+    "url": "https://www.paradigmcap.com"
+  },
+  {
+    "id": "f4aa5a68-d133-488b-bd30-e6849c282a84",
+    "slug": "pario-ventures",
+    "name": "Pario Ventures",
+    "type": "vc",
+    "url": "https://www.parioventures.com"
+  },
+  {
+    "id": "b64c4acb-b3c8-48a2-8955-c4454dffb998",
+    "slug": "passion-capital",
+    "name": "Passion Capital",
+    "type": "vc",
+    "url": "https://www.passioncapital.com"
+  },
+  {
+    "id": "d8bfb99c-be9f-4256-933b-8384ee27ae29",
+    "slug": "pender-ventures",
+    "name": "Pender Ventures",
+    "type": "vc",
+    "url": "https://www.penderventures.com"
+  },
+  {
+    "id": "c0a18f44-d1d7-449e-9270-ea96424624fb",
+    "slug": "petri",
+    "name": "Petri",
+    "type": "vc",
+    "url": "https://petri.bio"
+  },
+  {
+    "id": "5d31c5a5-cbf0-4583-8c58-8bbe2b4b67b5",
+    "slug": "pi-labs",
+    "name": "Pi Labs",
+    "type": "vc",
+    "url": "https://pilabs.vc"
+  },
+  {
+    "id": "4c60f07e-85e8-494e-9639-53713ebf0157",
+    "slug": "piton-capital",
+    "name": "Piton Capital",
+    "type": "vc",
+    "url": "https://www.pitoncap.com"
+  },
+  {
+    "id": "69e6e15e-2dc3-4b27-b889-f5cd5650870b",
+    "slug": "pjc",
+    "name": "PJC",
+    "type": "vc",
+    "url": "https://www.pjc.vc"
+  },
+  {
+    "id": "3e9d9113-eaf0-4f60-bbad-57559ef0202d",
+    "slug": "playfair",
+    "name": "Playfair",
+    "type": "vc",
+    "url": "https://www.playfair.vc"
+  },
+  {
+    "id": "e5667291-aaef-49e9-865a-896fb034b742",
+    "slug": "plaza-ventures",
+    "name": "Plaza Ventures",
+    "type": "vc",
+    "url": "https://plaza.ventures"
+  },
+  {
+    "id": "4d30de72-b74d-4eec-a128-517836f47be3",
+    "slug": "point72-ventures",
+    "name": "Point72 Ventures",
+    "type": "vc",
+    "url": "https://p72.vc"
+  },
+  {
+    "id": "9470adf7-51bc-4470-b776-c294b3e4f363",
+    "slug": "polaris-partners",
+    "name": "Polaris Partners",
+    "type": "vc",
+    "url": "https://polarispartners.com"
+  },
+  {
+    "id": "a8aae03b-0f41-4f31-90bf-9d221df7d461",
+    "slug": "portage",
+    "name": "Portage",
+    "type": "vc",
+    "url": "https://portageinvest.com"
+  },
+  {
+    "id": "826d7345-7544-46f8-a582-3a6dcee1bd8c",
+    "slug": "prelude-ventures",
+    "name": "Prelude Ventures",
+    "type": "vc",
+    "url": "https://www.preludeventures.com"
+  },
+  {
+    "id": "5e8791db-4d7c-482a-b710-d77f912308ad",
+    "slug": "primary-venture-partners",
+    "name": "Primary Venture Partners",
+    "type": "vc",
+    "url": "https://www.primary.vc"
+  },
+  {
+    "id": "55d6da5d-e5d0-4c99-a728-764e5e64f84f",
+    "slug": "ptv-healthcare-capital",
+    "name": "PTV Healthcare Capital",
+    "type": "vc",
+    "url": "https://ptvhc.com"
+  },
+  {
+    "id": "edcf6e9c-863e-4e68-9c3b-db04a49bd089",
+    "slug": "quake-capital-partners",
+    "name": "Quake Capital Partners",
+    "type": "vc",
+    "url": "https://www.quakecapital.com"
+  },
+  {
+    "id": "7119b799-f3f7-4667-9692-715ac3ca13b4",
+    "slug": "quantum-valley-investments",
+    "name": "Quantum Valley Investments",
+    "type": "vc",
+    "url": "https://quantumvalleyinvestments.com"
+  },
+  {
+    "id": "c93ae763-cb29-407f-b84f-eb700996c6c4",
+    "slug": "quark-venture",
+    "name": "Quark Venture",
+    "type": "vc",
+    "url": "https://www.quarkventure.com"
+  },
+  {
+    "id": "df0b5081-f42a-423a-a27b-a8c6c90e69fb",
+    "slug": "quona-capital",
+    "name": "Quona Capital",
+    "type": "vc",
+    "url": "https://quona.com"
+  },
+  {
+    "id": "3f995181-f5fc-4047-9e0d-a8639784cf1d",
+    "slug": "radical-ventures",
+    "name": "Radical Ventures",
+    "type": "vc",
+    "url": "https://radical.vc"
+  },
+  {
+    "id": "7d41e3d3-6078-4842-9762-09c12deda0e8",
+    "slug": "rarebreed-ventures",
+    "name": "RareBreed Ventures",
+    "type": "vc",
+    "url": "https://www.rarebreed.vc"
+  },
+  {
+    "id": "43c36c1c-33d1-4de2-bb1c-6f3e79cf40c5",
+    "slug": "rbcx",
+    "name": "RBCx",
+    "type": "vc",
+    "url": "https://www.rbcx.com"
+  },
+  {
+    "id": "90f7a19d-189a-46ae-93ca-9dd8c39b1e99",
+    "slug": "real-ventures",
+    "name": "Real Ventures",
+    "type": "vc",
+    "url": "https://realventures.com"
+  },
+  {
+    "id": "3617c140-cbde-49b4-b3f0-d475351ab0e9",
+    "slug": "redpoint-ventures",
+    "name": "Redpoint Ventures",
+    "type": "vc",
+    "url": "https://www.redpoint.com"
+  },
+  {
+    "id": "48e6dc0c-24db-4a96-bd6e-27fe475701d0",
+    "slug": "relay-ventures",
+    "name": "Relay Ventures",
+    "type": "vc",
+    "url": "https://relayventures.com"
+  },
+  {
+    "id": "a10f66e7-6f2b-4d79-8ea8-f04a669160fa",
+    "slug": "renewal-funds",
+    "name": "Renewal Funds",
+    "type": "vc",
+    "url": "https://www.renewalfunds.com"
+  },
+  {
+    "id": "fea0bf51-de85-4c03-9c3d-6890a943c9de",
+    "slug": "revolution",
+    "name": "Revolution",
+    "type": "vc",
+    "url": "https://revolution.com/entity/rotr"
+  },
+  {
+    "id": "1fb5bcf2-afd0-4ffe-878c-d3438f1b6bc1",
+    "slug": "rhino-ventures",
+    "name": "Rhino Ventures",
+    "type": "vc",
+    "url": "https://www.rhinovc.com"
+  },
+  {
+    "id": "e6b5bd08-d5e7-4e2a-88e8-39a9780bc7d6",
+    "slug": "rho-ventures",
+    "name": "Rho Ventures",
+    "type": "vc",
+    "url": "https://www.rho.com"
+  },
+  {
+    "id": "f0a01c62-916c-4362-ac71-20de7e0d7530",
+    "slug": "ripple-ventures",
+    "name": "Ripple Ventures",
+    "type": "vc",
+    "url": "https://www.rippleventures.com"
+  },
+  {
+    "id": "954d06b5-26db-4551-a92d-ea0fdd0cff9c",
+    "slug": "rogue-insight-capital",
+    "name": "Rogue Insight Capital",
+    "type": "vc",
+    "url": "https://www.rogueinsightcapital.com"
+  },
+  {
+    "id": "70e581f9-b16d-46a3-a492-905c06082603",
+    "slug": "rokk3r",
+    "name": "Rokk3r",
+    "type": "vc",
+    "url": "https://www.rokk3r.com"
+  },
+  {
+    "id": "8083c4e7-dcfb-4660-b500-e161e1cf002e",
+    "slug": "round13",
+    "name": "Round13",
+    "type": "vc",
+    "url": "https://round13.com"
+  },
+  {
+    "id": "84b6c734-a308-4edc-a714-c8100c592425",
+    "slug": "rre-ventures",
+    "name": "RRE Ventures",
+    "type": "vc",
+    "url": "https://www.linkedin.com/company/rre-ventures"
+  },
+  {
+    "id": "bbe9583c-3898-4d2c-8229-82edc828676f",
+    "slug": "rubicon-venture-capital",
+    "name": "Rubicon Venture Capital",
+    "type": "vc",
+    "url": "https://www.rubicon.vc"
+  },
+  {
+    "id": "34396d16-72e7-4524-be5c-502d5cb49b49",
+    "slug": "s3-ventures",
+    "name": "S3 Ventures",
+    "type": "vc",
+    "url": "https://www.s3vc.com"
+  },
+  {
+    "id": "f96f048f-e5a7-46a5-b505-77d6ce2c4b88",
+    "slug": "saison-capital",
+    "name": "Saison Capital",
+    "type": "vc",
+    "url": "https://www.saisoncapital.com"
+  },
+  {
+    "id": "42706638-27d8-4e42-939d-27c4ce070288",
+    "slug": "salesforce-ventures",
+    "name": "Salesforce Ventures",
+    "type": "vc",
+    "url": "https://salesforceventures.com"
+  },
+  {
+    "id": "11f7e3e6-11a1-4e20-9e94-c75699e7279b",
+    "slug": "sante-ventures",
+    "name": "Sante Ventures",
+    "type": "vc",
+    "url": "https://sante.com"
+  },
+  {
+    "id": "c6739ad9-c590-4ae6-8a78-dfd23c8fe2d0",
+    "slug": "saturn-partners",
+    "name": "Saturn Partners",
+    "type": "vc",
+    "url": "https://saturnpartnersvc.com"
+  },
+  {
+    "id": "fa3e4da8-b51f-4f3d-9952-92ce93b8180b",
+    "slug": "scaleup-venture-partners",
+    "name": "ScaleUP Venture Partners",
+    "type": "vc",
+    "url": "https://suv.vc"
+  },
+  {
+    "id": "37ce072a-2483-455e-aeee-75c91d77e7b3",
+    "slug": "scottish-equity-partners",
+    "name": "Scottish Equity Partners",
+    "type": "vc",
+    "url": "https://www.sep.co.uk"
+  },
+  {
+    "id": "ad4ce301-65f5-4f7d-ac09-0b5b46a86322",
+    "slug": "secocha-ventures",
+    "name": "Secocha Ventures",
+    "type": "vc",
+    "url": "https://www.secocha.com"
+  },
+  {
+    "id": "c8ad28ec-f001-4e79-9137-7bdb790d66bd",
+    "slug": "second-century-ventures",
+    "name": "Second Century Ventures",
+    "type": "vc",
+    "url": "https://www.scv.vc"
+  },
+  {
+    "id": "b6f5befc-f2fe-4aba-83f7-9b31efb2ca9a",
+    "slug": "seed-angel-forum",
+    "name": "Seed Angel Forum",
+    "type": "vc",
+    "url": "https://seedangel.co"
+  },
+  {
+    "id": "2d742b06-d0ed-4f1f-995d-cadd37ac4118",
+    "slug": "seedcamp",
+    "name": "Seedcamp",
+    "type": "vc",
+    "url": "https://seedcamp.com"
+  },
+  {
+    "id": "841a1be0-a465-4266-ae10-885f6d2b3f2d",
+    "slug": "sequoia-capital-southeast-asia",
+    "name": "Sequoia Capital Southeast Asia",
+    "type": "vc",
+    "url": "https://www.sequoiacap.com/sea"
+  },
+  {
+    "id": "de63be20-9bee-4d92-b43c-e3b7cbf07e04",
+    "slug": "serena-ventures",
+    "name": "Serena Ventures",
+    "type": "vc",
+    "url": "https://www.serenaventures.com"
+  },
+  {
+    "id": "9866e594-c60d-4743-a878-9e5b307e936f",
+    "slug": "silicon-roundabout",
+    "name": "Silicon Roundabout",
+    "type": "vc",
+    "url": "https://siliconroundabout.tech"
+  }
+]

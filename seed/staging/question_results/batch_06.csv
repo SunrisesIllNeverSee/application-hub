@@ -1,0 +1,29 @@
+slug,program_name,type,apply_url,extracted_question,matched_question_id,matched_question_text,similarity,confidence,recommendation
+everywhere,Everywhere,vc,https://airtable.com/appeY02X0EMCQQ19G/shrjpNqWOj0SJP1ix,none_found,,,,,none_found
+front-row-ventures,Front Row Ventures,vc,https://frontrow.ventures/apply,none_found,,,,,none_found
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com/pitch-us,What technology does your company leverage,7e2a3861-bb19-4465-9b99-cc12d3e976af,Describe the technical architecture of your project. What technologies are you using.,0.520,low,weak_match
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com/pitch-us,What are your industry verticals?,9a421f2d-0eaf-4e3e-b446-3ef0c82be157,Describe the market opportunity. What is the TAM and how will you capture a meaningful portion of it?,0.380,low,weak_match
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com/pitch-us,What is your stage of development?,77b5c487-44f2-4920-9645-60bf03863c40,What stage is your venture at? What have you built or tested so far?,0.550,medium,review_match
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com/pitch-us,What is your stage of financing?,4f6c0b35-20a7-4ed2-a41c-9a453168b768,What stage are you at and how much are you raising? What will you use the capital for?,0.500,low,weak_match
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com/pitch-us,What is your pre-money valuation?,17af203d-4e79-4e81-a740-405b48764cc2,"What is your current round, valuation, and how much have you raised so far in this round?",0.470,low,weak_match
+fuel-ventures,Fuel Ventures,vc,https://www.fuel.ventures/submit-pitch,none_found,,,,,none_found
+greensky-ventures,GreenSky Ventures,vc,https://greensky.vc/apply/,Tell us about your team.,a2f69282-e62c-4dc6-860f-e7f86c8cf2aa,Tell us about your team. Who are the founders and what do they each bring to the company?,0.750,high,use_match
+greensky-ventures,GreenSky Ventures,vc,https://greensky.vc/apply/,Explain to us what problem you are solving.,07a6b847-cfe4-45f4-97dd-72d508757b64,What problem are you solving? Why is this problem worth solving?,0.600,medium,review_match
+greensky-ventures,GreenSky Ventures,vc,https://greensky.vc/apply/,Show us commercial traction and/or product market fit.,82804735-c605-4428-a8db-0fda5c1b64ae,"Describe your commercial traction: customers, revenue, growth rate.",0.520,low,weak_match
+harlem-capital,Harlem Capital,vc,https://harlem.capital/pitch/,none_found,,,,,none_found
+jamjar-investments,JamJar Investments,vc,https://www.jamjarinvestments.com/pitch-to-us,none_found,,,,,none_found
+jetblue-ventures,JetBlue Ventures,vc,https://skyvc.typeform.com/to/CdW5AB8D,Please describe your company in 3 sentences or fewer.,c9f27326-0162-46c3-ad1d-7a914654a648,Describe your company in one sentence.,0.769,high,use_match
+jetblue-ventures,JetBlue Ventures,vc,https://skyvc.typeform.com/to/CdW5AB8D,What is the current investment stage for your company?,0e7627b1-b527-4a1e-818f-446fe9e29e61,What is your current funding stage and total amount raised to date?,0.579,medium,review_match
+loi-venture,LOI Venture,vc,https://www.loi.vc/pitch/,"Tell us about your business, market, and unique value proposition",bc76394d-2eaa-4668-8a03-e9e5b111b790,"Provide an overview of your company: what you do, who you serve, and the problem you solve.",0.460,low,weak_match
+lvlup-ventures,LvlUp Ventures,vc,https://www.lvlup.vc/apply/funding-application,none_found,,,,,none_found
+mars-investment-accelerator-fund,MaRS Investment Accelerator Fund,vc,https://marsiaf.com/iaf-application/,Briefly describe your business.,b765afba-6d84-4b03-8c1d-92f89d7b1e09,Briefly describe what your company does in 2–3 sentences.,0.740,medium,review_match
+mars-investment-accelerator-fund,MaRS Investment Accelerator Fund,vc,https://marsiaf.com/iaf-application/,Which province is the company based in?,e1a016d5-60cd-47f1-9d7b-c528480f3222,Where is your company based? Are you open to relocating?,0.440,low,weak_match
+mars-investment-accelerator-fund,MaRS Investment Accelerator Fund,vc,https://marsiaf.com/iaf-application/,What is your lifetime revenue to date ($CAD)?,9905327b-ab98-4f61-b80e-d8586838c9f8,What is your current monthly recurring revenue (MRR) or annual revenue?,0.480,low,weak_match
+mars-investment-accelerator-fund,MaRS Investment Accelerator Fund,vc,https://marsiaf.com/iaf-application/,"Within the pitch deck, please describe your product, market, team, go-to-market strategy, business model, value proposition, fundraising details, and any other information you feel is relevant",730e753d-27ad-4908-84ba-9692553e1c4e,Describe your product or service solution and its key features.,0.360,low,weak_match
+panache-ventures,Panache Ventures,vc,https://www.panache.vc/pitch-us,none_found,,,,,none_found
+playfair,Playfair,vc,https://playfair.vc/pitch-us.php,none_found,,,,,none_found
+silicon-roundabout,Silicon Roundabout,vc,https://siliconroundabout.tech/startup-application/,none_found,,,,,none_found
+slack-fund,Slack Fund,vc,https://airtable.com/app5kO0WaTWMJG0n7/pagIcieB3DVsIxyxp/form,none_found,,,,,none_found
+storm-ventures,Storm Ventures,vc,https://stormventures.typeform.com/to/H6I1Qq,Do you have recurring revenue?,502e8762-6d8f-42ed-9d3a-3d198ad25628,"Are you generating any revenue? If so, how much and from how many customers?",0.540,low,weak_match
+storm-ventures,Storm Ventures,vc,https://stormventures.typeform.com/to/H6I1Qq,Who do you sell to?,d05b9588-6944-45e9-aa22-3d42633c195d,Who is your target customer? How do you reach them?,0.520,low,weak_match
+storm-ventures,Storm Ventures,vc,https://stormventures.typeform.com/to/H6I1Qq,Do you have more than 5 paying customers?,decad76c-c340-431e-9de5-d8d4a69bc206,Do you have users or early adopters? What feedback have you received so far?,0.560,medium,review_match

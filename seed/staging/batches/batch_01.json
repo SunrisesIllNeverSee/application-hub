@@ -1,0 +1,555 @@
+[
+  {
+    "id": "19cb667d-a2b1-4415-ac97-740c6148954e",
+    "slug": "1871",
+    "name": "1871",
+    "type": "accel",
+    "url": "https://1871.com"
+  },
+  {
+    "id": "f2128224-c85d-495e-81c2-38ad490bab0d",
+    "slug": "2bx",
+    "name": "2bX",
+    "type": "accel",
+    "url": "https://2bx.vc"
+  },
+  {
+    "id": "952e8348-d367-4d93-8117-f32b90d4c784",
+    "slug": "43north",
+    "name": "43North",
+    "type": "accel",
+    "url": "https://www.43north.org"
+  },
+  {
+    "id": "6f5ca15d-f27c-4e57-ba29-0e2f0b2b170d",
+    "slug": "500-global",
+    "name": "500 Global",
+    "type": "accel",
+    "url": "https://500.co"
+  },
+  {
+    "id": "866561d8-24d6-4ba1-8eb2-ef13ef624a6b",
+    "slug": "accel-centennial-college",
+    "name": "ACCEL Centennial College",
+    "type": "accel",
+    "url": "https://accel.centennialcollege.ca"
+  },
+  {
+    "id": "b4f2930d-f900-40ac-9777-a1c9bb6365da",
+    "slug": "accelerate-okanagan",
+    "name": "Accelerate Okanagan",
+    "type": "accel",
+    "url": "https://accelerateokanagan.com"
+  },
+  {
+    "id": "ba4308d6-328c-47bf-a505-e09160c0d4fc",
+    "slug": "accelerating-asia",
+    "name": "Accelerating Asia",
+    "type": "accel",
+    "url": "https://www.acceleratingasia.com"
+  },
+  {
+    "id": "13571bbe-8979-499b-8bf1-3d62284a815d",
+    "slug": "accelerator-center",
+    "name": "Accelerator Center",
+    "type": "accel",
+    "url": "https://www.acceleratorcentre.com"
+  },
+  {
+    "id": "ebc12d45-ab0a-4e08-b462-5d537c4f11f0",
+    "slug": "alacrity-canada",
+    "name": "Alacrity Canada",
+    "type": "accel",
+    "url": "https://www.alacritycanada.com"
+  },
+  {
+    "id": "a7fbca48-2c9c-4975-a3a3-d85a1c719685",
+    "slug": "alberta-accelerator",
+    "name": "Alberta Accelerator Calgary",
+    "type": "accel",
+    "url": "https://500.co/accelerators/alberta-accelerator"
+  },
+  {
+    "id": "2d3fd5e7-babf-47de-9138-2b67b55663a9",
+    "slug": "alliance",
+    "name": "Alliance",
+    "type": "accel",
+    "url": "https://alliance.xyz"
+  },
+  {
+    "id": "a5af599e-f561-46ef-bbbd-35ff4a7f453d",
+    "slug": "altitude-accelerator",
+    "name": "Altitude Accelerator",
+    "type": "accel",
+    "url": "https://altitudeaccelerator.ca"
+  },
+  {
+    "id": "ddf11d14-5856-4365-8d03-d61f36250691",
+    "slug": "angelpad",
+    "name": "AngelPad",
+    "type": "accel",
+    "url": "https://angelpad.org"
+  },
+  {
+    "id": "a66150cc-14d4-447b-87d9-9d76235051ed",
+    "slug": "antler-academy",
+    "name": "Antler Academy",
+    "type": "accel",
+    "url": "https://www.antler.co/academy"
+  },
+  {
+    "id": "0d377847-666b-4017-92ad-ca0453b74c2c",
+    "slug": "antler-canada",
+    "name": "Antler Canada",
+    "type": "accel",
+    "url": "https://www.antler.co/location/canada"
+  },
+  {
+    "id": "9b659f6c-7992-44c1-9dae-21afbe5a91af",
+    "slug": "antler",
+    "name": "Antler Global",
+    "type": "accel",
+    "url": "https://www.antler.co"
+  },
+  {
+    "id": "5fb73b9a-21ee-4ac0-bfa8-7d861b220233",
+    "slug": "antler-us-boulder",
+    "name": "Antler US Boulder",
+    "type": "accel",
+    "url": "https://www.antler.co/location/us"
+  },
+  {
+    "id": "2c3df447-77eb-4fee-adfd-57a15933a63a",
+    "slug": "artscape-daniels-launchpad",
+    "name": "Artscape Daniels Launchpad",
+    "type": "accel",
+    "url": "https://www.linkedin.com/showcase/launchpadto"
+  },
+  {
+    "id": "ca264077-d4b7-4f7c-ad2c-90bccc1e1e19",
+    "slug": "acc-bio-incubator",
+    "name": "Austin Community College Bio Incubator",
+    "type": "accel",
+    "url": "https://sites.austincc.edu/incubator"
+  },
+  {
+    "id": "7897f662-519f-4408-836b-f2d834342180",
+    "slug": "acc-fashion-incubator",
+    "name": "Austin Community College Fashion Incubator",
+    "type": "accel",
+    "url": "https://sites.austincc.edu/fashion-incubator"
+  },
+  {
+    "id": "e30ac4ec-1e31-4cce-a1f7-658bfdadbdc5",
+    "slug": "austin-technology-incubator",
+    "name": "Austin Technology Incubator",
+    "type": "accel",
+    "url": "https://ati.utexas.edu"
+  },
+  {
+    "id": "4af872a4-c52d-4bd9-8036-58cd8b4e38c1",
+    "slug": "babson-college-center-for-womens-entrepreneurial-leadership",
+    "name": "Babson College Center for Women\u2019s Entrepreneurial Leadership",
+    "type": "accel",
+    "url": "https://www.babson.edu/womens-leadership-institute/campus-programs"
+  },
+  {
+    "id": "42ad60ef-de45-4214-8979-76962f08cc87",
+    "slug": "barclays-accelerator",
+    "name": "Barclays Accelerator",
+    "type": "accel",
+    "url": "https://home.barclays/who-we-are/innovation/barclays-accelerator/#/london"
+  },
+  {
+    "id": "849762d6-bf10-4177-9db4-21ca77301476",
+    "slug": "bc-tech-association",
+    "name": "BC Tech Association",
+    "type": "accel",
+    "url": "https://wearebctech.com"
+  },
+  {
+    "id": "1895065e-8896-4840-a0e0-95aa984104f6",
+    "slug": "bengal-entrepreneurship-program",
+    "name": "Bengal Entrepreneurship Program",
+    "type": "accel",
+    "url": "https://sbdc.buffalostate.edu/bengal-entrepreneurship-program"
+  },
+  {
+    "id": "61514451-34e0-4c0e-8ae3-f0b7db55344e",
+    "slug": "berkeley-skydeck",
+    "name": "Berkeley SkyDeck",
+    "type": "accel",
+    "url": "https://skydeck.berkeley.edu"
+  },
+  {
+    "id": "377dd145-6582-4057-bd46-9949f0b36703",
+    "slug": "biomedical-zone",
+    "name": "Biomedical Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/zone-learning/biomedical-zone"
+  },
+  {
+    "id": "e68f3860-215a-4c79-8f66-02bf3738d69e",
+    "slug": "black-entrepreneurship-alliance",
+    "name": "Black Entrepreneurship Alliance",
+    "type": "accel",
+    "url": "https://www.thebea.co"
+  },
+  {
+    "id": "08af2589-0650-470a-91ee-f508518dabd9",
+    "slug": "black-founders-network",
+    "name": "Black Founders Network",
+    "type": "accel",
+    "url": "https://entrepreneurs.utoronto.ca/for-entrepreneurs/black-founders-network"
+  },
+  {
+    "id": "a7639c7c-926f-47d7-b81f-bd29b4f2b1eb",
+    "slug": "bonum-ventures",
+    "name": "Bonum Ventures",
+    "type": "accel",
+    "url": "https://bonum.eu"
+  },
+  {
+    "id": "dbb9a3d2-4518-4f3d-81ad-b8c7808166f6",
+    "slug": "boomtown-accelerators",
+    "name": "Boomtown Accelerators",
+    "type": "accel",
+    "url": "https://boomtownaccelerators.com"
+  },
+  {
+    "id": "70252380-2aa6-4f89-9df4-572d41c01e4d",
+    "slug": "brampton-entrepreneur-centre",
+    "name": "Brampton Entrepreneur Centre",
+    "type": "accel",
+    "url": "https://www.brampton.ca/en/Business/bec/Pages/Welcome.aspx"
+  },
+  {
+    "id": "1ad7a0fe-9e54-4136-a7c1-be9e16a1222d",
+    "slug": "brampton-venture-zone",
+    "name": "Brampton Venture Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/zone-learning/venture-zone-brampton"
+  },
+  {
+    "id": "9cd629b3-7858-44b8-8ac4-2c0bbb54dd97",
+    "slug": "brandeis-innovation",
+    "name": "Brandeis Innovation",
+    "type": "accel",
+    "url": "https://www.brandeis.edu/innovation/grant-programs/index-copy.html"
+  },
+  {
+    "id": "0792e17a-65f0-4c3b-b2ec-114551d79e46",
+    "slug": "bu-spark",
+    "name": "BU Spark",
+    "type": "accel",
+    "url": "https://www.bu.edu/spark/resources/hackathons"
+  },
+  {
+    "id": "4aef4e0f-cce7-46b9-91d0-aa2655737985",
+    "slug": "caltech-new-ventures",
+    "name": "Caltech New Ventures",
+    "type": "accel",
+    "url": "https://innovation.caltech.edu/new-ventures"
+  },
+  {
+    "id": "4a4fe67e-8956-419d-8575-76f298f4b9f8",
+    "slug": "canadian-technology-accelerators",
+    "name": "Canadian Technology Accelerators",
+    "type": "accel",
+    "url": "https://www.tradecommissioner.gc.ca/cta-atc/index.aspx?lang=eng"
+  },
+  {
+    "id": "52cfb332-2461-4862-a2fa-8aa1b92e6873",
+    "slug": "canadian-women-network",
+    "name": "Canadian Women's Network",
+    "type": "accel",
+    "url": "https://www.cwnsv.com"
+  },
+  {
+    "id": "d9e1bc32-305d-46aa-bb03-be21ccc854d1",
+    "slug": "carbon-trust",
+    "name": "Carbon Trust",
+    "type": "accel",
+    "url": "https://www.carbontrust.com"
+  },
+  {
+    "id": "ebee521a-d11f-4b9d-ab37-87d024130e5c",
+    "slug": "cardinal-ventures",
+    "name": "Cardinal Ventures",
+    "type": "accel",
+    "url": "https://www.cardinalventures.org"
+  },
+  {
+    "id": "1a067e54-4110-4824-bfd1-499426906863",
+    "slug": "catalyst-program",
+    "name": "Catalyst Program",
+    "type": "accel",
+    "url": "https://innovation.ucsf.edu/venture/catalyst-program"
+  },
+  {
+    "id": "2d775a25-5e94-411f-9e2c-8e0a4f090fd4",
+    "slug": "catalyze-cu",
+    "name": "Catalyze CU",
+    "type": "accel",
+    "url": "https://www.colorado.edu/catalyzecu"
+  },
+  {
+    "id": "687ecd49-cf1e-4292-aea7-a732f2e79989",
+    "slug": "cedar-sinai-accelerator",
+    "name": "Cedar Sinai Accelerator",
+    "type": "accel",
+    "url": "https://csaccelerator.com"
+  },
+  {
+    "id": "11c34d28-6c70-451c-a6d7-5ae7e70a0102",
+    "slug": "centech",
+    "name": "Centech",
+    "type": "accel",
+    "url": "https://centech.co"
+  },
+  {
+    "id": "9ec463cc-f020-4943-bb24-1e2de625911a",
+    "slug": "center-for-entrepreneurship-suffolk-university",
+    "name": "Center for Entrepreneurship Suffolk University",
+    "type": "accel",
+    "url": "https://www.suffolk.edu/business/centers-institutes/center-for-entrepreneurship"
+  },
+  {
+    "id": "8c3fc301-3a78-4b0a-b064-3711295ba773",
+    "slug": "center-for-transformative-action",
+    "name": "Center for Transformative Action",
+    "type": "accel",
+    "url": "http://www.centerfortransformativeaction.org/index.php"
+  },
+  {
+    "id": "adaa57d2-0fd6-46e9-8a22-e89351b2af97",
+    "slug": "centre-for-entrepreneurship",
+    "name": "Centre for Entrepreneurship University of Toronto",
+    "type": "accel",
+    "url": "https://www.entrepreneurship.artsci.utoronto.ca"
+  },
+  {
+    "id": "0afa1228-297f-479a-ad0e-a06c838309ac",
+    "slug": "centre-for-integrated-transportation-and-mobility",
+    "name": "Centre for Integrated Transportation and Mobility",
+    "type": "accel",
+    "url": "https://citm.ca"
+  },
+  {
+    "id": "6823709b-5882-49c5-af84-263fe3a6d961",
+    "slug": "centre-for-women-in-business",
+    "name": "Centre for Women in Business",
+    "type": "accel",
+    "url": "https://www.centreforwomeninbusiness.ca"
+  },
+  {
+    "id": "b76c5505-63ec-43f2-8440-d9fef51dcbc6",
+    "slug": "chan-zuckerberg-biohub-chicago",
+    "name": "Chan Zuckerberg Biohub Chicago",
+    "type": "accel",
+    "url": "https://www.czbiohub.org/chi"
+  },
+  {
+    "id": "c8be9b9a-4960-4f19-9aa8-195b99f6c44f",
+    "slug": "chan-zuckerberg-biohub-network",
+    "name": "Chan Zuckerberg Biohub Network",
+    "type": "accel",
+    "url": "https://www.czbiohub.org"
+  },
+  {
+    "id": "076b2fcf-0497-419e-8b2f-76d04cfffb5a",
+    "slug": "chicagoblend",
+    "name": "Chicago:Blend",
+    "type": "accel",
+    "url": "https://www.linkedin.com/company/chicago-blend"
+  },
+  {
+    "id": "899fe13f-ad37-48b4-aff0-0783af32073f",
+    "slug": "chobani-incubator",
+    "name": "Chobani Incubator",
+    "type": "accel",
+    "url": "https://www.chobani.com/impact/chobani-incubator"
+  },
+  {
+    "id": "00815064-3b26-4ce5-b839-52f91969c4e7",
+    "slug": "citris-foundry",
+    "name": "CITRIS Foundry",
+    "type": "accel",
+    "url": "https://citrisfoundry.org"
+  },
+  {
+    "id": "8166eb96-cef3-497e-9a16-add1d6b23514",
+    "slug": "clean-energy-zone",
+    "name": "Clean Energy Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/cue/clean-energy-zone"
+  },
+  {
+    "id": "d2f813fc-811e-48c7-9d6d-6457e9b1c01e",
+    "slug": "cleantech-open",
+    "name": "Cleantech Open",
+    "type": "accel",
+    "url": "https://www.cleantechopen.org"
+  },
+  {
+    "id": "9f28b388-1140-4b5a-8ddc-17ab45a43374",
+    "slug": "cogo-labs",
+    "name": "Cogo Labs",
+    "type": "accel",
+    "url": "https://www.cogolabs.com"
+  },
+  {
+    "id": "a5e1d1c1-af37-414c-bf53-7b1a995c42e4",
+    "slug": "collider",
+    "name": "Collider",
+    "type": "accel",
+    "url": "https://www.collider.io"
+  },
+  {
+    "id": "7d273158-828c-4885-808d-38761de3d3ea",
+    "slug": "columbia-startup-lab",
+    "name": "Columbia Startup Lab",
+    "type": "accel",
+    "url": "https://entrepreneurship.columbia.edu"
+  },
+  {
+    "id": "3a704a77-5777-4e5d-a6f0-66c54d9d722f",
+    "slug": "computer-science-innovation-lab-uoft",
+    "name": "Computer Science Innovation Lab UofT",
+    "type": "accel",
+    "url": "https://www.dcsil.ca"
+  },
+  {
+    "id": "1ebc029e-f510-4b74-97aa-967bcf7e2d69",
+    "slug": "cornell-food-venture-center",
+    "name": "Cornell Food Venture Center",
+    "type": "accel",
+    "url": "https://cals.cornell.edu/cornell-agritech/partners-institutes/cornell-food-venture-center"
+  },
+  {
+    "id": "e23ca158-e10b-4ef7-b8d9-04fd9f8f7446",
+    "slug": "creative-destruction-lab",
+    "name": "Creative Destruction Lab",
+    "type": "accel",
+    "url": "https://www.creativedestructionlab.com"
+  },
+  {
+    "id": "6d096de1-f3a7-4ec5-8517-dcc99dadeebd",
+    "slug": "creative-destruction-lab-vancouver",
+    "name": "Creative Destruction Lab Vancouver",
+    "type": "accel",
+    "url": "https://creativedestructionlab.com/locations/vancouver"
+  },
+  {
+    "id": "df6e6a82-201f-4731-a12f-155ed6e947c0",
+    "slug": "csi-technology-incubator",
+    "name": "CSI Technology Incubator",
+    "type": "accel",
+    "url": "https://www.csitechincubator.com"
+  },
+  {
+    "id": "e2f089fe-dc2d-4551-80c1-b6e7ec7d7937",
+    "slug": "cu-innovation-entrepreneurship",
+    "name": "CU Innovation & Entrepreneurship",
+    "type": "accel",
+    "url": "https://www.colorado.edu/innovate"
+  },
+  {
+    "id": "6ec5a14a-f0b2-4640-a133-577081089209",
+    "slug": "cuny-startups",
+    "name": "CUNY Startups",
+    "type": "accel",
+    "url": "https://cunystartups.com"
+  },
+  {
+    "id": "c6441c05-75b9-42f9-8ac0-c3213d00156f",
+    "slug": "data-pitch",
+    "name": "Data Pitch",
+    "type": "accel",
+    "url": "https://datapitch.eu"
+  },
+  {
+    "id": "b39d41d1-b798-49c1-b5d8-9207ca91a2e6",
+    "slug": "dcu-fintech-innovation-centre",
+    "name": "DCU Fintech Innovation Centre",
+    "type": "accel",
+    "url": "https://dcufintech.org"
+  },
+  {
+    "id": "b75a1ba2-5e24-48cc-a069-32cee38c8353",
+    "slug": "design-fabrication-zone",
+    "name": "Design Fabrication Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/zone-learning/design-fabrication-zone"
+  },
+  {
+    "id": "f6189a31-05fa-4263-86ff-496f566ab988",
+    "slug": "digital-media-and-gaming-incubator",
+    "name": "Digital Media and Gaming Incubator",
+    "type": "accel",
+    "url": "https://www.georgebrown.ca/arts-design-information-technology/design/the-industry/digital-media-and-gaming-incubator"
+  },
+  {
+    "id": "dcc5358f-b706-43c7-ac76-7a194385c2a2",
+    "slug": "digitalhealth-london",
+    "name": "DigitalHealth.London",
+    "type": "accel",
+    "url": "https://digitalhealth.london"
+  },
+  {
+    "id": "e1fbea9d-613c-4c20-ac2e-9552496834d8",
+    "slug": "disney-accelerator",
+    "name": "Disney Accelerator",
+    "type": "accel",
+    "url": "https://sites.disney.com/accelerator"
+  },
+  {
+    "id": "d9f2b056-7946-4878-9801-4e1fdf861937",
+    "slug": "distill-ventures",
+    "name": "Distill Ventures",
+    "type": "accel",
+    "url": "http://distillventures.com"
+  },
+  {
+    "id": "13ee829b-6d67-4165-adde-283c298b042f",
+    "slug": "district-3-innovation",
+    "name": "District 3 Innovation",
+    "type": "accel",
+    "url": "https://district3.co"
+  },
+  {
+    "id": "7cd2b79b-2618-4ba7-80a8-c440778d350a",
+    "slug": "dmz-tech-incubator",
+    "name": "DMZ Tech Incubator",
+    "type": "accel",
+    "url": "https://dmz.torontomu.ca"
+  },
+  {
+    "id": "82fecbdb-edfc-4c08-8226-d546e2386e0e",
+    "slug": "dmz-women-founders-accelerator-programs",
+    "name": "DMZ Women Founders Accelerator Programs",
+    "type": "accel",
+    "url": "https://dmz.torontomu.ca/womeninnovationprograms"
+  },
+  {
+    "id": "f8894549-b7a5-43f1-91f5-d3e02698f440",
+    "slug": "dobson-mcgill-university",
+    "name": "Dobson McGill University",
+    "type": "accel",
+    "url": "https://www.mcgill.ca/dobson"
+  },
+  {
+    "id": "877dff5d-361e-4244-93fe-31f1ddfaf0cf",
+    "slug": "draper-startup-house",
+    "name": "Draper Startup House",
+    "type": "accel",
+    "url": "https://draperstartuphouse.com"
+  },
+  {
+    "id": "538ab96c-cf9c-40ec-b0f4-62cb985c93ff",
+    "slug": "draper-startup-house-accelerator",
+    "name": "Draper Startup House Accelerator",
+    "type": "accel",
+    "url": "https://dshaccelerator.com"
+  }
+]

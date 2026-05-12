@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "webc",
+    "name": "WeBC",
+    "type": "accel",
+    "homepage_url": "https://we-bc.ca",
+    "discovered_apply_url": "https://we-bc.ca/work-with-us/",
+    "confidence": "high",
+    "notes": "Work with us page with GravityForms application"
+  },
+  {
+    "slug": "weve-acceleration",
+    "name": "WEVE Acceleration",
+    "type": "accel",
+    "homepage_url": "https://weveacceleration.com",
+    "discovered_apply_url": "https://weveacceleration.com/apply-2",
+    "confidence": "high",
+    "notes": "Dedicated apply page confirmed at /apply-2"
+  },
+  {
+    "slug": "rbc-women-in-cleantech-accelerator",
+    "name": "Women in Cleantech RBC Accelerator",
+    "type": "accel",
+    "homepage_url": "https://www.marsdd.com/service/women-in-cleantech-accelerator",
+    "discovered_apply_url": "https://marsdd.com/apply",
+    "confidence": "high",
+    "notes": "MaRS apply link found on page"
+  },
+  {
+    "slug": "womens-startup-lab",
+    "name": "Women's Startup Lab",
+    "type": "accel",
+    "homepage_url": "https://www.womenstartuplab.com",
+    "discovered_apply_url": "https://www.womenstartuplab.com/join-us/",
+    "confidence": "high",
+    "notes": "Join us page with GravityForms found"
+  },
+  {
+    "slug": "xrc-labs",
+    "name": "XRC Labs",
+    "type": "accel",
+    "homepage_url": "https://www.xrclabs.com",
+    "discovered_apply_url": "https://www.xrclabs.com/apply",
+    "confidence": "high",
+    "notes": "/apply link found on homepage"
+  },
+  {
+    "slug": "y2-labs",
+    "name": "Y2 Labs",
+    "type": "accel",
+    "homepage_url": "https://y2labs.co",
+    "discovered_apply_url": "https://y2labs.co/get-started/",
+    "confidence": "high",
+    "notes": "Get started page found"
+  },
+  {
+    "slug": "yedi-incubator",
+    "name": "YEDI Incubator",
+    "type": "accel",
+    "homepage_url": "https://yedi.ca",
+    "discovered_apply_url": "https://yedi.ca/get-started-at-yedi/",
+    "confidence": "high",
+    "notes": "Get started at YEDI page found"
+  },
+  {
+    "slug": "1984-ventures",
+    "name": "1984 Ventures",
+    "type": "vc",
+    "homepage_url": "https://1984.vc",
+    "discovered_apply_url": "https://1984.vc/apply/start",
+    "confidence": "high",
+    "notes": "Structured application with Start your application\" form at /apply/start\""
+  },
+  {
+    "slug": "2048-ventures",
+    "name": "2048 Ventures",
+    "type": "vc",
+    "homepage_url": "https://www.2048.vc",
+    "discovered_apply_url": "https://airtable.com/appV89PYGo3zN47f9/pagNjeYwHGADSGIs3/form",
+    "confidence": "high",
+    "notes": "Airtable structured application form found at /pitch"
+  },
+  {
+    "slug": "astia",
+    "name": "Astia",
+    "type": "vc",
+    "homepage_url": "https://www.astia.org",
+    "discovered_apply_url": "https://astia.my.site.com/connect/s/raiseapplication",
+    "confidence": "high",
+    "notes": "Clear Apply page with Salesforce-powered application portal for investment consideration; founders answer structured questions"
+  },
+  {
+    "slug": "bcf-ventures",
+    "name": "BCF Ventures",
+    "type": "vc",
+    "homepage_url": "https://bcfventures.vc",
+    "discovered_apply_url": "https://www.f6s.com/bcfventures/apply",
+    "confidence": "high",
+    "notes": "APPLY NOW button prominently links to F6s application portal; structured questions for founders"
+  },
+  {
+    "slug": "betaworks",
+    "name": "betaworks",
+    "type": "vc",
+    "homepage_url": "https://www.betaworks.com",
+    "discovered_apply_url": "https://www.betaworks.com/camp/application",
+    "confidence": "high",
+    "notes": "Camp application page with structured form; program currently in session; accepts next cohort applications for AI Camp; guaranteed investment up to $500k for accepted startups"
+  },
+  {
+    "slug": "bethnal-green-ventures",
+    "name": "Bethnal Green Ventures",
+    "type": "vc",
+    "homepage_url": "https://www.bethnalgreenventures.com",
+    "discovered_apply_url": "https://www.bethnalgreenventures.com/apply",
+    "confidence": "high",
+    "notes": "Dedicated apply page for BGV programme; open applications for Autumn 2026; structured intake form for tech-for-good founders"
+  },
+  {
+    "slug": "capitalize-vc",
+    "name": "Capitalize VC",
+    "type": "vc",
+    "homepage_url": "https://www.capitalizevc.com",
+    "discovered_apply_url": "https://airtable.com/apppvODtMSw09eCae/pagdarmEj6iMMvBob/form",
+    "confidence": "high",
+    "notes": "PITCH US button links to Airtable form with structured fields; prominent on homepage and footer"
+  },
+  {
+    "slug": "contrary",
+    "name": "Contrary",
+    "type": "vc",
+    "homepage_url": "https://contrary.com",
+    "discovered_apply_url": "https://applications.contrary.com/",
+    "confidence": "high",
+    "notes": "Applications subdomain listed in footer Resources section; dedicated applications portal for Contrary; talent and research-driven fund with structured applications"
+  },
+  {
+    "slug": "differential-vc",
+    "name": "Differential VC",
+    "type": "vc",
+    "homepage_url": "https://www.differential.vc",
+    "discovered_apply_url": "https://www.differential.vc/contact-us/submit-a-deck-form",
+    "confidence": "high",
+    "notes": "Submit a deck! link prominently in navigation and homepage; dedicated form page for startup deck submissions"
+  }
+]

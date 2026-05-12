@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "creative-destruction-lab",
+    "name": "Creative Destruction Lab",
+    "type": "accel",
+    "homepage_url": "https://www.creativedestructionlab.com",
+    "discovered_apply_url": "https://creativedestructionlab.com/application-triage/",
+    "confidence": "high",
+    "notes": "Link text \"Apply\" + apply href"
+  },
+  {
+    "slug": "design-fabrication-zone",
+    "name": "Design Fabrication Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/zone-learning/design-fabrication-zone",
+    "discovered_apply_url": "https://www.torontomu.ca/admissions/",
+    "confidence": "high",
+    "notes": "Apply CTA: \"Apply\""
+  },
+  {
+    "slug": "digital-media-and-gaming-incubator",
+    "name": "Digital Media and Gaming Incubator",
+    "type": "accel",
+    "homepage_url": "https://www.georgebrown.ca/arts-design-information-technology/design/the-industry/digital-media-and-gaming-incubator",
+    "discovered_apply_url": "https://www.georgebrown.ca/apply",
+    "confidence": "high",
+    "notes": "\"Apply\" + apply href"
+  },
+  {
+    "slug": "district-3-innovation",
+    "name": "District 3 Innovation",
+    "type": "accel",
+    "homepage_url": "https://district3.co",
+    "discovered_apply_url": "https://district3.co/apply",
+    "confidence": "high",
+    "notes": "\"apply\" + apply href"
+  },
+  {
+    "slug": "ecommerce-north",
+    "name": "eCommerce North",
+    "type": "accel",
+    "homepage_url": "https://ecommercenorth.ca",
+    "discovered_apply_url": "https://elevateca.typeform.com/to/bIR5c2lA",
+    "confidence": "high",
+    "notes": "Typeform apply link (text: APPLY NOW)"
+  },
+  {
+    "slug": "elab-cornell-university",
+    "name": "eLab Cornell University",
+    "type": "accel",
+    "homepage_url": "https://www.elabstartup.com",
+    "discovered_apply_url": "https://www.elabstartup.com/apply/",
+    "confidence": "high",
+    "notes": "Apply Now"
+  },
+  {
+    "slug": "entrepreneur-first",
+    "name": "Entrepreneur First",
+    "type": "accel",
+    "homepage_url": "https://www.joinef.com",
+    "discovered_apply_url": "https://apply.joinef.com",
+    "confidence": "high",
+    "notes": "APPLY HERE"
+  },
+  {
+    "slug": "forum-ventures",
+    "name": "Forum Ventures",
+    "type": "accel",
+    "homepage_url": "https://www.forumvc.com",
+    "discovered_apply_url": "https://form.fillout.com/t/vrThVwGMuEus",
+    "confidence": "high",
+    "notes": "Fillout form embedded on /pitch-us page"
+  },
+  {
+    "slug": "founder-institute",
+    "name": "Founder Institute",
+    "type": "accel",
+    "homepage_url": "https://fi.co",
+    "discovered_apply_url": "https://fi.co/join/home",
+    "confidence": "high",
+    "notes": "Apply Now"
+  },
+  {
+    "slug": "founders-factory",
+    "name": "Founders Factory",
+    "type": "accel",
+    "homepage_url": "https://foundersfactory.com",
+    "discovered_apply_url": "https://form.typeform.com/to/WlDiIsRh",
+    "confidence": "high",
+    "notes": "Typeform apply link (text: Apply)"
+  },
+  {
+    "slug": "greentown-labs",
+    "name": "Greentown Labs",
+    "type": "accel",
+    "homepage_url": "https://greentownlabs.com",
+    "discovered_apply_url": "https://greentownlabs.com/apply-now/",
+    "confidence": "high",
+    "notes": "Apply Now"
+  },
+  {
+    "slug": "iterative",
+    "name": "Iterative",
+    "type": "accel",
+    "homepage_url": "https://www.iterative.vc",
+    "discovered_apply_url": "https://www.iterative.vc/apply",
+    "confidence": "high",
+    "notes": "Apply now"
+  },
+  {
+    "slug": "launch-ny",
+    "name": "Launch NY",
+    "type": "accel",
+    "homepage_url": "https://launchny.org",
+    "discovered_apply_url": "https://launchny.org/entrepreneurs/apply-now",
+    "confidence": "high",
+    "notes": "Explicit 'Apply Now' link in nav and multiple CTAs"
+  },
+  {
+    "slug": "launchpad-la",
+    "name": "Launchpad LA",
+    "type": "accel",
+    "homepage_url": "https://launchpad.la",
+    "discovered_apply_url": "https://launchpad.la/apply/",
+    "confidence": "high",
+    "notes": "Direct /apply path in nav"
+  },
+  {
+    "slug": "le-pont-quebec",
+    "name": "Le Pont Quebec",
+    "type": "accel",
+    "homepage_url": "https://www.lepont.io/en/home",
+    "discovered_apply_url": "https://lepont.io/en/apply",
+    "confidence": "high",
+    "notes": "Direct /apply link in nav"
+  },
+  {
+    "slug": "league-of-innovators",
+    "name": "League of Innovators",
+    "type": "accel",
+    "homepage_url": "https://www.theleagueofinnovators.org",
+    "discovered_apply_url": "https://www.loi.ac/find-your-program",
+    "confidence": "high",
+    "notes": "Explicit 'APPLY NOW - it's free' CTA linking to program finder; Airtable form embedded"
+  }
+]

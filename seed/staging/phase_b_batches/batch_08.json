@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "boston-startup-idea-to-ipo",
+    "name": "Boston Startup: Idea to IPO",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/Boston-Idea-to-IPO",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-idea-to-ipo%2F",
+    "confidence": "high",
+    "notes": "Meetup group signup; individual events register via Eventbrite links"
+  },
+  {
+    "slug": "boulder-startup-week",
+    "name": "Boulder Startup Week",
+    "type": "other",
+    "homepage_url": "https://boulderstartupweek.com",
+    "discovered_apply_url": "https://revelco.org/bsw/",
+    "confidence": "high",
+    "notes": "Registration at revelco.org/bsw; also sponsor and volunteer options; annual event"
+  },
+  {
+    "slug": "buffalo-startup-week",
+    "name": "Buffalo Startup Week",
+    "type": "other",
+    "homepage_url": "https://www.startupweekbuffalo.com",
+    "discovered_apply_url": "https://luma.com/a35ob3fy",
+    "confidence": "high",
+    "notes": "Multiple event registrations via lu.ma; Founder Day and Ecosystem/Capital tracks"
+  },
+  {
+    "slug": "calgary-hackathon",
+    "name": "Calgary Hackathon",
+    "type": "other",
+    "homepage_url": "https://www.yychacks.ca",
+    "discovered_apply_url": "https://www.showpass.com/yyc-hacks-chinook-blast-2024",
+    "confidence": "high",
+    "notes": "Showpass ticket link for YYC Hacks; annual hackathon in Calgary"
+  },
+  {
+    "slug": "canadian-innovation-exchange",
+    "name": "Canadian Innovation Exchange",
+    "type": "other",
+    "homepage_url": "https://cixsummit.com",
+    "discovered_apply_url": "https://cixsummit.com/tickets/",
+    "confidence": "high",
+    "notes": "Tickets/registration page at /tickets; also CIX Startup Awards application for startups"
+  },
+  {
+    "slug": "centre-for-social-innovation",
+    "name": "Centre for Social Innovation",
+    "type": "other",
+    "homepage_url": "https://socialinnovation.org",
+    "discovered_apply_url": "https://socialinnovation.org/join-us/membership/",
+    "confidence": "high",
+    "notes": "Membership plans page at /join-us/membership; community and coworking memberships"
+  },
+  {
+    "slug": "chicago-startup-community",
+    "name": "Chicago Startup Community",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/chicago-startup-community",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fchicago-startup-community%2F",
+    "confidence": "high",
+    "notes": "Meetup group signup; also Discord at discord.gg/K8ecPrZ4e9"
+  },
+  {
+    "slug": "dc-tech-venture-coalition",
+    "name": "DC Tech & Venture Coalition",
+    "type": "other",
+    "homepage_url": "https://www.dctav.co",
+    "discovered_apply_url": "https://dctav.wufoo.com/forms/dctav-join-us/",
+    "confidence": "high",
+    "notes": "Wufoo membership application form found on homepage"
+  },
+  {
+    "slug": "designx-community",
+    "name": "DesignX Community",
+    "type": "other",
+    "homepage_url": "https://designx.community",
+    "discovered_apply_url": "https://designx.community/join",
+    "confidence": "high",
+    "notes": "Explicit application process: apply once to join community \u2014 form with questions"
+  },
+  {
+    "slug": "dx3-canada",
+    "name": "DX3 Canada",
+    "type": "other",
+    "homepage_url": "https://www.dx3canada.com",
+    "discovered_apply_url": "https://dx3canada.com/register",
+    "confidence": "high",
+    "notes": "Conference registration page found directly on homepage"
+  },
+  {
+    "slug": "founder-led-biotech-summit",
+    "name": "Founder-led Biotech Summit",
+    "type": "other",
+    "homepage_url": "https://founderledbio.com",
+    "discovered_apply_url": "https://founderledbio.com/tour/",
+    "confidence": "high",
+    "notes": "Register CTA found; tour registration page for in-person events"
+  },
+  {
+    "slug": "foundersbeta",
+    "name": "FoundersBeta",
+    "type": "other",
+    "homepage_url": "https://www.foundersbeta.com",
+    "discovered_apply_url": "https://foundersbeta.com/membership/",
+    "confidence": "high",
+    "notes": "Become a Member CTA links to membership page \u2014 community with application process"
+  },
+  {
+    "slug": "fuck-up-toronto",
+    "name": "Fuck Up Toronto",
+    "type": "other",
+    "homepage_url": "https://www.fuckupnightsto.ca",
+    "discovered_apply_url": "https://docs.google.com/forms/d/e/1FAIpQLScK51l0f4BJA7X_ba4vSd-887aHJv5OQXwJHxLqYvdva7xUhw/viewform",
+    "confidence": "high",
+    "notes": "Google Form to apply as a speaker found prominently on homepage"
+  },
+  {
+    "slug": "greater-kw-chamber-of-commerce",
+    "name": "Greater KW Chamber of Commerce",
+    "type": "other",
+    "homepage_url": "https://greaterkwchamber.com",
+    "discovered_apply_url": "https://greaterkwchamber.com/membership/join",
+    "confidence": "high",
+    "notes": "Become A Member link found; membership join page"
+  },
+  {
+    "slug": "guelph-chamber-of-commerce",
+    "name": "Guelph Chamber of Commerce",
+    "type": "other",
+    "homepage_url": "https://www.guelphchamber.com",
+    "discovered_apply_url": "https://www.guelphchamber.com/membership/become-a-member",
+    "confidence": "high",
+    "notes": "Join Now CTA links to become-a-member page"
+  },
+  {
+    "slug": "hacktx",
+    "name": "HackTX",
+    "type": "other",
+    "homepage_url": "https://hacktx.com",
+    "discovered_apply_url": "https://rodeo.freetailhackers.com/",
+    "confidence": "high",
+    "notes": "Apply Now button links to Rodeo hacker portal"
+  }
+]

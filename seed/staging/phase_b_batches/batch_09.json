@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "hamilton-chamber-of-commerce",
+    "name": "Hamilton Chamber of Commerce",
+    "type": "other",
+    "homepage_url": "https://www.hamiltonchamber.ca/events-home",
+    "discovered_apply_url": "https://www.hamiltonchamber.ca/join-now/",
+    "confidence": "high",
+    "notes": "Join Now CTA found on events page; membership application"
+  },
+  {
+    "slug": "hive-vancouver-society",
+    "name": "HiVE Vancouver Society",
+    "type": "other",
+    "homepage_url": "https://www.hivevancouver.com",
+    "discovered_apply_url": "https://www.hivevancouver.com/memberships",
+    "confidence": "high",
+    "notes": "Join Now / Get Started CTAs link to memberships page; coworking community application"
+  },
+  {
+    "slug": "impact-hub-ottawa",
+    "name": "Impact Hub Ottawa",
+    "type": "other",
+    "homepage_url": "https://ottawa.impacthub.net",
+    "discovered_apply_url": "https://ottawa.impacthub.net/become-a-member/",
+    "confidence": "high",
+    "notes": "Membership application page found; multiple tiers with structured process"
+  },
+  {
+    "slug": "lahacks",
+    "name": "LAHacks",
+    "type": "other",
+    "homepage_url": "https://lahacks.com",
+    "discovered_apply_url": "https://apply.lahacks.com",
+    "confidence": "high",
+    "notes": "Direct apply subdomain found in page source"
+  },
+  {
+    "slug": "mit-hacking-medicine",
+    "name": "MIT Hacking Medicine",
+    "type": "other",
+    "homepage_url": "https://www.hackingmedicine.mit.edu",
+    "discovered_apply_url": "https://www.hackingmedicine.mit.edu/events/grandhack-2026",
+    "confidence": "high",
+    "notes": "GrandHack 2026 event page found; hackathon with application/registration process"
+  },
+  {
+    "slug": "onramp-coworking-university-of-toronto",
+    "name": "ONRamp Coworking University of Toronto",
+    "type": "other",
+    "homepage_url": "https://entrepreneurs.utoronto.ca/about/our-space",
+    "discovered_apply_url": "https://ute.acceleratorapp.co/application/new?program=onramp%20membership",
+    "confidence": "high",
+    "notes": "AcceleratorApp application form found directly in page links"
+  },
+  {
+    "slug": "payment-summit-canada",
+    "name": "Payment Summit Canada",
+    "type": "other",
+    "homepage_url": "https://www.thesummit.ca",
+    "discovered_apply_url": "https://www.thesummit.ca/page/5013974/register",
+    "confidence": "high",
+    "notes": "Register page found via curl redirect; 2026 Payments Canada SUMMIT registration"
+  },
+  {
+    "slug": "people-analytics-summit",
+    "name": "People Analytics Summit",
+    "type": "other",
+    "homepage_url": "https://www.peopleanalyticscanada.com",
+    "discovered_apply_url": "https://strategyinstitute-21235114.hs-sites.com/pa-2026-register-your-interest-for-2026",
+    "confidence": "high",
+    "notes": "HubSpot registration interest form found on homepage"
+  },
+  {
+    "slug": "productbc",
+    "name": "ProductBC",
+    "type": "other",
+    "homepage_url": "https://productbc.ca",
+    "discovered_apply_url": "https://productbc.ca/joinnow/",
+    "confidence": "high",
+    "notes": "Join Now CTA links to membership application page"
+  },
+  {
+    "slug": "queens-startup-summit",
+    "name": "Queen's Startup Summit",
+    "type": "other",
+    "homepage_url": "https://qssummit.com",
+    "discovered_apply_url": "https://qssummit.com",
+    "confidence": "high",
+    "notes": "Homepage CTA is 'Register Now' linking to site root (TBA date); delegate registration page at same domain"
+  },
+  {
+    "slug": "saas-connect",
+    "name": "SaaS Connect",
+    "type": "other",
+    "homepage_url": "https://www.cloudsoftwareassociation.com/saas-connect",
+    "discovered_apply_url": "https://www.eventbrite.ca/e/477618779627",
+    "confidence": "high",
+    "notes": "Eventbrite registration link found directly on page ('Register now' button)"
+  },
+  {
+    "slug": "saas-north",
+    "name": "SaaS North",
+    "type": "other",
+    "homepage_url": "https://saasnorth.com",
+    "discovered_apply_url": "https://saasnorth.com/get-your-saas-pass-2026/",
+    "confidence": "high",
+    "notes": "Primary CTA 'GET YOUR SAAS PASS' links to /get-your-saas-pass-2026/; also Apply to Exhibit and Apply to Speak"
+  },
+  {
+    "slug": "saastock",
+    "name": "SaaStock",
+    "type": "other",
+    "homepage_url": "https://www.saastock.com",
+    "discovered_apply_url": "https://saastock.typeform.com/to/yb3fdaB1",
+    "confidence": "high",
+    "notes": "Founder membership apply button links to Typeform; also /founder-membership/ page"
+  },
+  {
+    "slug": "saastr-apac",
+    "name": "SaaStr APAC",
+    "type": "other",
+    "homepage_url": "https://saastrapac.com",
+    "discovered_apply_url": "https://saastrapac.com/rsvp",
+    "confidence": "high",
+    "notes": "Primary CTA 'GRAB TICKETS!' / 'RSVP TO ATTEND' links to /rsvp; Attendee Portal also available"
+  },
+  {
+    "slug": "seneca-college-hackathon",
+    "name": "Seneca College Hackathon",
+    "type": "other",
+    "homepage_url": "https://www.senecahackathon.com",
+    "discovered_apply_url": "https://www.senecahackathon.com/register",
+    "confidence": "high",
+    "notes": "Multiple 'REGISTER NOW' CTAs linking directly to /register"
+  },
+  {
+    "slug": "sf-hacks",
+    "name": "SF Hacks",
+    "type": "other",
+    "homepage_url": "https://sfhacks.io",
+    "discovered_apply_url": "https://app.sfhacks.io/",
+    "confidence": "high",
+    "notes": "Apply and Register buttons both link to app.sfhacks.io; MLH 2026 badge present"
+  }
+]

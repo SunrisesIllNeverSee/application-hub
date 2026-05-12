@@ -1,0 +1,555 @@
+[
+  {
+    "id": "12e670b5-48b9-4ec5-9992-a54928ff19ba",
+    "slug": "colorado-startups",
+    "name": "Colorado Startups",
+    "type": "other",
+    "url": "https://coloradostartups.org"
+  },
+  {
+    "id": "6e787f8b-9e5e-402a-976a-88e259903b1f",
+    "slug": "colorado-startups-event-connect",
+    "name": "Colorado Startups Event Connect",
+    "type": "other",
+    "url": "https://coloradostartups.org/event-connect"
+  },
+  {
+    "id": "a0da8fb2-f6dc-40f5-9d84-eb7b9af4a1fe",
+    "slug": "communitech-customer-success",
+    "name": "Communitech Customer Success",
+    "type": "other",
+    "url": "https://www.meetup.com/Customer-Success-Leaders-P2P"
+  },
+  {
+    "id": "cd0afced-ea4a-42fb-99b1-e65563e64942",
+    "slug": "communitech-hrnet",
+    "name": "Communitech HRnet",
+    "type": "other",
+    "url": "https://www.meetup.com/hrnet-p2p"
+  },
+  {
+    "id": "5dab1968-3c1f-43e8-9961-74a3353b7ac3",
+    "slug": "communitech-job-seekers",
+    "name": "Communitech Job Seekers",
+    "type": "other",
+    "url": "https://www.meetup.com/job-seekers-connex-p2p"
+  },
+  {
+    "id": "7a08dfab-5706-4bd4-ad1a-1c17d81d8fe5",
+    "slug": "communitech-marketing-p2p",
+    "name": "Communitech Marketing P2P",
+    "type": "other",
+    "url": "https://www.meetup.com/strategic-marketing-peer2peer"
+  },
+  {
+    "id": "3bcc2de9-e44e-4add-a848-32c0a5e9006a",
+    "slug": "communitech-product-management-p2p",
+    "name": "Communitech Product Management P2P",
+    "type": "other",
+    "url": "https://www.meetup.com/product-management-p2p-2"
+  },
+  {
+    "id": "70e5d22c-326f-49cb-ad1e-72c493c251ad",
+    "slug": "communitech-sales-leaders",
+    "name": "Communitech Sales Leaders",
+    "type": "other",
+    "url": "https://www.meetup.com/sales-leaders-p2p"
+  },
+  {
+    "id": "ecd75570-f43c-49af-998f-2ba63cf6a016",
+    "slug": "communitech-uxwaterloo",
+    "name": "Communitech uxWaterloo",
+    "type": "other",
+    "url": "https://www.meetup.com/uxwaterloo-p2p"
+  },
+  {
+    "id": "af11ac88-9ec1-40df-bc90-283af449bb6b",
+    "slug": "comotion",
+    "name": "CoMotion",
+    "type": "other",
+    "url": "https://www.comotiongroup.ca"
+  },
+  {
+    "id": "7671eccd-9f34-4d3c-804a-7a49a27852ae",
+    "slug": "crew-collective-cafe",
+    "name": "Crew Collective & Caf\u00e9",
+    "type": "other",
+    "url": "https://www.crewcollectivecafe.com"
+  },
+  {
+    "id": "b0c1096a-da67-4676-ae6d-1f135c35bb5d",
+    "slug": "dc-startup-week",
+    "name": "DC Startup Week",
+    "type": "other",
+    "url": "https://www.dcstartupweek.org"
+  },
+  {
+    "id": "74741c16-2f96-4195-a0bc-d23ca2712840",
+    "slug": "dc-tech-venture-coalition",
+    "name": "DC Tech & Venture Coalition",
+    "type": "other",
+    "url": "https://www.dctav.co"
+  },
+  {
+    "id": "0afc562d-c5d4-4dab-90ba-1bd077ee6464",
+    "slug": "deerhacks-utm",
+    "name": "DeerHacks UTM",
+    "type": "other",
+    "url": "https://deerhacks.mcss.club"
+  },
+  {
+    "id": "b28e5e66-3204-4c3c-a33c-f6bd93c1df99",
+    "slug": "deltahacks",
+    "name": "DeltaHacks",
+    "type": "other",
+    "url": "https://deltahacks.com"
+  },
+  {
+    "id": "7e0f3b44-88df-4636-80a4-cec9bc93a585",
+    "slug": "denver-ai-developers-group",
+    "name": "Denver AI Developers Group",
+    "type": "other",
+    "url": "https://www.meetup.com/aittg-denver"
+  },
+  {
+    "id": "a87f7210-c8db-45e1-abf7-68a6c44d672c",
+    "slug": "denver-startup-week",
+    "name": "Denver Startup Week",
+    "type": "other",
+    "url": "https://www.denverstartupweek.org"
+  },
+  {
+    "id": "d7251f5e-fa93-4f64-817f-088a120701f2",
+    "slug": "designx-community",
+    "name": "DesignX Community",
+    "type": "other",
+    "url": "https://designx.community"
+  },
+  {
+    "id": "eb2b4f2a-dd49-4569-a1e4-08caf001d633",
+    "slug": "disrupt-hr-toronto",
+    "name": "Disrupt HR Toronto",
+    "type": "other",
+    "url": "https://disrupthr.co/city/vaughan"
+  },
+  {
+    "id": "1aaff906-7502-455f-98a2-802b09359c33",
+    "slug": "dx3-canada",
+    "name": "DX3 Canada",
+    "type": "other",
+    "url": "https://www.dx3canada.com"
+  },
+  {
+    "id": "9285062d-e6b6-47d2-b1b4-e342df463d80",
+    "slug": "elevate",
+    "name": "Elevate",
+    "type": "other",
+    "url": "https://elevate.ca"
+  },
+  {
+    "id": "8de12d88-0676-4e93-b23b-4ce11640c6c5",
+    "slug": "ellehacks",
+    "name": "ElleHacks",
+    "type": "other",
+    "url": "https://ellehacks.com"
+  },
+  {
+    "id": "2a047445-a12b-498e-ad9a-804d65036263",
+    "slug": "entrepreneurship-society",
+    "name": "Entrepreneurship Society University of Waterloo",
+    "type": "other",
+    "url": "https://entsoc.ca"
+  },
+  {
+    "id": "948ef672-5387-4e4c-b494-8309a69295d0",
+    "slug": "ff-venture-capital",
+    "name": "ff Venture Capital",
+    "type": "other",
+    "url": "https://ffvc.com"
+  },
+  {
+    "id": "b551168d-a6d4-44d1-bac7-8b3ff238f322",
+    "slug": "fifty-years",
+    "name": "Fifty Years",
+    "type": "other",
+    "url": "https://fiftyyears.com"
+  },
+  {
+    "id": "98f3af66-fbb9-4dbc-9152-042073d6ceed",
+    "slug": "flash-pitch",
+    "name": "Flash Pitch",
+    "type": "other",
+    "url": "https://www.flashpitch.nyc"
+  },
+  {
+    "id": "bc1b02dd-8397-45cc-a2e6-8fde23676827",
+    "slug": "flat6labs-uae",
+    "name": "FLAT6LABS UAE",
+    "type": "other",
+    "url": "https://www.flat6labs.com/Location/uae"
+  },
+  {
+    "id": "a8445045-4c37-4aff-a7cd-f81696bfb51a",
+    "slug": "founder-fridays",
+    "name": "Founder Fridays",
+    "type": "other",
+    "url": "https://rsvp.withgoogle.com/events/founder-fridays/what-is-founder-fridays"
+  },
+  {
+    "id": "6d1bf1a3-af51-459d-8d7d-3d7aa39d9d2a",
+    "slug": "founder-led-biotech-summit",
+    "name": "Founder-led Biotech Summit",
+    "type": "other",
+    "url": "https://founderledbio.com"
+  },
+  {
+    "id": "dd49b703-8182-4b49-b727-62793dea7f20",
+    "slug": "founders-village",
+    "name": "Founders Village",
+    "type": "other",
+    "url": "https://www.foundersvillage.co"
+  },
+  {
+    "id": "a2a5ba64-ec00-4c85-9e99-8bf50ce4e925",
+    "slug": "foundersbeta",
+    "name": "FoundersBeta",
+    "type": "other",
+    "url": "https://www.foundersbeta.com"
+  },
+  {
+    "id": "b71d9c84-9fb2-4deb-887e-dce90fee8d8b",
+    "slug": "fuck-up-toronto",
+    "name": "Fuck Up Toronto",
+    "type": "other",
+    "url": "https://www.fuckupnightsto.ca"
+  },
+  {
+    "id": "609d6f59-c241-4649-90ac-d7b45d359fea",
+    "slug": "get-cities",
+    "name": "GET Cities",
+    "type": "other",
+    "url": "https://www.getcities.org"
+  },
+  {
+    "id": "926c1baf-a1a8-4266-9e03-617217bb150e",
+    "slug": "google-developer-groups-boulder",
+    "name": "Google Developer Groups Boulder",
+    "type": "other",
+    "url": "https://www.meetup.com/Google-Developer-Group-Boulder"
+  },
+  {
+    "id": "ccf41c15-e2e5-4646-ad63-bd8bd1366189",
+    "slug": "greater-kw-chamber-of-commerce",
+    "name": "Greater KW Chamber of Commerce",
+    "type": "other",
+    "url": "https://greaterkwchamber.com"
+  },
+  {
+    "id": "b2cefef8-7c77-4449-b0b2-c6333e638876",
+    "slug": "gryphhacks",
+    "name": "GryphHacks",
+    "type": "other",
+    "url": "https://gryphhacks.com/home"
+  },
+  {
+    "id": "5193df24-1e75-4b09-9ef4-9c584143977b",
+    "slug": "guelph-chamber-of-commerce",
+    "name": "Guelph Chamber of Commerce",
+    "type": "other",
+    "url": "https://www.guelphchamber.com"
+  },
+  {
+    "id": "2aa85d8a-a639-4ae8-9ef7-15f607cc8a05",
+    "slug": "hack-nyu",
+    "name": "Hack NYU",
+    "type": "other",
+    "url": "https://hacknyu.org"
+  },
+  {
+    "id": "9e6e11d5-0880-47e8-ae26-a891280a671e",
+    "slug": "hack-the-north",
+    "name": "Hack the North",
+    "type": "other",
+    "url": "https://hackthenorth.com"
+  },
+  {
+    "id": "bb35365e-b435-4fa9-96ac-d0a07ae1dd7b",
+    "slug": "hack-western",
+    "name": "Hack Western",
+    "type": "other",
+    "url": "https://www.hackwestern.com"
+  },
+  {
+    "id": "629c37dc-c70b-4e00-ba41-d7e5bbd3358d",
+    "slug": "hackathon-101",
+    "name": "Hackathon 101",
+    "type": "other",
+    "url": "https://calendar.ucdenver.edu/event/hackathon_101_8956"
+  },
+  {
+    "id": "bbbcc788-743d-4139-9359-e2f2257fa874",
+    "slug": "hacktx",
+    "name": "HackTX",
+    "type": "other",
+    "url": "https://hacktx.com"
+  },
+  {
+    "id": "b2caaf6b-a920-455d-b1b6-83515a3834dd",
+    "slug": "hamilton-chamber-of-commerce",
+    "name": "Hamilton Chamber of Commerce",
+    "type": "other",
+    "url": "https://www.hamiltonchamber.ca/events-home"
+  },
+  {
+    "id": "f9a3c51a-c15b-4246-80cc-f8c61d925378",
+    "slug": "herdata",
+    "name": "HER+Data",
+    "type": "other",
+    "url": "https://www.meetup.com/her-data"
+  },
+  {
+    "id": "f373e570-efb0-4e15-8dd5-ba299ef0deba",
+    "slug": "hive-vancouver-society",
+    "name": "HiVE Vancouver Society",
+    "type": "other",
+    "url": "https://www.hivevancouver.com"
+  },
+  {
+    "id": "98504b3f-d585-42b2-a04a-0d18a33112ab",
+    "slug": "impact-hub-ottawa",
+    "name": "Impact Hub Ottawa",
+    "type": "other",
+    "url": "https://ottawa.impacthub.net"
+  },
+  {
+    "id": "c7ad8eee-841b-4b4b-bd6b-58db482b8503",
+    "slug": "innovate-finance-global-summit",
+    "name": "Innovate Finance Global Summit",
+    "type": "other",
+    "url": "https://www.innovatefinance.com/ifgs2023"
+  },
+  {
+    "id": "decf252e-a543-428b-9ef5-4c6c1e01c199",
+    "slug": "innovator-network-of-canada",
+    "name": "Innovator Network of Canada",
+    "type": "other",
+    "url": "https://www.linkedin.com/showcase/innovator-network-of-canada"
+  },
+  {
+    "id": "447bf6d8-e959-40a2-9ad7-343cffffba45",
+    "slug": "inspired-capital",
+    "name": "Inspired Capital",
+    "type": "other",
+    "url": "https://inspiredcapital.com"
+  },
+  {
+    "id": "57792772-dc54-4397-8fa0-a3ab037a24ba",
+    "slug": "inventures",
+    "name": "Inventures",
+    "type": "other",
+    "url": "https://inventurescanada.com"
+  },
+  {
+    "id": "f05c49a0-b01b-4e53-a756-5dcd525dc4fc",
+    "slug": "ivey-venture-capital-club",
+    "name": "Ivey Venture Capital Club",
+    "type": "other",
+    "url": "https://www.linkedin.com/company/ivey-venture-capital-club/?originalSubdomain=ca"
+  },
+  {
+    "id": "102a74a8-be59-4f23-96f3-c96da296e30a",
+    "slug": "jelly-social",
+    "name": "Jelly Social",
+    "type": "other",
+    "url": "https://jellysocial.ca"
+  },
+  {
+    "id": "0a3652ee-5216-435c-af73-48d37812924b",
+    "slug": "lahacks",
+    "name": "LAHacks",
+    "type": "other",
+    "url": "https://lahacks.com"
+  },
+  {
+    "id": "7d5fdb0a-aee9-4b3c-9833-9fc45d18a5f6",
+    "slug": "angel-summit",
+    "name": "Launch Angel Summit",
+    "type": "other",
+    "url": "https://www.launchangelsummit.com"
+  },
+  {
+    "id": "ffac10fd-c821-459b-89b8-a4cbb076fabe",
+    "slug": "ldv-capital",
+    "name": "LDV Capital",
+    "type": "other",
+    "url": "https://www.linkedin.com/company/ldv-capital"
+  },
+  {
+    "id": "67f808c6-998e-4fc6-8215-3f308019b386",
+    "slug": "legacy-conference",
+    "name": "Legacy Conference",
+    "type": "other",
+    "url": "https://www.legacycan.ca"
+  },
+  {
+    "id": "be75e431-6f9b-4354-a644-b5ce8ebc368c",
+    "slug": "mesh-conference",
+    "name": "mesh conference",
+    "type": "other",
+    "url": "https://meshconference.com"
+  },
+  {
+    "id": "8dc09b8a-b08b-4ca5-bd35-c281046d3538",
+    "slug": "miami-hack-week",
+    "name": "Miami Hack Week",
+    "type": "other",
+    "url": "https://www.miamihackweek.com"
+  },
+  {
+    "id": "1ad69c6d-7394-454a-a12e-3e0453607cce",
+    "slug": "miami-nft-week",
+    "name": "Miami NFT Week",
+    "type": "other",
+    "url": "https://miaminftweek.com"
+  },
+  {
+    "id": "1cdeb18a-ec9a-4b80-a4c9-c95c4963530e",
+    "slug": "miami-tech-life",
+    "name": "Miami Tech Life",
+    "type": "other",
+    "url": "https://www.miamitech.life"
+  },
+  {
+    "id": "daf62eed-3905-440e-82f6-65dbf3f80207",
+    "slug": "miami-tech-summit",
+    "name": "Miami Tech Summit",
+    "type": "other",
+    "url": "https://techsummitmiami.com"
+  },
+  {
+    "id": "173f7849-62f8-49cc-b055-6464c54113b9",
+    "slug": "mindshare-workplace-mississauga",
+    "name": "Mindshare Workplace Mississauga",
+    "type": "other",
+    "url": "https://mindshareworkspace.com"
+  },
+  {
+    "id": "a5169c1b-c8c3-4daf-a247-fc48db02044b",
+    "slug": "mississauga-board-of-trade",
+    "name": "Mississauga Board of Trade",
+    "type": "other",
+    "url": "https://mbot.com"
+  },
+  {
+    "id": "83a568ac-88b2-47ad-9d0d-93e848f52e9a",
+    "slug": "mit-hacking-medicine",
+    "name": "MIT Hacking Medicine",
+    "type": "other",
+    "url": "https://www.hackingmedicine.mit.edu"
+  },
+  {
+    "id": "3457b7c4-dff3-4a79-8e4f-71573c2df6de",
+    "slug": "montreal-newtech",
+    "name": "Montreal NewTech",
+    "type": "other",
+    "url": "https://www.montrealnewtech.com"
+  },
+  {
+    "id": "5ba723ae-e249-408f-80e1-fcc1d39c4f4d",
+    "slug": "motiv-digital",
+    "name": "Motiv Digital",
+    "type": "other",
+    "url": "https://motiv.digital"
+  },
+  {
+    "id": "a05e430a-0ec8-4070-98b3-f06b34c1a48d",
+    "slug": "move-mobility-reimagined",
+    "name": "MOVE Mobility ReImagined",
+    "type": "other",
+    "url": "https://movemnt.net/events"
+  },
+  {
+    "id": "85f06677-f090-4ca0-abd9-c5f758c0b694",
+    "slug": "new-tech-colorado",
+    "name": "New Tech Colorado",
+    "type": "other",
+    "url": "https://www.meetup.com/bdnewtech"
+  },
+  {
+    "id": "db4143fd-5b71-4f68-b7de-6cc9d5ccccdd",
+    "slug": "new-york-fintech-week",
+    "name": "New York Fintech Week",
+    "type": "other",
+    "url": "https://empirestartups.com/events/new-york-fintech-week"
+  },
+  {
+    "id": "81234214-29cf-4fd5-8ede-e1fb287371ea",
+    "slug": "nwplus",
+    "name": "nwPlus",
+    "type": "other",
+    "url": "https://nwplus.io"
+  },
+  {
+    "id": "c7675fac-bddb-4fa8-bbf9-b4b9a901c8db",
+    "slug": "ny-tech-meetup",
+    "name": "NY Tech Meetup",
+    "type": "other",
+    "url": "https://www.meetup.com/ny-tech"
+  },
+  {
+    "id": "ad66c9da-7b40-4c25-ad89-04e22fc11f89",
+    "slug": "nyedtech",
+    "name": "NYEdTech",
+    "type": "other",
+    "url": "https://www.meetup.com/NYEdTech"
+  },
+  {
+    "id": "bd487bb4-2878-46a7-88e5-414545cb1552",
+    "slug": "office-logic",
+    "name": "Office Logic",
+    "type": "other",
+    "url": "https://office-logic.co"
+  },
+  {
+    "id": "c747f584-8400-44b1-82e1-0fc542c44fa2",
+    "slug": "onramp-coworking-university-of-toronto",
+    "name": "ONRamp Coworking University of Toronto",
+    "type": "other",
+    "url": "https://entrepreneurs.utoronto.ca/about/our-space"
+  },
+  {
+    "id": "d7758bca-9a55-4d16-b26b-f4e646b37def",
+    "slug": "ottawa-board-of-trade",
+    "name": "Ottawa Board of Trade",
+    "type": "other",
+    "url": "https://www.ottawabot.ca/upcoming-events"
+  },
+  {
+    "id": "8426eea1-3122-404a-824b-65422769c72d",
+    "slug": "payment-summit-canada",
+    "name": "Payment Summit Canada",
+    "type": "other",
+    "url": "https://www.thesummit.ca"
+  },
+  {
+    "id": "a5baa457-7557-4ad1-835b-218ba4b0d972",
+    "slug": "people-analytics-summit",
+    "name": "People Analytics Summit",
+    "type": "other",
+    "url": "https://www.peopleanalyticscanada.com"
+  },
+  {
+    "id": "386232d2-fef1-4922-94fc-06e0f508a588",
+    "slug": "pitch-night-mia",
+    "name": "Pitch Night MIA",
+    "type": "other",
+    "url": "https://www.meetup.com/pitch-night-mia"
+  },
+  {
+    "id": "d6e840b8-331f-4f0b-94ea-fc619248350d",
+    "slug": "productbc",
+    "name": "ProductBC",
+    "type": "other",
+    "url": "https://productbc.ca"
+  }
+]

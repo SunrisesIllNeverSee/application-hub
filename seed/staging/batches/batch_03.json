@@ -1,0 +1,555 @@
+[
+  {
+    "id": "8f540060-d063-407c-95ed-12843ff415aa",
+    "slug": "launch-ny",
+    "name": "Launch NY",
+    "type": "accel",
+    "url": "https://launchny.org"
+  },
+  {
+    "id": "f656f0f8-84cb-407c-9c2e-54397ddafbb2",
+    "slug": "launchpad-for-women-entrepreneurs",
+    "name": "Launchpad for Women Entrepreneurs",
+    "type": "accel",
+    "url": "https://www.launchpadforwomen.ca"
+  },
+  {
+    "id": "fea211e2-d657-4928-b2c5-133f2cc1743b",
+    "slug": "launchpad-la",
+    "name": "Launchpad LA",
+    "type": "accel",
+    "url": "https://launchpad.la"
+  },
+  {
+    "id": "5eabb910-5358-4ca9-85af-3d6466c4041d",
+    "slug": "startup-lab",
+    "name": "Laurier StartUp Lab",
+    "type": "accel",
+    "url": "https://students.wlu.ca/work-leadership-and-volunteering/entrepreneurship/startup-lab/index.html?ref=work-leadership-and-volunteering%2Fentrepreneurship%2Flaunchpad.html"
+  },
+  {
+    "id": "43bebf5b-446c-4a67-a634-997e507c38e4",
+    "slug": "le-pont-quebec",
+    "name": "Le Pont Quebec",
+    "type": "accel",
+    "url": "https://www.lepont.io/en/home"
+  },
+  {
+    "id": "af839d54-b3e3-408f-a31d-a0c3b42fff38",
+    "slug": "lead-to-win",
+    "name": "Lead To Win",
+    "type": "accel",
+    "url": "https://www.leadtowin.ca"
+  },
+  {
+    "id": "0398f3fd-97be-442e-8767-f6cf6550bf80",
+    "slug": "league-of-innovators",
+    "name": "League of Innovators",
+    "type": "accel",
+    "url": "https://www.theleagueofinnovators.org"
+  },
+  {
+    "id": "1debe5f7-e0e0-4ae5-b430-e0cdc7fddd06",
+    "slug": "learnlaunch-accelerator",
+    "name": "LearnLaunch Accelerator",
+    "type": "accel",
+    "url": "https://learnlaunch.com/accelerator-2"
+  },
+  {
+    "id": "25838f54-f590-46a4-9134-510d56e09d76",
+    "slug": "legal-innovation-zone",
+    "name": "Legal Innovation Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/zone-learning/legal-innovation-zone"
+  },
+  {
+    "id": "df248a48-8fcc-47e8-a143-f6c641c733c3",
+    "slug": "life-changing-labs-accelerator",
+    "name": "Life Changing Labs Accelerator",
+    "type": "accel",
+    "url": "https://www.lifechanginglabs.com"
+  },
+  {
+    "id": "e793f029-1b24-4adb-86a2-36399efa773c",
+    "slug": "liftoff",
+    "name": "LiftOff",
+    "type": "accel",
+    "url": "https://www.liftoffbyccawr.com"
+  },
+  {
+    "id": "5553364c-3851-4669-b018-6fb3b23fb9f6",
+    "slug": "longo-centre-for-entrepreneurship",
+    "name": "Longo Centre for Entrepreneurship",
+    "type": "accel",
+    "url": "https://humber.ca/cfe"
+  },
+  {
+    "id": "0a773386-696a-4e8a-86a2-defbcb0b020a",
+    "slug": "mars-discovery-district",
+    "name": "MaRS Discovery District",
+    "type": "accel",
+    "url": "https://www.marsdd.com"
+  },
+  {
+    "id": "c2962699-eee2-4511-a04b-a9305931bf5c",
+    "slug": "mc2-capital",
+    "name": "MC2 Capital",
+    "type": "accel",
+    "url": "https://www.cabhi.com/mc2capital"
+  },
+  {
+    "id": "675d06bf-af4e-47b8-8d1a-c1c9f30cbac2",
+    "slug": "mcneil-center-for-entrepreneurship-innovation",
+    "name": "McNeil Center for Entrepreneurship & Innovation",
+    "type": "accel",
+    "url": "https://innovation.mines.edu"
+  },
+  {
+    "id": "4d3372a4-5f25-451b-9883-96e188eb16e1",
+    "slug": "mediatech-ventures",
+    "name": "MediaTech Ventures",
+    "type": "accel",
+    "url": "https://www.linkedin.com/company/mediatech-ventures"
+  },
+  {
+    "id": "b5c7e332-f375-4414-aa0a-683d2111c1b5",
+    "slug": "menlo-ventures",
+    "name": "Menlo Ventures",
+    "type": "accel",
+    "url": "https://menlovc.com"
+  },
+  {
+    "id": "a1ff9847-9d39-4967-9435-cf749b54be3a",
+    "slug": "metaprop",
+    "name": "MetaProp",
+    "type": "accel",
+    "url": "https://www.metaprop.vc"
+  },
+  {
+    "id": "813334e5-cf7a-4a2d-aa85-c277cfc2d06d",
+    "slug": "mhub",
+    "name": "mHUB",
+    "type": "accel",
+    "url": "https://www.mhubchicago.com/accelerator"
+  },
+  {
+    "id": "da43b581-517b-40db-aa73-1052dfbf6712",
+    "slug": "mit-global-startup-labs",
+    "name": "MIT Global Startup Labs",
+    "type": "accel",
+    "url": "https://gsl.mit.edu/mit-global-startup-labs"
+  },
+  {
+    "id": "d3131c76-d0dd-439e-a544-7effb4f90dee",
+    "slug": "mit-office-of-innovation",
+    "name": "MIT Office of Innovation",
+    "type": "accel",
+    "url": "https://innovation.mit.edu"
+  },
+  {
+    "id": "8c468ee8-3f66-4a02-ac15-d80916021286",
+    "slug": "mitacs-canada",
+    "name": "Mitacs Canada",
+    "type": "accel",
+    "url": "https://www.mitacs.ca/en"
+  },
+  {
+    "id": "612e9944-e190-4262-bb1e-a5a09b991d8e",
+    "slug": "mmode",
+    "name": "mmode",
+    "type": "accel",
+    "url": "https://www.mmode.ca"
+  },
+  {
+    "id": "4a4e8692-900b-49dd-8907-8fd95e1fa1d4",
+    "slug": "mtlab",
+    "name": "MTLab",
+    "type": "accel",
+    "url": "https://mtlab.ca"
+  },
+  {
+    "id": "addecc07-21ed-46cd-be97-7dd29719a7db",
+    "slug": "mucker-lab",
+    "name": "Mucker Lab",
+    "type": "accel",
+    "url": "https://www.mucker.com"
+  },
+  {
+    "id": "d80b8873-c074-49c8-80ca-14de11f9e98e",
+    "slug": "nar-reach",
+    "name": "NAR REACH US",
+    "type": "accel",
+    "url": "https://nar-reach.com"
+  },
+  {
+    "id": "a7ef27ce-499c-47bd-b835-02c6d2bdab5f",
+    "slug": "new-inc",
+    "name": "NEW INC",
+    "type": "accel",
+    "url": "https://www.newinc.org"
+  },
+  {
+    "id": "ae986484-4f47-491a-b1c2-ab301cb35b4a",
+    "slug": "new-ventures-bc",
+    "name": "New Ventures BC",
+    "type": "accel",
+    "url": "https://www.newventuresbc.com"
+  },
+  {
+    "id": "063c0c57-c4c4-43ff-8ec1-d9ebddfc3ee7",
+    "slug": "nex-cubed",
+    "name": "Nex Cubed",
+    "type": "accel",
+    "url": "https://www.facebook.com/nexcubed"
+  },
+  {
+    "id": "ecf30cab-387e-4111-8bfa-f0a924c030f8",
+    "slug": "next-canada",
+    "name": "Next Canada",
+    "type": "accel",
+    "url": "https://www.nextcanada.com"
+  },
+  {
+    "id": "24f7957a-ce67-4e81-b7f5-e6d6302ebb56",
+    "slug": "north-shore-innoventures",
+    "name": "North Shore InnoVentures",
+    "type": "accel",
+    "url": "https://nsiv.org"
+  },
+  {
+    "id": "82f4d9eb-a192-4130-a00f-c3ad349b2a84",
+    "slug": "nyu-tandon-future-labs",
+    "name": "NYU Tandon Future Labs",
+    "type": "accel",
+    "url": "https://futurelabs.nyc"
+  },
+  {
+    "id": "752dad26-1b33-4e8d-9693-b8987e721f26",
+    "slug": "on-deck",
+    "name": "On Deck",
+    "type": "accel",
+    "url": "https://www.beondeck.com"
+  },
+  {
+    "id": "01328ae6-127c-4535-a54e-2c479b78007f",
+    "slug": "oneeleven",
+    "name": "OneEleven",
+    "type": "accel",
+    "url": "https://oneeleven.com"
+  },
+  {
+    "id": "b5d2663f-385c-463f-8440-1f2a2337ed2e",
+    "slug": "onetech",
+    "name": "OneTech",
+    "type": "accel",
+    "url": "https://www.weareonetech.org"
+  },
+  {
+    "id": "58cb2944-d030-40e2-8c51-c498253fa0d8",
+    "slug": "ontario-centre-of-innovation",
+    "name": "Ontario Centre of Innovation",
+    "type": "accel",
+    "url": "https://www.oc-innovation.ca"
+  },
+  {
+    "id": "4db26dc8-0782-4951-817f-27f78232819e",
+    "slug": "organic-food-incubator",
+    "name": "Organic Food Incubator",
+    "type": "accel",
+    "url": "https://organicfoodincubator.com"
+  },
+  {
+    "id": "99369b52-dff2-45cf-9359-59108bc16921",
+    "slug": "outlier-ventures",
+    "name": "Outlier Ventures",
+    "type": "accel",
+    "url": "https://outlierventures.io"
+  },
+  {
+    "id": "291e469c-e196-469e-a1eb-83743dab5aef",
+    "slug": "oxygen-accelerator",
+    "name": "Oxygen Accelerator",
+    "type": "accel",
+    "url": "https://www.oxygenaccelerator.com"
+  },
+  {
+    "id": "db129990-77fa-4dd2-8983-b34bf632ae62",
+    "slug": "parkdale-centre-for-innovation",
+    "name": "Parkdale Centre for Innovation",
+    "type": "accel",
+    "url": "https://www.parkdaleinnovates.org"
+  },
+  {
+    "id": "e08abde6-274b-4dae-afa0-43cab15ccb69",
+    "slug": "pfizer-healthcare-hub",
+    "name": "Pfizer Healthcare Hub",
+    "type": "accel",
+    "url": "https://www.pfizer.co.uk/partnerships/pfizer-healthcare-hub"
+  },
+  {
+    "id": "95d68246-3033-49e2-807e-0306b70c93e4",
+    "slug": "pioneer",
+    "name": "Pioneer",
+    "type": "accel",
+    "url": "https://pioneer.app"
+  },
+  {
+    "id": "91685593-913d-47c9-9d22-dacf459c32cc",
+    "slug": "pioneer-square-labs",
+    "name": "Pioneer Square Labs",
+    "type": "accel",
+    "url": "https://twitter.com/psl"
+  },
+  {
+    "id": "b0a9b0af-ad8c-40e6-bb1c-80afa93a77b9",
+    "slug": "platform-calgary",
+    "name": "Platform Calgary",
+    "type": "accel",
+    "url": "https://platformcalgary.com"
+  },
+  {
+    "id": "0b258785-2384-418d-9bbb-5f7badba6f46",
+    "slug": "plug-and-play-tech-center",
+    "name": "Plug and Play Tech Center",
+    "type": "accel",
+    "url": "https://www.plugandplaytechcenter.com"
+  },
+  {
+    "id": "12d42222-f7ac-48ca-8c45-1cd5f778c00d",
+    "slug": "polsky-institute",
+    "name": "Polsky Institute",
+    "type": "accel",
+    "url": "https://polsky.uchicago.edu"
+  },
+  {
+    "id": "8bf1b6e8-4d20-4302-9dfc-ddef034759c2",
+    "slug": "praxis-center-for-venture-development",
+    "name": "Praxis Center for Venture Development",
+    "type": "accel",
+    "url": "https://eship.cornell.edu/item/praxis-center"
+  },
+  {
+    "id": "4ea5a63c-6e6d-48db-9628-821cbc436e6e",
+    "slug": "qb3",
+    "name": "QB3",
+    "type": "accel",
+    "url": "https://qb3.org"
+  },
+  {
+    "id": "f49541a4-d814-4531-99a6-104bbc291e44",
+    "slug": "reach",
+    "name": "REACH",
+    "type": "accel",
+    "url": "https://www.nar.realtor/technology/reach"
+  },
+  {
+    "id": "e04b3190-2578-406d-9dc2-20b507ba9d7d",
+    "slug": "reach-canada",
+    "name": "Reach Canada",
+    "type": "accel",
+    "url": "https://nar-reach.com/canada"
+  },
+  {
+    "id": "d51bb757-59e6-48e1-b0b7-96dc03af5793",
+    "slug": "reach-uk",
+    "name": "Reach UK",
+    "type": "accel",
+    "url": "https://nar-reach.com/uk"
+  },
+  {
+    "id": "ad186ebb-a4c0-42be-83ef-717a072e985c",
+    "slug": "redhawk-launch-accelerator",
+    "name": "RedHawk Launch Accelerator",
+    "type": "accel",
+    "url": "https://www.miamioh.edu/fsb/academics/entrepreneurship/focus-areas/startup-entrepreneurship/redhawk-launch-accelerator/index.html"
+  },
+  {
+    "id": "905dc1f7-7107-4bcf-8021-059430a6a891",
+    "slug": "rev-ithaca-startup-works",
+    "name": "Rev: Ithaca Startup Works",
+    "type": "accel",
+    "url": "https://www.revithaca.com"
+  },
+  {
+    "id": "4f2b44e5-6eb4-499a-a033-fdc622584712",
+    "slug": "rice-alliance-for-technology-and-entrepreneurship",
+    "name": "Rice Alliance for Technology and Entrepreneurship",
+    "type": "accel",
+    "url": "https://business.rice.edu/rice-alliance"
+  },
+  {
+    "id": "57527b10-977f-455b-84ac-7ca54ea01db3",
+    "slug": "rocky-mountain-microfinance-institute",
+    "name": "Rocky Mountain MicroFinance Institute",
+    "type": "accel",
+    "url": "https://rmmfi.org"
+  },
+  {
+    "id": "5f8c1f2d-bf40-42a2-9037-1c026edaa55a",
+    "slug": "rogers-cybersecure-catalyst",
+    "name": "Rogers Cybersecure Catalyst",
+    "type": "accel",
+    "url": "https://cybersecurecatalyst.ca/catalyst-cyber-accelerator"
+  },
+  {
+    "id": "70b0146c-a27d-4739-83cd-12da3b1abdc0",
+    "slug": "roseview-global-incubator",
+    "name": "Roseview Global Incubator",
+    "type": "accel",
+    "url": "https://roseviewglobal.com"
+  },
+  {
+    "id": "d416596e-0fb1-466a-9e72-3e4b11021542",
+    "slug": "science-discovery-zone",
+    "name": "Science Discovery Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/discoveryzone"
+  },
+  {
+    "id": "c54d98eb-dc84-42bb-b5cb-ad95edd1d2d6",
+    "slug": "seneca-helix",
+    "name": "Seneca HELIX",
+    "type": "accel",
+    "url": "https://www.senecacollege.ca/innovation/helix.html"
+  },
+  {
+    "id": "0504b978-803a-4328-b843-c6dc69d6ddad",
+    "slug": "sequoia-capital",
+    "name": "Sequoia Capital",
+    "type": "accel",
+    "url": "https://www.sequoiacap.com"
+  },
+  {
+    "id": "dd2cacb0-e0ca-42e6-810a-80387a9583c4",
+    "slug": "sheboot",
+    "name": "SheBoot",
+    "type": "accel",
+    "url": "https://sheboot.ca"
+  },
+  {
+    "id": "45216665-fbb3-4964-9e4d-9cd2e6338095",
+    "slug": "sheridan-edge",
+    "name": "Sheridan EDGE",
+    "type": "accel",
+    "url": "https://edge.sheridancollege.ca"
+  },
+  {
+    "id": "99914702-8ead-4655-a925-84bc7a8ae981",
+    "slug": "sku",
+    "name": "SKU",
+    "type": "accel",
+    "url": "https://sku.is"
+  },
+  {
+    "id": "cf4ce172-3a79-48c2-95ba-b466a8eefab0",
+    "slug": "small-foundation",
+    "name": "Small Foundation",
+    "type": "accel",
+    "url": "https://smallfoundation.ie"
+  },
+  {
+    "id": "86bc7908-3698-4032-8b88-cc4659531059",
+    "slug": "social-venture-zone",
+    "name": "Social Venture Zone",
+    "type": "accel",
+    "url": "https://www.torontomu.ca/svz"
+  },
+  {
+    "id": "fd61dacf-9f78-41c4-9c3c-82f827d85eb8",
+    "slug": "spinup",
+    "name": "SpinUp",
+    "type": "accel",
+    "url": "https://spinup.utm.utoronto.ca"
+  },
+  {
+    "id": "ce7ad652-bf59-4ff8-8aca-46d450afac51",
+    "slug": "sputnik-atx-vc",
+    "name": "Sputnik ATX VC",
+    "type": "accel",
+    "url": "https://www.sputnikatx.com"
+  },
+  {
+    "id": "edc1dc0a-c9d1-405f-91ae-59c27295b21e",
+    "slug": "starburst-aerospace",
+    "name": "Starburst Aerospace",
+    "type": "accel",
+    "url": "https://starburst.aero"
+  },
+  {
+    "id": "ae5ded51-11cb-4eda-acc9-a07c964d5630",
+    "slug": "start-alberta",
+    "name": "Start Alberta",
+    "type": "accel",
+    "url": "https://startalberta.ca"
+  },
+  {
+    "id": "d3a47fb2-5cba-4a49-a1b5-3e5540363bc7",
+    "slug": "startshea",
+    "name": "Start@Shea",
+    "type": "accel",
+    "url": "https://www.startatshea.com"
+  },
+  {
+    "id": "f352f1a6-feae-4268-b773-1b4dc3799fb0",
+    "slug": "started",
+    "name": "StartEd",
+    "type": "accel",
+    "url": "https://www.started.com"
+  },
+  {
+    "id": "a29db4aa-cdb4-487d-bb93-2cd3d359ed56",
+    "slug": "startgbc",
+    "name": "startGBC",
+    "type": "accel",
+    "url": "https://www.startgbc.com"
+  },
+  {
+    "id": "862e4345-efaf-4b6e-bc8f-0511a6946280",
+    "slug": "startup-calgary",
+    "name": "Startup Calgary",
+    "type": "accel",
+    "url": "https://www.startupcalgary.ca"
+  },
+  {
+    "id": "060a9195-8da3-4a2c-8b56-b447bd668474",
+    "slug": "startup-fiu",
+    "name": "StartUP FIU",
+    "type": "accel",
+    "url": "https://startup.fiu.edu"
+  },
+  {
+    "id": "2e57a782-da0a-4fd9-b7a9-5f212250f733",
+    "slug": "startup-garage",
+    "name": "Startup Garage",
+    "type": "accel",
+    "url": "https://startupgarage.ca"
+  },
+  {
+    "id": "8af6fee8-61a6-47b8-b077-95f8a5e87107",
+    "slug": "startup-health",
+    "name": "Startup Health",
+    "type": "accel",
+    "url": "https://www.startuphealth.com"
+  },
+  {
+    "id": "e24a43f7-8580-4c05-afa2-0e59eaab9b04",
+    "slug": "startup-montreal",
+    "name": "Startup Montr\u00e9al",
+    "type": "accel",
+    "url": "https://startupmontreal.com/en/home"
+  },
+  {
+    "id": "884cd547-f9b4-48a1-8fbc-f157bd87d73d",
+    "slug": "startup-school",
+    "name": "Startup School",
+    "type": "accel",
+    "url": "https://www.startupschool.org"
+  },
+  {
+    "id": "9d2a88f7-4fce-4ab2-9b14-257ec57f2dad",
+    "slug": "startupboot-camp",
+    "name": "Startupboot camp",
+    "type": "accel",
+    "url": "https://www.startupbootcamp.org/accelerator/fintech-new-york"
+  }
+]

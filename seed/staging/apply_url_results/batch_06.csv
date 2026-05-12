@@ -1,0 +1,80 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+earlybird-vc,Earlybird VC,vc,https://earlybird.com,,not_found,No structured application form found; contact page only (earlybird.com/contact-us); invite/referral based
+eight-roads,Eight Roads,vc,https://eightroads.com/en,,not_found,No structured application form; contact page only (eightroads.com/en/contact); referral/network based
+elsewhere-partners,Elsewhere Partners,vc,https://www.linkedin.com/company/elsewhere-partners,,not_found,Homepage is LinkedIn only; no standalone site or form found
+embark-ventures,Embark Ventures,vc,https://www.embark.vc,,not_found,No apply or pitch form found on site; deep tech focused fund; appears referral-based
+energy-impact-partners,Energy Impact Partners,vc,https://www.energyimpactpartners.com,,not_found,No structured application form; contact page only; strategic utility-backed fund; referral-based
+eniac-ventures,Eniac Ventures,vc,https://eniac.vc,,not_found,No apply form found on scraped page; links to TechCrunch only; likely referral/email based
+episode-1-ventures,Episode 1 Ventures,vc,https://episode1.com,https://www.episode1.com/,medium,"Embedded deck upload form on homepage (B2B software pre-seed/seed); no distinct URL for form — form lives on homepage; ""Submit your deck"" CTA"
+equal-ventures,Equal Ventures,vc,https://www.equal.vc,,not_found,Site timed out; no apply URL found via scrape or search; appears referral-based
+ethical-capital-partners,Ethical Capital Partners,vc,https://www.ethicalcapitalpartners.com,,not_found,Contact page only (ethicalcapitalpartners.com/contact); no intake form found
+everywhere,Everywhere,vc,https://everywhere.vc,https://airtable.com/appeY02X0EMCQQ19G/shrjpNqWOj0SJP1ix,high,Airtable application form linked directly from homepage as "Join our portfolio"
+expansion-venture-capital,Expansion Venture Capital,vc,https://www.expansionvc.com,,not_found,Contact page only (expansionvc.com/contact); no structured pitch intake form found
+extreme-venture-partners,Extreme Venture Partners,vc,https://www.evp.vc,,not_found,No apply form found; Canadian seed fund; appears referral-based; portfolio/team links only
+felicis,Felicis,vc,https://www.felicis.com,,not_found,No structured apply form on site; sources indicate email hello@felicis.com; no intake form URL found
+ferst-capital-partners,Ferst Capital Partners,vc,https://www.linkedin.com/company/ferst-capital-partners/about,,not_found,Homepage is LinkedIn only; no standalone website or form found
+fifth-wall,Fifth Wall,vc,https://fifthwall.com,,not_found,No structured application form; contact page only (fifthwall.com/contact); strategic RE-tech LP fund; referral-based
+firepower-capital,FirePower Capital,vc,https://www.firepowercapital.com,,not_found,Growth equity/PE-style firm; contact page only (firepowercapital.com/contact); not a traditional VC with open applications
+first-ascent-ventures,First Ascent Ventures,vc,https://firstascentventures.com,,not_found,No apply or pitch form found on site; enterprise software fund; fully invested Fund II; referral-based
+firstmark-capital,FirstMark Capital,vc,https://firstmarkcap.com,,not_found,No structured application form found on site; NYC early-stage VC; referral/warm intro based
+fj-labs,FJ Labs,vc,https://www.fjlabs.com,,not_found,No direct apply form found on scraped page; sources indicate pitch via fjlabs.com website contact; no specific intake URL
+flybridge,Flybridge,vc,https://www.flybridge.com,,not_found,No apply/pitch form found; pre-seed via Next Wave program (flybridge.com/next-wave) but no intake form; referral-based
+flying-fish-partners,Flying Fish Partners,vc,https://www.flyingfish.vc/home,,not_found,Contact page (flyingfish.vc/get-in-touch) only; no structured intake form; AI/ML pre-seed and seed fund
+formic-ventures,Formic Ventures,vc,https://formic.vc,,not_found,Contact page only (formic.vc/contact_us.html); no structured pitch intake form found
+forward-partners,Forward Partners,vc,https://forwardpartners.com,,not_found,DNS resolution failed for forwardpartners.com; domain may be expired or moved
+founders-fund,Founders Fund,vc,https://foundersfund.com,,not_found,No apply form found; no contact or pitch page; entirely referral/network based
+framework-venture-partners,Framework Venture Partners,vc,https://www.framework.vc,,not_found,Contact page only (framework.vc/en/contact); Canadian enterprise VC; referral-based
+frog-capital,Frog Capital,vc,https://frogcapital.com,,not_found,Contact page only (frogcapital.com/contact/); European scale-up VC; referral-based
+front-row-ventures,Front Row Ventures,vc,https://frontrow.ventures,https://frontrow.ventures/apply,high,Dedicated apply page with intake form for student founders; "Apply for funding" and "Apply now" CTAs link directly
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com,https://fuelventurecapital.com/pitch-us,high,Dedicated "Pitch Us" page found via nav; fintech growth fund
+fuel-ventures,Fuel Ventures,vc,https://fuel.ventures,https://www.fuel.ventures/submit-pitch,high,Dedicated "Submit Pitch" page prominently featured in nav and CTA; UK-based early stage VC
+garage-capital,Garage Capital,vc,https://www.garage.vc,,not_found,No apply or pitch form found on site; portfolio includes ApplyBoard; appears referral-based
+georgian,Georgian,vc,https://georgian.io,,not_found,No apply form found; growth-stage AI/software VC; referral/network based
+gibraltar-company,"Gibraltar & Company",vc,https://www.gibraltarcompany.ca,,not_found,Contact page only (gibraltarcompany.ca/contact); consumer-focused Canadian VC; referral-based
+globalive-capital,Globalive Capital,vc,https://www.globalive.com,,not_found,No dedicated apply form URL found; contact form embedded on site but no structured intake; referral-based
+golden-ventures,Golden Ventures,vc,https://www.golden.ventures,,not_found,No apply or pitch form found; FAQ page (faq.golden.ventures) but no intake form; referral/warm intro based
+good-news-ventures,Good News Ventures,vc,https://www.goodnewsventures.com,,not_found,No apply or pitch form found on site; blockchain/AI pre-seed fund; referral-based
+goodwater,Goodwater,vc,https://www.goodwatercap.com,,not_found,No apply form found; consumer tech VC; contact section present but no intake form or apply URL
+google-ventures,Google Ventures,vc,https://www.gv.com,,not_found,No public apply form; strategic corporate VC backed by Google/Alphabet; invitation-only
+graphite-ventures,Graphite Ventures,vc,https://www.graphitevc.com,https://www.graphitevc.com/connect/,medium,"Pitch Us page (graphitevc.com/connect/) with form to share pitch; also /connect-share-your-pitch/ redirects there; ""Tell us what you're building"""
+greensky-ventures,GreenSky Ventures,vc,https://greensky.vc,https://greensky.vc/apply/,high,Dedicated Apply page with intake form; "Apply" prominently in nav and homepage CTAs
+greycroft,Greycroft,vc,https://www.greycroft.com,,not_found,No apply form found on site; large multi-stage VC; referral/warm intro based
+greylock,Greylock,vc,https://greylock.com,,not_found,No structured apply form; contact page (greylock.com/contact-us/); pitch via businessplans@greylock.com (email only)
+harlem-capital,Harlem Capital,vc,https://harlem.capital,https://harlem.capital/pitch/,high,Dedicated Pitch page (harlem.capital/pitch/) found in nav; diversity-focused VC with intake form
+highland-europe,Highland Europe,vc,https://www.highlandeurope.com,,not_found,Contact section on homepage (#contact-us); no structured intake form or apply URL found
+hlm-venture-partners,HLM Venture Partners,vc,https://hlmvp.com,,not_found,Site redirects to hlminvestmentpartners.com; no apply/pitch form found; healthcare VC; investor login only
+hoxton-ventures,Hoxton Ventures,vc,https://www.hoxtonventures.com,https://hoxtonventures.com/contact/#submit-pitch,medium,Submit pitch section on contact page; form embedded at /contact/#submit-pitch anchor
+hyperplane-venture-capital,Hyperplane Venture Capital,vc,https://hyperplane.vc,,not_found,Contact page (hyperplane.vc/contact-us/) only; no structured intake form; seed AI/ML VC; referral-based
+hyphen-capital,Hyphen Capital,vc,https://www.hyphencap.com,,not_found,Site timed out; search results indicate email-only (dave@hyphencap.com); no intake form URL found
+igan-partners,iGan Partners,vc,https://iganpartners.com,,not_found,Site timed out; healthcare VC; prior pitch competitions referenced but no active form found
+impression-ventures,Impression Ventures,vc,https://impression.ventures,https://impression.ventures/pitch-us,medium,"Site timed out on scrape; search results confirm ""Pitch Us"" nav item at impression.ventures/pitch-us; fintech-focused Canadian VC"
+inbc-investment,InBC Investment,vc,https://www.inbcinvestment.ca,https://inbcinvestment.com/companies/,medium,"Short submission form at inbcinvestment.com/companies/ confirmed via FAQs and company investment page; note: domain .ca vs .com both used; form is quick intake"
+index-ventures,Index Ventures,vc,https://www.indexventures.com,,not_found,No apply form found; large global VC; TypeForm cookie mention but no intake form URL; referral-based
+initialized-capital,Initialized Capital,vc,https://initialized.com,,not_found,Site timed out; appears referral/intro based; sources indicate website contact but no specific intake form URL
+insight-partners,Insight Partners,vc,https://www.insightpartners.com,,not_found,Contact page (insightpartners.com/contact/) only; growth-stage VC; no structured startup intake form
+intact-ventures,Intact Ventures,vc,https://www.intactfc.com/English/intact-ventures/default.aspx,,not_found,"Site timed out; corporate VC arm of Intact Financial; search shows interest form exists but no specific URL; referral-based, insurtech focus"
+interlace-ventures,Interlace Ventures,vc,https://www.interlacevc.com,,not_found,No apply or pitch form found; commerce/retail tech VC; no intake URL or contact form link found
+ivp,IVP,vc,https://www.ivp.com,,not_found,Contact page (ivp.com/contact/) only; late-stage growth VC; referral-based
+ix-labs,IX Labs,vc,https://www.indexexchange.com/about/ix-labs,,not_found,Corporate venture arm of Index Exchange; no public apply form; invitation/partnership based
+jamjar-investments,JamJar Investments,vc,https://www.jamjarinvestments.com,https://www.jamjarinvestments.com/pitch-to-us,high,Dedicated "Pitch to us" page with form including deck upload; intake form with criteria listed
+jetblue-ventures,JetBlue Ventures,vc,https://www.jetblueventures.com,https://skyvc.typeform.com/to/CdW5AB8D,high,"JetBlue Ventures rebranded to SKY VC; homepage at jetblueventures.com now shows SKY VC with Typeform apply link ""Get in Touch"""
+jll-spark,JLL Spark,vc,https://spark.jllt.com,,not_found,Site timed out; JLL Spark is strategic corporate VC; no public apply form found; referral/LP relationship based
+junipero-capital,Junipero Capital,vc,https://www.junipero.vc,,not_found,No apply or pitch form found on site; early-stage VC; no intake form or apply URL visible
+kinetic-investments,Kinetic Investments,vc,https://www.linkedin.com/company/kinetic-investments,,not_found,Homepage is LinkedIn only; no standalone site or form found
+klass-capital,Klass Capital,vc,https://www.klass.com,,not_found,Site timed out; Toronto-based expansion-stage software investor; no public apply form found; referral-based
+kleiner-perkins,Kleiner Perkins,vc,https://www.kleinerperkins.com,,not_found,Site timed out; tier-1 VC; no public apply form; Fellows program exists but for students; referral-based
+krillion-ventures,Krillion Ventures,vc,https://krillionventures.com,,not_found,Email-only contact (oneinakrillion@krillionventures.com); no structured intake form
+lab-ventures,LAB Ventures,vc,https://www.labventures.co,,not_found,"Site timed out; Spark XYZ references a startup portal but URL not confirmed as active public form; Miami venture studio"
+lakelet-capital,Lakelet Capital,vc,https://lakeletcapital.com,,not_found,Site timed out; contact page (lakeletcapital.com/contact/) exists but no structured intake form; growth equity firm
+lakestar,Lakestar,vc,https://lakestar.com,,not_found,Site timed out; European VC; sources indicate email/LinkedIn contact only; no public apply form
+launch-ventures,Launch Ventures,vc,https://www.launch.vc,,not_found,Contact page (launch.vc/contact) and pitch competitions page found but no standalone intake form; referral-based
+ldv-partners,LDV Partners,vc,https://ldvp.com,,not_found,Site timed out; visual technology-focused VC; sources indicate submit via website but no specific form URL confirmed
+lerer-hippeau,Lerer Hippeau,vc,https://www.lererhippeau.com,,not_found,No apply form found on site; embedded contact form with "Something went wrong" error; referral/warm intro based
+lightspeed-venture-partners,Lightspeed Venture Partners,vc,https://lsvp.com,,not_found,Site timed out; large multi-stage global VC; no public apply form; referral-based
+liveoak-venture-partners,LiveOak Venture Partners,vc,https://liveoakvp.com,,not_found,Site timed out; Texas-focused early-stage VC; sources indicate deck submission via website but no specific form URL confirmed
+loi-venture,LOI Venture,vc,https://www.loi.vc,https://www.loi.vc/pitch/,high,Dedicated Pitch page in nav (loi.vc/pitch/); "tap the pitch button" CTA; $100K check fund with structured intake
+lowercarbon-capital,Lowercarbon Capital,vc,https://lowercarboncapital.com,,not_found,No apply or pitch form found on scraped page; climate tech VC; referral/warm intro based
+loyal-vc,Loyal VC,vc,https://www.loyal.vc,,not_found,No apply/pitch form found; entrepreneurs page (loyal.vc/entrepreneurs) exists but no intake form URL; referral-based
+luge-capital,Luge Capital,vc,https://www.luge.vc,,not_found,Contact page (luge.vc/contact-us/) only; fintech-focused Canadian VC; no structured intake form
+lumira-ventures,Lumira Ventures,vc,https://www.lumiraventures.com,,not_found,No apply or pitch form found on site; life sciences/biotech VC; referral-based
+lux-capital,Lux Capital,vc,https://www.luxcapital.com,,not_found,Contact page (luxcapital.com/contact) only; fellowship program (luxcapital.com/fellowship) for individuals not companies; referral-based for investment

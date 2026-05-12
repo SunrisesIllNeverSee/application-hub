@@ -1,0 +1,80 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+startx,StartX,accel,https://startx.com,https://startx.com/apply,high,Dedicated apply page with form (login to startx.com required)
+surge-mohawk,Surge Mohawk,accel,https://www.mohawkcollege.ca/surge-mohawks-entrepreneurship-resource-space,https://www.mohawkcollege.ca/node/2331,medium,Apply now link on page; node URL - may be course enrollment not accelerator application
+sutardja-center-for-entrepreneurship-technology,Sutardja Center for Entrepreneurship & Technology,accel,https://scet.berkeley.edu,https://startupstudio.berkeley.edu/,medium,Links to Berkeley Startup Studio - main startup application path
+synapse-consortium,Synapse Consortium,accel,https://synapseconsortium.com,,not_found,No apply link found; life science consortium with no visible application process
+tech-mba-venture-studio,Tech MBA Venture Studio,accel,https://schulich.yorku.ca/schulich-startups/venture-studio,https://schulich.yorku.ca/admissions/how-to-apply/,low,Links to MBA admissions apply page; venture studio itself has no separate application
+techalliance,TechAlliance,accel,https://techalliance.ca,https://www.techalliance.ca/techalliance-advisory-solutions/startups/,medium,Startups page found; Pitch Room and Pitch Development programs visible
+techbuffalo,TechBuffalo,accel,https://www.techbuffalo.org,https://www.techbuffalo.org/apply/,high,Dedicated /apply page found
+technexus,TechNexus Venture Collaborative,accel,https://technexus.com,,not_found,"No apply link found; corporate venture collaborative, no startup application visible"
+techranch,TechRanch,accel,https://techranchaustin.com,https://techranchaustin.com/programs/,low,Programs page found but no direct application form or apply link visible
+techrise-chicago,TechRise Chicago,accel,https://techrise.co,https://airtable.com/appfgBVkCSJj3MA6Y/pag5b2FJXvTdvGuHG/form,high,Airtable form for pitch competition applications
+texas-venture-labs,Texas Venture Labs,accel,https://www.mccombs.utexas.edu/centers-and-initiatives/jon-brumley-texas-venture-labs,,not_found,Page not accessible (404); university program with no visible external apply link
+the-bridge-university-of-toronto,The BRIDGE University of Toronto,accel,https://www.utsc.utoronto.ca/thebridge/welcome-bridge,,not_found,"University hub, no external apply form found; after-hours access mentioned but no startup application"
+the-center-for-life-science-ventures,The Center for Life Science Ventures,accel,https://eship.cornell.edu/item/the-mcgovern-center-2,,not_found,Cornell entrepreneurship page; no startup application link found
+the-cornell-food-processing-development-laboratory-fpdl,The Cornell Food Processing Development Laboratory (FPDL),accel,https://cals.cornell.edu/food-science/outreach-extension/services/food-processing-and-development-laboratory,,not_found,"Lab facility, not an accelerator with applications; no apply link found"
+the-eforum,The eForum,accel,https://www.theeforum.org,,not_found,Website has SSL error and returns 409 conflict; could not access
+the-forge,The Forge,accel,https://theforge.mcmaster.ca,https://theforge.mcmaster.ca/programs/startup-survivor/,high,Startup Survivor pitch competition program with apply link; also main incubator apply page visible
+the-forum,The Forum,accel,https://www.theforum.ca,https://www.theforumpitch.ca/,high,The Forum Pitch program - applications open year-round
+the-hive,The Hive,accel,http://hivedata.com,,not_found,hivedata.com is a data company; redirects to www.hivedata.com with no accelerator application
+the-hub,The Hub University of Toronto,accel,https://www.utsc.utoronto.ca/thehub,https://sicieeil.acceleratorapp.co/application/new?program=sicieeil-applications,high,AcceleratorApp application form found for UTSC entrepreneurship programs
+the-technology-farm,The Technology Farm,accel,https://www.thetechnologyfarm.com,,not_found,Cornell Agriculture tech park; no startup application form found
+tie-toronto,TiE Toronto,accel,https://toronto.tie.org,,not_found,Events/networking org; found event registration (Eventbrite) but no structured accelerator application
+toronto-fashion-incubator,Toronto Fashion Incubator,accel,https://fashionincubator.com,,not_found,DNS resolution failed for fashionincubator.com; website appears to be down
+transcend-network,Transcend Network,accel,https://www.transcend-network.com,https://form.typeform.com/to/ptlIt8DC,high,Typeform application found (Apply now link)
+transmedia-zone,Transmedia Zone,accel,https://www.torontomu.ca/transmediazone,https://forms.gle/aEAY4qcNYo3jtVQa7,high,Google Form for TZ membership application found
+treefrog-accelerator,Treefrog Accelerator,accel,https://www.treefrog.biz,https://www.treefrog.biz/application-process-form/,high,Dedicated application process form page found
+tufts-launchpad-biolabs,Tufts Launchpad BioLabs,accel,https://viceprovost.tufts.edu/research-services/core-facilities-resources/tufts-launchpad-biolabs,,not_found,Page returns 404; could not access Tufts LaunchPad BioLabs page
+ucla-ventures,UCLA Ventures,accel,https://ventures.ucla.edu,https://tdg.ucla.edu/ucla-researchers/ucla-ventures/pitch-gym,high,Pitch Gym program with Google Form application found
+university-at-buffalo-business-entrepreneur-partnerships,University at Buffalo Business & Entrepreneur Partnerships,accel,https://www.buffalo.edu/partnerships/about/centers-facilities-equipment/incubators.html,,not_found,Incubator info page; no direct application form found
+utest,University of Toronto Early Stage Technology (UTEST),accel,https://utest.to,https://utest.to/apply/,high,Dedicated /apply page found
+university-of-toronto-entrepreneurship,University of Toronto Entrepreneurship,accel,https://entrepreneurs.utoronto.ca,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,high,AcceleratorApp application form found (OnRamp membership)
+unusual-ventures,Unusual Ventures,accel,https://www.unusual.vc,https://www.unusual.vc/contact-us/,low,Only contact us page found; no structured pitch/application form visible
+unyicorps,UNYicorps,accel,https://www.unyicorps.org,,not_found,Redirects to in-icorps.org; no application link found on either site
+upscale,Upscale,accel,https://technation.io/programmes/upscale,https://technation.io/programmes/upscale,medium,Program page with apply section; GravityForms embedded on page
+urban-future-lab,Urban Future Lab,accel,http://ufl.nyc,https://www.ufl.nyc/programs,low,Programs page accessible at ufl.nyc/programs; no direct application form found
+urbanx,Urban-x,accel,https://www.urban-x.com,,not_found,DNS resolution failed for urban-x.com; website appears to be down
+venture-crush,Venture Crush,accel,https://www.venturecrush.com/fg/index.html,,not_found,Static page with no apply link found
+venture-development-center-umass-boston,Venture Development Center UMASS Boston,accel,https://www.umb.edu/vdc,,not_found,University page; no direct application form visible
+venture-for-canada,Venture for Canada,accel,https://ventureforcanada.ca,https://ventureforcanada.ca/programs/fellowships/,medium,Fellowships program page found; has form embedded but specific apply URL not extracted
+venture-labs,Venture Labs,accel,https://venturelabs.ca,https://venturelabs.ca/apply-for-our-programs/,high,Dedicated apply for programs page with GravityForms
+venture-lane,Venture Lane,accel,https://theventurelane.com,,not_found,Has GravityForms plugin but no apply page URL found
+venture-out,Venture Out,accel,https://ventureoutstartups.com,,not_found,Site redirects; could not find apply page (404 on /apply)
+venturelab,VentureLAB,accel,https://www.venturelab.ca,https://www.venturelab.ca/pitch-competition,medium,Pitch competition link found on homepage
+ventureout,VentureOut,accel,https://ventureoutny.com,https://ventureoutny.com/apply/,high,Dedicated /apply page found and confirmed accessible
+viterbi-startup-garage,Viterbi Startup Garage,accel,https://viterbiinnovation.usc.edu/vsg,,not_found,Page returns 404
+voyager-capital,Voyager Capital,accel,https://www.voyagercapital.com,,not_found,No apply/pitch link found; listed as accel but appears to be a VC fund
+watson-institute,Watson Institute,accel,https://watson.is,https://watson.is/apply/,high,Dedicated /apply page confirmed accessible
+webc,WeBC,accel,https://we-bc.ca,https://we-bc.ca/work-with-us/,high,Work with us page with GravityForms application
+weill-cornell-medicine-bioventure-elab,Weill Cornell Medicine Bioventure eLab,accel,https://elab.weill.cornell.edu,https://elab.weill.cornell.edu/programs-offerings-and-support/expertise-and-mentorship/pitch-coaching,low,Pitch coaching page found; no direct application form visible
+western-accelerator,Western Accelerator,accel,https://entrepreneurship.uwo.ca,https://entrepreneurship.uwo.ca/accelerator/,medium,Western Accelerator program page found; no direct apply form extracted
+westmont-enterprise-hub-university-of-west-london,Westmont Enterprise Hub University of West London,accel,https://www.uwl.ac.uk/business/westmont-enterprise-hub,,not_found,Page returns 403 Forbidden; could not access
+weve-acceleration,WEVE Acceleration,accel,https://weveacceleration.com,https://weveacceleration.com/apply-2,high,Dedicated apply page confirmed at /apply-2
+rbc-women-in-cleantech-accelerator,Women in Cleantech RBC Accelerator,accel,https://www.marsdd.com/service/women-in-cleantech-accelerator,https://marsdd.com/apply,high,MaRS apply link found on page
+womens-startup-lab,Women's Startup Lab,accel,https://www.womenstartuplab.com,https://www.womenstartuplab.com/join-us/,high,Join us page with GravityForms found
+world-innovation-lab,World Innovation Lab,accel,https://wilab.com,,not_found,No apply link found; /apply redirects to homepage
+xlr8-accelerator,XLR8 Accelerator,accel,https://xlr8.raiz.vc,,not_found,No apply link found; minimal website content
+xrc-labs,XRC Labs,accel,https://www.xrclabs.com,https://www.xrclabs.com/apply,high,/apply link found on homepage
+y-space,Y Space,accel,https://yspace.yorku.ca,https://www.yorku.ca/yspace/startups/,medium,Startups page found at YSpace; no direct apply form URL extracted
+y2-labs,Y2 Labs,accel,https://y2labs.co,https://y2labs.co/get-started/,high,Get started page found
+yedi-incubator,YEDI Incubator,accel,https://yedi.ca,https://yedi.ca/get-started-at-yedi/,high,Get started at YEDI page found
+zahn-innovation-centre,Zahn Innovation Centre,accel,https://www.ccny.cuny.edu/zahn,,not_found,Page returns 403 Forbidden; could not access
+zinc-venture-builder,Zinc Venture Builder,accel,https://www.zinc.vc/programmes/venture-builder,https://www.zinc.vc/programmes/pre-seed-investment/,medium,Venture builder page 404; found pre-seed investment programme page at zinc.vc
+zx-ventures,ZX Ventures,accel,https://www.zx-ventures.com,,not_found,DNS resolution failed; website appears to be down
+mergelane,MergeLane,fellowship,https://www.linkedin.com/company/mergelane/about,,not_found,LinkedIn page requires login; could not find apply link
+the-capital-network,The Capital Network,fellowship,https://www.thecapitalnetwork.org,https://www.thecapitalnetwork.org/programs,medium,Programs page found with form; specific apply URL not extracted
+the-vinetta-project,The Vinetta Project,fellowship,https://www.vinettaproject.com,,not_found,Homepage loads but no apply link found; /apply returns empty page
+xfactor-ventures,XFactor Ventures,fellowship,https://www.xfactor.ventures,https://www.xfactor.ventures/work-with-us-1,medium,Work With Us page found; application form likely embedded (JS-rendered)
+406-ventures,.406 Ventures,vc,https://www.406ventures.com/approach,,not_found,VC firm with contact page only; no structured application form
+10x-capital,10X Capital,vc,https://www.10xcapital.com,,not_found,No structured application form found; broker-dealer/VC hybrid
+1414-ventures,1414 Ventures,vc,https://www.1414ventures.com,,not_found,Only contact page found; no structured application
+1984-ventures,1984 Ventures,vc,https://1984.vc,https://1984.vc/apply/start,high,"Structured application with "Start your application" form at /apply/start"
+2048-ventures,2048 Ventures,vc,https://www.2048.vc,https://airtable.com/appV89PYGo3zN47f9/pagNjeYwHGADSGIs3/form,high,Airtable structured application form found at /pitch
+24-haymarket,24 Haymarket,vc,https://24haymarket.com,,not_found,Only contact page found; no structured application form
+5am-ventures,5AM Ventures,vc,https://5amventures.com,,not_found,"Only contact page found; life sciences VC, no structured application"
+645-ventures,645 Ventures,vc,https://645ventures.com,,not_found,No apply/pitch link found on homepage
+7-gate-ventures,7 Gate Ventures,vc,https://7gate.vc,,not_found,Startup visa page found but no structured founder application form
+7thirty,7thirty,vc,https://7thirtycapital.com,,not_found,Page returns 403; could not access
+8vc,8VC,vc,https://www.8vc.com,,not_found,Only contact page found; no structured application form
+abingworth,Abingworth,vc,https://www.abingworth.com,,not_found,"Life sciences VC; only contact page found, no structured application"
+accel,Accel,vc,https://www.accel.com,,not_found,"Major VC firm; contact-us page only, no structured founder application form"

@@ -1,0 +1,80 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+1871,1871,accel,https://1871.com,https://share.hsforms.com/1wL94zsghRhmkXg9bfdjNPg20ww1,medium,HubSpot form for membership inquiry
+2bx,2bX,accel,https://2bx.vc,,not_found,Only /jobs/ hiring page found; no accelerator apply
+43north,43North,accel,https://www.43north.org,https://43north.org/founders/program/application-waitlist/,high,Application waitlist page with form fields
+500-global,500 Global,accel,https://500.co,,not_found,JS-rendered SPA; no apply link in static HTML
+accel-centennial-college,ACCEL Centennial College,accel,https://accel.centennialcollege.ca,,not_found,No apply/application link on homepage
+accelerate-okanagan,Accelerate Okanagan,accel,https://accelerateokanagan.com,https://accelerateokanagan.com/entrepreneurs/general-programs-application-form/,high,Apply Now CTA to application form
+accelerating-asia,Accelerating Asia,accel,https://www.acceleratingasia.com,,not_found,No apply link on homepage; GET FUNDED is info page
+accelerator-center,Accelerator Center,accel,https://www.acceleratorcentre.com,,not_found,Only image file in apply href; no form
+alacrity-canada,Alacrity Canada,accel,https://www.alacritycanada.com,,not_found,Programs page only; no direct apply form linked
+alberta-accelerator,Alberta Accelerator Calgary,accel,https://500.co/accelerators/alberta-accelerator,,not_found,Sub-page of 500.co; no direct apply link
+alliance,Alliance,accel,https://alliance.xyz,https://alliance.xyz/apply,high,Apply CTA + /apply href
+altitude-accelerator,Altitude Accelerator,accel,https://altitudeaccelerator.ca,https://altitudeaccelerator.ca/investor-readiness/,high,Apply now CTA to program application page
+angelpad,AngelPad,accel,https://angelpad.org,https://angelpad.com/#apply,medium,Apply section on homepage
+antler-academy,Antler Academy,accel,https://www.antler.co/academy,https://www.antler.co/apply,high,Apply now CTA + /apply href
+antler-canada,Antler Canada,accel,https://www.antler.co/location/canada,https://www.antler.co/apply,high,Apply CTA on Canada location page
+antler,Antler Global,accel,https://www.antler.co,https://www.antler.co/apply,high,Apply CTA + /apply href
+antler-us-boulder,Antler US Boulder,accel,https://www.antler.co/location/us,https://www.antler.co/apply,high,Apply Now CTA + /apply href
+artscape-daniels-launchpad,Artscape Daniels Launchpad,accel,https://www.linkedin.com/showcase/launchpadto,,not_found,LinkedIn showcase - no apply form
+acc-bio-incubator,Austin Community College Bio Incubator,accel,https://sites.austincc.edu/incubator,,not_found,Page loaded but no startup apply link found
+acc-fashion-incubator,Austin Community College Fashion Incubator,accel,https://sites.austincc.edu/fashion-incubator,,not_found,No apply/application link on page
+austin-technology-incubator,Austin Technology Incubator,accel,https://ati.utexas.edu,https://ati.utexas.edu/apply/,high,Apply CTA + /apply/ href
+babson-college-center-for-womens-entrepreneurial-leadership,Babson College Center for Women’s Entrepreneurial Leadership,accel,https://www.babson.edu/womens-leadership-institute/campus-programs,,not_found,No program apply form; only undergrad/grad links
+barclays-accelerator,Barclays Accelerator,accel,https://home.barclays/who-we-are/innovation/barclays-accelerator/#/london,,not_found,Page blocked or no apply link rendered
+bc-tech-association,BC Tech Association,accel,https://wearebctech.com,,not_found,Membership org; Join Now is general membership
+bengal-entrepreneurship-program,Bengal Entrepreneurship Program,accel,https://sbdc.buffalostate.edu/bengal-entrepreneurship-program,,not_found,Only undergrad college admissions apply link
+berkeley-skydeck,Berkeley SkyDeck,accel,https://skydeck.berkeley.edu,https://skydeck.berkeley.edu/apply/,high,APPLY CTA + /apply/ href
+biomedical-zone,Biomedical Zone,accel,https://www.torontomu.ca/zone-learning/biomedical-zone,,not_found,No zone-specific apply link on page
+black-entrepreneurship-alliance,Black Entrepreneurship Alliance,accel,https://www.thebea.co,,not_found,Programs listed but no apply link on homepage
+black-founders-network,Black Founders Network,accel,https://entrepreneurs.utoronto.ca/for-entrepreneurs/black-founders-network,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,medium,Application form via acceleratorapp.co
+bonum-ventures,Bonum Ventures,accel,https://bonum.eu,,not_found,Only portfolio company links; no apply page
+boomtown-accelerators,Boomtown Accelerators,accel,https://boomtownaccelerators.com,,error,Page blocked by WAF - could not scrape
+brampton-entrepreneur-centre,Brampton Entrepreneur Centre,accel,https://www.brampton.ca/en/Business/bec/Pages/Welcome.aspx,,not_found,Municipal page; no entrepreneur apply form
+brampton-venture-zone,Brampton Venture Zone,accel,https://www.torontomu.ca/zone-learning/venture-zone-brampton,,not_found,No zone-specific apply link on page
+brandeis-innovation,Brandeis Innovation,accel,https://www.brandeis.edu/innovation/grant-programs/index-copy.html,,not_found,Grant programs info page; no apply link
+bu-spark,BU Spark,accel,https://www.bu.edu/spark/resources/hackathons,,not_found,Hackathons page; no accelerator apply link
+caltech-new-ventures,Caltech New Ventures,accel,https://innovation.caltech.edu/new-ventures,,not_found,Info page only; no apply link found
+canadian-technology-accelerators,Canadian Technology Accelerators,accel,https://www.tradecommissioner.gc.ca/cta-atc/index.aspx?lang=eng,,error,Govt site timed out - could not scrape
+canadian-women-network,Canadian Women's Network,accel,https://www.cwnsv.com,,not_found,No apply link visible on homepage
+carbon-trust,Carbon Trust,accel,https://www.carbontrust.com,,not_found,Consulting org; no startup application form
+cardinal-ventures,Cardinal Ventures,accel,https://www.cardinalventures.org,,not_found,No apply link on homepage
+catalyst-program,Catalyst Program,accel,https://innovation.ucsf.edu/venture/catalyst-program,,not_found,Info page; no apply form linked
+catalyze-cu,Catalyze CU,accel,https://www.colorado.edu/catalyzecu,,not_found,Apply link leads to mentor form not startup
+cedar-sinai-accelerator,Cedar Sinai Accelerator,accel,https://csaccelerator.com,,not_found,Page too small/sparse; no apply link
+centech,Centech,accel,https://centech.co,https://centech.co/appel-a-projets/,medium,Appel a projets - call for applications page
+center-for-entrepreneurship-suffolk-university,Center for Entrepreneurship Suffolk University,accel,https://www.suffolk.edu/business/centers-institutes/center-for-entrepreneurship,,not_found,Only college admissions apply link
+center-for-transformative-action,Center for Transformative Action,accel,http://www.centerfortransformativeaction.org/index.php,,not_found,Static info page; no apply link
+centre-for-entrepreneurship,Centre for Entrepreneurship University of Toronto,accel,https://www.entrepreneurship.artsci.utoronto.ca,,not_found,Apply link leads to TA positions not startups
+centre-for-integrated-transportation-and-mobility,Centre for Integrated Transportation and Mobility,accel,https://citm.ca,https://citm.ca/apply/,high,Become a client / Apply CTA
+centre-for-women-in-business,Centre for Women in Business,accel,https://www.centreforwomeninbusiness.ca,,not_found,No apply link on homepage
+chan-zuckerberg-biohub-chicago,Chan Zuckerberg Biohub Chicago,accel,https://www.czbiohub.org/chi,,not_found,Research org; no startup application form
+chan-zuckerberg-biohub-network,Chan Zuckerberg Biohub Network,accel,https://www.czbiohub.org,,not_found,Research org; no startup application form
+chicagoblend,Chicago:Blend,accel,https://www.linkedin.com/company/chicago-blend,,not_found,LinkedIn company page - no apply form
+chobani-incubator,Chobani Incubator,accel,https://www.chobani.com/impact/chobani-incubator,,not_found,JS-rendered SPA; no apply link in static content
+citris-foundry,CITRIS Foundry,accel,https://citrisfoundry.org,https://citrisfoundry.org/program/,medium,Apply CTA to program page
+clean-energy-zone,Clean Energy Zone,accel,https://www.torontomu.ca/cue/clean-energy-zone,,not_found,No zone-specific apply link on TMU page
+cleantech-open,Cleantech Open,accel,https://www.cleantechopen.org,https://www.cleantechopen.org/en/custom/2026ctoaccelerator/new/submit,high,Apply Now CTA to application form
+cogo-labs,Cogo Labs,accel,https://www.cogolabs.com,,not_found,No apply link on homepage
+collider,Collider,accel,https://www.collider.io,https://www.collider.io/apply,high,Apply CTA + /apply href
+columbia-startup-lab,Columbia Startup Lab,accel,https://entrepreneurship.columbia.edu,,not_found,Get Started links to info page not form
+computer-science-innovation-lab-uoft,Computer Science Innovation Lab UofT,accel,https://www.dcsil.ca,https://www.dcsil.ca/applications,medium,Applications href pattern
+cornell-food-venture-center,Cornell Food Venture Center,accel,https://cals.cornell.edu/cornell-agritech/partners-institutes/cornell-food-venture-center,,not_found,Info page only; no apply link
+creative-destruction-lab,Creative Destruction Lab,accel,https://www.creativedestructionlab.com,https://creativedestructionlab.com/application-triage/,high,Apply CTA + /application-triage/ href
+creative-destruction-lab-vancouver,Creative Destruction Lab Vancouver,accel,https://creativedestructionlab.com/locations/vancouver,https://creativedestructionlab.com/application-triage/,high,Same apply as CDL main - Apply CTA
+csi-technology-incubator,CSI Technology Incubator,accel,https://www.csitechincubator.com,https://www.f6s.com/csi-tech-incubator-fall-2024-cohort/apply,medium,Apply Now CTA to F6S application (may be past cohort)
+cu-innovation-entrepreneurship,CU Innovation & Entrepreneurship,accel,https://www.colorado.edu/innovate,,not_found,Get Started links to info page not form
+cuny-startups,CUNY Startups,accel,https://cunystartups.com,,not_found,No apply link on homepage; accelerator has no apply URL
+data-pitch,Data Pitch,accel,https://datapitch.eu,,error,DNS resolution failed - domain unreachable
+dcu-fintech-innovation-centre,DCU Fintech Innovation Centre,accel,https://dcufintech.org,https://dcufintech.org/dcu-support-center/applications-and-forms.html,medium,Applications and forms page
+design-fabrication-zone,Design Fabrication Zone,accel,https://www.torontomu.ca/zone-learning/design-fabrication-zone,,not_found,No zone-specific apply link on TMU page
+digital-media-and-gaming-incubator,Digital Media and Gaming Incubator,accel,https://www.georgebrown.ca/arts-design-information-technology/design/the-industry/digital-media-and-gaming-incubator,,not_found,George Brown /apply is college admissions
+digitalhealth-london,DigitalHealth.London,accel,https://digitalhealth.london,,not_found,Programme pages listed but no direct apply form
+disney-accelerator,Disney Accelerator,accel,https://sites.disney.com/accelerator,,not_found,No applications open; info/portfolio page only
+distill-ventures,Distill Ventures,accel,http://distillventures.com,,not_found,Contact email only; no online application form
+district-3-innovation,District 3 Innovation,accel,https://district3.co,https://district3.co/apply,high,Apply CTA + /apply href
+dmz-tech-incubator,DMZ Tech Incubator,accel,https://dmz.torontomu.ca,https://mydmz.torontomu.ca/portal/apply,high,Apply CTA to startup application portal
+dmz-women-founders-accelerator-programs,DMZ Women Founders Accelerator Programs,accel,https://dmz.torontomu.ca/womeninnovationprograms,https://mydmz.torontomu.ca/portal/apply,high,Apply CTA to startup application portal
+dobson-mcgill-university,Dobson McGill University,accel,https://www.mcgill.ca/dobson,,not_found,Programs info page; no apply form linked
+draper-startup-house,Draper Startup House,accel,https://draperstartuphouse.com,,not_found,JS SPA; no apply link in rendered content
+draper-startup-house-accelerator,Draper Startup House Accelerator,accel,https://dshaccelerator.com,,error,SSL/TLS connection failed - could not scrape

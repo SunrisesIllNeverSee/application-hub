@@ -1,0 +1,783 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+1871,1871,accel,https://1871.com,,not_found,No apply link found
+2bx,2bX,accel,https://2bx.vc,https://2bx.vc/jobs/,high,"Apply text: ""Apply"""
+43north,43North,accel,https://www.43north.org,https://43north.org/founders/program/application-waitlist/,medium,Apply href pattern in https://43north.org/founders/program
+500-global,500 Global,accel,https://500.co,,not_found,No apply link found
+accel-centennial-college,ACCEL Centennial College,accel,https://accel.centennialcollege.ca,,not_found,No apply link found
+accelerate-okanagan,Accelerate Okanagan,accel,https://accelerateokanagan.com,https://accelerateokanagan.com/entrepreneurs/general-programs-application-form/,high,"Apply text: ""Apply Now"""
+accelerating-asia,Accelerating Asia,accel,https://www.acceleratingasia.com,,not_found,No apply link found
+accelerator-center,Accelerator Center,accel,https://www.acceleratorcentre.com,https://www.acceleratorcentre.com/wp-content/uploads/2025/09/applyboard.png,medium,Apply href pattern in https://www.acceleratorcentre.com/wp
+alacrity-canada,Alacrity Canada,accel,https://www.alacritycanada.com,,not_found,No apply link found
+alberta-accelerator,Alberta Accelerator Calgary,accel,https://500.co/accelerators/alberta-accelerator,,not_found,No apply link found
+alliance,Alliance,accel,https://alliance.xyz,,error,fetch failed or empty
+altitude-accelerator,Altitude Accelerator,accel,https://altitudeaccelerator.ca,https://altitudeaccelerator.ca/investor-readiness/,high,"Apply CTA: ""Apply now"""
+angelpad,AngelPad,accel,https://angelpad.org,,not_found,No apply link found
+antler-academy,Antler Academy,accel,https://www.antler.co/academy,https://www.antler.co/apply,high,"Link text ""Apply now"" + apply href"
+antler-canada,Antler Canada,accel,https://www.antler.co/location/canada,,not_found,No apply link found
+antler,Antler Global,accel,https://www.antler.co,https://www.antler.co/apply,high,"""Apply"" + apply href"
+antler-us-boulder,Antler US Boulder,accel,https://www.antler.co/location/us,https://www.antler.co/apply,high,"Link text ""Apply Now"" + apply href"
+artscape-daniels-launchpad,Artscape Daniels Launchpad,accel,https://www.linkedin.com/showcase/launchpadto,,not_found,LinkedIn page - no direct apply form
+acc-bio-incubator,Austin Community College Bio Incubator,accel,https://sites.austincc.edu/incubator,,error,fetch failed or empty
+acc-fashion-incubator,Austin Community College Fashion Incubator,accel,https://sites.austincc.edu/fashion-incubator,,error,fetch failed or empty
+austin-technology-incubator,Austin Technology Incubator,accel,https://ati.utexas.edu,,error,fetch failed or empty
+babson-college-center-for-womens-entrepreneurial-leadership,Babson College Center for Women’s Entrepreneurial Leadership,accel,https://www.babson.edu/womens-leadership-institute/campus-programs,https://www.babson.edu/undergraduate/how-to-apply/,high,"Apply CTA: ""How to Apply"""
+barclays-accelerator,Barclays Accelerator,accel,https://home.barclays/who-we-are/innovation/barclays-accelerator/#/london,,not_found,No apply link found
+bc-tech-association,BC Tech Association,accel,https://wearebctech.com,,not_found,No apply link found
+bengal-entrepreneurship-program,Bengal Entrepreneurship Program,accel,https://sbdc.buffalostate.edu/bengal-entrepreneurship-program,https://suny.buffalostate.edu/apply,high,"""Apply"" + apply href"
+berkeley-skydeck,Berkeley SkyDeck,accel,https://skydeck.berkeley.edu,https://skydeck.berkeley.edu/apply/,high,"""APPLY"" + apply href"
+biomedical-zone,Biomedical Zone,accel,https://www.torontomu.ca/zone-learning/biomedical-zone,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+black-entrepreneurship-alliance,Black Entrepreneurship Alliance,accel,https://www.thebea.co,,not_found,No apply link found
+black-founders-network,Black Founders Network,accel,https://entrepreneurs.utoronto.ca/for-entrepreneurs/black-founders-network,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,medium,Apply href: https://ute.acceleratorapp.co/application/new?
+bonum-ventures,Bonum Ventures,accel,https://bonum.eu,,error,fetch failed or empty
+boomtown-accelerators,Boomtown Accelerators,accel,https://boomtownaccelerators.com,,error,fetch failed or empty
+brampton-entrepreneur-centre,Brampton Entrepreneur Centre,accel,https://www.brampton.ca/en/Business/bec/Pages/Welcome.aspx,https://www.brampton.ca/EN/residents/Recreation/Pages/Registered-Programs.aspx,medium,Apply href: https://www.brampton.ca/EN/residents/Recreatio
+brampton-venture-zone,Brampton Venture Zone,accel,https://www.torontomu.ca/zone-learning/venture-zone-brampton,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+brandeis-innovation,Brandeis Innovation,accel,https://www.brandeis.edu/innovation/grant-programs/index-copy.html,,not_found,No apply link found
+bu-spark,BU Spark,accel,https://www.bu.edu/spark/resources/hackathons,,not_found,No apply link found
+caltech-new-ventures,Caltech New Ventures,accel,https://innovation.caltech.edu/new-ventures,,not_found,No apply link found
+canadian-technology-accelerators,Canadian Technology Accelerators,accel,https://www.tradecommissioner.gc.ca/cta-atc/index.aspx?lang=eng,,error,fetch failed or empty
+canadian-women-network,Canadian Women's Network,accel,https://www.cwnsv.com,,error,fetch failed or empty
+carbon-trust,Carbon Trust,accel,https://www.carbontrust.com,,not_found,No apply link found
+cardinal-ventures,Cardinal Ventures,accel,https://www.cardinalventures.org,,error,fetch failed or empty
+catalyst-program,Catalyst Program,accel,https://innovation.ucsf.edu/venture/catalyst-program,,not_found,No apply link found
+catalyze-cu,Catalyze CU,accel,https://www.colorado.edu/catalyzecu,https://forms.gle/vRVUnE62B3mYLS7L7,high,"""Apply to Be a Catalyze CU Mentor"" + apply href"
+cedar-sinai-accelerator,Cedar Sinai Accelerator,accel,https://csaccelerator.com,,not_found,No apply link found
+centech,Centech,accel,https://centech.co,,not_found,No apply link found
+center-for-entrepreneurship-suffolk-university,Center for Entrepreneurship Suffolk University,accel,https://www.suffolk.edu/business/centers-institutes/center-for-entrepreneurship,,error,fetch failed or empty
+center-for-transformative-action,Center for Transformative Action,accel,http://www.centerfortransformativeaction.org/index.php,,not_found,No apply link found
+centre-for-entrepreneurship,Centre for Entrepreneurship University of Toronto,accel,https://www.entrepreneurship.artsci.utoronto.ca,https://www.entrepreneurship.artsci.utoronto.ca/apply-be-ta,high,"""Apply to be a TA"" + apply href"
+centre-for-integrated-transportation-and-mobility,Centre for Integrated Transportation and Mobility,accel,https://citm.ca,,error,fetch failed or empty
+centre-for-women-in-business,Centre for Women in Business,accel,https://www.centreforwomeninbusiness.ca,,not_found,No apply link found
+chan-zuckerberg-biohub-chicago,Chan Zuckerberg Biohub Chicago,accel,https://www.czbiohub.org/chi,,error,fetch failed or empty
+chan-zuckerberg-biohub-network,Chan Zuckerberg Biohub Network,accel,https://www.czbiohub.org,,error,fetch failed or empty
+chicagoblend,Chicago:Blend,accel,https://www.linkedin.com/company/chicago-blend,,not_found,LinkedIn page - no direct apply form
+chobani-incubator,Chobani Incubator,accel,https://www.chobani.com/impact/chobani-incubator,,not_found,No apply link found
+citris-foundry,CITRIS Foundry,accel,https://citrisfoundry.org,,error,fetch failed or empty
+clean-energy-zone,Clean Energy Zone,accel,https://www.torontomu.ca/cue/clean-energy-zone,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+cleantech-open,Cleantech Open,accel,https://www.cleantechopen.org,https://www.cleantechopen.org/en/custom/2026ctoaccelerator/new/submit,high,"Apply CTA: ""Apply Now"""
+cogo-labs,Cogo Labs,accel,https://www.cogolabs.com,,not_found,No apply link found
+collider,Collider,accel,https://www.collider.io,https://www.collider.io/apply,high,"""Apply"" + apply href"
+columbia-startup-lab,Columbia Startup Lab,accel,https://entrepreneurship.columbia.edu,https://entrepreneurship.columbia.edu/what-we-do/,medium,"Generic apply text: ""Get Started"""
+computer-science-innovation-lab-uoft,Computer Science Innovation Lab UofT,accel,https://www.dcsil.ca,https://www.dcsil.ca/applications,medium,Apply href: https://www.dcsil.ca/applications
+cornell-food-venture-center,Cornell Food Venture Center,accel,https://cals.cornell.edu/cornell-agritech/partners-institutes/cornell-food-venture-center,,not_found,No apply link found
+creative-destruction-lab,Creative Destruction Lab,accel,https://www.creativedestructionlab.com,https://creativedestructionlab.com/application-triage/,high,"Link text ""Apply"" + apply href"
+creative-destruction-lab-vancouver,Creative Destruction Lab Vancouver,accel,https://creativedestructionlab.com/locations/vancouver,,error,fetch failed or empty
+csi-technology-incubator,CSI Technology Incubator,accel,https://www.csitechincubator.com,,error,fetch failed or empty
+cu-innovation-entrepreneurship,CU Innovation & Entrepreneurship,accel,https://www.colorado.edu/innovate,https://www.colorado.edu/innovate/getting-started,medium,"Generic apply text: ""Get Started on Your Journey"""
+cuny-startups,CUNY Startups,accel,https://cunystartups.com,,error,fetch failed or empty
+data-pitch,Data Pitch,accel,https://datapitch.eu,,error,fetch failed or empty
+dcu-fintech-innovation-centre,DCU Fintech Innovation Centre,accel,https://dcufintech.org,https://dcufintech.org/dcu-support-center/applications-and-forms.html,medium,Apply href: https://dcufintech.org/dcu-support-center/appl
+design-fabrication-zone,Design Fabrication Zone,accel,https://www.torontomu.ca/zone-learning/design-fabrication-zone,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+digital-media-and-gaming-incubator,Digital Media and Gaming Incubator,accel,https://www.georgebrown.ca/arts-design-information-technology/design/the-industry/digital-media-and-gaming-incubator,https://www.georgebrown.ca/apply,high,"""Apply"" + apply href"
+digitalhealth-london,DigitalHealth.London,accel,https://digitalhealth.london,,error,fetch failed or empty
+disney-accelerator,Disney Accelerator,accel,https://sites.disney.com/accelerator,,not_found,No apply link found
+distill-ventures,Distill Ventures,accel,http://distillventures.com,,error,403 blocked
+district-3-innovation,District 3 Innovation,accel,https://district3.co,https://district3.co/apply,high,"""apply"" + apply href"
+dmz-tech-incubator,DMZ Tech Incubator,accel,https://dmz.torontomu.ca,,not_found,No apply link found
+dmz-women-founders-accelerator-programs,DMZ Women Founders Accelerator Programs,accel,https://dmz.torontomu.ca/womeninnovationprograms,,not_found,No apply link found
+dobson-mcgill-university,Dobson McGill University,accel,https://www.mcgill.ca/dobson,,not_found,No apply link found
+draper-startup-house,Draper Startup House,accel,https://draperstartuphouse.com,,error,fetch failed or empty
+draper-startup-house-accelerator,Draper Startup House Accelerator,accel,https://dshaccelerator.com,,error,fetch failed or empty
+dunin-deshpande-queens-innovation-centre,Dunin-Deshpande Queen's Innovation Centre,accel,https://www.queensu.ca/innovationcentre,,not_found,no apply link found
+eckert-life-science-accelerator,Eckert Life Science Accelerator,accel,https://www.elsalifescience.com,,not_found,no apply link found
+ecommerce-north,eCommerce North,accel,https://ecommercenorth.ca,https://elevateca.typeform.com/to/bIR5c2lA,high,Typeform apply link (text: APPLY NOW)
+elab-cornell-university,eLab Cornell University,accel,https://www.elabstartup.com,https://www.elabstartup.com/apply/,high,Apply Now
+ella-accelerator-for-women-entrepreneurs,ELLA Accelerator for Women Entrepreneurs,accel,https://www.yorku.ca/ella,,not_found,"Luma link is event registration, not apply page"
+empowered-startups,Empowered Startups,accel,http://www.empoweredstartups.com,,not_found,no apply link found
+entrepreneur-first,Entrepreneur First,accel,https://www.joinef.com,https://apply.joinef.com,high,APPLY HERE
+entrepreneurship-at-ubc,Entrepreneurship at UBC,accel,https://entrepreneurship.ubc.ca,https://innovation.ubc.ca/Apply-for-Venture-Founder-Fall-2026,medium,Apply for Venture Founder Fall 2026 — In
+envisage,envisAGE,accel,https://www.envis-age.ca/en,,not_found,no apply link found
+expa,Expa,accel,https://www.expa.com,,not_found,VC studio; no public apply form found
+fashion-zone,Fashion Zone,accel,https://www.torontomu.ca/fashion-zone,https://www.torontomu.ca/zone-learning/fashion-zone/become-a-member/application/,medium,Apply
+fintech-innovation-lab,Fintech Innovation Lab,accel,https://www.fintechinnovationlab.com,https://www.fintechinnovationlab.com/regions/apply-new-york/,low,New York
+food-future-co,Food Future Co,accel,https://www.foodfuture.co/#home-about,https://foodfuture.co/apply-to-cohort-13,medium,Cohort application page (no embedded form visible)
+fordham-foundry,Fordham Foundry,accel,https://www.fordhamfoundry.org,,not_found,no apply link found
+forum-ventures,Forum Ventures,accel,https://www.forumvc.com,https://form.fillout.com/t/vrThVwGMuEus,high,Fillout form embedded on /pitch-us page
+founder-fuel,Founder Fuel,accel,https://founderfuel.com,https://founderfuel.com/apply/,medium,Apply
+founder-institute,Founder Institute,accel,https://fi.co,https://fi.co/join/home,high,Apply Now
+founders-factory,Founders Factory,accel,https://foundersfactory.com,https://form.typeform.com/to/WlDiIsRh,high,Typeform apply link (text: Apply)
+founders-space,Founders Space,accel,https://www.foundersspace.com,https://www.foundersspace.com/join/,low,Events
+foundersboost,FoundersBoost,accel,https://www.foundersboost.com,https://www.foundersboost.com/pre-accelerator,medium,Apply now
+free-ventures,Free Ventures,accel,https://www.freeventures.org,,not_found,no apply link found
+further-faster,Further Faster,accel,https://www.furtherfaster.design,https://forms.gle/7M4TZtmqgKjxJEhf7,medium,Google Form on /ready-to-raise page
+futuresight,FutureSight,accel,https://futuresight.ventures,,not_found,no apply link found
+geovation,Geovation,accel,https://geovation.uk,https://geovation.uk/apply/,medium,Apply
+good-neighbor-fund,Good Neighbor Fund,accel,https://www.goodneighbor.fund,,not_found,no apply link found
+google-for-startups-canada,Google for Startups Canada,accel,https://startup.google.com/accelerator/canada,https://rsvp.withgoogle.com/events/google-for-startups-accelerator-updates/forms/registration,medium,Email updates registration; direct app form not found
+grebel-peace-incubator,Grebel Peace Incubator,accel,https://uwaterloo.ca/centre-peace-advancement/peace-incubator,,not_found,no apply link found
+greenhouse,GreenHouse,accel,https://uwaterloo.ca/united-college/greenhouse,,not_found,"Apply link leads to housing, not accelerator"
+greentown-labs,Greentown Labs,accel,https://greentownlabs.com,https://greentownlabs.com/apply-now/,high,Apply Now
+halton-region-small-business-centre,Halton Region Small Business Centre,accel,https://www.halton.ca/For-Business/Halton-Region-Small-Business-Centre,,not_found,no apply link found
+hardwaredotco,Hardwaredotco,accel,https://hardware.co,https://hardware.co/applications-open-hardware-co-batch-6-quality-life/,low,Blog post about batch 6 applications open
+harvard-innovation-labs,Harvard Innovation Labs,accel,https://innovationlabs.harvard.edu,https://innovationlabs.harvard.edu/events/application-deadline-harvard-alumni-accelerator-programs-2,medium,Now Accepting Applications from Alumni +
+hatchery-incubator-university-of-toronto,Hatchery Incubator University of Toronto,accel,https://hatchery.engineering.utoronto.ca,https://hatchery.engineering.utoronto.ca/application-forms/#/nest/,medium,APPLY
+health-innovation-hub-university-of-toronto,Health Innovation Hub University of Toronto,accel,https://h2i.utoronto.ca,https://h2i.utoronto.ca/join/,low,Join
+healthbox,Healthbox,accel,https://www.himss.org/what-we-do-solutions/healthbox,,error,Homepage 404; program may be defunct or moved
+hearstlab,HearstLab,accel,https://www.hearst.com/hearst-life/hearstlab,https://airtable.com/appLu68pqNyqxgopB/pag73lv5kjT6knzyl/form?prefill_HearstLab+team=US&hide_HearstLab+team=true&prefill_Lab+POC=recxsO0zRhVpNY2oA&hide_Lab+POC=true,medium,Apply US
+highline-beta,Highline Beta,accel,https://highlinebeta.com,,not_found,no apply link found
+highway1,Highway1,accel,https://highway1.io,,not_found,no apply link found
+holtxchange,HoltXchange,accel,https://holtxchange.com,,not_found,no apply link found
+huckletree,Huckletree,accel,https://www.huckletree.com/education/alpha,,not_found,no apply link found
+icube-incubator,ICUBE Incubator,accel,https://icubeutm.ca,,not_found,no apply link found
+idea,IDEA,accel,https://www.northeastern.edu/idea,,not_found,no apply link found
+idea-mississauga,Idea Mississauga,accel,https://www.ideamississauga.ca,,not_found,no apply link found
+ideahub,ideaHUB,accel,https://dalideahub.ca,https://dalideahub.ca/general-application-form/,low,Apply
+ignite,Ignite,accel,https://ignite.io,,error,Site blocked scraping (403)
+illinois-science-technology-coalition-and-institute,Illinois Science & Technology Coalition and Institute,accel,https://www.istcoalition.org,,not_found,no apply link found
+illumina-accelerator,Illumina Accelerator,accel,https://www.illumina.com/company/illumina-for-startups/accelerator-program.html,https://www.illumina.com/landing/illumina-accelerator/grant-competition-application.html,medium,Apply Now
+imagination-catalyst-incubator,Imagination Catalyst Incubator,accel,https://www.ocadu.ca/services/centre-for-emerging-artists-and-designers/imagination-catalyst,,error,Homepage 404; page may have moved
+indie-bio,Indie Bio,accel,https://indiebio.co,https://sosv.com/apply/sosv/,medium,Apply
+innosphere-ventures,Innosphere Ventures,accel,https://innosphereventures.org,https://forms.monday.com/forms/c84aae056c301c5a29b23d5f4f34392e?r=use1,medium,Monday.com form (HOW TO APPLY section)
+innovate-bc,Innovate BC,accel,https://www.innovatebc.ca,,not_found,no apply link found
+innovate-calgary-incubator,Innovate Calgary Incubator,accel,https://innovatecalgary.com,,not_found,no apply link found
+innovatebu,Innovate@BU,accel,https://www.bu.edu/innovate,https://www.bu.edu/innovate/programs-competitions/innovation-pathway/,medium,Innovation Pathway [Apply Now]
+innovation-and-entrepreneurship-centre-at-algonquin-college,Innovation and Entrepreneurship Centre at Algonquin College,accel,https://www.algonquincollege.com/alumni/benefits-perks/entrepreneurship-centre,,error,Homepage 404; URL may have changed
+innovation-boost-zone,Innovation Boost Zone,accel,https://www.torontomu.ca/innovation-boost-zone,,not_found,"Admissions link is for university, not IBZ"
+innovation-factory,Innovation Factory,accel,https://innovationfactory.ca,https://innovationfactory.ca/client-intake-form/,medium,Apply now
+innovation-guelph,Innovation Guelph,accel,https://innovationguelph.ca,,not_found,no apply link found
+innovation-hub-at-carleton-university,Innovation Hub at Carleton University,accel,https://carleton.ca/innovationhub,https://carleton.ca/innovationhub/innovation-hub-applicants/,low,Apply to the Innovation Hub Here
+innovation-studio,Innovation Studio,accel,https://www.linkedin.com/company/myinnovationstudio,,error,LinkedIn URL 404; program may be inactive
+innoved,InnovED,accel,https://www.innoved.oise.utoronto.ca,https://cpl.oise.utoronto.ca/register/,low,Register
+intuit-prosperity-accelerator,Intuit Prosperity Accelerator,accel,https://www.intuit.com/ca/prosperity-accelerator,,error,Rate limited (429); try manual check
+invest-buffalo-niagara,Invest Buffalo Niagara,accel,https://buffaloniagara.org/grow-your-business/startup-resources,,not_found,no apply link found
+invest-kingston,Invest Kingston,accel,https://www.investkingston.ca,,not_found,no apply link found
+invest-ottawa,Invest Ottawa,accel,https://www.investottawa.ca,,not_found,"Apply link is job listing, not accelerator"
+istarter,iStarter,accel,https://twitter.com/istarteritaly,,not_found,no apply link found
+iterative,Iterative,accel,https://www.iterative.vc,https://www.iterative.vc/apply,high,Apply now
+john-wood-centre-for-business-and-student-enterprise,John Wood Centre for Business and Student Enterprise,accel,https://www.uoguelph.ca/johnfwoodcentre/thehub,https://www.uoguelph.ca/wood-centre/hub-incubator-application-process,low,Apply to the Hub!
+johnson-summer-startup-accelerator,Johnson Summer Startup Accelerator,accel,https://eship.cornell.edu/item/johnson-summer-startup-accelerator,,not_found,no apply link found
+kaplan-institute-for-innovation-and-tech-entrepreneurship,Kaplan Institute for Innovation and Tech Entrepreneurship,accel,https://www.iit.edu/kaplan,,not_found,"Apply link is IIT admissions, not Kaplan program"
+l-marks,L Marks,accel,https://lmarks.com,,not_found,Corporate innovation studio; apply via contact form
+l-spark,L-Spark,accel,https://www.l-spark.com,https://www.l-spark.com/telus-sovereign-ai-accelerator/,low,Accelerate Your AI Innovation with TELUS
+la-piscine-mtl,La Piscine MTL,accel,https://www.lapiscine.co/en,https://forms.monday.com/forms/7624dfc48bc392df3e116fe3e1a48886?r=use1,medium,Monday.com form on deep-dive program page
+labasehec-montreal,LabaseHEC Montreal,accel,https://labase.hec.ca,,error,Site blocked scraping (403)
+lair-east-labs,Lair East Labs,accel,https://laireastlabs.com,https://forms.gle/CxLEVf5P1CjkXUVP6,medium,Google Form apply link on homepage
+lassonde-school-of-engineering-best-program,Lassonde School of Engineering BEST Program,accel,https://lassonde.yorku.ca/best/entrepreneurship,https://forms.monday.com/forms/0a8ec3e2cd98347e7d87e30123e7d078?r=use1,low,Apply to join our community
+launch-academy,Launch Academy,accel,https://www.launchacademy.ca,https://launch.launchacademy.ca/,medium,Launch Your Startup application portal
+launch-accelerator,Launch Accelerator,accel,https://launchaccelerator.co,,not_found,no apply link found
+launch-berkely,Launch Berkely,accel,https://www.uclaunch.com,https://www.uclaunch.com/apply,medium,Apply
+launch-lab,Launch Lab,accel,https://www.launchlab.ca,,not_found,no apply link found
+launch-ny,Launch NY,accel,https://launchny.org,https://launchny.org/entrepreneurs/apply-now,high,Explicit 'Apply Now' link in nav and multiple CTAs
+launchpad-for-women-entrepreneurs,Launchpad for Women Entrepreneurs,accel,https://www.launchpadforwomen.ca,https://www.launchpadforwomen.ca/courses,medium,Thinkific platform; enroll via course listing page; no dedicated /apply page
+launchpad-la,Launchpad LA,accel,https://launchpad.la,https://launchpad.la/apply/,high,Direct /apply path in nav
+startup-lab,Laurier StartUp Lab,accel,https://students.wlu.ca/work-leadership-and-volunteering/entrepreneurship/startup-lab/index.html?ref=work-leadership-and-volunteering%2Fentrepreneurship%2Flaunchpad.html,,not_found,"WLU Laurier StartUp Lab; page is informational only, no apply link found"
+le-pont-quebec,Le Pont Quebec,accel,https://www.lepont.io/en/home,https://lepont.io/en/apply,high,Direct /apply link in nav
+lead-to-win,Lead To Win,accel,https://www.leadtowin.ca,,not_found,Site returned Cloudflare error (522); no apply link reachable
+league-of-innovators,League of Innovators,accel,https://www.theleagueofinnovators.org,https://www.loi.ac/find-your-program,high,Explicit 'APPLY NOW - it's free' CTA linking to program finder; Airtable form embedded
+learnlaunch-accelerator,LearnLaunch Accelerator,accel,https://learnlaunch.com/accelerator-2,,not_found,Homepage shows news; no active /apply page found; applications announced via blog
+legal-innovation-zone,Legal Innovation Zone,accel,https://www.torontomu.ca/zone-learning/legal-innovation-zone,https://www.torontomu.ca/zone-learning/legal-innovation-zone/apply/,high,Dedicated /apply page in nav
+life-changing-labs-accelerator,Life Changing Labs Accelerator,accel,https://www.lifechanginglabs.com,,not_found,Homepage is portfolio showcase; no apply link visible
+liftoff,LiftOff,accel,https://www.liftoffbyccawr.com,,not_found,"sdgideafactory.ca/join-us link found but is about coworking space, not accelerator apply"
+longo-centre-for-entrepreneurship,Longo Centre for Entrepreneurship,accel,https://humber.ca/cfe,https://humber.ca/cfe/programs.html,medium,Programs listing page; no dedicated external apply link; likely internal enrollment
+mars-discovery-district,MaRS Discovery District,accel,https://www.marsdd.com,https://marsdd.com/apply,high,Direct /apply link found in HTML
+mc2-capital,MC2 Capital,accel,https://www.cabhi.com/mc2capital,https://www.cabhi.com/en/innovation-programs-services/acceleration-services,low,MC2 Capital page redirects to CABHI; Acceleration Services page has program info but no direct apply link
+mcneil-center-for-entrepreneurship-innovation,McNeil Center for Entrepreneurship & Innovation,accel,https://innovation.mines.edu,,not_found,innovation.mines.edu is a news/info page; Beck Venture Center apply surface not found on scraped page
+mediatech-ventures,MediaTech Ventures,accel,https://www.linkedin.com/company/mediatech-ventures,,not_found,LinkedIn company page only; no apply surface
+menlo-ventures,Menlo Ventures,accel,https://menlovc.com,,not_found,VC firm homepage; no public apply form for founders
+metaprop,MetaProp,accel,https://www.metaprop.vc,https://www.metaprop.com/partner-with-us,low,Partner With Us page exists but no form found; likely intake via contact
+mhub,mHUB,accel,https://www.mhubchicago.com/accelerator,https://www.mhubchicago.com/accelerator-program-interest,high,Explicit accelerator interest/apply form link found on accelerator sub-pages
+mit-global-startup-labs,MIT Global Startup Labs,accel,https://gsl.mit.edu/mit-global-startup-labs,,not_found,gsl.mit.edu returned empty/no-content response; site may be down or JS-only
+mit-office-of-innovation,MIT Office of Innovation,accel,https://innovation.mit.edu,,not_found,innovation.mit.edu is informational; no apply surface for external founders
+mitacs-canada,Mitacs Canada,accel,https://www.mitacs.ca/en,https://www.mitacs.ca/get-started/,medium,'Unleash Your Innovation Potential' CTA links to /get-started; research funding intake
+mmode,mmode,accel,https://www.mmode.ca,https://docs.google.com/forms/d/e/1FAIpQLScHrXWvGy2JRK4QbyaITR9QmESblcaJaJoJW2j7aML1Eifziw/viewform,medium,Google Form linked from event on homepage; industry network not accelerator apply per se
+mtlab,MTLab,accel,https://mtlab.ca,https://mtlab.ca/nos-programmes/,low,French-language tourism tech incubator; no direct apply link; programs listing page
+mucker-lab,Mucker Lab,accel,https://www.mucker.com,https://mucker.com/accelerator/,medium,Embedded pitch/apply form visible on /accelerator page (pitch deck required fields)
+nar-reach,NAR REACH US,accel,https://nar-reach.com,https://www.nar-reach.com/apply,high,Explicit APPLY link in navigation
+new-inc,NEW INC,accel,https://www.newinc.org,https://www.newinc.org/apply,high,newinc.org/apply redirects to newmuseum.org/new-inc/open-call/; open call application page
+new-ventures-bc,New Ventures BC,accel,https://www.newventuresbc.com,https://nvbc.typeform.com/to/vboBF4Gr,high,Typeform apply link found on AI Business Accelerator program page
+nex-cubed,Nex Cubed,accel,https://www.facebook.com/nexcubed,,not_found,Facebook company page only; no apply surface
+next-canada,Next Canada,accel,https://www.nextcanada.com,,not_found,Site JS-rendered; no apply links extractable from HTML; programs overview page found but no apply CTA
+north-shore-innoventures,North Shore InnoVentures,accel,https://nsiv.org,,not_found,nsiv.org returned empty response; site unreachable
+nyu-tandon-future-labs,NYU Tandon Future Labs,accel,https://futurelabs.nyc,https://futurelabs.nyc/programs/,low,Programs listing page found but no direct apply links on individual program pages
+on-deck,On Deck,accel,https://www.beondeck.com,,not_found,beondeck.com returned Cloudflare error code 522; site unreachable
+oneeleven,OneEleven,accel,https://oneeleven.com,,not_found,Site timed out during scrape; no content retrievable
+onetech,OneTech,accel,https://www.weareonetech.org,,not_found,weareonetech.org scraped but no apply links found; community org
+ontario-centre-of-innovation,Ontario Centre of Innovation,accel,https://www.oc-innovation.ca,,not_found,oc-innovation.ca scraped; only Bizzabo event link found; no accelerator apply page
+organic-food-incubator,Organic Food Incubator,accel,https://organicfoodincubator.com,,not_found,organicfoodincubator.com scraped; no apply links found on homepage
+outlier-ventures,Outlier Ventures,accel,https://outlierventures.io,https://outlierventures.io/base-camp/,low,Base Camp accelerator program page exists; apply link not extractable from JS-rendered site
+oxygen-accelerator,Oxygen Accelerator,accel,https://www.oxygenaccelerator.com,https://www.oxygenaccelerator.com/cee-startups-apply-now-to-oxygen-accelerator/,medium,Blog post with 'apply now' in URL found; may be outdated cohort announcement
+parkdale-centre-for-innovation,Parkdale Centre for Innovation,accel,https://www.parkdaleinnovates.org,,not_found,parkdaleinnovates.org returned only 1.6KB; likely redirect/error page
+pfizer-healthcare-hub,Pfizer Healthcare Hub,accel,https://www.pfizer.co.uk/partnerships/pfizer-healthcare-hub,,not_found,pfizer.co.uk/partnerships page only has internal links; no founder apply surface
+pioneer,Pioneer,accel,https://pioneer.app,,not_found,Pioneer.app explicitly states 'We're no longer making new investments'; program closed
+pioneer-square-labs,Pioneer Square Labs,accel,https://twitter.com/psl,,not_found,Twitter/X profile only; no apply surface
+platform-calgary,Platform Calgary,accel,https://platformcalgary.com,,not_found,"platformcalgary.com/events/submit is event submission, not accelerator apply"
+plug-and-play-tech-center,Plug and Play Tech Center,accel,https://www.plugandplaytechcenter.com,https://www.plugandplaytechcenter.com/join/,low,JS-rendered Angular app; /join path likely exists based on site structure; not confirmed
+polsky-institute,Polsky Institute,accel,https://polsky.uchicago.edu,https://polsky.uchicago.edu/polsky-deep-tech-ventures/,low,Deep Tech Ventures program page found; no direct apply link visible on scraped content
+praxis-center-for-venture-development,Praxis Center for Venture Development,accel,https://eship.cornell.edu/item/praxis-center,https://pcvd.cornell.edu/,low,Cornell PCVD homepage linked from eship.cornell.edu; no direct apply link found
+qb3,QB3,accel,https://qb3.org,https://qb3.org/early-stage-mentoring/,low,Early-stage mentoring page found; no dedicated apply CTA
+reach,REACH,accel,https://www.nar.realtor/technology/reach,https://nar-reach.com/apply,high,NAR REACH US - same apply portal as nar-reach.com
+reach-canada,Reach Canada,accel,https://nar-reach.com/canada,https://nar-reach.com/apply,high,REACH Canada apply page on nar-reach.com
+reach-uk,Reach UK,accel,https://nar-reach.com/uk,https://nar-reach.com/apply,high,REACH UK apply page on nar-reach.com
+redhawk-launch-accelerator,RedHawk Launch Accelerator,accel,https://www.miamioh.edu/fsb/academics/entrepreneurship/focus-areas/startup-entrepreneurship/redhawk-launch-accelerator/index.html,,not_found,miamioh.edu page links to general admission apply; not accelerator-specific apply
+rev-ithaca-startup-works,Rev: Ithaca Startup Works,accel,https://www.revithaca.com,https://www.revithaca.com/join-rev/,medium,Explicit 'Join REV' apply page found
+rice-alliance-for-technology-and-entrepreneurship,Rice Alliance for Technology and Entrepreneurship,accel,https://business.rice.edu/rice-alliance,https://business.rice.edu/apply,medium,General Rice business school /apply path; may be MBA admission not accelerator
+rocky-mountain-microfinance-institute,Rocky Mountain MicroFinance Institute,accel,https://rmmfi.org,https://rmmfi.org/business-programs/,medium,Business Programs page with Business Idea Lab and Boot Camp intake described; no direct apply form URL
+rogers-cybersecure-catalyst,Rogers Cybersecure Catalyst,accel,https://cybersecurecatalyst.ca/catalyst-cyber-accelerator,https://cybersecurecatalyst.ca/programs-and-services/,medium,Programs & Services listing page found; apply links for specific programs need further navigation
+roseview-global-incubator,Roseview Global Incubator,accel,https://roseviewglobal.com,https://roseviewglobal.com/programs/,low,Programs page exists; no apply link extractable from JS-rendered site
+science-discovery-zone,Science Discovery Zone,accel,https://www.torontomu.ca/discoveryzone,https://www.torontomu.ca/zone-learning/sdz/get-involved/,medium,'Get Involved' page found on TMU SDZ site
+seneca-helix,Seneca HELIX,accel,https://www.senecacollege.ca/innovation/helix.html,,not_found,senecacollege.ca/innovation/helix.html scraped; only general college apply link found (international admissions); no HELIX-specific apply
+sequoia-capital,Sequoia Capital,accel,https://www.sequoiacap.com,https://www.sequoiacap.com/arc/apply,high,Sequoia Arc accelerator has dedicated /arc/apply page
+sheboot,SheBoot,accel,https://sheboot.ca,https://sheboot.ca/for-founders/,medium,'For Founders' page found; sheboot.ca is Wix site; apply surface likely on this page
+sheridan-edge,Sheridan EDGE,accel,https://edge.sheridancollege.ca,https://www.surveymonkey.com/r/Student_ProgramInterestForm,medium,SurveyMonkey interest form linked from Sheridan EDGE programs page
+sku,SKU,accel,https://sku.is,https://sku.is/apply/,high,Direct /apply link in nav and multiple CTAs
+small-foundation,Small Foundation,accel,https://smallfoundation.ie,,not_found,smallfoundation.ie scraped; no apply/grant application links found for founders
+social-venture-zone,Social Venture Zone,accel,https://www.torontomu.ca/svz,https://www.torontomu.ca/svz/apply/,high,Dedicated /svz/apply/ page found
+spinup,SpinUp,accel,https://spinup.utm.utoronto.ca,https://spinup.utm.utoronto.ca/programming/,low,Programming page found; no direct apply form; UTM SpinUp is university program
+sputnik-atx-vc,Sputnik ATX VC,accel,https://www.sputnikatx.com,https://gust.com/programs/sputnik-atx-vc-summer-2026,high,Gust platform apply link displayed prominently on homepage
+starburst-aerospace,Starburst Aerospace,accel,https://starburst.aero,https://starburst.aero/accelerator-program/,medium,Accelerator program page found; apply form not extractable from static scrape
+start-alberta,Start Alberta,accel,https://startalberta.ca,,not_found,startalberta.ca is an ecosystem directory/resource site; no accelerator apply surface
+startshea,Start@Shea,accel,https://www.startatshea.com,https://www.startatshea.com/accelerate-shea,medium,Accelerate@Shea program page found on Wix site; apply form likely JS-rendered
+started,StartEd,accel,https://www.started.com,https://www.started.com/apply,high,Direct /apply page found in HTML hrefs
+startgbc,startGBC,accel,https://www.startgbc.com,,not_found,"startgbc.com appears to be a generic blog site, not George Brown College startup program; no apply links"
+startup-calgary,Startup Calgary,accel,https://www.startupcalgary.ca,,not_found,"startupcalgary.ca/events/submit is event submission, not startup apply; no accelerator apply page found"
+startup-fiu,StartUP FIU,accel,https://startup.fiu.edu,,not_found,startup.fiu.edu is informational site; no apply links in scraped HTML
+startup-garage,Startup Garage,accel,https://startupgarage.ca,https://startupgarage.ca/apply-now,high,Direct /apply-now href found multiple times
+startup-health,Startup Health,accel,https://www.startuphealth.com,https://www.startuphealth.com/apply-now,high,Explicit /apply-now href found in HTML
+startup-montreal,Startup Montréal,accel,https://startupmontreal.com/en/home,,not_found,startupmontreal.com/en/home returns 404; site appears moved or offline
+startup-school,Startup School,accel,https://www.startupschool.org,https://www.startupschool.org/users/sign_in?sign_up=true,high,YC Startup School is free online course; sign-up page is the apply surface
+startupboot-camp,Startupboot camp,accel,https://www.startupbootcamp.org/accelerator/fintech-new-york,,not_found,URL /accelerator/fintech-new-york returns 404 on Webflow site; program page not found
+startx,StartX,accel,https://startx.com,https://startx.com/apply,high,Dedicated apply page with form (login to startx.com required)
+surge-mohawk,Surge Mohawk,accel,https://www.mohawkcollege.ca/surge-mohawks-entrepreneurship-resource-space,https://www.mohawkcollege.ca/node/2331,medium,Apply now link on page; node URL - may be course enrollment not accelerator application
+sutardja-center-for-entrepreneurship-technology,Sutardja Center for Entrepreneurship & Technology,accel,https://scet.berkeley.edu,https://startupstudio.berkeley.edu/,medium,Links to Berkeley Startup Studio - main startup application path
+synapse-consortium,Synapse Consortium,accel,https://synapseconsortium.com,,not_found,No apply link found; life science consortium with no visible application process
+tech-mba-venture-studio,Tech MBA Venture Studio,accel,https://schulich.yorku.ca/schulich-startups/venture-studio,https://schulich.yorku.ca/admissions/how-to-apply/,low,Links to MBA admissions apply page; venture studio itself has no separate application
+techalliance,TechAlliance,accel,https://techalliance.ca,https://www.techalliance.ca/techalliance-advisory-solutions/startups/,medium,Startups page found; Pitch Room and Pitch Development programs visible
+techbuffalo,TechBuffalo,accel,https://www.techbuffalo.org,https://www.techbuffalo.org/apply/,high,Dedicated /apply page found
+technexus,TechNexus Venture Collaborative,accel,https://technexus.com,,not_found,"No apply link found; corporate venture collaborative, no startup application visible"
+techranch,TechRanch,accel,https://techranchaustin.com,https://techranchaustin.com/programs/,low,Programs page found but no direct application form or apply link visible
+techrise-chicago,TechRise Chicago,accel,https://techrise.co,https://airtable.com/appfgBVkCSJj3MA6Y/pag5b2FJXvTdvGuHG/form,high,Airtable form for pitch competition applications
+texas-venture-labs,Texas Venture Labs,accel,https://www.mccombs.utexas.edu/centers-and-initiatives/jon-brumley-texas-venture-labs,,not_found,Page not accessible (404); university program with no visible external apply link
+the-bridge-university-of-toronto,The BRIDGE University of Toronto,accel,https://www.utsc.utoronto.ca/thebridge/welcome-bridge,,not_found,"University hub, no external apply form found; after-hours access mentioned but no startup application"
+the-center-for-life-science-ventures,The Center for Life Science Ventures,accel,https://eship.cornell.edu/item/the-mcgovern-center-2,,not_found,Cornell entrepreneurship page; no startup application link found
+the-cornell-food-processing-development-laboratory-fpdl,The Cornell Food Processing Development Laboratory (FPDL),accel,https://cals.cornell.edu/food-science/outreach-extension/services/food-processing-and-development-laboratory,,not_found,"Lab facility, not an accelerator with applications; no apply link found"
+the-eforum,The eForum,accel,https://www.theeforum.org,,not_found,Website has SSL error and returns 409 conflict; could not access
+the-forge,The Forge,accel,https://theforge.mcmaster.ca,https://theforge.mcmaster.ca/programs/startup-survivor/,high,Startup Survivor pitch competition program with apply link; also main incubator apply page visible
+the-forum,The Forum,accel,https://www.theforum.ca,https://www.theforumpitch.ca/,high,The Forum Pitch program - applications open year-round
+the-hive,The Hive,accel,http://hivedata.com,,not_found,hivedata.com is a data company; redirects to www.hivedata.com with no accelerator application
+the-hub,The Hub University of Toronto,accel,https://www.utsc.utoronto.ca/thehub,https://sicieeil.acceleratorapp.co/application/new?program=sicieeil-applications,high,AcceleratorApp application form found for UTSC entrepreneurship programs
+the-technology-farm,The Technology Farm,accel,https://www.thetechnologyfarm.com,,not_found,Cornell Agriculture tech park; no startup application form found
+tie-toronto,TiE Toronto,accel,https://toronto.tie.org,,not_found,Events/networking org; found event registration (Eventbrite) but no structured accelerator application
+toronto-fashion-incubator,Toronto Fashion Incubator,accel,https://fashionincubator.com,,not_found,DNS resolution failed for fashionincubator.com; website appears to be down
+transcend-network,Transcend Network,accel,https://www.transcend-network.com,https://form.typeform.com/to/ptlIt8DC,high,Typeform application found (Apply now link)
+transmedia-zone,Transmedia Zone,accel,https://www.torontomu.ca/transmediazone,https://forms.gle/aEAY4qcNYo3jtVQa7,high,Google Form for TZ membership application found
+treefrog-accelerator,Treefrog Accelerator,accel,https://www.treefrog.biz,https://www.treefrog.biz/application-process-form/,high,Dedicated application process form page found
+tufts-launchpad-biolabs,Tufts Launchpad BioLabs,accel,https://viceprovost.tufts.edu/research-services/core-facilities-resources/tufts-launchpad-biolabs,,not_found,Page returns 404; could not access Tufts LaunchPad BioLabs page
+ucla-ventures,UCLA Ventures,accel,https://ventures.ucla.edu,https://tdg.ucla.edu/ucla-researchers/ucla-ventures/pitch-gym,high,Pitch Gym program with Google Form application found
+university-at-buffalo-business-entrepreneur-partnerships,University at Buffalo Business & Entrepreneur Partnerships,accel,https://www.buffalo.edu/partnerships/about/centers-facilities-equipment/incubators.html,,not_found,Incubator info page; no direct application form found
+utest,University of Toronto Early Stage Technology (UTEST),accel,https://utest.to,https://utest.to/apply/,high,Dedicated /apply page found
+university-of-toronto-entrepreneurship,University of Toronto Entrepreneurship,accel,https://entrepreneurs.utoronto.ca,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,high,AcceleratorApp application form found (OnRamp membership)
+unusual-ventures,Unusual Ventures,accel,https://www.unusual.vc,https://www.unusual.vc/contact-us/,low,Only contact us page found; no structured pitch/application form visible
+unyicorps,UNYicorps,accel,https://www.unyicorps.org,,not_found,Redirects to in-icorps.org; no application link found on either site
+upscale,Upscale,accel,https://technation.io/programmes/upscale,https://technation.io/programmes/upscale,medium,Program page with apply section; GravityForms embedded on page
+urban-future-lab,Urban Future Lab,accel,http://ufl.nyc,https://www.ufl.nyc/programs,low,Programs page accessible at ufl.nyc/programs; no direct application form found
+urbanx,Urban-x,accel,https://www.urban-x.com,,not_found,DNS resolution failed for urban-x.com; website appears to be down
+venture-crush,Venture Crush,accel,https://www.venturecrush.com/fg/index.html,,not_found,Static page with no apply link found
+venture-development-center-umass-boston,Venture Development Center UMASS Boston,accel,https://www.umb.edu/vdc,,not_found,University page; no direct application form visible
+venture-for-canada,Venture for Canada,accel,https://ventureforcanada.ca,https://ventureforcanada.ca/programs/fellowships/,medium,Fellowships program page found; has form embedded but specific apply URL not extracted
+venture-labs,Venture Labs,accel,https://venturelabs.ca,https://venturelabs.ca/apply-for-our-programs/,high,Dedicated apply for programs page with GravityForms
+venture-lane,Venture Lane,accel,https://theventurelane.com,,not_found,Has GravityForms plugin but no apply page URL found
+venture-out,Venture Out,accel,https://ventureoutstartups.com,,not_found,Site redirects; could not find apply page (404 on /apply)
+venturelab,VentureLAB,accel,https://www.venturelab.ca,https://www.venturelab.ca/pitch-competition,medium,Pitch competition link found on homepage
+ventureout,VentureOut,accel,https://ventureoutny.com,https://ventureoutny.com/apply/,high,Dedicated /apply page found and confirmed accessible
+viterbi-startup-garage,Viterbi Startup Garage,accel,https://viterbiinnovation.usc.edu/vsg,,not_found,Page returns 404
+voyager-capital,Voyager Capital,accel,https://www.voyagercapital.com,,not_found,No apply/pitch link found; listed as accel but appears to be a VC fund
+watson-institute,Watson Institute,accel,https://watson.is,https://watson.is/apply/,high,Dedicated /apply page confirmed accessible
+webc,WeBC,accel,https://we-bc.ca,https://we-bc.ca/work-with-us/,high,Work with us page with GravityForms application
+weill-cornell-medicine-bioventure-elab,Weill Cornell Medicine Bioventure eLab,accel,https://elab.weill.cornell.edu,https://elab.weill.cornell.edu/programs-offerings-and-support/expertise-and-mentorship/pitch-coaching,low,Pitch coaching page found; no direct application form visible
+western-accelerator,Western Accelerator,accel,https://entrepreneurship.uwo.ca,https://entrepreneurship.uwo.ca/accelerator/,medium,Western Accelerator program page found; no direct apply form extracted
+westmont-enterprise-hub-university-of-west-london,Westmont Enterprise Hub University of West London,accel,https://www.uwl.ac.uk/business/westmont-enterprise-hub,,not_found,Page returns 403 Forbidden; could not access
+weve-acceleration,WEVE Acceleration,accel,https://weveacceleration.com,https://weveacceleration.com/apply-2,high,Dedicated apply page confirmed at /apply-2
+rbc-women-in-cleantech-accelerator,Women in Cleantech RBC Accelerator,accel,https://www.marsdd.com/service/women-in-cleantech-accelerator,https://marsdd.com/apply,high,MaRS apply link found on page
+womens-startup-lab,Women's Startup Lab,accel,https://www.womenstartuplab.com,https://www.womenstartuplab.com/join-us/,high,Join us page with GravityForms found
+world-innovation-lab,World Innovation Lab,accel,https://wilab.com,,not_found,No apply link found; /apply redirects to homepage
+xlr8-accelerator,XLR8 Accelerator,accel,https://xlr8.raiz.vc,,not_found,No apply link found; minimal website content
+xrc-labs,XRC Labs,accel,https://www.xrclabs.com,https://www.xrclabs.com/apply,high,/apply link found on homepage
+y-space,Y Space,accel,https://yspace.yorku.ca,https://www.yorku.ca/yspace/startups/,medium,Startups page found at YSpace; no direct apply form URL extracted
+y2-labs,Y2 Labs,accel,https://y2labs.co,https://y2labs.co/get-started/,high,Get started page found
+yedi-incubator,YEDI Incubator,accel,https://yedi.ca,https://yedi.ca/get-started-at-yedi/,high,Get started at YEDI page found
+zahn-innovation-centre,Zahn Innovation Centre,accel,https://www.ccny.cuny.edu/zahn,,not_found,Page returns 403 Forbidden; could not access
+zinc-venture-builder,Zinc Venture Builder,accel,https://www.zinc.vc/programmes/venture-builder,https://www.zinc.vc/programmes/pre-seed-investment/,medium,Venture builder page 404; found pre-seed investment programme page at zinc.vc
+zx-ventures,ZX Ventures,accel,https://www.zx-ventures.com,,not_found,DNS resolution failed; website appears to be down
+mergelane,MergeLane,fellowship,https://www.linkedin.com/company/mergelane/about,,not_found,LinkedIn page requires login; could not find apply link
+the-capital-network,The Capital Network,fellowship,https://www.thecapitalnetwork.org,https://www.thecapitalnetwork.org/programs,medium,Programs page found with form; specific apply URL not extracted
+the-vinetta-project,The Vinetta Project,fellowship,https://www.vinettaproject.com,,not_found,Homepage loads but no apply link found; /apply returns empty page
+xfactor-ventures,XFactor Ventures,fellowship,https://www.xfactor.ventures,https://www.xfactor.ventures/work-with-us-1,medium,Work With Us page found; application form likely embedded (JS-rendered)
+406-ventures,.406 Ventures,vc,https://www.406ventures.com/approach,,not_found,VC firm with contact page only; no structured application form
+10x-capital,10X Capital,vc,https://www.10xcapital.com,,not_found,No structured application form found; broker-dealer/VC hybrid
+1414-ventures,1414 Ventures,vc,https://www.1414ventures.com,,not_found,Only contact page found; no structured application
+1984-ventures,1984 Ventures,vc,https://1984.vc,https://1984.vc/apply/start,high,"Structured application with Start your application"" form at /apply/start"""
+2048-ventures,2048 Ventures,vc,https://www.2048.vc,https://airtable.com/appV89PYGo3zN47f9/pagNjeYwHGADSGIs3/form,high,Airtable structured application form found at /pitch
+24-haymarket,24 Haymarket,vc,https://24haymarket.com,,not_found,Only contact page found; no structured application form
+5am-ventures,5AM Ventures,vc,https://5amventures.com,,not_found,"Only contact page found; life sciences VC, no structured application"
+645-ventures,645 Ventures,vc,https://645ventures.com,,not_found,No apply/pitch link found on homepage
+7-gate-ventures,7 Gate Ventures,vc,https://7gate.vc,,not_found,Startup visa page found but no structured founder application form
+7thirty,7thirty,vc,https://7thirtycapital.com,,not_found,Page returns 403; could not access
+8vc,8VC,vc,https://www.8vc.com,,not_found,Only contact page found; no structured application form
+abingworth,Abingworth,vc,https://www.abingworth.com,,not_found,"Life sciences VC; only contact page found, no structured application"
+accel,Accel,vc,https://www.accel.com,,not_found,"Major VC firm; contact-us page only, no structured founder application form"
+acf-investors,ACF Investors,vc,https://www.acfinvestors.com,https://www.acfinvestors.com/angel-cofund/#apply_form,medium,Has Apply for Funding sections on both Angel CoFund and Delta Fund pages (anchor links to embedded form); co-invest model requiring angel syndicate lead
+acme-capital,ACME Capital,vc,https://www.acme.vc,,not_found,not_found: site timed out on scrape; no apply surface identified
+acrew-capital,Acrew Capital,vc,https://www.acrewcapital.com,,not_found,not_found: contact is email only (hello@acrewcapital.com); no structured form for founders
+active-impact-investments,Active Impact Investments,vc,https://www.activeimpactinvestments.com,https://www.activeimpactinvestments.com/workwithus,low,Has a Work With Us page; page timed out on secondary scrape so form content unconfirmed; may be contact form only
+advent-life-sciences,Advent Life Sciences,vc,https://adventls.com,,not_found,not_found: contact page is email-based (contact@adventls.com); no founder application form
+alate-partners,Alate Partners,vc,https://alatepartners.com,,not_found,not_found: no apply or pitch page found; portfolio-focused site; no structured intake
+allosterx-capital,AllosteRx Capital,vc,https://www.allosterxcapital.com,,not_found,not_found: contact-us page only; no structured application form for founders
+alpha-bridge-ventures,Alpha Bridge Ventures,vc,https://www.alphabridge.vc,,not_found,not_found: contact-us anchor link only; no structured apply form visible
+alpha-partners,Alpha Partners,vc,https://alphapartners.com,,not_found,not_found: has a contact page and email newsletter form; no structured startup application
+amadeus-capital-partners,Amadeus Capital Partners,vc,https://www.amadeuscapital.com,https://www.amadeuscapital.com/submit-a-proposal/,medium,Submit a Proposal page in top nav; form content not fully loaded but dedicated proposal submission page exists
+amplifyla,Amplify.LA,vc,https://amplify.la,,not_found,not_found: contact page only; pre-seed LA fund with no public application form
+apollo-health-ventures,Apollo Health Ventures,vc,https://www.apollo.vc,,not_found,not_found: contact is email only (info@apollo.vc); co-founding model not open application
+archangel-network-of-funds,Archangel Network of Funds,vc,https://www.archangelnetwork.ca,,not_found,not_found: contact-us page only; invests through angel syndicates not open applications
+arctern-ventures,ArcTern Ventures,vc,https://www.arcternventures.com,,not_found,not_found: no dedicated apply page; contact section has email form but no structured founder intake
+ascent-venture-partners,Ascent Venture Partners,vc,https://www.ascentvp.com,,not_found,not_found: contact-us page only; no structured application form
+astia,Astia,vc,https://www.astia.org,https://astia.my.site.com/connect/s/raiseapplication,high,Clear Apply page with Salesforce-powered application portal for investment consideration; founders answer structured questions
+atb-ventures,ATB Ventures,vc,https://twitter.com/AtbVentures,,not_found,not_found: homepage is Twitter/X; no application surface accessible
+atlas-venture,Atlas Venture,vc,https://atlasventure.com,,not_found,not_found: cookies-heavy site; no apply or pitch page found in scraped content
+atomico,Atomico,vc,https://atomico.com,,not_found,not_found: no apply page found; large multi-stage European VC; inbound through network
+atx-venture-partners,ATX Venture Partners,vc,https://www.atxventurepartners.com,,not_found,not_found: contact section only; no structured startup application
+austin-ventures,Austin Ventures,vc,https://austinventures.com,,not_found,not_found: site warns of scam impersonators and states no current hiring; appears largely inactive/wind-down
+bain-capital-ventures,Bain Capital Ventures,vc,https://baincapitalventures.com,,not_found,not_found: has contact page; no structured founder application form; large growth-stage fund
+balderton-capital,Balderton Capital,vc,https://www.balderton.com,,not_found,not_found: no apply page found; large Series A+ European fund; network-driven dealflow
+baroda-ventures,Baroda Ventures,vc,https://www.linkedin.com/company/baroda-ventures,,not_found,not_found: homepage is LinkedIn company page; no application surface
+basf-venture-capital,BASF Venture Capital,vc,https://www.basf.com/global/en/who-we-are/organization/group-companies/BASF_Venture-Capital.html,,not_found,not_found: corporate VC with contact via Vanessa Holzhaeuser PR contact; no founder application form; email-based contact only
+battery-ventures,Battery Ventures,vc,https://www.battery.com,,not_found,not_found: no apply page found; large multi-stage fund; inbound through network
+bcf-ventures,BCF Ventures,vc,https://bcfventures.vc,https://www.f6s.com/bcfventures/apply,high,APPLY NOW button prominently links to F6s application portal; structured questions for founders
+bdmi-fund,BDMI Fund,vc,https://www.bdmifund.com,,not_found,not_found: site redirects to 1745 Ventures and Bertelsmann Investments; BDMI no longer active under that name
+bessemer-venture-partners,Bessemer Venture Partners,vc,https://www.bvp.com,,not_found,not_found: has contact page; large multi-stage fund with no public founder application
+betaworks,betaworks,vc,https://www.betaworks.com,https://www.betaworks.com/camp/application,high,Camp application page with structured form; program currently in session; accepts next cohort applications for AI Camp; guaranteed investment up to $500k for accepted startups
+bethnal-green-ventures,Bethnal Green Ventures,vc,https://www.bethnalgreenventures.com,https://www.bethnalgreenventures.com/apply,high,Dedicated apply page for BGV programme; open applications for Autumn 2026; structured intake form for tech-for-good founders
+bkr-capital,BKR capital,vc,https://www.bkrcapital.ca,https://www.bkrcapital.ca,medium,Website has contact form that explicitly requests pitch deck URL for investment inquiries; not a standalone apply portal but structured intake; Canada's first Black-led institutional VC
+blck-vc,BLCK VC,vc,https://www.blckvc.org,https://admin374289.typeform.com/to/XtSpRao2,medium,Typeform join link found; appears to be for community membership not founder investment; BLCK VC is a network organization not a fund
+blossom-capital,Blossom Capital,vc,https://www.blossomcap.com,,not_found,not_found: no apply page; Series A European fund; 5-6 investments per year via network
+blueyard-capital,BlueYard Capital,vc,https://www.blueyard.com,,not_found,not_found: no apply or pitch page; deep tech/crypto fund with no public application surface
+bolt,Bolt,vc,https://bolt.io,,not_found,not_found: Bolt explicitly states they are no longer making new investments; firm wound down
+boxgroup,BoxGroup,vc,https://www.boxgroup.com,,not_found,not_found: no apply page; known for pre-seed NYC investments via founder networks only
+braemar-energy-ventures,Braemar Energy Ventures,vc,http://www.braemarenergy.com,,not_found,not_found: Submit Business Plan link is mailto (bizplans@braemarenergy.com); email submission only not a structured form
+break-trail-ventures,Break Trail Ventures,vc,https://www.breaktrailventures.com,,not_found,not_found: contact section only; no structured application form
+breed-reply,Breed Reply,vc,https://www.reply.com/breed-reply/en,,not_found,not_found: parent Reply company site; no specific apply page for Breed Reply fund found
+brightspark-ventures,Brightspark Ventures,vc,https://brightspark.com/en,,not_found,not_found: investor-facing platform (retail investors); no founder application surface; operates as exempt market dealer
+buckley-ventures,Buckley Ventures,vc,https://www.buckleyventures.com,,not_found,not_found: minimal site; single-sentence description; no application form
+builders-vc,Builders VC,vc,https://www.builders.vc,,not_found,not_found: no apply page found; agriculture/food/industrial focus; no public application
+camber-creek,Camber Creek,vc,https://cambercreek.com,,not_found,not_found: no apply page; real estate tech PE firm; deals via direct sourcing and partner network
+capitalg,CapitalG,vc,https://www.capitalg.com,,not_found,not_found: Google growth equity fund; no public application; inbound via Google network only
+capitalize-vc,Capitalize VC,vc,https://www.capitalizevc.com,https://airtable.com/apppvODtMSw09eCae/pagdarmEj6iMMvBob/form,high,PITCH US button links to Airtable form with structured fields; prominent on homepage and footer
+carbon-direct-capital,Carbon Direct Capital,vc,https://www.carbondirectcapital.com,,not_found,not_found: contact is email only (inquiries@carbondirectcapital.com); no structured founder form
+cavu-venture-partners,CAVU Venture Partners,vc,https://www.cavuventures.com,,not_found,not_found: consumer brand-focused VC; no public application form
+celtic-house-venture-partners,Celtic House Venture Partners,vc,https://www.celtic.vc,,not_found,not_found: Canadian deep tech VC; no apply page; 75+ portfolio companies; network-driven
+cherry-ventures,Cherry Ventures,vc,https://www.cherry.vc,,not_found,not_found: European early-stage VC; contact form present but generic; no founder-specific application
+chingona-ventures,Chingona Ventures,vc,https://www.chingona.ventures,https://www.chingona.ventures/apply,medium,Submit button in nav links to /apply page; page timed out on secondary scrape so form details unconfirmed; clearly a dedicated founder submission page
+chloe-capital,Chloe Capital,vc,https://chloecapital.com,https://chloecapital.com/funding,medium,APPLY FOR FUNDING button on homepage; /funding page lists funding opportunities and accelerator programs; has NYC 2026 programme open; structured accelerator application
+chrysalix-venture-capital,Chrysalix Venture Capital,vc,https://www.chrysalix.com,https://www.chrysalix.com/pitch,medium,Pitch to us link in navigation; /pitch page confirmed accessible; industrial innovation VC; form content not fully loaded
+collaborative-fund,Collaborative Fund,vc,https://collabfund.com,,not_found,not_found: no apply page; thematic fund investing via network; no public founder application
+compound-vc,Compound VC,vc,https://www.compound.vc,,not_found,not_found: has a web form that failed to load (Oops error); no confirmed structured application
+congruent-ventures,Congruent Ventures,vc,https://www.congruentvc.com,,not_found,not_found: no apply page; climate tech fund; contact section present but no structured startup intake
+connect-ventures,Connect Ventures,vc,https://www.linkedin.com/company/connect-ventures,,not_found,not_found: homepage is LinkedIn; no application surface accessible
+continuous-ventures,Continuous Ventures,vc,https://www.continuous.vc,,not_found,not_found: site has client-side JS application error; no content loaded; cannot confirm apply page
+contrary,Contrary,vc,https://contrary.com,https://applications.contrary.com/,high,Applications subdomain listed in footer Resources section; dedicated applications portal for Contrary; talent and research-driven fund with structured applications
+core-innovation-capital,Core Innovation Capital,vc,http://corevc.com,,not_found,not_found: site rendered minimal content; no apply page identified; fintech VC
+courtside-ventures,Courtside Ventures,vc,https://www.courtsidevc.com,,not_found,not_found: sports/gaming/culture VC; no apply page found after scrape
+cowboy-ventures,Cowboy Ventures,vc,https://www.cowboy.vc,,not_found,not_found: pre-seed fund; no structured apply page; curated founder community model
+craft-ventures,Craft Ventures,vc,https://www.craftventures.com,,not_found,not_found: has web form on site that errored; no confirmed structured founder application portal
+crawley-ventures,Crawley Ventures,vc,http://www.crawleyventures.com,,not_found,not_found: contact section only with basic contact form; private investors since 1995; no startup-specific application
+crv,CRV,vc,https://www.crv.com,,not_found,not_found: has web form that failed to load (Oops error); no confirmed structured application; large multi-stage fund
+cycle-capital,Cycle Capital,vc,https://www.cyclecapital.com/en,,not_found,not_found: contact section on homepage; no dedicated founder application; Canadian cleantech VC
+cylon,CyLon,vc,https://www.cylonventures.com,,not_found,not_found: contact page with email (hello@cylonventures.com); cybersecurity VC; no structured application form
+dawn-capital,Dawn Capital,vc,https://dawncapital.com,,not_found,not_found: contact form present but generic; no dedicated founder pitch/apply page; Series B+ European SaaS fund
+dcvc,DCVC,vc,https://www.dcvc.com,,not_found,not_found: deep tech VC; no apply page; inbound via partner network
+defy-vc,defy.vc,vc,https://defy.vc,,not_found,not_found: has contact link but no structured application; pre-seed/seed fund
+deloitte-ventures,Deloitte Ventures,vc,https://www2.deloitte.com/ca/en/pages/insight/solutions/ventures.html,,not_found,not_found: Apply Now links are for Deloitte job openings not startup applications; corporate VC arm
+deming-center-venture-fund,Deming Center Venture Fund,vc,https://www.colorado.edu/dcvf,,not_found,not_found: University of Colorado fund; site not successfully scraped; student/faculty-focused fund
+diagram-ventures,Diagram Ventures,vc,https://diagram.ca,,not_found,not_found: contact-us link goes to diagram.vc/contact-us; venture creation model not open applications; no public founder form
+differential-vc,Differential VC,vc,https://www.differential.vc,https://www.differential.vc/contact-us/submit-a-deck-form,high,Submit a deck! link prominently in navigation and homepage; dedicated form page for startup deck submissions
+district-ventures-capital,District Ventures Capital,vc,https://www.districtventurescapital.com,,not_found,not_found: contact page only; CPG-focused Canadian VC; no structured application form
+dmz-ventures,DMZ Ventures,vc,https://dmzventures.com,,not_found,not_found: invests in startups through DMZ 18-month incubator program; no standalone VC application; requires DMZ incubator participation
+dn-capital,DN Capital,vc,https://dncapital.com,https://www.dncapital.com/contact,medium,Site explicitly states they are excited to receive business plans and links founders to contact page; contact page has structured form fields; not a pure email submission
+drive-capital,Drive Capital,vc,https://drivecapital.com,,not_found,not_found: contact is email only (info@drivecapital.com); Midwest-focused VC; no public application
+dubai-future-district-fund,Dubai Future District Fund,vc,https://dfdf.vc,,not_found,not_found: has a contact/submit section but content is generic; fund-of-funds and direct investments via institutional relationships
+earlybird-vc,Earlybird VC,vc,https://earlybird.com,,not_found,No structured application form found; contact page only (earlybird.com/contact-us); invite/referral based
+eight-roads,Eight Roads,vc,https://eightroads.com/en,,not_found,No structured application form; contact page only (eightroads.com/en/contact); referral/network based
+elsewhere-partners,Elsewhere Partners,vc,https://www.linkedin.com/company/elsewhere-partners,,not_found,Homepage is LinkedIn only; no standalone site or form found
+embark-ventures,Embark Ventures,vc,https://www.embark.vc,,not_found,No apply or pitch form found on site; deep tech focused fund; appears referral-based
+energy-impact-partners,Energy Impact Partners,vc,https://www.energyimpactpartners.com,,not_found,No structured application form; contact page only; strategic utility-backed fund; referral-based
+eniac-ventures,Eniac Ventures,vc,https://eniac.vc,,not_found,No apply form found on scraped page; links to TechCrunch only; likely referral/email based
+episode-1-ventures,Episode 1 Ventures,vc,https://episode1.com,https://www.episode1.com/,medium,"Embedded deck upload form on homepage (B2B software pre-seed/seed); no distinct URL for form — form lives on homepage; ""Submit your deck"" CTA"
+equal-ventures,Equal Ventures,vc,https://www.equal.vc,,not_found,Site timed out; no apply URL found via scrape or search; appears referral-based
+ethical-capital-partners,Ethical Capital Partners,vc,https://www.ethicalcapitalpartners.com,,not_found,Contact page only (ethicalcapitalpartners.com/contact); no intake form found
+everywhere,Everywhere,vc,https://everywhere.vc,https://airtable.com/appeY02X0EMCQQ19G/shrjpNqWOj0SJP1ix,high,"Airtable application form linked directly from homepage as ""Join our portfolio"""
+expansion-venture-capital,Expansion Venture Capital,vc,https://www.expansionvc.com,,not_found,Contact page only (expansionvc.com/contact); no structured pitch intake form found
+extreme-venture-partners,Extreme Venture Partners,vc,https://www.evp.vc,,not_found,No apply form found; Canadian seed fund; appears referral-based; portfolio/team links only
+felicis,Felicis,vc,https://www.felicis.com,,not_found,No structured apply form on site; sources indicate email hello@felicis.com; no intake form URL found
+ferst-capital-partners,Ferst Capital Partners,vc,https://www.linkedin.com/company/ferst-capital-partners/about,,not_found,Homepage is LinkedIn only; no standalone website or form found
+fifth-wall,Fifth Wall,vc,https://fifthwall.com,,not_found,No structured application form; contact page only (fifthwall.com/contact); strategic RE-tech LP fund; referral-based
+firepower-capital,FirePower Capital,vc,https://www.firepowercapital.com,,not_found,Growth equity/PE-style firm; contact page only (firepowercapital.com/contact); not a traditional VC with open applications
+first-ascent-ventures,First Ascent Ventures,vc,https://firstascentventures.com,,not_found,No apply or pitch form found on site; enterprise software fund; fully invested Fund II; referral-based
+firstmark-capital,FirstMark Capital,vc,https://firstmarkcap.com,,not_found,No structured application form found on site; NYC early-stage VC; referral/warm intro based
+fj-labs,FJ Labs,vc,https://www.fjlabs.com,,not_found,No direct apply form found on scraped page; sources indicate pitch via fjlabs.com website contact; no specific intake URL
+flybridge,Flybridge,vc,https://www.flybridge.com,,not_found,No apply/pitch form found; pre-seed via Next Wave program (flybridge.com/next-wave) but no intake form; referral-based
+flying-fish-partners,Flying Fish Partners,vc,https://www.flyingfish.vc/home,,not_found,Contact page (flyingfish.vc/get-in-touch) only; no structured intake form; AI/ML pre-seed and seed fund
+formic-ventures,Formic Ventures,vc,https://formic.vc,,not_found,Contact page only (formic.vc/contact_us.html); no structured pitch intake form found
+forward-partners,Forward Partners,vc,https://forwardpartners.com,,not_found,DNS resolution failed for forwardpartners.com; domain may be expired or moved
+founders-fund,Founders Fund,vc,https://foundersfund.com,,not_found,No apply form found; no contact or pitch page; entirely referral/network based
+framework-venture-partners,Framework Venture Partners,vc,https://www.framework.vc,,not_found,Contact page only (framework.vc/en/contact); Canadian enterprise VC; referral-based
+frog-capital,Frog Capital,vc,https://frogcapital.com,,not_found,Contact page only (frogcapital.com/contact/); European scale-up VC; referral-based
+front-row-ventures,Front Row Ventures,vc,https://frontrow.ventures,https://frontrow.ventures/apply,high,"Dedicated apply page with intake form for student founders; ""Apply for funding"" and ""Apply now"" CTAs link directly"
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com,https://fuelventurecapital.com/pitch-us,high,"Dedicated ""Pitch Us"" page found via nav; fintech growth fund"
+fuel-ventures,Fuel Ventures,vc,https://fuel.ventures,https://www.fuel.ventures/submit-pitch,high,"Dedicated ""Submit Pitch"" page prominently featured in nav and CTA; UK-based early stage VC"
+garage-capital,Garage Capital,vc,https://www.garage.vc,,not_found,No apply or pitch form found on site; portfolio includes ApplyBoard; appears referral-based
+georgian,Georgian,vc,https://georgian.io,,not_found,No apply form found; growth-stage AI/software VC; referral/network based
+gibraltar-company,Gibraltar & Company,vc,https://www.gibraltarcompany.ca,,not_found,Contact page only (gibraltarcompany.ca/contact); consumer-focused Canadian VC; referral-based
+globalive-capital,Globalive Capital,vc,https://www.globalive.com,,not_found,No dedicated apply form URL found; contact form embedded on site but no structured intake; referral-based
+golden-ventures,Golden Ventures,vc,https://www.golden.ventures,,not_found,No apply or pitch form found; FAQ page (faq.golden.ventures) but no intake form; referral/warm intro based
+good-news-ventures,Good News Ventures,vc,https://www.goodnewsventures.com,,not_found,No apply or pitch form found on site; blockchain/AI pre-seed fund; referral-based
+goodwater,Goodwater,vc,https://www.goodwatercap.com,,not_found,No apply form found; consumer tech VC; contact section present but no intake form or apply URL
+google-ventures,Google Ventures,vc,https://www.gv.com,,not_found,No public apply form; strategic corporate VC backed by Google/Alphabet; invitation-only
+graphite-ventures,Graphite Ventures,vc,https://www.graphitevc.com,https://www.graphitevc.com/connect/,medium,"Pitch Us page (graphitevc.com/connect/) with form to share pitch; also /connect-share-your-pitch/ redirects there; ""Tell us what you're building"""
+greensky-ventures,GreenSky Ventures,vc,https://greensky.vc,https://greensky.vc/apply/,high,"Dedicated Apply page with intake form; ""Apply"" prominently in nav and homepage CTAs"
+greycroft,Greycroft,vc,https://www.greycroft.com,,not_found,No apply form found on site; large multi-stage VC; referral/warm intro based
+greylock,Greylock,vc,https://greylock.com,,not_found,No structured apply form; contact page (greylock.com/contact-us/); pitch via businessplans@greylock.com (email only)
+harlem-capital,Harlem Capital,vc,https://harlem.capital,https://harlem.capital/pitch/,high,Dedicated Pitch page (harlem.capital/pitch/) found in nav; diversity-focused VC with intake form
+highland-europe,Highland Europe,vc,https://www.highlandeurope.com,,not_found,Contact section on homepage (#contact-us); no structured intake form or apply URL found
+hlm-venture-partners,HLM Venture Partners,vc,https://hlmvp.com,,not_found,Site redirects to hlminvestmentpartners.com; no apply/pitch form found; healthcare VC; investor login only
+hoxton-ventures,Hoxton Ventures,vc,https://www.hoxtonventures.com,https://hoxtonventures.com/contact/#submit-pitch,medium,Submit pitch section on contact page; form embedded at /contact/#submit-pitch anchor
+hyperplane-venture-capital,Hyperplane Venture Capital,vc,https://hyperplane.vc,,not_found,Contact page (hyperplane.vc/contact-us/) only; no structured intake form; seed AI/ML VC; referral-based
+hyphen-capital,Hyphen Capital,vc,https://www.hyphencap.com,,not_found,Site timed out; search results indicate email-only (dave@hyphencap.com); no intake form URL found
+igan-partners,iGan Partners,vc,https://iganpartners.com,,not_found,Site timed out; healthcare VC; prior pitch competitions referenced but no active form found
+impression-ventures,Impression Ventures,vc,https://impression.ventures,https://impression.ventures/pitch-us,medium,"Site timed out on scrape; search results confirm ""Pitch Us"" nav item at impression.ventures/pitch-us; fintech-focused Canadian VC"
+inbc-investment,InBC Investment,vc,https://www.inbcinvestment.ca,https://inbcinvestment.com/companies/,medium,Short submission form at inbcinvestment.com/companies/ confirmed via FAQs and company investment page; note: domain .ca vs .com both used; form is quick intake
+index-ventures,Index Ventures,vc,https://www.indexventures.com,,not_found,No apply form found; large global VC; TypeForm cookie mention but no intake form URL; referral-based
+initialized-capital,Initialized Capital,vc,https://initialized.com,,not_found,Site timed out; appears referral/intro based; sources indicate website contact but no specific intake form URL
+insight-partners,Insight Partners,vc,https://www.insightpartners.com,,not_found,Contact page (insightpartners.com/contact/) only; growth-stage VC; no structured startup intake form
+intact-ventures,Intact Ventures,vc,https://www.intactfc.com/English/intact-ventures/default.aspx,,not_found,"Site timed out; corporate VC arm of Intact Financial; search shows interest form exists but no specific URL; referral-based, insurtech focus"
+interlace-ventures,Interlace Ventures,vc,https://www.interlacevc.com,,not_found,No apply or pitch form found; commerce/retail tech VC; no intake URL or contact form link found
+ivp,IVP,vc,https://www.ivp.com,,not_found,Contact page (ivp.com/contact/) only; late-stage growth VC; referral-based
+ix-labs,IX Labs,vc,https://www.indexexchange.com/about/ix-labs,,not_found,Corporate venture arm of Index Exchange; no public apply form; invitation/partnership based
+jamjar-investments,JamJar Investments,vc,https://www.jamjarinvestments.com,https://www.jamjarinvestments.com/pitch-to-us,high,"Dedicated ""Pitch to us"" page with form including deck upload; intake form with criteria listed"
+jetblue-ventures,JetBlue Ventures,vc,https://www.jetblueventures.com,https://skyvc.typeform.com/to/CdW5AB8D,high,"JetBlue Ventures rebranded to SKY VC; homepage at jetblueventures.com now shows SKY VC with Typeform apply link ""Get in Touch"""
+jll-spark,JLL Spark,vc,https://spark.jllt.com,,not_found,Site timed out; JLL Spark is strategic corporate VC; no public apply form found; referral/LP relationship based
+junipero-capital,Junipero Capital,vc,https://www.junipero.vc,,not_found,No apply or pitch form found on site; early-stage VC; no intake form or apply URL visible
+kinetic-investments,Kinetic Investments,vc,https://www.linkedin.com/company/kinetic-investments,,not_found,Homepage is LinkedIn only; no standalone site or form found
+klass-capital,Klass Capital,vc,https://www.klass.com,,not_found,Site timed out; Toronto-based expansion-stage software investor; no public apply form found; referral-based
+kleiner-perkins,Kleiner Perkins,vc,https://www.kleinerperkins.com,,not_found,Site timed out; tier-1 VC; no public apply form; Fellows program exists but for students; referral-based
+krillion-ventures,Krillion Ventures,vc,https://krillionventures.com,,not_found,Email-only contact (oneinakrillion@krillionventures.com); no structured intake form
+lab-ventures,LAB Ventures,vc,https://www.labventures.co,,not_found,Site timed out; Spark XYZ references a startup portal but URL not confirmed as active public form; Miami venture studio
+lakelet-capital,Lakelet Capital,vc,https://lakeletcapital.com,,not_found,Site timed out; contact page (lakeletcapital.com/contact/) exists but no structured intake form; growth equity firm
+lakestar,Lakestar,vc,https://lakestar.com,,not_found,Site timed out; European VC; sources indicate email/LinkedIn contact only; no public apply form
+launch-ventures,Launch Ventures,vc,https://www.launch.vc,,not_found,Contact page (launch.vc/contact) and pitch competitions page found but no standalone intake form; referral-based
+ldv-partners,LDV Partners,vc,https://ldvp.com,,not_found,Site timed out; visual technology-focused VC; sources indicate submit via website but no specific form URL confirmed
+lerer-hippeau,Lerer Hippeau,vc,https://www.lererhippeau.com,,not_found,"No apply form found on site; embedded contact form with ""Something went wrong"" error; referral/warm intro based"
+lightspeed-venture-partners,Lightspeed Venture Partners,vc,https://lsvp.com,,not_found,Site timed out; large multi-stage global VC; no public apply form; referral-based
+liveoak-venture-partners,LiveOak Venture Partners,vc,https://liveoakvp.com,,not_found,Site timed out; Texas-focused early-stage VC; sources indicate deck submission via website but no specific form URL confirmed
+loi-venture,LOI Venture,vc,https://www.loi.vc,https://www.loi.vc/pitch/,high,"Dedicated Pitch page in nav (loi.vc/pitch/); ""tap the pitch button"" CTA; $100K check fund with structured intake"
+lowercarbon-capital,Lowercarbon Capital,vc,https://lowercarboncapital.com,,not_found,No apply or pitch form found on scraped page; climate tech VC; referral/warm intro based
+loyal-vc,Loyal VC,vc,https://www.loyal.vc,,not_found,No apply/pitch form found; entrepreneurs page (loyal.vc/entrepreneurs) exists but no intake form URL; referral-based
+luge-capital,Luge Capital,vc,https://www.luge.vc,,not_found,Contact page (luge.vc/contact-us/) only; fintech-focused Canadian VC; no structured intake form
+lumira-ventures,Lumira Ventures,vc,https://www.lumiraventures.com,,not_found,No apply or pitch form found on site; life sciences/biotech VC; referral-based
+lux-capital,Lux Capital,vc,https://www.luxcapital.com,,not_found,Contact page (luxcapital.com/contact) only; fellowship program (luxcapital.com/fellowship) for individuals not companies; referral-based for investment
+lvlup-ventures,LvlUp Ventures,vc,https://www.lvlup.vc,https://www.lvlup.vc/apply/funding-application,high,Structured multi-question funding application form; also covers 25+ VC ecosystem partners
+mantella-venture-partners,Mantella Venture Partners,vc,https://www.mantellavp.com,,not_found,No public apply/pitch form found; contact via LinkedIn or warm intro
+mars-investment-accelerator-fund,MaRS Investment Accelerator Fund,vc,https://www.marsiaf.com,https://marsiaf.com/iaf-application/,high,Dedicated online application form for founders
+massventures,MassVentures,vc,https://www.mass-ventures.com,https://www.mass-ventures.com/venture-program,medium,Venture program page describes process; no single open apply form — contact email required. START grant has separate intake (closed until Feb 2027)
+matbridge,Matbridge,vc,http://www.matbridge.ca,,not_found,No structured application intake; small investment firm — contact via website only
+matrix,Matrix,vc,https://matrix.vc,,not_found,No public apply form; email-based contact only (e.g. diana@matrixpartners.com)
+mendoza-ventures,Mendoza Ventures,vc,https://mendoza-ventures.com,,not_found,Portfolio page says 'send us your deck' via email/contact; no structured form
+metiquity-ventures,Metiquity Ventures,vc,https://metiquity.ca,https://metiquity.ca/For-Founders/Startups,medium,Founders page describes criteria but no direct online form found; likely contact-based
+miami-angels,Miami Angels,vc,https://www.miamiangels.vc,,not_found,Angel network — does not invest directly in companies per About page; founders present at quarterly pitch events; no standard apply URL
+m12vc,Microsoft's Venture Fund: M12,vc,https://m12.vc,,not_found,No public application form; M12 is invite/intro-driven; no structured intake found
+middle-east-venture-partners,Middle East Venture Partners,vc,https://www.mevp.com,,not_found,No public apply form found; contact via website; deal-flow is relationship-driven
+mistral-venture-partners,Mistral Venture Partners,vc,https://mistral.vc,,not_found,No public pitch form; seed VC focused on Canada — contact via LinkedIn or warm intro
+mmc-ventures,MMC Ventures,vc,https://mmc.vc,,not_found,No public application form found; UK early-stage VC — deal flow via intro and outreach
+moment-ventures,Moment Ventures,vc,https://www.momentventures.com,https://www.momentventures.com/contact/,low,"Contact page exists but recommends LinkedIn intro through network connection, not a structured form"
+1714,"Montage Ventures is an early stage VC in Menlo Park investing in fintech, commerce, & healthcare",vc,https://montageventures.com,https://www.montageventures.com/contact,low,Contact/connect page — no structured form; founders encouraged to email partners directly
+morphais-vc,Morphais VC,vc,https://www.morphais.com,,not_found,"Morphais is a VC sourcing/data platform, not a direct fund that accepts founder applications"
+motivate-venture-capital,Motivate Venture Capital,vc,https://motivate.vc,,not_found,No public apply form; FAQ mentions general inquiries via contact page only
+motive-ventures,Motive Ventures,vc,https://www.motivepartners.com,,not_found,No public application form; fintech-focused PE/VC; deal flow via relationship
+multicoin-capital,Multicoin Capital,vc,https://multicoin.capital,,not_found,No public application form; crypto/blockchain VC — deal flow is thesis-driven and intro-based
+mustard-seed,Mustard Seed,vc,https://www.linkedin.com/company/mustard-seed-impact/MustardSeed,,not_found,"LinkedIn-only URL provided; Mustard Seed is an impact advisory/co-investment firm, no structured VC apply form found"
+new-stack-ventures,New Stack Ventures,vc,https://www.newstack.com,,not_found,No structured apply form; early-stage VC focused on non-SF/NYC founders — contact via their site
+next-coast-ventures,Next Coast Ventures,vc,https://www.nextcoastventures.com,,not_found,Best pitch path is qualified introduction; no public online application form found
+nextview-ventures,NextView Ventures,vc,https://nextview.vc,,not_found,No public apply form found; pre-seed/seed VC — outreach via LinkedIn or intro recommended
+northzone,Northzone,vc,https://northzone.com,,not_found,No public application form; multi-stage European/US VC — deal flow via intro and relationship
+norwest-venture-partners,Norwest Venture Partners,vc,https://www.nvp.com,,not_found,No public apply form; seed-to-growth VC — deal flow via intro; careers/portfolio jobs board exists
+notion-capital,Notion Capital,vc,https://www.notion.vc,,not_found,No public apply form found; B2B SaaS/cloud UK VC — contact via team LinkedIn
+omers-ventures,OMERS Ventures,vc,https://omersventures.com,,not_found,No public application form; early-stage tech VC — deal flow via intro/outreach to team
+panache-ventures,Panache Ventures,vc,https://www.panache.vc,https://www.panache.vc/pitch-us,high,Dedicated pitch submission page; accepts deck from any founder; responds to every submission
+pangaea-ventures,Pangaea Ventures,vc,https://www.pangaeaventures.com,,not_found,"Hard-tech/materials VC; no public apply form found; contact via website or intro. Demo Day events exist for portfolio, not open intake"
+paradigm-capital,Paradigm Capital,vc,https://www.paradigmcap.com,,not_found,"Canadian investment bank (not a startup VC fund); tech capital-raising contact via Barry Richards, 416.364.4835"
+pario-ventures,Pario Ventures,vc,https://www.parioventures.com,,not_found,No public apply form; UK/US early-stage VC — no structured intake page found
+passion-capital,Passion Capital,vc,https://www.passioncapital.com,,not_found,"London-based early-stage VC; no public online application form found; pitch deck referenced in terms, but no apply URL"
+pender-ventures,Pender Ventures,vc,https://www.penderventures.com,,not_found,B2B software/healthtech Canadian VC; no public apply form; contact via website
+petri,Petri,vc,https://petri.bio,https://petri.bio,low,Petri is a bio/engineering accelerator by Pillar VC; apply via petri.bio but no direct form URL confirmed; application process is selective/cohort-based
+pi-labs,Pi Labs,vc,https://pilabs.vc,https://pilabs.vc/growth-programme,medium,Growth Programme with Demo Day and cohort selection; application details on Growth Programme page; not a rolling open form
+piton-capital,Piton Capital,vc,https://www.pitoncap.com,,not_found,Network-effects focused VC; website is minimal with only legal/SFDR docs; no apply form
+pjc,PJC,vc,https://www.pjc.vc,,not_found,No public apply form found; early-stage VC with portfolio jobs board only
+playfair,Playfair,vc,https://www.playfair.vc,https://playfair.vc/pitch-us.php,high,Open pitch form on website; pre-seed UK/EU VC; reviews every submission
+plaza-ventures,Plaza Ventures,vc,https://plaza.ventures,,not_found,No public apply form found; Canadian growth/secondary/early-stage VC — deal flow via network
+point72-ventures,Point72 Ventures,vc,https://p72.vc,,not_found,No public apply form; backed by Steven Cohen; fintech/AI/enterprise VC — intro-driven
+polaris-partners,Polaris Partners,vc,https://polarispartners.com,,not_found,No public apply form; early-stage tech/life sciences VC — deal flow via intro and network
+portage,Portage,vc,https://portageinvest.com,,not_found,Fintech-focused VC; no public apply form; deal flow via thesis-driven outreach and intro
+prelude-ventures,Prelude Ventures,vc,https://www.preludeventures.com,https://www.preludeventures.com/founders,medium,Founders page describes focus (climate/cleantech) but no online application form; email-based contact (jobs@preludeventures.com for jobs; no public startup intake form)
+primary-venture-partners,Primary Venture Partners,vc,https://www.primary.vc,,not_found,No public apply form; NYC seed-stage VC — intro-driven
+ptv-healthcare-capital,PTV Healthcare Capital,vc,https://ptvhc.com,,not_found,Austin-based late-stage healthcare VC; website appears minimal/inactive; no apply form found
+quake-capital-partners,Quake Capital Partners,vc,https://www.quakecapital.com,,not_found,No public structured application form found; early-stage VC with focus on diverse founders — contact via website
+quantum-valley-investments,Quantum Valley Investments,vc,https://quantumvalleyinvestments.com,,not_found,Private fund (Lazaridis/Fregin); invests in quantum information science spinouts; no public apply form — relationships and academic partnerships drive deal flow
+quark-venture,Quark Venture,vc,https://www.quarkventure.com,,not_found,Biotech/health sciences VC; no public apply form; investment via institutional relationships
+quona-capital,Quona Capital,vc,https://quona.com,,not_found,Inclusive fintech VC; no public startup apply form; deal flow via thesis-driven sourcing
+radical-ventures,Radical Ventures,vc,https://radical.vc,https://radical.vc/masterclass/,medium,AI Founders Masterclass/community has rolling applications (email AIFounders@radical.vc); general fund investments are not via open form
+rarebreed-ventures,RareBreed Ventures,vc,https://www.rarebreed.vc,,not_found,Pre-seed VC for founders outside SF/NYC; no public structured form found on site; outreach via email or warm intro to GP McKeever Conwell
+rbcx,RBCx,vc,https://www.rbcx.com,https://www.rbcx.com/banking/startup/,low,"RBCx is RBC's tech banking arm, not a VC fund; startup banking intake via website; no VC investment application"
+real-ventures,Real Ventures,vc,https://realventures.com,https://realventures.com/contact/,low,Contact page with form; no structured pitch intake; also runs FounderFuel accelerator with separate applications
+redpoint-ventures,Redpoint Ventures,vc,https://www.redpoint.com,,not_found,No public apply form; multi-stage VC — deal flow via intro and network
+relay-ventures,Relay Ventures,vc,https://relayventures.com,,not_found,No public apply form; Canadian VC — deal flow via intro and network
+renewal-funds,Renewal Funds,vc,https://www.renewalfunds.com,https://www.renewalfunds.com/entrepreneur,medium,Entrepreneur page with application form/criteria; impact-focused Canadian fund; LinkedIn confirms apply at renewalfunds.com/entrepreneur
+revolution,Revolution,vc,https://revolution.com/entity/rotr,https://events.revolution.com/,medium,Rise of the Rest pitch competitions — apply via events.revolution.com for road trip pitch competitions; $500K+ invested per city stop
+rhino-ventures,Rhino Ventures,vc,https://www.rhinovc.com,https://www.rhinovc.com/contact,low,Contact page with commitment to respond to every inquiry within one week; no structured form — email-based
+rho-ventures,Rho Ventures,vc,https://www.rho.com,,not_found,"rho.com is Rho (corporate banking platform), not Rho Ventures VC fund; Rho Ventures appears inactive/no current web presence"
+ripple-ventures,Ripple Ventures,vc,https://www.rippleventures.com,,not_found,Inception-stage Canadian VC; no public apply form; deal flow via intro; runs RippleX Fellowship (separate program)
+rogue-insight-capital,Rogue Insight Capital,vc,https://www.rogueinsightcapital.com,https://rogueinsightcapital.com/entrepreneurs/,low,Entrepreneurs page describes criteria and mentorship model but no online form; contact-based
+rokk3r,Rokk3r,vc,https://www.rokk3r.com,,not_found,Venture builder/corporate innovation firm; no standard startup apply form; engagement via venture building programs and partnerships
+round13,Round13,vc,https://round13.com,,not_found,Canadian growth-stage VC; no public apply form; deal flow via intro and network
+rre-ventures,RRE Ventures,vc,https://www.linkedin.com/company/rre-ventures,https://rre.com/,low,LinkedIn URL provided; real site is rre.com with contact/submission form embedded in portfolio page; early-stage VC
+rubicon-venture-capital,Rubicon Venture Capital,vc,https://www.rubicon.vc,,not_found,Sidecar model VC; website appears outdated; no structured apply form found
+s3-ventures,S3 Ventures,vc,https://www.s3vc.com,,not_found,Texas-based VC; no public apply form found; deal flow via intro and relationship
+saison-capital,Saison Capital,vc,https://www.saisoncapital.com,,not_found,SEA/India fintech VC; no public apply form; lean team — deal flow via thesis-driven sourcing
+salesforce-ventures,Salesforce Ventures,vc,https://salesforceventures.com,,not_found,CVC; no public apply form; investments via Salesforce ecosystem relationships and warm intros
+sante-ventures,Sante Ventures,vc,https://sante.com,,not_found,Austin-based healthcare/life sciences VC; no public apply form; deal flow via intro and partnerships
+saturn-partners,Saturn Partners,vc,https://saturnpartnersvc.com,,not_found,Boston-based seed/early-stage VC; no public apply form; contact-based outreach
+scaleup-venture-partners,ScaleUP Venture Partners,vc,https://suv.vc,https://suv.vc,medium,Submit pitch via form at suv.vc (per third-party source); Toronto-based B2B early-stage VC
+scottish-equity-partners,Scottish Equity Partners,vc,https://www.sep.co.uk,https://www.sep.co.uk/contact,low,Contact page for growth equity inquiries; no structured startup application form; UK/EU growth equity investor
+secocha-ventures,Secocha Ventures,vc,https://www.secocha.com,,not_found,Small VC fund; no public apply form found; newsletter signup only; contact-based
+second-century-ventures,Second Century Ventures,vc,https://www.scv.vc,https://www.scv.vc/pitch-us,medium,Pitch Us page instructs founders to email executive summary and deck to hello@SecondCenturyVentures.com; not a structured form
+seed-angel-forum,Seed Angel Forum,vc,https://seedangel.co,,not_found,Private quarterly pitch event in Denver/Boulder; no online application form — event-based angel network
+seedcamp,Seedcamp,vc,https://seedcamp.com,https://seedcamp.com,medium,Applications via Seedcamp website portal; pre-seed to Series B European VC; rolling intake with partner pitch as final step
+sequoia-capital-southeast-asia,Sequoia Capital Southeast Asia,vc,https://www.sequoiacap.com/sea,https://www.peakxv.com/,low,Rebranded as Peak XV Partners; Surge program (India/SEA) had open applications; primary intake now via peakxv.com not sequoiacap.com/sea
+serena-ventures,Serena Ventures,vc,https://www.serenaventures.com,https://www.serenaventures.com/competition,medium,Annual pitch competition with $100K investment prize; structured application reviewed by S Ventures team; main fund investments are intro-driven
+silicon-roundabout,Silicon Roundabout,vc,https://siliconroundabout.tech,https://siliconroundabout.tech/startup-application/,high,Dedicated startup application page; pre-seed to seed deep tech VC with monthly pitch events
+silverton-partners,Silverton Partners,vc,https://www.silvertonpartners.com,https://www.silvertonpartners.com/contact/,medium,Contact form only; no dedicated pitch/apply portal found
+slack-fund,Slack Fund,vc,https://slack.com/fund,https://airtable.com/app5kO0WaTWMJG0n7/pagIcieB3DVsIxyxp/form,high,Redirects to Salesforce Ventures; Airtable contact form found in nav
+spark-capital,Spark Capital,vc,https://www.sparkcapital.com,,not_found,Homepage rendered with very limited content; no apply/contact link visible; site appears to rely on warm intros
+staircase-ventures,Staircase Ventures,vc,https://staircaseventures.com,,not_found,No apply or contact link found; portfolio-focused site; likely warm-intro only
+stand-up-ventures,Stand Up Ventures,vc,https://www.standupvc.com,https://www.standupvc.com/connect,medium,Contact page at /connect; no structured intake form confirmed
+starlight-ventures,Starlight Ventures,vc,https://starlight.vc,https://starlight.vc/#contact,medium,Anchor link to contact section; email info@starlight.vc mentioned; no form
+storm-ventures,Storm Ventures,vc,https://www.stormventures.com,https://stormventures.typeform.com/to/H6I1Qq,high,Typeform intake linked prominently in nav and CTA buttons
+summit-partners,Summit Partners,vc,https://www.summitpartners.com,https://www.summitpartners.com/contact,medium,Contact page with office links; large growth/PE fund; no structured startup form
+sv-angel,SV Angel,vc,https://svangel.com,,not_found,Site returned client-side JS error; could not render; no apply URL discoverable
+tandemlaunch,TandemLaunch,vc,https://www.tandemlaunch.com/en,https://www.tandemlaunch.com/contact,medium,Contact page only; incubator/VC hybrid model; no open application form visible
+team-global,Team Global,vc,https://teamglobal.net,,not_found,Site timed out on all attempts; could not load
+telus-ventures,Telus Ventures,vc,https://www.telus.com/en/ventures,,not_found,Corporate VC page loaded but no startup pitch/apply link found; enterprise-focused
+tenity,Tenity,vc,https://www.tenity.com,https://www.tenity.com/programs/,medium,Accelerator/VC hybrid with programs page; no open apply form on homepage; check /programs for intake
+theventurefund,TheVenture.Fund,vc,https://www.linkedin.com/company/theventurefund,,not_found,LinkedIn-only URL; no dedicated website with apply portal
+threshold-ventures,Threshold Ventures,vc,https://threshold.vc,https://www.threshold.vc/contact,medium,Contact page at /contact; Stanford TVF fellows program also listed
+toronto-innovation-acceleration-partners,Toronto Innovation Acceleration Partners,vc,https://tiap.ca,https://tiap.ca/contact/,medium,Contact page found; programs page at /programs-and-investment; no open application portal
+true,True.,vc,https://www.true.global,https://www.true.global/contact/,medium,Contact page at /contact; investment page at /investment; no open startup form
+two-sigma-ventures,Two Sigma Ventures,vc,https://twosigmaventures.com,https://www.twosigma.com/contact-us/,low,Redirects to Two Sigma main site; contact-us form is general corporate; no startup intake
+two-small-fish-ventures,Two Small Fish Ventures,vc,https://twosmallfish.vc,https://twosmallfish.vc/contact-us,medium,Contact page at /contact-us; small pre-seed fund
+underscore-vc,Underscore VC,vc,https://underscore.vc,,not_found,No apply/contact link found on homepage; network-based; Core Community model; warm-intro focus
+union-capital,Union Capital,vc,https://www.linkedin.com/company/unionvc,,not_found,LinkedIn-only URL; no dedicated website
+union-square-ventures,Union Square Ventures,vc,https://www.usv.com,,not_found,Site timed out repeatedly; historically usv.com/pitch was the intake but could not confirm live
+unreasonable,Unreasonable,vc,https://unreasonablegroup.com,https://unreasonablegroup.com/fellowship,medium,Fellowship program page found; impact-focused VC/accelerator; apply through fellowship
+valo-ventures,Valo Ventures,vc,https://valoventures.org,https://valoventures.org/contact/,medium,Contact page at /contact; climate/ag tech focus; no structured intake form
+vanedge-capital,Vanedge Capital,vc,https://www.vanedgecapital.com,https://www.vanedgecapital.com/contact-us/,medium,Contact-us page found; no open pitch form visible
+varia-ventures,Varia Ventures,vc,https://varia.com,,not_found,No apply link found; investor-focused portal (LP portal); startup intake not visible on homepage
+venrock,Venrock,vc,https://www.venrock.com,https://www.venrock.com/contact,medium,Contact page found; no structured intake form; warm-intro focus
+venture-ontario,Venture Ontario,vc,https://www.ventureontario.ca,https://www.ventureontario.ca/contact,low,Government fund-of-funds; invests in VC funds not startups directly; contact page only
+venturesouq,VentureSouq,vc,https://www.venturesouq.com,https://www.venturesouq.com/contact,medium,Contact page at /contact; also runs Conscious Investor Fellowship program
+versant-ventures,Versant Ventures,vc,https://www.versantventures.com,http://www.versantventures.com/offices,low,Offices contact page only; life sciences VC; no structured startup intake
+version-one,Version One,vc,https://versionone.vc,,not_found,No apply/contact link found on homepage; Boris Wertz fund; likely warm-intro or email
+vertu-capital,Vertu Capital,vc,https://vertucapital.ca,https://vertupartners.com/contact/,medium,Site redirects to vertupartners.com; contact page at /contact
+village-global,Village Global,vc,https://www.villageglobal.vc,https://www.villageglobal.com/contact-us,medium,Contact-us page found; network-driven VC; investing page describes model
+vista-equity-partners,Vista Equity Partners,vc,https://www.vistaequitypartners.com,,not_found,Large PE firm; no startup apply portal; growth/buyout stage; no intake form found
+vitalize-venture-capital,VITALIZE Venture Capital,vc,https://www.vitalize.vc,,not_found,No apply/contact link found on homepage; newsletter-focused site
+vmg-partners,VMG Partners,vc,https://www.linkedin.com/company/vmg-partners,,not_found,LinkedIn-only URL; no dedicated website with apply portal
+weekend-fund,Weekend Fund,vc,https://weekend.fund,mailto:team@weekend.fund,low,Email-only contact (team@weekend.fund); no structured intake form; Ryan Hoover fund
+white-star-capital,White Star Capital,vc,https://whitestarcapital.com,,not_found,No apply/contact link found on homepage; multi-stage fund
+yaletown-partners,Yaletown Partners,vc,https://yaletown.com,https://www.yaletown.com/contact,medium,Contact page at /contact; Canadian growth fund
+1-million-cups-boulder,1 Million Cups Boulder,other,https://www.meetup.com/1-Million-Cups-Boulder,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2F1-million-cups-boulder%2F,high,Meetup signup to join group and RSVP to events; weekly entrepreneur pitch event
+accelerateott,AccelerateOTT,other,https://www.accelerateott.ca,https://www.eventbrite.ca/e/accelerateott-2026-tickets-1987148720315,high,Eventbrite ticket link found; also Startup World Cup application at startupworldcup.io/ottawa-regional-2026
+access-silicon-valley-boulder-denver,Access Silicon Valley Boulder/Denver,other,https://www.meetup.com/Access-Silicon-Valley-Boulder-Denver,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Faccess-silicon-valley-boulder-denver%2F,high,Meetup group signup; startup networking events with Silicon Valley investors
+adweek-social-media-week,AdWeek Social Media Week,other,https://event.adweek.com/social-media-week-2023,https://event.adweek.com/smw_2026/begin,high,Register link found pointing to 2026 edition; redirected to current year event
+agi-house,AGI House,other,https://agihouse.ai,https://forms.gle/TF6Arjmv7CMM4KUQA,high,Google Form join link prominently displayed on homepage
+ai-tinkerers,AI Tinkerers,other,https://tinkerer.ai/p/welcome,https://aitinkerers.org/all_cities,medium,All cities listing for local chapter events; no single apply form; community-based
+andrews-tech-mixer,Andrew's Tech Mixer,other,https://www.andrew.today/p/events,https://linktr.ee/andrewsmixers,high,Linktree with all events; individual events RSVP via lu.ma links
+asia-tech-x-singapore,Asia Tech x Singapore,other,https://asiatechxsg.com,https://asiatechxsg.com/atxenterprise/,high,Attend page at /atxenterprise; major Singapore tech conference
+assembly,Assembly,other,https://www.assemblycs.com,https://www.assemblycs.com/contact,medium,Coworking space; contact/tour page; no event application form
+association-of-chinese-canadian-entrepreneurs,Association of Chinese Canadian Entrepreneurs,other,https://www.acce.ca/new,https://www.acce.ca/new/category/events/,medium,Events page found; membership organization; no online apply form visible
+asugsv-summit,ASU+GSV Summit,other,https://www.asugsvsummit.com,https://cvent.me/lKxbvN,high,Cvent registration link for 2027; GSV Cup startup competition also available at /gsv-cup
+banff-venture-forum,Banff Venture Forum,other,https://banffventureforum.com,https://banffventureforum.com/registration/apply-to-present/,high,Dedicated startup showcase application at /registration/apply-to-present; also general registration at /registration
+big-data-boston,Big Data Boston,other,https://www.meetup.com/BigDataBoston,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbigdataboston%2F,high,Meetup group signup to join and attend events
+biotechto,BiotechTO,other,https://biotechto.com,,not_found,Page returned 404 not found; site may be down or moved
+bits-in-bio,Bits in Bio,other,https://www.bitsinbio.org,https://join.slack.com/t/bitsinbio/shared_invite/zt-3x4ryxqjr-a77cBC~RA6LFOTmxYJvZ~g,high,Slack community join link prominently shown; also lu.ma events at lu.ma/bitsinbio
+blockchain-futurist-conference,Blockchain Futurist Conference,other,https://www.futuristconference.com,https://futuristconference.com/toronto/ticket,high,Ticket pages for Toronto and Florida events; speaker application also at /speaker-form
+bootsector,BootSector,other,https://joinbootsector.com,https://joinbootsector.com/join-the-startup-community/,high,Dedicated join page at /join-the-startup-community; community organizer support platform
+bootstrappers-breakfast-for-san-francisco-startups,Bootstrappers Breakfast for San Francisco Startups,other,https://www.meetup.com/Bootstrappers-Breakfast-San-Francisco,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbootstrappers-breakfast-san-francisco%2F,high,Meetup signup to join and RSVP to breakfast events
+boston-ai-network-com,Boston AI Network,other,https://www.meetup.com/Boston-AI-Network-Artificial-Intelligence-Group,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbigdataboston%2F,medium,Scraped as Big Data Boston (same group area); Meetup signup is the apply mechanism
+boston-fintech,Boston FinTech,other,https://www.meetup.com/Boston-FinTech,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-fintech%2F,high,Meetup group signup; also check bostonfintechweek.org for annual event
+boston-hardware-meetup,Boston Hardware Meetup,other,https://www.meetup.com/boston-hardware,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-hardware%2F,high,Meetup group signup; hardware-focused meetup with strong attendance history
+boston-new-technology,Boston New Technology,other,https://www.meetup.com/Boston_New_Technology,,not_found,Site timed out repeatedly; Meetup group URL with underscore caused scrape failures
+boston-startup-idea-to-ipo,Boston Startup: Idea to IPO,other,https://www.meetup.com/Boston-Idea-to-IPO,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-idea-to-ipo%2F,high,Meetup group signup; individual events register via Eventbrite links
+boston-techjam,Boston TechJam,other,https://www.masstlc.org/bostontechjam,,not_found,Scrape timed out; MassTLC annual conference; check masstlc.org for current registration
+bostonhacks,BostonHacks,other,https://bostonhacks.io,,not_found,Site content appeared hijacked/redirected to unrelated gambling content; original hackathon site may be defunct
+boulder-open-coffee,Boulder Open Coffee,other,https://www.meetup.com/boulder-open-coffee,,not_found,Scrape timed out repeatedly; Meetup group for casual startup networking
+boulder-startup-week,Boulder Startup Week,other,https://boulderstartupweek.com,https://revelco.org/bsw/,high,Registration at revelco.org/bsw; also sponsor and volunteer options; annual event
+buffalo-startup-week,Buffalo Startup Week,other,https://www.startupweekbuffalo.com,https://luma.com/a35ob3fy,high,Multiple event registrations via lu.ma; Founder Day and Ecosystem/Capital tracks
+burlington-chamber-of-commerce,Burlington Chamber of Commerce,other,https://www.burlingtonchamber.com,,not_found,Site timed out repeatedly; chamber membership organization
+business-of-software-conference,Business of Software Conference,other,https://businessofsoftware.org,https://businessofsoftware.org/updates/,medium,Newsletter signup and workshop registration links found; annual conference; check site for main event registration
+calgary-hackathon,Calgary Hackathon,other,https://www.yychacks.ca,https://www.showpass.com/yyc-hacks-chinook-blast-2024,high,Showpass ticket link for YYC Hacks; annual hackathon in Calgary
+canadian-blockchain-consortium,Canadian Blockchain Consortium,other,https://www.canadablockchain.ca,,not_found,Site timed out repeatedly; could not load
+canadian-innovation-exchange,Canadian Innovation Exchange,other,https://cixsummit.com,https://cixsummit.com/tickets/,high,Tickets/registration page at /tickets; also CIX Startup Awards application for startups
+canadian-undergraduate-technology-conference,Canadian Undergraduate Technology Conference,other,https://www.cutc.ca/#,,not_found,Site timed out repeatedly; annual student tech conference
+canadian-women-real-estate,Canadian Women Real Estate,other,https://crewa.ca,,not_found,Site blocked all scraping engines; all engines failed
+canadian-womens-chamber-of-commerce,Canadian Women's Chamber of Commerce,other,https://canwcc.ca,,not_found,Site timed out repeatedly; membership organization
+centre-for-social-innovation,Centre for Social Innovation,other,https://socialinnovation.org,https://socialinnovation.org/join-us/membership/,high,Membership plans page at /join-us/membership; community and coworking memberships
+chicago-startup-community,Chicago Startup Community,other,https://www.meetup.com/chicago-startup-community,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fchicago-startup-community%2F,high,Meetup group signup; also Discord at discord.gg/K8ecPrZ4e9
+city-of-toronto-business,City of Toronto Business,other,https://www.toronto.ca/business-economy/new-businesses-startups,,not_found,Government resource page; no single apply URL; links to various city programs for new businesses
+co-labs,Co.Labs,other,https://www.co-labs.ca,,not_found,Site timed out repeatedly; Saskatoon tech community hub
+colorado-startups,Colorado Startups,other,https://coloradostartups.org,https://docs.google.com/forms/d/e/1FAIpQLSfM6EPCuXJ8IukLjApcecvggB7UoaXVGwLpqgNF5aPacRYNvQ/viewform,medium,Slack group join form; community network with no formal application process
+colorado-startups-event-connect,Colorado Startups Event Connect,other,https://coloradostartups.org/event-connect,,not_found,Event listing page; no separate application process found
+communitech-customer-success,Communitech Customer Success,other,https://www.meetup.com/Customer-Success-Leaders-P2P,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+communitech-hrnet,Communitech HRnet,other,https://www.meetup.com/hrnet-p2p,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+communitech-job-seekers,Communitech Job Seekers,other,https://www.meetup.com/job-seekers-connex-p2p,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+communitech-marketing-p2p,Communitech Marketing P2P,other,https://www.meetup.com/strategic-marketing-peer2peer,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+communitech-product-management-p2p,Communitech Product Management P2P,other,https://www.meetup.com/product-management-p2p-2,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+communitech-sales-leaders,Communitech Sales Leaders,other,https://www.meetup.com/sales-leaders-p2p,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+communitech-uxwaterloo,Communitech uxWaterloo,other,https://www.meetup.com/uxwaterloo-p2p,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+comotion,CoMotion,other,https://www.comotiongroup.ca,,not_found,Site blocked by Cloudflare; no apply URL discoverable
+crew-collective-cafe,Crew Collective & Café,other,https://www.crewcollectivecafe.com,,not_found,Coworking cafe; no application process — walk-in or booking model
+dc-startup-week,DC Startup Week,other,https://www.dcstartupweek.org,,not_found,Conference/community; newsletter signup only; no structured application process found
+dc-tech-venture-coalition,DC Tech & Venture Coalition,other,https://www.dctav.co,https://dctav.wufoo.com/forms/dctav-join-us/,high,Wufoo membership application form found on homepage
+deerhacks-utm,DeerHacks UTM,other,https://deerhacks.mcss.club,,not_found,Site returned 404 (Netlify); domain appears broken
+deltahacks,DeltaHacks,other,https://deltahacks.com,,low,Hackathon; applications released mid-October per FAQ; no active apply link found at scrape time
+denver-ai-developers-group,Denver AI Developers Group,other,https://www.meetup.com/aittg-denver,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+denver-startup-week,Denver Startup Week,other,https://www.denverstartupweek.org,,not_found,Site timed out; known conference/community event — no application process
+designx-community,DesignX Community,other,https://designx.community,https://designx.community/join,high,Explicit application process: apply once to join community — form with questions
+disrupt-hr-toronto,Disrupt HR Toronto,other,https://disrupthr.co/city/vaughan,,not_found,Event tickets only; no application process for speakers or participants found
+dx3-canada,DX3 Canada,other,https://www.dx3canada.com,https://dx3canada.com/register,high,Conference registration page found directly on homepage
+elevate,Elevate,other,https://elevate.ca,https://elevate.ca/ecommerce-north-accelerator/,medium,Apply Now CTA for eCommerce North Accelerator; festival itself has separate registration
+ellehacks,ElleHacks,other,https://ellehacks.com,https://ellehacksdash.com/#/login,medium,Hacker login/dashboard portal; MLH-affiliated hackathon with active application process
+entrepreneurship-society,Entrepreneurship Society University of Waterloo,other,https://entsoc.ca,,not_found,Domain appears redirected to unrelated medical content; no apply URL found
+ff-venture-capital,ff Venture Capital,other,https://ffvc.com,,not_found,VC firm website; no public application process — pitch via network
+fifty-years,Fifty Years,other,https://fiftyyears.com,https://50y.typeform.com/interest-c9,medium,Typeform interest form for 5050 program (founder-in-residence); applications open June 2026
+flash-pitch,Flash Pitch,other,https://www.flashpitch.nyc,,not_found,Domain DNS resolution failed; site appears down
+flat6labs-uae,FLAT6LABS UAE,other,https://www.flat6labs.com/Location/uae,https://flat6labs.com/program/the-catalyst-accelerator-program/,medium,Active accelerator programs listed on UAE page; Catalyst Accelerator is current active program
+founder-fridays,Founder Fridays,other,https://rsvp.withgoogle.com/events/founder-fridays/what-is-founder-fridays,,not_found,Google RSVP page; JS-rendered; informational page — invite/RSVP model not open application
+founder-led-biotech-summit,Founder-led Biotech Summit,other,https://founderledbio.com,https://founderledbio.com/tour/,high,Register CTA found; tour registration page for in-person events
+founders-village,Founders Village,other,https://www.foundersvillage.co,,not_found,Site returned no content; may be down or JS-only
+foundersbeta,FoundersBeta,other,https://www.foundersbeta.com,https://foundersbeta.com/membership/,high,Become a Member CTA links to membership page — community with application process
+fuck-up-toronto,Fuck Up Toronto,other,https://www.fuckupnightsto.ca,https://docs.google.com/forms/d/e/1FAIpQLScK51l0f4BJA7X_ba4vSd-887aHJv5OQXwJHxLqYvdva7xUhw/viewform,high,Google Form to apply as a speaker found prominently on homepage
+get-cities,GET Cities,other,https://www.getcities.org,,not_found,Site returned no content; may be JS-rendered or down
+google-developer-groups-boulder,Google Developer Groups Boulder,other,https://www.meetup.com/Google-Developer-Group-Boulder,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+greater-kw-chamber-of-commerce,Greater KW Chamber of Commerce,other,https://greaterkwchamber.com,https://greaterkwchamber.com/membership/join,high,Become A Member link found; membership join page
+gryphhacks,GryphHacks,other,https://gryphhacks.com/home,,low,Hackathon; site JS-rendered and did not return content; likely has MLH application portal
+guelph-chamber-of-commerce,Guelph Chamber of Commerce,other,https://www.guelphchamber.com,https://www.guelphchamber.com/membership/become-a-member,high,Join Now CTA links to become-a-member page
+hack-nyu,Hack NYU,other,https://hacknyu.org,,low,Hackathon; site JS-rendered; likely has an application portal but not discoverable via scrape
+hack-the-north,Hack the North,other,https://hackthenorth.com,,low,Hackathon; site JS-rendered; known to use portal.hackthenorth.com for applications
+hack-western,Hack Western,other,https://www.hackwestern.com,,low,Hackathon (Nov 2025 edition completed); site shows submissions page; next cycle not yet open
+hackathon-101,Hackathon 101,other,https://calendar.ucdenver.edu/event/hackathon_101_8956,,not_found,University calendar event listing only; no separate application
+hacktx,HackTX,other,https://hacktx.com,https://rodeo.freetailhackers.com/,high,Apply Now button links to Rodeo hacker portal
+hamilton-chamber-of-commerce,Hamilton Chamber of Commerce,other,https://www.hamiltonchamber.ca/events-home,https://www.hamiltonchamber.ca/join-now/,high,Join Now CTA found on events page; membership application
+herdata,HER+Data,other,https://www.meetup.com/her-data,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+hive-vancouver-society,HiVE Vancouver Society,other,https://www.hivevancouver.com,https://www.hivevancouver.com/memberships,high,Join Now / Get Started CTAs link to memberships page; coworking community application
+impact-hub-ottawa,Impact Hub Ottawa,other,https://ottawa.impacthub.net,https://ottawa.impacthub.net/become-a-member/,high,Membership application page found; multiple tiers with structured process
+innovate-finance-global-summit,Innovate Finance Global Summit,other,https://www.innovatefinance.com/ifgs2023,https://www.innovatefinance.com/ifgs2023/secureyourticket/,medium,Secure Your Ticket page found; conference registration for IFGS 2023
+innovator-network-of-canada,Innovator Network of Canada,other,https://www.linkedin.com/showcase/innovator-network-of-canada,,not_found,LinkedIn showcase page only; no application process — follow/join on LinkedIn
+inspired-capital,Inspired Capital,other,https://inspiredcapital.com,,not_found,VC firm; no public pitch application found; newsletter signup only
+inventures,Inventures,other,https://inventurescanada.com,,not_found,Conference; registration page not accessible via scrape; check inventurescanada.com/register
+ivey-venture-capital-club,Ivey Venture Capital Club,other,https://www.linkedin.com/company/ivey-venture-capital-club/?originalSubdomain=ca,,not_found,LinkedIn company page only; no application process discoverable
+jelly-social,Jelly Social,other,https://jellysocial.ca,,not_found,Site loaded but no apply/join CTA found; appears to be community events org
+lahacks,LAHacks,other,https://lahacks.com,https://apply.lahacks.com,high,Direct apply subdomain found in page source
+angel-summit,Launch Angel Summit,other,https://www.launchangelsummit.com,,not_found,Domain DNS resolution failed; site appears down
+ldv-capital,LDV Capital,other,https://www.linkedin.com/company/ldv-capital,,not_found,LinkedIn company page only; no application process discoverable
+legacy-conference,Legacy Conference,other,https://www.legacycan.ca,,not_found,Site expired (Squarespace account expired)
+mesh-conference,mesh conference,other,https://meshconference.com,,not_found,Conference; newsletter signup only; no structured application or registration CTA found
+miami-hack-week,Miami Hack Week,other,https://www.miamihackweek.com,,low,Site JS-rendered (loading animation only); hackathon — likely has application portal
+miami-nft-week,Miami NFT Week,other,https://miaminftweek.com,https://miaminftweek.ticketspice.com/2023,medium,Ticketspice ticket purchase page; event registration via ticket tiers
+miami-tech-life,Miami Tech Life,other,https://www.miamitech.life,https://www.miamitech.life/get-involved,medium,Get Involved link found on homepage; community engagement page
+miami-tech-summit,Miami Tech Summit,other,https://techsummitmiami.com,,not_found,Site loaded but no register/apply CTA found in scraped content
+mindshare-workplace-mississauga,Mindshare Workplace Mississauga,other,https://mindshareworkspace.com,,not_found,Coworking space; no application form — contact/booking model
+mississauga-board-of-trade,Mississauga Board of Trade,other,https://mbot.com,https://mbot.com/membership/membership-benefits/,medium,Membership benefits and join pages found; chamber membership application
+mit-hacking-medicine,MIT Hacking Medicine,other,https://www.hackingmedicine.mit.edu,https://www.hackingmedicine.mit.edu/events/grandhack-2026,high,GrandHack 2026 event page found; hackathon with application/registration process
+montreal-newtech,Montreal NewTech,other,https://www.montrealnewtech.com,,not_found,Domain redirects to elantech.co (unrelated); original site appears defunct
+motiv-digital,Motiv Digital,other,https://motiv.digital,,not_found,Innovation consultancy website; no public application process
+move-mobility-reimagined,MOVE Mobility ReImagined,other,https://movemnt.net/events,,not_found,Event news/blog page; no direct registration CTA found
+new-tech-colorado,New Tech Colorado,other,https://www.meetup.com/bdnewtech,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+new-york-fintech-week,New York Fintech Week,other,https://empirestartups.com/events/new-york-fintech-week,,not_found,Conference event listing; no registration CTA found (past event)
+nwplus,nwPlus,other,https://nwplus.io,https://nwplus.io/#hackathons,low,Hackathon organizer; hackathons section found but individual event apply links not rendered
+ny-tech-meetup,NY Tech Meetup,other,https://www.meetup.com/ny-tech,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+nyedtech,NYEdTech,other,https://www.meetup.com/NYEdTech,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+office-logic,Office Logic,other,https://office-logic.co,,not_found,Coworking space; bookings model via lovable.app tool; no application process
+onramp-coworking-university-of-toronto,ONRamp Coworking University of Toronto,other,https://entrepreneurs.utoronto.ca/about/our-space,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,high,AcceleratorApp application form found directly in page links
+ottawa-board-of-trade,Ottawa Board of Trade,other,https://www.ottawabot.ca/upcoming-events,https://www.ottawabot.ca/membership/why-be-a-member/,medium,Membership section found with member benefits page; chamber application
+payment-summit-canada,Payment Summit Canada,other,https://www.thesummit.ca,https://www.thesummit.ca/page/5013974/register,high,Register page found via curl redirect; 2026 Payments Canada SUMMIT registration
+people-analytics-summit,People Analytics Summit,other,https://www.peopleanalyticscanada.com,https://strategyinstitute-21235114.hs-sites.com/pa-2026-register-your-interest-for-2026,high,HubSpot registration interest form found on homepage
+pitch-night-mia,Pitch Night MIA,other,https://www.meetup.com/pitch-night-mia,,not_found,Meetup group; join via Meetup platform only — no application process with questions
+productbc,ProductBC,other,https://productbc.ca,https://productbc.ca/joinnow/,high,Join Now CTA links to membership application page
+qhacks,QHacks,other,https://qhacks.io,,not_found,Next.js SPA with Cloudflare challenge; no apply link extractable via static scrape; site describes Feb 2026 hackathon — application likely via MLH or similar platform when open
+queens-startup-summit,Queen's Startup Summit,other,https://qssummit.com,https://qssummit.com,high,Homepage CTA is 'Register Now' linking to site root (TBA date); delegate registration page at same domain
+refresh-miami,Refresh Miami,other,https://refreshmiami.com,https://refreshmiami.com/pricing,medium,Media/community site; 'Sign Up' links to /pricing (membership); no direct program application
+revolution-2,Revolution,other,https://twitter.com/revolution,,not_found,Twitter/X profile only — VC firm social account; no application surface on this URL
+rotaract-mississauga,Rotaract Mississauga,other,https://www.rotaractmiss.com,,not_found,Wix site; heavily JS-rendered; no apply/join link extractable; Rotaract membership typically through local club contact
+saas-connect,SaaS Connect,other,https://www.cloudsoftwareassociation.com/saas-connect,https://www.eventbrite.ca/e/477618779627,high,Eventbrite registration link found directly on page ('Register now' button)
+saas-north,SaaS North,other,https://saasnorth.com,https://saasnorth.com/get-your-saas-pass-2026/,high,Primary CTA 'GET YOUR SAAS PASS' links to /get-your-saas-pass-2026/; also Apply to Exhibit and Apply to Speak
+saas-open,SaaS Open,other,https://saasopen.com,,not_found,Scrape timed out; site may be down or heavily protected
+saastock,SaaStock,other,https://www.saastock.com,https://saastock.typeform.com/to/yb3fdaB1,high,Founder membership apply button links to Typeform; also /founder-membership/ page
+saastr,SaaStr,other,https://www.saastrannual2024.com,https://www.saastrannual.com/buy-tickets-2025,medium,2024 event site; buy tickets CTA redirects to saastrannual.com/buy-tickets-2025 for current year
+saastr-apac,SaaStr APAC,other,https://saastrapac.com,https://saastrapac.com/rsvp,high,Primary CTA 'GRAB TICKETS!' / 'RSVP TO ATTEND' links to /rsvp; Attendee Portal also available
+schulich-startups,Schulich Startups,other,https://schulich.yorku.ca/schulich-startups,,low,York University page; JS-heavy; no direct apply link found in static HTML; programs listed but no application URL visible
+schulich-ventures-club,Schulich Ventures Club,other,https://oneschulich.yorku.ca/svc/home,https://svc-membership-2021-2023.cheddarup.com,medium,JOIN link found pointing to cheddarup.com membership payment page (may be outdated)
+science-entrepreneur-club,Science Entrepreneur Club,other,https://www.science-entrepreneur.com/innovators-club,,low,Heavily JS-rendered page; no extractable apply/join links found in static HTML
+seneca-college-hackathon,Seneca College Hackathon,other,https://www.senecahackathon.com,https://www.senecahackathon.com/register,high,Multiple 'REGISTER NOW' CTAs linking directly to /register
+sf-hacks,SF Hacks,other,https://sfhacks.io,https://app.sfhacks.io/,high,Apply and Register buttons both link to app.sfhacks.io; MLH 2026 badge present
+socialhrcamp,SocialHRCamp,other,https://socialhrcamp.com,,low,Webflow site; ticket/register links appear as image icons only; no extractable href for ticket purchase
+south-florida-aspiring-entrepreneurs,South Florida Aspiring Entrepreneurs,other,https://www.meetup.com/South-Florida-Aspiring-Entrepreneurs,https://www.meetup.com/south-florida-aspiring-entrepreneurs/events/,medium,Meetup group; RSVP via individual event pages; events listing at /events/
+startup-boston,Startup Boston,other,https://www.startupbos.org,https://www.startupbos.org/membership,medium,Mailing list at /join-mailing-list and membership at /membership; also /join-team for volunteers
+startup-boston-week,Startup Boston Week,other,https://www.startupbos.org/startup-week,https://www.startupbos.org/sbw2026,medium,Startup Boston Week 2026 page at /sbw2026; apply to host/speak available from there
+startup-canada,Startup Canada,other,https://www.startupcan.ca,https://www.startupcan.ca/join-our-list/,medium,Join Our List link at /join-our-list/; MemberPress plugin active suggesting membership portal
+startup-colorado,Startup Colorado,other,https://startupcolorado.org,https://startupcolorado.org/join-the-community/,high,COMMUNITY section links to /join-the-community/ as the Start Here page
+startup-denver,Startup Denver,other,https://www.meetup.com/startupdenver,https://www.meetup.com/startupdenver/events/,medium,Meetup group; scrape timed out but standard Meetup pattern; RSVP via event pages
+startup-grind-nyc,Startup Grind NYC,other,https://www.meetup.com/Startup-Grind-NYC,https://www.startupgrind.com/new-york-city/,high,Events RSVP via startupgrind.com; specific event RSVP link found on page
+startup-grind-toronto,Startup Grind Toronto,other,https://www.meetup.com/startup-grind-toronto,https://www.startupgrind.com/events/,medium,Events listed with RSVP links pointing to startupgrind.com/events/
+startup-laurier,Startup Laurier,other,https://www.startuplaurier.ca,,not_found,DNS resolution failed; domain appears to have expired or does not exist
+startup-tnt,Startup TNT,other,https://www.startuptnt.com,https://startuptnt.com/events,medium,Events calendar at /events; no direct application form; community attends via event RSVPs
+startupbarn,Startupbarn,other,https://startupbarn.ca,https://tally.so/r/nPaQ8V,high,Site redirects to buildersclub.ca; Apply button links to Tally form tally.so/r/nPaQ8V
+startupfest,Startupfest,other,https://startupfestival.com,https://startupfestival.com/register,high,Multiple 'Register' links pointing to /register; Angular app with newsletter signup also present
+strikeup-conference,StrikeUP Conference,other,https://strikeup.ca,,low,WordPress site; scrape returned content but no register/apply href links found; likely off-season
+sxsw,SXSW,other,https://www.sxsw.com,https://sxsw.com/apply,high,'Apply to Participate' CTA links directly to sxsw.com/apply; also Apply to Exhibit and Apply to Market
+targeting-quality-conference,Targeting Quality Conference,other,https://kwsqa.org,https://kwsqa.org/tq2026/speaker-information/,medium,KWSQA site; Speaker Information page found for TQ2026; ticket purchase links not found in static scrape
+tech-exit,Tech Exit,other,https://techexit.io,https://techexit.io/toronto/pricing/,medium,Pricing pages per city (Toronto/Calgary/Vancouver); no direct register button found but pricing is the entry point
+tech-tuesdays-miami,Tech Tuesdays Miami,other,https://www.plainsight.app/techtuesdaysmiami,,low,Plainsight event platform; scrape returned JS bundle only; no extractable RSVP link
+techcrunch-disrupt,TechCrunch Disrupt,other,https://techcrunch.com/events/tc-disrupt-2023,https://techcrunch.com/events/techcrunch-disrupt/tickets/,high,Register Now link for TechCrunch Disrupt found; Startup Battlefield also linked at /startup-battlefield/
+techto,TechTO,other,https://www.meetup.com/techto,https://www.meetup.com/techto/events/,medium,Meetup group; join via Meetup sign-up; events at /events/
+techvancouver,TechVancouver,other,https://www.meetup.com/techvancouverorg,https://www.meetup.com/techvancouverorg/events/,medium,Meetup group; upcoming events found; RSVP via Meetup sign-up
+tedxwaterloo,TEDxWaterloo,other,https://www.linkedin.com/company/tedxwaterloo,,not_found,LinkedIn company page only; no application surface; TEDx speaker/attendee applications would be at a separate site
+the-atlantic-technology-summit,The Atlantic Technology Summit,other,https://www.atlantictechsummit.com,https://www.atlantictechsummit.com/#/tickets?lang=en,high,Zoho Backstage event; Tickets tab found in navigation at /#/tickets
+the-commons,The Commons,other,https://thecommons.co,,not_found,Site redirected management to City of Denver; co-working available walk-in; no formal application process; space booking via artsandvenuesdenver.com
+the-firehood,The Firehood,other,https://firehood.net,https://firehood.net/pages/how-we-work-together,high,'Join the Firehood' links to /pages/how-we-work-together; membership product also at /products/firehood-ventures-membership
+the-hip-haus-networking,The Hip Haus Networking,other,https://thehiphaus.com,https://www.thehiphaus.com/circles,high,'Apply Now!' button links to /circles; also Eventbrite for specific events
+the-lab-miami,The Lab Miami,other,https://www.thelabmiami.com,https://www.thelabmiami.com/membership,high,Membership links prominently featured (/membership); also /contact for inquiries
+the-studio-boulder,The Studio Boulder,other,https://www.thestudioboulder.com,,low,Next.js SPA; no extractable membership/apply links found in static HTML
+toronto-cto-meetup,Toronto CTO Meetup,other,https://www.meetup.com/Toronto-CTO-Group,https://www.meetup.com/Toronto-CTO-Group/events/,medium,Meetup group for CTOs; RSVP via Meetup event pages
+toronto-event-hub,Toronto Event Hub,other,https://www.torontoeventhub.com,,low,Site loaded but no apply/register/submit links found; appears to be an events listing site
+toronto-product-management-association,Toronto Product Management Association,other,https://www.tpma.ca,https://www.members.tpma.ca/join,high,Join link at members.tpma.ca/join; also /membership page and member login
+toronto-tech-fest,Toronto Tech Fest,other,https://www.torontotechfest.com,,not_found,Site did not load during scrape window; domain may be inactive
+toronto-womxn-in-data-science,Toronto Womxn in Data Science,other,https://www.womxndsto.com,https://www.joinwoven.com,medium,Site links to joinwoven.com as the community platform; community moved to Woven
+traction-conference,Traction Conference,other,https://www.tractionconf.io,,low,Squarespace site; no ticket/register URL found in static extraction; conference may be dormant (last active content older)
+university-of-san-francisco-data-science-speaker-series,University of San Francisco Data Science Speaker Series,other,https://www.meetup.com/usf-data-science-speaker-series,https://www.meetup.com/usf-data-science-speaker-series/events/,medium,Meetup group; events listing found; RSVP via Meetup
+university-of-toronto-entrepreneurship-week,University of Toronto Entrepreneurship Week,other,https://entrepreneurs.utoronto.ca/events/entrepreneurship-week,,low,UofT entrepreneurship page; Wix-based; no direct register/apply links found in static scrape
+uoft-ai,UofT AI,other,https://www.uoft.ai,,low,React SPA (JavaScript required); static HTML only contains app shell; no links extractable
+uoft-hacks,UofT Hacks,other,https://uofthacks.com,https://dorahacks.io/buidl/21736,high,DoraHacks application link found on page for hackathon submissions
+uottahack,uOttaHack,other,https://uottahack.ca,,low,Wix-based SPA; heavily JS-rendered; no apply links extractable from static HTML
+vancouver-dev,Vancouver dev,other,https://vancouver.dev,,low,Next.js SPA; static HTML is app shell only; no links extractable; likely a developer community hub
+vancouver-entrepreneurs-forum,Vancouver Entrepreneurs Forum,other,https://www.vef.org,https://www.vef.org/member,high,/member page exists; also /membership-community and VEF membership contest; Squarespace site
+vancouver-startup-week,Vancouver Startup Week,other,https://www.vanstartupweek.ca,,low,Site loaded but no register/apply/ticket href links found in static extraction
+vancouver-startups,Vancouver Startups,other,https://www.linkedin.com/company/vancouver-startups,,not_found,LinkedIn company page only; no application surface
+venture-cafe,Venture Cafe,other,https://venturecafecambridge.org,https://venturecafecambridge.org/share/register-your-startup/,high,Register Your Startup link found at /share/register-your-startup/; Thursday Gathering program page also present
+venture-x-canada,Venture X Canada,other,https://venturexcanada.ca/locations/mississauga/heartland,,low,Site loaded but JS-heavy; no book/tour/contact href links found in static extraction
+web-summit-vancouver,Web Summit Vancouver,other,https://vancouver.websummit.com,https://attend.websummit.com/van26,high,Primary CTA links to attend.websummit.com/van26; also /tickets/attendees/ and indigenous attendee program
+wny-venture-association,WNY Venture Association,other,https://www.wnyventure.com,,low,Squarespace site; no apply/register/join links found; links only to Twitter/Facebook and Springboard NY
+women-founders-network,Women Founders Network,other,https://www.womenfoundersnetwork.org,https://www.womenfoundersnetwork.org/joinus,high,Join Us page at /joinus; Fast Pitch competition at /about-fast-pitch; Junior VC and Due Diligence Analyst programs also listed
+women-in-miami-tech,Women in Miami Tech,other,https://www.meetup.com/Women-in-Miami-Tech,https://www.meetup.com/women-in-miami-tech/events/,medium,Meetup group; upcoming events found; RSVP via Meetup event pages
+women-in-payments,Women in Payments,other,https://womeninpayments.silkstart.com/cpages/regions,,low,Silkstart-powered site; regions listing page; no join/register links found pointing to membership; likely requires navigating to a specific regional chapter
+work-bench,Work-Bench,other,https://www.work-bench.com,,low,Webflow site; no apply/founders program links found; links to cofounders.nyc and portfolio; enterprise-focused VC/community
+ylab,YLab,other,https://www.ylab.ca,https://anc.ca.apm.activecommunities.com/richmondhill/membership/search/detail/148,medium,Makerspace in Richmond Hill; membership purchase via City's ActiveNet system at that URL; open house via Eventbrite
+youre-next-career-network,You're Next Career Network University of Toronto,other,https://www.yourenext.ca,,low,React SPA; JavaScript required; only app shell in static HTML; no links extractable
+young-women-in-business,Young Women in Business,other,https://ywib.ca,https://ywib.ca/toronto/membership,medium,Chapter-based org; Toronto membership page at /toronto/membership; chapters include Vancouver/Calgary/UBC
+yvr-startups,YVR Startups,other,https://www.meetup.com/yvr-startups,https://www.meetup.com/yvr-startups/events/,medium,Meetup group; active events found; RSVP via Meetup event pages

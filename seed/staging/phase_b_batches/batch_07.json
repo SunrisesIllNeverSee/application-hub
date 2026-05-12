@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "1-million-cups-boulder",
+    "name": "1 Million Cups Boulder",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/1-Million-Cups-Boulder",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2F1-million-cups-boulder%2F",
+    "confidence": "high",
+    "notes": "Meetup signup to join group and RSVP to events; weekly entrepreneur pitch event"
+  },
+  {
+    "slug": "accelerateott",
+    "name": "AccelerateOTT",
+    "type": "other",
+    "homepage_url": "https://www.accelerateott.ca",
+    "discovered_apply_url": "https://www.eventbrite.ca/e/accelerateott-2026-tickets-1987148720315",
+    "confidence": "high",
+    "notes": "Eventbrite ticket link found; also Startup World Cup application at startupworldcup.io/ottawa-regional-2026"
+  },
+  {
+    "slug": "access-silicon-valley-boulder-denver",
+    "name": "Access Silicon Valley Boulder/Denver",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/Access-Silicon-Valley-Boulder-Denver",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Faccess-silicon-valley-boulder-denver%2F",
+    "confidence": "high",
+    "notes": "Meetup group signup; startup networking events with Silicon Valley investors"
+  },
+  {
+    "slug": "adweek-social-media-week",
+    "name": "AdWeek Social Media Week",
+    "type": "other",
+    "homepage_url": "https://event.adweek.com/social-media-week-2023",
+    "discovered_apply_url": "https://event.adweek.com/smw_2026/begin",
+    "confidence": "high",
+    "notes": "Register link found pointing to 2026 edition; redirected to current year event"
+  },
+  {
+    "slug": "agi-house",
+    "name": "AGI House",
+    "type": "other",
+    "homepage_url": "https://agihouse.ai",
+    "discovered_apply_url": "https://forms.gle/TF6Arjmv7CMM4KUQA",
+    "confidence": "high",
+    "notes": "Google Form join link prominently displayed on homepage"
+  },
+  {
+    "slug": "andrews-tech-mixer",
+    "name": "Andrew's Tech Mixer",
+    "type": "other",
+    "homepage_url": "https://www.andrew.today/p/events",
+    "discovered_apply_url": "https://linktr.ee/andrewsmixers",
+    "confidence": "high",
+    "notes": "Linktree with all events; individual events RSVP via lu.ma links"
+  },
+  {
+    "slug": "asia-tech-x-singapore",
+    "name": "Asia Tech x Singapore",
+    "type": "other",
+    "homepage_url": "https://asiatechxsg.com",
+    "discovered_apply_url": "https://asiatechxsg.com/atxenterprise/",
+    "confidence": "high",
+    "notes": "Attend page at /atxenterprise; major Singapore tech conference"
+  },
+  {
+    "slug": "asugsv-summit",
+    "name": "ASU+GSV Summit",
+    "type": "other",
+    "homepage_url": "https://www.asugsvsummit.com",
+    "discovered_apply_url": "https://cvent.me/lKxbvN",
+    "confidence": "high",
+    "notes": "Cvent registration link for 2027; GSV Cup startup competition also available at /gsv-cup"
+  },
+  {
+    "slug": "banff-venture-forum",
+    "name": "Banff Venture Forum",
+    "type": "other",
+    "homepage_url": "https://banffventureforum.com",
+    "discovered_apply_url": "https://banffventureforum.com/registration/apply-to-present/",
+    "confidence": "high",
+    "notes": "Dedicated startup showcase application at /registration/apply-to-present; also general registration at /registration"
+  },
+  {
+    "slug": "big-data-boston",
+    "name": "Big Data Boston",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/BigDataBoston",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbigdataboston%2F",
+    "confidence": "high",
+    "notes": "Meetup group signup to join and attend events"
+  },
+  {
+    "slug": "bits-in-bio",
+    "name": "Bits in Bio",
+    "type": "other",
+    "homepage_url": "https://www.bitsinbio.org",
+    "discovered_apply_url": "https://join.slack.com/t/bitsinbio/shared_invite/zt-3x4ryxqjr-a77cBC~RA6LFOTmxYJvZ~g",
+    "confidence": "high",
+    "notes": "Slack community join link prominently shown; also lu.ma events at lu.ma/bitsinbio"
+  },
+  {
+    "slug": "blockchain-futurist-conference",
+    "name": "Blockchain Futurist Conference",
+    "type": "other",
+    "homepage_url": "https://www.futuristconference.com",
+    "discovered_apply_url": "https://futuristconference.com/toronto/ticket",
+    "confidence": "high",
+    "notes": "Ticket pages for Toronto and Florida events; speaker application also at /speaker-form"
+  },
+  {
+    "slug": "bootsector",
+    "name": "BootSector",
+    "type": "other",
+    "homepage_url": "https://joinbootsector.com",
+    "discovered_apply_url": "https://joinbootsector.com/join-the-startup-community/",
+    "confidence": "high",
+    "notes": "Dedicated join page at /join-the-startup-community; community organizer support platform"
+  },
+  {
+    "slug": "bootstrappers-breakfast-for-san-francisco-startups",
+    "name": "Bootstrappers Breakfast for San Francisco Startups",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/Bootstrappers-Breakfast-San-Francisco",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbootstrappers-breakfast-san-francisco%2F",
+    "confidence": "high",
+    "notes": "Meetup signup to join and RSVP to breakfast events"
+  },
+  {
+    "slug": "boston-fintech",
+    "name": "Boston FinTech",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/Boston-FinTech",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-fintech%2F",
+    "confidence": "high",
+    "notes": "Meetup group signup; also check bostonfintechweek.org for annual event"
+  },
+  {
+    "slug": "boston-hardware-meetup",
+    "name": "Boston Hardware Meetup",
+    "type": "other",
+    "homepage_url": "https://www.meetup.com/boston-hardware",
+    "discovered_apply_url": "https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-hardware%2F",
+    "confidence": "high",
+    "notes": "Meetup group signup; hardware-focused meetup with strong attendance history"
+  }
+]

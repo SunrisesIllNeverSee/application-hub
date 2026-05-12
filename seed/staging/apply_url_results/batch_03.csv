@@ -1,0 +1,80 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+launch-ny,Launch NY,accel,https://launchny.org,https://launchny.org/entrepreneurs/apply-now,high,Explicit 'Apply Now' link in nav and multiple CTAs
+launchpad-for-women-entrepreneurs,Launchpad for Women Entrepreneurs,accel,https://www.launchpadforwomen.ca,https://www.launchpadforwomen.ca/courses,medium,Thinkific platform; enroll via course listing page; no dedicated /apply page
+launchpad-la,Launchpad LA,accel,https://launchpad.la,https://launchpad.la/apply/,high,Direct /apply path in nav
+startup-lab,Laurier StartUp Lab,accel,https://students.wlu.ca/work-leadership-and-volunteering/entrepreneurship/startup-lab/index.html?ref=work-leadership-and-volunteering%2Fentrepreneurship%2Flaunchpad.html,,not_found,"WLU Laurier StartUp Lab; page is informational only, no apply link found"
+le-pont-quebec,Le Pont Quebec,accel,https://www.lepont.io/en/home,https://lepont.io/en/apply,high,Direct /apply link in nav
+lead-to-win,Lead To Win,accel,https://www.leadtowin.ca,,not_found,Site returned Cloudflare error (522); no apply link reachable
+league-of-innovators,League of Innovators,accel,https://www.theleagueofinnovators.org,https://www.loi.ac/find-your-program,high,Explicit 'APPLY NOW - it's free' CTA linking to program finder; Airtable form embedded
+learnlaunch-accelerator,LearnLaunch Accelerator,accel,https://learnlaunch.com/accelerator-2,,not_found,Homepage shows news; no active /apply page found; applications announced via blog
+legal-innovation-zone,Legal Innovation Zone,accel,https://www.torontomu.ca/zone-learning/legal-innovation-zone,https://www.torontomu.ca/zone-learning/legal-innovation-zone/apply/,high,Dedicated /apply page in nav
+life-changing-labs-accelerator,Life Changing Labs Accelerator,accel,https://www.lifechanginglabs.com,,not_found,Homepage is portfolio showcase; no apply link visible
+liftoff,LiftOff,accel,https://www.liftoffbyccawr.com,,not_found,"sdgideafactory.ca/join-us link found but is about coworking space, not accelerator apply"
+longo-centre-for-entrepreneurship,Longo Centre for Entrepreneurship,accel,https://humber.ca/cfe,https://humber.ca/cfe/programs.html,medium,Programs listing page; no dedicated external apply link; likely internal enrollment
+mars-discovery-district,MaRS Discovery District,accel,https://www.marsdd.com,https://marsdd.com/apply,high,Direct /apply link found in HTML
+mc2-capital,MC2 Capital,accel,https://www.cabhi.com/mc2capital,https://www.cabhi.com/en/innovation-programs-services/acceleration-services,low,MC2 Capital page redirects to CABHI; Acceleration Services page has program info but no direct apply link
+mcneil-center-for-entrepreneurship-innovation,McNeil Center for Entrepreneurship & Innovation,accel,https://innovation.mines.edu,,not_found,innovation.mines.edu is a news/info page; Beck Venture Center apply surface not found on scraped page
+mediatech-ventures,MediaTech Ventures,accel,https://www.linkedin.com/company/mediatech-ventures,,not_found,LinkedIn company page only; no apply surface
+menlo-ventures,Menlo Ventures,accel,https://menlovc.com,,not_found,VC firm homepage; no public apply form for founders
+metaprop,MetaProp,accel,https://www.metaprop.vc,https://www.metaprop.com/partner-with-us,low,Partner With Us page exists but no form found; likely intake via contact
+mhub,mHUB,accel,https://www.mhubchicago.com/accelerator,https://www.mhubchicago.com/accelerator-program-interest,high,Explicit accelerator interest/apply form link found on accelerator sub-pages
+mit-global-startup-labs,MIT Global Startup Labs,accel,https://gsl.mit.edu/mit-global-startup-labs,,not_found,gsl.mit.edu returned empty/no-content response; site may be down or JS-only
+mit-office-of-innovation,MIT Office of Innovation,accel,https://innovation.mit.edu,,not_found,innovation.mit.edu is informational; no apply surface for external founders
+mitacs-canada,Mitacs Canada,accel,https://www.mitacs.ca/en,https://www.mitacs.ca/get-started/,medium,'Unleash Your Innovation Potential' CTA links to /get-started; research funding intake
+mmode,mmode,accel,https://www.mmode.ca,https://docs.google.com/forms/d/e/1FAIpQLScHrXWvGy2JRK4QbyaITR9QmESblcaJaJoJW2j7aML1Eifziw/viewform,medium,Google Form linked from event on homepage; industry network not accelerator apply per se
+mtlab,MTLab,accel,https://mtlab.ca,https://mtlab.ca/nos-programmes/,low,French-language tourism tech incubator; no direct apply link; programs listing page
+mucker-lab,Mucker Lab,accel,https://www.mucker.com,https://mucker.com/accelerator/,medium,Embedded pitch/apply form visible on /accelerator page (pitch deck required fields)
+nar-reach,NAR REACH US,accel,https://nar-reach.com,https://www.nar-reach.com/apply,high,Explicit APPLY link in navigation
+new-inc,NEW INC,accel,https://www.newinc.org,https://www.newinc.org/apply,high,newinc.org/apply redirects to newmuseum.org/new-inc/open-call/; open call application page
+new-ventures-bc,New Ventures BC,accel,https://www.newventuresbc.com,https://nvbc.typeform.com/to/vboBF4Gr,high,Typeform apply link found on AI Business Accelerator program page
+nex-cubed,Nex Cubed,accel,https://www.facebook.com/nexcubed,,not_found,Facebook company page only; no apply surface
+next-canada,Next Canada,accel,https://www.nextcanada.com,,not_found,Site JS-rendered; no apply links extractable from HTML; programs overview page found but no apply CTA
+north-shore-innoventures,North Shore InnoVentures,accel,https://nsiv.org,,not_found,nsiv.org returned empty response; site unreachable
+nyu-tandon-future-labs,NYU Tandon Future Labs,accel,https://futurelabs.nyc,https://futurelabs.nyc/programs/,low,Programs listing page found but no direct apply links on individual program pages
+on-deck,On Deck,accel,https://www.beondeck.com,,not_found,beondeck.com returned Cloudflare error code 522; site unreachable
+oneeleven,OneEleven,accel,https://oneeleven.com,,not_found,Site timed out during scrape; no content retrievable
+onetech,OneTech,accel,https://www.weareonetech.org,,not_found,weareonetech.org scraped but no apply links found; community org
+ontario-centre-of-innovation,Ontario Centre of Innovation,accel,https://www.oc-innovation.ca,,not_found,oc-innovation.ca scraped; only Bizzabo event link found; no accelerator apply page
+organic-food-incubator,Organic Food Incubator,accel,https://organicfoodincubator.com,,not_found,organicfoodincubator.com scraped; no apply links found on homepage
+outlier-ventures,Outlier Ventures,accel,https://outlierventures.io,https://outlierventures.io/base-camp/,low,Base Camp accelerator program page exists; apply link not extractable from JS-rendered site
+oxygen-accelerator,Oxygen Accelerator,accel,https://www.oxygenaccelerator.com,https://www.oxygenaccelerator.com/cee-startups-apply-now-to-oxygen-accelerator/,medium,Blog post with 'apply now' in URL found; may be outdated cohort announcement
+parkdale-centre-for-innovation,Parkdale Centre for Innovation,accel,https://www.parkdaleinnovates.org,,not_found,parkdaleinnovates.org returned only 1.6KB; likely redirect/error page
+pfizer-healthcare-hub,Pfizer Healthcare Hub,accel,https://www.pfizer.co.uk/partnerships/pfizer-healthcare-hub,,not_found,pfizer.co.uk/partnerships page only has internal links; no founder apply surface
+pioneer,Pioneer,accel,https://pioneer.app,,not_found,Pioneer.app explicitly states 'We're no longer making new investments'; program closed
+pioneer-square-labs,Pioneer Square Labs,accel,https://twitter.com/psl,,not_found,Twitter/X profile only; no apply surface
+platform-calgary,Platform Calgary,accel,https://platformcalgary.com,,not_found,"platformcalgary.com/events/submit is event submission, not accelerator apply"
+plug-and-play-tech-center,Plug and Play Tech Center,accel,https://www.plugandplaytechcenter.com,https://www.plugandplaytechcenter.com/join/,low,JS-rendered Angular app; /join path likely exists based on site structure; not confirmed
+polsky-institute,Polsky Institute,accel,https://polsky.uchicago.edu,https://polsky.uchicago.edu/polsky-deep-tech-ventures/,low,Deep Tech Ventures program page found; no direct apply link visible on scraped content
+praxis-center-for-venture-development,Praxis Center for Venture Development,accel,https://eship.cornell.edu/item/praxis-center,https://pcvd.cornell.edu/,low,Cornell PCVD homepage linked from eship.cornell.edu; no direct apply link found
+qb3,QB3,accel,https://qb3.org,https://qb3.org/early-stage-mentoring/,low,Early-stage mentoring page found; no dedicated apply CTA
+reach,REACH,accel,https://www.nar.realtor/technology/reach,https://nar-reach.com/apply,high,NAR REACH US - same apply portal as nar-reach.com
+reach-canada,Reach Canada,accel,https://nar-reach.com/canada,https://nar-reach.com/apply,high,REACH Canada apply page on nar-reach.com
+reach-uk,Reach UK,accel,https://nar-reach.com/uk,https://nar-reach.com/apply,high,REACH UK apply page on nar-reach.com
+redhawk-launch-accelerator,RedHawk Launch Accelerator,accel,https://www.miamioh.edu/fsb/academics/entrepreneurship/focus-areas/startup-entrepreneurship/redhawk-launch-accelerator/index.html,,not_found,miamioh.edu page links to general admission apply; not accelerator-specific apply
+rev-ithaca-startup-works,Rev: Ithaca Startup Works,accel,https://www.revithaca.com,https://www.revithaca.com/join-rev/,medium,Explicit 'Join REV' apply page found
+rice-alliance-for-technology-and-entrepreneurship,Rice Alliance for Technology and Entrepreneurship,accel,https://business.rice.edu/rice-alliance,https://business.rice.edu/apply,medium,General Rice business school /apply path; may be MBA admission not accelerator
+rocky-mountain-microfinance-institute,Rocky Mountain MicroFinance Institute,accel,https://rmmfi.org,https://rmmfi.org/business-programs/,medium,Business Programs page with Business Idea Lab and Boot Camp intake described; no direct apply form URL
+rogers-cybersecure-catalyst,Rogers Cybersecure Catalyst,accel,https://cybersecurecatalyst.ca/catalyst-cyber-accelerator,https://cybersecurecatalyst.ca/programs-and-services/,medium,Programs & Services listing page found; apply links for specific programs need further navigation
+roseview-global-incubator,Roseview Global Incubator,accel,https://roseviewglobal.com,https://roseviewglobal.com/programs/,low,Programs page exists; no apply link extractable from JS-rendered site
+science-discovery-zone,Science Discovery Zone,accel,https://www.torontomu.ca/discoveryzone,https://www.torontomu.ca/zone-learning/sdz/get-involved/,medium,'Get Involved' page found on TMU SDZ site
+seneca-helix,Seneca HELIX,accel,https://www.senecacollege.ca/innovation/helix.html,,not_found,senecacollege.ca/innovation/helix.html scraped; only general college apply link found (international admissions); no HELIX-specific apply
+sequoia-capital,Sequoia Capital,accel,https://www.sequoiacap.com,https://www.sequoiacap.com/arc/apply,high,Sequoia Arc accelerator has dedicated /arc/apply page
+sheboot,SheBoot,accel,https://sheboot.ca,https://sheboot.ca/for-founders/,medium,'For Founders' page found; sheboot.ca is Wix site; apply surface likely on this page
+sheridan-edge,Sheridan EDGE,accel,https://edge.sheridancollege.ca,https://www.surveymonkey.com/r/Student_ProgramInterestForm,medium,SurveyMonkey interest form linked from Sheridan EDGE programs page
+sku,SKU,accel,https://sku.is,https://sku.is/apply/,high,Direct /apply link in nav and multiple CTAs
+small-foundation,Small Foundation,accel,https://smallfoundation.ie,,not_found,smallfoundation.ie scraped; no apply/grant application links found for founders
+social-venture-zone,Social Venture Zone,accel,https://www.torontomu.ca/svz,https://www.torontomu.ca/svz/apply/,high,Dedicated /svz/apply/ page found
+spinup,SpinUp,accel,https://spinup.utm.utoronto.ca,https://spinup.utm.utoronto.ca/programming/,low,Programming page found; no direct apply form; UTM SpinUp is university program
+sputnik-atx-vc,Sputnik ATX VC,accel,https://www.sputnikatx.com,https://gust.com/programs/sputnik-atx-vc-summer-2026,high,Gust platform apply link displayed prominently on homepage
+starburst-aerospace,Starburst Aerospace,accel,https://starburst.aero,https://starburst.aero/accelerator-program/,medium,Accelerator program page found; apply form not extractable from static scrape
+start-alberta,Start Alberta,accel,https://startalberta.ca,,not_found,startalberta.ca is an ecosystem directory/resource site; no accelerator apply surface
+startshea,Start@Shea,accel,https://www.startatshea.com,https://www.startatshea.com/accelerate-shea,medium,Accelerate@Shea program page found on Wix site; apply form likely JS-rendered
+started,StartEd,accel,https://www.started.com,https://www.started.com/apply,high,Direct /apply page found in HTML hrefs
+startgbc,startGBC,accel,https://www.startgbc.com,,not_found,"startgbc.com appears to be a generic blog site, not George Brown College startup program; no apply links"
+startup-calgary,Startup Calgary,accel,https://www.startupcalgary.ca,,not_found,"startupcalgary.ca/events/submit is event submission, not startup apply; no accelerator apply page found"
+startup-fiu,StartUP FIU,accel,https://startup.fiu.edu,,not_found,startup.fiu.edu is informational site; no apply links in scraped HTML
+startup-garage,Startup Garage,accel,https://startupgarage.ca,https://startupgarage.ca/apply-now,high,Direct /apply-now href found multiple times
+startup-health,Startup Health,accel,https://www.startuphealth.com,https://www.startuphealth.com/apply-now,high,Explicit /apply-now href found in HTML
+startup-montreal,Startup Montréal,accel,https://startupmontreal.com/en/home,,not_found,startupmontreal.com/en/home returns 404; site appears moved or offline
+startup-school,Startup School,accel,https://www.startupschool.org,https://www.startupschool.org/users/sign_in?sign_up=true,high,YC Startup School is free online course; sign-up page is the apply surface
+startupboot-camp,Startupboot camp,accel,https://www.startupbootcamp.org/accelerator/fintech-new-york,,not_found,URL /accelerator/fintech-new-york returns 404 on Webflow site; program page not found

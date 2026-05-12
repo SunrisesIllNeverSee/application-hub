@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "2bx",
+    "name": "2bX",
+    "type": "accel",
+    "homepage_url": "https://2bx.vc",
+    "discovered_apply_url": "https://2bx.vc/jobs/",
+    "confidence": "high",
+    "notes": "Apply text: \"Apply\""
+  },
+  {
+    "slug": "accelerate-okanagan",
+    "name": "Accelerate Okanagan",
+    "type": "accel",
+    "homepage_url": "https://accelerateokanagan.com",
+    "discovered_apply_url": "https://accelerateokanagan.com/entrepreneurs/general-programs-application-form/",
+    "confidence": "high",
+    "notes": "Apply text: \"Apply Now\""
+  },
+  {
+    "slug": "altitude-accelerator",
+    "name": "Altitude Accelerator",
+    "type": "accel",
+    "homepage_url": "https://altitudeaccelerator.ca",
+    "discovered_apply_url": "https://altitudeaccelerator.ca/investor-readiness/",
+    "confidence": "high",
+    "notes": "Apply CTA: \"Apply now\""
+  },
+  {
+    "slug": "antler-academy",
+    "name": "Antler Academy",
+    "type": "accel",
+    "homepage_url": "https://www.antler.co/academy",
+    "discovered_apply_url": "https://www.antler.co/apply",
+    "confidence": "high",
+    "notes": "Link text \"Apply now\" + apply href"
+  },
+  {
+    "slug": "antler",
+    "name": "Antler Global",
+    "type": "accel",
+    "homepage_url": "https://www.antler.co",
+    "discovered_apply_url": "https://www.antler.co/apply",
+    "confidence": "high",
+    "notes": "\"Apply\" + apply href"
+  },
+  {
+    "slug": "antler-us-boulder",
+    "name": "Antler US Boulder",
+    "type": "accel",
+    "homepage_url": "https://www.antler.co/location/us",
+    "discovered_apply_url": "https://www.antler.co/apply",
+    "confidence": "high",
+    "notes": "Link text \"Apply Now\" + apply href"
+  },
+  {
+    "slug": "babson-college-center-for-womens-entrepreneurial-leadership",
+    "name": "Babson College Center for Women\u2019s Entrepreneurial Leadership",
+    "type": "accel",
+    "homepage_url": "https://www.babson.edu/womens-leadership-institute/campus-programs",
+    "discovered_apply_url": "https://www.babson.edu/undergraduate/how-to-apply/",
+    "confidence": "high",
+    "notes": "Apply CTA: \"How to Apply\""
+  },
+  {
+    "slug": "bengal-entrepreneurship-program",
+    "name": "Bengal Entrepreneurship Program",
+    "type": "accel",
+    "homepage_url": "https://sbdc.buffalostate.edu/bengal-entrepreneurship-program",
+    "discovered_apply_url": "https://suny.buffalostate.edu/apply",
+    "confidence": "high",
+    "notes": "\"Apply\" + apply href"
+  },
+  {
+    "slug": "berkeley-skydeck",
+    "name": "Berkeley SkyDeck",
+    "type": "accel",
+    "homepage_url": "https://skydeck.berkeley.edu",
+    "discovered_apply_url": "https://skydeck.berkeley.edu/apply/",
+    "confidence": "high",
+    "notes": "\"APPLY\" + apply href"
+  },
+  {
+    "slug": "biomedical-zone",
+    "name": "Biomedical Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/zone-learning/biomedical-zone",
+    "discovered_apply_url": "https://www.torontomu.ca/admissions/",
+    "confidence": "high",
+    "notes": "Apply CTA: \"Apply\""
+  },
+  {
+    "slug": "brampton-venture-zone",
+    "name": "Brampton Venture Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/zone-learning/venture-zone-brampton",
+    "discovered_apply_url": "https://www.torontomu.ca/admissions/",
+    "confidence": "high",
+    "notes": "Apply CTA: \"Apply\""
+  },
+  {
+    "slug": "catalyze-cu",
+    "name": "Catalyze CU",
+    "type": "accel",
+    "homepage_url": "https://www.colorado.edu/catalyzecu",
+    "discovered_apply_url": "https://forms.gle/vRVUnE62B3mYLS7L7",
+    "confidence": "high",
+    "notes": "\"Apply to Be a Catalyze CU Mentor\" + apply href"
+  },
+  {
+    "slug": "centre-for-entrepreneurship",
+    "name": "Centre for Entrepreneurship University of Toronto",
+    "type": "accel",
+    "homepage_url": "https://www.entrepreneurship.artsci.utoronto.ca",
+    "discovered_apply_url": "https://www.entrepreneurship.artsci.utoronto.ca/apply-be-ta",
+    "confidence": "high",
+    "notes": "\"Apply to be a TA\" + apply href"
+  },
+  {
+    "slug": "clean-energy-zone",
+    "name": "Clean Energy Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/cue/clean-energy-zone",
+    "discovered_apply_url": "https://www.torontomu.ca/admissions/",
+    "confidence": "high",
+    "notes": "Apply CTA: \"Apply\""
+  },
+  {
+    "slug": "cleantech-open",
+    "name": "Cleantech Open",
+    "type": "accel",
+    "homepage_url": "https://www.cleantechopen.org",
+    "discovered_apply_url": "https://www.cleantechopen.org/en/custom/2026ctoaccelerator/new/submit",
+    "confidence": "high",
+    "notes": "Apply CTA: \"Apply Now\""
+  },
+  {
+    "slug": "collider",
+    "name": "Collider",
+    "type": "accel",
+    "homepage_url": "https://www.collider.io",
+    "discovered_apply_url": "https://www.collider.io/apply",
+    "confidence": "high",
+    "notes": "\"Apply\" + apply href"
+  }
+]

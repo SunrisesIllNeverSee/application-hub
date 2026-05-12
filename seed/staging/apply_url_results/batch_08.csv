@@ -1,0 +1,80 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+silverton-partners,Silverton Partners,vc,https://www.silvertonpartners.com,https://www.silvertonpartners.com/contact/,medium,Contact form only; no dedicated pitch/apply portal found
+slack-fund,Slack Fund,vc,https://slack.com/fund,https://airtable.com/app5kO0WaTWMJG0n7/pagIcieB3DVsIxyxp/form,high,Redirects to Salesforce Ventures; Airtable contact form found in nav
+spark-capital,Spark Capital,vc,https://www.sparkcapital.com,,not_found,Homepage rendered with very limited content; no apply/contact link visible; site appears to rely on warm intros
+staircase-ventures,Staircase Ventures,vc,https://staircaseventures.com,,not_found,No apply or contact link found; portfolio-focused site; likely warm-intro only
+stand-up-ventures,Stand Up Ventures,vc,https://www.standupvc.com,https://www.standupvc.com/connect,medium,Contact page at /connect; no structured intake form confirmed
+starlight-ventures,Starlight Ventures,vc,https://starlight.vc,https://starlight.vc/#contact,medium,Anchor link to contact section; email info@starlight.vc mentioned; no form
+storm-ventures,Storm Ventures,vc,https://www.stormventures.com,https://stormventures.typeform.com/to/H6I1Qq,high,Typeform intake linked prominently in nav and CTA buttons
+summit-partners,Summit Partners,vc,https://www.summitpartners.com,https://www.summitpartners.com/contact,medium,Contact page with office links; large growth/PE fund; no structured startup form
+sv-angel,SV Angel,vc,https://svangel.com,,not_found,Site returned client-side JS error; could not render; no apply URL discoverable
+tandemlaunch,TandemLaunch,vc,https://www.tandemlaunch.com/en,https://www.tandemlaunch.com/contact,medium,Contact page only; incubator/VC hybrid model; no open application form visible
+team-global,Team Global,vc,https://teamglobal.net,,not_found,Site timed out on all attempts; could not load
+telus-ventures,Telus Ventures,vc,https://www.telus.com/en/ventures,,not_found,Corporate VC page loaded but no startup pitch/apply link found; enterprise-focused
+tenity,Tenity,vc,https://www.tenity.com,https://www.tenity.com/programs/,medium,Accelerator/VC hybrid with programs page; no open apply form on homepage; check /programs for intake
+theventurefund,TheVenture.Fund,vc,https://www.linkedin.com/company/theventurefund,,not_found,LinkedIn-only URL; no dedicated website with apply portal
+threshold-ventures,Threshold Ventures,vc,https://threshold.vc,https://www.threshold.vc/contact,medium,Contact page at /contact; Stanford TVF fellows program also listed
+toronto-innovation-acceleration-partners,Toronto Innovation Acceleration Partners,vc,https://tiap.ca,https://tiap.ca/contact/,medium,Contact page found; programs page at /programs-and-investment; no open application portal
+true,True.,vc,https://www.true.global,https://www.true.global/contact/,medium,Contact page at /contact; investment page at /investment; no open startup form
+two-sigma-ventures,Two Sigma Ventures,vc,https://twosigmaventures.com,https://www.twosigma.com/contact-us/,low,Redirects to Two Sigma main site; contact-us form is general corporate; no startup intake
+two-small-fish-ventures,Two Small Fish Ventures,vc,https://twosmallfish.vc,https://twosmallfish.vc/contact-us,medium,Contact page at /contact-us; small pre-seed fund
+underscore-vc,Underscore VC,vc,https://underscore.vc,,not_found,No apply/contact link found on homepage; network-based; Core Community model; warm-intro focus
+union-capital,Union Capital,vc,https://www.linkedin.com/company/unionvc,,not_found,LinkedIn-only URL; no dedicated website
+union-square-ventures,Union Square Ventures,vc,https://www.usv.com,,not_found,Site timed out repeatedly; historically usv.com/pitch was the intake but could not confirm live
+unreasonable,Unreasonable,vc,https://unreasonablegroup.com,https://unreasonablegroup.com/fellowship,medium,Fellowship program page found; impact-focused VC/accelerator; apply through fellowship
+valo-ventures,Valo Ventures,vc,https://valoventures.org,https://valoventures.org/contact/,medium,Contact page at /contact; climate/ag tech focus; no structured intake form
+vanedge-capital,Vanedge Capital,vc,https://www.vanedgecapital.com,https://www.vanedgecapital.com/contact-us/,medium,Contact-us page found; no open pitch form visible
+varia-ventures,Varia Ventures,vc,https://varia.com,,not_found,No apply link found; investor-focused portal (LP portal); startup intake not visible on homepage
+venrock,Venrock,vc,https://www.venrock.com,https://www.venrock.com/contact,medium,Contact page found; no structured intake form; warm-intro focus
+venture-ontario,Venture Ontario,vc,https://www.ventureontario.ca,https://www.ventureontario.ca/contact,low,Government fund-of-funds; invests in VC funds not startups directly; contact page only
+venturesouq,VentureSouq,vc,https://www.venturesouq.com,https://www.venturesouq.com/contact,medium,Contact page at /contact; also runs Conscious Investor Fellowship program
+versant-ventures,Versant Ventures,vc,https://www.versantventures.com,http://www.versantventures.com/offices,low,Offices contact page only; life sciences VC; no structured startup intake
+version-one,Version One,vc,https://versionone.vc,,not_found,No apply/contact link found on homepage; Boris Wertz fund; likely warm-intro or email
+vertu-capital,Vertu Capital,vc,https://vertucapital.ca,https://vertupartners.com/contact/,medium,Site redirects to vertupartners.com; contact page at /contact
+village-global,Village Global,vc,https://www.villageglobal.vc,https://www.villageglobal.com/contact-us,medium,Contact-us page found; network-driven VC; investing page describes model
+vista-equity-partners,Vista Equity Partners,vc,https://www.vistaequitypartners.com,,not_found,Large PE firm; no startup apply portal; growth/buyout stage; no intake form found
+vitalize-venture-capital,VITALIZE Venture Capital,vc,https://www.vitalize.vc,,not_found,No apply/contact link found on homepage; newsletter-focused site
+vmg-partners,VMG Partners,vc,https://www.linkedin.com/company/vmg-partners,,not_found,LinkedIn-only URL; no dedicated website with apply portal
+weekend-fund,Weekend Fund,vc,https://weekend.fund,mailto:team@weekend.fund,low,Email-only contact (team@weekend.fund); no structured intake form; Ryan Hoover fund
+white-star-capital,White Star Capital,vc,https://whitestarcapital.com,,not_found,No apply/contact link found on homepage; multi-stage fund
+yaletown-partners,Yaletown Partners,vc,https://yaletown.com,https://www.yaletown.com/contact,medium,Contact page at /contact; Canadian growth fund
+1-million-cups-boulder,1 Million Cups Boulder,other,https://www.meetup.com/1-Million-Cups-Boulder,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2F1-million-cups-boulder%2F,high,Meetup signup to join group and RSVP to events; weekly entrepreneur pitch event
+accelerateott,AccelerateOTT,other,https://www.accelerateott.ca,https://www.eventbrite.ca/e/accelerateott-2026-tickets-1987148720315,high,Eventbrite ticket link found; also Startup World Cup application at startupworldcup.io/ottawa-regional-2026
+access-silicon-valley-boulder-denver,Access Silicon Valley Boulder/Denver,other,https://www.meetup.com/Access-Silicon-Valley-Boulder-Denver,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Faccess-silicon-valley-boulder-denver%2F,high,Meetup group signup; startup networking events with Silicon Valley investors
+adweek-social-media-week,AdWeek Social Media Week,other,https://event.adweek.com/social-media-week-2023,https://event.adweek.com/smw_2026/begin,high,Register link found pointing to 2026 edition; redirected to current year event
+agi-house,AGI House,other,https://agihouse.ai,https://forms.gle/TF6Arjmv7CMM4KUQA,high,Google Form join link prominently displayed on homepage
+ai-tinkerers,AI Tinkerers,other,https://tinkerer.ai/p/welcome,https://aitinkerers.org/all_cities,medium,All cities listing for local chapter events; no single apply form; community-based
+andrews-tech-mixer,Andrew's Tech Mixer,other,https://www.andrew.today/p/events,https://linktr.ee/andrewsmixers,high,Linktree with all events; individual events RSVP via lu.ma links
+asia-tech-x-singapore,Asia Tech x Singapore,other,https://asiatechxsg.com,https://asiatechxsg.com/atxenterprise/,high,Attend page at /atxenterprise; major Singapore tech conference
+assembly,Assembly,other,https://www.assemblycs.com,https://www.assemblycs.com/contact,medium,Coworking space; contact/tour page; no event application form
+association-of-chinese-canadian-entrepreneurs,Association of Chinese Canadian Entrepreneurs,other,https://www.acce.ca/new,https://www.acce.ca/new/category/events/,medium,Events page found; membership organization; no online apply form visible
+asugsv-summit,ASU+GSV Summit,other,https://www.asugsvsummit.com,https://cvent.me/lKxbvN,high,Cvent registration link for 2027; GSV Cup startup competition also available at /gsv-cup
+banff-venture-forum,Banff Venture Forum,other,https://banffventureforum.com,https://banffventureforum.com/registration/apply-to-present/,high,Dedicated startup showcase application at /registration/apply-to-present; also general registration at /registration
+big-data-boston,Big Data Boston,other,https://www.meetup.com/BigDataBoston,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbigdataboston%2F,high,Meetup group signup to join and attend events
+biotechto,BiotechTO,other,https://biotechto.com,,not_found,Page returned 404 not found; site may be down or moved
+bits-in-bio,Bits in Bio,other,https://www.bitsinbio.org,https://join.slack.com/t/bitsinbio/shared_invite/zt-3x4ryxqjr-a77cBC~RA6LFOTmxYJvZ~g,high,Slack community join link prominently shown; also lu.ma events at lu.ma/bitsinbio
+blockchain-futurist-conference,Blockchain Futurist Conference,other,https://www.futuristconference.com,https://futuristconference.com/toronto/ticket,high,Ticket pages for Toronto and Florida events; speaker application also at /speaker-form
+bootsector,BootSector,other,https://joinbootsector.com,https://joinbootsector.com/join-the-startup-community/,high,Dedicated join page at /join-the-startup-community; community organizer support platform
+bootstrappers-breakfast-for-san-francisco-startups,Bootstrappers Breakfast for San Francisco Startups,other,https://www.meetup.com/Bootstrappers-Breakfast-San-Francisco,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbootstrappers-breakfast-san-francisco%2F,high,Meetup signup to join and RSVP to breakfast events
+boston-ai-network-com,Boston AI Network,other,https://www.meetup.com/Boston-AI-Network-Artificial-Intelligence-Group,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbigdataboston%2F,medium,Scraped as Big Data Boston (same group area); Meetup signup is the apply mechanism
+boston-fintech,Boston FinTech,other,https://www.meetup.com/Boston-FinTech,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-fintech%2F,high,Meetup group signup; also check bostonfintechweek.org for annual event
+boston-hardware-meetup,Boston Hardware Meetup,other,https://www.meetup.com/boston-hardware,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-hardware%2F,high,Meetup group signup; hardware-focused meetup with strong attendance history
+boston-new-technology,Boston New Technology,other,https://www.meetup.com/Boston_New_Technology,,not_found,Site timed out repeatedly; Meetup group URL with underscore caused scrape failures
+boston-startup-idea-to-ipo,Boston Startup: Idea to IPO,other,https://www.meetup.com/Boston-Idea-to-IPO,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-idea-to-ipo%2F,high,Meetup group signup; individual events register via Eventbrite links
+boston-techjam,Boston TechJam,other,https://www.masstlc.org/bostontechjam,,not_found,Scrape timed out; MassTLC annual conference; check masstlc.org for current registration
+bostonhacks,BostonHacks,other,https://bostonhacks.io,,not_found,Site content appeared hijacked/redirected to unrelated gambling content; original hackathon site may be defunct
+boulder-open-coffee,Boulder Open Coffee,other,https://www.meetup.com/boulder-open-coffee,,not_found,Scrape timed out repeatedly; Meetup group for casual startup networking
+boulder-startup-week,Boulder Startup Week,other,https://boulderstartupweek.com,https://revelco.org/bsw/,high,Registration at revelco.org/bsw; also sponsor and volunteer options; annual event
+buffalo-startup-week,Buffalo Startup Week,other,https://www.startupweekbuffalo.com,https://luma.com/a35ob3fy,high,Multiple event registrations via lu.ma; Founder Day and Ecosystem/Capital tracks
+burlington-chamber-of-commerce,Burlington Chamber of Commerce,other,https://www.burlingtonchamber.com,,not_found,Site timed out repeatedly; chamber membership organization
+business-of-software-conference,Business of Software Conference,other,https://businessofsoftware.org,https://businessofsoftware.org/updates/,medium,Newsletter signup and workshop registration links found; annual conference; check site for main event registration
+calgary-hackathon,Calgary Hackathon,other,https://www.yychacks.ca,https://www.showpass.com/yyc-hacks-chinook-blast-2024,high,Showpass ticket link for YYC Hacks; annual hackathon in Calgary
+canadian-blockchain-consortium,Canadian Blockchain Consortium,other,https://www.canadablockchain.ca,,not_found,Site timed out repeatedly; could not load
+canadian-innovation-exchange,Canadian Innovation Exchange,other,https://cixsummit.com,https://cixsummit.com/tickets/,high,Tickets/registration page at /tickets; also CIX Startup Awards application for startups
+canadian-undergraduate-technology-conference,Canadian Undergraduate Technology Conference,other,https://www.cutc.ca/#,,not_found,Site timed out repeatedly; annual student tech conference
+canadian-women-real-estate,Canadian Women Real Estate,other,https://crewa.ca,,not_found,Site blocked all scraping engines; all engines failed
+canadian-womens-chamber-of-commerce,Canadian Women's Chamber of Commerce,other,https://canwcc.ca,,not_found,Site timed out repeatedly; membership organization
+centre-for-social-innovation,Centre for Social Innovation,other,https://socialinnovation.org,https://socialinnovation.org/join-us/membership/,high,Membership plans page at /join-us/membership; community and coworking memberships
+chicago-startup-community,Chicago Startup Community,other,https://www.meetup.com/chicago-startup-community,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fchicago-startup-community%2F,high,Meetup group signup; also Discord at discord.gg/K8ecPrZ4e9
+city-of-toronto-business,City of Toronto Business,other,https://www.toronto.ca/business-economy/new-businesses-startups,,not_found,Government resource page; no single apply URL; links to various city programs for new businesses
+co-labs,Co.Labs,other,https://www.co-labs.ca,,not_found,Site timed out repeatedly; Saskatoon tech community hub

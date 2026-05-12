@@ -1,0 +1,146 @@
+[
+  {
+    "slug": "legal-innovation-zone",
+    "name": "Legal Innovation Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/zone-learning/legal-innovation-zone",
+    "discovered_apply_url": "https://www.torontomu.ca/zone-learning/legal-innovation-zone/apply/",
+    "confidence": "high",
+    "notes": "Dedicated /apply page in nav"
+  },
+  {
+    "slug": "mars-discovery-district",
+    "name": "MaRS Discovery District",
+    "type": "accel",
+    "homepage_url": "https://www.marsdd.com",
+    "discovered_apply_url": "https://marsdd.com/apply",
+    "confidence": "high",
+    "notes": "Direct /apply link found in HTML"
+  },
+  {
+    "slug": "mhub",
+    "name": "mHUB",
+    "type": "accel",
+    "homepage_url": "https://www.mhubchicago.com/accelerator",
+    "discovered_apply_url": "https://www.mhubchicago.com/accelerator-program-interest",
+    "confidence": "high",
+    "notes": "Explicit accelerator interest/apply form link found on accelerator sub-pages"
+  },
+  {
+    "slug": "nar-reach",
+    "name": "NAR REACH US",
+    "type": "accel",
+    "homepage_url": "https://nar-reach.com",
+    "discovered_apply_url": "https://www.nar-reach.com/apply",
+    "confidence": "high",
+    "notes": "Explicit APPLY link in navigation"
+  },
+  {
+    "slug": "new-inc",
+    "name": "NEW INC",
+    "type": "accel",
+    "homepage_url": "https://www.newinc.org",
+    "discovered_apply_url": "https://www.newinc.org/apply",
+    "confidence": "high",
+    "notes": "newinc.org/apply redirects to newmuseum.org/new-inc/open-call/; open call application page"
+  },
+  {
+    "slug": "new-ventures-bc",
+    "name": "New Ventures BC",
+    "type": "accel",
+    "homepage_url": "https://www.newventuresbc.com",
+    "discovered_apply_url": "https://nvbc.typeform.com/to/vboBF4Gr",
+    "confidence": "high",
+    "notes": "Typeform apply link found on AI Business Accelerator program page"
+  },
+  {
+    "slug": "reach",
+    "name": "REACH",
+    "type": "accel",
+    "homepage_url": "https://www.nar.realtor/technology/reach",
+    "discovered_apply_url": "https://nar-reach.com/apply",
+    "confidence": "high",
+    "notes": "NAR REACH US - same apply portal as nar-reach.com"
+  },
+  {
+    "slug": "reach-canada",
+    "name": "Reach Canada",
+    "type": "accel",
+    "homepage_url": "https://nar-reach.com/canada",
+    "discovered_apply_url": "https://nar-reach.com/apply",
+    "confidence": "high",
+    "notes": "REACH Canada apply page on nar-reach.com"
+  },
+  {
+    "slug": "reach-uk",
+    "name": "Reach UK",
+    "type": "accel",
+    "homepage_url": "https://nar-reach.com/uk",
+    "discovered_apply_url": "https://nar-reach.com/apply",
+    "confidence": "high",
+    "notes": "REACH UK apply page on nar-reach.com"
+  },
+  {
+    "slug": "sequoia-capital",
+    "name": "Sequoia Capital",
+    "type": "accel",
+    "homepage_url": "https://www.sequoiacap.com",
+    "discovered_apply_url": "https://www.sequoiacap.com/arc/apply",
+    "confidence": "high",
+    "notes": "Sequoia Arc accelerator has dedicated /arc/apply page"
+  },
+  {
+    "slug": "sku",
+    "name": "SKU",
+    "type": "accel",
+    "homepage_url": "https://sku.is",
+    "discovered_apply_url": "https://sku.is/apply/",
+    "confidence": "high",
+    "notes": "Direct /apply link in nav and multiple CTAs"
+  },
+  {
+    "slug": "social-venture-zone",
+    "name": "Social Venture Zone",
+    "type": "accel",
+    "homepage_url": "https://www.torontomu.ca/svz",
+    "discovered_apply_url": "https://www.torontomu.ca/svz/apply/",
+    "confidence": "high",
+    "notes": "Dedicated /svz/apply/ page found"
+  },
+  {
+    "slug": "sputnik-atx-vc",
+    "name": "Sputnik ATX VC",
+    "type": "accel",
+    "homepage_url": "https://www.sputnikatx.com",
+    "discovered_apply_url": "https://gust.com/programs/sputnik-atx-vc-summer-2026",
+    "confidence": "high",
+    "notes": "Gust platform apply link displayed prominently on homepage"
+  },
+  {
+    "slug": "started",
+    "name": "StartEd",
+    "type": "accel",
+    "homepage_url": "https://www.started.com",
+    "discovered_apply_url": "https://www.started.com/apply",
+    "confidence": "high",
+    "notes": "Direct /apply page found in HTML hrefs"
+  },
+  {
+    "slug": "startup-garage",
+    "name": "Startup Garage",
+    "type": "accel",
+    "homepage_url": "https://startupgarage.ca",
+    "discovered_apply_url": "https://startupgarage.ca/apply-now",
+    "confidence": "high",
+    "notes": "Direct /apply-now href found multiple times"
+  },
+  {
+    "slug": "startup-health",
+    "name": "Startup Health",
+    "type": "accel",
+    "homepage_url": "https://www.startuphealth.com",
+    "discovered_apply_url": "https://www.startuphealth.com/apply-now",
+    "confidence": "high",
+    "notes": "Explicit /apply-now href found in HTML"
+  }
+]

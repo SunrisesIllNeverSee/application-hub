@@ -1,0 +1,80 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+acf-investors,ACF Investors,vc,https://www.acfinvestors.com,https://www.acfinvestors.com/angel-cofund/#apply_form,medium,Has Apply for Funding sections on both Angel CoFund and Delta Fund pages (anchor links to embedded form); co-invest model requiring angel syndicate lead
+acme-capital,ACME Capital,vc,https://www.acme.vc,,not_found,not_found: site timed out on scrape; no apply surface identified
+acrew-capital,Acrew Capital,vc,https://www.acrewcapital.com,,not_found,not_found: contact is email only (hello@acrewcapital.com); no structured form for founders
+active-impact-investments,Active Impact Investments,vc,https://www.activeimpactinvestments.com,https://www.activeimpactinvestments.com/workwithus,low,Has a Work With Us page; page timed out on secondary scrape so form content unconfirmed; may be contact form only
+advent-life-sciences,Advent Life Sciences,vc,https://adventls.com,,not_found,not_found: contact page is email-based (contact@adventls.com); no founder application form
+alate-partners,Alate Partners,vc,https://alatepartners.com,,not_found,not_found: no apply or pitch page found; portfolio-focused site; no structured intake
+allosterx-capital,AllosteRx Capital,vc,https://www.allosterxcapital.com,,not_found,not_found: contact-us page only; no structured application form for founders
+alpha-bridge-ventures,Alpha Bridge Ventures,vc,https://www.alphabridge.vc,,not_found,not_found: contact-us anchor link only; no structured apply form visible
+alpha-partners,Alpha Partners,vc,https://alphapartners.com,,not_found,not_found: has a contact page and email newsletter form; no structured startup application
+amadeus-capital-partners,Amadeus Capital Partners,vc,https://www.amadeuscapital.com,https://www.amadeuscapital.com/submit-a-proposal/,medium,Submit a Proposal page in top nav; form content not fully loaded but dedicated proposal submission page exists
+amplifyla,Amplify.LA,vc,https://amplify.la,,not_found,not_found: contact page only; pre-seed LA fund with no public application form
+apollo-health-ventures,Apollo Health Ventures,vc,https://www.apollo.vc,,not_found,not_found: contact is email only (info@apollo.vc); co-founding model not open application
+archangel-network-of-funds,Archangel Network of Funds,vc,https://www.archangelnetwork.ca,,not_found,not_found: contact-us page only; invests through angel syndicates not open applications
+arctern-ventures,ArcTern Ventures,vc,https://www.arcternventures.com,,not_found,not_found: no dedicated apply page; contact section has email form but no structured founder intake
+ascent-venture-partners,Ascent Venture Partners,vc,https://www.ascentvp.com,,not_found,not_found: contact-us page only; no structured application form
+astia,Astia,vc,https://www.astia.org,https://astia.my.site.com/connect/s/raiseapplication,high,Clear Apply page with Salesforce-powered application portal for investment consideration; founders answer structured questions
+atb-ventures,ATB Ventures,vc,https://twitter.com/AtbVentures,,not_found,not_found: homepage is Twitter/X; no application surface accessible
+atlas-venture,Atlas Venture,vc,https://atlasventure.com,,not_found,not_found: cookies-heavy site; no apply or pitch page found in scraped content
+atomico,Atomico,vc,https://atomico.com,,not_found,not_found: no apply page found; large multi-stage European VC; inbound through network
+atx-venture-partners,ATX Venture Partners,vc,https://www.atxventurepartners.com,,not_found,not_found: contact section only; no structured startup application
+austin-ventures,Austin Ventures,vc,https://austinventures.com,,not_found,not_found: site warns of scam impersonators and states no current hiring; appears largely inactive/wind-down
+bain-capital-ventures,Bain Capital Ventures,vc,https://baincapitalventures.com,,not_found,not_found: has contact page; no structured founder application form; large growth-stage fund
+balderton-capital,Balderton Capital,vc,https://www.balderton.com,,not_found,not_found: no apply page found; large Series A+ European fund; network-driven dealflow
+baroda-ventures,Baroda Ventures,vc,https://www.linkedin.com/company/baroda-ventures,,not_found,not_found: homepage is LinkedIn company page; no application surface
+basf-venture-capital,BASF Venture Capital,vc,https://www.basf.com/global/en/who-we-are/organization/group-companies/BASF_Venture-Capital.html,,not_found,not_found: corporate VC with contact via Vanessa Holzhaeuser PR contact; no founder application form; email-based contact only
+battery-ventures,Battery Ventures,vc,https://www.battery.com,,not_found,not_found: no apply page found; large multi-stage fund; inbound through network
+bcf-ventures,BCF Ventures,vc,https://bcfventures.vc,https://www.f6s.com/bcfventures/apply,high,APPLY NOW button prominently links to F6s application portal; structured questions for founders
+bdmi-fund,BDMI Fund,vc,https://www.bdmifund.com,,not_found,not_found: site redirects to 1745 Ventures and Bertelsmann Investments; BDMI no longer active under that name
+bessemer-venture-partners,Bessemer Venture Partners,vc,https://www.bvp.com,,not_found,not_found: has contact page; large multi-stage fund with no public founder application
+betaworks,betaworks,vc,https://www.betaworks.com,https://www.betaworks.com/camp/application,high,Camp application page with structured form; program currently in session; accepts next cohort applications for AI Camp; guaranteed investment up to $500k for accepted startups
+bethnal-green-ventures,Bethnal Green Ventures,vc,https://www.bethnalgreenventures.com,https://www.bethnalgreenventures.com/apply,high,Dedicated apply page for BGV programme; open applications for Autumn 2026; structured intake form for tech-for-good founders
+bkr-capital,BKR capital,vc,https://www.bkrcapital.ca,https://www.bkrcapital.ca,medium,Website has contact form that explicitly requests pitch deck URL for investment inquiries; not a standalone apply portal but structured intake; Canada's first Black-led institutional VC
+blck-vc,BLCK VC,vc,https://www.blckvc.org,https://admin374289.typeform.com/to/XtSpRao2,medium,Typeform join link found; appears to be for community membership not founder investment; BLCK VC is a network organization not a fund
+blossom-capital,Blossom Capital,vc,https://www.blossomcap.com,,not_found,not_found: no apply page; Series A European fund; 5-6 investments per year via network
+blueyard-capital,BlueYard Capital,vc,https://www.blueyard.com,,not_found,not_found: no apply or pitch page; deep tech/crypto fund with no public application surface
+bolt,Bolt,vc,https://bolt.io,,not_found,not_found: Bolt explicitly states they are no longer making new investments; firm wound down
+boxgroup,BoxGroup,vc,https://www.boxgroup.com,,not_found,not_found: no apply page; known for pre-seed NYC investments via founder networks only
+braemar-energy-ventures,Braemar Energy Ventures,vc,http://www.braemarenergy.com,,not_found,not_found: Submit Business Plan link is mailto (bizplans@braemarenergy.com); email submission only not a structured form
+break-trail-ventures,Break Trail Ventures,vc,https://www.breaktrailventures.com,,not_found,not_found: contact section only; no structured application form
+breed-reply,Breed Reply,vc,https://www.reply.com/breed-reply/en,,not_found,not_found: parent Reply company site; no specific apply page for Breed Reply fund found
+brightspark-ventures,Brightspark Ventures,vc,https://brightspark.com/en,,not_found,not_found: investor-facing platform (retail investors); no founder application surface; operates as exempt market dealer
+buckley-ventures,Buckley Ventures,vc,https://www.buckleyventures.com,,not_found,not_found: minimal site; single-sentence description; no application form
+builders-vc,Builders VC,vc,https://www.builders.vc,,not_found,not_found: no apply page found; agriculture/food/industrial focus; no public application
+camber-creek,Camber Creek,vc,https://cambercreek.com,,not_found,not_found: no apply page; real estate tech PE firm; deals via direct sourcing and partner network
+capitalg,CapitalG,vc,https://www.capitalg.com,,not_found,not_found: Google growth equity fund; no public application; inbound via Google network only
+capitalize-vc,Capitalize VC,vc,https://www.capitalizevc.com,https://airtable.com/apppvODtMSw09eCae/pagdarmEj6iMMvBob/form,high,PITCH US button links to Airtable form with structured fields; prominent on homepage and footer
+carbon-direct-capital,Carbon Direct Capital,vc,https://www.carbondirectcapital.com,,not_found,not_found: contact is email only (inquiries@carbondirectcapital.com); no structured founder form
+cavu-venture-partners,CAVU Venture Partners,vc,https://www.cavuventures.com,,not_found,not_found: consumer brand-focused VC; no public application form
+celtic-house-venture-partners,Celtic House Venture Partners,vc,https://www.celtic.vc,,not_found,not_found: Canadian deep tech VC; no apply page; 75+ portfolio companies; network-driven
+cherry-ventures,Cherry Ventures,vc,https://www.cherry.vc,,not_found,not_found: European early-stage VC; contact form present but generic; no founder-specific application
+chingona-ventures,Chingona Ventures,vc,https://www.chingona.ventures,https://www.chingona.ventures/apply,medium,Submit button in nav links to /apply page; page timed out on secondary scrape so form details unconfirmed; clearly a dedicated founder submission page
+chloe-capital,Chloe Capital,vc,https://chloecapital.com,https://chloecapital.com/funding,medium,APPLY FOR FUNDING button on homepage; /funding page lists funding opportunities and accelerator programs; has NYC 2026 programme open; structured accelerator application
+chrysalix-venture-capital,Chrysalix Venture Capital,vc,https://www.chrysalix.com,https://www.chrysalix.com/pitch,medium,Pitch to us link in navigation; /pitch page confirmed accessible; industrial innovation VC; form content not fully loaded
+collaborative-fund,Collaborative Fund,vc,https://collabfund.com,,not_found,not_found: no apply page; thematic fund investing via network; no public founder application
+compound-vc,Compound VC,vc,https://www.compound.vc,,not_found,not_found: has a web form that failed to load (Oops error); no confirmed structured application
+congruent-ventures,Congruent Ventures,vc,https://www.congruentvc.com,,not_found,not_found: no apply page; climate tech fund; contact section present but no structured startup intake
+connect-ventures,Connect Ventures,vc,https://www.linkedin.com/company/connect-ventures,,not_found,not_found: homepage is LinkedIn; no application surface accessible
+continuous-ventures,Continuous Ventures,vc,https://www.continuous.vc,,not_found,not_found: site has client-side JS application error; no content loaded; cannot confirm apply page
+contrary,Contrary,vc,https://contrary.com,https://applications.contrary.com/,high,Applications subdomain listed in footer Resources section; dedicated applications portal for Contrary; talent and research-driven fund with structured applications
+core-innovation-capital,Core Innovation Capital,vc,http://corevc.com,,not_found,not_found: site rendered minimal content; no apply page identified; fintech VC
+courtside-ventures,Courtside Ventures,vc,https://www.courtsidevc.com,,not_found,not_found: sports/gaming/culture VC; no apply page found after scrape
+cowboy-ventures,Cowboy Ventures,vc,https://www.cowboy.vc,,not_found,not_found: pre-seed fund; no structured apply page; curated founder community model
+craft-ventures,Craft Ventures,vc,https://www.craftventures.com,,not_found,not_found: has web form on site that errored; no confirmed structured founder application portal
+crawley-ventures,Crawley Ventures,vc,http://www.crawleyventures.com,,not_found,not_found: contact section only with basic contact form; private investors since 1995; no startup-specific application
+crv,CRV,vc,https://www.crv.com,,not_found,not_found: has web form that failed to load (Oops error); no confirmed structured application; large multi-stage fund
+cycle-capital,Cycle Capital,vc,https://www.cyclecapital.com/en,,not_found,not_found: contact section on homepage; no dedicated founder application; Canadian cleantech VC
+cylon,CyLon,vc,https://www.cylonventures.com,,not_found,not_found: contact page with email (hello@cylonventures.com); cybersecurity VC; no structured application form
+dawn-capital,Dawn Capital,vc,https://dawncapital.com,,not_found,not_found: contact form present but generic; no dedicated founder pitch/apply page; Series B+ European SaaS fund
+dcvc,DCVC,vc,https://www.dcvc.com,,not_found,not_found: deep tech VC; no apply page; inbound via partner network
+defy-vc,defy.vc,vc,https://defy.vc,,not_found,not_found: has contact link but no structured application; pre-seed/seed fund
+deloitte-ventures,Deloitte Ventures,vc,https://www2.deloitte.com/ca/en/pages/insight/solutions/ventures.html,,not_found,not_found: Apply Now links are for Deloitte job openings not startup applications; corporate VC arm
+deming-center-venture-fund,Deming Center Venture Fund,vc,https://www.colorado.edu/dcvf,,not_found,not_found: University of Colorado fund; site not successfully scraped; student/faculty-focused fund
+diagram-ventures,Diagram Ventures,vc,https://diagram.ca,,not_found,not_found: contact-us link goes to diagram.vc/contact-us; venture creation model not open applications; no public founder form
+differential-vc,Differential VC,vc,https://www.differential.vc,https://www.differential.vc/contact-us/submit-a-deck-form,high,Submit a deck! link prominently in navigation and homepage; dedicated form page for startup deck submissions
+district-ventures-capital,District Ventures Capital,vc,https://www.districtventurescapital.com,,not_found,not_found: contact page only; CPG-focused Canadian VC; no structured application form
+dmz-ventures,DMZ Ventures,vc,https://dmzventures.com,,not_found,not_found: invests in startups through DMZ 18-month incubator program; no standalone VC application; requires DMZ incubator participation
+dn-capital,DN Capital,vc,https://dncapital.com,https://www.dncapital.com/contact,medium,Site explicitly states they are excited to receive business plans and links founders to contact page; contact page has structured form fields; not a pure email submission
+drive-capital,Drive Capital,vc,https://drivecapital.com,,not_found,not_found: contact is email only (info@drivecapital.com); Midwest-focused VC; no public application
+dubai-future-district-fund,Dubai Future District Fund,vc,https://dfdf.vc,,not_found,not_found: has a contact/submit section but content is generic; fund-of-funds and direct investments via institutional relationships

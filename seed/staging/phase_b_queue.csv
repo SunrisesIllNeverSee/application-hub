@@ -1,0 +1,161 @@
+slug,name,type,homepage_url,discovered_apply_url,confidence,notes
+2bx,2bX,accel,https://2bx.vc,https://2bx.vc/jobs/,high,"Apply text: ""Apply"""
+accelerate-okanagan,Accelerate Okanagan,accel,https://accelerateokanagan.com,https://accelerateokanagan.com/entrepreneurs/general-programs-application-form/,high,"Apply text: ""Apply Now"""
+altitude-accelerator,Altitude Accelerator,accel,https://altitudeaccelerator.ca,https://altitudeaccelerator.ca/investor-readiness/,high,"Apply CTA: ""Apply now"""
+antler-academy,Antler Academy,accel,https://www.antler.co/academy,https://www.antler.co/apply,high,"Link text ""Apply now"" + apply href"
+antler,Antler Global,accel,https://www.antler.co,https://www.antler.co/apply,high,"""Apply"" + apply href"
+antler-us-boulder,Antler US Boulder,accel,https://www.antler.co/location/us,https://www.antler.co/apply,high,"Link text ""Apply Now"" + apply href"
+babson-college-center-for-womens-entrepreneurial-leadership,Babson College Center for Women’s Entrepreneurial Leadership,accel,https://www.babson.edu/womens-leadership-institute/campus-programs,https://www.babson.edu/undergraduate/how-to-apply/,high,"Apply CTA: ""How to Apply"""
+bengal-entrepreneurship-program,Bengal Entrepreneurship Program,accel,https://sbdc.buffalostate.edu/bengal-entrepreneurship-program,https://suny.buffalostate.edu/apply,high,"""Apply"" + apply href"
+berkeley-skydeck,Berkeley SkyDeck,accel,https://skydeck.berkeley.edu,https://skydeck.berkeley.edu/apply/,high,"""APPLY"" + apply href"
+biomedical-zone,Biomedical Zone,accel,https://www.torontomu.ca/zone-learning/biomedical-zone,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+brampton-venture-zone,Brampton Venture Zone,accel,https://www.torontomu.ca/zone-learning/venture-zone-brampton,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+catalyze-cu,Catalyze CU,accel,https://www.colorado.edu/catalyzecu,https://forms.gle/vRVUnE62B3mYLS7L7,high,"""Apply to Be a Catalyze CU Mentor"" + apply href"
+centre-for-entrepreneurship,Centre for Entrepreneurship University of Toronto,accel,https://www.entrepreneurship.artsci.utoronto.ca,https://www.entrepreneurship.artsci.utoronto.ca/apply-be-ta,high,"""Apply to be a TA"" + apply href"
+clean-energy-zone,Clean Energy Zone,accel,https://www.torontomu.ca/cue/clean-energy-zone,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+cleantech-open,Cleantech Open,accel,https://www.cleantechopen.org,https://www.cleantechopen.org/en/custom/2026ctoaccelerator/new/submit,high,"Apply CTA: ""Apply Now"""
+collider,Collider,accel,https://www.collider.io,https://www.collider.io/apply,high,"""Apply"" + apply href"
+creative-destruction-lab,Creative Destruction Lab,accel,https://www.creativedestructionlab.com,https://creativedestructionlab.com/application-triage/,high,"Link text ""Apply"" + apply href"
+design-fabrication-zone,Design Fabrication Zone,accel,https://www.torontomu.ca/zone-learning/design-fabrication-zone,https://www.torontomu.ca/admissions/,high,"Apply CTA: ""Apply"""
+digital-media-and-gaming-incubator,Digital Media and Gaming Incubator,accel,https://www.georgebrown.ca/arts-design-information-technology/design/the-industry/digital-media-and-gaming-incubator,https://www.georgebrown.ca/apply,high,"""Apply"" + apply href"
+district-3-innovation,District 3 Innovation,accel,https://district3.co,https://district3.co/apply,high,"""apply"" + apply href"
+ecommerce-north,eCommerce North,accel,https://ecommercenorth.ca,https://elevateca.typeform.com/to/bIR5c2lA,high,Typeform apply link (text: APPLY NOW)
+elab-cornell-university,eLab Cornell University,accel,https://www.elabstartup.com,https://www.elabstartup.com/apply/,high,Apply Now
+entrepreneur-first,Entrepreneur First,accel,https://www.joinef.com,https://apply.joinef.com,high,APPLY HERE
+forum-ventures,Forum Ventures,accel,https://www.forumvc.com,https://form.fillout.com/t/vrThVwGMuEus,high,Fillout form embedded on /pitch-us page
+founder-institute,Founder Institute,accel,https://fi.co,https://fi.co/join/home,high,Apply Now
+founders-factory,Founders Factory,accel,https://foundersfactory.com,https://form.typeform.com/to/WlDiIsRh,high,Typeform apply link (text: Apply)
+greentown-labs,Greentown Labs,accel,https://greentownlabs.com,https://greentownlabs.com/apply-now/,high,Apply Now
+iterative,Iterative,accel,https://www.iterative.vc,https://www.iterative.vc/apply,high,Apply now
+launch-ny,Launch NY,accel,https://launchny.org,https://launchny.org/entrepreneurs/apply-now,high,Explicit 'Apply Now' link in nav and multiple CTAs
+launchpad-la,Launchpad LA,accel,https://launchpad.la,https://launchpad.la/apply/,high,Direct /apply path in nav
+le-pont-quebec,Le Pont Quebec,accel,https://www.lepont.io/en/home,https://lepont.io/en/apply,high,Direct /apply link in nav
+league-of-innovators,League of Innovators,accel,https://www.theleagueofinnovators.org,https://www.loi.ac/find-your-program,high,Explicit 'APPLY NOW - it's free' CTA linking to program finder; Airtable form embedded
+legal-innovation-zone,Legal Innovation Zone,accel,https://www.torontomu.ca/zone-learning/legal-innovation-zone,https://www.torontomu.ca/zone-learning/legal-innovation-zone/apply/,high,Dedicated /apply page in nav
+mars-discovery-district,MaRS Discovery District,accel,https://www.marsdd.com,https://marsdd.com/apply,high,Direct /apply link found in HTML
+mhub,mHUB,accel,https://www.mhubchicago.com/accelerator,https://www.mhubchicago.com/accelerator-program-interest,high,Explicit accelerator interest/apply form link found on accelerator sub-pages
+nar-reach,NAR REACH US,accel,https://nar-reach.com,https://www.nar-reach.com/apply,high,Explicit APPLY link in navigation
+new-inc,NEW INC,accel,https://www.newinc.org,https://www.newinc.org/apply,high,newinc.org/apply redirects to newmuseum.org/new-inc/open-call/; open call application page
+new-ventures-bc,New Ventures BC,accel,https://www.newventuresbc.com,https://nvbc.typeform.com/to/vboBF4Gr,high,Typeform apply link found on AI Business Accelerator program page
+reach,REACH,accel,https://www.nar.realtor/technology/reach,https://nar-reach.com/apply,high,NAR REACH US - same apply portal as nar-reach.com
+reach-canada,Reach Canada,accel,https://nar-reach.com/canada,https://nar-reach.com/apply,high,REACH Canada apply page on nar-reach.com
+reach-uk,Reach UK,accel,https://nar-reach.com/uk,https://nar-reach.com/apply,high,REACH UK apply page on nar-reach.com
+sequoia-capital,Sequoia Capital,accel,https://www.sequoiacap.com,https://www.sequoiacap.com/arc/apply,high,Sequoia Arc accelerator has dedicated /arc/apply page
+sku,SKU,accel,https://sku.is,https://sku.is/apply/,high,Direct /apply link in nav and multiple CTAs
+social-venture-zone,Social Venture Zone,accel,https://www.torontomu.ca/svz,https://www.torontomu.ca/svz/apply/,high,Dedicated /svz/apply/ page found
+sputnik-atx-vc,Sputnik ATX VC,accel,https://www.sputnikatx.com,https://gust.com/programs/sputnik-atx-vc-summer-2026,high,Gust platform apply link displayed prominently on homepage
+started,StartEd,accel,https://www.started.com,https://www.started.com/apply,high,Direct /apply page found in HTML hrefs
+startup-garage,Startup Garage,accel,https://startupgarage.ca,https://startupgarage.ca/apply-now,high,Direct /apply-now href found multiple times
+startup-health,Startup Health,accel,https://www.startuphealth.com,https://www.startuphealth.com/apply-now,high,Explicit /apply-now href found in HTML
+startup-school,Startup School,accel,https://www.startupschool.org,https://www.startupschool.org/users/sign_in?sign_up=true,high,YC Startup School is free online course; sign-up page is the apply surface
+startx,StartX,accel,https://startx.com,https://startx.com/apply,high,Dedicated apply page with form (login to startx.com required)
+techbuffalo,TechBuffalo,accel,https://www.techbuffalo.org,https://www.techbuffalo.org/apply/,high,Dedicated /apply page found
+techrise-chicago,TechRise Chicago,accel,https://techrise.co,https://airtable.com/appfgBVkCSJj3MA6Y/pag5b2FJXvTdvGuHG/form,high,Airtable form for pitch competition applications
+the-forge,The Forge,accel,https://theforge.mcmaster.ca,https://theforge.mcmaster.ca/programs/startup-survivor/,high,Startup Survivor pitch competition program with apply link; also main incubator apply page visible
+the-forum,The Forum,accel,https://www.theforum.ca,https://www.theforumpitch.ca/,high,The Forum Pitch program - applications open year-round
+the-hub,The Hub University of Toronto,accel,https://www.utsc.utoronto.ca/thehub,https://sicieeil.acceleratorapp.co/application/new?program=sicieeil-applications,high,AcceleratorApp application form found for UTSC entrepreneurship programs
+transcend-network,Transcend Network,accel,https://www.transcend-network.com,https://form.typeform.com/to/ptlIt8DC,high,Typeform application found (Apply now link)
+transmedia-zone,Transmedia Zone,accel,https://www.torontomu.ca/transmediazone,https://forms.gle/aEAY4qcNYo3jtVQa7,high,Google Form for TZ membership application found
+treefrog-accelerator,Treefrog Accelerator,accel,https://www.treefrog.biz,https://www.treefrog.biz/application-process-form/,high,Dedicated application process form page found
+ucla-ventures,UCLA Ventures,accel,https://ventures.ucla.edu,https://tdg.ucla.edu/ucla-researchers/ucla-ventures/pitch-gym,high,Pitch Gym program with Google Form application found
+utest,University of Toronto Early Stage Technology (UTEST),accel,https://utest.to,https://utest.to/apply/,high,Dedicated /apply page found
+university-of-toronto-entrepreneurship,University of Toronto Entrepreneurship,accel,https://entrepreneurs.utoronto.ca,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,high,AcceleratorApp application form found (OnRamp membership)
+venture-labs,Venture Labs,accel,https://venturelabs.ca,https://venturelabs.ca/apply-for-our-programs/,high,Dedicated apply for programs page with GravityForms
+ventureout,VentureOut,accel,https://ventureoutny.com,https://ventureoutny.com/apply/,high,Dedicated /apply page found and confirmed accessible
+watson-institute,Watson Institute,accel,https://watson.is,https://watson.is/apply/,high,Dedicated /apply page confirmed accessible
+webc,WeBC,accel,https://we-bc.ca,https://we-bc.ca/work-with-us/,high,Work with us page with GravityForms application
+weve-acceleration,WEVE Acceleration,accel,https://weveacceleration.com,https://weveacceleration.com/apply-2,high,Dedicated apply page confirmed at /apply-2
+rbc-women-in-cleantech-accelerator,Women in Cleantech RBC Accelerator,accel,https://www.marsdd.com/service/women-in-cleantech-accelerator,https://marsdd.com/apply,high,MaRS apply link found on page
+womens-startup-lab,Women's Startup Lab,accel,https://www.womenstartuplab.com,https://www.womenstartuplab.com/join-us/,high,Join us page with GravityForms found
+xrc-labs,XRC Labs,accel,https://www.xrclabs.com,https://www.xrclabs.com/apply,high,/apply link found on homepage
+y2-labs,Y2 Labs,accel,https://y2labs.co,https://y2labs.co/get-started/,high,Get started page found
+yedi-incubator,YEDI Incubator,accel,https://yedi.ca,https://yedi.ca/get-started-at-yedi/,high,Get started at YEDI page found
+1984-ventures,1984 Ventures,vc,https://1984.vc,https://1984.vc/apply/start,high,"Structured application with Start your application"" form at /apply/start"""
+2048-ventures,2048 Ventures,vc,https://www.2048.vc,https://airtable.com/appV89PYGo3zN47f9/pagNjeYwHGADSGIs3/form,high,Airtable structured application form found at /pitch
+astia,Astia,vc,https://www.astia.org,https://astia.my.site.com/connect/s/raiseapplication,high,Clear Apply page with Salesforce-powered application portal for investment consideration; founders answer structured questions
+bcf-ventures,BCF Ventures,vc,https://bcfventures.vc,https://www.f6s.com/bcfventures/apply,high,APPLY NOW button prominently links to F6s application portal; structured questions for founders
+betaworks,betaworks,vc,https://www.betaworks.com,https://www.betaworks.com/camp/application,high,Camp application page with structured form; program currently in session; accepts next cohort applications for AI Camp; guaranteed investment up to $500k for accepted startups
+bethnal-green-ventures,Bethnal Green Ventures,vc,https://www.bethnalgreenventures.com,https://www.bethnalgreenventures.com/apply,high,Dedicated apply page for BGV programme; open applications for Autumn 2026; structured intake form for tech-for-good founders
+capitalize-vc,Capitalize VC,vc,https://www.capitalizevc.com,https://airtable.com/apppvODtMSw09eCae/pagdarmEj6iMMvBob/form,high,PITCH US button links to Airtable form with structured fields; prominent on homepage and footer
+contrary,Contrary,vc,https://contrary.com,https://applications.contrary.com/,high,Applications subdomain listed in footer Resources section; dedicated applications portal for Contrary; talent and research-driven fund with structured applications
+differential-vc,Differential VC,vc,https://www.differential.vc,https://www.differential.vc/contact-us/submit-a-deck-form,high,Submit a deck! link prominently in navigation and homepage; dedicated form page for startup deck submissions
+everywhere,Everywhere,vc,https://everywhere.vc,https://airtable.com/appeY02X0EMCQQ19G/shrjpNqWOj0SJP1ix,high,"Airtable application form linked directly from homepage as ""Join our portfolio"""
+front-row-ventures,Front Row Ventures,vc,https://frontrow.ventures,https://frontrow.ventures/apply,high,"Dedicated apply page with intake form for student founders; ""Apply for funding"" and ""Apply now"" CTAs link directly"
+fuel-venture-capital,Fuel Venture Capital,vc,https://fuelventurecapital.com,https://fuelventurecapital.com/pitch-us,high,"Dedicated ""Pitch Us"" page found via nav; fintech growth fund"
+fuel-ventures,Fuel Ventures,vc,https://fuel.ventures,https://www.fuel.ventures/submit-pitch,high,"Dedicated ""Submit Pitch"" page prominently featured in nav and CTA; UK-based early stage VC"
+greensky-ventures,GreenSky Ventures,vc,https://greensky.vc,https://greensky.vc/apply/,high,"Dedicated Apply page with intake form; ""Apply"" prominently in nav and homepage CTAs"
+harlem-capital,Harlem Capital,vc,https://harlem.capital,https://harlem.capital/pitch/,high,Dedicated Pitch page (harlem.capital/pitch/) found in nav; diversity-focused VC with intake form
+jamjar-investments,JamJar Investments,vc,https://www.jamjarinvestments.com,https://www.jamjarinvestments.com/pitch-to-us,high,"Dedicated ""Pitch to us"" page with form including deck upload; intake form with criteria listed"
+jetblue-ventures,JetBlue Ventures,vc,https://www.jetblueventures.com,https://skyvc.typeform.com/to/CdW5AB8D,high,"JetBlue Ventures rebranded to SKY VC; homepage at jetblueventures.com now shows SKY VC with Typeform apply link ""Get in Touch"""
+loi-venture,LOI Venture,vc,https://www.loi.vc,https://www.loi.vc/pitch/,high,"Dedicated Pitch page in nav (loi.vc/pitch/); ""tap the pitch button"" CTA; $100K check fund with structured intake"
+lvlup-ventures,LvlUp Ventures,vc,https://www.lvlup.vc,https://www.lvlup.vc/apply/funding-application,high,Structured multi-question funding application form; also covers 25+ VC ecosystem partners
+mars-investment-accelerator-fund,MaRS Investment Accelerator Fund,vc,https://www.marsiaf.com,https://marsiaf.com/iaf-application/,high,Dedicated online application form for founders
+panache-ventures,Panache Ventures,vc,https://www.panache.vc,https://www.panache.vc/pitch-us,high,Dedicated pitch submission page; accepts deck from any founder; responds to every submission
+playfair,Playfair,vc,https://www.playfair.vc,https://playfair.vc/pitch-us.php,high,Open pitch form on website; pre-seed UK/EU VC; reviews every submission
+silicon-roundabout,Silicon Roundabout,vc,https://siliconroundabout.tech,https://siliconroundabout.tech/startup-application/,high,Dedicated startup application page; pre-seed to seed deep tech VC with monthly pitch events
+slack-fund,Slack Fund,vc,https://slack.com/fund,https://airtable.com/app5kO0WaTWMJG0n7/pagIcieB3DVsIxyxp/form,high,Redirects to Salesforce Ventures; Airtable contact form found in nav
+storm-ventures,Storm Ventures,vc,https://www.stormventures.com,https://stormventures.typeform.com/to/H6I1Qq,high,Typeform intake linked prominently in nav and CTA buttons
+1-million-cups-boulder,1 Million Cups Boulder,other,https://www.meetup.com/1-Million-Cups-Boulder,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2F1-million-cups-boulder%2F,high,Meetup signup to join group and RSVP to events; weekly entrepreneur pitch event
+accelerateott,AccelerateOTT,other,https://www.accelerateott.ca,https://www.eventbrite.ca/e/accelerateott-2026-tickets-1987148720315,high,Eventbrite ticket link found; also Startup World Cup application at startupworldcup.io/ottawa-regional-2026
+access-silicon-valley-boulder-denver,Access Silicon Valley Boulder/Denver,other,https://www.meetup.com/Access-Silicon-Valley-Boulder-Denver,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Faccess-silicon-valley-boulder-denver%2F,high,Meetup group signup; startup networking events with Silicon Valley investors
+adweek-social-media-week,AdWeek Social Media Week,other,https://event.adweek.com/social-media-week-2023,https://event.adweek.com/smw_2026/begin,high,Register link found pointing to 2026 edition; redirected to current year event
+agi-house,AGI House,other,https://agihouse.ai,https://forms.gle/TF6Arjmv7CMM4KUQA,high,Google Form join link prominently displayed on homepage
+andrews-tech-mixer,Andrew's Tech Mixer,other,https://www.andrew.today/p/events,https://linktr.ee/andrewsmixers,high,Linktree with all events; individual events RSVP via lu.ma links
+asia-tech-x-singapore,Asia Tech x Singapore,other,https://asiatechxsg.com,https://asiatechxsg.com/atxenterprise/,high,Attend page at /atxenterprise; major Singapore tech conference
+asugsv-summit,ASU+GSV Summit,other,https://www.asugsvsummit.com,https://cvent.me/lKxbvN,high,Cvent registration link for 2027; GSV Cup startup competition also available at /gsv-cup
+banff-venture-forum,Banff Venture Forum,other,https://banffventureforum.com,https://banffventureforum.com/registration/apply-to-present/,high,Dedicated startup showcase application at /registration/apply-to-present; also general registration at /registration
+big-data-boston,Big Data Boston,other,https://www.meetup.com/BigDataBoston,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbigdataboston%2F,high,Meetup group signup to join and attend events
+bits-in-bio,Bits in Bio,other,https://www.bitsinbio.org,https://join.slack.com/t/bitsinbio/shared_invite/zt-3x4ryxqjr-a77cBC~RA6LFOTmxYJvZ~g,high,Slack community join link prominently shown; also lu.ma events at lu.ma/bitsinbio
+blockchain-futurist-conference,Blockchain Futurist Conference,other,https://www.futuristconference.com,https://futuristconference.com/toronto/ticket,high,Ticket pages for Toronto and Florida events; speaker application also at /speaker-form
+bootsector,BootSector,other,https://joinbootsector.com,https://joinbootsector.com/join-the-startup-community/,high,Dedicated join page at /join-the-startup-community; community organizer support platform
+bootstrappers-breakfast-for-san-francisco-startups,Bootstrappers Breakfast for San Francisco Startups,other,https://www.meetup.com/Bootstrappers-Breakfast-San-Francisco,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fbootstrappers-breakfast-san-francisco%2F,high,Meetup signup to join and RSVP to breakfast events
+boston-fintech,Boston FinTech,other,https://www.meetup.com/Boston-FinTech,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-fintech%2F,high,Meetup group signup; also check bostonfintechweek.org for annual event
+boston-hardware-meetup,Boston Hardware Meetup,other,https://www.meetup.com/boston-hardware,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-hardware%2F,high,Meetup group signup; hardware-focused meetup with strong attendance history
+boston-startup-idea-to-ipo,Boston Startup: Idea to IPO,other,https://www.meetup.com/Boston-Idea-to-IPO,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fboston-idea-to-ipo%2F,high,Meetup group signup; individual events register via Eventbrite links
+boulder-startup-week,Boulder Startup Week,other,https://boulderstartupweek.com,https://revelco.org/bsw/,high,Registration at revelco.org/bsw; also sponsor and volunteer options; annual event
+buffalo-startup-week,Buffalo Startup Week,other,https://www.startupweekbuffalo.com,https://luma.com/a35ob3fy,high,Multiple event registrations via lu.ma; Founder Day and Ecosystem/Capital tracks
+calgary-hackathon,Calgary Hackathon,other,https://www.yychacks.ca,https://www.showpass.com/yyc-hacks-chinook-blast-2024,high,Showpass ticket link for YYC Hacks; annual hackathon in Calgary
+canadian-innovation-exchange,Canadian Innovation Exchange,other,https://cixsummit.com,https://cixsummit.com/tickets/,high,Tickets/registration page at /tickets; also CIX Startup Awards application for startups
+centre-for-social-innovation,Centre for Social Innovation,other,https://socialinnovation.org,https://socialinnovation.org/join-us/membership/,high,Membership plans page at /join-us/membership; community and coworking memberships
+chicago-startup-community,Chicago Startup Community,other,https://www.meetup.com/chicago-startup-community,https://www.meetup.com/register/?returnUri=https%3A%2F%2Fwww.meetup.com%2Fchicago-startup-community%2F,high,Meetup group signup; also Discord at discord.gg/K8ecPrZ4e9
+dc-tech-venture-coalition,DC Tech & Venture Coalition,other,https://www.dctav.co,https://dctav.wufoo.com/forms/dctav-join-us/,high,Wufoo membership application form found on homepage
+designx-community,DesignX Community,other,https://designx.community,https://designx.community/join,high,Explicit application process: apply once to join community — form with questions
+dx3-canada,DX3 Canada,other,https://www.dx3canada.com,https://dx3canada.com/register,high,Conference registration page found directly on homepage
+founder-led-biotech-summit,Founder-led Biotech Summit,other,https://founderledbio.com,https://founderledbio.com/tour/,high,Register CTA found; tour registration page for in-person events
+foundersbeta,FoundersBeta,other,https://www.foundersbeta.com,https://foundersbeta.com/membership/,high,Become a Member CTA links to membership page — community with application process
+fuck-up-toronto,Fuck Up Toronto,other,https://www.fuckupnightsto.ca,https://docs.google.com/forms/d/e/1FAIpQLScK51l0f4BJA7X_ba4vSd-887aHJv5OQXwJHxLqYvdva7xUhw/viewform,high,Google Form to apply as a speaker found prominently on homepage
+greater-kw-chamber-of-commerce,Greater KW Chamber of Commerce,other,https://greaterkwchamber.com,https://greaterkwchamber.com/membership/join,high,Become A Member link found; membership join page
+guelph-chamber-of-commerce,Guelph Chamber of Commerce,other,https://www.guelphchamber.com,https://www.guelphchamber.com/membership/become-a-member,high,Join Now CTA links to become-a-member page
+hacktx,HackTX,other,https://hacktx.com,https://rodeo.freetailhackers.com/,high,Apply Now button links to Rodeo hacker portal
+hamilton-chamber-of-commerce,Hamilton Chamber of Commerce,other,https://www.hamiltonchamber.ca/events-home,https://www.hamiltonchamber.ca/join-now/,high,Join Now CTA found on events page; membership application
+hive-vancouver-society,HiVE Vancouver Society,other,https://www.hivevancouver.com,https://www.hivevancouver.com/memberships,high,Join Now / Get Started CTAs link to memberships page; coworking community application
+impact-hub-ottawa,Impact Hub Ottawa,other,https://ottawa.impacthub.net,https://ottawa.impacthub.net/become-a-member/,high,Membership application page found; multiple tiers with structured process
+lahacks,LAHacks,other,https://lahacks.com,https://apply.lahacks.com,high,Direct apply subdomain found in page source
+mit-hacking-medicine,MIT Hacking Medicine,other,https://www.hackingmedicine.mit.edu,https://www.hackingmedicine.mit.edu/events/grandhack-2026,high,GrandHack 2026 event page found; hackathon with application/registration process
+onramp-coworking-university-of-toronto,ONRamp Coworking University of Toronto,other,https://entrepreneurs.utoronto.ca/about/our-space,https://ute.acceleratorapp.co/application/new?program=onramp%20membership,high,AcceleratorApp application form found directly in page links
+payment-summit-canada,Payment Summit Canada,other,https://www.thesummit.ca,https://www.thesummit.ca/page/5013974/register,high,Register page found via curl redirect; 2026 Payments Canada SUMMIT registration
+people-analytics-summit,People Analytics Summit,other,https://www.peopleanalyticscanada.com,https://strategyinstitute-21235114.hs-sites.com/pa-2026-register-your-interest-for-2026,high,HubSpot registration interest form found on homepage
+productbc,ProductBC,other,https://productbc.ca,https://productbc.ca/joinnow/,high,Join Now CTA links to membership application page
+queens-startup-summit,Queen's Startup Summit,other,https://qssummit.com,https://qssummit.com,high,Homepage CTA is 'Register Now' linking to site root (TBA date); delegate registration page at same domain
+saas-connect,SaaS Connect,other,https://www.cloudsoftwareassociation.com/saas-connect,https://www.eventbrite.ca/e/477618779627,high,Eventbrite registration link found directly on page ('Register now' button)
+saas-north,SaaS North,other,https://saasnorth.com,https://saasnorth.com/get-your-saas-pass-2026/,high,Primary CTA 'GET YOUR SAAS PASS' links to /get-your-saas-pass-2026/; also Apply to Exhibit and Apply to Speak
+saastock,SaaStock,other,https://www.saastock.com,https://saastock.typeform.com/to/yb3fdaB1,high,Founder membership apply button links to Typeform; also /founder-membership/ page
+saastr-apac,SaaStr APAC,other,https://saastrapac.com,https://saastrapac.com/rsvp,high,Primary CTA 'GRAB TICKETS!' / 'RSVP TO ATTEND' links to /rsvp; Attendee Portal also available
+seneca-college-hackathon,Seneca College Hackathon,other,https://www.senecahackathon.com,https://www.senecahackathon.com/register,high,Multiple 'REGISTER NOW' CTAs linking directly to /register
+sf-hacks,SF Hacks,other,https://sfhacks.io,https://app.sfhacks.io/,high,Apply and Register buttons both link to app.sfhacks.io; MLH 2026 badge present
+startup-colorado,Startup Colorado,other,https://startupcolorado.org,https://startupcolorado.org/join-the-community/,high,COMMUNITY section links to /join-the-community/ as the Start Here page
+startup-grind-nyc,Startup Grind NYC,other,https://www.meetup.com/Startup-Grind-NYC,https://www.startupgrind.com/new-york-city/,high,Events RSVP via startupgrind.com; specific event RSVP link found on page
+startupbarn,Startupbarn,other,https://startupbarn.ca,https://tally.so/r/nPaQ8V,high,Site redirects to buildersclub.ca; Apply button links to Tally form tally.so/r/nPaQ8V
+startupfest,Startupfest,other,https://startupfestival.com,https://startupfestival.com/register,high,Multiple 'Register' links pointing to /register; Angular app with newsletter signup also present
+sxsw,SXSW,other,https://www.sxsw.com,https://sxsw.com/apply,high,'Apply to Participate' CTA links directly to sxsw.com/apply; also Apply to Exhibit and Apply to Market
+techcrunch-disrupt,TechCrunch Disrupt,other,https://techcrunch.com/events/tc-disrupt-2023,https://techcrunch.com/events/techcrunch-disrupt/tickets/,high,Register Now link for TechCrunch Disrupt found; Startup Battlefield also linked at /startup-battlefield/
+the-atlantic-technology-summit,The Atlantic Technology Summit,other,https://www.atlantictechsummit.com,https://www.atlantictechsummit.com/#/tickets?lang=en,high,Zoho Backstage event; Tickets tab found in navigation at /#/tickets
+the-firehood,The Firehood,other,https://firehood.net,https://firehood.net/pages/how-we-work-together,high,'Join the Firehood' links to /pages/how-we-work-together; membership product also at /products/firehood-ventures-membership
+the-hip-haus-networking,The Hip Haus Networking,other,https://thehiphaus.com,https://www.thehiphaus.com/circles,high,'Apply Now!' button links to /circles; also Eventbrite for specific events
+the-lab-miami,The Lab Miami,other,https://www.thelabmiami.com,https://www.thelabmiami.com/membership,high,Membership links prominently featured (/membership); also /contact for inquiries
+toronto-product-management-association,Toronto Product Management Association,other,https://www.tpma.ca,https://www.members.tpma.ca/join,high,Join link at members.tpma.ca/join; also /membership page and member login
+uoft-hacks,UofT Hacks,other,https://uofthacks.com,https://dorahacks.io/buidl/21736,high,DoraHacks application link found on page for hackathon submissions
+vancouver-entrepreneurs-forum,Vancouver Entrepreneurs Forum,other,https://www.vef.org,https://www.vef.org/member,high,/member page exists; also /membership-community and VEF membership contest; Squarespace site
+venture-cafe,Venture Cafe,other,https://venturecafecambridge.org,https://venturecafecambridge.org/share/register-your-startup/,high,Register Your Startup link found at /share/register-your-startup/; Thursday Gathering program page also present
+web-summit-vancouver,Web Summit Vancouver,other,https://vancouver.websummit.com,https://attend.websummit.com/van26,high,Primary CTA links to attend.websummit.com/van26; also /tickets/attendees/ and indigenous attendee program
+women-founders-network,Women Founders Network,other,https://www.womenfoundersnetwork.org,https://www.womenfoundersnetwork.org/joinus,high,Join Us page at /joinus; Fast Pitch competition at /about-fast-pitch; Junior VC and Due Diligence Analyst programs also listed
