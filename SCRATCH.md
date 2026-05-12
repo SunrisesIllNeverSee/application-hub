@@ -43,7 +43,7 @@ P3 active. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain a
 - **FundingCake Phase C** — promote 39 staged questions into `program_questions` (CSV ready at `seed/staging/fundingcake_questions_promote.csv`)
 - **MoatScore / FundScore** — placeholder cards on Today need real formula or removal (MULTI_CLAUDE: pick one)
 - **ROADMAP.md Vision Tier pruning** — move distant future items to AFTER_LAUNCH.md Future Products section
-- **FundingCake questions promotion SQL** — 39 rows ready, Deric to review then promote
+- **FundingCake questions promotion SQL** — 39 rows staged but quality is mixed (MaRS rows have low similarity 0.38–0.46, some false positives). HOLD — manual review of CSV before any Supabase write. See `seed/staging/fundingcake_questions_promote.csv`.
 
 ### Deric to drive
 
@@ -74,7 +74,7 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Currently claimed
 
-- **mcp-eval** — Browser Extension V1 — `browser-extension/`, `docs/BROWSER_EXTENSION.md` — claimed 2026-05-12
+- **mcp-eval** — Browser Extension V1 scaffold done (`browser-extension/`, `docs/BROWSER_EXTENSION.md`, semantic match wired) — releasing lane, rename directory pending
 
 ## Recently released
 
