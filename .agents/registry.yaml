@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-12T01:00:00Z
+updated_at: 2026-05-12T18:00:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
@@ -67,12 +67,18 @@ mcp:
   transports: [stdio, http]
 
 programs:
-  total: 843
-  seeded_with_questions: 31
-  shells: 812
+  total: 959
+  seeded_with_questions: 149
+  shells: 810
+  category_breakdown:
+    tech_accelerators_vcs: 843
+    universities_fellowships: 30
+    grants_foundations: 30
+    job_roles_archetypes: 30
+    companies: 30
 
 questions:
-  archived_total: 225
+  archived_total: 666
   embeddings_seeded: 225
   embedding_model: nomic-embed-text
   embedding_dims: 768
