@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 
-export const metadata = { title: 'Funders' }
-
 const TYPE_LABELS: Record<string, string> = {
   accelerator: 'Accelerator',
   vc: 'VC',
@@ -25,14 +23,13 @@ interface FunderRow {
   program_count: number
 }
 
-interface PageProps {
-  searchParams: Promise<{ type?: string }>
+interface FundersDirectoryProps {
+  /** Optional `?type=` filter from search params */
+  filterType?: string
 }
 
-export default async function FundersPage({ searchParams }: PageProps) {
-  const { type: typeParam } = await searchParams
+export async function FundersDirectory({ filterType = '' }: FundersDirectoryProps) {
   const supabase = await createClient()
-  const filterType = typeParam ?? ''
 
   // Fetch funders with program count
   let query = supabase
@@ -62,18 +59,20 @@ export default async function FundersPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Funders</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          {funders.length} organizations running programs in the Hub.
-        </p>
-      </div>
+      <p className="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
+        {funders.length} organizations running programs in the Hub.
+      </p>
 
       {/* Type filter */}
       <div className="flex flex-wrap gap-1.5 mb-6">
         <FilterChip href="/applications?view=funders" active={!filterType} label="All" />
         {TYPES.map(t => (
-          <FilterChip key={t} href={`/applications?view=funders?type=${t}`} active={filterType === t} label={TYPE_LABELS[t]} />
+          <FilterChip
+            key={t}
+            href={`/applications?view=funders&type=${t}`}
+            active={filterType === t}
+            label={TYPE_LABELS[t]}
+          />
         ))}
       </div>
 
@@ -84,7 +83,11 @@ export default async function FundersPage({ searchParams }: PageProps) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {funders.map(f => (
-            <Link key={f.id} href={`/funders/${f.slug}`} className="card p-5 hover:shadow-md transition-shadow group">
+            <Link
+              key={f.id}
+              href={`/funders/${f.slug}`}
+              className="card p-5 hover:shadow-md transition-shadow group"
+            >
               <div className="flex items-start justify-between gap-2 mb-3">
                 <h2 className="text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                   {f.name}

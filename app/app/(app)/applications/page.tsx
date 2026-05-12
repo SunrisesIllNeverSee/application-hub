@@ -20,6 +20,7 @@ import {
 } from '@/lib/applicantMode'
 import { formatDeadline, programTypeLabel, cn } from '@/lib/utils'
 import { HubFilters } from './HubFilters'
+import { FundersDirectory } from '@/components/FundersDirectory'
 
 export const metadata = {
   title: 'Applications',
@@ -49,7 +50,6 @@ export default async function HubPage({
   } = await supabase.auth.getUser()
 
   const tab: TabKey = resolvedParams.tab === 'mine' ? 'mine' : 'discover'
-
   // Fetch the user's active applicant mode + claimed identities. Falls back
   // to founder for users on profiles created before migration 027.
   let activeIdentity: ApplicantMode = DEFAULT_MODE
@@ -62,6 +62,27 @@ export default async function HubPage({
       .single<{ active_identity: ApplicantMode | null; identities: ApplicantMode[] | null }>()
     activeIdentity = profile?.active_identity ?? DEFAULT_MODE
     identities = profile?.identities ?? [DEFAULT_MODE]
+  }
+
+  // Funders view short-circuits — we don't need program/fit/app data.
+  if (resolvedParams.view === 'funders') {
+    return (
+      <div>
+        <div className="mb-4">
+          {user && <ModeSelector activeIdentity={activeIdentity} identities={identities} />}
+        </div>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Applications</h1>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Organizations running programs in the Hub
+            </p>
+          </div>
+          <ApplicationsTabs tab="funders" />
+        </div>
+        <FundersDirectory filterType={resolvedParams.type ?? ''} />
+      </div>
+    )
   }
 
   // Fetch programs. If the user hasn't explicitly filtered by type, scope to
@@ -249,25 +270,7 @@ export default async function HubPage({
           </p>
         </div>
 
-        {/* Primary tabs: Discover / Mine */}
-        <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 flex-shrink-0">
-          <a
-            href="/applications"
-            className={tab === 'discover'
-              ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}
-          >
-            Discover
-          </a>
-          <a
-            href="/applications?tab=mine"
-            className={tab === 'mine'
-              ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}
-          >
-            My Applications
-          </a>
-        </div>
+        <ApplicationsTabs tab={tab} />
       </div>
 
       {tab === 'mine' ? (
@@ -608,3 +611,27 @@ function TimelineRow({ program, days }: { program: ProgramWithFit; days: number 
     </Link>
   )
 }
+
+// --- Top-level tab switcher (Discover / My Applications / Funders) ---
+
+type ApplicationsTabKey = 'discover' | 'mine' | 'funders'
+
+function ApplicationsTabs({ tab }: { tab: ApplicationsTabKey }) {
+  const base = 'px-3 py-1.5 rounded-md text-xs font-medium'
+  const active = `${base} bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm`
+  const inactive = `${base} text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200`
+  return (
+    <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 flex-shrink-0">
+      <a href="/applications" className={tab === 'discover' ? active : inactive}>
+        Discover
+      </a>
+      <a href="/applications?tab=mine" className={tab === 'mine' ? active : inactive}>
+        My Applications
+      </a>
+      <a href="/applications?view=funders" className={tab === 'funders' ? active : inactive}>
+        Funders
+      </a>
+    </div>
+  )
+}
+
