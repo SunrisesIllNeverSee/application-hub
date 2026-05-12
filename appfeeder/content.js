@@ -140,6 +140,26 @@ function fillField(match) {
   }
 }
 
+// ── Capture on blur (save new answer version when user finishes typing) ────────
+
+function attachCaptureListeners(fields) {
+  fields.forEach(({ questionText, element }) => {
+    if (!element || element.dataset.apphubCapture) return
+    element.dataset.apphubCapture = '1'
+
+    element.addEventListener('blur', () => {
+      const answerText = element.value.trim()
+      // Only capture if the user actually wrote something meaningful
+      if (answerText.length < 10) return
+      chrome.runtime.sendMessage({
+        type: 'CAPTURE_ANSWER',
+        questionText,
+        answerText,
+      })
+    })
+  })
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 function run() {
@@ -149,6 +169,9 @@ function run() {
 
   const fields = detector[1]()
   if (fields.length === 0) return
+
+  // Attach capture listeners immediately so answers are saved as you type
+  attachCaptureListeners(fields)
 
   const questions = fields.map(f => ({ fieldId: f.fieldId, questionText: f.questionText }))
 

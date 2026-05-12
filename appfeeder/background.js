@@ -50,6 +50,24 @@ async function matchQuestions(questions) {
   return results
 }
 
+async function captureAnswer(questionText, answerText) {
+  const { jwt } = await getAuth()
+  if (!jwt) return
+
+  try {
+    await fetch(`${APP_URL}/api/answers/capture`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({ questionText, answerText }),
+    })
+  } catch {
+    // Silent — capture is best-effort
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'MATCH_QUESTIONS') {
     matchQuestions(message.questions).then(sendResponse)
@@ -61,5 +79,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       sendResponse({ authenticated: !!jwt })
     })
     return true
+  }
+
+  if (message.type === 'CAPTURE_ANSWER') {
+    captureAnswer(message.questionText, message.answerText)
+    // Fire-and-forget — no sendResponse needed
   }
 })
