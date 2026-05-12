@@ -1,6 +1,6 @@
 # Application Hub — Status
 
-_Last updated: 2026-05-12 (vscode-claude session)_
+_Last updated: 2026-05-12 (cowork session)_
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 
@@ -23,7 +23,7 @@ Other coordination docs should point here rather than restating these facts unle
 - Root `.gitignore` is present and excludes dependency folders, build output, `.next`, local env files, and editor artifacts.
 
 ### Deployment
-- App is deployed live at `https://application-hub-chi.vercel.app`
+- App is deployed live at `https://mos2es.xyz`
 - Auth (magic link + password escape hatch) confirmed working on live site.
 - Smoke test completed 2026-05-10. All core routes load against live Supabase.
 
@@ -50,6 +50,20 @@ Other coordination docs should point here rather than restating these facts unle
 - `migrations/027_recruiter_alerts.sql` is present and adds the `recruiter_alerts` dedup table for the weekly recruiter email agent.
 - Migrations through `035` are now the expected app chain (034-035 are renames of duplicate-prefix files; Supabase CLI synced).
 - The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
+
+
+### Shipped 2026-05-12 (this session)
+
+- **Applicant modes (PR #2 closed)**: migration 030 applied, 3 reviewer findings resolved, CHANGES_REQUESTED review dismissed, handoff doc updated. Mode selector, RFC badges, contribution rewards, `isModeDeeplyCurated()` as single source of truth.
+- **Credits & achievements system**: migration 032. `credit_events` append-only ledger, `user_achievements`, `user_credit_balance` view. Sidebar balance badge (§Xd), Supabase Realtime earn toast, redemption stub, personalized OG share card at `/profile/credits`.
+- **OG image** `/api/og`: MO§ES™ branded edge route, personalized `?stat=` + `?name=` params, wired into layout metadata.
+- **Supabase CLI linked**: all 35 migrations in `supabase/migrations/`, duplicate prefixes resolved (034/035), `db push --dry-run` clean, migration lint CI job blocks duplicate prefixes.
+- **Archive page rebuilt**: `/archive/questions` — lock/unlock state per user, Universal tab, theme tabs (All · Universal · Team · Traction · Problem · Solution · Market · Vision · Technical · Business · Fundraising · Personal · Fit · Impact), prominent Answer button for unlocked questions, "Unlocks via daily drip" hint for locked.
+- **Landing page archive**: replaced static single-question teaser with live top-12 questions fetched from DB on every render.
+- **Stress test white text fixed**: `warning` Tailwind palette was missing 400/700/800 stops — Risk banner text was invisible. Full amber spectrum added.
+- **Type-check at 0 errors**: `database.types.ts` regenerated from live schema, `composite_score` → `fit_score` (column never existed), `QuestionTheme` widened, null guards added across 6 files.
+- **FundingCake documented**: `docs/28_fundingcake_shells.md` — 812 programs, real funded entities, gap is `apply_url` not captured. Fill path documented.
+- **Ingest lane VC policy clarified**: `docs/21_curated_ingest_lane.md` — VCs with structured application intake are included, pure deal flow is excluded.
 
 ### SMTP / Email
 - Resend SMTP is wired to Supabase Auth and confirmed working.
@@ -166,7 +180,7 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | Significance stars display | Done |
 | Workspace opportunity ranking | Done |
 | Recruiter agent (weekly email + dedup) | Done — edge function deployed 2026-05-12 |
-| Question archive `/archive/questions` | Done — browse UI with theme/domain/sort filters |
+| Question archive `/archive/questions` | Done — theme tabs, Universal tab, lock/unlock state per user, prominent Answer CTA, sort by significance or popularity |
 | Funders index `/funders` | Done — grid with type filter |
 | Funder profile `/funders/[slug]` | Done — program list, breadcrumb, website link |
 | `database.types.ts` | Done — regenerated from live schema (migrations 001–035) |

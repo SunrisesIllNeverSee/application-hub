@@ -8,84 +8,44 @@
 
 ---
 
-## Current state (2026-05-11)
+## Current state (2026-05-12)
 
-P1 sprint complete. Migrations 001-027 applied to Supabase. Build is clean. Site live at mos2es.xyz.
+P1 sprint complete. P2 in progress. Build is clean. Site live at mos2es.xyz. Type-check: 0 errors.
 
-### What's actually deployed
+### What's deployed (as of 2026-05-12)
 
 - Hub (842 programs), Question Bank + drip, BYOK, draft routing, import flows
 - Stripe skeleton (code done — Deric needs to add price IDs to Vercel)
-- Dark mode, outcome tracking, funders schema (026 applied), deadline alerts (cron live)
+- Dark mode, outcome tracking, funders schema, deadline alerts (cron live)
 - Team mode (schema + API — no UI beyond settings tab)
 - Answer review persistence + stress-test persistence
-- Reviewer family: `.claude/agents/rns-answer-reviewer.md`, `program-fit-reviewer`, `fidelity-certifier`, `stress-test-conductor`
-- **NEW (2026-05-11 second session)**: Home dashboard `/today`, StressTestPanel, DnaRadarChart, SignificanceStars, workspace opportunity ranking, recruiter agent (migrations/027 + /api/cron/recruiter + edge function)
+- Reviewer family: rns-answer-reviewer, program-fit-reviewer, fidelity-certifier, stress-test-conductor
+- Home dashboard `/today`, StressTestPanel, DnaRadarChart, SignificanceStars, workspace opportunity ranking
+- Recruiter agent (migration 027 + /api/cron/recruiter + edge function)
+- **Applicant modes** (migrations 030-031): mode toggle, multi-identity profile, RFC badges, contribution rewards
+- **Credits & achievements** (migration 032): credit_events ledger, user_achievements, sidebar badge, earn toast, redemption stub
+- **OG image** `/api/og`: MO§ES™ branded, personalized share card on /profile/credits
+- **Archive page** `/archive/questions`: all 225 questions, theme tabs, Universal tab, lock/unlock state, Answer button
+- **Landing page archive**: live top-12 questions from DB (was static single example)
+- **Supabase CLI linked**: migrations in `supabase/migrations/`, db push clean, migration lint in CI
 
-### Remaining open work
+### Remaining open work (P1)
 
-- Funders index UI `/funders` (Cowork)
-- Stripe activation (Deric: add price IDs to Vercel env vars)
-- CRON_SECRET to Supabase edge function env vars (Deric: manual — recruiter agent step 2)
-- Recruiter agent schedule activation (Deric: Supabase dashboard → Edge Functions → recruiter-agent → Schedule → `0 9 * * 1`)
-- MoatScore / FundScore signal (P2)
-- Internal applicant ranking (P2)
-- Plugin sibling layout restructure — defer until after repo clean-out (see `~/Desktop/mcp_eval/plugin-eval-session-summary.md`)
-- ~~MCP token-budget / plugin-eval~~ ✅ 100/100 Grade A, 69 tests, CI green
+- Real deadlines seeding — most programs show "Rolling," needs YC/Techstars/SBIR cycles added
+- Browser/device responsive QA on `/hub`, `/hub/[slug]`, `/workspace/[program_id]`, `/profile`, `/bank`
+
+### Remaining open work (Deric to drive)
+
+- Stripe: add price IDs to Vercel env vars
+- Recruiter agent: set CRON_SECRET in Supabase edge function env, activate Monday 9am schedule
+- Soft-launch: reach out to 10–20 power users, share MCP setup instructions
+
+### FundingCake programs
+
+812 programs from FundingCake import (migration 019). Real funded entities, 782 have URLs, 0 have apply_url. The gap is FundingCake captured homepage URLs not intake page URLs. See `docs/28_fundingcake_shells.md`. Fill path: RFC mechanic (passive) + targeted ingest for top accelerators and VC programs with real intake forms.
 
 ---
 
 ## For Codex — most recent context
 
-Updated 2026-05-11 — plugin-eval complete, CI green.
-
-Read in order:
-1. `~/Desktop/MULTI_CLAUDE.md` — cross-workspace state, what's live, what's next
-2. `STATUS.md` — confirmed repo state
-3. `TASKS.md` — concrete remaining items
-4. `~/Desktop/mcp_eval/plugin-eval-session-summary.md` — full plugin-eval session notes
-
-### Your open lane
-- **Reviewer-family follow-through** — run the fit/certification/stress-test agents on real saved answers and tighten the rubric.
-- **MCP server rebuild** — 21 tools now, rebuild dist before any power users connect.
-- ~~MCP token budget~~ — Done. Plugin-eval 100/100. Sibling layout deferred to post-clean-out.
-
-### What Cowork (Claude) landed today
-- Migrations 013-026 all applied
-- Multi-provider draft (Anthropic/OpenAI/Ollama), dark mode, outcome tracking
-- Funders schema (30 orgs), deadline alerts (edge fn + pg_cron), team mode
-- Portable taxonomy (domain + universal_theme), application import UI
-- MULTI_CLAUDE.md created at ~/Desktop/
-
----
-
-## Currently claimed
-
-| Agent | Task | Files / paths | Claimed at | Notes |
-|---|---|---|---|---|
-
----
-
-## Recently released
-
-| Cowork | Home dashboard, StressTestPanel, DnaRadarChart, SignificanceStars, workspace opportunity ranking, recruiter agent | `app/app/(app)/today/page.tsx`, `app/components/DnaRadarChart.tsx`, `app/components/SignificanceStars.tsx`, `app/components/StressTestPanel.tsx`, `app/app/api/stress-test/route.ts`, `app/app/api/cron/recruiter/route.ts`, `supabase/functions/recruiter-agent/index.ts`, `migrations/027_recruiter_alerts.sql`, `docs/22_recruiter_agent.md` | Released 2026-05-11 (second session) | P1 sprint complete |
-| Cowork | Migration 026 applied, MULTI_CLAUDE.md created, SCRATCH.md synced | `SCRATCH.md`, `MULTI_CLAUDE.md` | 2026-05-11 | Full cross-agent sync after major feature burst |
-| Codex | Answer review persistence + reviewer family + stress-test persistence + repo cleanup pass | `migrations/026_answer_reviews.sql`, `.claude/agents/`, `.claude/commands/`, `application-hub-mcp-server/src/tools/user/hub_stress_test_answer.ts`, `docs/07_agent_review_contract.md`, `docs/12_stress_test_persistence.md`, `docs/16_mcp_agent_plugin_gap_review.md`, `README.md`, `docs/MIGRATIONS.md` | Released 2026-05-11 | |
-| Cowork | Dark mode, outcome tracking, funders, deadline alerts, team mode | `app/components/ThemeProvider.tsx`, `app/components/OutcomeTracker.tsx`, `migrations/023-025`, `supabase/functions/deadline-alerts/` | Released 2026-05-11 | |
-
----
-
-## How to use this file
-
-### When you start a task
-Append a row to "Currently claimed". Commit SCRATCH.md BEFORE starting work.
-
-If the task includes a new migration:
-- claim the next migration number here before writing the SQL file
-- this is the lightweight guardrail against duplicate numeric prefixes from parallel sessions
-
-### When you finish
-Remove your row, move to "Recently released", commit with the work.
-
-### Stale claims
-No commits touching claimed paths since claim landed + other agent needs those paths = stale. Take it, leave a one-line note.
+Updated 2026-05-12 — applicant modes shipped, credits system live, archive page rebuilt, Supabase CLI linked, type-check at 0 errors, migration chain at 035, next migration 036.
