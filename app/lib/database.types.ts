@@ -2389,7 +2389,7 @@ export type Database = {
         | "school_professional"
         | "other"
       outcome_type: "accepted" | "rejected" | "waitlist"
-      program_source: "seeded" | "community" | "funder" | "fundingcake"
+      program_source: "seeded" | "community" | "funder"
       program_status: "upcoming" | "open" | "closed" | "results"
       program_type:
         | "grant"
@@ -2586,7 +2586,7 @@ export const Constants = {
         "other",
       ],
       outcome_type: ["accepted", "rejected", "waitlist"],
-      program_source: ["seeded", "community", "funder", "fundingcake"],
+      program_source: ["seeded", "community", "funder"],
       program_status: ["upcoming", "open", "closed", "results"],
       program_type: [
         "grant",
