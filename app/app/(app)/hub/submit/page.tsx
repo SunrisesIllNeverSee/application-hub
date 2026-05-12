@@ -121,8 +121,9 @@ function hostname(url: string | null | undefined): string {
 export default async function SubmitProgramPage({
   searchParams,
 }: {
-  searchParams: { queued?: string; kind?: string }
+  searchParams: Promise<{ queued?: string; kind?: string }>
 }) {
+  const { queued, kind } = await searchParams
   const supabase = await createClient()
 
   const {
@@ -140,7 +141,7 @@ export default async function SubmitProgramPage({
     submissions = (data ?? []) as unknown as SubmissionRow[]
   }
 
-  const queuedId = searchParams.queued?.trim() || null
+  const queuedId = queued?.trim() || null
   const justQueued =
     queuedId !== null &&
     submissions.some((s) => s.id === queuedId)
@@ -171,7 +172,7 @@ export default async function SubmitProgramPage({
       )}
 
       <div className="card p-6 mb-8">
-        <SubmitProgramForm defaultKind={searchParams.kind} />
+        <SubmitProgramForm defaultKind={kind} />
       </div>
 
       <section>

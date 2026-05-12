@@ -99,16 +99,17 @@ type SessionRow = {
 export default async function ProfileImportPage({
   searchParams,
 }: {
-  searchParams: { kind?: string; session?: string; saved?: string; err?: string }
+  searchParams: Promise<{ kind?: string; session?: string; saved?: string; err?: string }>
 }) {
+  const { kind, session, saved, err } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const defaultKind = resolveSourceKind(searchParams.kind)
-  const savedCount = searchParams.saved ? Number(searchParams.saved) : null
-  const sessionParam = searchParams.session ?? null
-  const errParam = searchParams.err ?? null
+  const defaultKind = resolveSourceKind(kind)
+  const savedCount = saved ? Number(saved) : null
+  const sessionParam = session ?? null
+  const errParam = err ?? null
 
   type SessionsResp = { data: SessionRow[] | null }
   const sessionsResp = (await supabase
