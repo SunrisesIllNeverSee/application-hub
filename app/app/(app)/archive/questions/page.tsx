@@ -229,18 +229,27 @@ export default async function ArchiveQuestionsPage({
                 </div>
 
                 {/* Significance + action */}
-                <div className="flex-shrink-0 flex flex-col items-end gap-1.5">
-                  <SignificanceStars score={q.significance_score} size="sm" />
-                  <span className="text-[11px] text-neutral-400 dark:text-neutral-500 tabular-nums">
-                    {q.significance_score.toFixed(2)}
-                  </span>
-                  {unlocked && (
+                <div className="flex-shrink-0 flex flex-col items-end gap-2 min-w-[90px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-semibold tabular-nums text-neutral-500 dark:text-neutral-400">
+                      {q.significance_score.toFixed(2)}
+                    </span>
+                    <SignificanceStars score={q.significance_score} size="sm" />
+                  </div>
+                  {unlocked ? (
                     <Link
                       href="/bank"
-                      className="text-[11px] text-brand-600 dark:text-brand-400 hover:underline mt-0.5"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium transition-colors"
                     >
-                      Answer →
+                      Answer
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </Link>
+                  ) : (
+                    <span className="text-[10px] text-neutral-400 dark:text-neutral-500 text-right leading-tight">
+                      Unlocks via<br/>daily drip
+                    </span>
                   )}
                 </div>
               </div>

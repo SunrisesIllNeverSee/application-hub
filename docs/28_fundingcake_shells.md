@@ -1,85 +1,75 @@
-# FundingCake Shell Programs
+# FundingCake Programs
 
 ## What they are
 
-Migration `019_fundingcake_seed.sql` bulk-imported 812 programs from FundingCake.com. These are **directory-only shells** — they have names, logos, URLs, and location metadata, but nothing else.
+Migration `019_fundingcake_seed.sql` imported 812 programs from FundingCake.com — a platform that specifically curates **funding opportunities with real money attached** (accelerators, VCs, grants, fellowships). These are legitimate entities, not junk.
 
 ```
 812 programs, source = 'fundingcake'
-  0 / 812  have apply_url
-  0 / 812  have questions mapped
-  0 / 812  have heat score
-  0 / 812  have program value score
-  0 / 812  have DNA computed
+ 782 / 812  have a program URL (their website)
+ 778 / 812  have a description
+  29 / 812  have money_terms data in JSONB
+   9 / 812  have equity_pct data
+   0 / 812  have apply_url  ← the actual gap
+   0 / 812  have questions mapped
+   0 / 812  have heat/value scores computed
 ```
+
+## The real gap: apply_url was never captured
+
+FundingCake records the program's **homepage URL** but not the **application intake URL**. So every program has a `url` you can visit, but the field `details->apply_url` is null across all 812.
+
+This means:
+- The programs are real and have money
+- We know their website (782/812)
+- We just don't have the direct link to "apply here" or the questions on that page
+
+The work is: take the 782 URLs → find the application page → extract questions. That's the standard curated ingest path (`docs/21_curated_ingest_lane.md`).
 
 ## Breakdown by type
 
-| Type (our schema) | FundingCake type | Count | Application surface |
-|---|---|---|---|
-| `accel` | accelerator | 300 | Unknown — FundingCake didn't capture apply URLs |
-| `vc` | vc | 290 | Mostly none — relationship-driven deal flow |
-| `other` | community (96), other (122) | 218 | None — meetups, coworking, events |
-| `fellowship` | fellowship | 4 | Unknown |
+| Type | Count | Notes |
+|---|---|---|
+| `accel` (accelerator) | 300 | Real accelerators. Most have application intake. Top targets for question ingest. |
+| `vc` | 290 | Mix: some run structured programs (scout, cohort, fast-track) with real intake; others are pure deal flow with no public application form. Need case-by-case review. |
+| `other` | 218 | Includes 96 "community" (meetups, coworking, events) — those are noise. The remaining ~122 are uncategorized programs worth reviewing. |
+| `fellowship` | 4 | Likely have application intake. Small enough to curate manually. |
 
-## What the "800+ programs indexed" claim means
+## What "800+ programs indexed" means on the landing page
 
-The landing page says "800+ programs indexed." This is accurate but qualified:
-- ~30 programs are **fully curated** (seeded by hand: questions mapped, DNA computed, value scores)
-- ~812 programs are **directory shells** (FundingCake import: name + logo + metadata only)
+- ~30 programs: **fully curated** — questions mapped, DNA computed, fit scores active
+- ~812 programs: **URL-indexed** — in the directory, show in Hub, but no question coverage yet
 
-The shells power the directory — they're real programs in the Hub — but they have no question coverage, so fit scoring doesn't work for them and they sort to the bottom (heat_score = 0).
+Both are legitimate. "Indexed" = in the archive. "Curated" = questions mapped and scored. The landing page claim is accurate.
 
-## The problem with the 290 VCs
+## How these programs appear in the app today
 
-Per the ingest lane policy (`docs/21_curated_ingest_lane.md`), VCs with no application surface should be excluded. 290 FundingCake entries are pure VC prestige directory items — no apply URL, no questions, no application intake. They're noise in Founder mode.
-
-They're in the DB because the original bulk import didn't filter by application surface. No questions can ever be mapped to them because they don't have public application forms.
-
-## Plan
-
-### Accelerators (300) — RFC fill path
-These are the highest-priority shells. Most real accelerators DO have application questions — FundingCake just didn't capture them. 
-
-The RFC mechanic handles this:
-- When a user hits an accelerator shell in the Hub, the empty state prompts them to submit the program URL
-- Community submissions → Cowork/admin reviews → questions mapped → program becomes curated
-- Submitter earns credits
-
-No bulk action needed. This fills organically as users engage.
-
-### VCs (290) — filter or curate selectively
-Options:
-1. **Add `hidden = true` flag** to VCs that have no apply_url in details JSONB — they stay in DB but don't appear in Hub
-2. **Curate the ones that matter** — a16z Scout, Sequoia Arc, First Round Fast Track, Precursor, etc. have actual intake forms. Manually add apply URLs and questions for the ~20 that matter.
-3. **Leave as-is** — they sort last anyway (heat = 0), users see them as dead links
-
-Recommendation: option 2 for the top ~20, option 1 to hide the rest.
-
-### Community entries (96) — hide
-Meetups, coworking spaces, conferences. Not programs anyone applies to. Should be hidden from Hub via the `hidden` column or a type filter.
-
-### Fellowships (4) — manual review
-Small enough to look at individually. May have real application surfaces.
-
-## How to add questions to a shell
-
-When a program URL has been validated:
-1. Scrape the application page (Firecrawl)
-2. Extract questions
-3. Add to `archived_questions` if new (or map to existing)
-4. Add rows to `program_questions` linking program → question
-5. Run `compute_program_dna()` for the program
-6. Run `compute_significance_scores()` if any new questions were added
-
-See `CONTRIBUTING.md` for the full seed SQL pattern.
-
-## Current state in the app
-
-FundingCake shells appear in `/hub` for Founder mode (type = `accel` or `vc`) but:
-- No questions → no answer pre-fill
-- No DNA → no DNA radar chart
-- No heat/value score → sorted to the bottom
+FundingCake programs show up in `/hub` filtered by mode (Founder = accel/vc, Researcher = grant/fellowship). They appear in the Hub list but:
+- No questions → no answer pre-fill in workspace
+- No DNA → no radar chart on program detail
+- No heat/value score → sort to bottom (heat_score = 0)
 - No deadline → shows as "Rolling"
 
-Users can save them to their applications list but get nothing from the intelligence layer until questions are mapped.
+A user can save them and track applications, but gets nothing from the intelligence layer until questions are mapped.
+
+## Fill path
+
+### Short-term: RFC mechanic (passive)
+When a logged-in user hits an empty program in Hub, the sparse empty state already prompts them to submit the program URL. Community submissions → admin review → questions extracted. Submitter earns credits. This fills organically.
+
+### Medium-term: targeted ingest (active)
+Priority order for manual curation:
+1. Top 50 accelerators by brand recognition (YC, Techstars, 500 Global, etc. — most are already in the curated 30)
+2. VC scout/cohort programs that have real application forms (a16z Scout, Sequoia Arc, First Round Fast Track, Precursor, Hustle Fund, etc.)
+3. Fellowships (only 4 from FundingCake)
+4. "Community" entries — evaluate individually, hide those that are meetups/events
+
+### How to map questions to a program
+1. Visit `programs.url` → find the application page
+2. Extract questions (manually or via Firecrawl)
+3. Insert new questions into `archived_questions` if not already there
+4. Insert `program_questions` rows linking program → question
+5. Run `compute_program_dna()` for that program
+6. Run `compute_significance_scores()` if new questions were added
+
+See `CONTRIBUTING.md` for the seed SQL pattern.
