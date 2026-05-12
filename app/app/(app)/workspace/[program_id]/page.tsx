@@ -125,7 +125,7 @@ export default async function WorkspaceDetailPage({ params }: Props) {
 
       {/* Header */}
       <div className="card p-6 mb-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-semibold text-neutral-900 dark:text-white">{program.name}</h1>
             {program.description && (

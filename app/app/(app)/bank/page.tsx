@@ -110,7 +110,7 @@ export default async function BankPage() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">
               Question Bank
@@ -260,7 +260,7 @@ export default async function BankPage() {
 
           {/* Pro upsell */}
           <div className="mt-6 card p-5 border border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-900/10">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-neutral-900 dark:text-white">
                   Unlock all {totalQuestions} questions now
@@ -269,7 +269,7 @@ export default async function BankPage() {
                   Pro unlocks your full arsenal immediately. No waiting.
                 </p>
               </div>
-              <button className="btn-primary flex-shrink-0 opacity-60 cursor-not-allowed" disabled>
+              <button className="btn-primary w-full sm:w-auto flex-shrink-0 opacity-60 cursor-not-allowed" disabled>
                 Upgrade to Pro — coming soon
               </button>
             </div>

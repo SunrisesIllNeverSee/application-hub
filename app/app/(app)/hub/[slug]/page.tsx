@@ -92,7 +92,7 @@ export default async function ProgramDetailPage({ params }: Props) {
 
       {/* Header */}
       <div className="card p-6 mb-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300">
