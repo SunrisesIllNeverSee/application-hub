@@ -64,20 +64,20 @@ export const CREDIT_EVENTS: CreditEventDef[] = [
   {
     type: 'social_share',
     amount: 25,
-    label: 'Share a post',
+    label: 'Share on X / Twitter',
     dedup: 'weekly',
     category: 'social',
     manual: true,
-    description: 'Share Application Hub — up to once per week',
+    description: 'Share the pre-written post on X — up to once per week',
   },
   {
     type: 'social_repost',
     amount: 25,
-    label: 'Repost / Quote tweet',
+    label: 'Share on LinkedIn',
     dedup: 'weekly',
     category: 'social',
     manual: true,
-    description: 'Repost or quote-tweet Application Hub — up to once per week',
+    description: 'Share the pre-written post on LinkedIn — up to once per week',
   },
   // ── App (auto-triggered by DB triggers) ────────────────────────────────────
   {
@@ -193,4 +193,39 @@ export function resolveDedupKey(eventType: CreditEventType, actionId?: string): 
   if (def.dedup === 'weekly') return weeklyDedupKey(eventType)
   if (def.dedup === 'per_action' && actionId) return `${eventType}:${actionId}`
   return null
+}
+
+// =============================================================================
+// Pre-made share content
+// =============================================================================
+// Ready-to-go post text for each platform. Opening the share URL pre-fills
+// the platform's compose window — the user just hits "Post" and earns credits.
+// =============================================================================
+
+export const SHARE_CONTENT = {
+  twitter: {
+    text: `I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere. The question archive is genuinely useful → mos2es.xyz #founders #startups`,
+    eventType: 'social_share' as CreditEventType,
+    platformLabel: 'X / Twitter',
+  },
+  linkedin: {
+    text: `Discovered a tool that's changed how I approach accelerator applications. Application Hub archives every question across YC, Techstars, NSF, and 800+ programs — so you build one reusable answer bank instead of starting from scratch every time.`,
+    url: 'https://mos2es.xyz',
+    eventType: 'social_repost' as CreditEventType,
+    platformLabel: 'LinkedIn',
+  },
+} as const
+
+/**
+ * Returns the share intent URL for a given platform.
+ * Opening this URL in a new tab pre-fills the platform's compose window.
+ */
+export function getShareUrl(platform: 'twitter' | 'linkedin'): string {
+  if (platform === 'twitter') {
+    const text = encodeURIComponent(SHARE_CONTENT.twitter.text)
+    return `https://twitter.com/intent/tweet?text=${text}`
+  }
+  const url = encodeURIComponent(SHARE_CONTENT.linkedin.url)
+  const summary = encodeURIComponent(SHARE_CONTENT.linkedin.text)
+  return `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${summary}`
 }
