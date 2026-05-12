@@ -67,11 +67,11 @@ mcp:
   transports: [stdio, http]
 
 programs:
-  total: 959
-  seeded_with_questions: 149
-  shells: 810
+  total: 146
+  seeded_with_questions: 146
+  shells: 0
   category_breakdown:
-    tech_accelerators_vcs: 843
+    tech_accelerators_vcs: 31
     universities_fellowships: 30
     grants_foundations: 30
     job_roles_archetypes: 30
