@@ -47,9 +47,11 @@ P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration ch
 
 782/812 have real website URLs. 778 have descriptions. The only gap is `apply_url` — FundingCake captured homepages, not intake pages.
 
-**IN PROGRESS (mcp_eval session, 2026-05-12):** Phase A — 10 parallel Firecrawl agents scraping all 782 homepages to discover apply_url. Results staging at `seed/staging/apply_url_results/batch_NN.csv`. Phase B (question extraction) follows when Phase A completes.
+**Phase A COMPLETE (2026-05-12):** 782 homepages scraped — 160 high-confidence apply_urls found (20%), 132 medium, 395 not_found. Master CSV at `seed/staging/fundingcake_apply_urls.csv`.
 
-**Do not touch:** `seed/staging/batches/`, `seed/staging/apply_url_results/` — agents actively writing.
+**Phase B IN PROGRESS:** 10 parallel agents scraping 160 confirmed apply pages, extracting question text, matching to `archived_questions`. Results at `seed/staging/question_results/batch_NN.csv`.
+
+**Do not touch:** `seed/staging/phase_b_batches/`, `seed/staging/question_results/` — agents actively writing.
 
 ---
 
@@ -59,7 +61,7 @@ Updated 2026-05-12 (vscode-claude + mcp-eval) — auth rebuilt (password+GitHub)
 
 ## Currently claimed
 
-- **mcp-eval** — FundingCake apply_url discovery Phase A — `seed/staging/batches/`, `seed/staging/apply_url_results/` — claimed 2026-05-12 — 10 Firecrawl agents running, do not write to these paths
+- **mcp-eval** — FundingCake Phase B question extraction — `seed/staging/phase_b_batches/`, `seed/staging/question_results/` — claimed 2026-05-12 — 10 agents running, do not write to these paths
 
 ## Recently released
 
