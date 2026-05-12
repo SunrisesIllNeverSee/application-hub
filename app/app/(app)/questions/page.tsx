@@ -322,9 +322,12 @@ async function BankView({ userId }: { userId: string }) {
                   Pro unlocks your full arsenal immediately. No waiting.
                 </p>
               </div>
-              <button className="btn-primary w-full sm:w-auto flex-shrink-0 opacity-60 cursor-not-allowed" disabled>
-                Upgrade to Pro — coming soon
-              </button>
+              <Link
+                href="/profile/settings"
+                className="btn-primary w-full sm:w-auto flex-shrink-0"
+              >
+                Upgrade to Pro →
+              </Link>
             </div>
           </div>
         </div>

@@ -93,10 +93,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unknown mode.' }, { status: 400 })
   }
 
-  const founderSignals = (themeCount.traction ?? 0) + (themeCount.business_model ?? 0) + (themeCount.fundraising ?? 0)
+  const founderSignals = (themeCount.traction ?? 0) + (themeCount.business_model ?? 0) + (themeCount.fundraising ?? 0) + (themeCount.market ?? 0)
   const researcherSignals = (themeCount.technical ?? 0) + (themeCount.impact ?? 0)
+  const studentSignals = (themeCount.fit ?? 0) + (themeCount.personal ?? 0) + (themeCount.vision ?? 0)
+  const jobSeekerSignals = (themeCount.team ?? 0) + (themeCount.personal ?? 0)
+
   let identity: ApplicantMode = 'founder'
-  if (researcherSignals > founderSignals && researcherSignals > 0) identity = 'researcher'
+  const max = Math.max(founderSignals, researcherSignals, studentSignals)
+  if (max === 0) {
+    identity = 'founder'
+  } else if (researcherSignals === max && researcherSignals > founderSignals) {
+    identity = 'researcher'
+  } else if (studentSignals === max && studentSignals > founderSignals && studentSignals > researcherSignals) {
+    identity = 'student'
+  } else if (jobSeekerSignals > founderSignals && jobSeekerSignals > researcherSignals && jobSeekerSignals > studentSignals && (themeCount.traction ?? 0) === 0 && (themeCount.business_model ?? 0) === 0) {
+    identity = 'job_seeker'
+  }
 
   await supabase
     .from('user_profiles')
@@ -114,7 +126,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     summary: {
-      identity: identity.replace('_', ' '),
+      identity: identity.replace(/_/g, ' '),
       answersCount,
       themesCovered: Object.keys(themeCount).length,
       topThemes,
