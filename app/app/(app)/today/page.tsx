@@ -13,7 +13,7 @@ function greeting() {
 }
 
 export default async function TodayPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

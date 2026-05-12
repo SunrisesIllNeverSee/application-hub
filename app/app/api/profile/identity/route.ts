@@ -24,7 +24,7 @@ interface PatchBody {
  * we auto-include the active mode in identities[] for the user.
  */
 export async function PATCH(req: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

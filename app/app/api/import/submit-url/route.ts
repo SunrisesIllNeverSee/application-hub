@@ -114,7 +114,7 @@ const SUBMISSION_RATE_WINDOW_HOURS = 24
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()

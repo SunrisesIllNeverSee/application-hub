@@ -5,6 +5,7 @@ import type {
   Program,
   ProgramDna,
   ProgramQuestionWithArchived,
+  ProgramNextCycle,
 } from '@/lib/database.types'
 import { ThemeBar } from '@/components/ThemeBar'
 import { SignificanceStars } from '@/components/SignificanceStars'
@@ -22,22 +23,24 @@ import {
 } from '@/lib/utils'
 
 interface Props {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
+  const { slug } = await params
   return {
-    title: params.slug.replace(/-/g, ' '),
+    title: slug.replace(/-/g, ' '),
   }
 }
 
 export default async function ProgramDetailPage({ params }: Props) {
-  const supabase = createClient()
+  const { slug } = await params
+  const supabase = await createClient()
 
   const { data: program } = await supabase
     .from('programs')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single<Program>()
 
   if (!program) notFound()
@@ -58,9 +61,17 @@ export default async function ProgramDetailPage({ params }: Props) {
     .order('order_index', { ascending: true })
     .returns<ProgramQuestionWithArchived[]>()
 
+  // Fetch the next active cycle for this program
+  const { data: nextCycleRow } = await supabase
+    .from('program_next_cycle')
+    .select('*')
+    .eq('program_id', program.id)
+    .maybeSingle<ProgramNextCycle>()
+
   const dna = dnaRows ?? []
   const questions = questionRows ?? []
-  const deadline = formatDeadline(program.deadline_at)
+  const nextCycle = nextCycleRow ?? null
+  const deadline = formatDeadline(nextCycle?.closes_at ?? program.deadline_at)
   const heat = getHeatSignal(program.heat_score, program.program_value_score)
   const applicants = getApplicantSignal(program.applicant_count, program.cohort_size)
   const tldr = program.tldr
@@ -168,6 +179,13 @@ export default async function ProgramDetailPage({ params }: Props) {
               </span>
             }
           />
+          {nextCycle?.cycle_name && (
+            <Stat
+              label="Cycle"
+              value={nextCycle.cycle_name}
+              hint={nextCycle.cohort_name ?? undefined}
+            />
+          )}
           <Stat
             label={heat.provisional ? 'Heat signal' : 'Heat score'}
             value={heat.label}

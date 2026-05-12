@@ -4,7 +4,7 @@ import { IntegrationsForm } from '@/components/IntegrationsForm'
 export const metadata = { title: 'Integrations — Profile' }
 
 export default async function ProfileIntegrationsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

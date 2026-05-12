@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 // or return JSON if called from a client component.
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       // Redirect to login with return path

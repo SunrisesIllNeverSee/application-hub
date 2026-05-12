@@ -2641,9 +2641,21 @@ export type ProfileAnswerWithQuestion = Row<"profile_answers"> & {
 export type ProgramQuestionWithArchived = Row<"program_questions"> & {
   archived_question: Row<"archived_questions"> | null
 }
+export interface ProgramNextCycle {
+  program_id: string
+  cycle_id: string
+  cycle_name: string
+  opens_at: string | null
+  closes_at: string | null
+  cohort_name: string | null
+  cohort_size: number | null
+  apply_url: string | null
+}
+
 export type ProgramWithFit = Program & {
   fit?: UserProgramFit | null
   application?: Row<"user_applications"> | null
+  cycle?: ProgramNextCycle | null
 }
 
 // ── Enum aliases ──────────────────────────────────────────────────────────────

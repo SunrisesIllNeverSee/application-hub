@@ -3,6 +3,14 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { CHARACTER_LIMIT, ResponseFormat, PROGRAM_TYPES, PROGRAM_STATUSES } from "../../constants.js";
 
+type RankedProgram = {
+  id: string; name: string; slug: string; type: string; domain: string; status: string;
+  equity_pct: number | null; cash_value_usd: number | null; credit_value_usd: number | null;
+  program_value_score: number | null; network_score: number | null; brand_score: number | null;
+  follow_on_rate_pct: number | null; heat_score: number | null;
+  is_rolling: boolean; deadline_at: string | null;
+};
+
 const Schema = z.object({
   type: z.array(z.enum(PROGRAM_TYPES)).optional(),
   status: z.array(z.enum(PROGRAM_STATUSES)).optional().default(["open"]),
@@ -24,25 +32,16 @@ Use filters to narrow by type or equity tolerance. Best for answering "what shou
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ type, status, equity_max_pct, limit, response_format }) => {
-    let q = supabase
-      .from("programs")
-      .select(`id, name, slug, type, status, equity_pct, cash_value_usd, credit_value_usd,
-               program_value_score, network_score, brand_score, follow_on_rate_pct,
-               is_rolling, deadline_at`)
-      .not("program_value_score", "is", null)
-      .order("program_value_score", { ascending: false })
-      .limit(limit);
-
-    if (status) q = q.in("status", status);
-    if (type) q = q.in("type", type);
-    if (equity_max_pct !== undefined) {
-      q = q.or(`equity_pct.is.null,equity_pct.lte.${equity_max_pct}`);
-    }
-
-    const { data, error } = await q;
+    const { data, error } = await supabase.rpc("get_top_programs_by_value", {
+      p_types:      type ?? null,
+      p_domain:     "founder",
+      p_equity_max: equity_max_pct ?? null,
+      p_status:     status ?? ["open"],
+      p_limit:      limit,
+    });
     if (error) return { content: [{ type: "text", text: `Error: ${error.message}` }] };
 
-    const programs = data ?? [];
+    const programs: RankedProgram[] = (data ?? []) as RankedProgram[];
     const output = { count: programs.length, programs };
 
     if (response_format === ResponseFormat.JSON) {

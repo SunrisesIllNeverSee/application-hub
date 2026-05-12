@@ -14,7 +14,7 @@ const THEME_ORDER: QuestionTheme[] = [
 ]
 
 export default async function AnswerBankPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

@@ -52,7 +52,7 @@ const STATUS_DOT = {
 }
 
 export default async function TimelinePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: programs } = await supabase
     .from('programs')

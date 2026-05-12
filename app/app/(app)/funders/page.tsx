@@ -26,12 +26,13 @@ interface FunderRow {
 }
 
 interface PageProps {
-  searchParams: { type?: string }
+  searchParams: Promise<{ type?: string }>
 }
 
 export default async function FundersPage({ searchParams }: PageProps) {
-  const supabase = createClient()
-  const filterType = searchParams.type ?? ''
+  const { type: typeParam } = await searchParams
+  const supabase = await createClient()
+  const filterType = typeParam ?? ''
 
   // Fetch funders with program count
   let query = supabase

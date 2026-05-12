@@ -13,7 +13,7 @@ function slugify(name: string): string {
 // POST /api/teams — create a team (owner must be on 'team' tier)
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 // GET /api/teams — list teams the authenticated user belongs to
 export async function GET() {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -3,9 +3,12 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
+const DOMAINS = ["founder", "jobs", "education", "grants", "general"] as const;
+
 const Schema = z.object({
   limit: z.number().int().min(1).max(50).default(20),
   theme: z.string().optional().describe("Filter to a specific theme"),
+  domain: z.enum(DOMAINS).default("founder").describe("Application domain — founder, jobs, education, grants, general"),
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
 }).strict();
 
@@ -20,11 +23,12 @@ the majority of most applications without starting from scratch.
 Ranked by significance_score descending. Use theme to filter to a specific category.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
-  }, async ({ limit, theme, response_format }) => {
+  }, async ({ limit, theme, domain, response_format }) => {
     let q = supabase
       .from("archived_questions")
       .select(`id, text, theme, significance_score, asked_by_count, avg_word_limit`)
       .eq("is_universal", true)
+      .eq("domain", domain)
       .order("significance_score", { ascending: false })
       .limit(limit);
 

@@ -3,11 +3,14 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
+const DOMAINS = ["founder", "jobs", "education", "grants", "general"] as const;
+
 const Schema = z.object({
   text: z.string().min(3).describe(
     "Question text or concept to search for (e.g. 'describe your traction', 'why are you the right team')"
   ),
   theme: z.string().optional().describe("Filter by theme (traction, team, market, etc.)"),
+  domain: z.enum(DOMAINS).default("founder").describe("Application domain — founder, jobs, education, grants, general"),
   threshold: z.number().min(0).max(1).default(0.7).describe("Cosine similarity threshold (0–1). Default 0.7."),
   limit: z.number().int().min(1).max(20).default(10),
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN)
@@ -26,7 +29,7 @@ Use this to:
 Returns: question text, theme, significance score, asked_by_count, is_universal, programs that ask it.`,
     inputSchema: Schema,
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false }
-  }, async ({ text, theme, threshold, limit, response_format }) => {
+  }, async ({ text, theme, domain, threshold, limit, response_format }) => {
     // Use pgvector match_archived_questions RPC (requires embedding generation server-side)
     // Falls back to full-text search if embeddings not yet available
     let data: any[] | null = null;
@@ -45,6 +48,7 @@ Returns: question text, theme, significance score, asked_by_count, is_universal,
       const { data: fbData, error: fbError } = await supabase
         .from("archived_questions")
         .select(`id, text, theme, significance_score, asked_by_count, is_universal`)
+        .eq("domain", domain)
         .ilike("text", `%${text.split(" ").slice(0, 3).join("%")}%`)
         .order("significance_score", { ascending: false })
         .limit(limit);
@@ -54,7 +58,7 @@ Returns: question text, theme, significance score, asked_by_count, is_universal,
 
     if (error) return { content: [{ type: "text", text: `Error: ${error.message}` }] };
 
-    let questions = (data ?? []);
+    let questions = (data ?? []).filter((q: any) => !domain || q.domain === domain || q.domain == null);
     if (theme) questions = questions.filter((q: any) => q.theme === theme);
 
     const output = { count: questions.length, query: text, questions };

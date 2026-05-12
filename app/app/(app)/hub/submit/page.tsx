@@ -123,7 +123,7 @@ export default async function SubmitProgramPage({
 }: {
   searchParams: { queued?: string; kind?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

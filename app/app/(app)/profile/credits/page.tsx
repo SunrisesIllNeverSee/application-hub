@@ -5,7 +5,7 @@ import { CreditsPanel } from '@/components/CreditsPanel'
 export const metadata = { title: 'Days & Achievements' }
 
 export default async function CreditsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

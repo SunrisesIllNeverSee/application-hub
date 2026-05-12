@@ -23,16 +23,17 @@ interface Program {
 }
 
 interface PageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export default async function FunderProfilePage({ params }: PageProps) {
-  const supabase = createClient()
+  const { slug } = await params
+  const supabase = await createClient()
 
   const { data: funder } = await supabase
     .from('funders')
     .select('id, name, slug, type, hq_location, founded_year, website, description')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single()
 
   if (!funder) notFound()

@@ -38,13 +38,13 @@ async function importPasteAction(formData: FormData): Promise<void> {
 
   // Resolve base URL for the internal API call. In Next 14 on the server we
   // need an absolute URL for fetch().
-  const h = headers()
+  const h = await headers()
   const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000'
   const proto = h.get('x-forwarded-proto') ?? 'http'
   const base = `${proto}://${host}`
 
   // Forward the session cookies so the API route sees the same auth user.
-  const cookieHeader = cookies()
+  const cookieHeader = (await cookies())
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
     .join('; ')
@@ -101,7 +101,7 @@ export default async function ProfileImportPage({
 }: {
   searchParams: { kind?: string; session?: string; saved?: string; err?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 

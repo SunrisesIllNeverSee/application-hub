@@ -45,7 +45,7 @@ export default async function ArchiveQuestionsPage({
 }: {
   searchParams: { theme?: string; sort?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

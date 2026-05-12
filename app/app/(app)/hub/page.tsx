@@ -6,6 +6,7 @@ import type {
   UserApplication,
   ProgramWithFit,
   ApplicantMode,
+  ProgramNextCycle,
 } from '@/lib/database.types'
 import { ProgramCard } from '@/components/ProgramCard'
 import { ModeSelector } from '@/components/ModeSelector'
@@ -26,9 +27,10 @@ export const metadata = {
 export default async function HubPage({
   searchParams,
 }: {
-  searchParams: { sort?: string; type?: string; rolling?: string; view?: string }
+  searchParams: Promise<{ sort?: string; type?: string; rolling?: string; view?: string; domain?: string }>
 }) {
-  const supabase = createClient()
+  const resolvedParams = await searchParams
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -55,17 +57,22 @@ export default async function HubPage({
     .select('*')
     .order('heat_score', { ascending: false })
 
-  if (searchParams.type) {
-    query = query.eq('type', searchParams.type)
+  if (resolvedParams.type) {
+    query = query.eq('type', resolvedParams.type)
   } else {
     const allowedTypes = modeToLegacyTypes(activeIdentity)
     if (allowedTypes.length > 0) {
       query = query.in('type', allowedTypes as unknown as string[])
     }
   }
-  if (searchParams.rolling === 'true') {
+  if (resolvedParams.rolling === 'true') {
     query = query.eq('is_rolling', true)
   }
+
+  // Domain guard — keeps the hub scoped to the active domain.
+  // Defaults to 'founder' until multi-domain UI is built.
+  const activeDomain = resolvedParams.domain ?? 'founder'
+  query = query.eq('domain', activeDomain)
 
   const { data: programs } = await query.returns<Program[]>()
 
@@ -96,27 +103,44 @@ export default async function HubPage({
     }
   }
 
+  // Fetch next active cycle for each program
+  let cycleMap: Record<string, ProgramNextCycle> = {}
+  if (programs?.length) {
+    const programIds = programs.map(p => p.id)
+    const { data: cycleRows } = await supabase
+      .from('program_next_cycle')
+      .select('*')
+      .in('program_id', programIds)
+      .returns<ProgramNextCycle[]>()
+    if (cycleRows) {
+      cycleMap = Object.fromEntries(cycleRows.map(c => [c.program_id, c]))
+    }
+  }
+
   const programsWithFit: ProgramWithFit[] = (programs ?? []).map((p) => ({
     ...p,
     fit: fitMap[p.id],
     application: applicationMap[p.id],
+    cycle: cycleMap[p.id] ?? null,
   }))
 
   // Sort
   const now = Date.now()
   const MS_PER_DAY = 86_400_000
 
-  const sort = searchParams.sort ?? 'composite'
+  const sort = resolvedParams.sort ?? 'composite'
   const sorted = [...programsWithFit].sort((a, b) => {
     if (sort === 'heat') return b.heat_score - a.heat_score
     if (sort === 'deadline') {
-      const da = a.deadline_at ?? '9999-12-31'
-      const db = b.deadline_at ?? '9999-12-31'
+      const da = a.cycle?.closes_at ?? a.deadline_at ?? '9999-12-31'
+      const db = b.cycle?.closes_at ?? b.deadline_at ?? '9999-12-31'
       return da.localeCompare(db)
     }
     // composite default: programs closing <=60 days always surface first
-    const daysA = a.deadline_at ? (new Date(a.deadline_at).getTime() - now) / MS_PER_DAY : Infinity
-    const daysB = b.deadline_at ? (new Date(b.deadline_at).getTime() - now) / MS_PER_DAY : Infinity
+    const deadlineA = a.cycle?.closes_at ?? a.deadline_at
+    const deadlineB = b.cycle?.closes_at ?? b.deadline_at
+    const daysA = deadlineA ? (new Date(deadlineA).getTime() - now) / MS_PER_DAY : Infinity
+    const daysB = deadlineB ? (new Date(deadlineB).getTime() - now) / MS_PER_DAY : Infinity
     const urgentA = daysA > 0 && daysA <= 60
     const urgentB = daysB > 0 && daysB <= 60
     if (urgentA !== urgentB) return urgentA ? -1 : 1
@@ -126,7 +150,7 @@ export default async function HubPage({
     return scoreB - scoreA
   })
 
-  const view = searchParams.view === 'timeline' ? 'timeline' : 'cards'
+  const view = resolvedParams.view === 'timeline' ? 'timeline' : 'cards'
 
   return (
     <div>
@@ -172,7 +196,7 @@ export default async function HubPage({
       ) : (
         <div className="flex gap-6">
           <aside className="w-48 flex-shrink-0 hidden lg:block">
-            <HubFilters currentSort={sort} currentType={searchParams.type} currentRolling={searchParams.rolling} />
+            <HubFilters currentSort={sort} currentType={resolvedParams.type} currentRolling={resolvedParams.rolling} />
           </aside>
           <div className="flex-1 min-w-0">
             {sorted.length === 0 ? (
@@ -275,12 +299,13 @@ function TimelineView({ programs }: { programs: ProgramWithFit[] }) {
   const now = Date.now()
 
   function daysLeft(p: ProgramWithFit) {
-    if (!p.deadline_at) return null
-    return Math.ceil((new Date(p.deadline_at).getTime() - now) / MS_PER_DAY)
+    const deadline = p.cycle?.closes_at ?? p.deadline_at
+    if (!deadline) return null
+    return Math.ceil((new Date(deadline).getTime() - now) / MS_PER_DAY)
   }
 
-  const rolling = programs.filter(p => p.is_rolling || !p.deadline_at)
-  const withDeadline = programs.filter(p => !p.is_rolling && p.deadline_at)
+  const rolling = programs.filter(p => p.is_rolling || (!p.cycle?.closes_at && !p.deadline_at))
+  const withDeadline = programs.filter(p => !p.is_rolling && (p.cycle?.closes_at || p.deadline_at))
   const closingSoon = withDeadline.filter(p => { const d = daysLeft(p); return d !== null && d >= 0 && d <= 14 })
   const open = withDeadline.filter(p => { const d = daysLeft(p); return d !== null && d > 14 })
   const closed = withDeadline.filter(p => { const d = daysLeft(p); return d !== null && d! < 0 })

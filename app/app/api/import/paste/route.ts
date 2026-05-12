@@ -152,7 +152,7 @@ function parsePairs(rawText: string): ExtractedPair[] {
 // case-insensitive substring search if pg_trgm is unavailable or returns 0.
 
 async function findArchivedQuestion(
-  supabase: ReturnType<typeof createClient>,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   questionText: string
 ): Promise<{ id: string } | null> {
   // 1) Trigram similarity via the % operator + similarity() function. We use
@@ -194,7 +194,7 @@ async function findArchivedQuestion(
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

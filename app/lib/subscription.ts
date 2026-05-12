@@ -7,7 +7,7 @@ export type TierName = 'free' | 'pro' | 'team'
  * Falls back to 'free' if no active/trialing row exists.
  */
 export async function getUserTier(userId: string): Promise<TierName> {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data } = await supabase
     .from('user_subscriptions')
     .select('tier')
@@ -24,7 +24,7 @@ export async function getUserTier(userId: string): Promise<TierName> {
  * Pro/Team users with limit=-1 (unlimited) always return true.
  */
 export async function canDraft(userId: string): Promise<boolean> {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: planRow } = await supabase
     .from('user_subscriptions')

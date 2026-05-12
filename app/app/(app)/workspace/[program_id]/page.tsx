@@ -18,15 +18,16 @@ import { SignificanceStars } from '@/components/SignificanceStars'
 import { cn } from '@/lib/utils'
 
 interface Props {
-  params: { program_id: string }
+  params: Promise<{ program_id: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
-  const supabase = createClient()
+  const { program_id } = await params
+  const supabase = await createClient()
   const { data: program } = await supabase
     .from('programs')
     .select('name')
-    .eq('id', params.program_id)
+    .eq('id', program_id)
     .single<Pick<Program, 'name'>>()
 
   return {
@@ -35,7 +36,8 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function WorkspaceDetailPage({ params }: Props) {
-  const supabase = createClient()
+  const { program_id } = await params
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -44,7 +46,7 @@ export default async function WorkspaceDetailPage({ params }: Props) {
   const { data: program } = await supabase
     .from('programs')
     .select('*')
-    .eq('id', params.program_id)
+    .eq('id', program_id)
     .single<Program>()
 
   if (!program) notFound()
