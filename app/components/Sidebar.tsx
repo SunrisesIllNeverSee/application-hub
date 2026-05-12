@@ -55,7 +55,7 @@ const NAV = [
     ),
   },
   {
-    href: '/profile/answers',
+    href: '/answers',
     label: 'Answer Bank',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">

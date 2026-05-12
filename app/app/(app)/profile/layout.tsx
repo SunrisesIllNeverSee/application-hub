@@ -1,7 +1,6 @@
 import { ProfileTab } from '@/components/ProfileTab'
 
 const TABS = [
-  { label: 'Answer Bank', href: '/profile/answers' },
   { label: 'About', href: '/profile/about' },
   { label: 'Integrations', href: '/profile/integrations' },
   { label: 'Import', href: '/profile/import' },

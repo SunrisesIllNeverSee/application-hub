@@ -31,26 +31,29 @@ export default async function ProfileAboutPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      {summary && (summary.contribution_count ?? 0) > 0 && (
-        <div className="rounded-lg border border-amber-200 dark:border-amber-800/60 bg-amber-50/60 dark:bg-amber-950/30 p-4 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-amber-700 dark:text-amber-300 font-semibold mb-1">
-              Contribution credits earned
-            </p>
-            <p className="text-sm text-amber-900 dark:text-amber-100">
-              <span className="font-medium">{summary.total_credits_earned}</span> drip unlocks from{' '}
+      <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-semibold mb-1">
+            Contribution credits
+          </p>
+          {(summary && (summary.contribution_count ?? 0) > 0) ? (
+            <p className="text-sm text-neutral-800 dark:text-neutral-200">
+              <span className="font-medium text-amber-700 dark:text-amber-300">{summary.total_credits_earned}</span> drip unlocks from{' '}
               <span className="font-medium">{summary.contribution_count}</span> accepted submission{(summary.contribution_count ?? 0) !== 1 ? 's' : ''}.
-              {' '}Keep building the archive in sparse verticals to earn more.
             </p>
-          </div>
-          <Link
-            href="/hub/submit"
-            className="flex-shrink-0 text-xs font-medium text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 underline"
-          >
-            Submit another
-          </Link>
+          ) : (
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              No accepted submissions yet. Submit a program in a sparse vertical and earn drip unlocks when it&apos;s accepted.
+            </p>
+          )}
         </div>
-      )}
+        <Link
+          href="/hub/submit"
+          className="flex-shrink-0 text-xs font-medium text-brand-600 dark:text-brand-400 hover:underline whitespace-nowrap"
+        >
+          Submit a program →
+        </Link>
+      </div>
       <ProfileAboutForm profile={profile} userEmail={user.email ?? ''} />
     </div>
   )

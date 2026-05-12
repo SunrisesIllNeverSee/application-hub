@@ -278,7 +278,7 @@ export function AnswerEditor({
           placeholder:text-neutral-400 dark:placeholder:text-neutral-600
           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
           resize-y transition-colors"
-        autoFocus
+        autoFocus={!compact}
       />
 
       <WordCount

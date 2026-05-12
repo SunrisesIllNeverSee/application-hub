@@ -248,7 +248,7 @@ export default async function BankPage() {
                 className="card px-5 py-3 flex items-center gap-3 opacity-50"
               >
                 <ThemeTag theme={q.theme as never} />
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 flex-1 line-clamp-1 blur-[2px] select-none">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 flex-1 line-clamp-1 blur-sm select-none">
                   {q.text}
                 </p>
                 <span className="text-xs text-neutral-400 dark:text-neutral-500 flex-shrink-0">

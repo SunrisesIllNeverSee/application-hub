@@ -47,8 +47,21 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 AGENTS_DIR = REPO_ROOT / ".agents"
 REGISTRY = AGENTS_DIR / "registry.yaml"
 CLAIMS = AGENTS_DIR / "claims.yaml"
-MIGRATIONS = REPO_ROOT / "migrations"
 STATUS = REPO_ROOT / "STATUS.md"
+
+# Migration path is read from registry at runtime (see load_migrations_path).
+# Fallback to legacy location if registry doesn't specify.
+_MIGRATIONS_FALLBACK = REPO_ROOT / "migrations"
+
+
+def load_migrations_path(registry: dict) -> Path:
+    rel = registry.get("migrations", {}).get("path")
+    if rel:
+        return REPO_ROOT / rel.rstrip("/")
+    return _MIGRATIONS_FALLBACK
+
+
+MIGRATIONS = _MIGRATIONS_FALLBACK  # overridden after registry load
 
 STALE_HEARTBEAT_HOURS = 24
 
@@ -269,6 +282,10 @@ def main() -> int:
 
     registry = load_yaml(REGISTRY)
     claims_doc = load_yaml(CLAIMS)
+
+    # Override migrations path from registry
+    global MIGRATIONS
+    MIGRATIONS = load_migrations_path(registry)
 
     check_migrations(registry, findings)
     check_claim_overlaps(claims_doc, findings)

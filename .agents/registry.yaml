@@ -9,10 +9,12 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 36
+  next: 38
   path: supabase/migrations/  # was: migrations/ (root)
   cli_synced: true  # supabase db push --dry-run confirmed clean 2026-05-11
   applied:
+    - { n: 37, file: 037_heat_score_compute.sql, commit: "pending", landed: "2026-05-12", note: "Synthetic heat_score RPC from brand_score + cohort_size + program_value_score" }
+    - { n: 36, file: 036_deadline_and_rolling_seed.sql, commit: "pending", landed: "2026-05-12", note: "Rolling status + cycle deadlines for 20 high-value programs" }
     - { n: 33, file: 033_fix_security_definer_views.sql, commit: "pending", landed: "2026-05-12", note: "Fix SECURITY DEFINER on opportunities, user_credit_balance, user_contribution_summary views" }
     - { n: 32, file: 032_credits_and_achievements.sql, commit: "pending", landed: "2026-05-11", note: "credit_events + user_achievements tables, answer/submission triggers" }
     - { n: 31, file: 031_fix_contribution_credit_amount.sql, commit: "pending", landed: 2026-05-11, note: "Fix: credit_amount reflects actual unlocks inserted" }

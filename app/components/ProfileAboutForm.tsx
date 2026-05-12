@@ -181,19 +181,7 @@ export function ProfileAboutForm({ profile: initialProfile, userEmail }: Props) 
             )
           })}
         </div>
-        <Field label="Active identity" hint="Which one is in focus right now? Drives the Hub view and recommended programs.">
-          <select
-            value={activeIdentity}
-            onChange={(e) => setActiveIdentity(e.target.value as ApplicantMode)}
-            className="input"
-          >
-            {identities.map((mode) => (
-              <option key={mode} value={mode}>
-                {modeLabel(mode)} · {modeContextLabel(mode)}
-              </option>
-            ))}
-          </select>
-        </Field>
+
       </section>
 
       {/* Founder identity */}
