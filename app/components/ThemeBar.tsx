@@ -2,13 +2,13 @@ import type { QuestionTheme } from '@/lib/database.types'
 import { themeLabel, cn } from '@/lib/utils'
 
 interface ThemeBarProps {
-  theme: QuestionTheme
+  theme: string
   /** Percentage value 0-100 as stored in program_dna.weight_pct */
   weight: number
   questionCount?: number
 }
 
-const THEME_COLORS: Record<QuestionTheme, string> = {
+const THEME_COLORS: Partial<Record<QuestionTheme, string>> = {
   problem: 'bg-red-400',
   solution: 'bg-blue-400',
   market: 'bg-purple-400',
@@ -25,7 +25,7 @@ const THEME_COLORS: Record<QuestionTheme, string> = {
 
 export function ThemeBar({ theme, weight, questionCount }: ThemeBarProps) {
   const pct = Math.max(0, Math.min(100, Math.round(weight)))
-  const barColor = THEME_COLORS[theme] ?? 'bg-neutral-400'
+  const barColor = (THEME_COLORS as Record<string, string | undefined>)[theme] ?? 'bg-neutral-400'
 
   return (
     <div className="space-y-1">

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
-type AppStatus = 'saved' | 'drafting' | 'submitted' | 'accepted' | 'rejected' | 'waitlisted'
+type AppStatus = 'saved' | 'drafting' | 'submitted' | 'accepted' | 'rejected' | 'waitlisted' | 'waitlist'
 
 interface Props {
   programId: string

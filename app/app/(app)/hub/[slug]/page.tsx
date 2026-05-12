@@ -144,7 +144,7 @@ export default async function ProgramDetailPage({ params }: Props) {
           />
           <Stat
             label="Focus"
-            value={program.geo_focus?.length > 0 ? program.geo_focus.join(', ') : '—'}
+            value={(program.geo_focus?.length ?? 0) > 0 ? (program.geo_focus ?? []).join(', ') : '—'}
           />
           <Stat
             label="Deadline"
@@ -188,8 +188,8 @@ export default async function ProgramDetailPage({ params }: Props) {
           )}
           {program.cohort_name && <Stat label="Cohort" value={program.cohort_name} />}
           {cohortStart && <Stat label="Starts" value={cohortStart} />}
-          {program.industry_tags?.length > 0 && (
-            <Stat label="Industries" value={program.industry_tags.slice(0, 2).join(', ')} />
+          {(program.industry_tags?.length ?? 0) > 0 && (
+            <Stat label="Industries" value={(program.industry_tags ?? []).slice(0, 2).join(', ')} />
           )}
         </div>
       </div>
