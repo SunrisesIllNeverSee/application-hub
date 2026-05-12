@@ -359,14 +359,15 @@ Opportunity ranking (`opportunityScore()`) is now in the Workspace. Next layer: 
 
 Sidebar says "My Applications" while docs/code often say "Workspace." Pick the user-facing label and align docs, nav, and copy.
 
-### [ ] Dev-only password sign-in decision
-**Owner**: Cowork
-**Priority**: P2
+### [x] Password-based auth (signup + signin)
+**Owner**: vscode-claude
+**Priority**: P0 — was blocking real user onboarding
 
-The password escape hatch helped during email limits. Before public launch:
-- Gate behind `NODE_ENV === "development"`
-- Gate behind feature flag
-- Or remove once custom SMTP is reliable
+Email + password is now the primary auth flow:
+- Sign in tab: `supabase.auth.signInWithPassword`
+- Create account tab: `supabase.auth.signUp` with email confirmation
+- Magic link demoted to secondary fallback ("forgot password?")
+- Dev-only password escape hatch removed from the visible UI
 
 ### [ ] Residual dependency audit follow-up
 **Owner**: Codex
