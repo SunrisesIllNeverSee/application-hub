@@ -34,10 +34,8 @@ jobs:
       - name: Install pyyaml
         run: pip3 install pyyaml
 
-      - name: Run .agents/check.py (default — blockers fail, warnings advisory)
-        # Once the existing warnings are reconciled by the registry owner,
-        # flip this step to `--strict` so warnings also fail the build.
-        run: python3 .agents/check.py
+      - name: Run .agents/check.py (strict — warnings and blockers both fail)
+        run: python3 .agents/check.py --strict
 
       - name: Print JSON report (advisory)
         if: always()

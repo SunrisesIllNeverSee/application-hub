@@ -19,6 +19,8 @@ interface Application {
 interface SidebarProps {
   user: User
   applications: Application[]
+  /** Days of Pro access earned — shown as a badge in the footer */
+  creditBalance?: number
 }
 
 const NAV = [
@@ -63,6 +65,26 @@ const NAV = [
     ),
   },
   {
+    href: '/funders',
+    label: 'Funders',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    href: '/archive/questions',
+    label: 'Archive',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     href: '/profile',
     label: 'Profile',
     icon: (
@@ -85,7 +107,7 @@ const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
 
 const STATUS_ORDER = ['drafting', 'saved', 'submitted', 'waitlisted', 'accepted', 'rejected']
 
-export function Sidebar({ user, applications }: SidebarProps) {
+export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -209,7 +231,19 @@ export function Sidebar({ user, applications }: SidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-neutral-200 truncate">{user.email}</p>
-            <p className="text-xs text-neutral-500">Free plan</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="text-xs text-neutral-500">Free plan</p>
+              {creditBalance > 0 && (
+                <Link
+                  href="/profile/credits"
+                  title={`${creditBalance} days of Pro access earned — click to redeem`}
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-semibold hover:bg-amber-500/30 transition-colors"
+                >
+                  <span>§</span>
+                  <span>{creditBalance}d</span>
+                </Link>
+              )}
+            </div>
           </div>
           {/* Dark mode toggle */}
           <button

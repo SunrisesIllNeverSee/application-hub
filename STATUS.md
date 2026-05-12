@@ -1,6 +1,6 @@
 # Application Hub — Status
 
-_Last updated: 2026-05-11 (second session)_
+_Last updated: 2026-05-12 (vscode-claude session)_
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 
@@ -165,7 +165,13 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | DNA radar chart on program detail | Done |
 | Significance stars display | Done |
 | Workspace opportunity ranking | Done |
-| Recruiter agent (weekly email + dedup) | Done |
+| Recruiter agent (weekly email + dedup) | Done — edge function deployed 2026-05-12 |
+| Question archive `/archive/questions` | Done — browse UI with theme/domain/sort filters |
+| Funders index `/funders` | Done — grid with type filter |
+| Funder profile `/funders/[slug]` | Done — program list, breadcrumb, website link |
+| `database.types.ts` | Done — regenerated from live schema (migrations 001–032) |
+| CI agents-check | Done — flipped to `--strict` mode 2026-05-12 |
+| Question embeddings (768d, nomic-embed-text) | Done — all 225 questions seeded via Ollama |
 
 ---
 

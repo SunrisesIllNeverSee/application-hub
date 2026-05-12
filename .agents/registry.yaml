@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-11T23:00:00Z
+updated_at: 2026-05-12T01:00:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
@@ -63,10 +63,9 @@ programs:
 
 questions:
   archived_total: 225
-  embeddings_seeded: 0
+  embeddings_seeded: 225
   embedding_model: nomic-embed-text
   embedding_dims: 768
-  embedding_note: Run scripts/seed-question-embeddings.ts to populate
 
 features:
   byok: shipped
@@ -77,13 +76,19 @@ features:
   stripe_live: shipped
   custom_smtp: shipped
   recruiter_agent: shipped
-  recruiter_agent_activation: pending_deric
+  recruiter_agent_edge_fn: shipped
+  recruiter_agent_resend_key: pending_verify
   today_dashboard: shipped
   dna_radar_chart: shipped
   significance_stars: shipped
   opportunity_ranking: shipped
   match_question_api: shipped
   embedding_seeder_script: shipped
+  question_archive_ui: shipped
+  funders_index_ui: shipped
+  funders_profile_ui: shipped
+  database_types_generated: shipped
+  ci_strict_mode: shipped
   browser_extension: not_started
   credits_ledger: shipped
   achievements: shipped
