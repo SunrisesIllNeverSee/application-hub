@@ -86,3 +86,32 @@ Not a backlog — these are things we're building, just not yet.
 - Leaderboard: who's answering questions, providing programs, filling applications
 - Rate/rank answers — community signal on answer quality
 - Funny/notable answers surface
+
+---
+
+## Data Lifecycle & Archive
+
+### Cycle Retirement Process
+Programs and cycles go stale fast — a closed YC S25 cycle shouldn't carry the same weight as an open S26. The retirement process:
+
+1. **Mark stale**: cron or manual review sets `program_cycles.is_active = false` when `closes_at` has passed + a grace period (e.g. 30 days after close)
+2. **Score decay**: `programs.heat_score` decays if the program has no active cycle and hasn't opened a new one in 6+ months — drops it in Hub ranking but doesn't delete
+3. **Program archival**: programs with no active cycle for 12+ months get `programs.is_archived = true` — hidden from Hub by default, still queryable
+
+### Static Public Archive
+Heavy closed-cycle data doesn't need to live in the hot DB:
+
+- **What moves**: closed `program_cycles` rows older than 2 years, plus their associated `program_questions` snapshots
+- **Where it goes**: JSON export to a public S3/R2 bucket + a static archive page (e.g. `/archive/yc-s22`)
+- **Why public**: SEO value, researcher use, historical reference — this is a moat asset
+- **Hot DB stays lean**: only active programs, open cycles, and the last 1-2 closed cycles per program stay live
+
+### Cleanup Cadence (proposed)
+| Trigger | Action |
+|---|---|
+| `closes_at` + 30 days | Set `is_active = false` on cycle |
+| No active cycle for 6 months | Decay `heat_score` |
+| No active cycle for 12 months | Set `programs.is_archived = true` |
+| Archived for 2 years | Export to static archive, delete hot rows |
+
+Gate: needs `programs.is_archived` column (migration) + Hub filter to exclude archived by default.
