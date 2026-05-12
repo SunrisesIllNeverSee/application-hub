@@ -2,7 +2,7 @@
 
 Current phase: **Launch hardening — ship the spine, layer RNS**
 
-Last updated: 2026-05-11
+Last updated: 2026-05-12
 
 This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` is who is touching what right now.
 
@@ -10,7 +10,7 @@ This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` 
 
 ## Live State
 
-App is live at `https://mos2es.xyz`. The repo now includes migrations through `027`, Question Bank, drip mechanic, profile split, BYOK integrations, reviewer persistence, sidebar IA updates, home dashboard, stress-test UI, DNA visualization, significance stars, opportunity ranking, and recruiter agent. P1 sprint complete as of 2026-05-11. Moving to P2.
+App is live at `https://mos2es.xyz`. Migrations through `037`. Stripe live (1 real checkout). GitHub OAuth live. Funders index, archive page, standalone Answer Bank, heat scores, deadline seeding, responsive QA, FundingCake pipeline, applicant modes, credits system all shipped. P2 complete. Moving to P3 + product rethink.
 
 ### Bugs to fix
 
@@ -26,13 +26,13 @@ App is live at `https://mos2es.xyz`. The repo now includes migrations through `0
 
 - [x] **Timeline → fold into Hub as view tab** — Timeline remains as a route, but sidebar navigation has been folded back into the main Hub flow.
 
-- [ ] **Answer Bank and Profile are fully separate** — Answer Bank = user's ammunition/memory (what they've written). Profile = who they are (metadata, stage, company). Different routes, different jobs, different UI.
+- [x] **Answer Bank and Profile are fully separate** — Standalone `/answers` route. Sidebar link updated. Removed from Profile tabs.
 
 - [x] **Sidebar IA redesign** — Hub / Bank / Answer Bank / Profile at top, then a divider, then user's applications list sorted by status.
 
 - [x] **Question Bank (`/bank`)** — built. Uses `user_question_unlocks`, significance ordering, locked previews, and daily drip.
 
-- [ ] **Companies/Funders index** — users want an org-level index (YC, Techstars, NEA) separate from program cycles. Needs three-layer schema. P2.
+- [x] **Companies/Funders index** — `/funders` + `/funders/[slug]` built. Uses `migration 023_funders_schema.sql`.
 
 ---
 
@@ -147,7 +147,7 @@ Rate logging exists, BYOK routing exists, and the route now gives clearer founde
 
 Sidebar, app padding, and tablet squeeze work landed. Keep real-device testing open, but the first implementation pass is complete.
 
-### [ ] Browser/device responsive QA
+### [x] Browser/device responsive QA
 **Owner**: Cowork + Codex
 **Priority**: P1
 
@@ -168,7 +168,7 @@ Landing-page fixes shipped:
 - footer/legal row wraps cleanly on smaller viewports
 - stale MCP count copy updated from `20` to `21`
 
-### [ ] Seed real deadlines + urgency sort
+### [x] Seed real deadlines + urgency sort
 **Owner**: Cowork
 **Priority**: P1
 
@@ -203,7 +203,7 @@ This now unblocks better fit scoring, smarter drip, BYOK, and future billing.
 
 Documented, configured, and confirmed during live smoke test.
 
-### [ ] AI draft live smoke test
+### [x] AI draft live smoke test
 **Owner**: Cowork
 **Priority**: P1
 
@@ -234,7 +234,7 @@ Implementation:
 - Promote only targets with real application pages, reusable question signal, or meaningful funding workflow data
 - Keep generic VC prestige tracking out of the active ingest lane
 
-### [ ] Heat/applicant synthetic compute job
+### [x] Heat/applicant synthetic compute job
 **Owner**: Codex + Cowork
 **Priority**: P2
 
@@ -335,7 +335,7 @@ Implementation:
 
 `DnaRadarChart` is a pure SVG radar/polygon chart on program detail pages. Renders when 4+ themes have weight. Supports optional `userCoverage` overlay.
 
-### [ ] Heat scores + applicant counts
+### [x] Heat scores + applicant counts
 **Owner**: Cowork data + Codex compute
 **Priority**: P2
 
@@ -353,7 +353,7 @@ Today dashboard has placeholder cards. Needs: scoring formula, data inputs, and 
 
 Opportunity ranking (`opportunityScore()`) is now in the Workspace. Next layer: show where a founder likely ranks among applicants for a given program. Requires hosted application data (user-submitted answers + program acceptance signals). Dependent on outcome tracking and more applied-user data.
 
-### [ ] Workspace naming alignment
+### [x] Workspace naming alignment
 **Owner**: Cowork
 **Priority**: P2
 
@@ -403,7 +403,7 @@ Future migration:
 - application/cohort distinction
 - possible `/funders` index
 
-### [ ] Stripe integration
+### [x] Stripe integration
 **Owner**: Cowork UI + Codex webhook
 **Priority**: P3
 
@@ -411,7 +411,7 @@ Future migration:
 - Webhook updates `user_subscriptions`
 - Gates unlimited AI, export, heat scores, acceptance rates
 
-### [ ] Deadline alerts
+### [x] Deadline alerts
 **Owner**: Cowork UI + Codex cron
 **Priority**: P3
 
@@ -419,7 +419,7 @@ Future migration:
 - Only trigger when readiness is above threshold
 - Email through Supabase Edge Function + Resend
 
-### [ ] Outcome tracking
+### [x] Outcome tracking
 **Owner**: Cowork
 **Priority**: P3
 
