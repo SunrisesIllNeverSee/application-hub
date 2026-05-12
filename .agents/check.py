@@ -235,6 +235,34 @@ def check_status_md_agrees(registry: dict, findings: list) -> None:
         )
 
 
+def check_nextjs_async_params(findings: list) -> None:
+    """All Next.js page searchParams/params must be typed as Promise<{...}> (Next.js 15+).
+    Any page using the old sync `searchParams: {` or `params: {` signature will cause
+    a runtime error. This check catches regressions before they reach Vercel.
+    """
+    app_dir = REPO_ROOT / "app" / "app"
+    if not app_dir.exists():
+        return
+    sync_pat = re.compile(r"\b(searchParams|params)\s*:\s*\{(?!.*Promise)")
+    offenders: list[str] = []
+    for tsx in app_dir.rglob("*.tsx"):
+        if "node_modules" in tsx.parts or ".next" in tsx.parts:
+            continue
+        text = tsx.read_text(errors="replace")
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if sync_pat.search(line):
+                rel = tsx.relative_to(ROOT)
+                offenders.append(f"{rel}:{lineno} — {line.strip()[:80]}")
+    if offenders:
+        for o in offenders:
+            findings.append(
+                (
+                    "BLOCKER",
+                    f"Next.js 15: non-async page prop (must be Promise<{{...}}>): {o}",
+                )
+            )
+
+
 def format_report(findings: list, *, as_json: bool, quiet: bool) -> str:
     if as_json:
         return json.dumps(
@@ -293,6 +321,7 @@ def main() -> int:
     check_stale_sessions(claims_doc, findings)
     check_released_claims_have_commits(claims_doc, findings)
     check_status_md_agrees(registry, findings)
+    check_nextjs_async_params(findings)
 
     out = format_report(findings, as_json=args.json, quiet=args.quiet)
     if out:
