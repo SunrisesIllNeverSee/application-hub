@@ -31,7 +31,7 @@ export default async function ProfileAboutPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      {summary && summary.contribution_count > 0 && (
+      {summary && (summary.contribution_count ?? 0) > 0 && (
         <div className="rounded-lg border border-amber-200 dark:border-amber-800/60 bg-amber-50/60 dark:bg-amber-950/30 p-4 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-wider text-amber-700 dark:text-amber-300 font-semibold mb-1">
@@ -39,7 +39,7 @@ export default async function ProfileAboutPage() {
             </p>
             <p className="text-sm text-amber-900 dark:text-amber-100">
               <span className="font-medium">{summary.total_credits_earned}</span> drip unlocks from{' '}
-              <span className="font-medium">{summary.contribution_count}</span> accepted submission{summary.contribution_count !== 1 ? 's' : ''}.
+              <span className="font-medium">{summary.contribution_count}</span> accepted submission{(summary.contribution_count ?? 0) !== 1 ? 's' : ''}.
               {' '}Keep building the archive in sparse verticals to earn more.
             </p>
           </div>

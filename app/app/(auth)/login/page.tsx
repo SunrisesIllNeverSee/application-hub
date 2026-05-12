@@ -4,111 +4,93 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+type Mode = 'signin' | 'signup' | 'magic' | 'magic_sent'
+
 export default function LoginPage() {
   const router = useRouter()
+  const [mode, setMode] = useState<Mode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [otpCode, setOtpCode] = useState('')
-  const [otpLoading, setOtpLoading] = useState(false)
-  const [otpError, setOtpError] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null)
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!email.trim()) return
-
-    setLoading(true)
+  function resetForm() {
     setError(null)
-
-    const supabase = createClient()
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-
-    setLoading(false)
-
-    if (error) {
-      setError(error.message)
-    } else {
-      setSubmitted(true)
-    }
-  }
-
-  async function handleOtpSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!otpCode.trim() || otpCode.length !== 6) return
-
-    setOtpLoading(true)
-    setOtpError(null)
-
-    const supabase = createClient()
-
-    const { error } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: otpCode.trim(),
-      type: 'email',
-    })
-
-    setOtpLoading(false)
-
-    if (error) {
-      setOtpError(error.message)
-    } else {
-      router.push('/hub')
-      router.refresh()
-    }
+    setInfo(null)
+    setPassword('')
   }
 
   async function handlePasswordSignIn(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !password) return
-
     setLoading(true)
     setError(null)
-
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    })
-
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
     setLoading(false)
-
     if (error) {
       setError(error.message)
     } else {
-      router.push('/hub')
+      router.push('/today')
       router.refresh()
     }
   }
 
+  async function handleSignUp(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email.trim() || !password) return
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    setLoading(true)
+    setError(null)
+    const supabase = createClient()
+    const { error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    })
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      setInfo('Account created — check your email to confirm, then sign in.')
+      setMode('signin')
+      setPassword('')
+    }
+  }
+
+  async function handleMagicLink(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email.trim()) return
+    setLoading(true)
+    setError(null)
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    })
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      setMode('magic_sent')
+    }
+  }
+
+  const isPasswordMode = mode === 'signin' || mode === 'signup'
+
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo mark */}
+        {/* Logo */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600 mb-4">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="text-white"
-              aria-hidden="true"
-            >
-              <path
-                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <h1 className="text-2xl font-semibold text-white">Application Hub</h1>
@@ -118,192 +100,182 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8">
-          {submitted ? (
+
+          {/* Magic link sent state */}
+          {mode === 'magic_sent' ? (
             <div className="text-center py-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-success-50 dark:bg-success-500/10 mb-4">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="text-success-500"
-                >
-                  <path
-                    d="M20 6L9 17l-5-5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500/10 mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-green-400">
+                  <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <h2 className="text-lg font-semibold text-white mb-2">Check your inbox</h2>
               <p className="text-sm text-neutral-400 leading-relaxed">
                 We sent a magic link to{' '}
-                <span className="text-neutral-200 font-medium">{email}</span>. Click it to sign in
-                — no password needed.
+                <span className="text-neutral-200 font-medium">{email}</span>.
+                Click it to sign in.
               </p>
+              <button
+                onClick={() => { setMode('signin'); resetForm() }}
+                className="mt-6 text-sm text-brand-400 hover:text-brand-300 transition-colors"
+              >
+                ← Back to sign in
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Sign in / Sign up tab toggle */}
+              <div className="flex rounded-lg bg-neutral-800 p-1 mb-6">
+                <button
+                  type="button"
+                  onClick={() => { setMode('signin'); resetForm() }}
+                  className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    mode === 'signin'
+                      ? 'bg-neutral-700 text-white shadow-sm'
+                      : 'text-neutral-400 hover:text-neutral-300'
+                  }`}
+                >
+                  Sign in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMode('signup'); resetForm() }}
+                  className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    mode === 'signup'
+                      ? 'bg-neutral-700 text-white shadow-sm'
+                      : 'text-neutral-400 hover:text-neutral-300'
+                  }`}
+                >
+                  Create account
+                </button>
+              </div>
 
-              {/* OTP entry — secondary path */}
-              <div className="mt-8 pt-6 border-t border-neutral-800 text-left">
-                <p className="text-xs text-neutral-500 text-center mb-4">
-                  Or enter the 6-digit code from your email
+              {/* Info banner (e.g. after signup) */}
+              {info && (
+                <p className="mb-4 text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                  {info}
                 </p>
-                <form onSubmit={handleOtpSubmit} className="space-y-3">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000"
-                    className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-600
-                      focus:ring-brand-500 text-center tracking-widest text-lg font-mono"
-                    aria-label="6-digit verification code"
-                  />
-                  {otpError && (
-                    <p className="text-sm text-danger-500 bg-danger-50/10 border border-danger-500/20 rounded-lg px-3 py-2">
-                      {otpError}
+              )}
+
+              {/* Email + password form */}
+              {isPasswordMode && (
+                <form onSubmit={mode === 'signin' ? handlePasswordSignIn : handleSignUp} className="space-y-4">
+                  <div>
+                    <label htmlFor="email" className="label text-neutral-300">Email address</label>
+                    <input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@yourcompany.com"
+                      className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-brand-500"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="password" className="label text-neutral-300">Password</label>
+                    <input
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
+                      className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-brand-500"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {error}
                     </p>
                   )}
+
                   <button
                     type="submit"
-                    disabled={otpLoading || otpCode.length !== 6}
-                    className="w-full btn-secondary py-2 text-sm"
+                    disabled={loading || !email.trim() || !password}
+                    className="w-full btn-primary py-2.5"
                   >
-                    {otpLoading ? (
+                    {loading ? (
                       <span className="flex items-center justify-center gap-2">
                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
-                        Verifying…
+                        {mode === 'signup' ? 'Creating account…' : 'Signing in…'}
                       </span>
                     ) : (
-                      'Verify code'
+                      mode === 'signup' ? 'Create account' : 'Sign in'
                     )}
                   </button>
+
+                  {/* Magic link fallback */}
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => { setMode('magic'); resetForm() }}
+                      className="text-xs text-neutral-500 hover:text-neutral-400 transition-colors"
+                    >
+                      {mode === 'signin' ? 'Forgot password? Use a magic link instead' : 'Prefer a magic link instead?'}
+                    </button>
+                  </div>
                 </form>
-              </div>
+              )}
 
-              <button
-                onClick={() => {
-                  setSubmitted(false)
-                  setEmail('')
-                  setOtpCode('')
-                  setOtpError(null)
-                }}
-                className="mt-6 text-sm text-brand-400 hover:text-brand-300 transition-colors"
-              >
-                Use a different email
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold text-white">Sign in</h2>
-                <p className="mt-1 text-sm text-neutral-400">
-                  Enter your email and we&apos;ll send you a magic link.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="label text-neutral-300">
-                    Email address
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@yourcompany.com"
-                    className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500
-                      focus:ring-brand-500"
-                  />
-                </div>
-
-                {error && (
-                  <p className="text-sm text-danger-500 bg-danger-50/10 border border-danger-500/20 rounded-lg px-3 py-2">
-                    {error}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading || !email.trim()}
-                  className="w-full btn-primary py-2.5"
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
-                      Sending link…
-                    </span>
-                  ) : (
-                    'Send magic link'
-                  )}
-                </button>
-              </form>
-
-              {/* Dev/testing path — password sign-in. Remove or gate before launch. */}
-              <div className="mt-4 pt-4 border-t border-neutral-800">
-                <form onSubmit={handlePasswordSignIn} className="space-y-3">
+              {/* Magic link mode */}
+              {mode === 'magic' && (
+                <form onSubmit={handleMagicLink} className="space-y-4">
+                  <div className="mb-2">
+                    <h2 className="text-base font-semibold text-white">Sign in with magic link</h2>
+                    <p className="mt-1 text-sm text-neutral-400">We&apos;ll email you a one-click sign-in link.</p>
+                  </div>
                   <div>
-                    <label htmlFor="password" className="label text-neutral-300 text-xs">
-                      Or sign in with password (dev only)
-                    </label>
+                    <label htmlFor="email-magic" className="label text-neutral-300">Email address</label>
                     <input
-                      id="password"
-                      type="password"
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
-                      className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500
-                        focus:ring-brand-500"
+                      id="email-magic"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@yourcompany.com"
+                      className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-brand-500"
                     />
                   </div>
+
+                  {error && (
+                    <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {error}
+                    </p>
+                  )}
+
                   <button
                     type="submit"
-                    disabled={loading || !email.trim() || !password}
-                    className="w-full btn-secondary py-2 text-sm"
+                    disabled={loading || !email.trim()}
+                    className="w-full btn-primary py-2.5"
                   >
-                    Sign in with password
+                    {loading ? 'Sending…' : 'Send magic link'}
                   </button>
+
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => { setMode('signin'); resetForm() }}
+                      className="text-xs text-neutral-500 hover:text-neutral-400 transition-colors"
+                    >
+                      ← Back to sign in with password
+                    </button>
+                  </div>
                 </form>
-              </div>
+              )}
 
               <p className="mt-6 text-xs text-neutral-500 text-center">
-                By signing in you agree to our{' '}
-                <a href="#" className="text-neutral-400 hover:text-neutral-300 underline">
-                  Terms
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-neutral-400 hover:text-neutral-300 underline">
-                  Privacy Policy
-                </a>
-                .
+                By continuing you agree to our{' '}
+                <a href="#" className="text-neutral-400 hover:text-neutral-300 underline">Terms</a>
+                {' '}and{' '}
+                <a href="#" className="text-neutral-400 hover:text-neutral-300 underline">Privacy Policy</a>.
               </p>
             </>
           )}
@@ -311,12 +283,8 @@ export default function LoginPage() {
 
         <p className="mt-8 text-center text-xs text-neutral-600">
           Built by{' '}
-          <a
-            href="https://ellocello.com"
-            className="text-neutral-500 hover:text-neutral-400 transition-colors"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://ellocello.com" className="text-neutral-500 hover:text-neutral-400 transition-colors"
+            target="_blank" rel="noreferrer">
             Ello Cello LLC
           </a>
         </p>

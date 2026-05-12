@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       acceptance_reports: {
@@ -2059,6 +2084,7 @@ export type Database = {
           expected_reward_cents_max: number | null
           expected_reward_cents_min: number | null
           follow_on_rate_pct: number | null
+          funder_id: string | null
           funder_type: string | null
           funder_user_id: string | null
           funding_amount_cents: number | null
@@ -2128,6 +2154,7 @@ export type Database = {
           expected_reward_cents_max?: number | null
           expected_reward_cents_min?: number | null
           follow_on_rate_pct?: number | null
+          funder_id?: string | null
           funder_type?: string | null
           funder_user_id?: string | null
           funding_amount_cents?: number | null
@@ -2197,6 +2224,7 @@ export type Database = {
           expected_reward_cents_max?: number | null
           expected_reward_cents_min?: number | null
           follow_on_rate_pct?: number | null
+          funder_id?: string | null
           funder_type?: string | null
           funder_user_id?: string | null
           funding_amount_cents?: number | null
@@ -2240,6 +2268,13 @@ export type Database = {
           visa_sponsorship?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "programs_funder_id_fkey"
+            columns: ["funder_id"]
+            isOneToOne: false
+            referencedRelation: "funders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "programs_parent_program_id_fkey"
             columns: ["parent_program_id"]
@@ -2507,6 +2542,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       ai_provider_type: ["anthropic", "openai", "google", "ollama", "custom"],
@@ -2582,4 +2620,34 @@ export const Constants = {
     },
   },
 } as const
-<claude-code-hint v="1" type="plugin" value="supabase@claude-plugins-official" />
+
+// ── Convenience row aliases ───────────────────────────────────────────────────
+type Row<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"]
+
+type View<T extends keyof Database["public"]["Views"]> =
+  Database["public"]["Views"][T]["Row"]
+
+export type Program                  = Row<"programs">
+export type ProfileAnswer            = Row<"profile_answers">
+export type UserApplication          = Row<"user_applications">
+export type UserProgramFit           = Row<"user_program_fit">
+export type ProgramDna               = Row<"program_dna">
+export type ArchivedQuestion         = Row<"archived_questions">
+export type UserContributionSummary  = View<"user_contribution_summary">
+export type ProfileAnswerWithQuestion = Row<"profile_answers"> & {
+  archived_question: Row<"archived_questions"> | null
+}
+export type ProgramQuestionWithArchived = Row<"program_questions"> & {
+  archived_question: Row<"archived_questions"> | null
+}
+export type ProgramWithFit = Program & {
+  fit?: UserProgramFit | null
+  application?: Row<"user_applications"> | null
+}
+
+// ── Enum aliases ──────────────────────────────────────────────────────────────
+export type ApplicantMode      = Database["public"]["Enums"]["applicant_mode"]
+export type SubscriptionTier   = Database["public"]["Enums"]["subscription_tier"]
+export type AnswerConfidence   = Database["public"]["Enums"]["answer_confidence"]
+export type QuestionTheme = 'traction' | 'team' | 'vision' | 'market' | 'product' | 'financials' | 'impact' | 'legal' | 'other' | 'problem' | 'solution' | 'business_model' | 'technical' | 'fundraising' | 'personal' | 'fit'

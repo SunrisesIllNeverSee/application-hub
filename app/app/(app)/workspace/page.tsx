@@ -69,7 +69,7 @@ export default async function WorkspacePage() {
     .select('*, programs(id, name, slug, type, deadline_at, is_rolling, check_size_max, program_value_score, heat_score)')
     .eq('user_id', user.id)
     .not('program_id', 'in', `(${programIds.join(',') || '00000000-0000-0000-0000-000000000000'})`)
-    .order('composite_score', { ascending: false })
+    .order('fit_score', { ascending: false })
     .limit(5)
     .returns<(UserProgramFit & { programs: Program | null })[]>()
 
@@ -122,7 +122,7 @@ export default async function WorkspacePage() {
                 {activeApps.map((program, i) => {
                   const deadline = formatDeadline(program.deadline_at)
                   const fit = program.fit
-                  const coveragePct = fit ? Math.round(fit.coverage_pct * 100) : 0
+                  const coveragePct = fit ? Math.round((fit.coverage_pct ?? 0) * 100) : 0
                   const fitPct = fit ? Math.round(fit.fit_score * 100) : 0
                   const status = program.app?.status ?? 'saved'
                   const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.saved
@@ -245,7 +245,7 @@ export default async function WorkspacePage() {
                   if (!prog) return null
                   const deadline = formatDeadline(prog.deadline_at)
                   const fitPct = Math.round((f.fit_score ?? 0) * 100)
-                  const composite = Math.round(f.composite_score ?? 0)
+                  const composite = Math.round(f.fit_score ?? 0)
                   const checkSize = formatCheckSize(prog.check_size_max ?? null)
                   return (
                     <Link key={f.program_id} href={`/hub/${prog.slug}`}

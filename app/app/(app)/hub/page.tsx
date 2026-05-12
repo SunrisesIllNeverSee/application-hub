@@ -121,8 +121,8 @@ export default async function HubPage({
     const urgentB = daysB > 0 && daysB <= 60
     if (urgentA !== urgentB) return urgentA ? -1 : 1
     if (urgentA && urgentB) return daysA - daysB
-    const scoreA = a.fit ? a.fit.composite_score : a.heat_score
-    const scoreB = b.fit ? b.fit.composite_score : b.heat_score
+    const scoreA = a.fit ? a.fit.fit_score : a.heat_score
+    const scoreB = b.fit ? b.fit.fit_score : b.heat_score
     return scoreB - scoreA
   })
 

@@ -13,6 +13,26 @@ export default async function RootPage() {
     redirect('/hub')
   }
 
+  // Fetch top questions for the live archive preview
+  const { data: topQuestions } = await supabase
+    .from('archived_questions')
+    .select('id, text, theme, asked_by_count, significance_score')
+    .order('significance_score', { ascending: false })
+    .limit(12)
+
+  type ArchiveQuestion = { id: string; text: string; theme: string; asked_by_count: number; significance_score: number }
+  const questions = (topQuestions ?? []) as ArchiveQuestion[]
+  const THEME_LABELS: Record<string, string> = {
+    traction: 'Traction & metrics',
+    team: 'Team & leadership',
+    vision: 'Vision & market',
+    market: 'Vision & market',
+    product: 'Product',
+    financials: 'Financials',
+    impact: 'Impact',
+    other: 'Other',
+  }
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
       <header className="border-b border-neutral-800/60 sticky top-0 z-30 bg-neutral-950/80 backdrop-blur">
@@ -201,7 +221,7 @@ export default async function RootPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center">
-              <p className="text-4xl font-semibold text-neutral-100">225</p>
+              <p className="text-4xl font-semibold text-neutral-100">{questions.length > 0 ? `${questions.length}+` : '225'}</p>
               <p className="mt-1 text-xs text-neutral-400 uppercase tracking-wide">Questions archived</p>
             </div>
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center">
@@ -209,21 +229,49 @@ export default async function RootPage() {
               <p className="mt-1 text-xs text-neutral-400 uppercase tracking-wide">Programs indexed</p>
             </div>
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center">
-              <p className="text-4xl font-semibold text-neutral-100">0.92</p>
+              <p className="text-4xl font-semibold text-neutral-100">
+                {questions[0] ? questions[0].significance_score.toFixed(2) : '0.92'}
+              </p>
               <p className="mt-1 text-xs text-neutral-400 uppercase tracking-wide">Top significance score</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-neutral-400 mb-2">Sample archived question</p>
-                <p className="text-lg text-neutral-100 font-medium">Tell us about your team.</p>
-                <p className="mt-2 text-sm text-neutral-300">Asked by 28 of 800+ programs · Universal across stages and sectors</p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="text-xs text-neutral-400">Significance</p>
-                <p className="text-2xl font-semibold text-brand-300">0.92</p>
-              </div>
+
+          {/* Live question list */}
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 overflow-hidden">
+            <div className="px-5 py-4 border-b border-neutral-800 flex items-center justify-between gap-3">
+              <p className="text-xs uppercase tracking-wide text-neutral-400 font-medium">Top questions · live from the archive</p>
+              <Link href="/login" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
+                Browse all 225 →
+              </Link>
+            </div>
+            <div className="divide-y divide-neutral-800/60">
+              {questions.map((q) => (
+                <div key={q.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-neutral-800/30 transition-colors group">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-neutral-200 group-hover:text-white transition-colors truncate">
+                      {q.text}
+                    </p>
+                    <p className="mt-0.5 text-xs text-neutral-500">
+                      {q.asked_by_count} program{q.asked_by_count !== 1 ? 's' : ''} ask this
+                      {q.theme && THEME_LABELS[q.theme] ? (
+                        <span className="ml-2 px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 text-[10px] uppercase tracking-wide">
+                          {THEME_LABELS[q.theme]}
+                        </span>
+                      ) : null}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 text-right">
+                    <p className="text-sm font-semibold text-brand-400 tabular-nums">
+                      {q.significance_score.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-5 py-3 border-t border-neutral-800/60 bg-neutral-900/40">
+              <p className="text-xs text-neutral-500">
+                Showing top {questions.length} by significance score · <Link href="/login" className="text-brand-400 hover:text-brand-300">Sign up to unlock yours →</Link>
+              </p>
             </div>
           </div>
         </section>

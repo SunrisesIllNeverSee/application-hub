@@ -20,17 +20,18 @@ If a target does not create a real application surface, funding workflow, or reu
 - Grants
 - Fellowships
 - Incubators
-- Venture programs with structured application intake
+- **Venture Capital (VC) firms with a structured application intake** — i.e., firms that run a formal program with a public application page, intake questions, or documented selection criteria (e.g. YC, a16z Scout, Sequoia Arc, First Round Fast Track). These are program-style applications and belong in the archive.
 - Founder programs with repeatable application questions
 - Funding opportunities with public application pages or documented selection criteria
 
 ### Exclude
 
-- Generic VC prestige tracking
-- Ecosystem personalities
-- Firms with no application surface
-- Media lists and startup gossip
+- VC firms with **no application surface** — pure relationship-driven deal flow with no intake form, no questions, and no public application process
+- Generic VC prestige lists or partner bios
+- Ecosystem personalities, media lists, startup gossip
 - Programs with no usable question, funding, or application signal
+
+**The test:** does the firm/program have questions a founder actually answers? If yes, include it. If it's just brand/prestige data with no application questions, skip it.
 
 ---
 

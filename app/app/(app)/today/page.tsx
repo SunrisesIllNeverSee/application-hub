@@ -51,7 +51,7 @@ export default async function TodayPage() {
       .from('user_program_fit')
       .select('*, programs(id, name, slug, type, deadline_at, is_rolling)')
       .eq('user_id', user.id)
-      .order('composite_score', { ascending: false })
+      .order('fit_score', { ascending: false })
       .limit(8)
       .returns<(UserProgramFit & { programs: { id: string; name: string; slug: string; type: string; deadline_at: string | null; is_rolling: boolean } | null })[]>(),
     supabase
@@ -206,7 +206,7 @@ export default async function TodayPage() {
               if (!prog) return null
               const deadline = formatDeadline(prog.deadline_at)
               const fitPct = Math.round((f.fit_score ?? 0) * 100)
-              const composite = Math.round(f.composite_score ?? 0)
+              const composite = Math.round(f.fit_score ?? 0)
               return (
                 <Link key={f.program_id} href={`/hub/${prog.slug}`}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition-colors group">
