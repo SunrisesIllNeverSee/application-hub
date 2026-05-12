@@ -65,7 +65,7 @@ export function ModeSelector({
       <div
         role="tablist"
         aria-label="Active applicant mode"
-        className="inline-flex flex-wrap items-center gap-1 rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-1"
+        className="flex w-full overflow-x-auto items-center gap-1 rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-1"
       >
         {APPLICANT_MODES.map((mode) => {
           const active = mode === activeIdentity
@@ -81,7 +81,7 @@ export function ModeSelector({
               disabled={busy}
               onClick={() => switchMode(mode)}
               className={cn(
-                'group relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors',
+                'group relative flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors',
                 active
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
                   : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100',
