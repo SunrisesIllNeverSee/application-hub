@@ -48,7 +48,7 @@ Other coordination docs should point here rather than restating these facts unle
 - `migrations/015_byok_key_storage.sql` is present and adds `key_encrypted` for BYOK key storage.
 - `migrations/026_answer_reviews.sql` is present and adds append-only persistence for agent review output plus owner-scoped RLS.
 - `migrations/027_recruiter_alerts.sql` is present and adds the `recruiter_alerts` dedup table for the weekly recruiter email agent.
-- Migrations through `032` are now the expected app chain.
+- Migrations through `033` are now the expected app chain.
 - The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
 
 ### SMTP / Email
@@ -169,7 +169,7 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | Question archive `/archive/questions` | Done — browse UI with theme/domain/sort filters |
 | Funders index `/funders` | Done — grid with type filter |
 | Funder profile `/funders/[slug]` | Done — program list, breadcrumb, website link |
-| `database.types.ts` | Done — regenerated from live schema (migrations 001–032) |
+| `database.types.ts` | Done — regenerated from live schema (migrations 001–033) |
 | CI agents-check | Done — flipped to `--strict` mode 2026-05-12 |
 | Question embeddings (768d, nomic-embed-text) | Done — all 225 questions seeded via Ollama |
 
