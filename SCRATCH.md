@@ -41,7 +41,7 @@ P3 active. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain a
 - **ADR-001 locked** — `docs/adr/ADR-001-portability.md` formal decision record, domain-agnostic infrastructure confirmed
 - **Pricing strategy implemented** — Team tier removed from PricingCards UI, Free/Pro only for launch
 - **Migration cleanup baseline** — `seed/000_baseline.sql` placeholder created, regenerate at migration 050
-- **Browser extension V1** — `browser-extension/` scaffold + `docs/BROWSER_EXTENSION.md` spec + semantic match wired (mcp-eval)
+- **Appfeeder V1** — `appfeeder/` scaffold + `docs/BROWSER_EXTENSION.md` spec + semantic match wired (mcp-eval)
 
 ### Remaining open work
 
@@ -77,7 +77,7 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Currently claimed
 
-- **mcp-eval** — Browser Extension V1 scaffold done (`browser-extension/`, `docs/BROWSER_EXTENSION.md`, semantic match wired) — releasing lane, rename directory pending
+- **mcp-eval** — Appfeeder V1 scaffold done (`appfeeder/`, `docs/BROWSER_EXTENSION.md`, semantic match wired) — lane releasing
 
 ## Recently released
 

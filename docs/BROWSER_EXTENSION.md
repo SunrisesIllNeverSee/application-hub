@@ -2,7 +2,7 @@
 
 **Status:** Scaffold complete, build pending  
 **Version:** 1.0 (MV3)  
-**Directory:** `browser-extension/`
+**Directory:** `appfeeder/`
 
 ---
 
@@ -146,7 +146,7 @@ V1 ships Suggest mode only. Auto-fill toggle is in the popup but disabled
 ## File structure
 
 ```
-browser-extension/
+appfeeder/
 ├── manifest.json
 ├── background.js
 ├── content.js
@@ -165,7 +165,7 @@ browser-extension/
 ## Loading in Chrome (dev)
 
 1. `chrome://extensions` → Enable Developer Mode
-2. Load unpacked → select `browser-extension/`
+2. Load unpacked → select `appfeeder/`
 3. Navigate to one of the V1 portals
 4. Open popup → paste JWT from mos2es.xyz/profile/settings
 
