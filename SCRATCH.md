@@ -37,13 +37,16 @@ P3 active. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain a
 - AFTER_LAUNCH.md — Architecture Decisions (ADR-001), Pricing Strategy, Migration Cleanup Plan, Data Lifecycle / Cycle Retirement
 - codex/feedback.md — structured + Claude addendum (product commentary, ICP, business model analysis)
 - codex/feedbackplan.md — full sequential build plan from feedback.md
+- codex/feedback2.md — Codex-generated summary of vision docs + ICP/strategic commentary
+- **ADR-001 locked** — `docs/adr/ADR-001-portability.md` formal decision record, domain-agnostic infrastructure confirmed
+- **Pricing strategy implemented** — Team tier removed from PricingCards UI, Free/Pro only for launch
+- **Migration cleanup baseline** — `seed/000_baseline.sql` placeholder created, regenerate at migration 050
+- **Browser extension V1** — `browser-extension/` scaffold + `docs/BROWSER_EXTENSION.md` spec + semantic match wired (mcp-eval)
 
 ### Remaining open work
 
-- **FundingCake Phase C** — promote 39 staged questions into `program_questions` (CSV ready at `seed/staging/fundingcake_questions_promote.csv`)
-- **MoatScore / FundScore** — placeholder cards on Today need real formula or removal (MULTI_CLAUDE: pick one)
+- **FundingCake Phase C** — HOLD — 39 rows staged but quality mixed (MaRS rows similarity 0.38–0.46, false positives). Manual review of `seed/staging/fundingcake_questions_promote.csv` before any Supabase write
 - **ROADMAP.md Vision Tier pruning** — move distant future items to AFTER_LAUNCH.md Future Products section
-- **FundingCake questions promotion SQL** — 39 rows staged but quality is mixed (MaRS rows have low similarity 0.38–0.46, some false positives). HOLD — manual review of CSV before any Supabase write. See `seed/staging/fundingcake_questions_promote.csv`.
 
 ### Deric to drive
 
