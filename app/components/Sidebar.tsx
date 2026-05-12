@@ -25,71 +25,41 @@ interface SidebarProps {
 
 const NAV = [
   {
-    href: '/today',
-    label: 'Today',
+    href: '/dash',
+    label: 'Dash',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4z"
           stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
   {
-    href: '/hub',
-    label: 'Hub',
+    href: '/applications',
+    label: 'Applications',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
   {
-    href: '/bank',
-    label: 'Question Bank',
+    href: '/questions',
+    label: 'Questions',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
   {
     href: '/answers',
-    label: 'Answer Bank',
+    label: 'Answers',
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    href: '/funders',
-    label: 'Funders',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    href: '/archive/questions',
-    label: 'Archive',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    href: '/profile',
-    label: 'Profile',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        <path d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M4 7l8-4 8 4M4 7l8 4 8-4m-8 4v10"
           stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
@@ -130,15 +100,19 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
   })
 
   function isNavActive(href: string) {
-    if (href === '/today') {
-      return pathname === '/today'
+    if (href === '/dash') {
+      return pathname === '/dash'
     }
-    if (href === '/hub') {
-      return pathname === '/hub' || (pathname.startsWith('/hub') && !pathname.startsWith('/hub/timeline'))
+    if (href === '/applications') {
+      return pathname === '/applications' ||
+             pathname.startsWith('/applications/') ||
+             pathname.startsWith('/workspace')
     }
-    if (href === '/profile') {
-      return pathname === '/profile' || pathname === '/profile/about' ||
-             pathname === '/profile/settings' || pathname === '/profile/integrations'
+    if (href === '/questions') {
+      return pathname === '/questions' || pathname.startsWith('/questions/')
+    }
+    if (href === '/answers') {
+      return pathname === '/answers' || pathname.startsWith('/answers/')
     }
     return pathname === href || pathname.startsWith(href + '/')
   }
@@ -147,14 +121,14 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-4 py-4 border-b border-neutral-800 flex-shrink-0">
-        <Link href="/today" className="flex items-center gap-2.5">
+        <Link href="/dash" className="flex items-center gap-2.5">
           <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center flex-shrink-0">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="text-[10px] font-bold text-white tracking-tighter">AQ</span>
           </div>
-          <span className="text-sm font-semibold text-white tracking-tight">Application Hub</span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-semibold text-white tracking-tight">AQUA</span>
+            <span className="text-[10px] text-neutral-500 tracking-tight">Applications · Questions · Answers</span>
+          </div>
         </Link>
       </div>
 
@@ -193,8 +167,8 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
           <div className="px-3 py-2">
             <p className="text-xs text-neutral-600 dark:text-neutral-600">
               No applications yet.{' '}
-              <Link href="/hub" className="text-brand-500 hover:text-brand-400">
-                Browse Hub &rarr;
+              <Link href="/applications" className="text-brand-500 hover:text-brand-400">
+                Browse Applications &rarr;
               </Link>
             </p>
           </div>
@@ -288,14 +262,11 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
 
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-14 bg-neutral-900 border-b border-neutral-800">
-        <Link href="/today" className="flex items-center gap-2">
+        <Link href="/dash" className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="text-[10px] font-bold text-white tracking-tighter">AQ</span>
           </div>
-          <span className="text-sm font-semibold text-white">Application Hub</span>
+          <span className="text-sm font-semibold text-white">AQUA</span>
         </Link>
         <button onClick={() => setMobileOpen(true)}
           className="text-neutral-400 hover:text-white p-1" aria-label="Open menu">

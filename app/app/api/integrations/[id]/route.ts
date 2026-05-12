@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 // DELETE /api/integrations/[id] — remove a provider key
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -13,7 +13,7 @@ export async function DELETE(
   const { error } = await supabase
     .from('user_integrations')
     .delete()
-    .eq('id', params.id)
+    .eq('id', (await params).id)
     .eq('user_id', user.id) // RLS belt-and-suspenders
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

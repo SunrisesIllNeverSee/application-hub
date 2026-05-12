@@ -101,7 +101,7 @@ export default async function ArchiveQuestionsPage({
           {' '}·{' '}
           <span className="font-medium text-brand-600 dark:text-brand-400">{unlockedTotal} unlocked</span>
           {' '}·{' '}
-          <Link href="/bank" className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
+          <Link href="/questions" className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
             Answer bank →
           </Link>
         </p>
@@ -149,7 +149,7 @@ export default async function ArchiveQuestionsPage({
             Significance
           </Link>
           <Link
-            href={`/archive/questions?${theme ? `theme=${theme}&` : ''}sort=popular`}
+            href={`/questions?view=archive?${theme ? `theme=${theme}&` : ''}sort=popular`}
             className={cn(
               'px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
               sort === 'popular'
@@ -239,7 +239,7 @@ export default async function ArchiveQuestionsPage({
                   </div>
                   {unlocked ? (
                     <Link
-                      href="/bank"
+                      href="/questions"
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium transition-colors"
                     >
                       Answer

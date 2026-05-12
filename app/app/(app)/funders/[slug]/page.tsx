@@ -50,7 +50,7 @@ export default async function FunderProfilePage({ params }: PageProps) {
     <div>
       {/* Breadcrumb */}
       <div className="mb-4">
-        <Link href="/funders" className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300">
+        <Link href="/applications?view=funders" className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300">
           ← Funders
         </Link>
       </div>
@@ -101,7 +101,7 @@ export default async function FunderProfilePage({ params }: PageProps) {
         ) : (
           <div className="space-y-3">
             {programs.map(p => (
-              <Link key={p.id} href={`/hub/${p.slug}`} className="card px-5 py-4 flex items-center gap-4 hover:shadow-md transition-shadow group">
+              <Link key={p.id} href={`/applications/${p.slug}`} className="card px-5 py-4 flex items-center gap-4 hover:shadow-md transition-shadow group">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-neutral-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                     {p.name}
@@ -134,7 +134,7 @@ export default async function FunderProfilePage({ params }: PageProps) {
 
         <div className="mt-6">
           <Link
-            href={`/hub?funder=${funder.slug}`}
+            href={`/applications?funder=${funder.slug}`}
             className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
           >
             Browse all {funder.name} programs in the Hub →

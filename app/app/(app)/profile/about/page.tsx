@@ -48,7 +48,7 @@ export default async function ProfileAboutPage() {
           )}
         </div>
         <Link
-          href="/hub/submit"
+          href="/applications/submit"
           className="flex-shrink-0 text-xs font-medium text-brand-600 dark:text-brand-400 hover:underline whitespace-nowrap"
         >
           Submit a program →

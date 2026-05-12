@@ -5,7 +5,7 @@ import { ThemeTag } from '@/components/ThemeTag'
 import { AnswerEditor } from '@/components/AnswerEditor'
 import Link from 'next/link'
 
-export const metadata = { title: 'Answer Bank' }
+export const metadata = { title: 'Answers' }
 
 const THEME_ORDER: QuestionTheme[] = [
   'problem', 'solution', 'market', 'traction', 'team',
@@ -44,13 +44,13 @@ export default async function AnswerBankPage() {
     <div>
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Answer Bank</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Answers</h1>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             Your reusable answers. Write once, apply everywhere.
           </p>
         </div>
         <Link
-          href="/bank"
+          href="/questions"
           className="flex-shrink-0 text-sm text-brand-600 dark:text-brand-400 hover:underline"
         >
           Question Bank →
@@ -78,7 +78,7 @@ export default async function AnswerBankPage() {
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
             Start answering questions in your{' '}
-            <Link href="/bank" className="text-brand-600 dark:text-brand-400 hover:underline">
+            <Link href="/questions" className="text-brand-600 dark:text-brand-400 hover:underline">
               Question Bank
             </Link>
             {' '}and they&apos;ll appear here for reuse across every application.

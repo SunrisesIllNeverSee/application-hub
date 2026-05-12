@@ -55,7 +55,7 @@ export function ProgramCard({ program, rank }: ProgramCardProps) {
 
   return (
     <Link
-      href={`/hub/${program.slug}`}
+      href={`/applications/${program.slug}`}
       className="card p-4 sm:p-5 flex items-center gap-3 sm:gap-4 hover:shadow-card-hover transition-all duration-150 block group"
     >
       {/* Rank */}

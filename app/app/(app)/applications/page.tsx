@@ -21,7 +21,7 @@ import {
 import { HubFilters } from './HubFilters'
 
 export const metadata = {
-  title: 'Program Hub',
+  title: 'Applications',
 }
 
 export default async function HubPage({
@@ -159,7 +159,7 @@ export default async function HubPage({
       </div>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Hub</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Applications</h1>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             {sorted.length > 0
               ? `${sorted.length} ${modeContextLabel(activeIdentity).toLowerCase()} ranked by fit and opportunity value`
@@ -176,13 +176,13 @@ export default async function HubPage({
 
         {/* View tabs */}
         <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 flex-shrink-0">
-          <a href="/hub"
+          <a href="/applications"
             className={view === 'cards'
               ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
               : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
             Programs
           </a>
-          <a href="/hub?view=timeline"
+          <a href="/applications?view=timeline"
             className={view === 'timeline'
               ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
               : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
@@ -217,7 +217,7 @@ export default async function HubPage({
 
 function EmptyState({ activeIdentity }: { activeIdentity: ApplicantMode }) {
   const sparse = !isModeDeeplyCurated(activeIdentity)
-  const submitHref = `/hub/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`
+  const submitHref = `/applications/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`
   const contextLabel = modeContextLabel(activeIdentity).toLowerCase()
   const identityLabel = modeLabel(activeIdentity).toLowerCase()
 
@@ -253,7 +253,7 @@ function EmptyState({ activeIdentity }: { activeIdentity: ApplicantMode }) {
             Submit a {contextLabel.replace(/s$/, '')} program
           </Link>
           <Link
-            href="/hub?type="
+            href="/applications?type="
             className="px-4 py-2 rounded-md text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
             View all programs
@@ -363,7 +363,7 @@ function TimelineRow({ program, days }: { program: ProgramWithFit; days: number 
     : 'bg-brand-500'
 
   return (
-    <Link href={`/hub/${program.slug}`} className="card p-4 block hover:shadow-card-hover transition-shadow group">
+    <Link href={`/applications/${program.slug}`} className="card p-4 block hover:shadow-card-hover transition-shadow group">
       <div className="flex items-center justify-between gap-4 mb-2">
         <span className="text-sm font-medium text-neutral-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors truncate">
           {program.name}

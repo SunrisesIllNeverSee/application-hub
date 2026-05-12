@@ -12,17 +12,19 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://mos2es.xyz'),
   title: {
-    default: 'Application Hub',
-    template: '%s — Application Hub',
+    default: 'AQUA',
+    template: '%s — AQUA',
   },
   description:
-    'One answer bank for every application you write. Built deep on tech startup applications first; jobs, schools, and grants run on the same engine. Switch modes to apply to anything.',
+    'Applications. Questions. Answers. A structured intelligence system for reusable applications. Fill once, improve continuously, apply everywhere.',
   keywords: [
+    'applications',
+    'questions',
+    'answers',
     'accelerator',
     'grants',
     'fellowship',
     'startup',
-    'applications',
     'YC',
     'Techstars',
     'job applications',
@@ -37,10 +39,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: 'https://mos2es.xyz',
-    siteName: 'Application Hub',
-    title: 'Application Hub — Apply to startups, jobs, schools, and grants, smarter',
+    siteName: 'AQUA',
+    title: 'AQUA — Applications. Questions. Answers.',
     description:
-      'One answer bank for every application you write. Built deep on tech startup applications first; jobs, schools, and grants run on the same engine. Switch modes to apply to anything.',
+      'Applications. Questions. Answers. A structured intelligence system for reusable applications. Fill once, improve continuously, apply everywhere.',
   },
 }
 

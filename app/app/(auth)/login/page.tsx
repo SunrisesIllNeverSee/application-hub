@@ -32,7 +32,7 @@ export default function LoginPage() {
     if (error) {
       setError(error.message)
     } else {
-      router.push('/today')
+      router.push('/dash')
       router.refresh()
     }
   }

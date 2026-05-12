@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
               lineHeight: 1,
             }}
           >
-            MO§ES™
+            AQUA
           </div>
           <div
             style={{
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
               letterSpacing: '-0.5px',
             }}
           >
-            Application Hub
+            Applications · Questions · Answers
           </div>
         </div>
 
@@ -87,10 +87,10 @@ export async function GET(req: NextRequest) {
                   maxWidth: '900px',
                 }}
               >
-                The question archive for every application you&apos;ll ever write.
+                A structured intelligence system for reusable applications.
               </div>
               <div style={{ fontSize: '24px', color: '#666', fontWeight: '400' }}>
-                Answer once. Apply everywhere.
+                Fill once. Improve continuously. Apply everywhere.
               </div>
             </>
           )}

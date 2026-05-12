@@ -87,7 +87,7 @@ export default async function TimelinePage() {
             Track open windows, closing deadlines, and rolling programs
           </p>
         </div>
-        <Link href="/hub" className="btn-secondary text-sm">
+        <Link href="/applications" className="btn-secondary text-sm">
           ← Directory view
         </Link>
       </div>
@@ -180,7 +180,7 @@ function TimelineRow({
 
   return (
     <Link
-      href={`/hub/${program.slug}`}
+      href={`/applications/${program.slug}`}
       className={cn(
         'card px-5 py-4 flex items-center gap-4 hover:shadow-card-hover transition-shadow',
         dimmed && 'opacity-60'

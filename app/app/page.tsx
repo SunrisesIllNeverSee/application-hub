@@ -10,7 +10,7 @@ export default async function RootPage() {
   } = await supabase.auth.getUser()
 
   if (user) {
-    redirect('/hub')
+    redirect('/applications')
   }
 
   // Fetch top questions for the live archive preview
@@ -43,7 +43,7 @@ export default async function RootPage() {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            <span className="text-sm font-semibold tracking-tight">Application Hub</span>
+            <span className="text-sm font-semibold tracking-tight">AQUA</span>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6 text-sm">
             <a href="#archive" className="text-neutral-400 hover:text-neutral-100 transition-colors hidden sm:inline">Archive</a>
@@ -94,7 +94,7 @@ export default async function RootPage() {
               ) : (
                 <Link
                   key={mode}
-                  href={`/hub/submit?kind=${defaultSubmitKindForMode(mode)}`}
+                  href={`/applications/submit?kind=${defaultSubmitKindForMode(mode)}`}
                   title={modeCommunityDescription(mode)}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-medium hover:border-amber-700 hover:text-amber-300 transition-colors"
                 >
@@ -108,7 +108,7 @@ export default async function RootPage() {
             Built deep on tech startup applications first. Same archive/answer-bank engine across all modes — jobs, schools, and grants ship next.
           </p>
           <p className="mt-6 max-w-2xl mx-auto text-base sm:text-lg text-neutral-300 leading-relaxed">
-            <span className="text-neutral-100">Every applicant faces the same problem</span>: 10 applications, the same 10 essays. Application Hub archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
+            <span className="text-neutral-100">Every applicant faces the same problem</span>: 10 applications, the same 10 essays. AQUA archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/login" className="btn-primary px-5 py-2.5 text-sm">
@@ -203,7 +203,7 @@ export default async function RootPage() {
               </p>
             </div>
             <div className="rounded-2xl border border-brand-600/30 bg-gradient-to-br from-brand-950/40 to-neutral-900/40 p-6">
-              <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Application Hub</p>
+              <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">AQUA</p>
               <p className="text-lg text-neutral-100 leading-relaxed">
                 One answer bank. One canonical answer per universal question. Pre-filled across every program you apply to.
               </p>
@@ -312,7 +312,7 @@ export default async function RootPage() {
               <thead>
                 <tr className="bg-neutral-900/60 border-b border-neutral-800">
                   <th className="text-left p-4 font-medium text-neutral-300">Feature</th>
-                  <th className="p-4 font-medium text-brand-300">Application Hub</th>
+                  <th className="p-4 font-medium text-brand-300">AQUA</th>
                   <th className="p-4 font-medium text-neutral-400">Notion templates</th>
                   <th className="p-4 font-medium text-neutral-400">ChatGPT alone</th>
                   <th className="p-4 font-medium text-neutral-400">App consultant</th>
@@ -355,7 +355,7 @@ export default async function RootPage() {
                 </p>
               </div>
               <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5 font-mono text-sm">
-                <p className="text-neutral-400"># Connect to Application Hub</p>
+                <p className="text-neutral-400"># Connect to AQUA</p>
                 <p className="mt-2 text-neutral-300">
                   <span className="text-brand-300">npx</span> @modelcontextprotocol/inspector \
                 </p>
@@ -479,7 +479,7 @@ export default async function RootPage() {
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              <span className="text-neutral-100 font-semibold">Application Hub</span>
+              <span className="text-neutral-100 font-semibold">AQUA</span>
             </Link>
             <p className="text-xs text-neutral-400 leading-relaxed">AI-native infrastructure for accelerator and grant applications.</p>
           </div>

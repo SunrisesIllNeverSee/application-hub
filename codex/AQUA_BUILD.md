@@ -228,3 +228,122 @@ Pure structure. Routing, nav, tab merges, redirects. No new intelligence. Ships 
 Features 1, 2, 3, 7, 8 in phase order.
 These must be held by one brain — the split-screen establishes the pattern the answer bank follows, the onboarding feeds the persona, the persona feeds the Dash. Coherence across all five is non-negotiable.
 
+
+---
+
+## Scoring System — FMS / FundScore / AQUAscore / MoatScore
+
+Three measurement layers feed one public credential.
+
+### The three layers
+
+| Layer | Measures | Source | Type |
+|---|---|---|---|
+| **FMS** | Strategic defensibility (Tier 1-5) | Project + manual/AI-assisted review | Human-readable tier |
+| **FundScore** | Investor artifact readiness (0-10) | Deterministic GitHub repo scan | Auditable score |
+| **AQUAscore** | Applicant craft inside the system | answers count, themes, stress tests, version depth, hash integrity | Internal activity score |
+
+### The composite
+
+```
+MoatScore = f(FMS, FundScore, AQUAscore)
+```
+
+MoatScore is the **public-facing credential**. Programs, recruiters, admissions committees see it. It's portable across job, school, accelerator, grant applications.
+
+### Graceful degradation modes
+
+| User type | Composition |
+|---|---|
+| GitHub + project + AQUA usage | FMS + FundScore + AQUAscore = full MoatScore |
+| Project but no GitHub | FMS + AQUAscore = partial, "connect GitHub" prompt |
+| Pure applicant (jobs/school) | AQUAscore + Portfolio Readiness surrogate (LinkedIn, references, work samples) + optional FMS |
+
+Score isn't gated — depth is. Natural Pro progression: connect more sources, complete the score.
+
+### Where it lives in AQUA
+
+- **Dash**: MoatScore prominently, "67 — top 15% of founders." Click for breakdown.
+- **Profile → Persona**: Full three-layer view. FMS tier with reasoning, FundScore checks passing/failing, AQUAscore components. "Delta to next tier" mechanic anchors here.
+- **Program view** (future B2B): Programs see MoatScore + composition as audit trail.
+
+### Why this works across categories
+
+FMS works for any project — researchers have research, founders have startups, job seekers have side work. The tier system is legible to anyone ("Tier 4 moat project" beats "score 73"). FundScore is deterministic and auditable — trust layer. AQUAscore rewards rigor inside the system, which is exactly what programs are trying to detect.
+
+### Tier mobility
+
+FMS moats move up and down over time. AQUAscore grows with usage. FundScore tracks repo state. MoatScore is alive, not static. Retention loop is built into the metric.
+
+### Wiring decision (locked)
+
+- Feature 3 (Dash) shows MoatScore as **real composite** of available signals, not a placeholder
+- Feature 8 (Persona Profile) implements the three-layer model
+- Missing signals show CTAs to connect/complete, not fake numbers
+- FundScore CLI from signal-ecosystem/FMS-2.0-Package/fundscore can be vendored or imported
+
+
+---
+
+## Scoring philosophy refinement (locked)
+
+### Additive, not subtractive
+
+Every signal a user connects **adds** to MoatScore. Nothing reduces it for what's missing. A non-technical job applicant with maxed AQUAscore and strong portfolio shouldn't score lower than a founder with GitHub but mediocre answers.
+
+```
+MoatScore = AQUAscore (always) 
+          + FMS_boost (if project assessed)
+          + FundScore_boost (if GitHub connected)
+          + PortfolioReadiness_boost (if non-tech path filled out)
+          × category_weighting (founder / student / job_seeker / researcher / grant)
+```
+
+The score is a sum of what you bring, weighted by category relevance — never a deduction for what you don't bring.
+
+### Category-aware weighting
+
+A PhD applicant doesn't need FundScore. A founder pitching VCs does. Weights flex based on the user's `active_identity`:
+
+- **Founder**: FundScore + FMS heavily weighted, AQUAscore as craft signal
+- **Job seeker**: AQUAscore + PortfolioReadiness primary, FMS optional (side projects)
+- **Student**: AQUAscore primary, FMS for research, FundScore irrelevant
+- **Researcher**: AQUAscore + FMS for research projects, FundScore irrelevant
+- **Grant applicant**: AQUAscore + FMS for the funded work, FundScore optional
+
+### V1 scope (don't get lost in the sauce)
+
+- **AQUAscore is the core**. Required. Works for any user, any category.
+- **FMS and FundScore are opt-in boost layers** for users with projects/repos
+- **Portfolio Readiness is the future surrogate** for non-tech paths (LinkedIn, references, work samples) — V2
+- Persona profile shows components as "what you have" — not "what you're missing"
+- Programs see composition. The headline MoatScore is just a number. The breakdown is for the user to optimize, not for the system to gatekeep.
+
+### What V1 ships
+
+Feature 8 (Persona Profile) wires:
+- AQUAscore (always computed)
+- FMS tier (if a project URL is connected — manual or AI-assisted classification)
+- FundScore (if a GitHub URL is connected — vendor the existing CLI)
+- MoatScore as additive composite, weighted by active_identity
+
+Everything else (Portfolio Readiness surrogate, B2B program view of the breakdown, sophisticated tier mobility) is V2.
+
+
+---
+
+## AQUAscore composition (the brand IS the scoring system)
+
+The acronym maps to the scoring components directly. Each pillar contributes its own sub-score; the composite is AQUAscore.
+
+| Pillar | Measures | Signals |
+|---|---|---|
+| **A**pplications | Your activity on programs | Started count, completed count, fit quality, diversity across themes/types, submission count |
+| **Q**uestions | Your engagement with the archive | Themes covered, drip progression, lineage submissions, archive depth (universal vs. niche), questions answered vs. unlocked |
+| **A**nswers | Your craft on answers | Count, version depth, stress-test rigor, hash integrity, confidence progression (draft → solid → locked), theme distribution |
+| **AQUA**score | Composite | Weighted sum across all three, weighted by `active_identity` |
+
+The user looks at the breakdown and immediately understands it because they've been navigating in those three buckets all along. The sidebar, the schema, the scoring — same three pillars at every layer of zoom.
+
+This is what makes AQUAscore explainable in a single sentence: **"Your AQUAscore is how active and skilled you are across Applications, Questions, and Answers."**
+

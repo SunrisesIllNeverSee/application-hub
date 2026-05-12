@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Scoring & Intelligence',
   description:
-    'How Application Hub computes significance scores, fit scores, and program value signals.',
+    'How AQUA computes significance scores, fit scores, and program value signals.',
 }
 
 interface ScoreCard {
@@ -151,7 +151,7 @@ export default function ScoringPage() {
                 strokeLinejoin="round"
               />
             </svg>
-            Application Hub
+            AQUA
           </Link>
           <span className="text-neutral-300 dark:text-neutral-600 text-sm">/</span>
           <span className="text-sm text-neutral-500 dark:text-neutral-400">Scoring</span>
@@ -225,7 +225,7 @@ export default function ScoringPage() {
             {[
               {
                 title: 'We do not decide who gets in',
-                body: "Application Hub has no relationship with any program's admissions process. No score we surface influences any decision made by YC, Techstars, NSF, or any other program.",
+                body: "AQUA has no relationship with any program's admissions process. No score we surface influences any decision made by YC, Techstars, NSF, or any other program.",
               },
               {
                 title: 'We do not rank founders against each other',
@@ -292,7 +292,7 @@ export default function ScoringPage() {
 
         {/* CTA strip */}
         <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-neutral-100 dark:border-neutral-800">
-          <Link href="/hub" className="btn-primary text-sm">
+          <Link href="/applications" className="btn-primary text-sm">
             Go to Hub
           </Link>
           <Link href="/login" className="btn-secondary text-sm">
@@ -311,7 +311,7 @@ export default function ScoringPage() {
               href="/"
               className="hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
             >
-              Application Hub
+              AQUA
             </Link>
             {' '}&middot; Ello Cello LLC
           </p>

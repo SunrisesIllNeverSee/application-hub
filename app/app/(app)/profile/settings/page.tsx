@@ -19,8 +19,9 @@ type SearchParams = {
 export default async function ProfileSettingsPage({
   searchParams,
 }: {
-  searchParams?: SearchParams
+  searchParams?: Promise<SearchParams>
 }) {
+  const sp = (await searchParams) ?? undefined
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -77,8 +78,8 @@ export default async function ProfileSettingsPage({
     }
   }
 
-  const showUpgradeSuccess = searchParams?.upgraded === 'true'
-  const showUpgradeCancelled = searchParams?.upgrade_cancelled === 'true'
+  const showUpgradeSuccess = sp?.upgraded === 'true'
+  const showUpgradeCancelled = sp?.upgrade_cancelled === 'true'
 
   return (
     <div className="space-y-10">

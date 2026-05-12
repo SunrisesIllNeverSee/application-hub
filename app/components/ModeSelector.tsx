@@ -52,7 +52,7 @@ export function ModeSelector({
         throw new Error(body?.error ?? `Switch failed (${res.status})`)
       }
       // Clear type filter params on mode switch so the new mode's filter applies cleanly
-    startTransition(() => router.push('/hub'))
+    startTransition(() => router.push('/applications'))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Switch failed')
     } finally {
@@ -118,7 +118,7 @@ export function ModeSelector({
           · {modeContextLabel(activeIdentity)} programs
           {!isModeDeeplyCurated(activeIdentity) && (
             <> · <a
-              href={`/hub/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`}
+              href={`/applications/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`}
               className="text-amber-600 dark:text-amber-400 hover:underline font-medium"
             >
               Submit a program, earn days

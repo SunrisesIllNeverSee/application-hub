@@ -5,7 +5,7 @@ import type { ProfileAnswer } from '@/lib/database.types'
 import { SignificanceStars } from '@/components/SignificanceStars'
 import { cn } from '@/lib/utils'
 
-export const metadata = { title: 'Question Bank' }
+export const metadata = { title: 'Questions' }
 
 // Theme display order — high signal first
 const THEME_ORDER = [
@@ -113,7 +113,7 @@ export default async function BankPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">
-              Question Bank
+              Questions
             </h1>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
               Your ammunition. Answer once, apply everywhere.

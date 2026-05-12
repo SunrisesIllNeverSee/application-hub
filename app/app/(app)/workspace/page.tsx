@@ -104,7 +104,7 @@ export default async function WorkspacePage() {
             Ranked by opportunity value · fit × program value
           </p>
         </div>
-        <Link href="/hub" className="btn-secondary text-sm">Browse programs</Link>
+        <Link href="/applications" className="btn-secondary text-sm">Browse programs</Link>
       </div>
 
       {programsWithFit.length === 0 ? (
@@ -235,7 +235,7 @@ export default async function WorkspacePage() {
                   <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">Your best unopened opportunities</h2>
                   <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">High-fit programs you haven&apos;t started yet</p>
                 </div>
-                <Link href="/hub" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 transition-colors">
+                <Link href="/applications" className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 transition-colors">
                   See all →
                 </Link>
               </div>
@@ -248,7 +248,7 @@ export default async function WorkspacePage() {
                   const composite = Math.round(f.fit_score ?? 0)
                   const checkSize = formatCheckSize(prog.check_size_max ?? null)
                   return (
-                    <Link key={f.program_id} href={`/hub/${prog.slug}`}
+                    <Link key={f.program_id} href={`/applications/${prog.slug}`}
                       className="card p-4 flex items-center gap-3 hover:shadow-card-hover transition-shadow border-dashed">
                       <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">
                         {i + 1}
@@ -311,7 +311,7 @@ function EmptyState() {
       <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto mb-6">
         Browse the Hub to find programs that fit your startup, then start an application to see your opportunity rankings here.
       </p>
-      <Link href="/hub" className="btn-primary">Browse programs</Link>
+      <Link href="/applications" className="btn-primary">Browse programs</Link>
     </div>
   )
 }

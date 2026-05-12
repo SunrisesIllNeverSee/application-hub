@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formatDeadline, cn } from '@/lib/utils'
 import type { UserProgramFit } from '@/lib/database.types'
 
-export const metadata = { title: 'Today' }
+export const metadata = { title: 'Dash' }
 
 function greeting() {
   const h = new Date().getHours()
@@ -108,10 +108,10 @@ export default async function TodayPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard href="/bank" label="New today" value={todayCount}
+        <StatCard href="/questions" label="New today" value={todayCount}
           sub={`${totalUnlocked} total unlocked`} accent={todayCount > 0}
           icon={<QuestionIcon />} />
-        <StatCard href="/bank" label="Unanswered" value={unanswered}
+        <StatCard href="/questions" label="Unanswered" value={unanswered}
           sub={`${answered} answered`} accent={unanswered > 0}
           icon={<PencilIcon />} />
         <StatCard href="/workspace" label="Active apps" value={activeApps.length}
@@ -175,7 +175,7 @@ export default async function TodayPage() {
 
       {/* Question bank nudge */}
       {unanswered > 0 && (
-        <Section title="Answer bank" href="/bank" hrefLabel="Open bank">
+        <Section title="Answer bank" href="/questions" hrefLabel="Open bank">
           <div className="flex items-center gap-4 p-4 rounded-xl bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-900/50">
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-100 dark:bg-brand-900/50 flex items-center justify-center">
               <PencilIcon className="text-brand-600 dark:text-brand-400" />
@@ -190,14 +190,14 @@ export default async function TodayPage() {
                   : 'Each answer pre-fills future applications automatically.'}
               </p>
             </div>
-            <Link href="/bank" className="btn-primary text-xs flex-shrink-0">Answer now</Link>
+            <Link href="/questions" className="btn-primary text-xs flex-shrink-0">Answer now</Link>
           </div>
         </Section>
       )}
 
       {/* Top matches */}
       {topMatches.length > 0 && (
-        <Section title="Top matches for you" href="/hub" hrefLabel="Browse all">
+        <Section title="Top matches for you" href="/applications" hrefLabel="Browse all">
           <div className="space-y-1">
             {topMatches.map(f => {
               const prog = (Array.isArray(f.programs) ? f.programs[0] : f.programs) as {
@@ -208,7 +208,7 @@ export default async function TodayPage() {
               const fitPct = Math.round((f.fit_score ?? 0) * 100)
               const composite = Math.round(f.fit_score ?? 0)
               return (
-                <Link key={f.program_id} href={`/hub/${prog.slug}`}
+                <Link key={f.program_id} href={`/applications/${prog.slug}`}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition-colors group">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-neutral-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
@@ -243,8 +243,8 @@ export default async function TodayPage() {
             Answer questions once, apply everywhere. Browse the Hub to find programs — your fit scores and recommendations will appear here.
           </p>
           <div className="flex items-center justify-center gap-3">
-            <Link href="/hub" className="btn-primary">Browse programs</Link>
-            <Link href="/bank" className="btn-secondary">Open question bank</Link>
+            <Link href="/applications" className="btn-primary">Browse programs</Link>
+            <Link href="/questions" className="btn-secondary">Open question bank</Link>
           </div>
         </div>
       )}

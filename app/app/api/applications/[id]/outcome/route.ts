@@ -11,7 +11,7 @@ interface OutcomeBody {
 // PATCH /api/applications/[id]/outcome — log an outcome for a user application
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient()
   const {
@@ -48,7 +48,7 @@ export async function PATCH(
   const { data: existing, error: lookupError } = await supabase
     .from('user_applications')
     .select('id, user_id')
-    .eq('id', params.id)
+    .eq('id', (await params).id)
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -76,7 +76,7 @@ export async function PATCH(
   const { data: updated, error: updateError } = await supabase
     .from('user_applications')
     .update(updatePayload)
-    .eq('id', params.id)
+    .eq('id', (await params).id)
     .eq('user_id', user.id)
     .select('*')
     .single()

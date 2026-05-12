@@ -12,7 +12,7 @@ interface InviteBody {
 // POST /api/teams/[id]/invite — invite a member by email
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -21,7 +21,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const teamId = params.id
+    const teamId = (await params).id
 
     // Verify caller is an owner or admin of this team
     const { data: membership } = await supabase

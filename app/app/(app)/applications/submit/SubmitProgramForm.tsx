@@ -118,7 +118,7 @@ export function SubmitProgramForm({ defaultKind }: SubmitProgramFormProps = {}) 
         setNotice({
           tone: 'info',
           message: 'Good news — this program is already in the archive.',
-          href: slug ? `/hub/${slug}` : undefined,
+          href: slug ? `/applications/${slug}` : undefined,
           hrefLabel: 'View program',
         })
         return
@@ -142,7 +142,7 @@ export function SubmitProgramForm({ defaultKind }: SubmitProgramFormProps = {}) 
       setNotes('')
       setKind(initialKind)
       startTransition(() => {
-        router.push(`/hub/submit?queued=${encodeURIComponent(queueId)}`)
+        router.push(`/applications/submit?queued=${encodeURIComponent(queueId)}`)
         router.refresh()
       })
     } catch (err) {

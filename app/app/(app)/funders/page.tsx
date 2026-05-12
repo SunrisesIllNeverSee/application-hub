@@ -71,9 +71,9 @@ export default async function FundersPage({ searchParams }: PageProps) {
 
       {/* Type filter */}
       <div className="flex flex-wrap gap-1.5 mb-6">
-        <FilterChip href="/funders" active={!filterType} label="All" />
+        <FilterChip href="/applications?view=funders" active={!filterType} label="All" />
         {TYPES.map(t => (
-          <FilterChip key={t} href={`/funders?type=${t}`} active={filterType === t} label={TYPE_LABELS[t]} />
+          <FilterChip key={t} href={`/applications?view=funders?type=${t}`} active={filterType === t} label={TYPE_LABELS[t]} />
         ))}
       </div>
 

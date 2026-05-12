@@ -76,7 +76,7 @@ async function importPasteAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/profile/answers')
-  revalidatePath('/bank')
+  revalidatePath('/questions')
   revalidatePath('/profile/import')
 
   const sessionId =
