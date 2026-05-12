@@ -18,16 +18,28 @@ import {
   modeLabel,
   modeToLegacyTypes,
 } from '@/lib/applicantMode'
+import { formatDeadline, programTypeLabel, cn } from '@/lib/utils'
 import { HubFilters } from './HubFilters'
 
 export const metadata = {
   title: 'Applications',
 }
 
+type TabKey = 'discover' | 'mine'
+
+const APP_STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
+  saved: { label: 'Saved', dot: 'bg-neutral-400 dark:bg-neutral-500' },
+  drafting: { label: 'In progress', dot: 'bg-brand-500' },
+  submitted: { label: 'Submitted', dot: 'bg-success-500' },
+  accepted: { label: 'Accepted', dot: 'bg-success-600' },
+  rejected: { label: 'Rejected', dot: 'bg-neutral-400 dark:bg-neutral-500' },
+  waitlisted: { label: 'Waitlisted', dot: 'bg-warning-500' },
+}
+
 export default async function HubPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; type?: string; rolling?: string; view?: string; domain?: string }>
+  searchParams: Promise<{ sort?: string; type?: string; rolling?: string; view?: string; domain?: string; tab?: string }>
 }) {
   const resolvedParams = await searchParams
   const supabase = await createClient()
@@ -35,6 +47,8 @@ export default async function HubPage({
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  const tab: TabKey = resolvedParams.tab === 'mine' ? 'mine' : 'discover'
 
   // Fetch the user's active applicant mode + claimed identities. Falls back
   // to founder for users on profiles created before migration 027.
@@ -117,6 +131,43 @@ export default async function HubPage({
     }
   }
 
+  // For the "Mine" tab — the discover query may have filtered out programs
+  // the user already applied to (different type/domain than active identity).
+  // Fetch any missing program rows so My Applications always lists everything.
+  const programMap: Record<string, Program> = Object.fromEntries(
+    (programs ?? []).map((p) => [p.id, p])
+  )
+  if (user && tab === 'mine') {
+    const missingIds = Object.keys(applicationMap).filter((id) => !programMap[id])
+    if (missingIds.length > 0) {
+      const { data: extraPrograms } = await supabase
+        .from('programs')
+        .select('*')
+        .in('id', missingIds)
+        .returns<Program[]>()
+      for (const p of extraPrograms ?? []) programMap[p.id] = p
+
+      // Also pull cycles + fit for these
+      const { data: extraCycles } = await supabase
+        .from('program_next_cycle')
+        .select('*')
+        .in('program_id', missingIds)
+        .returns<ProgramNextCycle[]>()
+      for (const c of extraCycles ?? []) cycleMap[c.program_id] = c
+
+      const missingFromFit = missingIds.filter((id) => !fitMap[id])
+      if (missingFromFit.length > 0) {
+        const { data: extraFit } = await supabase
+          .from('user_program_fit')
+          .select('*')
+          .eq('user_id', user.id)
+          .in('program_id', missingFromFit)
+          .returns<UserProgramFit[]>()
+        for (const f of extraFit ?? []) fitMap[f.program_id] = f
+      }
+    }
+  }
+
   const programsWithFit: ProgramWithFit[] = (programs ?? []).map((p) => ({
     ...p,
     fit: fitMap[p.id],
@@ -152,6 +203,26 @@ export default async function HubPage({
 
   const view = resolvedParams.view === 'timeline' ? 'timeline' : 'cards'
 
+  // For the "Mine" tab: hydrate the user's applications with program + fit data.
+  const mineRows: MineRow[] = []
+  if (user) {
+    for (const app of Object.values(applicationMap)) {
+      const program = programMap[app.program_id]
+      if (!program) continue
+      mineRows.push({
+        application: app,
+        program,
+        fit: fitMap[app.program_id],
+        cycle: cycleMap[app.program_id] ?? null,
+      })
+    }
+    mineRows.sort((a, b) => {
+      const ua = a.application.updated_at ?? a.application.created_at ?? ''
+      const ub = b.application.updated_at ?? b.application.created_at ?? ''
+      return ub.localeCompare(ua)
+    })
+  }
+
   return (
     <div>
       <div className="mb-4">
@@ -161,7 +232,11 @@ export default async function HubPage({
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Applications</h1>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            {sorted.length > 0
+            {tab === 'mine'
+              ? mineRows.length > 0
+                ? `${mineRows.length} active application${mineRows.length === 1 ? '' : 's'} · most recent first`
+                : 'Track the programs you’re actively applying to'
+              : sorted.length > 0
               ? `${sorted.length} ${modeContextLabel(activeIdentity).toLowerCase()} ranked by fit and opportunity value`
               : `Discover ${modeContextLabel(activeIdentity).toLowerCase()} matched to your profile`}
             {' '}
@@ -174,42 +249,70 @@ export default async function HubPage({
           </p>
         </div>
 
-        {/* View tabs */}
+        {/* Primary tabs: Discover / Mine */}
         <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 flex-shrink-0">
-          <a href="/applications"
-            className={view === 'cards'
+          <a
+            href="/applications"
+            className={tab === 'discover'
               ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
-            Programs
+              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}
+          >
+            Discover
           </a>
-          <a href="/applications?view=timeline"
-            className={view === 'timeline'
+          <a
+            href="/applications?tab=mine"
+            className={tab === 'mine'
               ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
-            Timeline
+              : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}
+          >
+            My Applications
           </a>
         </div>
       </div>
 
-      {view === 'timeline' ? (
-        <TimelineView programs={sorted} />
+      {tab === 'mine' ? (
+        <MyApplicationsList rows={mineRows} />
       ) : (
-        <div className="flex gap-6">
-          <aside className="w-48 flex-shrink-0 hidden lg:block">
-            <HubFilters currentSort={sort} currentType={resolvedParams.type} currentRolling={resolvedParams.rolling} />
-          </aside>
-          <div className="flex-1 min-w-0">
-            {sorted.length === 0 ? (
-              <EmptyState activeIdentity={activeIdentity} />
-            ) : (
-              <div className="space-y-3">
-                {sorted.map((program, i) => (
-                  <ProgramCard key={program.id} program={program} rank={i + 1} />
-                ))}
-              </div>
-            )}
+        <>
+          {/* Sub-view tabs (Programs / Timeline) — only visible in Discover */}
+          <div className="mb-4 flex justify-end">
+            <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1 flex-shrink-0">
+              <a href="/applications"
+                className={view === 'cards'
+                  ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                  : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
+                Programs
+              </a>
+              <a href="/applications?view=timeline"
+                className={view === 'timeline'
+                  ? 'px-3 py-1.5 rounded-md text-xs font-medium bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                  : 'px-3 py-1.5 rounded-md text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'}>
+                Timeline
+              </a>
+            </div>
           </div>
-        </div>
+
+          {view === 'timeline' ? (
+            <TimelineView programs={sorted} />
+          ) : (
+            <div className="flex gap-6">
+              <aside className="w-48 flex-shrink-0 hidden lg:block">
+                <HubFilters currentSort={sort} currentType={resolvedParams.type} currentRolling={resolvedParams.rolling} />
+              </aside>
+              <div className="flex-1 min-w-0">
+                {sorted.length === 0 ? (
+                  <EmptyState activeIdentity={activeIdentity} />
+                ) : (
+                  <div className="space-y-3">
+                    {sorted.map((program, i) => (
+                      <ProgramCard key={program.id} program={program} rank={i + 1} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
@@ -292,7 +395,134 @@ function EmptyState({ activeIdentity }: { activeIdentity: ApplicantMode }) {
   )
 }
 
-// ─── Timeline view ────────────────────────────────────────────────────────────
+// --- My Applications tab ---
+
+type MineRow = {
+  application: UserApplication
+  program: Program
+  fit: UserProgramFit | undefined
+  cycle: ProgramNextCycle | null
+}
+
+function MyApplicationsList({ rows }: { rows: MineRow[] }) {
+  if (rows.length === 0) {
+    return (
+      <div className="card p-12 text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-800 mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
+            <path
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <h3 className="text-base font-semibold text-neutral-900 dark:text-white mb-2">
+          No applications yet
+        </h3>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto mb-6">
+          No applications yet — pick one from{' '}
+          <Link href="/applications" className="text-brand-600 dark:text-brand-400 hover:text-brand-700 transition-colors">
+            Discover →
+          </Link>
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      {rows.map((row) => {
+        const { application, program, fit, cycle } = row
+        const deadlineSource = cycle?.closes_at ?? program.deadline_at
+        const deadline = formatDeadline(deadlineSource)
+        const status = application.status ?? 'saved'
+        const statusCfg = APP_STATUS_CONFIG[status] ?? APP_STATUS_CONFIG.saved
+        const fitPct = fit ? Math.round(fit.fit_score * 100) : null
+        const lastUpdated = application.updated_at ?? application.created_at
+        const lastUpdatedLabel = lastUpdated ? formatRelative(lastUpdated) : null
+
+        return (
+          <Link
+            key={application.id}
+            href={`/workspace/${program.id}`}
+            className="card p-4 flex items-center gap-3 hover:shadow-card-hover transition-shadow"
+          >
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                  {programTypeLabel(program.type)}
+                </span>
+                <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', statusCfg.dot)} />
+                <span className="text-xs text-neutral-400 dark:text-neutral-500">{statusCfg.label}</span>
+              </div>
+              <h3 className="text-sm font-semibold text-neutral-900 dark:text-white truncate">
+                {program.name}
+              </h3>
+              {lastUpdatedLabel && (
+                <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
+                  Updated {lastUpdatedLabel}
+                </p>
+              )}
+            </div>
+            <div className="flex-shrink-0 text-right">
+              {deadlineSource && (
+                <p className={cn(
+                  'text-xs',
+                  deadline.urgent
+                    ? 'text-warning-600 dark:text-warning-400 font-medium'
+                    : 'text-neutral-400 dark:text-neutral-500'
+                )}>
+                  {deadline.label}
+                </p>
+              )}
+              {fitPct !== null && (
+                <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
+                  {fitPct}% fit
+                </p>
+              )}
+            </div>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="text-neutral-300 dark:text-neutral-600 flex-shrink-0"
+            >
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+        )
+      })}
+    </div>
+  )
+}
+
+function formatRelative(iso: string): string {
+  const then = new Date(iso).getTime()
+  if (Number.isNaN(then)) return ''
+  const diffMs = Date.now() - then
+  const minute = 60_000
+  const hour = 60 * minute
+  const day = 24 * hour
+  if (diffMs < hour) {
+    const mins = Math.max(1, Math.round(diffMs / minute))
+    return `${mins}m ago`
+  }
+  if (diffMs < day) {
+    const hours = Math.round(diffMs / hour)
+    return `${hours}h ago`
+  }
+  if (diffMs < 30 * day) {
+    const days = Math.round(diffMs / day)
+    return `${days}d ago`
+  }
+  return new Date(iso).toLocaleDateString()
+}
+
+// --- Timeline view ---
 
 function TimelineView({ programs }: { programs: ProgramWithFit[] }) {
   const MS_PER_DAY = 86_400_000
