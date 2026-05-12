@@ -55,22 +55,10 @@ const PLANS: Plan[] = [
     badge: 'Most popular',
     highlight: true,
   },
-  {
-    id: 'team',
-    name: 'Team',
-    monthlyPrice: 49,
-    annualPrice: 399,
-    description: 'For teams and cohorts',
-    features: [
-      'Everything in Pro',
-      'Multi-seat access',
-      'Shared answer library',
-      'Team collaboration',
-    ],
-    cta: 'Upgrade to Team',
-    comingSoon: [false, false, true, true],
-  },
 ]
+
+// Team tier exists in Stripe + schema but is not marketed pre-100-users.
+// Re-add to PLANS when founder wedge validates. See ADR-001, docs/AFTER_LAUNCH.md.
 
 export function PricingCards({ currentTier }: Props) {
   const router = useRouter()
@@ -159,7 +147,7 @@ export function PricingCards({ currentTier }: Props) {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-xl">
         {PLANS.map((plan) => {
           const isCurrent = currentTier === plan.id
           const price = annual ? plan.annualPrice : plan.monthlyPrice
