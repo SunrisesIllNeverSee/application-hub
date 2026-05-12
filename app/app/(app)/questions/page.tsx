@@ -3,6 +3,8 @@ import { ThemeTag } from '@/components/ThemeTag'
 import { AnswerEditor } from '@/components/AnswerEditor'
 import type { ProfileAnswer } from '@/lib/database.types'
 import { SignificanceStars } from '@/components/SignificanceStars'
+import { QuestionsArchiveView } from '@/components/QuestionsArchiveView'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
 export const metadata = { title: 'Questions' }
@@ -36,19 +38,82 @@ interface LockedQuestion {
   significance_score: number
 }
 
-export default async function BankPage() {
+type View = 'bank' | 'archive'
+
+interface PageProps {
+  searchParams: Promise<{ view?: string; theme?: string; sort?: string }>
+}
+
+export default async function QuestionsPage({ searchParams }: PageProps) {
+  const { view: rawView, theme: rawTheme, sort: rawSort } = await searchParams
+  const view: View = rawView === 'archive' ? 'archive' : 'bank'
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
+  return (
+    <div>
+      {/* Tab header */}
+      <div className="mb-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">
+              Questions
+            </h1>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Your ammunition. Answer once, apply everywhere.
+            </p>
+          </div>
+        </div>
+
+        {/* View tabs */}
+        <div className="mt-5 flex gap-1 border-b border-neutral-200 dark:border-neutral-800">
+          <Link
+            href="/questions"
+            className={cn(
+              'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors',
+              view === 'bank'
+                ? 'border-brand-600 dark:border-brand-400 text-brand-600 dark:text-brand-400'
+                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
+            )}
+          >
+            My Questions
+          </Link>
+          <Link
+            href="/questions?view=archive"
+            className={cn(
+              'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors',
+              view === 'archive'
+                ? 'border-brand-600 dark:border-brand-400 text-brand-600 dark:text-brand-400'
+                : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
+            )}
+          >
+            Full Archive
+          </Link>
+        </div>
+      </div>
+
+      {view === 'archive' ? (
+        <QuestionsArchiveView theme={rawTheme ?? ''} sort={rawSort ?? 'significance'} />
+      ) : (
+        <BankView userId={user.id} />
+      )}
+    </div>
+  )
+}
+
+async function BankView({ userId }: { userId: string }) {
+  const supabase = await createClient()
+
   // Run daily drip (server-side, idempotent)
-  await supabase.rpc('run_daily_drip', { p_user_id: user.id })
+  await supabase.rpc('run_daily_drip', { p_user_id: userId })
 
   // Fetch unlocked questions with archived question data
   const { data: unlockedRows } = await supabase
     .from('user_question_unlocks')
     .select('*, archived_question:archived_questions(*)')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('unlocked_at', { ascending: false })
 
   const unlocked: UnlockedQuestion[] = (unlockedRows ?? []) as UnlockedQuestion[]
@@ -58,7 +123,7 @@ export default async function BankPage() {
   const { data: answerRows } = await supabase
     .from('profile_answers')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
 
   const answerMap: Record<string, ProfileAnswer> = Object.fromEntries(
     (answerRows ?? []).map(a => [a.archived_question_id, a])
@@ -78,7 +143,7 @@ export default async function BankPage() {
   const { data: subscription } = await supabase
     .from('user_subscriptions')
     .select('tier')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single()
 
   const isPro = subscription?.tier === 'pro' || subscription?.tier === 'team'
@@ -108,27 +173,9 @@ export default async function BankPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">
-              Questions
-            </h1>
-            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              Your ammunition. Answer once, apply everywhere.
-            </p>
-          </div>
-          {newToday > 0 && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">
-              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
-              {newToday} new today
-            </span>
-          )}
-        </div>
-
-        {/* Progress bar */}
-        <div className="mt-5">
+      {/* Status row */}
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 mb-2">
             <span>
               <span className="font-semibold text-neutral-800 dark:text-neutral-200">{answeredCount}</span>
@@ -149,6 +196,12 @@ export default async function BankPage() {
             />
           </div>
         </div>
+        {newToday > 0 && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 flex-shrink-0">
+            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+            {newToday} new today
+          </span>
+        )}
       </div>
 
       {/* Empty state */}
@@ -279,5 +332,3 @@ export default async function BankPage() {
     </div>
   )
 }
-
-

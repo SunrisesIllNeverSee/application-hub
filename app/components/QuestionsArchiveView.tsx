@@ -3,9 +3,6 @@ import { SignificanceStars } from '@/components/SignificanceStars'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
-export const metadata = { title: 'Archive' }
-
-// ── Theme tabs ──────────────────────────────────────────────────────────────
 const THEME_GROUPS = [
   { key: '',             label: 'All' },
   { key: 'universal',   label: 'Universal' },
@@ -40,20 +37,24 @@ interface ArchivedQuestion {
   is_universal: boolean
 }
 
-export default async function ArchiveQuestionsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ theme?: string; sort?: string }>
-}) {
-  const { theme: rawTheme, sort: rawSort } = await searchParams
+interface Props {
+  theme: string
+  sort: string
+}
+
+function archiveHref(params: { theme?: string; sort?: string }) {
+  const qs = new URLSearchParams()
+  qs.set('view', 'archive')
+  if (params.theme) qs.set('theme', params.theme)
+  if (params.sort && params.sort !== 'significance') qs.set('sort', params.sort)
+  return `/questions?${qs.toString()}`
+}
+
+export async function QuestionsArchiveView({ theme, sort }: Props) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const theme = rawTheme ?? ''
-  const sort  = rawSort  ?? 'significance'
-
-  // Fetch all questions
   let query = supabase
     .from('archived_questions')
     .select('id, text, theme, significance_score, asked_by_count, typical_word_limit, is_universal')
@@ -71,14 +72,12 @@ export default async function ArchiveQuestionsPage({
   const { data } = await query
   const questions = (data ?? []) as ArchivedQuestion[]
 
-  // Unlock state
   const { data: unlockedRows } = await supabase
     .from('user_question_unlocks')
     .select('archived_question_id')
     .eq('user_id', user.id)
   const unlockedIds = new Set((unlockedRows ?? []).map(r => r.archived_question_id as string))
 
-  // Counts for tabs (run once on full set)
   const { data: allRows } = await supabase
     .from('archived_questions')
     .select('id, theme, is_universal')
@@ -94,20 +93,12 @@ export default async function ArchiveQuestionsPage({
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Archive</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          {all.length} questions scored by significance across 800+ programs
-          {' '}·{' '}
-          <span className="font-medium text-brand-600 dark:text-brand-400">{unlockedTotal} unlocked</span>
-          {' '}·{' '}
-          <Link href="/questions" className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
-            Answer bank →
-          </Link>
-        </p>
-      </div>
+      <p className="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
+        {all.length} questions scored by significance across 800+ programs
+        {' '}·{' '}
+        <span className="font-medium text-brand-600 dark:text-brand-400">{unlockedTotal} unlocked</span>
+      </p>
 
-      {/* Theme tabs + sort */}
       <div className="flex items-start justify-between gap-4 mb-6 border-b border-neutral-200 dark:border-neutral-800">
         <div className="flex flex-wrap gap-0 -mb-px overflow-x-auto">
           {THEME_GROUPS.map(g => {
@@ -117,7 +108,7 @@ export default async function ArchiveQuestionsPage({
             return (
               <Link
                 key={g.key}
-                href={`/archive/questions${g.key ? `?theme=${g.key}` : ''}${sort !== 'significance' ? `${g.key ? '&' : '?'}sort=${sort}` : ''}`}
+                href={archiveHref({ theme: g.key, sort })}
                 className={cn(
                   'px-3 py-2.5 text-xs font-medium border-b-2 whitespace-nowrap transition-colors',
                   active
@@ -138,7 +129,7 @@ export default async function ArchiveQuestionsPage({
         </div>
         <div className="flex gap-1 flex-shrink-0 pb-2">
           <Link
-            href={`/archive/questions${theme ? `?theme=${theme}` : ''}`}
+            href={archiveHref({ theme, sort: 'significance' })}
             className={cn(
               'px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
               sort !== 'popular'
@@ -149,7 +140,7 @@ export default async function ArchiveQuestionsPage({
             Significance
           </Link>
           <Link
-            href={`/questions?view=archive?${theme ? `theme=${theme}&` : ''}sort=popular`}
+            href={archiveHref({ theme, sort: 'popular' })}
             className={cn(
               'px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
               sort === 'popular'
@@ -162,7 +153,6 @@ export default async function ArchiveQuestionsPage({
         </div>
       </div>
 
-      {/* Question rows */}
       {questions.length === 0 ? (
         <p className="text-sm text-neutral-400 dark:text-neutral-500 py-12 text-center">
           No questions in this category.
@@ -181,7 +171,6 @@ export default async function ArchiveQuestionsPage({
                     : 'border-neutral-100 dark:border-neutral-800/40 bg-neutral-50/40 dark:bg-neutral-900/10'
                 )}
               >
-                {/* Lock indicator */}
                 <div className={cn(
                   'flex-shrink-0 mt-0.5',
                   unlocked ? 'text-brand-500' : 'text-neutral-300 dark:text-neutral-700'
@@ -199,7 +188,6 @@ export default async function ArchiveQuestionsPage({
                   )}
                 </div>
 
-                {/* Text + meta */}
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     'text-sm leading-relaxed',
@@ -229,7 +217,6 @@ export default async function ArchiveQuestionsPage({
                   </div>
                 </div>
 
-                {/* Significance + action */}
                 <div className="flex-shrink-0 flex flex-col items-end gap-2 min-w-[90px]">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-semibold tabular-nums text-neutral-500 dark:text-neutral-400">
