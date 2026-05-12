@@ -10,7 +10,7 @@ sessions:
     surface: cowork
     started_at: 2026-05-11T08:00:00Z
     heartbeat: 2026-05-11T23:00:00Z
-    status: active
+    status: wrapped
   - id: vscode-claude-2026-05-11
     surface: vscode-claude
     started_at: 2026-05-11T10:00:00Z

@@ -25,7 +25,7 @@
     button.save {
       width: 100%; padding: 7px; margin-top: 10px; background: #6366f1;
       color: #fff; border: none; border-radius: 5px; font-size: 13px;
-      font-weight: 500; cursor: pointer;
+      font-weight: 500; cursor: pointer; type: button;
     }
     button.save:hover { background: #4f46e5; }
     button.clear {
@@ -34,6 +34,13 @@
       cursor: pointer;
     }
     button.clear:hover { color: #ef4444; border-color: #ef4444; }
+    button.capture {
+      width: 100%; padding: 7px; background: #f0fdf4;
+      color: #16a34a; border: 1px solid #bbf7d0; border-radius: 5px; font-size: 12px;
+      font-weight: 500; cursor: pointer;
+    }
+    button.capture:hover { background: #dcfce7; }
+    button.capture.done { background: #dcfce7; color: #15803d; }
     footer { padding: 8px 14px; border-top: 1px solid #e5e5e5; text-align: center; }
     footer a { font-size: 11px; color: #9ca3af; text-decoration: none; }
     footer a:hover { color: #6366f1; }
@@ -54,11 +61,16 @@
     <input type="password" id="jwt-input" placeholder="eyJ…" autocomplete="off" />
     <p class="hint">
       Get yours at
-      <a href="https://mos2es.xyz/profile/settings" target="_blank">mos2es.xyz/profile/settings</a>
+      <a href="https://mos2es.xyz/profile/settings" target="_blank" rel="noopener noreferrer">mos2es.xyz/profile/settings</a>
       → "Show session token"
     </p>
-    <button class="save" id="save-btn">Save & connect</button>
-    <button class="clear" id="clear-btn">Clear saved token</button>
+    <button type="button" class="save" id="save-btn">Save &amp; connect</button>
+    <button type="button" class="clear" id="clear-btn">Clear saved token</button>
+  </div>
+
+  <div class="section">
+    <button type="button" class="capture" id="capture-btn">⬇ Save page as Markdown</button>
+    <p class="hint">Captures program info, questions, and URL from the current page</p>
   </div>
 
   <footer>
