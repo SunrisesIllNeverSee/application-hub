@@ -96,10 +96,10 @@ export function CreditsPanel({
             <span className="text-3xl font-bold text-neutral-900 dark:text-white tabular-nums">
               {balance.toLocaleString()}
             </span>
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">credits</span>
+            <span className="text-sm text-neutral-500 dark:text-neutral-400">days of Pro</span>
           </div>
           <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">
-            Used for bonus question unlocks, priority features, and future perks
+            Each day earned = one day of Pro access. Redeem when ready.
           </p>
         </div>
       </div>
@@ -184,7 +184,7 @@ export function CreditsPanel({
                   <p className="text-xs text-neutral-400 dark:text-neutral-500">{event.description}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">+{event.amount} cr</span>
+                  <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">+{event.amount} days</span>
                   <button
                     onClick={() => !claimed && claim(event.type as CreditEventType)}
                     disabled={claimed || claiming === event.type}
@@ -222,7 +222,7 @@ export function CreditsPanel({
                     <p className="text-xs text-neutral-400 dark:text-neutral-500">{event.description}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">+{event.amount} cr</span>
+                    <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">+{event.amount} days</span>
                     <button
                       onClick={() => !claimed && claim(event.type as CreditEventType)}
                       disabled={claimed || claiming === event.type}
@@ -321,7 +321,7 @@ function ShareCard({
       {/* Actions */}
       <div className="px-4 py-3 flex items-center justify-between gap-3">
         <span className="text-xs text-neutral-400 dark:text-neutral-500">
-          {claimed ? 'Thanks for sharing!' : `+${amount} credits · weekly`}
+          {claimed ? 'Thanks for sharing!' : `+${amount} days · weekly`}
         </span>
         <div className="flex items-center gap-2">
           {!claimed && (

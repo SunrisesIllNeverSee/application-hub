@@ -121,7 +121,7 @@ export function ModeSelector({
               href={`/hub/submit?kind=${defaultSubmitKindForMode(activeIdentity)}`}
               className="text-amber-600 dark:text-amber-400 hover:underline font-medium"
             >
-              Submit a program, earn credits
+              Submit a program, earn days
             </a></>
           )}
         </p>

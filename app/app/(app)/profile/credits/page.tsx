@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as adminClient } from '@supabase/supabase-js'
 import { CreditsPanel } from '@/components/CreditsPanel'
 
-export const metadata = { title: 'Credits & Achievements' }
+export const metadata = { title: 'Days & Achievements' }
 
 export default async function CreditsPage() {
   const supabase = createClient()
@@ -29,7 +29,7 @@ export default async function CreditsPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Credits & Achievements</h1>
         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          Earn credits by contributing to the community, sharing, and using the platform.
+          Earn days of Pro access. Every day earned extends your Pro clock when you&apos;re ready to upgrade.
         </p>
       </div>
       <CreditsPanel

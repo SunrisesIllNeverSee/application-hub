@@ -68,7 +68,7 @@ export const CREDIT_EVENTS: CreditEventDef[] = [
     dedup: 'weekly',
     category: 'social',
     manual: true,
-    description: 'Share the pre-written post on X — up to once per week',
+    description: 'Share the pre-written post on X — earn 25 days of Pro, up to once per week',
   },
   {
     type: 'social_repost',
@@ -77,7 +77,7 @@ export const CREDIT_EVENTS: CreditEventDef[] = [
     dedup: 'weekly',
     category: 'social',
     manual: true,
-    description: 'Share the pre-written post on LinkedIn — up to once per week',
+    description: 'Share the pre-written post on LinkedIn — earn 25 days of Pro, up to once per week',
   },
   // ── App (auto-triggered by DB triggers) ────────────────────────────────────
   {
@@ -204,12 +204,12 @@ export function resolveDedupKey(eventType: CreditEventType, actionId?: string): 
 
 export const SHARE_CONTENT = {
   twitter: {
-    text: `I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere. The question archive is genuinely useful → mos2es.xyz #founders #startups`,
+    text: `I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere — the question archive is genuinely useful. mos2es.xyz #founders #startups`,
     eventType: 'social_share' as CreditEventType,
     platformLabel: 'X / Twitter',
   },
   linkedin: {
-    text: `Discovered a tool that's changed how I approach accelerator applications. Application Hub archives every question across YC, Techstars, NSF, and 800+ programs — so you build one reusable answer bank instead of starting from scratch every time.`,
+    text: `Discovered a tool that changed how I approach accelerator applications. Application Hub archives every question across YC, Techstars, NSF, and 800+ programs — so you build one reusable answer bank instead of starting from scratch every time. Worth a look.`,
     url: 'https://mos2es.xyz',
     eventType: 'social_repost' as CreditEventType,
     platformLabel: 'LinkedIn',

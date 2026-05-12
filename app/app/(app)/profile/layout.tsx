@@ -6,7 +6,7 @@ const TABS = [
   { label: 'Integrations', href: '/profile/integrations' },
   { label: 'Import', href: '/profile/import' },
   { label: 'Settings', href: '/profile/settings' },
-  { label: 'Credits', href: '/profile/credits' },
+  { label: 'Days', href: '/profile/credits' },
 ]
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
