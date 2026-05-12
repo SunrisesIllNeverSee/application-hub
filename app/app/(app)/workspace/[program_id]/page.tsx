@@ -142,7 +142,7 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
               {cohortStart && <span>· Starts {cohortStart}</span>}
               {fit && (
                 <span className="inline-flex items-center">
-                  · {Math.round(fit.fit_score * 100)}% fit
+                  · {Math.round(fit.fit_score)}% fit
                   <ScoreTooltip
                     label="Fit Score"
                     description="How well your profile aligns to this program's DNA across coverage, theme alignment, criteria match, and answer quality."

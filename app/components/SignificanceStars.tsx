@@ -11,8 +11,8 @@ export function SignificanceStars({
   score: number
   size?: 'xs' | 'sm'
 }) {
-  // Map 0-1 → 1-5 stars (anything above 0 gets at least 1 star)
-  const stars = score > 0 ? Math.max(1, Math.round(score * 5)) : 0
+  // score is stored on a 1-5 scale
+  const stars = score > 0 ? Math.min(5, Math.max(1, Math.round(score))) : 0
 
   if (stars === 0) return null
 

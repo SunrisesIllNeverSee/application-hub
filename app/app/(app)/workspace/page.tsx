@@ -13,7 +13,7 @@ export const metadata = {
  * Normalized so the best program = 100.
  */
 function opportunityScore(fit: UserProgramFit | undefined, program: Program): number {
-  const fitPct = (fit?.fit_score ?? 0) * 100
+  const fitPct = (fit?.fit_score ?? 0)
   const programValue = program.program_value_score ?? 50
   // Weight: 50% fit, 35% program value, 15% urgency bonus
   const base = fitPct * 0.50 + programValue * 0.35
@@ -123,7 +123,7 @@ export default async function WorkspacePage() {
                   const deadline = formatDeadline(program.deadline_at)
                   const fit = program.fit
                   const coveragePct = fit ? Math.round((fit.coverage_pct ?? 0) * 100) : 0
-                  const fitPct = fit ? Math.round(fit.fit_score * 100) : 0
+                  const fitPct = fit ? Math.round(fit.fit_score) : 0
                   const status = program.app?.status ?? 'saved'
                   const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.saved
                   const checkSize = formatCheckSize(program.check_size_max ?? program.check_size_min ?? null)
@@ -194,7 +194,7 @@ export default async function WorkspacePage() {
               <div className="space-y-2">
                 {otherApps.map(program => {
                   const deadline = formatDeadline(program.deadline_at)
-                  const fitPct = program.fit ? Math.round(program.fit.fit_score * 100) : 0
+                  const fitPct = program.fit ? Math.round(program.fit.fit_score) : 0
                   const status = program.app?.status ?? 'submitted'
                   const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.submitted
                   return (
@@ -244,7 +244,7 @@ export default async function WorkspacePage() {
                   const prog = (Array.isArray(f.programs) ? f.programs[0] : f.programs) as Program | null
                   if (!prog) return null
                   const deadline = formatDeadline(prog.deadline_at)
-                  const fitPct = Math.round((f.fit_score ?? 0) * 100)
+                  const fitPct = Math.round(f.fit_score ?? 0)
                   const composite = Math.round(f.fit_score ?? 0)
                   const checkSize = formatCheckSize(prog.check_size_max ?? null)
                   return (

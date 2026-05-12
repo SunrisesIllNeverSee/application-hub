@@ -200,11 +200,11 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
       {/* User footer */}
       <div className="px-3 py-3 border-t border-neutral-800 flex-shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-brand-700 flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
+          <Link href="/profile/persona" className="w-7 h-7 rounded-full bg-brand-700 flex items-center justify-center text-xs font-semibold text-white flex-shrink-0 hover:bg-brand-600 transition-colors" title="View profile">
             {initials}
-          </div>
+          </Link>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-neutral-200 truncate">{user.email}</p>
+            <Link href="/profile/persona" className="text-xs font-medium text-neutral-200 truncate hover:text-white transition-colors block">{user.email}</Link>
             <div className="flex items-center gap-1.5 mt-0.5">
               <p className="text-xs text-neutral-500">Free plan</p>
               {creditBalance > 0 && (

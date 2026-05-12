@@ -190,23 +190,23 @@ function AnswerDetail({ answer }: { answer: ProfileAnswerWithQuestion }) {
           </p>
         )}
 
-        {/* Editor */}
-        <div className="mt-4">
-          <AnswerEditor
-            archivedQuestionId={answer.archived_question_id}
-            initialAnswer={answer}
-            compact
-          />
-        </div>
-
-        {/* Provenance footer — document integrity */}
-        <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800">
-          <p className="text-[10px] text-neutral-400 dark:text-neutral-600 font-mono break-all">
-            id: {answer.id}
-          </p>
-          <p className="text-[10px] text-neutral-400 dark:text-neutral-600 mt-1">
-            Captured moment — timestamped, version-tracked. Provenance carries forward into your Persona Profile.
-          </p>
+        {/* Editor + provenance in one card */}
+        <div className="mt-4 rounded-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+          <div className="p-4">
+            <AnswerEditor
+              archivedQuestionId={answer.archived_question_id}
+              initialAnswer={answer}
+              compact
+            />
+          </div>
+          <div className="px-4 py-2.5 bg-neutral-50 dark:bg-neutral-900/60 border-t border-neutral-100 dark:border-neutral-800 flex items-center gap-3 flex-wrap">
+            <p className="text-[10px] text-neutral-400 dark:text-neutral-600 font-mono truncate flex-1">
+              {answer.id}
+            </p>
+            <p className="text-[10px] text-neutral-400 dark:text-neutral-600 flex-shrink-0">
+              timestamped · version-tracked
+            </p>
+          </div>
         </div>
       </div>
     </div>
