@@ -43,14 +43,15 @@ interface ArchivedQuestion {
 export default async function ArchiveQuestionsPage({
   searchParams,
 }: {
-  searchParams: { theme?: string; sort?: string }
+  searchParams: Promise<{ theme?: string; sort?: string }>
 }) {
+  const { theme: rawTheme, sort: rawSort } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const theme = searchParams.theme ?? ''
-  const sort  = searchParams.sort  ?? 'significance'
+  const theme = rawTheme ?? ''
+  const sort  = rawSort  ?? 'significance'
 
   // Fetch all questions
   let query = supabase
