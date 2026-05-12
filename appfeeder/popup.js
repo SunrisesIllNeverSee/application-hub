@@ -82,46 +82,18 @@ captureBtn.addEventListener('click', () => {
   })
 })
 
-// Runs inside the page context — extracts all useful metadata
+// Runs inside the page context — dumps raw page text + metadata
 function scrapePage() {
   const url = window.location.href
   const title = document.title || window.location.hostname
-
-  // Deadline / date patterns
-  const bodyText = document.body.innerText
-  const deadlineMatch = bodyText.match(/deadline[:\s]+([^\n]{0,60})/i)
-    || bodyText.match(/(due|closes?|applications?\s+close)[:\s]+([^\n]{0,60})/i)
-  const deadline = deadlineMatch ? deadlineMatch[0].trim() : null
-
-  // Questions — labels, textareas, fieldsets
-  const questions = []
-  document.querySelectorAll('label, legend, [class*="question"], [class*="prompt"]').forEach(el => {
-    const text = el.textContent.trim().replace(/\s+/g, ' ')
-    if (text.length > 8 && text.length < 400 && !questions.includes(text)) {
-      questions.push(text)
-    }
-  })
-
-  // Fallback: grab h2/h3/p near textareas
-  if (questions.length === 0) {
-    document.querySelectorAll('textarea').forEach(ta => {
-      const prev = ta.previousElementSibling
-      if (prev) {
-        const text = prev.textContent.trim().replace(/\s+/g, ' ')
-        if (text.length > 8) questions.push(text)
-      }
-    })
-  }
-
-  // Meta description / og tags
+  const rawText = document.body.innerText
   const metaDesc = document.querySelector('meta[name="description"]')?.content
     || document.querySelector('meta[property="og:description"]')?.content
     || null
-
-  return { url, title, deadline, questions, metaDesc }
+  return { url, title, rawText, metaDesc }
 }
 
-function buildMarkdown({ url, title, deadline, questions, metaDesc }) {
+function buildMarkdown({ url, title, rawText, metaDesc }) {
   const date = new Date().toISOString().slice(0, 10)
   const lines = [
     `# ${title}`,
@@ -129,20 +101,10 @@ function buildMarkdown({ url, title, deadline, questions, metaDesc }) {
     `**URL:** ${url}`,
     `**Captured:** ${date}`,
   ]
-  if (deadline) lines.push(`**Deadline:** ${deadline}`)
   if (metaDesc) lines.push(`**Description:** ${metaDesc}`)
   lines.push('')
-
-  if (questions.length > 0) {
-    lines.push('## Questions')
-    lines.push('')
-    questions.forEach((q, i) => {
-      lines.push(`${i + 1}. ${q}`)
-      lines.push('')
-    })
-  } else {
-    lines.push('_No questions detected — may require login or JS interaction._')
-  }
-
+  lines.push('## Raw Page Text')
+  lines.push('')
+  lines.push(rawText.trim())
   return lines.join('\n')
 }
