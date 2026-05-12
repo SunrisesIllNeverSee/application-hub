@@ -8,44 +8,47 @@
 
 ---
 
-## Current state (2026-05-12)
+## Current state (2026-05-12, vscode-claude session)
 
-P1 sprint complete. P2 in progress. Build is clean. Site live at mos2es.xyz. Type-check: 0 errors.
+P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 033 (supabase/migrations/), next = 034.
 
-### What's deployed (as of 2026-05-12)
+### What's shipped (confirmed this session)
 
 - Hub (842 programs), Question Bank + drip, BYOK, draft routing, import flows
-- Stripe skeleton (code done — Deric needs to add price IDs to Vercel)
-- Dark mode, outcome tracking, funders schema, deadline alerts (cron live)
+- Stripe — live (livemode: true, 1 real checkout processed)
+- Email+password signup/signin — primary auth flow, GitHub OAuth live
+- Dark mode, funders schema, deadline alerts edge fn (ACTIVE)
 - Team mode (schema + API — no UI beyond settings tab)
 - Answer review persistence + stress-test persistence
 - Reviewer family: rns-answer-reviewer, program-fit-reviewer, fidelity-certifier, stress-test-conductor
 - Home dashboard `/today`, StressTestPanel, DnaRadarChart, SignificanceStars, workspace opportunity ranking
-- Recruiter agent (migration 027 + /api/cron/recruiter + edge function)
-- **Applicant modes** (migrations 030-031): mode toggle, multi-identity profile, RFC badges, contribution rewards
-- **Credits & achievements** (migration 032): credit_events ledger, user_achievements, sidebar badge, earn toast, redemption stub
-- **OG image** `/api/og`: MO§ES™ branded, personalized share card on /profile/credits
-- **Archive page** `/archive/questions`: all 225 questions, theme tabs, Universal tab, lock/unlock state, Answer button
-- **Landing page archive**: live top-12 questions from DB (was static single example)
-- **Supabase CLI linked**: migrations in `supabase/migrations/`, db push clean, migration lint in CI
+- Recruiter agent — edge function ACTIVE, `/api/cron/recruiter` live
+- Applicant modes (030-031), Credits & achievements (032)
+- Archive page `/archive/questions` — 225 questions, theme tabs, lock/unlock state
+- Funders index `/funders` + `/funders/[slug]`
+- Question embeddings — 225 questions seeded at 768d via nomic-embed-text
+- Security DEFINER views fixed (migration 033)
+- CI in strict mode, database.types.ts regenerated + aliases
 
-### Remaining open work (P1)
+### Remaining open work
 
-- Real deadlines seeding — most programs show "Rolling," needs YC/Techstars/SBIR cycles added
-- Browser/device responsive QA on `/hub`, `/hub/[slug]`, `/workspace/[program_id]`, `/profile`, `/bank`
+- Real deadlines seeding — most programs show "Rolling"
+- Heat scores — synthetic compute from brand_score + cohort_size
+- MoatScore / FundScore — placeholder cards on Today need actual compute
+- Responsive QA — mobile/tablet viewport pass on hub/bank/workspace/profile
+- Workspace naming locked as "My Applications" (sidebar) / "Workspace" (routes)
 
-### Remaining open work (Deric to drive)
+### Deric to drive
 
-- Stripe: add price IDs to Vercel env vars
-- Recruiter agent: set CRON_SECRET in Supabase edge function env, activate Monday 9am schedule
-- Soft-launch: reach out to 10–20 power users, share MCP setup instructions
+- Stripe: confirm price IDs in Vercel env
+- Recruiter agent: set CRON_SECRET + APP_URL in Supabase edge function env, activate Monday 9am schedule
 
 ### FundingCake programs
 
-812 programs from FundingCake import (migration 019). Real funded entities, 782 have URLs, 0 have apply_url. The gap is FundingCake captured homepage URLs not intake page URLs. See `docs/28_fundingcake_shells.md`. Fill path: RFC mechanic (passive) + targeted ingest for top accelerators and VC programs with real intake forms.
+812 shells — real entities, no apply_url. Fill path: RFC mechanic + targeted ingest for top accelerators.
 
 ---
 
 ## For Codex — most recent context
 
-Updated 2026-05-12 — applicant modes shipped, credits system live, archive page rebuilt, Supabase CLI linked, type-check at 0 errors, migration chain at 035, next migration 036.
+Updated 2026-05-12 (vscode-claude) — auth rebuilt (password+GitHub), security fixes, archive/funders UI, types clean, migration 033 latest, next = 034.
