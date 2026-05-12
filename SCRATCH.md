@@ -47,11 +47,13 @@ P2 in progress. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration ch
 
 782/812 have real website URLs. 778 have descriptions. The only gap is `apply_url` — FundingCake captured homepages, not intake pages.
 
-**Phase A COMPLETE (2026-05-12):** 782 homepages scraped — 160 high-confidence apply_urls found (20%), 132 medium, 395 not_found. Master CSV at `seed/staging/fundingcake_apply_urls.csv`.
+**Phase A + B COMPLETE (2026-05-12):**
 
-**Phase B IN PROGRESS:** 10 parallel agents scraping 160 confirmed apply pages, extracting question text, matching to `archived_questions`. Results at `seed/staging/question_results/batch_NN.csv`.
+- Phase A: 782 homepages → 160 high-confidence apply_urls → `seed/staging/fundingcake_apply_urls.csv`
+- Phase B: 160 apply pages → 88 questions from 21 programs → `seed/staging/fundingcake_questions.csv`
+- Promote-ready: 39 questions (high confidence archive matches) → `seed/staging/fundingcake_questions_promote.csv`
 
-**Do not touch:** `seed/staging/phase_b_batches/`, `seed/staging/question_results/` — agents actively writing.
+**Next step (human review required):** Review `fundingcake_questions_promote.csv` (39 rows), then promote to `program_questions` + update `programs.apply_url`. Phase C (browser extension) handles JS-gated forms organically.
 
 ---
 
@@ -61,7 +63,7 @@ Updated 2026-05-12 (vscode-claude + mcp-eval) — auth rebuilt (password+GitHub)
 
 ## Currently claimed
 
-- **mcp-eval** — FundingCake Phase B question extraction — `seed/staging/phase_b_batches/`, `seed/staging/question_results/` — claimed 2026-05-12 — 10 agents running, do not write to these paths
+- **mcp-eval** — FundingCake pipeline DONE — all staging files committed `aca8a06` — lane released
 
 ## Recently released
 
