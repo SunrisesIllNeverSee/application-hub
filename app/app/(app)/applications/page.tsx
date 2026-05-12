@@ -443,7 +443,7 @@ function MyApplicationsList({ rows }: { rows: MineRow[] }) {
         const deadline = formatDeadline(deadlineSource)
         const status = application.status ?? 'saved'
         const statusCfg = APP_STATUS_CONFIG[status] ?? APP_STATUS_CONFIG.saved
-        const fitPct = fit ? Math.round(fit.fit_score) : null
+        const fitPct = (fit && (fit.coverage_pct ?? 0) > 0) ? Math.round(fit.fit_score) : null
         const lastUpdated = application.updated_at ?? application.created_at
         const lastUpdatedLabel = lastUpdated ? formatRelative(lastUpdated) : null
 

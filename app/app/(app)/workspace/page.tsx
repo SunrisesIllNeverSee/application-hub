@@ -214,7 +214,7 @@ export default async function WorkspacePage() {
                       </div>
                       <div className="flex-shrink-0 text-right">
                         <p className="text-xs text-neutral-400 dark:text-neutral-500">{deadline.label}</p>
-                        {program.fit && <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">{fitPct}% fit</p>}
+                        {program.fit && (program.fit.coverage_pct ?? 0) > 0 && <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">{fitPct}% fit</p>}
                       </div>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                         className="text-neutral-300 dark:text-neutral-600 flex-shrink-0">
