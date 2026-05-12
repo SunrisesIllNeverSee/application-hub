@@ -17,6 +17,18 @@ export default async function AppLayout({
     redirect('/login')
   }
 
+  // Onboarding gate — block all (app) routes until user completes /onboarding.
+  // Legacy users with existing profile_answers were backfilled in migration 040.
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('onboarding_completed_at')
+    .eq('user_id', user.id)
+    .maybeSingle<{ onboarding_completed_at: string | null }>()
+
+  if (!profile?.onboarding_completed_at) {
+    redirect('/onboarding')
+  }
+
   // Fetch user's applications for sidebar list
   const { data: appRows } = await supabase
     .from('user_applications')
