@@ -9,7 +9,9 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 34
+  next: 36
+  path: supabase/migrations/  # was: migrations/ (root)
+  cli_synced: true  # supabase db push --dry-run confirmed clean 2026-05-11
   applied:
     - { n: 33, file: 033_fix_security_definer_views.sql, commit: "pending", landed: "2026-05-12", note: "Fix SECURITY DEFINER on opportunities, user_credit_balance, user_contribution_summary views" }
     - { n: 32, file: 032_credits_and_achievements.sql, commit: "pending", landed: "2026-05-11", note: "credit_events + user_achievements tables, answer/submission triggers" }
@@ -17,18 +19,20 @@ migrations:
     - { n: 30, file: 030_applicant_modes_and_contributions.sql, commit: "codex", landed: 2026-05-11, note: "Codex — applicant_mode enum, identities[], contribution rewards trigger" }
     - { n: 29, file: 029_embedding_resize_768.sql, commit: "c02299b", landed: 2026-05-11 }
     - { n: 28, file: 028_solofounders_seed.sql, commit: "3d81666", landed: 2026-05-11 }
+    - { n: 35, file: 035_user_integrations_unique_provider.sql, commit: "rename", landed: "2026-05-11", note: "Renamed from 022_user_integrations_unique_provider to fix duplicate prefix" }
+    - { n: 34, file: 034_portable_taxonomy.sql, commit: "rename", landed: "2026-05-11", note: "Renamed from 018_portable_taxonomy to fix duplicate prefix" }
     - { n: 27, file: 027_recruiter_alerts.sql, commit: "296f6ef", landed: 2026-05-11 }
     - { n: 26, file: 026_answer_reviews.sql, commit: "3635f40", landed: 2026-05-11 }
     - { n: 25, file: 025_teams_schema.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 24, file: 024_deadline_alerts.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 23, file: 023_funders_schema.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 22, file: 022_stripe_events.sql, commit: "d649251", landed: 2026-05-11 }
-    - { n: 22, file: 022_user_integrations_unique_provider.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 22, file: 035_user_integrations_unique_provider.sql, note: "Renamed: was 022_user_integrations_unique_provider.sql", commit: "unknown", landed: 2026-05-11 }
     - { n: 21, file: 021_import_queue_extensions.sql, commit: "a111dc9", landed: 2026-05-11 }
     - { n: 20, file: 020_app_import_sessions.sql, commit: "a111dc9", landed: 2026-05-11 }
     - { n: 19, file: 019_fundingcake_seed.sql, commit: "a111dc9", landed: 2026-05-11 }
     - { n: 18, file: 018_opportunity_taxonomy.sql, commit: "05b93f9", landed: 2026-05-11 }
-    - { n: 18, file: 018_portable_taxonomy.sql, commit: "unknown", landed: 2026-05-11 }
+    - { n: 18, file: 034_portable_taxonomy.sql, note: "Renamed: was 018_portable_taxonomy.sql", commit: "unknown", landed: 2026-05-11 }
     - { n: 17, file: 017_app_import_sessions.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 16, file: 016_program_content_and_scores.sql, commit: "unknown", landed: 2026-05-11 }
     - { n: 15, file: 015_byok_key_storage.sql, commit: "464455e", landed: 2026-05-11 }

@@ -63,7 +63,7 @@ application-hub/
 ├── README.md                  ← project overview for humans
 ├── CONTRIBUTING.md            ← how to add programs, questions, seed data
 │
-├── migrations/                ← Supabase SQL, apply in order
+├── supabase/migrations/         ← Supabase SQL, apply in order (was: migrations/)
 │   ├── 001_enums_and_extensions.sql
 │   ├── 002_core_tables.sql
 │   ├── 003_intelligence_and_integrations.sql
@@ -256,7 +256,7 @@ See `TASKS.md` for the prioritized task list.
 
 ## Don't do these things
 
-- Don't run migrations out of order — they depend on each other
+- Don't run migrations out of order — they depend on each other. New migrations go in supabase/migrations/, NOT the legacy migrations/ root folder
 - Don't use the service role key client-side or expose it in any frontend code
 - Don't add community/social features before the data layer and review loop are genuinely useful (noise before signal)
 - Don't auto-submit applications — this is a preparation layer, not a submission layer

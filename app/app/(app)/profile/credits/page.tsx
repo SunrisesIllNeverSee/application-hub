@@ -27,7 +27,7 @@ export default async function CreditsPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Credits & Achievements</h1>
+        <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Days & Achievements</h1>
         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Earn days of Pro access. Every day earned extends your Pro clock when you&apos;re ready to upgrade.
         </p>
@@ -36,6 +36,7 @@ export default async function CreditsPage() {
         initialBalance={balance}
         initialAchievements={achievements}
         initialRecentEvents={recentEvents}
+        userEmail={user.email}
       />
     </div>
   )

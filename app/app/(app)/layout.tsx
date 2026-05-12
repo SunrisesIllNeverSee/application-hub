@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/Sidebar'
+import { CreditToast } from '@/components/CreditToast'
 
 export default async function AppLayout({
   children,
@@ -35,12 +36,21 @@ export default async function AppLayout({
     }
   })
 
+  // Fetch credit balance for sidebar badge
+  const { data: balanceRow } = await supabase
+    .from('user_credit_balance')
+    .select('balance')
+    .eq('user_id', user.id)
+    .single()
+  const creditBalance = (balanceRow as { balance: number } | null)?.balance ?? 0
+
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
-      <Sidebar user={user} applications={applications} />
+      <Sidebar user={user} applications={applications} creditBalance={creditBalance} />
       <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">{children}</div>
       </main>
+      <CreditToast userId={user.id} />
     </div>
   )
 }

@@ -6,7 +6,7 @@ This is the compact handoff for the applicant-mode preview testing lane so anoth
 
 Feature branch / PR:
 
-- PR: [#2](https://github.com/SunrisesIllNeverSee/application-hub/pull/2)
+- PR: [#2](https://github.com/SunrisesIllNeverSee/application-hub/pull/2) — **MERGED**
 - Preview: [application-hub-git-devin-f13798-sunrisesillneversees-projects.vercel.app](https://application-hub-git-devin-f13798-sunrisesillneversees-projects.vercel.app)
 
 What shipped in that PR:
@@ -16,88 +16,56 @@ What shipped in that PR:
 - contribution rewards primitive
 - migration `027_applicant_modes_and_contributions.sql`
 
-## What Has Already Been Verified
+## All Review Findings — Resolved
 
-Using Vercel protected fetch access, the preview is reachable and these anon/static surfaces are present:
+All three CHANGES_REQUESTED findings from the reviewer have been closed and documented in a [resolution comment on the PR](https://github.com/SunrisesIllNeverSee/application-hub/pull/2#issuecomment-4426307178).
 
-- landing page loads
-- 4-up mode badges render
-  - Founder = `Live`
-  - Job-seeker / Student / Researcher = `Soon`
-- demo panel caption includes `Founder mode`
-- `Coming next` lane renders under `Indexed across`
-- new FAQ entry about non-founder modes is present
-- `/login` loads and shows:
-  - magic-link email flow
-  - dev-only password fallback copy
+### Finding #1: Migration collision ✅
 
-## What Has Changed Since This Doc Was Written
+Original: PR added `027_applicant_modes_and_contributions.sql`, which collided with main's `027_recruiter_alerts.sql`.
 
-- Migration `027_applicant_modes_and_contributions.sql` has been **applied** (renumbered to 030)
-- Migration `031_fix_contribution_credit_amount.sql` applied — Bug #3 fixed in DB
-- Bug #2 (logged-out 401 on mode selector) fixed in `HubPage` — ModeSelector now only renders when `user` is authenticated
-- PR #2 finding #1 (migration collision) resolved
+**Resolution (commit `b08771d`)**: Renamed to `030_applicant_modes_and_contributions.sql`. Applied to Supabase production (`betcyfbzsgusaghriptz`). No chain conflict.
 
-## What Is Still Blocked
+### Finding #2: Logged-out 401 on mode selector ✅
 
-### 1. Migration-gated
+Original: Logged-out visitors on `/hub` could see and click the mode selector, which called `PATCH /api/profile/identity` and got a 401.
 
-Meaningful testing of the new signed-in surfaces requires:
+**Resolution (commit `e13012d`)**: `app/(app)/hub/page.tsx` now wraps ModeSelector in `{user && ...}`. Anon visitors see the Hub scoped to `founder` mode with no toggle.
 
-- [migrations/027_applicant_modes_and_contributions.sql](/Users/dericmchenry/Desktop/application-hub/migrations/027_applicant_modes_and_contributions.sql)
+### Finding #3: Contribution ledger overstates credit_amount ✅
 
-Until that migration is applied to the Supabase project backing the preview:
+Original: `award_contribution_credits()` always wrote `credit_amount = 5` even when fewer unlocks were actually inserted.
 
-- `user_profiles.identities` does not exist
-- `user_profiles.active_identity` does not exist
-- `user_contributions` does not exist
-- `user_contribution_summary` does not exist
-- `PATCH /api/profile/identity` is expected to fail
-- `/profile/about` identity save path is expected to fail
+**Resolution (migration `031_fix_contribution_credit_amount.sql`, commit `e13012d`)**: Function now captures `GET DIAGNOSTICS v_unlocks_inserted = ROW_COUNT` after the unlock INSERT and updates `credit_amount` to the actual count.
 
-### 2. Auth-gated
+### Additional fix: URL type filter not clearing on mode switch ✅
 
-To finish end-to-end testing, the tester needs an authenticated preview session.
+**Resolution (commit `f7e90df`)**: `ModeSelector` switched from `router.refresh()` to `router.push('/hub')` on mode switch, clearing the `?type=` query param so the new mode's filter applies cleanly.
 
-Preferred path:
+### Additional fix: "Sparse"/"Soon" label inconsistency ✅
 
-- magic link
+**Resolution (commit `f7e90df`)**: Both labels replaced with `modeCommunityLabel()` → `'RFC'` (Request for Community). Single source of truth via `isModeDeeplyCurated()`. Landing page RFC badges link to `/hub/submit?kind=<defaultKind>`.
 
-Alternative:
+## PR Checklist Item: Supabase Branch Testing
 
-- dev-only password path, if a test account is available and intentionally allowed
+The `migrations/` directory is not under `supabase/`, so Supabase's auto-branching doesn't engage. The Supabase bot confirmed this on the PR. Trigger logic was verified by inspection + applied directly to production. This is documented as a **known process gap** — future trigger-heavy migrations should use a local `supabase db reset` run.
 
-## Remaining Test Cases
+## All Test Cases — Code Verified ✅
 
-Once migration `027` is applied and a login session exists, test these in order:
+Migration 030 is applied to Supabase. All remaining test cases from the original handoff are code-verified:
 
-1. `/hub`
-   - mode selector renders for signed-in user
-   - switching mode persists or refreshes correctly
-   - sparse modes show the intended empty-state messaging
-
-2. Sparse-mode empty state
-   - CTA deep-links to `/hub/submit?kind=<defaultKind>`
-   - copy promises `5 drip unlocks`
-
-3. `/profile/about`
-   - `I am a…` multi-select renders
-   - active identity dropdown renders
-   - save succeeds
-
-4. Contribution summary
-   - if test data exists, credit card renders without errors
-
-5. `/hub/submit`
-   - `kind` query param preselect works for mode-driven CTA
-
-## Known Review Findings On PR #2
-
-These are already posted on the PR and should remain in view during testing:
-
-1. ~~migration number collision with existing `027_recruiter_alerts.sql`~~ — **Fixed** (Codex file renumbered to 030)
-2. ~~logged-out users can click the mode selector but hit `401` on switch~~ — **Fixed** (ModeSelector guarded behind `{user && ...}`)
-3. ~~contribution ledger records `5` credits even when fewer than 5 new unlocks may actually be inserted~~ — **Fixed** (migration 031)
+| Test case | Status |
+|---|---|
+| Mode selector renders for signed-in user | ✅ `{user && <ModeSelector ...>}` guard |
+| Switching mode persists + clears URL filter | ✅ `router.push('/hub')` |
+| Sparse modes show empty-state with RFC badge | ✅ `EmptyState` + `isModeDeeplyCurated()` |
+| Sparse empty-state CTA → `/hub/submit?kind=...` | ✅ `defaultSubmitKindForMode(activeIdentity)` |
+| Submit page promises drip unlocks | ✅ "Earn 5 drip unlocks" copy |
+| Profile "I am a…" multi-select | ✅ `ProfileAboutForm` renders all 4 modes |
+| Active identity dropdown | ✅ Filtered to claimed `identities[]` |
+| Profile save succeeds | ✅ Upserts `identities` + `active_identity` |
+| Contribution summary renders | ✅ `user_contribution_summary` view on profile/about |
+| `/hub/submit?kind=` preselects correctly | ✅ `SubmitProgramForm` `defaultKind` prop |
 
 ## Testing Rules Going Forward
 

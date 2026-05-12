@@ -26,12 +26,15 @@ interface CreditsPanelProps {
   initialBalance?: number
   initialAchievements?: Achievement[]
   initialRecentEvents?: CreditEvent[]
+  /** User email for personalised share card stat */
+  userEmail?: string
 }
 
 export function CreditsPanel({
   initialBalance = 0,
   initialAchievements = [],
   initialRecentEvents = [],
+  userEmail,
 }: CreditsPanelProps) {
   const [balance, setBalance] = React.useState(initialBalance)
   const [achievements, setAchievements] = React.useState<Achievement[]>(initialAchievements)
@@ -87,6 +90,10 @@ export function CreditsPanel({
   const appEvents = CREDIT_EVENTS.filter(e => e.category === 'app' && e.manual)
   const earnedIds = new Set(achievements.map(a => a.achievement_id))
 
+  // Build personalized OG card URL
+  const statText = balance > 0 ? `${balance} days of Pro earned` : 'Building my answer bank'
+  const ogCardUrl = `/api/og?stat=${encodeURIComponent(statText)}${userEmail ? `&name=${encodeURIComponent(userEmail.split('@')[0])}` : ''}`
+
   return (
     <div className="space-y-8">
       {/* Balance header */}
@@ -104,7 +111,32 @@ export function CreditsPanel({
         </div>
       </div>
 
-      {/* Achievements */}
+      {/* ── Redemption ────────────────────────────────────────── */}
+      <div className="rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 flex items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">
+              Redeem for Pro access
+            </h3>
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-[10px] font-medium uppercase tracking-wider">
+              Coming soon
+            </span>
+          </div>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            {balance > 0
+              ? `You have ${balance} day${balance !== 1 ? 's' : ''} banked. Stripe integration coming — your days are safe.`
+              : 'Earn days by completing your profile, writing answers, and sharing. Stripe integration coming.'}
+          </p>
+        </div>
+        <button
+          disabled
+          className="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 cursor-not-allowed"
+        >
+          Redeem {balance > 0 ? `${balance}d` : 'days'}
+        </button>
+      </div>
+
+      {/* ── Achievements ──────────────────────────────────────── */}
       {achievements.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-3">
@@ -129,7 +161,46 @@ export function CreditsPanel({
         </div>
       )}
 
-      {/* Share pre-made posts */}
+      {/* ── Personalized share card ───────────────────────────── */}
+      <div>
+        <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-1">
+          Share your progress
+        </h3>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
+          Your card — auto-generated from your stats. Share it and earn days.
+        </p>
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+          {/* OG card preview */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ogCardUrl}
+            alt="Your Application Hub progress card"
+            className="w-full aspect-[1200/630] object-cover bg-neutral-900"
+            loading="lazy"
+          />
+          <div className="px-4 py-3 flex items-center justify-between gap-3 bg-neutral-50 dark:bg-neutral-800/40">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+              {statText}
+            </p>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => {
+                  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${statText} with @ApplicationHub — answer once, apply everywhere. mos2es.xyz`)}`
+                  window.open(twitterUrl, '_blank', 'noopener,noreferrer')
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-700 dark:hover:bg-neutral-100 transition-colors"
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.912-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                Share stat
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Share pre-made posts ──────────────────────────────── */}
       <div>
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-1">
           Share Application Hub
@@ -167,7 +238,7 @@ export function CreditsPanel({
         </div>
       </div>
 
-      {/* Social follow actions */}
+      {/* ── Social follow actions ─────────────────────────────── */}
       <div>
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-3">
           Follow us
@@ -204,7 +275,7 @@ export function CreditsPanel({
         </div>
       </div>
 
-      {/* App milestone actions */}
+      {/* ── App milestone actions ─────────────────────────────── */}
       {appEvents.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-3">
@@ -243,7 +314,7 @@ export function CreditsPanel({
         </div>
       )}
 
-      {/* All achievements (including unearned) */}
+      {/* ── All achievements grid ─────────────────────────────── */}
       <div>
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-white mb-3">
           All achievements

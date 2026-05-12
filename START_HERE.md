@@ -46,10 +46,14 @@ If `check.py` returns warnings, fix them before committing. Warnings now block b
 
 1. Check `migrations.next` in `.agents/registry.yaml`
 2. Claim that number in `.agents/claims.yaml` **before** writing SQL
-3. Land the migration
-4. Update `migrations.next` in the registry and release your claim
+3. Create the file in `supabase/migrations/` (NOT the legacy `migrations/` root)
+4. Run `supabase db push` to apply it to production
+5. Update `migrations.next` in the registry and release your claim
+
 
 **Do not skip step 2.** The 027 collision happened because two sessions both claimed the same number without checking first.
+
+**Migration home has moved**: `supabase/migrations/` is the canonical location. The CLI is linked (`supabase db push --dry-run` returns "Remote database is up to date"). The old `migrations/` root folder is the legacy location — new files must go in `supabase/migrations/`.
 
 ---
 

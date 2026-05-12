@@ -23,6 +23,69 @@ jobs:
       - name: Run strict registry check
         run: python3 .agents/check.py --strict
 
+  # ── Migration lint ──────────────────────────────────────────────────────────
+  # Validates that every migration in supabase/migrations/ has a unique
+  # sequential prefix and that the local list is consistent with what the
+  # Supabase CLI expects. Does NOT apply migrations to any database.
+  # Only runs when migration files change.
+  migrations:
+    name: Migration lint
+    runs-on: ubuntu-latest
+    needs: agent-check
+    if: |
+      github.event_name == 'push' ||
+      contains(toJson(github.event.pull_request.changed_files), 'supabase/migrations')
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Check for duplicate migration prefixes
+        run: |
+          python3 - << 'PYEOF'
+          import os, sys, re
+          from collections import defaultdict
+
+          mig_dir = "supabase/migrations"
+          files = [f for f in os.listdir(mig_dir) if f.endswith(".sql")]
+          prefixes = defaultdict(list)
+          for f in files:
+              m = re.match(r'^(\d+)', f)
+              if m:
+                  prefixes[m.group(1)].append(f)
+
+          duplicates = {k: v for k, v in prefixes.items() if len(v) > 1}
+          if duplicates:
+              print("ERROR: Duplicate migration prefixes detected:")
+              for prefix, names in sorted(duplicates.items()):
+                  for name in names:
+                      print(f"  {prefix}: {name}")
+              sys.exit(1)
+          print(f"OK: {len(files)} migrations, all prefixes unique")
+          PYEOF
+
+      - name: Validate migration file names
+        run: |
+          python3 - << 'PYEOF'
+          import os, sys, re
+
+          mig_dir = "supabase/migrations"
+          files = sorted(f for f in os.listdir(mig_dir) if f.endswith(".sql"))
+          errors = []
+          for f in files:
+              if not re.match(r'^\d+_[a-z0-9_]+\.sql$', f):
+                  errors.append(f"  INVALID name: {f} (expected NNN_description.sql)")
+
+          if errors:
+              print("ERROR: Migration file name violations:")
+              print("\n".join(errors))
+              sys.exit(1)
+          print(f"OK: all {len(files)} migration names are valid")
+          PYEOF
+
   # ── MCP server ───────────────────────────────────────────────────────────────
   mcp-server:
     name: MCP server
