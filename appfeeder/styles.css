@@ -3,8 +3,8 @@
 #apphub-overlay {
   position: fixed;
   bottom: 20px;
-  right: 20px;
-  width: 320px;
+  left: 20px;
+  width: 380px;
   background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 8px;
