@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Application Hub</title>
+  <title>Appfeeder</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { width: 280px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: #111; background: #fff; }
@@ -28,6 +28,12 @@
       font-weight: 500; cursor: pointer;
     }
     button.save:hover { background: #4f46e5; }
+    button.clear {
+      width: 100%; padding: 7px; margin-top: 6px; background: transparent;
+      color: #9ca3af; border: 1px solid #e5e5e5; border-radius: 5px; font-size: 12px;
+      cursor: pointer;
+    }
+    button.clear:hover { color: #ef4444; border-color: #ef4444; }
     footer { padding: 8px 14px; border-top: 1px solid #e5e5e5; text-align: center; }
     footer a { font-size: 11px; color: #9ca3af; text-decoration: none; }
     footer a:hover { color: #6366f1; }
@@ -35,7 +41,7 @@
 </head>
 <body>
   <header>
-    <h1>Application Hub</h1>
+    <h1>Appfeeder</h1>
   </header>
 
   <div class="status">
@@ -46,17 +52,17 @@
   <div class="section">
     <label for="jwt-input">Session token</label>
     <input type="password" id="jwt-input" placeholder="eyJ…" autocomplete="off" />
-    <p class="hint">Get yours at <a href="https://mos2es.xyz/profile/settings" target="_blank">mos2es.xyz/profile/settings</a></p>
-
-    <label for="anon-key-input" style="margin-top:10px;">Supabase anon key</label>
-    <input type="password" id="anon-key-input" placeholder="eyJ…" autocomplete="off" />
-    <p class="hint">Found in your project settings (public key — safe to paste)</p>
-
+    <p class="hint">
+      Get yours at
+      <a href="https://mos2es.xyz/profile/settings" target="_blank">mos2es.xyz/profile/settings</a>
+      → "Show session token"
+    </p>
     <button class="save" id="save-btn">Save & connect</button>
+    <button class="clear" id="clear-btn">Clear saved token</button>
   </div>
 
   <footer>
-    <a href="https://mos2es.xyz" target="_blank">mos2es.xyz</a>
+    <a href="https://mos2es.xyz" target="_blank" rel="noopener noreferrer">mos2es.xyz</a>
   </footer>
 
   <script src="popup.js"></script>

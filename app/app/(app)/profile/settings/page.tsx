@@ -3,6 +3,7 @@ import { ProfileSettingsForm } from '@/components/ProfileSettingsForm'
 import { PricingCards } from '@/components/PricingCards'
 import { BillingAlerts } from '@/components/BillingAlerts'
 import { TeamSection } from '@/components/TeamSection'
+import { ExtensionTokenCard } from '@/components/ExtensionTokenCard'
 import type { SubscriptionTier } from '@/lib/database.types'
 
 export const metadata = {
@@ -112,6 +113,11 @@ export default async function ProfileSettingsPage({
         initialTeam={teamData}
         initialMemberCount={memberCount}
       />
+
+      {/* Appfeeder extension token */}
+      <div className="max-w-2xl">
+        <ExtensionTokenCard />
+      </div>
     </div>
   )
 }
