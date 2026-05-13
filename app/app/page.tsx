@@ -18,7 +18,7 @@ export default async function RootPage() {
     .from('archived_questions')
     .select('id, text, theme, asked_by_count, significance_score')
     .order('significance_score', { ascending: false })
-    .limit(12)
+    .limit(8)
 
   type ArchiveQuestion = { id: string; text: string; theme: string; asked_by_count: number; significance_score: number }
   const questions = (topQuestions ?? []) as ArchiveQuestion[]
@@ -211,7 +211,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="archive" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+        <section id="archive" className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">The archive</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Questions are data. Answers are capital.</h2>
@@ -276,7 +276,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Answer bank</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Your bank grows every time you show up.</h2>
@@ -299,7 +299,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="compare" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+        <section id="compare" className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">How we compare</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The other ways applicants try to do this.</h2>
@@ -308,32 +308,30 @@ export default async function RootPage() {
             </p>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-neutral-800">
-            <table className="w-full min-w-[720px] text-sm">
+            <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="bg-neutral-900/60 border-b border-neutral-800">
                   <th className="text-left p-4 font-medium text-neutral-300">Feature</th>
                   <th className="p-4 font-medium text-brand-300">AQUA</th>
-                  <th className="p-4 font-medium text-neutral-400">Notion templates</th>
                   <th className="p-4 font-medium text-neutral-400">ChatGPT alone</th>
                   <th className="p-4 font-medium text-neutral-400">App consultant</th>
                 </tr>
               </thead>
               <tbody className="text-neutral-300">
                 {[
-                  ['Question archive (225+)', '✓', '—', '—', '—'],
-                  ['Significance scoring', '✓', '—', '—', 'Maybe'],
-                  ['Auto pre-fill across programs', '✓', '—', '—', '—'],
-                  ['Program-specific fit score', '✓', '—', '—', 'Manual'],
-                  ['MCP / agent integration', '✓', '—', '—', '—'],
-                  ['Reuses your answers as data', '✓', 'Manual', '—', '—'],
-                  ['Cost', '$0–49/mo', '$8/mo + DIY', '$20/mo', '$2k–10k/app'],
+                  ['Question archive (225+)', '✓', '—', '—'],
+                  ['Significance scoring', '✓', '—', 'Maybe'],
+                  ['Auto pre-fill across programs', '✓', '—', '—'],
+                  ['Program-specific fit score', '✓', '—', 'Manual'],
+                  ['MCP / agent integration', '✓', '—', '—'],
+                  ['Reuses your answers as data', '✓', '—', '—'],
+                  ['Cost', '$0–49/mo', '$20/mo', '$2k–10k/app'],
                 ].map((row, i) => (
                   <tr key={i} className={`border-b border-neutral-800/60 ${i === 6 ? 'bg-neutral-900/40' : ''}`}>
                     <td className="p-4 text-neutral-200 font-medium">{row[0]}</td>
                     <td className="p-4 text-center text-brand-300 font-semibold">{row[1]}</td>
                     <td className="p-4 text-center text-neutral-400">{row[2]}</td>
                     <td className="p-4 text-center text-neutral-400">{row[3]}</td>
-                    <td className="p-4 text-center text-neutral-400">{row[4]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -341,7 +339,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="mcp" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+        <section id="mcp" className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <div className="rounded-3xl border border-neutral-800 bg-gradient-to-br from-neutral-900/80 to-neutral-950 p-10 md:p-14">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
@@ -367,7 +365,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section id="pricing" className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+        <section id="pricing" className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <div className="text-center mb-12">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Pricing</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Simple. Applicant-friendly.</h2>
@@ -412,7 +410,7 @@ export default async function RootPage() {
           </div>
         </section>
 
-        <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20">
+        <section className="max-w-3xl mx-auto px-4 sm:px-6 py-24">
           <div className="text-center mb-10">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-3">Questions</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">The ones applicants actually ask.</h2>
