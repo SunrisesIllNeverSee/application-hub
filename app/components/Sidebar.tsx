@@ -20,6 +20,7 @@ interface SidebarProps {
   user: User
   applications: Application[]
   creditBalance?: number
+  unreadCount?: number
 }
 
 const NAV = [
@@ -27,6 +28,7 @@ const NAV = [
   { href: '/applications', label: 'Applications', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
   { href: '/questions', label: 'Questions', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
   { href: '/answers', label: 'Answers', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M4 7l8-4 8 4M4 7l8 4 8-4m-8 4v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
+  { href: '/community/messages', label: 'Messages', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
@@ -43,7 +45,7 @@ const SunIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="non
 const MoonIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>)
 const SignOutIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>)
 
-export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps) {
+export function Sidebar({ user, applications, creditBalance = 0, unreadCount = 0 }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -78,6 +80,7 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
     if (href === '/applications') return pathname === '/applications' || pathname.startsWith('/applications/') || pathname.startsWith('/workspace')
     if (href === '/questions') return pathname === '/questions' || pathname.startsWith('/questions/')
     if (href === '/answers') return pathname === '/answers' || pathname.startsWith('/answers/')
+    if (href === '/community/messages') return pathname === '/community/messages' || pathname.startsWith('/community/messages/')
     return pathname === href || pathname.startsWith(href + '/')
   }
 
@@ -92,9 +95,11 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
         </button>
         {NAV.map((item) => {
           const active = isNavActive(item.href)
+          const showDot = item.href === '/community/messages' && unreadCount > 0
           return (
-            <Link key={item.href} href={item.href} title={item.label} className={cn('flex items-center justify-center w-9 h-9 rounded-lg transition-colors', active ? 'bg-neutral-800 text-brand-400' : 'text-neutral-500 hover:text-white hover:bg-neutral-800/60')}>
+            <Link key={item.href} href={item.href} title={item.label} className={cn('relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors', active ? 'bg-neutral-800 text-brand-400' : 'text-neutral-500 hover:text-white hover:bg-neutral-800/60')}>
               {item.icon}
+              {showDot && (<span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-brand-600" />)}
             </Link>
           )
         })}
@@ -126,10 +131,12 @@ export function Sidebar({ user, applications, creditBalance = 0 }: SidebarProps)
       <div className="px-2 py-3 space-y-0.5 flex-shrink-0">
         {NAV.map((item) => {
           const active = isNavActive(item.href)
+          const showBadge = item.href === '/community/messages' && unreadCount > 0
           return (
             <Link key={item.href} href={item.href} className={cn('flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors', active ? 'bg-neutral-800 text-white font-medium' : 'text-neutral-400 hover:text-white hover:bg-neutral-800/60')}>
               <span className={cn('flex-shrink-0', active ? 'text-brand-400' : 'text-neutral-500')}>{item.icon}</span>
               {item.label}
+              {showBadge && (<span className="ml-auto text-[10px] font-semibold bg-brand-600 text-white rounded-full px-1.5 py-0.5 min-w-[18px] text-center">{unreadCount > 99 ? '99+' : unreadCount}</span>)}
             </Link>
           )
         })}

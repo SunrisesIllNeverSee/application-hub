@@ -118,6 +118,8 @@ export async function POST(req: NextRequest) {
     })
     .eq('user_id', user.id)
 
+  const { data: starterCount } = await supabase.rpc('claim_starter_package', { p_user_id: user.id })
+
   const topThemes = Object.entries(themeCount)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3)
@@ -130,6 +132,7 @@ export async function POST(req: NextRequest) {
       answersCount,
       themesCovered: Object.keys(themeCount).length,
       topThemes,
+      starter_unlocked: starterCount ?? 0,
     },
   })
 }
