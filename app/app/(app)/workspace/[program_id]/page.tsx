@@ -16,6 +16,7 @@ import { ScoreTooltip } from '@/components/ScoreTooltip'
 import { SignificanceStars } from '@/components/SignificanceStars'
 import { QuestionTree } from '@/components/QuestionTree'
 import { CompiledOutput } from '@/components/CompiledOutput'
+import { SubmissionExport } from '@/components/SubmissionExport'
 import { formatDeadline, formatProgramStartDate, cn } from '@/lib/utils'
 
 interface Props {
@@ -225,11 +226,45 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
                   >
                     Compiled output
                   </Link>
+                  <Link
+                    href={tabHref('submit')}
+                    className={cn(
+                      'px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors',
+                      tab === 'submit'
+                        ? 'border-brand-500 text-brand-700 dark:text-brand-300'
+                        : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
+                    )}
+                  >
+                    Submit
+                  </Link>
                 </div>
 
                 {/* Tab content */}
                 <div className="flex-1 overflow-y-auto min-h-0">
-                  {tab === 'compiled' ? (
+                  {tab === 'submit' ? (
+                    <SubmissionExport
+                      programName={program.name}
+                      programUrl={program.url}
+                      questions={questions.map((q) => ({
+                        archived_question_id: q.archived_question_id,
+                        item: {
+                          asked_as: q.asked_as,
+                          word_limit: q.word_limit,
+                          char_limit: q.char_limit,
+                          section: q.section,
+                          order_index: q.order_index,
+                          is_required: q.is_required,
+                          archived_question: q.archived_question ? { theme: q.archived_question.theme } : null,
+                        },
+                        answer: answerMap[q.archived_question_id]
+                          ? {
+                              answer_content: answerMap[q.archived_question_id].answer_content ?? '',
+                              word_count: answerMap[q.archived_question_id].word_count,
+                            }
+                          : null,
+                      }))}
+                    />
+                  ) : tab === 'compiled' ? (
                     <CompiledOutput
                       question={selectedQuestion.asked_as}
                       answer={selectedAnswer?.answer_content ?? ''}
