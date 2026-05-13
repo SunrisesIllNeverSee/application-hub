@@ -69,14 +69,27 @@ export async function POST(req: NextRequest) {
   }
 }
 
+function isPrivateUrl(url: string): boolean {
+  return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|::1|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)/i.test(url)
+}
+
 async function pingOllama(baseUrl: string): Promise<{ ok: boolean; info?: string; error?: string }> {
+  const isPrivate = isPrivateUrl(baseUrl)
+  // If the test ran on production (Vercel) and the user pointed at a private URL,
+  // there's no way for the serverless function to reach it — regardless of whether
+  // we hit ECONNREFUSED, timeout, or something else. Give the tunnel hint upfront.
+  const onProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
+  const productionPrivateHint = isPrivate && onProduction
+    ? ` The live site cannot reach private/localhost URLs — Vercel runs the test in the cloud, not on your machine. Expose Ollama via a tunnel (ngrok, Tailscale Funnel, Cloudflare Tunnel) and save the public https URL.`
+    : ''
+
   try {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), 5000)
     const resp = await fetch(`${baseUrl}/api/tags`, { signal: ctrl.signal })
     clearTimeout(timer)
     if (!resp.ok) {
-      return { ok: false, error: `Ollama returned ${resp.status} — check the URL is correct and the Ollama server is running.` }
+      return { ok: false, error: `Ollama returned ${resp.status} — check the URL is correct and the Ollama server is running.${productionPrivateHint}` }
     }
     type TagsResp = { models?: { name: string }[] }
     const data = (await resp.json().catch(() => ({}))) as TagsResp
@@ -87,11 +100,14 @@ async function pingOllama(baseUrl: string): Promise<{ ok: boolean; info?: string
     return { ok: true, info: `Ollama reachable. ${models.length} model${models.length === 1 ? '' : 's'} pulled: ${models.slice(0, 5).join(', ')}${models.length > 5 ? '…' : ''}` }
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error'
+    if (isPrivate && onProduction) {
+      return { ok: false, error: `Cannot reach ${baseUrl} from the live site.${productionPrivateHint}` }
+    }
     if (/abort|timeout/i.test(msg)) {
-      return { ok: false, error: `Timed out reaching ${baseUrl}. If you're testing against the live site, Ollama needs to be publicly reachable (ngrok, Tailscale Funnel, Cloudflare Tunnel). localhost won't work from production.` }
+      return { ok: false, error: `Timed out reaching ${baseUrl}. Check the URL and that Ollama is responsive.` }
     }
     if (/ECONNREFUSED|fetch failed/i.test(msg)) {
-      return { ok: false, error: `Connection refused. Is Ollama running at ${baseUrl}? Try \`ollama serve\` first.` }
+      return { ok: false, error: `Connection refused at ${baseUrl}. Is Ollama running? Try \`ollama serve\` first.` }
     }
     return { ok: false, error: msg }
   }
