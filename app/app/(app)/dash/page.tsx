@@ -38,6 +38,7 @@ export default async function DashPage() {
     profileRes,
     balanceRes,
     questionOfDayRes,
+    outcomesRes,
   ] = await Promise.all([
     supabase
       .from('user_question_unlocks')
@@ -101,6 +102,11 @@ export default async function DashPage() {
       .eq('user_id', user.id)
       .order('archived_question(significance_score)', { ascending: false })
       .limit(20),
+    supabase
+      .from('user_applications')
+      .select('status, would_recommend, outcome_logged_at')
+      .eq('user_id', user.id)
+      .in('status', ['accepted', 'waitlisted', 'rejected']),
   ])
 
   const isPro = subRes.data?.tier === 'pro' || subRes.data?.tier === 'team'
@@ -113,6 +119,18 @@ export default async function DashPage() {
   const stressTestCount = (stressTestsRes.data ?? []).length
   const achievements = achievementsRes.data ?? []
   const creditBalance = balanceRes.data?.balance ?? 0
+
+  const outcomes = outcomesRes.data ?? []
+  const outcomeAccepted = outcomes.filter((o) => o.status === 'accepted').length
+  const outcomeWaitlisted = outcomes.filter((o) => o.status === 'waitlisted').length
+  const outcomeRejected = outcomes.filter((o) => o.status === 'rejected').length
+  const outcomeTotal = outcomeAccepted + outcomeWaitlisted + outcomeRejected
+  const recommendValues = outcomes
+    .map((o) => (o as { would_recommend: number | null }).would_recommend)
+    .filter((v): v is number => typeof v === 'number')
+  const avgRecommend = recommendValues.length > 0
+    ? recommendValues.reduce((s, v) => s + v, 0) / recommendValues.length
+    : null
 
   // Question of the day
   const answeredIds = new Set(allAnswers.map((a) => a.archived_question_id))
@@ -516,35 +534,64 @@ export default async function DashPage() {
           </div>
         </div>
 
-        {/* Col C — Achievements + Rewards */}
-        <div className="card p-4 flex flex-col">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-              Achievements
+        {/* Col C — Outcomes (if any) or Achievements + Rewards */}
+        {outcomeTotal > 0 ? (
+          <div className="card p-4 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                Outcomes
+              </p>
+              <Link href="/applications?tab=mine" className="text-[10px] text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                View all →
+              </Link>
+            </div>
+            <div className="mb-3 flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold text-neutral-900 dark:text-white tabular-nums">{outcomeTotal}</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">logged</span>
+            </div>
+            <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-snug">
+              {[
+                outcomeAccepted > 0 ? `${outcomeAccepted} accepted` : null,
+                outcomeWaitlisted > 0 ? `${outcomeWaitlisted} waitlisted` : null,
+                outcomeRejected > 0 ? `${outcomeRejected} rejected` : null,
+              ].filter(Boolean).join(' · ')}
             </p>
-            <Link href="/profile/credits" className="text-[10px] text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
-              Days dashboard →
-            </Link>
-          </div>
-          <div className="mb-3 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-neutral-900 dark:text-white tabular-nums">§{creditBalance}</span>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400">days credit</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {achievements.slice(0, 4).map((ach) => (
-              <span
-                key={ach.achievement_id}
-                title={`Unlocked ${new Date(ach.unlocked_at as string).toLocaleDateString()}`}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-900/40 text-success-700 dark:text-success-300"
-              >
-                {'🏆'} {prettifyAchievement(ach.achievement_id as string)}
-              </span>
-            ))}
-            {achievements.length === 0 && (
-              <p className="text-xs text-neutral-400 dark:text-neutral-500">Answer questions to earn achievements.</p>
+            {avgRecommend != null && (
+              <p className="mt-1.5 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                ★ {avgRecommend.toFixed(1)} avg recommend
+              </p>
             )}
           </div>
-        </div>
+        ) : (
+          <div className="card p-4 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                Achievements
+              </p>
+              <Link href="/profile/credits" className="text-[10px] text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                Days dashboard →
+              </Link>
+            </div>
+            <div className="mb-3 flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold text-neutral-900 dark:text-white tabular-nums">§{creditBalance}</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">days credit</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {achievements.slice(0, 4).map((ach) => (
+                <span
+                  key={ach.achievement_id}
+                  title={`Unlocked ${new Date(ach.unlocked_at as string).toLocaleDateString()}`}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-900/40 text-success-700 dark:text-success-300"
+                >
+                  {'🏆'} {prettifyAchievement(ach.achievement_id as string)}
+                </span>
+              ))}
+              {achievements.length === 0 && (
+                <p className="text-xs text-neutral-400 dark:text-neutral-500">Answer questions to earn achievements.</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Free tier nudge */}
