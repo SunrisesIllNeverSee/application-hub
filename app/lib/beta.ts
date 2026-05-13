@@ -5,14 +5,21 @@
  *   trial length in Stripe checkout, beta_participant flag capture.
  * BETA_END_DATE: ISO date when beta ends. Used by /api/beta/check to
  *   trigger the grace-period or basic-tier transition.
+ *
+ * NEXT_PUBLIC_BETA_MODE: client-readable mirror. Required for client
+ *   components (e.g. PricingCards) that need to gate UI on beta state.
  */
 
 export function isBetaMode(): boolean {
-  return process.env.BETA_MODE === 'true'
+  // Prefer server-only flag; fall back to public mirror for client components.
+  return (
+    process.env.BETA_MODE === 'true' ||
+    process.env.NEXT_PUBLIC_BETA_MODE === 'true'
+  )
 }
 
 export function getBetaEndDate(): Date | null {
-  const raw = process.env.BETA_END_DATE
+  const raw = process.env.BETA_END_DATE ?? process.env.NEXT_PUBLIC_BETA_END_DATE
   if (!raw) return null
   const d = new Date(raw)
   return isNaN(d.getTime()) ? null : d

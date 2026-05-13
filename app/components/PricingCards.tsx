@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { isBetaMode } from '@/lib/beta'
 
 type Tier = 'free' | 'pro' | 'team'
 
@@ -22,6 +23,28 @@ interface Plan {
   comingSoon?: boolean[]
 }
 
+const BETA = isBetaMode()
+
+const PRO_FEATURES_BETA: string[] = [
+  'Unlimited applications',
+  'Unlimited AI drafts',
+  'Export answers',
+  'Acceptance rate data',
+  'Heat scores',
+  'MCP server access',
+  '30 days free after beta ends',
+]
+
+const PRO_FEATURES_NORMAL: string[] = [
+  'Unlimited applications',
+  'Unlimited AI drafts',
+  'Export answers',
+  'Acceptance rate data',
+  'Heat scores',
+  'MCP server access',
+  'Priority support',
+]
+
 const PLANS: Plan[] = [
   {
     id: 'free',
@@ -40,19 +63,14 @@ const PLANS: Plan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    monthlyPrice: 19,
-    annualPrice: 159,
-    description: 'For serious applicants',
-    features: [
-      'Unlimited applications',
-      'Unlimited AI drafts',
-      'Export answers',
-      'Acceptance rate data',
-      'Heat scores',
-      'MCP server access',
-    ],
-    cta: 'Upgrade to Pro',
-    badge: 'Most popular',
+    monthlyPrice: BETA ? 1 : 19,
+    annualPrice: BETA ? 12 : 159,
+    description: BETA
+      ? 'Beta — $1/mo with 14-day free trial'
+      : 'For serious applicants',
+    features: BETA ? PRO_FEATURES_BETA : PRO_FEATURES_NORMAL,
+    cta: BETA ? 'Start Pro Beta' : 'Upgrade to Pro',
+    badge: BETA ? 'Beta' : 'Most popular',
     highlight: true,
   },
 ]

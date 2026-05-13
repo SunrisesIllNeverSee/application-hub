@@ -124,8 +124,9 @@ export async function POST(req: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.user_id
         const tier = session.metadata?.tier as 'pro' | 'team' | undefined
+        const isBetaParticipant = session.metadata?.beta_participant === 'true'
 
-        console.log(`[webhook] checkout.session.completed session=${session.id} userId=${userId} tier=${tier}`)
+        console.log(`[webhook] checkout.session.completed session=${session.id} userId=${userId} tier=${tier} beta=${isBetaParticipant}`)
 
         if (!userId || !tier) {
           console.error('[webhook] checkout.session.completed: missing metadata', session.id)
@@ -146,6 +147,56 @@ export async function POST(req: NextRequest) {
           console.error('[webhook] checkout.session.completed: update failed', updateErr)
           throw updateErr
         }
+
+        // Beta-participant capture: tag the subscription row + persist the
+        // payment method so we can charge the grace-period rollover after beta.
+        if (isBetaParticipant) {
+          let betaPaymentMethodId: string | null = null
+          try {
+            const stripeClient = getStripe()
+            const subscriptionId = session.subscription as string | null
+            if (subscriptionId) {
+              const sub = await stripeClient.subscriptions.retrieve(subscriptionId)
+              const pm = sub.default_payment_method
+              if (typeof pm === 'string') betaPaymentMethodId = pm
+              else if (pm && typeof pm === 'object' && 'id' in pm) betaPaymentMethodId = (pm as { id: string }).id
+            }
+            if (!betaPaymentMethodId && session.setup_intent) {
+              const setupIntentId = typeof session.setup_intent === 'string'
+                ? session.setup_intent
+                : session.setup_intent.id
+              const intent = await stripeClient.setupIntents.retrieve(setupIntentId)
+              if (typeof intent.payment_method === 'string') {
+                betaPaymentMethodId = intent.payment_method
+              } else if (intent.payment_method && 'id' in intent.payment_method) {
+                betaPaymentMethodId = (intent.payment_method as { id: string }).id
+              }
+            }
+          } catch (pmErr) {
+            console.error('[webhook] failed to resolve beta payment method:', pmErr)
+          }
+
+          const betaPayload: Record<string, unknown> = {
+            beta_participant: true,
+            beta_grace_period_days: 30,
+          }
+          if (betaPaymentMethodId) {
+            betaPayload.beta_payment_method_id = betaPaymentMethodId
+          }
+
+          const { error: betaErr } = await supabase
+            .from('user_subscriptions')
+            // Cast: beta_* columns may not be in generated types yet.
+            .update(betaPayload as never)
+            .eq('user_id', userId)
+
+          if (betaErr) {
+            console.error('[webhook] beta_participant update failed:', betaErr)
+          } else {
+            console.log(`[webhook] beta_participant captured for user ${userId} (pm=${betaPaymentMethodId ?? 'none'})`)
+          }
+        }
+
         console.log(`[webhook] checkout.session.completed: user ${userId} upgraded to ${tier}`)
         break
       }

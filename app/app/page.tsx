@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { APPLICANT_MODES, modeLabel, isModeDeeplyCurated, modeCommunityLabel, modeCommunityDescription, defaultSubmitKindForMode } from '@/lib/applicantMode'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isBetaMode } from '@/lib/beta'
 
 export default async function RootPage() {
   const supabase = await createClient()
@@ -38,12 +39,15 @@ export default async function RootPage() {
       <header className="border-b border-neutral-800/60 sticky top-0 z-30 bg-neutral-950/80 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-brand-600">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-brand-600">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white" aria-hidden="true">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            <span className="text-sm font-semibold tracking-tight">AQUA</span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-xl font-semibold tracking-tight">AQUA</span>
+              <span className="text-[10px] text-neutral-500 tracking-tight">Applications · Questions · Answers</span>
+            </div>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6 text-sm">
             <a href="#archive" className="text-neutral-400 hover:text-neutral-100 transition-colors hidden sm:inline">Archive</a>
@@ -121,6 +125,10 @@ export default async function RootPage() {
           <p className="mt-5 text-xs text-neutral-400">
             Free tier · 10 AI drafts/month · No credit card
           </p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <span className="text-xs text-neutral-500">Powered by</span>
+            <span className="text-xs font-semibold text-neutral-400">MO§ES™</span>
+          </div>
 
           <div className="mt-16 mx-auto max-w-4xl">
             <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 shadow-2xl shadow-brand-900/20 overflow-hidden">
@@ -384,16 +392,20 @@ export default async function RootPage() {
               </ul>
             </div>
             <div className="rounded-2xl border-2 border-brand-600/60 bg-gradient-to-b from-brand-950/40 to-neutral-900/40 p-8 relative">
-              <span className="absolute -top-2 left-8 px-2 py-0.5 rounded-full bg-brand-700 text-xs font-medium text-white">Most popular</span>
+              <span className="absolute -top-2 left-8 px-2 py-0.5 rounded-full bg-brand-700 text-xs font-medium text-white">{isBetaMode() ? 'Beta — $1/mo' : 'Most popular'}</span>
               <p className="text-sm font-semibold text-brand-300">Pro</p>
-              <p className="mt-2 text-4xl font-semibold">$19<span className="text-base text-neutral-400 font-normal">/mo</span></p>
-              <p className="text-xs text-neutral-400 mb-6">per applicant</p>
+              {isBetaMode() ? (
+                <p className="mt-2 text-4xl font-semibold">$1<span className="text-base text-neutral-400 font-normal">/mo</span></p>
+              ) : (
+                <p className="mt-2 text-4xl font-semibold">$19<span className="text-base text-neutral-400 font-normal">/mo</span></p>
+              )}
+              <p className="text-xs text-neutral-400 mb-6">{isBetaMode() ? '14-day free trial · 30 days free after beta ends' : 'per applicant'}</p>
               <ul className="space-y-2 text-sm text-neutral-200">
                 <li>· Unlimited AI drafts</li>
                 <li>· All 225 questions unlocked</li>
                 <li>· Fit scores + program DNA</li>
                 <li>· Heat scores and acceptance signals</li>
-                <li>· Priority support</li>
+                <li>· {isBetaMode() ? '30 days free after beta ends' : 'Priority support'}</li>
               </ul>
             </div>
             <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-8">
