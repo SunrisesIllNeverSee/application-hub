@@ -368,21 +368,38 @@ Write the draft answer only — no preamble, no explanation, no word count at th
       const model = resolvedModelPreference
         ?? (resolvedProvider === 'ollama' ? 'llama3.2' : 'gpt-4o-mini')
 
-      const resp = await fetch(`${baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1024,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-        }),
-      })
+      // Catch fetch-level failures (unreachable host, DNS, refused connection)
+      // and return a friendly 502 instead of bubbling up a generic TypeError.
+      // This is the failure mode when a user types localhost as the Ollama URL
+      // and then tries to draft from the production site — Vercel's serverless
+      // function has no path back to their laptop.
+      let resp: Response
+      try {
+        resp = await fetch(`${baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 1024,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt },
+            ],
+          }),
+        })
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Network error'
+        const isLocal = /localhost|127\.0\.0\.1|0\.0\.0\.0|::1/i.test(baseUrl)
+        const hint = resolvedProvider === 'ollama' && isLocal
+          ? `Cannot reach ${baseUrl} from the live site. Ollama on localhost is only reachable when running the app locally. To use Ollama with the live site, expose it via a tunnel (ngrok, Tailscale Funnel, Cloudflare Tunnel) and save the public URL in Profile → Integrations.`
+          : resolvedProvider === 'ollama'
+          ? `Cannot reach Ollama at ${baseUrl}. Check that Ollama is running and the URL is correct. Use the Test connection button in Profile → Integrations to diagnose.`
+          : `Cannot reach the AI provider. ${msg}`
+        return NextResponse.json({ error: hint, code: 'provider_unreachable' }, { status: 502 })
+      }
       if (!resp.ok) {
         const err = await resp.text()
         return NextResponse.json({ error: `Provider error: ${err}` }, { status: 502 })
