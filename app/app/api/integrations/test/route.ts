@@ -86,7 +86,12 @@ async function pingOllama(baseUrl: string): Promise<{ ok: boolean; info?: string
   try {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), 5000)
-    const resp = await fetch(`${baseUrl}/api/tags`, { signal: ctrl.signal })
+    const resp = await fetch(`${baseUrl}/api/tags`, {
+      signal: ctrl.signal,
+      // ngrok free tier serves an HTML interstitial unless this header is present.
+      // Include it unconditionally — harmless for non-ngrok URLs.
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+    })
     clearTimeout(timer)
     if (!resp.ok) {
       return { ok: false, error: `Ollama returned ${resp.status} — check the URL is correct and the Ollama server is running.${productionPrivateHint}` }

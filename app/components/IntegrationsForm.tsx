@@ -45,9 +45,9 @@ const PROVIDERS: { id: ProviderKey; name: string; placeholder: string; hint: str
   },
   {
     id: 'ollama',
-    name: 'Ollama (local)',
-    placeholder: 'http://localhost:11434',
-    hint: 'Run Ollama locally and paste your base URL',
+    name: 'Ollama (local / self-hosted)',
+    placeholder: 'https://your-tunnel.ngrok-free.app',
+    hint: 'Ollama uses a URL instead of an API key. For the live site, expose Ollama via a tunnel (ngrok, Tailscale Funnel, or Cloudflare Tunnel) and paste that HTTPS URL below. Local: http://localhost:11434',
     model: 'llama3.2',
   },
 ]
@@ -255,16 +255,19 @@ export function IntegrationsForm({ integrations: initial }: Props) {
                   {provider.id === 'ollama' ? (
                     <>
                       <div>
-                        <label className="label text-xs">Base URL</label>
+                        <label className="label text-xs">Ollama URL <span className="font-normal text-neutral-400 dark:text-neutral-500">(this is your "key" — no API key needed)</span></label>
                         <input
                           type="text"
                           value={baseUrl}
                           onChange={e => setBaseUrl(e.target.value)}
-                          placeholder="http://localhost:11434"
+                          placeholder="https://your-tunnel.ngrok-free.app"
                           className="input w-full font-mono text-sm"
                           autoComplete="off"
                           autoFocus
                         />
+                        <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                          Paste your ngrok / tunnel URL here. The live site can&apos;t reach localhost — use a public HTTPS tunnel.
+                        </p>
                       </div>
                       <div>
                         <label className="label text-xs">Model</label>

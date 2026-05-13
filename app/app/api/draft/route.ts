@@ -380,6 +380,9 @@ Write the draft answer only — no preamble, no explanation, no word count at th
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
+            // ngrok free tier serves an HTML interstitial unless this header is included.
+            // Harmless for non-ngrok endpoints.
+            'ngrok-skip-browser-warning': 'true',
           },
           body: JSON.stringify({
             model,
