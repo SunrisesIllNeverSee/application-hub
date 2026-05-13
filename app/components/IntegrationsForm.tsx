@@ -59,10 +59,50 @@ export function IntegrationsForm({ integrations: initial }: Props) {
   const [baseUrl, setBaseUrl] = useState('')
   const [model, setModel] = useState('')
   const [saving, setSaving] = useState(false)
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [removing, setRemoving] = useState<string | null>(null)
 
   const integrationMap = Object.fromEntries(integrations.map(i => [i.provider, i]))
+
+  async function handleTest(providerId: ProviderKey) {
+    setTesting(true)
+    setTestResult(null)
+    setError(null)
+    const isOllama = providerId === 'ollama'
+    const ollamaUrl = (baseUrl.trim() || apiKey.trim()) || 'http://localhost:11434'
+    const body: Record<string, string> = {
+      provider: providerId,
+      api_key: isOllama ? 'ollama' : apiKey.trim(),
+    }
+    if (isOllama) {
+      body.base_url = ollamaUrl
+      body.model = model.trim()
+    } else {
+      if (baseUrl.trim()) body.base_url = baseUrl.trim()
+      if (model.trim()) body.model = model.trim()
+    }
+    try {
+      const res = await fetch('/api/integrations/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setTestResult({ ok: false, message: data.error ?? `Test failed (${res.status})` })
+      } else if (data.ok) {
+        setTestResult({ ok: true, message: data.info ?? 'Connected.' })
+      } else {
+        setTestResult({ ok: false, message: data.error ?? 'Connection failed' })
+      }
+    } catch (e) {
+      setTestResult({ ok: false, message: e instanceof Error ? e.message : 'Network error' })
+    } finally {
+      setTesting(false)
+    }
+  }
 
   async function handleSave(providerId: ProviderKey) {
     // Ollama is special — the "API key" field doesn't matter (Ollama ignores
@@ -256,7 +296,29 @@ export function IntegrationsForm({ integrations: initial }: Props) {
                   {error && (
                     <p className="text-xs text-danger-600 dark:text-danger-400">{error}</p>
                   )}
+                  {testResult && (
+                    <div
+                      className={
+                        testResult.ok
+                          ? 'rounded-md border border-success-200 dark:border-success-900/60 bg-success-50/60 dark:bg-success-950/30 px-3 py-2 text-xs text-success-800 dark:text-success-300'
+                          : 'rounded-md border border-danger-200 dark:border-danger-900/60 bg-danger-50/60 dark:bg-danger-950/30 px-3 py-2 text-xs text-danger-800 dark:text-danger-300'
+                      }
+                    >
+                      {testResult.ok ? '✓ ' : '✗ '}
+                      {testResult.message}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleTest(provider.id)}
+                      disabled={
+                        testing ||
+                        (provider.id === 'ollama' ? false : !apiKey.trim())
+                      }
+                      className="text-sm px-3 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-neutral-700 dark:text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {testing ? 'Testing…' : 'Test connection'}
+                    </button>
                     <button
                       onClick={() => handleSave(provider.id)}
                       disabled={
@@ -268,7 +330,7 @@ export function IntegrationsForm({ integrations: initial }: Props) {
                       {saving ? 'Saving…' : 'Save'}
                     </button>
                     <button
-                      onClick={() => { setActiveProvider(null); setApiKey(''); setBaseUrl(''); setModel(''); setError(null) }}
+                      onClick={() => { setActiveProvider(null); setApiKey(''); setBaseUrl(''); setModel(''); setError(null); setTestResult(null) }}
                       className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
                     >
                       Cancel
