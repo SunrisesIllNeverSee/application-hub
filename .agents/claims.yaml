@@ -20,7 +20,7 @@ sessions:
     surface: codex
     started_at: 2026-05-11T12:00:00Z
     heartbeat: 2026-05-11T23:59:00Z
-    status: active
+    status: wrapped
   - id: mcp-eval-2026-05-11
     surface: mcp-eval
     started_at: 2026-05-11T14:00:00Z
@@ -36,7 +36,7 @@ sessions:
     surface: vscode-claude
     started_at: 2026-05-11T22:00:00Z
     heartbeat: 2026-05-11T23:30:00Z
-    status: active
+    status: wrapped
     note: continuation session — Phase B/C enforcement work + strict-mode opt-in
 
 claims:

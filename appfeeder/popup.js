@@ -82,7 +82,7 @@ captureBtn.addEventListener('click', () => {
   })
 })
 
-// Runs inside the page context — dumps raw page text + metadata
+// Runs inside the page context — dumps raw page text + all live field values
 function scrapePage() {
   const url = window.location.href
   const title = document.title || window.location.hostname
@@ -90,10 +90,43 @@ function scrapePage() {
   const metaDesc = document.querySelector('meta[name="description"]')?.content
     || document.querySelector('meta[property="og:description"]')?.content
     || null
-  return { url, title, rawText, metaDesc }
+
+  // Capture live input/textarea values (React stores these in .value, not DOM text)
+  const fieldValues = []
+  document.querySelectorAll('input[type="text"], input[type="email"], input[type="url"], textarea').forEach(el => {
+    const val = el.value.trim()
+    if (!val) return
+    // Find associated label text
+    let label = ''
+    if (el.id) label = document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim() || ''
+    if (!label) label = el.getAttribute('aria-label') || el.getAttribute('placeholder') || ''
+    if (!label) {
+      // Walk up to find nearby label/heading
+      let p = el.parentElement
+      for (let i = 0; i < 5 && p; i++) {
+        const h = p.querySelector('label, h1, h2, h3, h4, p, span')
+        if (h && h !== el && h.textContent.trim().length > 3) {
+          label = h.textContent.trim().replace(/\s+/g, ' ')
+          break
+        }
+        p = p.parentElement
+      }
+    }
+    fieldValues.push({ label: label || '(unlabeled)', value: val })
+  })
+
+  // Checked radio/checkbox options
+  document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked').forEach(el => {
+    const label = document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim()
+      || el.getAttribute('aria-label')
+      || el.value
+    fieldValues.push({ label: '(selected)', value: label })
+  })
+
+  return { url, title, rawText, metaDesc, fieldValues }
 }
 
-function buildMarkdown({ url, title, rawText, metaDesc }) {
+function buildMarkdown({ url, title, rawText, metaDesc, fieldValues }) {
   const date = new Date().toISOString().slice(0, 10)
   const lines = [
     `# ${title}`,
@@ -102,6 +135,18 @@ function buildMarkdown({ url, title, rawText, metaDesc }) {
     `**Captured:** ${date}`,
   ]
   if (metaDesc) lines.push(`**Description:** ${metaDesc}`)
+
+  if (fieldValues && fieldValues.length > 0) {
+    lines.push('')
+    lines.push('## Your Answers')
+    lines.push('')
+    fieldValues.forEach(({ label, value }) => {
+      lines.push(`**${label}**`)
+      lines.push(value)
+      lines.push('')
+    })
+  }
+
   lines.push('')
   lines.push('## Raw Page Text')
   lines.push('')
