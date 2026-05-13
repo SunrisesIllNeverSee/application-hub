@@ -29,7 +29,8 @@ Other coordination docs should point here rather than restating these facts unle
 
 ### Database
 - Supabase migration directory exists.
-- Migrations `001` through `040` are the canonical migration chain. Duplicate numeric prefixes resolved: 018_portable_taxonomy → 034, 022_user_integrations_unique_provider → 035. 038_ranking_rpc, 039_program_cycles, and 040_onboarding_gate all applied to Supabase via MCP. Supabase CLI linked, `db push --dry-run` clean.
+- Migrations `001` through `041` are the canonical migration chain. Duplicate numeric prefixes resolved: 018_portable_taxonomy → 034, 022_user_integrations_unique_provider → 035. 038_ranking_rpc, 039_program_cycles, 040_onboarding_gate, and 041_beta_mode all applied to Supabase via MCP. Supabase CLI linked, `db push --dry-run` clean.
+- `migrations/041_beta_mode.sql` is present and applied. Adds `beta_settings` (single-row config), `starter_packages` + `user_starter_claims` (Founder Starter Pack seeded with the top 10 universal questions), `community_messages` (RLS scoped to sender+recipient), enhanced outcome columns on `user_applications` (`outcome_notes`, `interview_date`, `program_feedback`, `would_recommend`, `outcome_logged_at`), beta columns on `user_subscriptions` (`beta_payment_method_id`, `beta_grace_period_days`, `beta_participant`, `grace_period_ends_at`), the `'starter'` source value on `user_question_unlocks`, and the `claim_starter_package(uuid)` RPC.
 - `migrations/008_intelligence_layer_v2.sql` is present and includes:
   - MCP-facing program display columns
   - question significance scoring
@@ -48,7 +49,7 @@ Other coordination docs should point here rather than restating these facts unle
 - `migrations/015_byok_key_storage.sql` is present and adds `key_encrypted` for BYOK key storage.
 - `migrations/026_answer_reviews.sql` is present and adds append-only persistence for agent review output plus owner-scoped RLS.
 - `migrations/027_recruiter_alerts.sql` is present and adds the `recruiter_alerts` dedup table for the weekly recruiter email agent.
-- Migrations through `040` are now the expected app chain (034-035 are renames of duplicate-prefix files; Supabase CLI synced).
+- Migrations through `041` are now the expected app chain (034-035 are renames of duplicate-prefix files; Supabase CLI synced).
 - The current strategy is to keep the existing migration chain and layer RNS-backed intelligence above the current scoring fields rather than rolling back to a minimal schema.
 
 
@@ -197,7 +198,7 @@ The repo has the MVP spine plus most of Milestone 3. Remaining gaps:
 | Question archive `/archive/questions` | Done — theme tabs, Universal tab, lock/unlock state per user, prominent Answer CTA, sort by significance or popularity |
 | Funders index `/funders` | Done — grid with type filter |
 | Funder profile `/funders/[slug]` | Done — program list, breadcrumb, website link |
-| `database.types.ts` | Done — regenerated from live schema (migrations 001–040) |
+| `database.types.ts` | Done — regenerated from live schema (migrations 001–041) |
 | CI agents-check | Done — flipped to `--strict` mode 2026-05-12 |
 | Question embeddings (768d, nomic-embed-text) | Done — all 225 questions seeded via Ollama |
 

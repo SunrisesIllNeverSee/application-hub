@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-12T18:00:00Z
+updated_at: 2026-05-12T22:00:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
@@ -9,10 +9,11 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 41
+  next: 42
   path: supabase/migrations/  # was: migrations/ (root)
   cli_synced: true  # supabase db push --dry-run confirmed clean 2026-05-11
   applied:
+    - { n: 41, file: 041_beta_mode.sql, commit: "pending", landed: "2026-05-12", note: "Beta mode — beta_settings, starter_packages, community_messages, enhanced outcome tracking, claim_starter_package() RPC" }
     - { n: 40, file: 040_onboarding_gate.sql, commit: "pending", landed: "2026-05-12", note: "Onboarding gate — onboarding_completed_at + backfill for legacy users." }
     - { n: 39, file: 039_program_cycles.sql, commit: "4a3dbe1", landed: "2026-05-12", note: "program_cycles Layer 3 schema — confirmed applied to Supabase 2026-05-12." }
     - { n: 38, file: 038_ranking_rpc.sql, commit: "pending", landed: "2026-05-12", note: "Ranking RPC — get_top_programs_by_value() applied to Supabase via MCP 2026-05-12" }
