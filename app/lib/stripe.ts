@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { isBetaMode } from './beta'
 
 // Server-side Stripe client — never import from client components
 let _stripe: Stripe | null = null
@@ -32,6 +33,14 @@ export type SubscriptionTier = 'pro' | 'team'
 export type BillingInterval = 'monthly' | 'annual'
 
 export function getPriceId(tier: SubscriptionTier, interval: BillingInterval): string {
+  // During beta, route Pro checkouts to the beta-only $1/mo price if one is
+  // configured. Falls through to the normal price if STRIPE_BETA_PRO_PRICE_ID
+  // is unset (lets local dev work without setting up a separate Stripe price).
+  if (isBetaMode() && tier === 'pro') {
+    const betaPriceId = process.env.STRIPE_BETA_PRO_PRICE_ID
+    if (betaPriceId) return betaPriceId
+  }
+
   const map: Record<SubscriptionTier, Record<BillingInterval, string | undefined>> = {
     pro: {
       monthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID,

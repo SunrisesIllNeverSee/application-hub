@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getStripe, getPriceId, type SubscriptionTier, type BillingInterval } from '@/lib/stripe'
+import { isBetaMode } from '@/lib/beta'
 
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -88,6 +89,23 @@ export async function POST(req: NextRequest) {
     // Stripe-hosted Checkout is the recommended frontend pattern for SaaS
     // subscriptions (per stripe-best-practices skill). The Payment Element
     // is an alternative only if you need deep inline customization.
+    const beta = isBetaMode()
+    const trialDays = beta ? 14 : 7
+
+    const sessionMetadata: Record<string, string> = {
+      user_id: user.id,
+      tier,
+    }
+    const subscriptionMetadata: Record<string, string> = {
+      user_id: user.id,
+      tier,
+    }
+    if (beta) {
+      sessionMetadata.beta_participant = 'true'
+      subscriptionMetadata.beta_participant = 'true'
+      subscriptionMetadata.beta_grace_period_days = '30'
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: stripeCustomerId,
@@ -99,10 +117,10 @@ export async function POST(req: NextRequest) {
       cancel_url: `${origin}/profile/settings?upgrade_cancelled=true`,
       // Duplicate metadata on the session AND the subscription — the webhook
       // reads user_id from whichever event fires first.
-      metadata: { user_id: user.id, tier },
+      metadata: sessionMetadata,
       subscription_data: {
-        metadata: { user_id: user.id, tier },
-        trial_period_days: 7,
+        metadata: subscriptionMetadata,
+        trial_period_days: trialDays,
       },
       // Optional but recommended for SaaS — allow promo codes at checkout
       allow_promotion_codes: true,
