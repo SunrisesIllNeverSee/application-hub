@@ -31,10 +31,25 @@ function resolveSourceKind(raw: string | undefined): SourceKind {
 
 async function importAction(formData: FormData): Promise<void> {
   'use server'
-  const pastedText = String(formData.get('pasted_text') ?? '').trim()
+
+  // Accept either an uploaded file (.txt/.md) OR pasted text. File takes precedence.
+  let bodyText = String(formData.get('pasted_text') ?? '').trim()
+  const uploadedFile = formData.get('upload_file')
+  if (uploadedFile && typeof uploadedFile === 'object' && 'text' in uploadedFile) {
+    try {
+      const file = uploadedFile as unknown as { name?: string; size?: number; text: () => Promise<string> }
+      if (file.size && file.size > 0) {
+        const fileText = (await file.text()).trim()
+        if (fileText.length > 0) bodyText = fileText
+      }
+    } catch {
+      // Fall through to pasted text
+    }
+  }
+
   const sourceKind = resolveSourceKind(String(formData.get('source_kind') ?? ''))
 
-  if (pastedText.length < 50) {
+  if (bodyText.length < 50) {
     redirect('/workstation?tab=import&err=too_short')
   }
 
@@ -53,7 +68,7 @@ async function importAction(formData: FormData): Promise<void> {
     const res = await fetch(`${base}/api/import/paste`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', cookie: cookieHeader },
-      body: JSON.stringify({ pasted_text: pastedText, source_kind: sourceKind }),
+      body: JSON.stringify({ pasted_text: bodyText, source_kind: sourceKind }),
       cache: 'no-store',
     })
     payload = await res.json()
@@ -223,9 +238,23 @@ export default async function WorkstationPage({ searchParams }: Props) {
             </div>
           )}
 
-          <form action={importAction} className="card p-6 space-y-5">
+          <form action={importAction} encType="multipart/form-data" className="card p-6 space-y-5">
             <div>
-              <label className="label" htmlFor="pasted_text">Application text</label>
+              <label className="label" htmlFor="upload_file">Upload a file <span className="font-normal text-neutral-400 dark:text-neutral-500">(.txt / .md — optional)</span></label>
+              <input
+                id="upload_file"
+                name="upload_file"
+                type="file"
+                accept=".txt,.md,.markdown,text/plain,text/markdown"
+                className="input file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-neutral-100 file:text-neutral-700 dark:file:bg-neutral-800 dark:file:text-neutral-300 file:text-sm file:cursor-pointer"
+              />
+              <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-600">
+                Upload a structured Q&amp;A document, or paste directly below. File takes precedence over pasted text.
+              </p>
+            </div>
+
+            <div>
+              <label className="label" htmlFor="pasted_text">Or paste application text</label>
               <textarea
                 id="pasted_text"
                 name="pasted_text"
@@ -237,7 +266,10 @@ export default async function WorkstationPage({ searchParams }: Props) {
                 required
               />
               <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-600">
-                50–50,000 characters. Paste Q&amp;A pairs, a Google Doc export, or a full essay.
+                50–50,000 characters. Best results with structured formats:{' '}
+                <span className="font-mono">Q:</span> / <span className="font-mono">A:</span> pairs,
+                <span className="font-mono"> Question:</span> / <span className="font-mono">Answer:</span> labels,
+                Markdown headers, or numbered lists. No AI key needed.
               </p>
             </div>
 

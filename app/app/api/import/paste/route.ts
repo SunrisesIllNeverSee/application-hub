@@ -233,6 +233,79 @@ function parseQuestions(rawText: string): ExtractedQuestion[] {
   return out
 }
 
+// ─── Regex-based structured parser (no AI required) ──────────────────────────
+// Detects common Q&A formats: "Q:/A:", "Question:/Answer:", bold-marked,
+// numbered, markdown headers. Returns ExtractedPair[] with theme='personal'
+// (user can re-theme in the answer bank) and confidence='draft'.
+//
+// This is the fallback path when no Anthropic key is configured. Deterministic,
+// requires no external API, free.
+
+function parseStructuredText(text: string): ExtractedPair[] {
+  const cleaned = text.replace(/\r\n/g, '\n').trim()
+  if (!cleaned) return []
+
+  const pairs: ExtractedPair[] = []
+
+  // Pattern 1: "Q: ... A: ..." (with optional bold markers, case insensitive)
+  // Also handles "Question:" / "Answer:"
+  const qaRegex = /(?:^|\n)\s*(?:\*\*)?\s*(?:Q|Question)(?:\*\*)?\s*[:\.]\s*([\s\S]*?)\n\s*(?:\*\*)?\s*(?:A|Answer)(?:\*\*)?\s*[:\.]\s*([\s\S]*?)(?=\n\s*(?:\*\*)?\s*(?:Q|Question)(?:\*\*)?\s*[:\.]|$)/gi
+
+  let m: RegExpExecArray | null
+  while ((m = qaRegex.exec(cleaned)) !== null) {
+    const q = m[1].trim().replace(/\s+/g, ' ')
+    const a = m[2].trim()
+    if (q.length > 0 && a.length >= 10) {
+      pairs.push({
+        question_text: q,
+        answer_text: a,
+        theme: 'personal',
+        confidence: 'draft',
+      })
+    }
+  }
+  if (pairs.length > 0) return pairs
+
+  // Pattern 2: Markdown headers "## question" followed by answer block
+  const mdRegex = /(?:^|\n)#{1,3}\s+(.+?)\n+([\s\S]+?)(?=\n#{1,3}\s+|$)/g
+  while ((m = mdRegex.exec(cleaned)) !== null) {
+    const q = m[1].trim().replace(/\?$/, '?').replace(/\s+/g, ' ')
+    const a = m[2].trim()
+    if (q.length > 0 && a.length >= 10) {
+      pairs.push({
+        question_text: q.endsWith('?') ? q : q + '?',
+        answer_text: a,
+        theme: 'personal',
+        confidence: 'draft',
+      })
+    }
+  }
+  if (pairs.length > 0) return pairs
+
+  // Pattern 3: Numbered "1. question / answer" with question ending in ?
+  // and the following non-empty block treated as the answer.
+  const blocks = cleaned.split(/\n\s*\n+/).map((b) => b.trim()).filter(Boolean)
+  for (let i = 0; i < blocks.length - 1; i++) {
+    const possibleQ = blocks[i].replace(/^\d+[\.\)]\s*/, '').trim()
+    if (possibleQ.endsWith('?') && possibleQ.length < 500) {
+      const possibleA = blocks[i + 1].replace(/^\d+[\.\)]\s*/, '').trim()
+      if (possibleA.length >= 10 && !possibleA.endsWith('?')) {
+        pairs.push({
+          question_text: possibleQ.replace(/\s+/g, ' '),
+          answer_text: possibleA,
+          theme: 'personal',
+          confidence: 'draft',
+        })
+        i++ // skip the answer block on next iteration
+      }
+    }
+  }
+
+  return pairs
+}
+
+
+
 // ─── Fuzzy-match helper ───────────────────────────────────────────────────────
 // Tries the trigram operator first (requires pg_trgm). Falls back to a simple
 // case-insensitive substring search if pg_trgm is unavailable or returns 0.
@@ -359,13 +432,17 @@ export async function POST(req: NextRequest) {
       apiKey = process.env.ANTHROPIC_API_KEY ?? null
     }
 
-    if (!apiKey) {
+    // No Anthropic key — fall back to regex parser if mode is qa_pairs.
+    // Questions-only mode still needs AI for theme classification.
+    const useRegexFallback = !apiKey && mode === 'qa_pairs'
+    const anthropic: Anthropic | null = apiKey ? new Anthropic({ apiKey }) : null
+
+    if (!apiKey && mode === 'questions_only') {
       return NextResponse.json(
-        { error: 'AI extraction not configured' },
+        { error: 'Questions-only mode requires AI. Connect Anthropic in Profile → Integrations or paste in Q:/A: format.' },
         { status: 503 }
       )
     }
-    const anthropic = new Anthropic({ apiKey })
 
     // 3. Call Claude — prompt differs by mode
     let llmErrorText: string | null = null
@@ -373,7 +450,13 @@ export async function POST(req: NextRequest) {
     let questions: ExtractedQuestion[] = []
 
     try {
-      if (mode === 'questions_only') {
+      if (useRegexFallback) {
+        // No AI configured — use deterministic regex parser
+        pairs = parseStructuredText(pasted_text)
+        if (pairs.length === 0) {
+          llmErrorText = 'No Q&A pairs detected. Format your text as "Q: ... / A: ..." or "Question: ... / Answer: ...", or use Markdown headers.'
+        }
+      } else if (anthropic && mode === 'questions_only') {
         const message = await anthropic.messages.create({
           model: MODEL,
           max_tokens: 4096,
@@ -382,7 +465,7 @@ export async function POST(req: NextRequest) {
         })
         const raw = message.content[0]?.type === 'text' ? message.content[0].text : '[]'
         questions = parseQuestions(raw)
-      } else {
+      } else if (anthropic) {
         const message = await anthropic.messages.create({
           model: MODEL,
           max_tokens: 4096,
@@ -395,7 +478,7 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       llmErrorText =
         err instanceof Error ? err.message : 'Unknown error calling Anthropic'
-      console.error('[/api/import/paste] Anthropic call failed:', err)
+      console.error('[/api/import/paste] extraction failed:', err)
     }
 
     const rawItemCount = mode === 'questions_only' ? questions.length : pairs.length
