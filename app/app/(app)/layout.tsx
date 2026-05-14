@@ -57,15 +57,9 @@ export default async function AppLayout({
     .single()
   const creditBalance = (balanceRow as { balance: number } | null)?.balance ?? 0
 
-  const { count: unreadMessages } = await supabase
-    .from('community_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('to_user_id', user.id)
-    .eq('is_read', false)
-
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
-      <Sidebar user={user} applications={applications} creditBalance={creditBalance} unreadCount={unreadMessages ?? 0} />
+      <Sidebar user={user} applications={applications} creditBalance={creditBalance} />
       <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
         <BetaEndBanner />
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">{children}</div>
