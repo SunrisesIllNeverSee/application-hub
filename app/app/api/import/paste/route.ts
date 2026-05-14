@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { decryptKey } from '@/lib/encryption'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 
@@ -333,8 +334,31 @@ export async function POST(req: NextRequest) {
     }
     const { pasted_text, source_kind, mode, program_name } = parsed
 
-    // 2. AI config — fail closed if no platform key.
-    const apiKey = process.env.ANTHROPIC_API_KEY
+    // 2. AI config — BYOK first, then platform key.
+    let apiKey: string | null = null
+
+    // Check user's saved Anthropic integration
+    const { data: integrations } = await supabase
+      .from('user_integrations')
+      .select('key_encrypted, key_storage_ref')
+      .eq('user_id', user.id)
+      .eq('provider', 'anthropic')
+      .eq('status', 'active')
+      .limit(1)
+
+    if (integrations?.[0]?.key_encrypted && integrations[0]?.key_storage_ref) {
+      try {
+        apiKey = decryptKey(integrations[0].key_encrypted, integrations[0].key_storage_ref)
+      } catch {
+        // decryption failed — fall through to platform key
+      }
+    }
+
+    // Fall back to platform key
+    if (!apiKey) {
+      apiKey = process.env.ANTHROPIC_API_KEY ?? null
+    }
+
     if (!apiKey) {
       return NextResponse.json(
         { error: 'AI extraction not configured' },
