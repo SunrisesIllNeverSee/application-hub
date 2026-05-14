@@ -1,5 +1,18 @@
 # Application Hub — Claude Context
 
+> ⚠️ **READ THIS FIRST — DATA REALITY CHECK (2026-05-14)**
+>
+> The intelligence engine in this repo is REAL and works. The seed data it's
+> currently operating on is SYNTHESIZED. Treat every `program_questions` row
+> attached to the 30 originally-seeded programs as fiction until verified
+> against a real imported application. The deric-rebuild is on a separate
+> branch / session; this state is **archival** for that reference, not active
+> development. See `ARCHIVE_NOTES.md` for the engine-vs-data split and the
+> communication structure spec for the new build.
+
+---
+
+
 > This file is the persistent context for any Claude or Cowork session working on this project.
 > Read it first. Every time. It's short on purpose.
 > Then read `.agents/PROTOCOL.md` and use `.agents/registry.yaml` / `.agents/claims.yaml` for machine-readable truth and claims.

@@ -255,7 +255,7 @@ export function IntegrationsForm({ integrations: initial }: Props) {
                   {provider.id === 'ollama' ? (
                     <>
                       <div>
-                        <label className="label text-xs">Ollama URL <span className="font-normal text-neutral-400 dark:text-neutral-500">(this is your "key" — no API key needed)</span></label>
+                        <label className="label text-xs">Ollama URL <span className="font-normal text-neutral-400 dark:text-neutral-500">(this is your &ldquo;key&rdquo; — no API key needed)</span></label>
                         <input
                           type="text"
                           value={baseUrl}
