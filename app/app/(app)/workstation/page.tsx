@@ -64,6 +64,8 @@ async function importAction(formData: FormData): Promise<void> {
     .join('; ')
 
   let payload: { session_id?: string | null; extracted_count?: number; error?: string } | null = null
+  let httpOk = false
+  let networkError = false
   try {
     const res = await fetch(`${base}/api/import/paste`, {
       method: 'POST',
@@ -71,13 +73,24 @@ async function importAction(formData: FormData): Promise<void> {
       body: JSON.stringify({ pasted_text: bodyText, source_kind: sourceKind }),
       cache: 'no-store',
     })
-    payload = await res.json()
-    if (!res.ok) {
-      const msg = payload?.error ?? 'extraction_failed'
-      redirect(`/workstation?tab=import&err=${encodeURIComponent(msg)}`)
-    }
-  } catch {
+    httpOk = res.ok
+    payload = await res.json().catch(() => null)
+  } catch (err) {
+    // Real network failure — fetch threw before getting a response.
+    // Re-throw if this is a Next.js redirect (has a digest field) — but
+    // since the redirects are now outside the try/catch, this is purely
+    // a fetch-level failure.
+    console.error('[workstation importAction] fetch failed:', err)
+    networkError = true
+  }
+
+  if (networkError) {
     redirect('/workstation?tab=import&err=network')
+  }
+
+  if (!httpOk) {
+    const msg = payload?.error ?? 'extraction_failed'
+    redirect(`/workstation?tab=import&err=${encodeURIComponent(msg)}`)
   }
 
   revalidatePath('/workstation')
