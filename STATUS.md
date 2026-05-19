@@ -16,7 +16,35 @@
 ---
 
 
-_Last updated: 2026-05-12 (cowork session)_
+Last updated: 2026-05-19 (vscode-claude session)
+
+---
+
+## 2026-05-19 — WebExtension foundation
+
+**Session:** vscode-claude-2026-05-19
+**Claim:** webextension/ file lane
+
+### What landed
+
+- `webextension/` folder created — browser-organized structure for all future extensions
+- Browser reference folders: `chrome/`, `firefox/`, `safari/` — each with setup guide, store info, deployment log
+- **Userscript** (`application-hub/userscript/application-hub.user.js`):
+  - Scans all textareas, attaches AH trigger button
+  - Opens answer bank panel on click, fetches from Supabase using session JWT
+  - DOM-safe rendering (no innerHTML with dynamic data)
+  - Connects to existing `ExtensionTokenCard` + `GET /api/auth/token` — already live in settings page
+  - Safari install guide via free Userscripts app (Mac App Store, no Xcode needed)
+  - Chrome/Firefox install guide via Tampermonkey/Violentmonkey
+- WXT scaffold (v0) archived at `_archive/application-hub-v0/` — Chrome + Firefox builds were passing
+- `application-hub/` cleared for full rebuild (next session)
+
+### What is next
+
+- Discuss and design the extension rebuild — user wants to rethink the approach
+- Safari native extension: blocked on Xcode.app install (~7GB)
+- Add `data_collection_permissions` field to Firefox manifest before AMO submission
+- Publish pipeline (`@wext/shipit`, store accounts) when ready to ship
 
 This file is the current GitHub-visible source of truth. It separates what is confirmed in this repository from what may exist locally but has not yet been uploaded.
 

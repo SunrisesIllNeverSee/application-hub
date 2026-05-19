@@ -174,3 +174,19 @@ claims:
       - 8e92cd0  # Phase B — check.py + stripe-smoke.sh
       - 41380f3  # Phase C — install-hook.sh + agents-check.yml
       - 0260291  # registry gaps reconciliation doc
+
+  - id: vscode-claude-2026-05-19
+    session: vscode-claude-2026-05-19
+    surface: vscode-claude
+    type: file_lane
+    paths:
+      - webextension/
+    purpose: >
+      WebExtension foundation — browser folder structure (chrome/, firefox/, safari/),
+      Application Hub userscript (textarea detection, answer bank panel, Supabase auth
+      via session token from existing /api/auth/token + ExtensionTokenCard),
+      Safari Userscripts app install guide, WXT scaffold archived as v0,
+      application-hub/ cleared for rebuild.
+    acquired_at: 2026-05-19T05:00:00Z
+    heartbeat: 2026-05-19T10:30:00Z
+    landed_commits: []  # backfilled after commit

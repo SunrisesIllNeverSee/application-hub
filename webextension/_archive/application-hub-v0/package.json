@@ -1,0 +1,39 @@
+{
+  "name": "application-hub-extension",
+  "version": "0.0.1",
+  "description": "Application Hub browser extension — Chrome, Firefox, Edge, Safari",
+  "private": true,
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "vue-tsc --noEmit",
+    "postinstall": "wxt prepare",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.0",
+    "webext-storage-cache": "^6.0.0",
+    "webextension-polyfill": "^0.12.0"
+  },
+  "overrides": {
+    "@webext-core/fake-browser": "1.3.4"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.320",
+    "@types/firefox-webext-browser": "^120.0.0",
+    "@types/webextension-polyfill": "^0.10.0",
+    "addons-linter": "^7.0.0",
+    "sinon-chrome": "^3.0.1",
+    "typescript": "^5.8.3",
+    "wxt": "^0.20.26",
+    "@wxt-dev/module-react": "^1.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  }
+}
