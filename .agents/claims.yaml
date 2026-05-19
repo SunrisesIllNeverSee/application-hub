@@ -189,4 +189,5 @@ claims:
       application-hub/ cleared for rebuild.
     acquired_at: 2026-05-19T05:00:00Z
     heartbeat: 2026-05-19T10:30:00Z
-    landed_commits: []  # backfilled after commit
+    released_at: 2026-05-19T10:30:00Z
+    landed_commits: [b4eaaee]
