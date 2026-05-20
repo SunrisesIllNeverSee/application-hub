@@ -1,0 +1,358 @@
+/* ── Side panel ─────────────────────────────────────────────────────────────── */
+
+.panel-body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #111;
+  background: #fafafa;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #18181b;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.panel-logo {
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: #a78bfa;
+}
+
+.panel-sub {
+  font-size: 10px;
+  color: #71717a;
+  margin-left: 6px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #52525b;
+}
+
+.status-dot.connected {
+  background: #22c55e;
+}
+
+.panel-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+}
+
+.panel-section.hidden,
+.panel-generating.hidden {
+  display: none;
+}
+
+.panel-label {
+  font-size: 12px;
+  color: #52525b;
+  margin: 0 0 8px;
+}
+
+.panel-hint {
+  font-size: 11px;
+  color: #71717a;
+  margin: 6px 0 12px;
+  line-height: 1.5;
+}
+
+.panel-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  margin-bottom: 8px;
+  outline: none;
+  background: #fff;
+}
+
+.panel-input:focus {
+  border-color: #a78bfa;
+}
+
+.panel-idle-msg {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3f3f46;
+  margin: 0 0 6px;
+}
+
+.panel-page-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.panel-page-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3f3f46;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel-badge {
+  font-size: 10px;
+  background: #f4f4f5;
+  color: #71717a;
+  border-radius: 99px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.panel-actions-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.panel-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field-card {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: border-color 0.15s;
+}
+
+.field-card.has-match {
+  border-color: #c4b5fd;
+}
+
+.field-card.has-generated {
+  border-color: #a78bfa;
+}
+
+.field-question {
+  font-size: 11px;
+  font-weight: 600;
+  color: #3f3f46;
+  margin-bottom: 7px;
+  line-height: 1.4;
+}
+
+.field-answer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-answer-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e4e4e7;
+  border-radius: 5px;
+  padding: 7px 9px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.5;
+  color: #27272a;
+  outline: none;
+  background: #fafafa;
+}
+
+.field-answer-input:focus {
+  border-color: #a78bfa;
+  background: #fff;
+}
+
+.field-actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.panel-generating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  color: #71717a;
+  font-size: 13px;
+}
+
+.generating-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e4e4e7;
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  will-change: transform;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Buttons */
+.btn-primary {
+  background: #18181b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary:hover { background: #27272a; }
+
+.btn-secondary {
+  background: #fff;
+  color: #3f3f46;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-secondary:hover { background: #f4f4f5; }
+
+.btn-ghost {
+  background: none;
+  color: #71717a;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-ghost:hover { color: #3f3f46; background: #f4f4f5; }
+
+.btn-aqua {
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-aqua:hover { background: #6d28d9; }
+.btn-aqua:disabled { opacity: 0.5; cursor: default; }
+
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-xs { padding: 4px 8px; font-size: 11px; }
+
+/* ── Popup ───────────────────────────────────────────────────────────────────── */
+
+/* Application Hub — overlay injected into portal pages */
+
+#apphub-overlay {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 380px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #111;
+  overflow: hidden;
+}
+
+#apphub-overlay .apphub-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #6366f1;
+  color: #fff;
+}
+
+#apphub-overlay .apphub-header span {
+  flex: 1;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+#apphub-overlay #apphub-fill-all {
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#apphub-overlay #apphub-fill-all:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+#apphub-overlay #apphub-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+}
+
+#apphub-overlay #apphub-dismiss:hover {
+  color: #fff;
+}
+
+#apphub-overlay .apphub-body {
+  padding: 10px 12px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+#apphub-overlay .apphub-match {
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+#apphub-overlay .apphub-match:last-child {
+  border-bottom: none;
+}
+
+#apphub-overlay .apphub-q {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+#apphub-overlay .apphub-a {
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.4;
+}

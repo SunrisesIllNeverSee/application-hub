@@ -1,97 +1,78 @@
-# WebExtension — Setup Task List
-
-Work through these in order. Check off each item as it's done.
+# WebExtension — Task List
 
 ---
 
-## Phase 1 — Environment & Tooling ✅
+## Done
 
-### VS Code Extensions
-- [x] Install `aaravb.chrome-extension-developer-tools`
-- [x] Install `firefox-devtools.vscode-firefox-debug`
-- [x] Install `ms-edgedevtools.vscode-edge-devtools`
+### Environment
 
-### System Requirements
-- [x] Node.js >= 18 — v22.22.2
-- [x] npm >= 9 — v10.9.7
-- [x] web-ext installed globally — v10.1.0
-- [x] Xcode CLI tools — version 2416
-- [x] **Firefox** — installed
-- [ ] **Xcode.app** — CLI tools present but full app not installed (~7GB via Mac App Store)
-      Needed for: running `xcrun safari-web-extension-converter` to wrap the build into a native app
-      NOT needed for: building the extension JS/CSS/manifest (wxt build handles that)
-- [ ] Apple Developer account ($99/yr) — only needed for distributing to other users via Mac App Store
-      NOT needed for: local Safari testing (Xcode run → Safari Settings → enable extension is free)
+- [x] VS Code extensions: Chrome DevTools, Firefox Debugger, Edge Tools
+- [x] Node.js v22, npm v10
+- [x] web-ext v10.1.0 installed globally
+- [x] Firefox installed
 
----
+### Foundation (2026-05-19)
 
-## Phase 2 — WXT Project Initialization ✅
+- [x] webextension/ folder structure — chrome/, firefox/, safari/ browser reference docs
+- [x] appfeeder/ moved into webextension/application-hub/
+- [x] v0 WXT scaffold archived at \_archive/application-hub-v0/
 
-- [x] package.json created with all scripts
-- [x] WXT React module configured in wxt.config.ts
-- [x] Entrypoints scaffolded: background.ts, popup/ (index.html + main.tsx + App.tsx)
-- [x] npm install passes cleanly
-      Note: pinned @webext-core/fake-browser to 1.3.4 via overrides — v1.4.0 was published
-      missing its lib/ build output (WXT upstream bug workaround)
-- [x] npm run build — Chrome MV3 build passes (144KB, 725ms)
-- [x] npm run build:firefox — Firefox MV2 build passes (144KB, 577ms)
-- [x] Firefox data-collection warning suppressed in wxt.config.ts
-- [ ] Verify npm run type-check passes (run after first npm run dev to generate .wxt/tsconfig.json)
+### Extension v0.2 (2026-05-20)
+
+- [x] manifest.json — removed 6-site allowlist, now `<all_urls>`, sidePanel + sidebar\_action
+- [x] AQUA side panel — sidepanel.html + sidepanel.js (per-field generate, fill, save to bank)
+- [x] background.js — BYOK fetch, Anthropic + OpenAI generation, routes fields to panel
+- [x] content.js — universal scan (any site), fill commands, EXPORT\_MD, GET\_FIELDS
+- [x] Safari fallback — injected iframe panel via content script (no Xcode needed)
+- [x] popup.html/js — simplified: auth token + "Open AQUA panel" button
+- [x] styles.css — overlay + full panel UI + button system
+- [x] GET /api/integrations/key — decrypts and returns BYOK key for extension
+- [x] README.md — full architecture doc, browser support table, API endpoints
 
 ---
 
-## Phase 3 — Core Dependencies ✅
+## Up Next
 
-All installed via package.json:
+### Load and test in Chrome
 
-- [x] webextension-polyfill — Chrome/Firefox API bridge
-- [x] @types/chrome — Chrome TypeScript types
-- [x] @types/firefox-webext-browser — Firefox browser.* types
-- [x] @types/webextension-polyfill — TypeScript types for polyfill
-- [x] webext-storage-cache — cache layer for Supabase reads
-- [x] @supabase/supabase-js — Supabase client for background script
-- [x] React 18 + @wxt-dev/module-react
+- [ ] chrome://extensions → Load unpacked → webextension/application-hub/
+- [ ] Click toolbar icon → confirm AQUA panel opens
+- [ ] Navigate to any application form → confirm fields detected
+- [ ] Paste session token → confirm Connected status
+- [ ] Test "Generate" on a field (requires BYOK key in Profile → Settings → Integrations)
+- [ ] Test "Fill field" → confirm React-safe injection works
+- [ ] Test "Export MD" → confirm markdown downloads
 
----
+### Load and test in Firefox
 
-## Phase 4 — Testing Setup (partial)
+- [ ] about:debugging → Load Temporary Add-on → select manifest.json
+- [ ] Confirm sidebar opens on toolbar click
+- [ ] Same field detection + fill test as Chrome
 
-- [x] sinon-chrome — Chrome API mocks
-- [x] addons-linter — Mozilla AMO lint (result: 0 errors, 0 notices, 2 warnings — React-internal, expected)
-- [ ] webextensions-api-fake — add when writing first integration tests
-- [ ] Configure vitest (recommended test runner for WXT projects)
+### Program DNA context
 
----
+- [ ] Detect current program from URL in content.js
+- [ ] background.js: fetch program\_dna from Supabase when program identified
+- [ ] Pass DNA weights to generateAnswer() prompt for tailored output
 
-## Phase 5 — Publish Pipeline (do when ready to ship)
+### Streaming responses
 
-- [ ] npm install -D @wext/shipit
-- [ ] Create Chrome Web Store developer account (one-time $5 fee)
-- [ ] Create Firefox AMO (addons.mozilla.org) developer account (free)
-- [ ] Add data_collection_permissions to Firefox manifest before AMO submission
-- [ ] Add store credentials to .env (gitignored) for shipit
-- [ ] Verify npm run zip and npm run zip:firefox produce valid archives
+- [ ] Replace single-shot generation with streaming (Anthropic SSE / OpenAI stream)
+- [ ] Show token-by-token output in the panel textarea
 
----
+### Multi-page form persistence
 
-## Phase 6 — First Real Feature (tooling is green — start here next)
+- [ ] Accumulate detected fields across navigations in chrome.storage.session
+- [ ] Panel shows all fields from full application, not just current page
 
-- [ ] Popup UI: show "Connected" / "Sign in" state from browser.storage.local
-- [ ] Supabase auth in extension (magic link or token-paste in options page)
-- [ ] Store Supabase JWT in browser.storage.local
-- [ ] Background: fetch top 3 unanswered questions from profile_answers + archived_questions
-- [ ] Display in popup with word-limit badges
-- [ ] Content script: detect textarea on application pages
-- [ ] Message passing: content script -> background -> Supabase -> back to content script
-- [ ] "Fill from answer bank" button overlay in content script
+### Safari native extension
 
----
+- [ ] Blocked on Xcode.app install (~7GB, Mac App Store)
+- [ ] After Xcode: xcrun safari-web-extension-converter + Xcode run
 
-## Pending Environment Items
+### Publish pipeline
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Firefox | Not installed | Download from mozilla.org |
-| Xcode.app | Not installed | Required for Safari builds, Mac App Store ~7GB |
-| Apple Developer account | Unknown | $99/yr, needed for Safari App Store |
-| Safari build test | Blocked | Waiting on Xcode.app |
+- [ ] Chrome Web Store developer account ($5 one-time)
+- [ ] Firefox AMO account (free)
+- [ ] Add data\_collection\_permissions to Firefox manifest before AMO submit
+- [ ] npm install -D @wext/shipit for unified publish command

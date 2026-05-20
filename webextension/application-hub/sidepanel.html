@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AQUA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="panel-body">
+
+  <!-- Header -->
+  <header class="panel-header">
+    <div class="panel-header-left">
+      <span class="panel-logo">AQUA</span>
+      <span class="panel-sub">by Application Hub</span>
+    </div>
+    <div id="panel-status" class="status-dot"></div>
+  </header>
+
+  <!-- Auth gate (shown when not connected) -->
+  <section id="panel-auth" class="panel-section hidden">
+    <p class="panel-label">Connect your Application Hub account to get started.</p>
+    <input id="panel-jwt" class="panel-input" type="password" placeholder="Paste session token…" />
+    <p class="panel-hint">
+      Get it from <strong>Profile → Settings → Appfeeder Extension → Show session token</strong>
+    </p>
+    <button id="panel-connect-btn" class="btn-primary">Connect</button>
+  </section>
+
+  <!-- No fields detected -->
+  <section id="panel-idle" class="panel-section hidden">
+    <p class="panel-idle-msg">No application fields detected on this page.</p>
+    <p class="panel-hint">Navigate to an application form and AQUA will activate automatically.</p>
+  </section>
+
+  <!-- Main: fields detected -->
+  <section id="panel-main" class="panel-section hidden">
+
+    <div class="panel-page-info">
+      <span id="panel-page-title" class="panel-page-title"></span>
+      <span id="panel-field-count" class="panel-badge"></span>
+    </div>
+
+    <div class="panel-actions-bar">
+      <button id="btn-generate-all" class="btn-primary btn-sm">
+        ✦ Generate all with AQUA
+      </button>
+      <button id="btn-fill-matched" class="btn-secondary btn-sm">
+        Fill matched
+      </button>
+      <button id="btn-export-md" class="btn-ghost btn-sm">
+        ↓ Export MD
+      </button>
+    </div>
+
+    <!-- Field list -->
+    <div id="panel-fields" class="panel-fields"></div>
+
+  </section>
+
+  <!-- Generating state -->
+  <div id="panel-generating" class="panel-generating hidden">
+    <div class="generating-spinner"></div>
+    <span id="generating-label">AQUA is thinking…</span>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
