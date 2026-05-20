@@ -128,12 +128,15 @@ Session: `codex-2026-05-20-canonical-rebuild`
 - `cd application-hub-mcp-server && npm run check` passed.
 - `git diff --check` passed.
 - Landing page loaded via Playwright on desktop and mobile widths.
+- Supabase migration history repaired: timestamp drift entries `20260512153021` and `20260513011652` marked reverted; local `040` and `041` marked applied after remote schema verification.
+- Supabase migrations `042`-`046` pushed successfully to the linked project.
+- Remote schema spot-check confirmed canonical tables and RPC functions exist.
 
 ### Known Non-Blocking Gaps
 
-- `supabase db push --dry-run` is blocked by pre-existing remote migration history entries missing locally: `20260512153021`, `20260513011652`.
 - Real production scoring still requires Deric's proprietary formulas.
 - Real Stripe Connect payout execution still requires dashboard/env activation and an admin approval flow.
+- A post-push `supabase migration list` retry hit Supabase's temporary login-role circuit breaker after repeated auth retries; avoid hammering it and retry after the cooldown if a table-format list is needed.
 
 ### Commit Status
 

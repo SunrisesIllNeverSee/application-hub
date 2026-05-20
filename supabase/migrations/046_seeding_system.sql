@@ -6,7 +6,7 @@
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS seeding_entities (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   entity_id       TEXT UNIQUE,
   name            TEXT NOT NULL,
   vertical        TEXT NOT NULL CHECK (vertical IN ('founder', 'college', 'grants', 'jobs')),

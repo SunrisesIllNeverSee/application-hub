@@ -8,7 +8,7 @@ ALTER TABLE canonical_commitments
   ADD COLUMN IF NOT EXISTS aggregate_stats JSONB NOT NULL DEFAULT '{"count":0,"avg_fidelity":0,"top_rated":null}'::jsonb;
 
 CREATE TABLE IF NOT EXISTS aggregate_versions (
-  id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   canonical_id   UUID NOT NULL REFERENCES canonical_commitments(id) ON DELETE CASCADE,
   version        INT NOT NULL,
   aggregate_stats JSONB NOT NULL DEFAULT '{}',

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS canonical_user_credits (
 );
 
 CREATE TABLE IF NOT EXISTS contribution_rewards (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   entity_type     TEXT NOT NULL,
   entity_id       UUID,

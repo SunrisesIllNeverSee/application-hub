@@ -7,7 +7,7 @@
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS canonical_commitments (
-  id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   hash                  TEXT UNIQUE NOT NULL,
   version               TEXT NOT NULL DEFAULT '1.0',
   vertical              TEXT NOT NULL CHECK (vertical IN ('founder', 'college', 'grants', 'jobs')),
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS canonical_commitments (
 );
 
 CREATE TABLE IF NOT EXISTS answer_variants (
-  id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   canonical_id          UUID NOT NULL REFERENCES canonical_commitments(id) ON DELETE CASCADE,
   user_id               UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   entity                TEXT,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS answer_variants (
 );
 
 CREATE TABLE IF NOT EXISTS application_packages (
-  id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id               UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   program_entity        TEXT,
   vertical              TEXT NOT NULL CHECK (vertical IN ('founder', 'college', 'grants', 'jobs')),
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS application_packages (
 );
 
 CREATE TABLE IF NOT EXISTS lineage_events (
-  id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   entity_type           TEXT NOT NULL CHECK (entity_type IN ('canonical', 'variant', 'package', 'seeding_entity', 'reward')),
   entity_id             UUID NOT NULL,
   action                TEXT NOT NULL,

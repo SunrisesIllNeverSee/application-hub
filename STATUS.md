@@ -42,6 +42,7 @@ Last updated: 2026-05-20 (codex canonical rebuild session)
 - Chrome MV3 extension scaffold added at `webextension/chrome/aqua-extension/`.
 - MCP wrapper tools added under the `aqua.*` namespace.
 - `docs/CANONICAL_HUB.md` and `docs/CANONICAL_RESET_RECIPE.md` added.
+- Supabase CLI migration history repaired: drift entries `20260512153021` and `20260513011652` marked reverted, local `040` and `041` marked applied, and migrations `042`-`046` pushed to the linked Supabase project.
 
 ### Important caveat
 
