@@ -42,8 +42,8 @@ sessions:
     surface: codex
     started_at: 2026-05-20T21:53:01Z
     heartbeat: 2026-05-20T22:29:56Z
-    status: active
-    note: canonical rebuild scaffold from Grok deep dive transcript — signed off locally, awaiting commit/push decision
+    status: wrapped
+    note: canonical rebuild scaffold from Grok deep dive transcript — landed in b0f8baa
 
 claims:
   - id: claim-2026-05-11-001
@@ -229,3 +229,5 @@ claims:
       wrappers, docs, and proprietary-algorithm hooks.
     acquired_at: 2026-05-20T21:53:01Z
     heartbeat: 2026-05-20T22:29:56Z
+    released_at: 2026-05-20T22:29:56Z
+    landed_commits: [b0f8baa]
