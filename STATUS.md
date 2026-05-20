@@ -16,7 +16,36 @@
 ---
 
 
-Last updated: 2026-05-19 (vscode-claude session)
+Last updated: 2026-05-20 (codex canonical rebuild session)
+
+---
+
+## 2026-05-20 — Canonical rebuild scaffold
+
+**Session:** codex-2026-05-20-canonical-rebuild
+**Claim:** canonical rebuild file lanes
+
+### What landed
+
+- `REBUILD/CANONICAL_REBUILD_TASKS.md` created as the implementation checklist for the Grok deep-dive rebuild.
+- Supabase migrations `042` through `046` added:
+  - Canonical commitments, answer variants, application packages, lineage events
+  - Canonical RPCs, embedding column, hybrid search, package retrieval, smart matcher search
+  - Rewards and payout-ready contribution ledger
+  - Aggregate stats/history for high-fidelity variants
+  - Seeding entities and manual review gate for real application data
+- Migration chain high-water mark in repo is now `001-046` (`047` next).
+- `supabase/functions/canonical-hub/` scaffolded with `ingest`, `qualify`, `export`, and `map_variant` actions.
+- `supabase/functions/smart-matcher/` scaffolded for persona-aware recommendations.
+- Next.js APIs added under `/api/hub/*` plus Stripe payout scaffold.
+- Reusable UI components added for ingestion, variant review, highlight refinement, and Smart Matcher feed.
+- Chrome MV3 extension scaffold added at `webextension/chrome/aqua-extension/`.
+- MCP wrapper tools added under the `aqua.*` namespace.
+- `docs/CANONICAL_HUB.md` and `docs/CANONICAL_RESET_RECIPE.md` added.
+
+### Important caveat
+
+The proprietary algorithms are intentionally placeholders and are marked with `TODO: Your IP` in the implementation. Production scoring still needs Deric's exact formulas for commitment similarity, language quantification, fidelity, SigTune/contextual scoring, and variant reduction thresholds.
 
 ---
 
