@@ -79,12 +79,12 @@ export default async function RootPage() {
           </div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
-            One answer bank — for every application you&apos;ll ever write
+            Questions are Data. Answers are Assets.
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
-            The question archive
+            One governed answer bank.
             <br />
-            <span className="text-neutral-400">for every application you&apos;ll ever write.</span>
+            <span className="text-neutral-400">Your future self, pre-filled.</span>
           </h1>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
             {APPLICANT_MODES.map((mode) => {
@@ -112,7 +112,7 @@ export default async function RootPage() {
             Built deep on tech startup applications first. Same archive/answer-bank engine across all modes — jobs, schools, and grants ship next.
           </p>
           <p className="mt-6 max-w-2xl mx-auto text-base sm:text-lg text-neutral-300 leading-relaxed">
-            <span className="text-neutral-100">Every applicant faces the same problem</span>: 10 applications, the same 10 essays. AQUA archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so you build a reusable answer bank that pre-fills across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
+            AQUA is the <span className="text-neutral-100">hosting source</span> for every application you&apos;ll ever write. One governed answer bank archives every question across <span className="text-neutral-100">accelerators, jobs, schools, and grants</span> — scored by significance — so your answers compound and pre-fill across <span className="text-neutral-100">YC, Stripe, Stanford, NSF</span>, and 800+ more.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/login" className="btn-primary px-5 py-2.5 text-sm">

@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "AQUA — Application Hub Pre-Fill",
+  "version": "0.1.0",
+  "description": "Pre-fill application forms with your AQUA answer bank. Privacy-first: all answers stored locally.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.acceleratorapp.co/*",
+    "https://*.commonapp.org/*",
+    "https://*.grants.gov/*",
+    "https://mos2es.xyz/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.acceleratorapp.co/*",
+        "https://*.commonapp.org/*",
+        "https://*.grants.gov/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "AQUA Pre-Fill"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
