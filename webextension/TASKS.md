@@ -20,6 +20,7 @@
   - helper server at `scripts/local-extension-agent.mjs`
   - root script `npm run extension:agent`
   - popup + sidepanel action to send the current page into `codex/qaapplication/inbox/`
+- [x] Added a separate `x-bookmarks/` extension lane for exporting loaded X bookmarks into Markdown or JSON
 
 ## Next verification pass
 
@@ -40,6 +41,7 @@
   - run Smart Matcher
   - gate Bulk Assist by coverage and fidelity
 - [ ] Confirm missing or invalid JWT fails closed without partial silent behavior
+- [ ] Load unpacked `webextension/x-bookmarks/` in Chrome and confirm it exports loaded bookmarks from `x.com/i/bookmarks`
 - [ ] Review Firefox compatibility at the manifest and API level
 - [ ] Keep Safari as injected-panel fallback until a native packaging pass happens
 
@@ -50,3 +52,4 @@
 - [ ] Streaming generation in the panel
 - [ ] Native Safari packaging
 - [ ] WXT / TypeScript / React migration, only after the single-extension lane stays stable
+- [ ] Add a separate `x-bookmarks/` extension lane for exporting X bookmarks to Markdown/JSON

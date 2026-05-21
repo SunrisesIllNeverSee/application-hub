@@ -61,6 +61,7 @@ Last updated: 2026-05-21 (codex webextension consolidation session)
   - `webextension/TASKS.md`
   - `webextension/application-hub/README.md`
 - Added local helper server at `scripts/local-extension-agent.mjs` plus root command `npm run extension:agent`. The helper accepts current-page captures from the extension, saves them into `codex/qaapplication/inbox/`, and returns nearest existing application files from the local corpus.
+- Added a separate `webextension/x-bookmarks/` lane for exporting loaded X bookmarks to Markdown or JSON. This is intentionally separate from AQUA.
 
 ### Verification completed
 
