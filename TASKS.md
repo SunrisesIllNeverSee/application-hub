@@ -85,6 +85,11 @@ App is live at `https://mos2es.xyz`. Migrations through `037`. Stripe live (1 re
 
 - [x] **Companies/Funders index** — `/funders` + `/funders/[slug]` built. Uses `migration 023_funders_schema.sql`.
 
+### Local corpus / indexing notes
+
+- [x] Copied `SEEDING_PLAN.md` into `qaapplication/` for the category seeding / indexing workflow
+- [x] Added `qaapplication/inbox/` as the local landing zone for incoming page captures from the agent bridge
+
 ---
 
 ## Launch Milestone 1 — Ship Today
