@@ -89,6 +89,7 @@ App is live at `https://mos2es.xyz`. Migrations through `037`. Stripe live (1 re
 
 - [x] Copied `SEEDING_PLAN.md` into `qaapplication/` for the category seeding / indexing workflow
 - [x] Added `qaapplication/inbox/` as the local landing zone for incoming page captures from the agent bridge
+- [x] Imported the remaining `mcp_eval/` markdown docs into `qaapplication/` so the working corpus is in one place
 
 ---
 

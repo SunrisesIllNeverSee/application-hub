@@ -8,6 +8,7 @@ Current files:
 - `cohort-5-application-airtable-2026-05-13.md`
 - `mometrics.html`
 - `SEEDING_PLAN.md`
+- imported `plugin-eval-*.md` and `startup-submission-form-*.md` docs from `mcp_eval/`
 - `solo fund`
 - `unicorn fund`
 
