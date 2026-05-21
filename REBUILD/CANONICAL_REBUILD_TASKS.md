@@ -138,6 +138,26 @@ Session: `codex-2026-05-20-canonical-rebuild`
 - Real Stripe Connect payout execution still requires dashboard/env activation and an admin approval flow.
 - A post-push `supabase migration list` retry hit Supabase's temporary login-role circuit breaker after repeated auth retries; avoid hammering it and retry after the cooldown if a table-format list is needed.
 
+## Stress Test Pass 1
+
+Run by: Codex
+Run date: 2026-05-21
+
+### Checks
+
+- App typecheck passed.
+- App production build passed.
+- MCP server check passed.
+- Edge Function `deno check` passed for `canonical-hub` and `smart-matcher`.
+- Local unauthenticated API route smoke tests returned `401` for ingest, export, refine, and autofill eligibility.
+- Remote schema probe confirmed canonical tables and `smart_matcher_search` exist.
+- `canonical-hub` and `smart-matcher` Edge Functions deployed to Supabase.
+- Direct unauthenticated/spoofed Edge Function calls are blocked by Supabase gateway with `401`.
+
+### Finding Fixed
+
+- The first scaffold trusted explicit `user_id` in Edge Function payloads. This could have allowed direct caller spoofing if gateway JWT verification were bypassed or function settings changed. Fixed by deriving user identity from the bearer JWT and rejecting mismatched explicit `user_id` values.
+
 ### Commit Status
 
 Not committed or pushed yet. Local changes are ready for Deric review or for Codex to commit/push on explicit instruction.

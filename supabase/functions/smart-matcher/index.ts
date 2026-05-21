@@ -30,7 +30,6 @@ function json(body: unknown, status = 200) {
 }
 
 async function getUserId(req: Request, explicitUserId?: string) {
-  if (explicitUserId) return explicitUserId
   const auth = req.headers.get('authorization')
   if (!auth?.startsWith('Bearer ')) return null
   const token = auth.slice(7)
@@ -39,7 +38,10 @@ async function getUserId(req: Request, explicitUserId?: string) {
     auth: { persistSession: false },
   })
   const { data } = await userClient.auth.getUser(token)
-  return data.user?.id ?? null
+  const tokenUserId = data.user?.id ?? null
+  if (!tokenUserId) return null
+  if (explicitUserId && explicitUserId !== tokenUserId) return null
+  return tokenUserId
 }
 
 Deno.serve(async (req: Request) => {

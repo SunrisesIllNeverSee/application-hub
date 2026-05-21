@@ -43,6 +43,7 @@ Last updated: 2026-05-20 (codex canonical rebuild session)
 - MCP wrapper tools added under the `aqua.*` namespace.
 - `docs/CANONICAL_HUB.md` and `docs/CANONICAL_RESET_RECIPE.md` added.
 - Supabase CLI migration history repaired: drift entries `20260512153021` and `20260513011652` marked reverted, local `040` and `041` marked applied, and migrations `042`-`046` pushed to the linked Supabase project.
+- Stress test pass 1: app/MCP/Edge checks passed, unauthenticated hub routes fail closed, remote canonical schema exists, and `canonical-hub` + `smart-matcher` Edge Functions are deployed. Edge Function identity handling was tightened to derive user identity from JWT instead of trusting payload `user_id`.
 
 ### Important caveat
 

@@ -110,7 +110,6 @@ function extractCommitments(content: string) {
 }
 
 async function getUserId(req: Request, explicitUserId?: string) {
-  if (explicitUserId) return explicitUserId
   const auth = req.headers.get('authorization')
   if (!auth?.startsWith('Bearer ')) return null
   const token = auth.slice(7)
@@ -119,7 +118,10 @@ async function getUserId(req: Request, explicitUserId?: string) {
     auth: { persistSession: false },
   })
   const { data } = await anonClient.auth.getUser(token)
-  return data.user?.id ?? null
+  const tokenUserId = data.user?.id ?? null
+  if (!tokenUserId) return null
+  if (explicitUserId && explicitUserId !== tokenUserId) return null
+  return tokenUserId
 }
 
 async function recordLineage(entity_type: string, entity_id: string, action: string, parent_hashes: string[], new_hash: string, metadata: Record<string, unknown>) {
@@ -177,6 +179,7 @@ async function findOrCreateCanonical(commitment: { title: string; content: strin
 
 async function handleIngest(req: Request, payload: z.infer<typeof hubRequestSchema>) {
   const userId = await getUserId(req, payload.user_id)
+  if (!userId) return json({ error: 'Unauthorized' }, 401)
   const commitments = payload.commitments ?? (payload.content ? extractCommitments(payload.content) : [])
   if (commitments.length === 0) return json({ error: 'No commitments supplied or extracted' }, 400)
 
@@ -261,6 +264,7 @@ async function handleIngest(req: Request, payload: z.infer<typeof hubRequestSche
 
 async function handleQualify(req: Request, payload: z.infer<typeof hubRequestSchema>) {
   const userId = await getUserId(req, payload.user_id)
+  if (!userId) return json({ error: 'Unauthorized' }, 401)
   if (!payload.variant_id && !payload.content) return json({ error: 'variant_id or content is required' }, 400)
 
   let variant = null
