@@ -21,7 +21,7 @@ The older Chrome-only `aqua-extension` scaffold has been archived under `_archiv
 | [x-bookmarks/userscript/](/Users/dericmchenry/Desktop/application-hub/webextension/x-bookmarks/userscript) | X bookmarks userscript lane for local Markdown / JSON sorting |
 | [chrome/](/Users/dericmchenry/Desktop/application-hub/webextension/chrome) | Browser-specific notes and store records |
 | [firefox/](/Users/dericmchenry/Desktop/application-hub/webextension/firefox) | Browser-specific notes and store records |
-| [safari/](/Users/dericmchenry/Desktop/application-hub/webextension/safari) | Safari notes and wrapper path |
+| [safari/](/Users/dericmchenry/Desktop/application-hub/webextension/safari) | Safari notes and userscript lanes, including QA Link Capture |
 | [_archive/](/Users/dericmchenry/Desktop/application-hub/webextension/_archive) | Retired scaffolds and donor code |
 
 ## Live extension architecture

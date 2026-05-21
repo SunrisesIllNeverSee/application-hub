@@ -68,3 +68,8 @@ The extension calls deployed Next.js routes with a bearer JWT. If a route only t
 - TypeScript/React rebuild
 - broader `browser.*` polyfill cleanup
 - native Safari packaging
+
+## Safari userscript lane
+
+- `webextension/safari/qa-link-capture.user.js` is the Safari-friendly local QA capture lane
+- `webextension/x-bookmarks/userscript/x-bookmarks.user.js` is the separate Safari-compatible X bookmarks export lane

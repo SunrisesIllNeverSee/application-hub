@@ -39,6 +39,24 @@ function tokenize(text) {
   )
 }
 
+function cleanText(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function metadataLine(label, value) {
+  return `**${label}:** ${cleanText(value) || '—'}`
+}
+
+function normalizeBlock(value) {
+  return String(value || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 function similarity(a, b) {
   if (a.size === 0 || b.size === 0) return 0
   let overlap = 0
@@ -83,22 +101,45 @@ async function buildCorpus() {
 
 function buildMarkdown(payload) {
   const questions = Array.isArray(payload.questions) ? payload.questions : []
-  const sections = questions
+  const fieldSections = questions
     .map((q) => `## ${q.label || q.questionText || 'Question'}\n\n${q.value || ''}`)
     .join('\n\n')
 
-  return `# ${payload.title || 'Captured Application'}
+  const notes = normalizeBlock(payload.content || '')
+  const pageText = normalizeBlock(payload.page_text || '')
 
-**URL:** ${payload.url || ''}
-**Captured:** ${new Date().toISOString()}
+  const parts = [
+    `# ${payload.application_name || payload.title || 'Captured Application'}`,
+    '',
+    metadataLine('URL', payload.url),
+    metadataLine('Host', payload.host),
+    metadataLine('Site', payload.site_name),
+    metadataLine('Company', payload.company_name),
+    metadataLine('Application', payload.application_name || payload.title),
+    metadataLine('Capture kind', payload.capture_kind || 'page'),
+    metadataLine('Captured', new Date().toISOString()),
+    '',
+  ]
 
-${sections || payload.content || ''}
-`.trim() + '\n'
+  if (notes) {
+    parts.push('## Capture Notes', '', notes, '')
+  }
+
+  if (fieldSections) {
+    parts.push('## Detected Fields', '', fieldSections, '')
+  }
+
+  if (pageText) {
+    parts.push('## Page Snapshot', '', pageText, '')
+  }
+
+  return parts.join('\n').trim() + '\n'
 }
 
 async function saveCapture(payload) {
   await fs.mkdir(inboxRoot, { recursive: true })
-  const filename = `${new Date().toISOString().replace(/[:.]/g, '-')}-${slugify(payload.title)}.md`
+  const filenameBase = payload.application_name || payload.company_name || payload.site_name || payload.title
+  const filename = `${new Date().toISOString().replace(/[:.]/g, '-')}-${slugify(filenameBase)}.md`
   const target = path.join(inboxRoot, filename)
   await fs.writeFile(target, buildMarkdown(payload), 'utf8')
   return target

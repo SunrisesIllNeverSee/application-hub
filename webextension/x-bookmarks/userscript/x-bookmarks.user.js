@@ -374,10 +374,13 @@
 
     wrap.style.cssText = [
       'position:fixed',
-      'top:20px',
+      'top:50%',
       'right:20px',
+      'transform:translateY(-50%)',
       'z-index:2147483647',
       'width:180px',
+      'max-height:calc(100vh - 40px)',
+      'overflow:auto',
       'padding:12px',
       'border-radius:12px',
       'background:#0f172a',

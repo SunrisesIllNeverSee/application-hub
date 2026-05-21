@@ -18,7 +18,8 @@ Works today. Uses the free **Userscripts** app from the Mac App Store.
 
 | Project         | Script                                                            | Status  |
 | --------------- | ----------------------------------------------------------------- | ------- |
-| application-hub | `application-hub/userscript/application-hub.user.js`             | ready   |
+| application-hub | `../_archive/application-hub-v0/userscript/application-hub.user.js` | archived |
+| qa-link-capture | `qa-link-capture.user.js`                                         | ready   |
 
 ---
 
