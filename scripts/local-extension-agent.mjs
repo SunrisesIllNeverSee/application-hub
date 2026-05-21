@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const repoRoot = path.resolve(__dirname, '..')
-const corpusRoot = path.join(repoRoot, 'codex', 'qaapplication')
+const corpusRoot = path.join(repoRoot, 'qaapplication')
 const inboxRoot = path.join(corpusRoot, 'inbox')
 const host = process.env.EXTENSION_AGENT_HOST || '127.0.0.1'
 const port = Number(process.env.EXTENSION_AGENT_PORT || 4317)

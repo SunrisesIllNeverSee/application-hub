@@ -61,8 +61,8 @@ One live extension. Two operating modes.
 
 1. Start the helper with `npm run extension:agent`
 2. The extension sends the current page capture to `http://127.0.0.1:4317/assist`
-3. The helper saves the page into `codex/qaapplication/inbox/`
-4. The helper returns the closest files from `codex/qaapplication/` so you can open the current application beside prior ones in VS Code
+3. The helper saves the page into `qaapplication/inbox/`
+4. The helper returns the closest files from `qaapplication/` so you can open the current application beside prior ones in VS Code
 
 ## Auth model
 

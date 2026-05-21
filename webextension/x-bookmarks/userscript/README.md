@@ -1,6 +1,6 @@
 # X Bookmarks Userscript
 
-Safari-compatible userscript for exporting the loaded X / Twitter bookmarks page to Markdown or JSON.
+Safari-compatible userscript for collecting and exporting the X / Twitter bookmarks page to Markdown or JSON.
 
 ## Install
 
@@ -19,11 +19,10 @@ Safari-compatible userscript for exporting the loaded X / Twitter bookmarks page
 ## Use
 
 1. Open `x.com/i/bookmarks` while signed in
-2. Scroll to load the bookmarks you want
-3. Use the floating panel to export Markdown or JSON
+2. Use the floating panel to export Markdown or JSON
 
 ## Notes
 
 - This is separate from AQUA.
 - It is local-first and does not require an Application Hub login.
-- It only exports what is currently loaded on the page.
+- It auto-scrolls to collect more bookmarks before exporting, up to the page's load limits.

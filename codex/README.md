@@ -4,7 +4,7 @@ This folder is the working-notes / operator-memory area for the repo.
 
 ## Active / useful
 
-- [qaapplication/README.md](/Users/dericmchenry/Desktop/application-hub/codex/qaapplication/README.md) - local application corpus you’ve been filling from
+- [qaapplication/README.md](/Users/dericmchenry/Desktop/application-hub/qaapplication/README.md) - local application corpus you’ve been filling from
 - [AQUA_BUILD.md](/Users/dericmchenry/Desktop/application-hub/codex/AQUA_BUILD.md) - current AQUA build grounding
 - [WORKING_PLAN.md](/Users/dericmchenry/Desktop/application-hub/codex/WORKING_PLAN.md) - planning notes
 - [feedbackplan.md](/Users/dericmchenry/Desktop/application-hub/codex/feedbackplan.md) - derived build/feedback plan

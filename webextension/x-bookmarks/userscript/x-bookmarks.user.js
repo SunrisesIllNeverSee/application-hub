@@ -110,33 +110,74 @@
     return blocks.join('\n\n');
   }
 
-  function extractBookmarks() {
-    var articles = Array.from(document.querySelectorAll('article'))
-      .filter(function (article) { return article.querySelector('a[href*="/status/"]'); });
+  function extractBookmarksInto(store, articles) {
+    var list = articles || Array.from(document.querySelectorAll('article'));
+    list
+      .filter(function (article) { return article.querySelector('a[href*="/status/"]'); })
+      .forEach(function (article) {
+        var link = article.querySelector('a[href*="/status/"]');
+        var url = normalizeUrl(link ? link.getAttribute('href') : null);
+        if (!url || store.seen.has(url)) return;
+        store.seen.add(url);
 
-    var seen = new Set();
-    var items = [];
-
-    articles.forEach(function (article) {
-      var link = article.querySelector('a[href*="/status/"]');
-      var url = normalizeUrl(link ? link.getAttribute('href') : null);
-      if (!url || seen.has(url)) return;
-      seen.add(url);
-
-      var user = extractUserName(article);
-      var postedAtNode = article.querySelector('time');
-      items.push({
-        source_url: url,
-        display_name: user.displayName,
-        handle: user.handle,
-        text: extractTweetText(article),
-        posted_at: postedAtNode ? postedAtNode.getAttribute('datetime') : null,
-        extracted_from: location.href,
-        raw_user_text: cleanText(article.querySelector('[data-testid="User-Name"]') ? article.querySelector('[data-testid="User-Name"]').innerText : '') || null,
+        var user = extractUserName(article);
+        var postedAtNode = article.querySelector('time');
+        store.items.push({
+          source_url: url,
+          display_name: user.displayName,
+          handle: user.handle,
+          text: extractTweetText(article),
+          posted_at: postedAtNode ? postedAtNode.getAttribute('datetime') : null,
+          extracted_from: location.href,
+          raw_user_text: cleanText(article.querySelector('[data-testid="User-Name"]') ? article.querySelector('[data-testid="User-Name"]').innerText : '') || null,
+        });
       });
-    });
+  }
 
-    return items;
+  function sleep(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  async function collectBookmarks(options) {
+    var onProgress = options && options.onProgress ? options.onProgress : function () {};
+    var maxRounds = options && options.maxRounds ? options.maxRounds : 80;
+    var settleRounds = options && options.settleRounds ? options.settleRounds : 3;
+    var pauseMs = options && options.pauseMs ? options.pauseMs : 900;
+
+    var store = { seen: new Set(), items: [] };
+    var stableRounds = 0;
+    var lastCount = 0;
+
+    for (var round = 0; round < maxRounds; round++) {
+      extractBookmarksInto(store);
+      onProgress({
+        round: round + 1,
+        count: store.items.length,
+        settled: stableRounds >= settleRounds,
+      });
+
+      if (store.items.length === lastCount) stableRounds += 1;
+      else stableRounds = 0;
+
+      lastCount = store.items.length;
+      if (stableRounds >= settleRounds) break;
+
+      var scrollHeightBefore = document.documentElement.scrollHeight;
+      window.scrollTo(0, scrollHeightBefore);
+      await sleep(pauseMs);
+
+      var scrollHeightAfter = document.documentElement.scrollHeight;
+      if (scrollHeightAfter <= scrollHeightBefore + 2) {
+        await sleep(Math.max(300, Math.round(pauseMs / 2)));
+      }
+    }
+
+    window.scrollTo(0, 0);
+    await sleep(150);
+    extractBookmarksInto(store);
+    return store.items;
   }
 
   function sortItems(items, mode) {
@@ -250,30 +291,79 @@
     mdBtn.textContent = 'Markdown';
     mdBtn.addEventListener('click', function () {
       var mode = select.value;
-      var items = sortItems(extractBookmarks(), mode);
-      if (!items.length) {
-        showToast('No bookmarks found on the page yet.', true);
-        return;
-      }
-      download(makeFilename('md'), formatMarkdown(items, mode), 'text/markdown');
-      showToast('Downloaded Markdown export.', false);
+      mdBtn.disabled = true;
+      jsonBtn.disabled = true;
+      mdBtn.textContent = 'Loading...';
+      jsonBtn.textContent = 'JSON';
+      showToast('Collecting bookmarks from the page...', false);
+      collectBookmarks({
+        onProgress: function (state) {
+          mdBtn.textContent = state.count ? 'Markdown (' + state.count + ')' : 'Markdown';
+        },
+      }).then(function (loadedItems) {
+        var items = sortItems(loadedItems, mode);
+        if (!items.length) {
+          showToast('No bookmarks found on the page yet.', true);
+          mdBtn.disabled = false;
+          jsonBtn.disabled = false;
+          mdBtn.textContent = 'Markdown';
+          return;
+        }
+        download(makeFilename('md'), formatMarkdown(items, mode), 'text/markdown');
+        showToast('Downloaded Markdown export.', false);
+        mdBtn.disabled = false;
+        jsonBtn.disabled = false;
+        mdBtn.textContent = 'Markdown';
+        jsonBtn.textContent = 'JSON';
+      }).catch(function (error) {
+        console.error('[X Bookmarks Exporter] Markdown export failed', error);
+        showToast('Markdown export failed. See console.', true);
+        mdBtn.disabled = false;
+        jsonBtn.disabled = false;
+        mdBtn.textContent = 'Markdown';
+        jsonBtn.textContent = 'JSON';
+      });
     });
 
     var jsonBtn = document.createElement('button');
     jsonBtn.textContent = 'JSON';
     jsonBtn.addEventListener('click', function () {
       var mode = select.value;
-      var items = sortItems(extractBookmarks(), mode);
-      if (!items.length) {
-        showToast('No bookmarks found on the page yet.', true);
-        return;
-      }
-      download(makeFilename('json'), formatJson(items, mode), 'application/json');
-      showToast('Downloaded JSON export.', false);
+      mdBtn.disabled = true;
+      jsonBtn.disabled = true;
+      jsonBtn.textContent = 'Loading...';
+      showToast('Collecting bookmarks from the page...', false);
+      collectBookmarks({
+        onProgress: function (state) {
+          jsonBtn.textContent = state.count ? 'JSON (' + state.count + ')' : 'JSON';
+        },
+      }).then(function (loadedItems) {
+        var items = sortItems(loadedItems, mode);
+        if (!items.length) {
+          showToast('No bookmarks found on the page yet.', true);
+          mdBtn.disabled = false;
+          jsonBtn.disabled = false;
+          jsonBtn.textContent = 'JSON';
+          return;
+        }
+        download(makeFilename('json'), formatJson(items, mode), 'application/json');
+        showToast('Downloaded JSON export.', false);
+        mdBtn.disabled = false;
+        jsonBtn.disabled = false;
+        mdBtn.textContent = 'Markdown';
+        jsonBtn.textContent = 'JSON';
+      }).catch(function (error) {
+        console.error('[X Bookmarks Exporter] JSON export failed', error);
+        showToast('JSON export failed. See console.', true);
+        mdBtn.disabled = false;
+        jsonBtn.disabled = false;
+        mdBtn.textContent = 'Markdown';
+        jsonBtn.textContent = 'JSON';
+      });
     });
 
     var hint = document.createElement('div');
-    hint.textContent = 'Scroll the page first to load more bookmarks.';
+    hint.textContent = 'Exports auto-scroll to collect more bookmarks before downloading.';
     hint.style.cssText = 'font-size:11px;color:#94a3b8;line-height:1.4;margin-top:6px;';
 
     wrap.appendChild(title);

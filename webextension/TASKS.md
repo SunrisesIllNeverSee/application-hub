@@ -19,9 +19,10 @@
 - [x] Added a local agent bridge:
   - helper server at `scripts/local-extension-agent.mjs`
   - root script `npm run extension:agent`
-  - popup + sidepanel action to send the current page into `codex/qaapplication/inbox/`
+  - popup + sidepanel action to send the current page into `qaapplication/inbox/`
 - [x] Added a separate `x-bookmarks/` userscript lane for exporting loaded X bookmarks into Markdown or JSON
 - [x] QA passed for `x-bookmarks/` userscript on a synthetic bookmarks page fixture
+- [x] Upgraded `x-bookmarks/` export to auto-scroll and accumulate bookmarks before download
 
 ## Next verification pass
 
@@ -42,7 +43,7 @@
   - run Smart Matcher
   - gate Bulk Assist by coverage and fidelity
 - [ ] Confirm missing or invalid JWT fails closed without partial silent behavior
-- [ ] Install `webextension/x-bookmarks/userscript/x-bookmarks.user.js` as a userscript and confirm it exports loaded bookmarks from `x.com/i/bookmarks`
+- [ ] Install `webextension/x-bookmarks/userscript/x-bookmarks.user.js` as a userscript and confirm it exports the full bookmarked set from `x.com/i/bookmarks`
 - [ ] Load unpacked `webextension/application-hub/` in Chrome and confirm the AQUA smoke path on a real page
 - [ ] Review Firefox compatibility at the manifest and API level
 - [ ] Keep Safari as injected-panel fallback until a native packaging pass happens
