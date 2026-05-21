@@ -16,4 +16,4 @@ The remaining markdown files here are working notes, research dumps, or historic
 ## Webextensions
 
 - [webextension/application-hub](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub) - AQUA extension
-- [webextension/x-bookmarks](/Users/dericmchenry/Desktop/application-hub/webextension/x-bookmarks) - separate X bookmarks export lane
+- [webextension/x-bookmarks/userscript](/Users/dericmchenry/Desktop/application-hub/webextension/x-bookmarks/userscript) - separate X bookmarks userscript lane

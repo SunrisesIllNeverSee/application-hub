@@ -1,23 +1,19 @@
-# X Bookmarks Export
+# X Bookmarks
 
-Small standalone extension for exporting the currently loaded X / Twitter bookmarks page into Markdown or JSON.
+This folder now holds the standalone userscript lane for exporting loaded X / Twitter bookmarks.
+
+## Userscript
+
+- [userscript/x-bookmarks.user.js](/Users/dericmchenry/Desktop/application-hub/webextension/x-bookmarks/userscript/x-bookmarks.user.js)
 
 ## What it does
 
 - reads the loaded bookmarks page only
-- extracts each visible bookmarked post into structured data
-- downloads a Markdown or JSON dump for local sorting in VS Code
-
-## How to use
-
-1. Open `x.com/i/bookmarks` while signed in to X
-2. Load this folder unpacked in Chrome or Edge
-3. Click the extension icon
-4. Choose a sort mode
-5. Download Markdown or JSON
+- exports visible bookmarked posts to Markdown or JSON
+- keeps the lane separate from AQUA and the local application agent workflow
 
 ## Notes
 
-- This is separate from the AQUA extension stack.
-- It is intentionally local-first and does not need your Application Hub sign-in.
-- It only exports the bookmarks already loaded in the page, so scroll to load more before exporting if needed.
+- Open `x.com/i/bookmarks` while signed in to X
+- Scroll first so the items you want are loaded into the page
+- Install with Userscripts on Safari, or Tampermonkey / Violentmonkey elsewhere
