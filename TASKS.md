@@ -91,6 +91,7 @@ App is live at `https://mos2es.xyz`. Migrations through `037`. Stripe live (1 re
 - [x] Added `qaapplication/inbox/` as the local landing zone for incoming page captures from the agent bridge
 - [x] Imported the remaining `mcp_eval/` markdown docs into `qaapplication/` so the working corpus is in one place
 - [x] Added `webextension/safari/INSTALL-QA-LINK-CAPTURE.md` for the Safari QA capture setup flow
+- [x] Added `npm run tabs:export` to dump open Safari/Chrome tabs into Markdown under `qaapplication/inbox/`, with Safari window grouping fixed after parser tuning
 
 ---
 

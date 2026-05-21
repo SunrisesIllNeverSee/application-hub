@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "extension:agent": "node scripts/local-extension-agent.mjs"
+    "extension:agent": "node scripts/local-extension-agent.mjs",
+    "tabs:export": "node scripts/export-open-tabs.mjs"
   },
   "devDependencies": {
     "playwright": "^1.60.0"

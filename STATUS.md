@@ -61,6 +61,7 @@ Last updated: 2026-05-21 (codex webextension consolidation session)
   - `webextension/TASKS.md`
   - `webextension/application-hub/README.md`
 - Added local helper server at `scripts/local-extension-agent.mjs` plus root command `npm run extension:agent`. The helper accepts current-page captures from the extension, saves them into `qaapplication/inbox/`, and returns nearest existing application files from the local corpus.
+- Added `scripts/export-open-tabs.mjs` plus `npm run tabs:export` for exporting open Safari or Chrome tabs into Markdown under `qaapplication/inbox/`; Safari is now grouped by real browser windows and tab counts after a parser fix.
 - Copied `SEEDING_PLAN.md` into `qaapplication/` so the category seeding / indexing instructions live beside the application corpus.
 - Imported the remaining `mcp_eval/` markdown docs into `qaapplication/` so the application/eval corpus lives in one place.
 - Added a separate `webextension/x-bookmarks/` userscript lane for exporting X bookmarks to Markdown or JSON. The exporter now auto-scrolls and accumulates more bookmarks before download. This is intentionally separate from AQUA.
