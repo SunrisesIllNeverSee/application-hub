@@ -85,5 +85,6 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Recently released
 
+- **codex** — webextension consolidation pass (`webextension/application-hub/`, archived donor scaffold, bearer-auth route cleanup) — 2026-05-21
 - **vscode-claude** — three infra tasks (ranking RPC, Next.js 15, portability guardrail), AFTER_LAUNCH.md sections, codex/ files — commits `9c15708`, `aba40c5` — 2026-05-12
 - **mcp-eval** — CI fixes, coordination sync, markdown lint — `.github/workflows/ci.yml`, `SCRATCH.md`, `STATUS.md`, `.agents/claims.yaml` — 2026-05-12

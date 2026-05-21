@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getRequestUser } from '@/lib/supabase/request-auth'
 
 async function callCanonicalHub(body: Record<string, unknown>, accessToken?: string) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -24,14 +24,7 @@ async function callCanonicalHub(body: Record<string, unknown>, accessToken?: str
 }
 
 export async function POST(req: Request) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
+  const { user, accessToken } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json().catch(() => ({}))
@@ -41,6 +34,6 @@ export async function POST(req: Request) {
       action: 'ingest',
       user_id: user.id,
     },
-    session?.access_token
+    accessToken ?? undefined
   )
 }

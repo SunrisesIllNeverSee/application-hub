@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { decryptKey } from '@/lib/encryption'
+import { getRequestUser } from '@/lib/supabase/request-auth'
 
 // GET /api/integrations/key
 // Returns the decrypted API key for the user's default BYOK integration.
 // Used by the AQUA browser extension to call AI providers directly.
-// Requires a valid session — never returns keys unauthenticated.
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+// Requires a valid session cookie or bearer JWT — never returns keys unauthenticated.
+export async function GET(req: Request) {
+  const { supabase, user } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   if (!process.env.INTEGRATION_ENCRYPTION_KEY) {

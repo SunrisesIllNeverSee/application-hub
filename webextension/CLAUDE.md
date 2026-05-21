@@ -1,75 +1,70 @@
 # WebExtension — Claude Context
 
-> Claude context for the `webextension/` folder.
-> Read this before working on anything in this directory.
+Read this before editing anything in `webextension/`.
 
----
+## Current reality
 
-## What this is
+The live extension is plain JavaScript MV3 in:
 
-A cross-browser WebExtension for the Application Hub platform. Built with WXT (Vite-based), TypeScript, React. Targets Chrome, Firefox, Edge, and Safari from a single codebase.
+- `/Users/dericmchenry/Desktop/application-hub/webextension/application-hub`
 
-This extension is a companion to the main `app/` Next.js application — it shares the same Supabase backend (`betcyfbzsgusaghriptz`).
+Do not treat the archived donor scaffold or older WXT notes as the active implementation.
 
----
+## Product model
 
-## Current state
+One extension, two operating modes:
 
-- [ ] WXT project not yet initialized — see `TASKS.md` for setup checklist
-- [ ] No entrypoints written yet
-- [ ] No Supabase auth integration yet
+- `Manual Assist`
+  - detect fields
+  - show matched bank answers
+  - generate one field at a time
+  - fill only on user click
+  - export Markdown
+  - save edited answers back to bank
+- `Automation Assist`
+  - capture full page/application into Canonical Hub
+  - run Smart Matcher
+  - bulk assist with coverage and fidelity gates
+  - no auto-submit in this pass
 
----
+Manual is the default lane. Automation is additive, not a replacement.
 
-## Architecture decisions
+## Runtime surfaces
 
-**Framework**: WXT — chosen over Plasmo because it has better Safari support, is framework-agnostic, and has the best DX in 2026.
+- `background.js` — orchestration layer and message bus
+- `content.js` — DOM scan, fill, export, capture hooks, Safari fallback
+- `sidepanel.html/js` — main UX
+- `popup.html/js` — lightweight auth, status, mode, quick actions
 
-**UI**: React (same as `app/`) so components can eventually be shared.
+## Message families
 
-**Auth**: Supabase JWT stored in `browser.storage.local`. The extension authenticates independently from the web app session — user logs in once via the extension's options page.
+- `AUTH_*`
+- `FIELDS_*`
+- `MATCH_*`
+- `GENERATE_*`
+- `FILL_*`
+- `CAPTURE_*`
+- `EXPORT_*`
+- `SMART_MATCHER_*`
+- `CANONICAL_*`
 
-**API**: Background script makes direct Supabase calls (anon key for user-scoped reads, service role never in extension). Draft generation hits `/api/draft` on the deployed Next.js app, or Anthropic directly if the user has a BYOK key stored via the existing `user_integrations` table.
+Keep new work inside those families instead of inventing one-off message types.
 
----
+## Storage keys
 
-## Key conventions
+- `jwt`
+- `hubUrl`
+- `mode`
+- `automationEnabled`
+- `lastActiveTab`
 
-- All extension code lives in `webextension/` — do not mix with `app/`
-- Use `browser.*` namespace everywhere (not `chrome.*`) — the polyfill handles Chrome compatibility
-- Background script = service worker in MV3 — it can be terminated; don't store ephemeral state there
-- Content scripts have limited API access — pass messages to background for storage/fetch
-- Icons must be provided in multiple sizes: 16, 32, 48, 128px
+## Backend assumptions
 
----
+The extension calls deployed Next.js routes with a bearer JWT. If a route only trusts cookie auth, fix the route instead of papering over it inside extension code.
 
-## Supabase connection
+## Future work, not current truth
 
-```
-URL: https://betcyfbzsgusaghriptz.supabase.co
-Anon key: safe to use in extension (public, user-scoped RLS)
-Service role key: NEVER put this in an extension
-```
-
-The anon key goes in `wxt.config.ts` under `define` (build-time constant) or in `browser.storage.local` after first run.
-
----
-
-## Safari specifics
-
-Safari builds require an Xcode wrapper — you cannot test Safari without a Mac and Xcode installed. After `npm run build`, run:
-
-```bash
-xcrun safari-web-extension-converter .output/safari-mv3/
-```
-
-This generates an Xcode project in the parent directory. Open it, build, and enable the extension in Safari Preferences.
-
----
-
-## Do not do these things
-
-- Do not put the Supabase service role key in any extension file
-- Do not call `chrome.*` directly — always use `browser.*` + polyfill
-- Do not store sensitive data (API keys, JWTs) in `sessionStorage` or `localStorage` on the page — use `browser.storage.local`
-- Do not use `manifest_version: 2` for new code unless Firefox compatibility requires it (WXT handles the split automatically)
+- WXT migration
+- TypeScript/React rebuild
+- broader `browser.*` polyfill cleanup
+- native Safari packaging

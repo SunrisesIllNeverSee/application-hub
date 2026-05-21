@@ -16,7 +16,68 @@
 ---
 
 
-Last updated: 2026-05-20 (codex canonical rebuild session)
+Last updated: 2026-05-21 (codex webextension consolidation session)
+
+---
+
+## 2026-05-21 — WebExtension consolidation
+
+**Session:** codex-2026-05-21-webextension-consolidation
+**Claim:** webextension/application-hub + donor scaffold + extension auth routes
+
+### What landed
+
+- `webextension/application-hub/` is now the single live extension implementation path.
+- The old Chrome-only donor scaffold was archived to `webextension/_archive/aqua-extension-donor-2026-05-21/`.
+- Live extension architecture was consolidated around one MV3 manifest and one message bus:
+  - `background.js` = orchestration, settings, API calls
+  - `content.js` = field detection, fill, blur capture, Markdown export, Safari fallback panel
+  - `sidepanel.html/js` = main operator UI
+  - `popup.html/js` = auth, mode, quick actions
+- Two explicit operating modes now exist in the live extension:
+  - `Manual Assist`
+  - `Automation Assist`
+- Extension storage keys were normalized to:
+  - `jwt`
+  - `hubUrl`
+  - `mode`
+  - `automationEnabled`
+  - `lastActiveTab`
+- Donor features migrated into the live extension:
+  - canonical capture flow
+  - Smart Matcher trigger
+  - popup connection fields and quick-action pattern
+- Extension-facing app routes were patched to accept bearer JWT auth from the extension in addition to cookie sessions:
+  - `/api/integrations/key`
+  - `/api/hub/ingest`
+  - `/api/hub/smart-matcher`
+  - `/api/hub/autofill-eligibility`
+- New helper added at `app/lib/supabase/request-auth.ts` to centralize cookie-or-bearer request auth.
+- Webextension docs updated to match reality:
+  - `webextension/README.md`
+  - `webextension/CLAUDE.md`
+  - `webextension/TASKS.md`
+  - `webextension/application-hub/README.md`
+
+### Verification completed
+
+- `node --check` passed on extension JS files
+- `cd app && npm run type-check` passed
+- `cd app && npm run build` passed
+- `python3 .agents/check.py` passed
+- `git diff --check` passed
+
+### Important caveat
+
+This pass is structurally implemented and statically verified, but it is not yet runtime-certified in a real unpacked Chrome session. The next required check is a browser smoke pass covering:
+
+- popup save/clear flow
+- side panel open
+- field detection on a live/simple form
+- manual generate/fill/export
+- automation capture to hub
+- Smart Matcher
+- bulk-assist threshold gating
 
 ---
 

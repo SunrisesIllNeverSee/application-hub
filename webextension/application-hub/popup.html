@@ -3,100 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Application Hub</title>
+  <title>AQUA</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 260px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 360px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 13px;
       color: #18181b;
-      background: #fff;
+      background: #ffffff;
     }
-    header {
-      padding: 12px 14px;
-      background: #18181b;
+    main { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+    header { display: flex; align-items: center; justify-content: space-between; }
+    h1 { font-size: 20px; font-weight: 800; color: #18181b; }
+    .mode-line { font-size: 12px; color: #71717a; }
+    .status-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: #a1a1aa; }
+    .dot.connected { background: #16a34a; }
+    .section { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 11px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.04em; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      border: 1px solid #d4d4d8;
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      color: #27272a;
+      background: #fff;
+      outline: none;
+    }
+    input:focus { border-color: #52525b; }
+    .toggle-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      background: #fafafa;
     }
-    .logo { font-weight: 800; font-size: 14px; color: #a78bfa; letter-spacing: 0.04em; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #52525b; }
-    .dot.connected { background: #22c55e; }
-    .section { padding: 12px 14px; border-top: 1px solid #f4f4f5; }
-    label { display: block; font-size: 11px; font-weight: 600; color: #71717a; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
-    input {
-      width: 100%; padding: 6px 8px;
-      border: 1px solid #e4e4e7; border-radius: 5px;
-      font-size: 12px; font-family: monospace; color: #3f3f46;
-      outline: none; background: #fafafa;
-    }
-    input:focus { border-color: #a78bfa; background: #fff; }
-    .hint { font-size: 11px; color: #a1a1aa; margin-top: 5px; line-height: 1.4; }
-    .hint a { color: #7c3aed; text-decoration: none; }
-    .hint a:hover { text-decoration: underline; }
-    .btn-row { display: flex; gap: 6px; margin-top: 10px; }
+    .toggle-copy { color: #52525b; font-size: 12px; line-height: 1.4; }
+    .button-row { display: flex; gap: 8px; }
     button {
-      flex: 1; padding: 7px 10px; border-radius: 5px;
-      font-size: 12px; font-weight: 500; cursor: pointer;
-      font-family: inherit; border: none;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
     }
-    .btn-save { background: #18181b; color: #fff; }
-    .btn-save:hover { background: #27272a; }
-    .btn-clear { background: #f4f4f5; color: #71717a; }
-    .btn-clear:hover { color: #ef4444; background: #fef2f2; }
-    .btn-panel {
-      width: 100%; padding: 9px; border-radius: 6px;
-      font-size: 13px; font-weight: 700;
-      background: #7c3aed; color: #fff; cursor: pointer;
-      border: none; font-family: inherit;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .btn-panel:hover { background: #6d28d9; }
-    footer { padding: 8px 14px; border-top: 1px solid #f4f4f5; text-align: center; }
-    footer a { font-size: 11px; color: #a1a1aa; text-decoration: none; }
-    footer a:hover { color: #7c3aed; }
-    #status-row { padding: 8px 14px; display: flex; align-items: center; gap: 6px; background: #fafafa; }
-    #status-text { font-size: 12px; color: #71717a; }
+    .primary { background: #18181b; color: #fff; flex: 1; }
+    .secondary { background: #f4f4f5; color: #27272a; flex: 1; }
+    .stack button { width: 100%; }
+    .stack { display: flex; flex-direction: column; gap: 8px; }
+    .hint { font-size: 11px; color: #71717a; line-height: 1.5; }
+    .disabled { opacity: 0.6; pointer-events: none; }
   </style>
 </head>
 <body>
+  <main>
+    <header>
+      <h1>AQUA</h1>
+      <div class="mode-line" id="mode-value">Manual Assist</div>
+    </header>
 
-  <header>
-    <span class="logo">AQUA</span>
-    <div class="dot" id="status-dot"></div>
-  </header>
-
-  <div id="status-row">
-    <span id="status-text">Checking connection…</span>
-  </div>
-
-  <div class="section">
-    <button type="button" class="btn-panel" id="open-panel-btn">
-      ✦ Open AQUA panel
-    </button>
-    <p class="hint" style="margin-top: 8px;">
-      The panel shows detected fields and lets you generate or fill answers.
-    </p>
-  </div>
-
-  <div class="section">
-    <label for="jwt-input">Session token</label>
-    <input type="password" id="jwt-input" placeholder="eyJ…" autocomplete="off" />
-    <p class="hint">
-      Get it at
-      <a href="https://mos2es.xyz/profile/settings" target="_blank" rel="noopener noreferrer">mos2es.xyz → Profile → Settings</a>
-      → "Show session token"
-    </p>
-    <div class="btn-row">
-      <button type="button" class="btn-save" id="save-btn">Save</button>
-      <button type="button" class="btn-clear" id="clear-btn">Clear</button>
+    <div class="status-row">
+      <div class="dot" id="status-dot"></div>
+      <div id="status-text">Checking connection…</div>
     </div>
-  </div>
 
-  <footer>
-    <a href="https://mos2es.xyz" target="_blank" rel="noopener noreferrer">mos2es.xyz</a>
-  </footer>
+    <div class="section">
+      <label for="hub-url-input">Hub URL</label>
+      <input id="hub-url-input" type="text" placeholder="https://mos2es.xyz" />
+    </div>
+
+    <div class="section">
+      <label for="jwt-input">Session token</label>
+      <input id="jwt-input" type="password" placeholder="Paste token from Profile → Settings" autocomplete="off" />
+      <div class="hint">This stays in extension local storage for v1 so the extension can call your user-scoped API routes directly.</div>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-copy">
+        <strong>Automation Assist</strong><br />
+        Enable canonical capture, Smart Matcher, and threshold-gated bulk assist.
+      </div>
+      <input id="automation-enabled" type="checkbox" />
+    </div>
+
+    <div class="button-row">
+      <button id="save-btn" class="primary" type="button">Save</button>
+      <button id="clear-btn" class="secondary" type="button">Clear</button>
+    </div>
+
+    <div class="stack" id="quick-actions">
+      <button id="open-panel-btn" class="primary" type="button">Open side panel</button>
+      <button id="capture-btn" class="secondary" type="button">Capture current page</button>
+      <button id="matcher-btn" class="secondary" type="button">Run Smart Matcher</button>
+      <button id="open-hub-btn" class="secondary" type="button">Open full hub</button>
+      <button id="export-md-btn" class="secondary" type="button">Export Markdown</button>
+    </div>
+  </main>
 
   <script src="popup.js"></script>
 </body>

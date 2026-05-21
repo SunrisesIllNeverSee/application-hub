@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getRequestUser } from '@/lib/supabase/request-auth'
 
 export async function POST(req: Request) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
+  const { user, accessToken } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -24,7 +17,7 @@ export async function POST(req: Request) {
     headers: {
       'Content-Type': 'application/json',
       apikey: anonKey,
-      Authorization: session?.access_token ? `Bearer ${session.access_token}` : `Bearer ${anonKey}`,
+      Authorization: accessToken ? `Bearer ${accessToken}` : `Bearer ${anonKey}`,
     },
     body: JSON.stringify({
       ...body,

@@ -1,8 +1,31 @@
 # Application Hub — Task List
 
-Current phase: **AQUA shipped — Phase 2 features all landed (2026-05-12)**
+Current phase: **AQUA shipped — extension consolidation landed, browser runtime QA next (2026-05-21)**
 
-Last updated: 2026-05-12
+Last updated: 2026-05-21
+
+## 2026-05-21 — WebExtension consolidation log
+
+- [x] Consolidate extension implementation into `webextension/application-hub/`
+- [x] Archive donor scaffold to `webextension/_archive/aqua-extension-donor-2026-05-21/`
+- [x] Add explicit `Manual Assist` and `Automation Assist` modes
+- [x] Unify message bus and storage keys in the live extension
+- [x] Wire canonical capture, Smart Matcher, and bulk-assist threshold checks into the live extension
+- [x] Patch extension-facing app routes to accept bearer JWT auth
+- [x] Update `webextension/*` docs to reflect the actual current architecture
+- [x] Static verification:
+  - `node --check` on extension scripts
+  - `cd app && npm run type-check`
+  - `cd app && npm run build`
+  - `python3 .agents/check.py`
+  - `git diff --check`
+- [ ] Runtime verification still needed in unpacked Chrome:
+  - popup auth/settings flow
+  - side panel open
+  - field detection
+  - manual generate/fill/export
+  - automation capture + Smart Matcher
+  - bulk-assist gating UX
 
 ## AQUA Phase — Shipped 2026-05-12
 
