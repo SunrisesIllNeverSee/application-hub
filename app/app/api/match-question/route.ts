@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { decryptKey } from '@/lib/encryption'
 
 // ============================================================
 // POST /api/match-question
@@ -162,9 +163,9 @@ export async function POST(req: Request) {
   // BYOK — try all active user integrations that support embeddings
   const { data: integrations } = await supabase
     .from('user_integrations')
-    .select('provider, key_encrypted, base_url, model_preference')
+    .select('provider, key_encrypted, key_storage_ref, base_url, model_preference')
     .eq('user_id', user.id)
-    .eq('is_active', true)
+    .eq('status', 'active')
     .in('provider', ['ollama', 'openai'])
 
   for (const integration of integrations ?? []) {
@@ -174,10 +175,7 @@ export async function POST(req: Request) {
       const model = integration.model_preference ?? 'nomic-embed-text'
       embedding = await embedOllama(text.trim(), integration.base_url, model)
     } else if (integration.provider === 'openai' && integration.key_encrypted) {
-      const { data: decrypted } = await adminClient.rpc('decrypt_integration_key', {
-        p_user_id: user.id,
-        p_provider: 'openai',
-      })
+      const decrypted = decryptKey(integration.key_encrypted, integration.key_storage_ref)
       if (decrypted) embedding = await embedWithBYOK(text.trim(), decrypted)
     }
   }

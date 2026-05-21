@@ -10,6 +10,7 @@
 // @grant        GM_xmlhttpRequest
 // @connect      127.0.0.1
 // @connect      localhost
+// @run-at       document-end
 // ==/UserScript==
 
 (function () {
@@ -18,6 +19,7 @@
   const AGENT_URL = 'http://127.0.0.1:4317'
   const PANEL_ID = 'qa-link-capture-panel'
   const TOAST_PREFIX = 'qa-link-capture-toast-'
+  const BANNER_ID = 'qa-link-capture-banner'
 
   function gmAddStyle(css) {
     if (typeof GM_addStyle === 'function') {
@@ -74,7 +76,8 @@
   }
 
   function inferApplicationName() {
-    const h1 = textOrNull(document.querySelector('h1')?.innerText)
+    const h1Node = document.querySelector('h1')
+    const h1 = textOrNull(h1Node ? h1Node.innerText : '')
     const titleParts = splitTitle(document.title)
     const ogTitle = getMeta('meta[property="og:title"]')
     return h1 || titleParts[0] || ogTitle || textOrNull(document.title) || 'Untitled application'
@@ -96,17 +99,17 @@
   }
 
   function cssEscape(value) {
-    if (window.CSS?.escape) return window.CSS.escape(value)
+    if (window.CSS && window.CSS.escape) return window.CSS.escape(value)
     return String(value || '').replace(/["\\]/g, '\\$&')
   }
 
   function getLabel(element) {
-    if (element.labels?.[0]?.innerText) return cleanText(element.labels[0].innerText)
+    if (element.labels && element.labels[0] && element.labels[0].innerText) return cleanText(element.labels[0].innerText)
 
     const id = element.getAttribute('id')
     if (id) {
       const label = document.querySelector(`label[for="${cssEscape(id)}"]`)
-      if (label?.textContent) return cleanText(label.textContent)
+      if (label && label.textContent) return cleanText(label.textContent)
     }
 
     const aria = textOrNull(element.getAttribute('aria-label'))
@@ -116,15 +119,16 @@
     if (placeholder) return placeholder
 
     const parentLabel = element.closest('label')
-    if (parentLabel?.textContent) return cleanText(parentLabel.textContent)
+    if (parentLabel && parentLabel.textContent) return cleanText(parentLabel.textContent)
 
     const previous = element.previousElementSibling
     if (previous && ['LABEL', 'P', 'H3', 'H4', 'LEGEND'].includes(previous.tagName)) {
       return cleanText(previous.textContent)
     }
 
-    const containerLabel = element.closest('div, section, fieldset, form')?.querySelector('label, legend, h1, h2, h3, p')
-    return textOrNull(containerLabel?.textContent)
+    const container = element.closest('div, section, fieldset, form')
+    const containerLabel = container ? container.querySelector('label, legend, h1, h2, h3, p') : null
+    return textOrNull(containerLabel ? containerLabel.textContent : '')
   }
 
   function getFieldValue(element) {
@@ -171,7 +175,9 @@
 
   function pageText() {
     const root = document.querySelector('main') || document.querySelector('[role="main"]') || document.body
-    return cleanText(root?.innerText || document.body?.innerText || '').slice(0, 12000)
+    const rootText = root ? root.innerText : ''
+    const bodyText = document.body ? document.body.innerText : ''
+    return cleanText(rootText || bodyText || '').slice(0, 12000)
   }
 
   function summaryIntro() {
@@ -273,6 +279,48 @@
     }, 2200)
   }
 
+  function showBanner() {
+    if (document.getElementById(BANNER_ID)) return
+
+    const banner = document.createElement('div')
+    banner.id = BANNER_ID
+    banner.textContent = `QA Link Capture active · ${location.hostname}`
+    banner.style.cssText = [
+      'position:fixed',
+      'top:16px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:2147483647',
+      'background:#f59e0b',
+      'color:#111827',
+      'border:1px solid #fbbf24',
+      'padding:8px 12px',
+      'border-radius:999px',
+      'font:600 12px/1.2 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif',
+      'box-shadow:0 10px 24px rgba(0,0,0,0.22)',
+      'display:flex',
+      'align-items:center',
+      'gap:10px',
+    ].join(';')
+
+    const close = document.createElement('button')
+    close.textContent = 'Dismiss'
+    close.style.cssText = [
+      'border:none',
+      'background:rgba(17,24,39,0.12)',
+      'color:#111827',
+      'border-radius:999px',
+      'padding:4px 8px',
+      'font:inherit',
+      'cursor:pointer',
+    ].join(';')
+    close.addEventListener('click', () => banner.remove())
+
+    banner.appendChild(close)
+    document.body.appendChild(banner)
+    console.log('[QA Link Capture] userscript injected on', location.href)
+  }
+
   function ensurePanel() {
     if (document.getElementById(PANEL_ID)) return
 
@@ -368,17 +416,37 @@
   }
 
   function boot() {
-    if (!document.body) return
+    if (!document.body) return false
+    showBanner()
     ensurePanel()
+    return true
+  }
+
+  function start() {
+    if (boot()) return
+    const waitForBody = () => {
+      if (boot()) return
+      window.setTimeout(waitForBody, 50)
+    }
+    waitForBody()
   }
 
   gmAddStyle('')
-  boot()
+  let observer = null
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true })
+  } else {
+    start()
+  }
 
-  const observer = new MutationObserver(() => boot())
-  if (document.body) {
+  const bindObserver = () => {
+    if (observer || !document.body) return
+    observer = new MutationObserver(() => boot())
     observer.observe(document.body, { childList: true, subtree: true })
   }
+
+  bindObserver()
+  document.addEventListener('DOMContentLoaded', bindObserver, { once: true })
 
   GM_registerMenuCommand('QA Link Capture — send current page', () => {
     const btn = document.querySelector(`#${PANEL_ID} button`)

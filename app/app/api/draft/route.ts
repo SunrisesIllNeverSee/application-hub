@@ -129,8 +129,7 @@ export async function POST(req: NextRequest) {
     let resolvedModelPreference: string | null = null
     let integrationProvider = 'byok_anthropic'
 
-    // Priority: anthropic → openai → ollama → google
-    const PROVIDER_PRIORITY = ['anthropic', 'openai', 'ollama', 'google']
+    const PROVIDER_PRIORITY = ['anthropic', 'openai', 'ollama']
 
     const { data: integrations } = await supabase
       .from('user_integrations')

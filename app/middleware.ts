@@ -10,6 +10,8 @@ const PROTECTED_ROUTES = [
   '/questions',
   '/answers',
   '/workspace',
+  '/workstation',
+  '/community',
   '/profile',
   '/bank',
   '/hub',
