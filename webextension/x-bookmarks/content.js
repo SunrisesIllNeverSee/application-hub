@@ -10,7 +10,10 @@ function normalizeUrl(url) {
   try {
     return new URL(url, location.origin).href
   } catch {
-    return null
+    if (typeof url === 'string' && url.startsWith('/')) {
+      return location.origin === 'null' ? url : `${location.origin}${url}`
+    }
+    return url || null
   }
 }
 

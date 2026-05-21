@@ -21,6 +21,7 @@
   - root script `npm run extension:agent`
   - popup + sidepanel action to send the current page into `codex/qaapplication/inbox/`
 - [x] Added a separate `x-bookmarks/` extension lane for exporting loaded X bookmarks into Markdown or JSON
+- [x] QA passed for `x-bookmarks/` on a synthetic bookmarks page fixture
 
 ## Next verification pass
 
@@ -42,6 +43,7 @@
   - gate Bulk Assist by coverage and fidelity
 - [ ] Confirm missing or invalid JWT fails closed without partial silent behavior
 - [ ] Load unpacked `webextension/x-bookmarks/` in Chrome and confirm it exports loaded bookmarks from `x.com/i/bookmarks`
+- [ ] Load unpacked `webextension/application-hub/` in Chrome and confirm the AQUA smoke path on a real page
 - [ ] Review Firefox compatibility at the manifest and API level
 - [ ] Keep Safari as injected-panel fallback until a native packaging pass happens
 
