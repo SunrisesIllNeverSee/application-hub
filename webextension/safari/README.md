@@ -8,6 +8,8 @@
 
 Works today. Uses the free **Userscripts** app from the Mac App Store.
 
+Setup guide: [INSTALL-QA-LINK-CAPTURE.md](</Users/dericmchenry/Desktop/application-hub/webextension/safari/INSTALL-QA-LINK-CAPTURE.md>)
+
 **Install:**
 1. Mac App Store → search "Userscripts" by Justin Wasack → install (free)
 2. Safari → Settings → Extensions → enable Userscripts

@@ -65,6 +65,7 @@ Last updated: 2026-05-21 (codex webextension consolidation session)
 - Imported the remaining `mcp_eval/` markdown docs into `qaapplication/` so the application/eval corpus lives in one place.
 - Added a separate `webextension/x-bookmarks/` userscript lane for exporting X bookmarks to Markdown or JSON. The exporter now auto-scrolls and accumulates more bookmarks before download. This is intentionally separate from AQUA.
 - Added a Safari-compatible `webextension/safari/qa-link-capture.user.js` userscript that sends the current page to the local QA agent with site/company/application hints and visible field capture.
+- Added `webextension/safari/INSTALL-QA-LINK-CAPTURE.md` as the quick setup guide for the Safari QA capture lane.
 - Added a `codex/README.md` index so the local application corpus and rough notes are easier to navigate.
 
 ### Verification completed
