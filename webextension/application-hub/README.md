@@ -4,6 +4,7 @@ One live extension. Two operating modes.
 
 - `Manual Assist`: detect, review, generate, fill, export, save
 - `Automation Assist`: capture to Canonical Hub, Smart Matcher, threshold-gated bulk assist
+- `Local Agent Bridge`: send the current application page into your local workspace without auth
 
 ## Load locally
 
@@ -14,6 +15,7 @@ One live extension. Two operating modes.
 3. Load unpacked from `/Users/dericmchenry/Desktop/application-hub/webextension/application-hub`
 4. Click the toolbar icon to open the popup
 5. Use `Open side panel` from the popup
+6. Optional local agent lane: run `npm run extension:agent` from the repo root, then use `Send to local agent`
 
 ### Firefox
 
@@ -55,6 +57,13 @@ One live extension. Two operating modes.
 5. Bulk Assist checks `POST /api/hub/autofill-eligibility`
 6. If level 1 thresholds pass, the extension fills matched answers in bulk
 
+### Local Agent Bridge
+
+1. Start the helper with `npm run extension:agent`
+2. The extension sends the current page capture to `http://127.0.0.1:4317/assist`
+3. The helper saves the page into `codex/qaapplication/inbox/`
+4. The helper returns the closest files from `codex/qaapplication/` so you can open the current application beside prior ones in VS Code
+
 ## Auth model
 
 The extension stores a user JWT in extension local storage for v1. Live app routes now accept either:
@@ -63,6 +72,8 @@ The extension stores a user JWT in extension local storage for v1. Live app rout
 - a bearer JWT from the extension
 
 That keeps one auth model across popup, panel, and background without introducing service-role behavior.
+
+For the `Local Agent Bridge`, sign-in is not required. It is a purely local workspace assist lane.
 
 ## Notes
 

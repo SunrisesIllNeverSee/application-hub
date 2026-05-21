@@ -81,6 +81,12 @@
     </div>
 
     <div class="section">
+      <label for="agent-url-input">Local agent URL</label>
+      <input id="agent-url-input" type="text" placeholder="http://127.0.0.1:4317" />
+      <div class="hint">Run <code>npm run extension:agent</code> in this repo to capture forms into your local workspace without needing sign-in.</div>
+    </div>
+
+    <div class="section">
       <label for="jwt-input">Session token</label>
       <input id="jwt-input" type="password" placeholder="Paste token from Profile → Settings" autocomplete="off" />
       <div class="hint">This stays in extension local storage for v1 so the extension can call your user-scoped API routes directly.</div>
@@ -101,9 +107,10 @@
 
     <div class="stack" id="quick-actions">
       <button id="open-panel-btn" class="primary" type="button">Open side panel</button>
-      <button id="capture-btn" class="secondary" type="button">Capture current page</button>
-      <button id="matcher-btn" class="secondary" type="button">Run Smart Matcher</button>
-      <button id="open-hub-btn" class="secondary" type="button">Open full hub</button>
+      <button id="agent-btn" class="secondary" type="button">Send to local agent</button>
+      <button id="capture-btn" class="secondary" type="button" data-auth-required="true">Capture current page</button>
+      <button id="matcher-btn" class="secondary" type="button" data-auth-required="true">Run Smart Matcher</button>
+      <button id="open-hub-btn" class="secondary" type="button" data-auth-required="true">Open full hub</button>
       <button id="export-md-btn" class="secondary" type="button">Export Markdown</button>
     </div>
   </main>

@@ -1,17 +1,19 @@
 const DEFAULT_SETTINGS = {
   hubUrl: 'https://mos2es.xyz',
+  agentUrl: 'http://127.0.0.1:4317',
   jwt: '',
   mode: 'manual',
   automationEnabled: false,
 }
 
 const hubUrlInput = document.getElementById('hub-url-input')
+const agentUrlInput = document.getElementById('agent-url-input')
 const jwtInput = document.getElementById('jwt-input')
 const automationToggle = document.getElementById('automation-enabled')
 const modeValue = document.getElementById('mode-value')
 const statusDot = document.getElementById('status-dot')
 const statusText = document.getElementById('status-text')
-const quickActions = document.getElementById('quick-actions')
+const authOnlyActions = Array.from(document.querySelectorAll('[data-auth-required="true"]'))
 
 function setStatus(message, connected) {
   statusText.textContent = message
@@ -50,6 +52,7 @@ async function activeTabId() {
 async function refresh() {
   const { authenticated, settings } = await getSettings()
   hubUrlInput.value = settings.hubUrl
+  agentUrlInput.value = settings.agentUrl
   jwtInput.value = settings.jwt
   automationToggle.checked = Boolean(settings.automationEnabled)
   setModeText(settings)
@@ -57,19 +60,20 @@ async function refresh() {
     authenticated ? 'Connected to your answer bank.' : 'Paste a session token to connect.',
     authenticated
   )
-  quickActions.classList.toggle('disabled', !authenticated)
+  authOnlyActions.forEach((button) => { button.disabled = !authenticated })
 }
 
 document.getElementById('save-btn').addEventListener('click', async () => {
   const next = await saveSettings({
     hubUrl: hubUrlInput.value.trim() || DEFAULT_SETTINGS.hubUrl,
+    agentUrl: agentUrlInput.value.trim() || DEFAULT_SETTINGS.agentUrl,
     jwt: jwtInput.value.trim(),
     automationEnabled: automationToggle.checked,
     mode: automationToggle.checked ? 'automation' : 'manual',
   })
   setModeText(next)
   setStatus('Connection saved.', Boolean(next.jwt))
-  quickActions.classList.toggle('disabled', !next.jwt)
+  authOnlyActions.forEach((button) => { button.disabled = !next.jwt })
 })
 
 document.getElementById('clear-btn').addEventListener('click', async () => {
@@ -79,7 +83,7 @@ document.getElementById('clear-btn').addEventListener('click', async () => {
   automationToggle.checked = false
   setModeText(next)
   setStatus('Connection cleared.', false)
-  quickActions.classList.add('disabled')
+  authOnlyActions.forEach((button) => { button.disabled = true })
 })
 
 automationToggle.addEventListener('change', async () => {
@@ -103,6 +107,15 @@ document.getElementById('capture-btn').addEventListener('click', async () => {
     vertical: 'founder',
   })
   setStatus(response?.error ? response.error : 'Canonical capture sent.', !response?.error)
+})
+
+document.getElementById('agent-btn').addEventListener('click', async () => {
+  const tabId = await activeTabId()
+  const response = await chrome.runtime.sendMessage({
+    type: 'AGENT_SEND_REQUEST',
+    tabId,
+  })
+  setStatus(response?.error ? response.error : `Saved to ${response?.saved_to}`, !response?.error)
 })
 
 document.getElementById('matcher-btn').addEventListener('click', async () => {

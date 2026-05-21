@@ -1,5 +1,6 @@
 const DEFAULT_SETTINGS = {
   hubUrl: 'https://mos2es.xyz',
+  agentUrl: 'http://127.0.0.1:4317',
   jwt: '',
   mode: 'manual',
   automationEnabled: false,
@@ -371,6 +372,20 @@ async function runBulkAssist() {
   setAutomationFeedback(`Bulk Assist held the line. Coverage is ${coveragePct} with ${fidelityPct} average fidelity, below the manual prefill threshold.`, 'muted')
 }
 
+async function sendToLocalAgent() {
+  const response = await chrome.runtime.sendMessage({
+    type: 'AGENT_SEND_REQUEST',
+    tabId: activeTabId,
+  })
+
+  setAutomationFeedback(
+    response?.error
+      ? response.error
+      : `Saved to ${response?.saved_to}. ${response?.related_files?.length ? 'Related local application files are ready in the repo.' : 'No related files were found yet.'}`,
+    response?.error ? 'error' : 'success'
+  )
+}
+
 async function connectFromPanel() {
   const jwt = $('panel-jwt').value.trim()
   const hubUrl = $('panel-hub-url').value.trim() || DEFAULT_SETTINGS.hubUrl
@@ -409,6 +424,7 @@ chrome.runtime.onMessage.addListener((message) => {
 })
 
 $('panel-connect-btn').addEventListener('click', connectFromPanel)
+$('panel-send-agent-auth').addEventListener('click', sendToLocalAgent)
 $('btn-generate-all').addEventListener('click', generateAll)
 $('btn-fill-matched').addEventListener('click', fillAllMatched)
 $('btn-export-md').addEventListener('click', exportMd)
@@ -418,6 +434,8 @@ $('btn-open-hub-idle').addEventListener('click', () => chrome.runtime.sendMessag
 $('btn-capture-hub').addEventListener('click', runCaptureToHub)
 $('btn-smart-matcher').addEventListener('click', runSmartMatcher)
 $('btn-bulk-assist').addEventListener('click', runBulkAssist)
+$('btn-send-agent').addEventListener('click', sendToLocalAgent)
+$('btn-send-agent-idle').addEventListener('click', sendToLocalAgent)
 $('mode-manual').addEventListener('click', () => switchMode('manual'))
 $('mode-automation').addEventListener('click', () => switchMode('automation'))
 

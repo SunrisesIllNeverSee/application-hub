@@ -35,11 +35,13 @@ Last updated: 2026-05-21 (codex webextension consolidation session)
   - `sidepanel.html/js` = main operator UI
   - `popup.html/js` = auth, mode, quick actions
 - Two explicit operating modes now exist in the live extension:
+  - `Local Agent Bridge`
   - `Manual Assist`
   - `Automation Assist`
 - Extension storage keys were normalized to:
   - `jwt`
   - `hubUrl`
+  - `agentUrl`
   - `mode`
   - `automationEnabled`
   - `lastActiveTab`
@@ -58,6 +60,7 @@ Last updated: 2026-05-21 (codex webextension consolidation session)
   - `webextension/CLAUDE.md`
   - `webextension/TASKS.md`
   - `webextension/application-hub/README.md`
+- Added local helper server at `scripts/local-extension-agent.mjs` plus root command `npm run extension:agent`. The helper accepts current-page captures from the extension, saves them into `codex/qaapplication/inbox/`, and returns nearest existing application files from the local corpus.
 
 ### Verification completed
 

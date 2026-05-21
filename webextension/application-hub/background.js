@@ -1,5 +1,6 @@
 const DEFAULT_SETTINGS = {
   hubUrl: 'https://mos2es.xyz',
+  agentUrl: 'http://127.0.0.1:4317',
   jwt: '',
   mode: 'manual',
   automationEnabled: false,
@@ -10,12 +11,17 @@ function normalizeHubUrl(hubUrl) {
   return (hubUrl || DEFAULT_SETTINGS.hubUrl).replace(/\/$/, '')
 }
 
+function normalizeAgentUrl(agentUrl) {
+  return (agentUrl || DEFAULT_SETTINGS.agentUrl).replace(/\/$/, '')
+}
+
 async function getSettings() {
   const raw = await chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS))
   return {
     ...DEFAULT_SETTINGS,
     ...raw,
     hubUrl: normalizeHubUrl(raw.hubUrl),
+    agentUrl: normalizeAgentUrl(raw.agentUrl),
     mode: raw.mode === 'automation' ? 'automation' : 'manual',
     automationEnabled: Boolean(raw.automationEnabled),
   }
@@ -24,6 +30,7 @@ async function getSettings() {
 async function saveSettings(partial) {
   const next = { ...(await getSettings()), ...partial }
   if (partial.hubUrl !== undefined) next.hubUrl = normalizeHubUrl(partial.hubUrl)
+  if (partial.agentUrl !== undefined) next.agentUrl = normalizeAgentUrl(partial.agentUrl)
   if (partial.mode !== undefined) next.mode = partial.mode === 'automation' ? 'automation' : 'manual'
   if (partial.automationEnabled !== undefined) next.automationEnabled = Boolean(partial.automationEnabled)
   await chrome.storage.local.set(next)
@@ -75,6 +82,21 @@ async function hubFetch(path, body) {
 
   const payload = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(payload.error || `AQUA request failed (${res.status})`)
+  return payload
+}
+
+async function localAgentFetch(path, body) {
+  const { agentUrl } = await getSettings()
+  const res = await fetch(`${agentUrl}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  const payload = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(payload.error || `Local agent failed (${res.status})`)
   return payload
 }
 
@@ -246,6 +268,12 @@ async function requestPageCapture(tabId) {
   return chrome.tabs.sendMessage(tabId, { type: 'CAPTURE_PAGE_REQUEST' })
 }
 
+async function sendToLocalAgent(tabId) {
+  if (!tabId) throw new Error('No active application tab.')
+  const capture = await requestPageCapture(tabId)
+  return localAgentFetch('/assist', capture)
+}
+
 async function routeFieldsToConsumers(tabId, pageTitle, rawFields) {
   const matched = await matchQuestions(rawFields)
   await saveSettings({ lastActiveTab: tabId ?? null })
@@ -392,6 +420,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         avg_fidelity: message.avgFidelity,
         outcomes_available: Boolean(message.outcomesAvailable),
       })
+    }
+
+    if (message.type === 'AGENT_SEND_REQUEST') {
+      const tabId = message.tabId || (await getSettings()).lastActiveTab
+      return sendToLocalAgent(tabId)
     }
 
     if (message.type === 'APP_OPEN_HUB') {

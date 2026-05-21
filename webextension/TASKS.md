@@ -16,6 +16,10 @@
   - `POST /api/hub/autofill-eligibility`
 - [x] Updated app routes so bearer JWT auth works for extension-driven hub and BYOK calls
 - [x] Archived the donor scaffold at `/Users/dericmchenry/Desktop/application-hub/webextension/_archive/aqua-extension-donor-2026-05-21`
+- [x] Added a local agent bridge:
+  - helper server at `scripts/local-extension-agent.mjs`
+  - root script `npm run extension:agent`
+  - popup + sidepanel action to send the current page into `codex/qaapplication/inbox/`
 
 ## Next verification pass
 

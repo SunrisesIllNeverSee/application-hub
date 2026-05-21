@@ -26,7 +26,10 @@
     <p class="panel-hint">
       Get the token from <strong>Profile → Settings</strong>. The hub URL can stay on the default production value.
     </p>
-    <button id="panel-connect-btn" class="btn-primary">Connect AQUA</button>
+    <div class="panel-actions-bar">
+      <button id="panel-connect-btn" class="btn-primary">Connect AQUA</button>
+      <button id="panel-send-agent-auth" class="btn-secondary">Send to local agent</button>
+    </div>
   </section>
 
   <section id="panel-idle" class="panel-section hidden">
@@ -34,6 +37,7 @@
     <p class="panel-hint">Open an application form, then refresh the scan. Manual Assist stays lightweight; Automation Assist adds capture and matching flows when you need them.</p>
     <div class="panel-actions-bar">
       <button id="btn-rescan-idle" class="btn-secondary btn-sm">Refresh scan</button>
+      <button id="btn-send-agent-idle" class="btn-secondary btn-sm">Send to local agent</button>
       <button id="btn-open-hub-idle" class="btn-ghost btn-sm">Open full hub</button>
     </div>
   </section>
@@ -71,6 +75,7 @@
         <button id="btn-capture-hub" class="btn-primary btn-sm">Capture to Hub</button>
         <button id="btn-smart-matcher" class="btn-secondary btn-sm">Run Smart Matcher</button>
         <button id="btn-bulk-assist" class="btn-secondary btn-sm">Bulk Assist</button>
+        <button id="btn-send-agent" class="btn-ghost btn-sm">Send to local agent</button>
       </div>
 
       <div id="automation-feedback" class="callout callout-muted">Automation is off by default. Switching into this mode keeps the manual workflow intact and only adds these higher-trust actions.</div>
