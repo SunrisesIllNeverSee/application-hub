@@ -1,0 +1,194 @@
+# Program candidates extracted from open-tabs-safari-2026-05-21T22-09-49-989Z.md
+# Format: one entry per program, fields aligned with seed/programs/*.sql columns
+# Still candidate — has NOT been visited / validated. Index = company + apply URL only.
+#
+# Promotion path: inbox/processing/candidates → seed/staging → seed/programs/<slug>.sql
+#
+# Required-by-schema fields are filled with best-guess defaults where the URL
+# alone reveals them. Anything still unknown is marked TODO and must be filled
+# by the next research pass.
+
+source:
+  capture: open-tabs-safari-2026-05-21T22-09-49-989Z.md
+  captured_at: 2026-05-21T22:09:49Z
+  triaged_at: 2026-05-22
+
+candidates:
+  # ─────────────────── ACCELERATORS / COHORT PROGRAMS ───────────────────
+  - slug: alliance-accelerator
+    name: Alliance Accelerator Application
+    organization: Alliance
+    type: accelerator
+    kind: accelerator
+    domain: accelerators
+    url: https://alliance.xyz/apply/1
+    geo_focus: [Global]
+    industry_tags: [web3, crypto, founders]   # TODO confirm on visit
+    is_rolling: TODO
+    notes: numbered apply step page; confirm canonical /apply URL
+
+  - slug: cyber-fund-monastery
+    name: cyber•Fund Monastery for AI-native Founders
+    organization: cyber•Fund
+    type: accelerator
+    kind: accelerator
+    domain: accelerators
+    url: https://cyber.fund/content/monastery
+    geo_focus: [Global]
+    industry_tags: [ai, founders, residency]
+    is_rolling: TODO
+    notes: residency / fellowship hybrid for AI-native founders
+
+  - slug: hyperagent-founding-500
+    name: Hyperagent Founding 500
+    organization: Hyperagent
+    type: accelerator
+    kind: accelerator
+    domain: accelerators
+    url: https://hyperagent.com/s/6YBNB4VIO26vErBhadK36w
+    geo_focus: [Global]
+    industry_tags: [ai, founders]
+    is_rolling: TODO
+    notes: hash-tokened invite URL — find canonical apply URL behind it
+
+  # ─────────────────── JOBS (essay-driven) ──────────────────────────────
+  - slug: company-palantir-neurodivergent-fellowship
+    name: Palantir Neurodivergent Fellowship
+    organization: Palantir Technologies
+    type: job
+    kind: job_fulltime
+    domain: jobs
+    url: https://jobs.lever.co/palantir/61eaa54c-e1b7-4064-afad-f7df3d48d652/apply
+    geo_focus: [USA]                         # TODO confirm
+    industry_tags: [software, fellowship, neurodivergent]
+    is_rolling: true                          # Lever postings are typically rolling
+    notes: dedicated fellowship track; high essay likelihood
+
+  - slug: company-steel-applied-ai
+    name: Steel — Member of Technical Staff, Applied AI
+    organization: Steel
+    type: job
+    kind: job_fulltime
+    domain: jobs
+    url: https://jobs.ashbyhq.com/steel/c5a1ec46-5507-4c5b-9fed-f15ce25fd7be/application
+    geo_focus: [Global]                       # TODO confirm
+    industry_tags: [ai, infrastructure]
+    is_rolling: true
+    notes: Ashby application; confirm essay questions
+
+  - slug: company-pokee-ai
+    name: Pokee AI Careers
+    organization: Pokee AI
+    type: job
+    kind: job_fulltime
+    domain: jobs
+    url: https://pokee.ai/careers
+    geo_focus: [Global]
+    industry_tags: [ai]
+    is_rolling: true
+    notes: company-level careers page; expand specific role indexing later
+
+  - slug: company-nous-research
+    name: Nous Research Careers
+    organization: Nous Research
+    type: job
+    kind: job_fulltime
+    domain: jobs
+    url: https://nousresearch.com/careers
+    geo_focus: [Global]
+    industry_tags: [ai, research]
+    is_rolling: true
+    notes: AI research lab; essay-driven roles likely
+
+  - slug: company-deepseek
+    name: DeepSeek Recruitment
+    organization: DeepSeek (High-Flyer)
+    type: job
+    kind: job_fulltime
+    domain: jobs
+    url: https://app.mokahr.com/social-recruitment/high-flyer/140576#/job/ec402ff5-47fe-4e32-820c-b04884fca585
+    geo_focus: [China]                        # TODO confirm; portal is CN
+    industry_tags: [ai, research]
+    is_rolling: true
+    notes: Chinese-language portal; may need translation pass on questions
+
+  # ─────────────────── GRANTS / PRIZES ──────────────────────────────────
+  - slug: thinking-machines-interactivity-research-grants
+    name: Thinking Machines Lab Interactivity Research Grants
+    organization: Thinking Machines Lab
+    type: grant
+    kind: grant
+    domain: grants
+    url: https://thinkingmachines.ai/news/interactivity-research-grants/
+    geo_focus: [Global]
+    industry_tags: [ai, research, interactivity]
+    is_rolling: TODO
+    notes: announcement page; find canonical application form URL
+
+  - slug: gemini-xprize
+    name: Google Build with Gemini XPRIZE
+    organization: XPRIZE
+    type: prize
+    kind: grant                               # closest enum (verify enum list)
+    domain: grants
+    url: https://xprize.devpost.com/
+    geo_focus: [Global]
+    industry_tags: [ai, gemini, hackathon]
+    is_rolling: false
+    notes: $2M prize; Devpost-hosted; capture deadline on visit
+
+  - slug: google-for-startups-ai-agents-challenge
+    name: Google for Startups AI Agents Challenge
+    organization: Google for Startups
+    type: prize
+    kind: grant
+    domain: grants
+    url: https://devpost.com/                 # TODO replace with canonical hackathon page (strip invite token)
+    geo_focus: [Global]
+    industry_tags: [ai, agents, hackathon]
+    is_rolling: false
+    notes: linked via guest-invite token; resolve canonical event page
+
+  - slug: aria-safeguarded-ai
+    name: ARIA Safeguarded AI Funding
+    organization: ARIA (Advanced Research and Invention Agency)
+    type: grant
+    kind: grant
+    domain: grants
+    url: https://aria.org.uk/opportunity-spaces/mathematics-for-safe-ai/safeguarded-ai/funding/
+    geo_focus: [UK, Global]
+    industry_tags: [ai, safety, mathematics]
+    is_rolling: TODO
+    notes: UK ARIA opportunity space; may host multiple sub-calls
+
+  # ─────────────────── VC / FUND APPLICATIONS ───────────────────────────
+  - slug: lvlup-first-check-fund
+    name: LvlUp First Check Fund
+    organization: LvlUp VC
+    type: vc
+    kind: vc_check
+    domain: vc
+    url: https://www.lvlup.vc/fund/first-check-fund
+    geo_focus: [Global]                       # TODO confirm
+    industry_tags: [pre-seed, first-check]
+    is_rolling: true
+    notes: pitch-application; confirm form vs gated channel
+
+  - slug: hashgraph-ventures
+    name: Hashgraph Ventures
+    organization: Hashgraph Ventures
+    type: vc
+    kind: vc_check
+    domain: vc
+    url: https://hashgraphvc.com/
+    geo_focus: [Global]
+    industry_tags: [ai, blockchain]
+    is_rolling: true
+    notes: landing page; locate pitch / apply CTA
+
+# Items NOT in this candidate list (excluded by triage):
+# - https://x.com                                      → skip (social)
+# - https://nodeops.network/createos/skills            → reference (marketplace)
+# - https://docs.langchain.com/.../observability-quickstart → reference (docs)
+# - https://smith.langchain.com/o/...                  → skip (private workspace)
+# - https://app.devin.ai/...  (3 tabs)                 → skip (private workspace)
