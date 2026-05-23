@@ -145,3 +145,27 @@ Protocol files:
 - Do not treat Firecrawl output as production truth without review.
 - Do not let founder-first copy harden the underlying architecture into founder-only assumptions.
 - Do not auto-submit applications; this is still a preparation and intelligence layer.
+
+
+<claude-mem-context>
+# Memory Context
+
+# [application-hub] recent context, 2026-05-21 6:09pm EDT
+
+Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
+Format: ID TIME TYPE TITLE
+Fetch details: get_observations([IDs]) | Search: mem-search skill
+
+Stats: 7 obs (2,472t read) | 87,013t work | 97% savings
+
+### May 21, 2026
+1 5:42p 🟣 Safari QA Link Capture Installation Guide
+2 5:43p ✅ Safari QA Capture Documentation Committed
+3 5:44p ✅ Safari QA Capture Documentation Pushed to Remote
+5 5:51p 🔵 Extension consolidation complete but runtime-unverified; canonical rebuild branch active
+6 6:03p 🔵 Safari tab export script broken after delimiter refactor
+7 6:05p 🔴 Safari tab export script line ending parsing bug fixed
+8 6:06p ✅ Safari tab export feature committed and pushed to remote
+
+Access 87k tokens of past work via get_observations([IDs]) or mem-search skill.
+</claude-mem-context>
