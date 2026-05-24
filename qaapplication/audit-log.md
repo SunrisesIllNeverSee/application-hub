@@ -15,7 +15,8 @@ Most recent entries first. Append new entries at the top.
 
 ## 2026-05-24
 
-- **2026-05-24** · **restructure** · — · folders renamed for true sequential flow. `submitted/ → applications/`. `drafts/ → drafting/`. `inbox/processing/ → processing/` (promoted to top-level). `inbox/incoming/` flattened (raw drops land directly in `inbox/`). Pipeline now reads top-to-bottom: `inbox → processing → applications → questions → answers → drafting`.
+- **2026-05-24** · **doc-only** · — · pipeline order corrected in docs: `drafting/` now comes before `answers/` in the flow (it's the second part of Q→A — the answering happens during drafting, and `answers/` is the harvested bank that crystallizes out of accumulated drafting). New order: `inbox → processing → applications → questions → drafting → answers`.
+- **2026-05-24** · **restructure** · — · folders renamed for true sequential flow. `submitted/ → applications/`. `drafts/ → drafting/`. `inbox/processing/ → processing/` (promoted to top-level). `inbox/incoming/` flattened (raw drops land directly in `inbox/`).
 - **2026-05-24** · **received + extracted + filed** · `3xcapital` · raw capture (Tally form) extracted to `applications/3xcapital.md`, normalized to `questions/3xcapital.md`, answers logged to `answers/3xcapital.md`. Raw moved to `drafting/_shared/raw/3xcapital-raw.md`. **Submission was 2026-05-13; processed today.**
 - **2026-05-24** · **routing fix** · `solo-fund` · was in `drafting/`, but already submitted — moved to `applications/`, indexed to `questions/` and `answers/`.
 - **2026-05-24** · **prior restructure** · — · earlier in the day: removed the old `applications/` folder + `inbox/done/` lane. Established `submitted/`, `drafts/`, `audit-log.md` at root. Those folders were renamed again later today for sequential clarity (see entry above).

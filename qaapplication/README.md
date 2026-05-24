@@ -9,10 +9,14 @@ list top-to-bottom and you see the workflow.
 inbox/        ← 1. raw drops (HTML, markdown, screenshots — single-program captures)
 processing/   ← 2. multi-program captures being triaged into candidates
 applications/ ← 3. formatted + indexed canonical records of submitted applications
-questions/    ← 4. normalized Q→A index per submitted application
-answers/      ← 5. raw answer bank per submitted application (answer-first format)
-drafting/     ← 6. active drafts being filled out, pulling from questions/ + answers/
+questions/    ← 4. normalized Q-only index per submitted application (first part of Q→A)
+drafting/     ← 5. active drafts — Q's get answered here (second part of Q→A); seeding input
+answers/      ← 6. raw answer bank harvested from drafting/, indexed for reuse
 ```
+
+`questions/` and `drafting/` are paired: `questions/` is the Q side,
+`drafting/` is the A side getting filled in. `answers/` is what
+crystallizes out of accumulated drafting work — the reusable bank.
 
 Plus three folders that are **orthogonal** to the lifecycle (don't carry forward):
 
@@ -27,15 +31,13 @@ src/          ← canonical methodology docs
 ```text
 new capture → inbox/<raw>.html
    ↓ extract questions
-drafting/<slug>.md                  ← waiting to be filled
+questions/<slug>.md                 ← Q-only structure pulled out
+drafting/<slug>.md                  ← Q + A workspace being filled
 drafting/_shared/raw/<slug>.html    ← raw moved here for audit
-   ↓ draft + submit
+   ↓ submit
 applications/<slug>.md              ← canonical filled record
-   ↓ index Q→A
-questions/<slug>.md
-answers/<slug>.md
-   ↓ next time Deric drafts a new application
-drafting/<new-slug>.md              ← pulls reusable answers from answers/
+   ↓ harvest answers across all submissions
+answers/<slug>.md                   ← reusable bank, indexed for next draft
 ```
 
 Each step's output is the next step's input. The bank compounds.
