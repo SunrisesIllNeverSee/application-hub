@@ -1,126 +1,52 @@
-# answers/ — Cross-Program Answer Data Bank
+# answers/ — Raw Answer Data Bank
 
-This folder is the **indexed layer** — answers harvested from
-`questions/<slug>.md` and reorganized cross-program for reuse when
-filling out new applications.
+Raw capture of every answer Deric has given across submitted applications,
+**before any editorial reorganization**. Format per entry:
 
-## Two-stage flow into this folder
+```markdown
+### Answer
 
-```text
-applications/<slug>.md          ← raw canonical (native shape per program)
-   ↓ normalize to clean Q→A pairs
-questions/<slug>.md             ← formatted Q→A by program
-   ↓ harvest across programs by question theme/recurrence
-answers/<theme-or-question>.md  ← indexed answer bank, this folder
+<answer text, verbatim>
+
+— from: <application slug> · <YYYY-MM-DD> · Q: "<question text>"
 ```
 
-Each layer is denser and more reusable than the last:
+The answer comes first because that's what you scan for when filling out a
+new application. The identification footer is provenance — *where did this
+answer come from, when, in response to what question.*
 
-- `applications/` is a per-program canonical (one file per program, varied shape)
-- `questions/` is per-program normalized (one file per program, uniform Q→A shape)
-- `answers/` is **per question or per theme, cross-program** (one file per
-  recurring question or thematic bucket, with answer variants and provenance)
+## File layout
 
-## Why "full formatted" goes into this folder (per Deric's pipeline decision)
-
-We index **the full Q→A**, not just the answers. Answers without their
-originating questions lose context — the same answer can be a strong fit
-for one question and a non-sequitur for another. By keeping the question
-attached, every answer in the bank is auditable: where did this come
-from, what was it answering, when was it last used, what was the result?
-
-The indexing happens **inside** this folder. The input is full Q→A from
-`questions/`. The output is the same Q→A organized for retrieval.
-
-## Structure (TBD — three viable options)
-
-Three reasonable structures, none picked yet. Deric to decide.
-
-### Option A — by question theme (flat, low-ceremony)
+One file per submitted application:
 
 ```text
 answers/
 ├── README.md
-├── founder-bio.md       ← all "tell us about yourself" variants
-├── why-this-team.md     ← all "why you / why this team" variants
-├── what-do-you-do.md    ← all product-description variants
-├── traction.md          ← all traction variants
-├── moat.md              ← all competitive-moat variants
-├── revenue-model.md     ← all "how do you make money" variants
-├── why-now.md           ← all "why is this urgent" variants
-├── why-this-program.md  ← all "why are you applying here" variants
-└── ...
+├── a16z-speedrun.md
+├── 3xcapital.md
+├── cyberfund.md
+└── unicorn-fund.md
 ```
 
-Each file holds 2-N answer variants, each tagged with the source program
-and the exact question that was asked.
+Each file contains every Q→A entry from that program. Entries are in form
+order (or conversation order for chat-based apps).
 
-**Pro:** human-readable, easy to grep.
-**Con:** theme taxonomy has to be defined up-front and maintained.
+## What's here vs what's in `questions/`
 
-### Option B — by archived question (mirrors parent application-hub's data model)
+| `questions/<slug>.md` | `answers/<slug>.md` |
+| --- | --- |
+| Question-first format, designed for the question-archive pipeline | Answer-first format, designed for filling out new applications |
+| Includes all Qs (including unanswered / N/A / unselected) | Only entries where Deric gave an answer |
+| Preserves form structure / sections | Flat list, scannable for retrieval |
 
-```text
-answers/
-├── README.md
-├── q-why-this-team/
-│   ├── question.md                ← the canonical question text + variants
-│   ├── a-a16z-speedrun.md         ← the a16z-specific answer
-│   ├── a-cyberfund.md             ← the cyber.fund-specific answer
-│   └── a-redbud.md                ← the Redbud-specific answer (when drafted)
-├── q-what-is-your-moat/
-│   └── ...
-└── ...
-```
+Both files cover the same source application. They serve different
+downstream consumers — `questions/` feeds the question archive,
+`answers/` feeds the next application Deric fills out.
 
-Mirrors the parent's `archived_questions` + `program_questions` +
-`profile_answers` tables directly. One folder per unique question across
-all programs.
+## Tweaking happens later
 
-**Pro:** maps 1:1 to the Supabase schema; eventual export is mechanical.
-**Con:** heavier filesystem; more files.
-
-### Option C — single indexed file
-
-```text
-answers/
-├── README.md
-└── answer-bank.yaml   ← flat-file index of every Q→A with metadata
-```
-
-One queryable file. Frontmatter per entry: question_id, theme,
-source_program, last_used_date, performance_signal (rejected? accepted?
-got_interview?).
-
-**Pro:** single source of truth, easy to query programmatically.
-**Con:** harder to read at a glance; merge conflicts if multiple drafts
-edit simultaneously.
-
-## Recommendation (mine, until Deric decides)
-
-**Option A for now.** It's the lowest-ceremony structure that still
-produces usable output. We can migrate to Option B later when the parent
-Supabase pipeline is ready to consume from this folder — the theme files
-naturally map to archived_questions rows.
-
-## How this folder gets populated (the actual work)
-
-Once a sample of 3-5 submitted applications exists in `questions/`, the
-harvesting pass is:
-
-1. Read every `questions/<slug>.md` file.
-2. For each Q, ask: "is this question recurring across multiple programs?"
-3. If yes, create or update the relevant theme file in `answers/`.
-4. Each entry in a theme file records: source program, exact question
-   asked, the verbatim answer that was given, optional commentary on what
-   worked / what didn't (per `inbox/done/<slug>-submitted-*.md` status).
-
-This is **not** an automated pipeline — it's a deliberate editorial pass
-that produces clean reusable answer variants.
-
-## Status
-
-- [ ] Structure decided (Option A / B / C)
-- [ ] First harvest pass across the three submitted applications
-- [ ] First theme files populated (recommended starting bucket:
-  `founder-bio.md`, since every program asks for it)
+Per Deric's directive: **raw capture first, before tweaking.** Don't try
+to canonicalize answers into a single "best answer per theme" yet. The
+raw bank is the input to future indexing — keeping multiple answer
+variants per question lets future-Deric pick the version that fits the
+next application's tone.

@@ -103,3 +103,5 @@ Comparable protocol/AI governance startups + patent-heavy pre-seed deals. Applic
 Any other comments?
 Look forward to building with you 
 By clicking Submit you agree to our Privacy policy
+
+https://3xcapital.fund
