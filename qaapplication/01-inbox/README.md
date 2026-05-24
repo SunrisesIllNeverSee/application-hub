@@ -4,9 +4,9 @@
 markdown exports, screenshots — anything that contains an application).
 
 Flat folder, no subfolders. Files leave this folder when they get
-extracted into `../05-drafting/<slug>.md` (if waiting to be filled) or
-straight to `../03-applications/<slug>.md` (if already submitted), with
-the raw moving to `../05-drafting/_shared/raw/<slug>.<ext>` for audit
+extracted into `../06-workshop/<slug>.md` (if waiting to be filled) or
+straight to `../04-applications/<slug>.md` (if already submitted), with
+the raw moving to `../06-workshop/_shared/raw/<slug>.<ext>` for audit
 and an entry appended to `../audit-log.md`.
 
 If a capture contains multiple programs at once (e.g. a tabs export with

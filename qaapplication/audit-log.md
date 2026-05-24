@@ -15,28 +15,29 @@ Most recent entries first. Append new entries at the top.
 
 ## 2026-05-24
 
-- **2026-05-24** · **doc-only** · — · pipeline order corrected in docs: `05-drafting/` now comes before `06-answers/archive/` in the flow (it's the second part of Q→A — the answering happens during drafting, and `06-answers/archive/` is the harvested bank that crystallizes out of accumulated drafting). New order: `inbox → processing → applications → questions → drafting → answers`.
+- **2026-05-24** · **restructure** · — · added `03-programs/` (entity index for companies/programs themselves; mirrors parent's `programs` table). Renamed `05-drafting/ → 06-workshop/`. Shifted numbering on downstream folders. Backfilled entity records for 5 submitted programs. Workshop programs (redbud, founding500, yc, cohort-5) still need entity backfill.
+- **2026-05-24** · **doc-only** · — · pipeline order corrected in docs: workshop now comes before answers in the flow (workshop is where Q's get answered; answers is the harvested bank that crystallizes out of accumulated workshop work).
 - **2026-05-24** · **restructure** · — · folders renamed for true sequential flow. `submitted/ → applications/`. `drafts/ → drafting/`. `01-inbox/processing/ → processing/` (promoted to top-level). `01-inbox/incoming/` flattened (raw drops land directly in `01-inbox/`).
-- **2026-05-24** · **received + extracted + filed** · `3xcapital` · raw capture (Tally form) extracted to `03-applications/3xcapital.md`, normalized to `04-questions/source/3xcapital.md`, answers logged to `06-answers/archive/3xcapital.md`. Raw moved to `05-drafting/_shared/raw/3xcapital-raw.md`. **Submission was 2026-05-13; processed today.**
-- **2026-05-24** · **routing fix** · `solo-fund` · was in `05-drafting/`, but already submitted — moved to `03-applications/`, indexed to `04-questions/source/` and `06-answers/archive/`.
-- **2026-05-24** · **prior restructure** · — · earlier in the day: removed the old `03-applications/` folder + `01-inbox/done/` lane. Established `submitted/`, `drafts/`, `audit-log.md` at root. Those folders were renamed again later today for sequential clarity (see entry above).
+- **2026-05-24** · **received + extracted + filed** · `3xcapital` · raw capture (Tally form) extracted to `04-applications/3xcapital.md`, normalized to `05-questions/source/3xcapital.md`, answers logged to `07-answers/archive/3xcapital.md`. Raw moved to `06-workshop/_shared/raw/3xcapital-raw.md`. **Submission was 2026-05-13; processed today.**
+- **2026-05-24** · **routing fix** · `solo-fund` · was in `06-workshop/`, but already submitted — moved to `04-applications/`, indexed to `05-questions/source/` and `07-answers/archive/`.
+- **2026-05-24** · **prior restructure** · — · earlier in the day: removed the old `04-applications/` folder + `01-inbox/done/` lane. Established `submitted/`, `drafts/`, `audit-log.md` at root. Those folders were renamed again later today for sequential clarity (see entry above).
 
 ## 2026-05-23
 
-- **2026-05-23** · **received** · `founding500` · raw HTML dump (Hyperagent Founding 500 / Airtable form) in `01-inbox/incoming/founding500.html` → extracted to `05-drafting/founding500.md` → raw moved to `05-drafting/_shared/raw/founding500.html`.
-- **2026-05-23** · **received** · `yc` · raw HTML dump (YC Summer 2026 application) in `01-inbox/incoming/yc.html` → extracted to `05-drafting/yc.md` → raw moved to `05-drafting/_shared/raw/yc.html`.
-- **2026-05-23** · **submitted** · `cyberfund` · cyber.fund Monastery conversational agent. Assets uploaded: Conservation Law paper V.05 (PDF from Zenodo DOI 10.5281/zenodo.20029607), field-sheet markdown, KASSA voice-demo brief markdown. Canonical: `03-applications/cyberfund.md`. Status: submitted, awaiting response.
-- **2026-05-23** · **received** · `redbud` · raw HTML dump (Redbud VC Pitch Us / Tally form) in `01-inbox/incoming/redbudraw.html` → extracted to `05-drafting/redbud.md` → raw moved to `05-drafting/_shared/raw/redbudraw.html`.
+- **2026-05-23** · **received** · `founding500` · raw HTML dump (Hyperagent Founding 500 / Airtable form) in `01-inbox/incoming/founding500.html` → extracted to `06-workshop/founding500.md` → raw moved to `06-workshop/_shared/raw/founding500.html`.
+- **2026-05-23** · **received** · `yc` · raw HTML dump (YC Summer 2026 application) in `01-inbox/incoming/yc.html` → extracted to `06-workshop/yc.md` → raw moved to `06-workshop/_shared/raw/yc.html`.
+- **2026-05-23** · **submitted** · `cyberfund` · cyber.fund Monastery conversational agent. Assets uploaded: Conservation Law paper V.05 (PDF from Zenodo DOI 10.5281/zenodo.20029607), field-sheet markdown, KASSA voice-demo brief markdown. Canonical: `04-applications/cyberfund.md`. Status: submitted, awaiting response.
+- **2026-05-23** · **received** · `redbud` · raw HTML dump (Redbud VC Pitch Us / Tally form) in `01-inbox/incoming/redbudraw.html` → extracted to `06-workshop/redbud.md` → raw moved to `06-workshop/_shared/raw/redbudraw.html`.
 
 ## 2026-05 (exact dates `[CONFIRM]`)
 
-- **2026-05** · **submitted (×2)** · `a16z-speedrun` · a16z Speedrun apply form. Submission #1 pitch deck = `mos2es.com/benchmarks`. Result: rejected. Submission #2 pitch deck `[CONFIRM]`. Result: pending. Canonical: `03-applications/a16z-speedrun.md`.
-- **2026-05** · **submitted** · `unicorn-fund` · NextUnicorn.Fund (multi-track Google Forms). Status: L1 → L2 → pitch event completed → **15-min follow-up scheduled 2026-06-02** (active warm lead). Canonical: `03-applications/unicorn-fund.md`. Submitted answers not preserved locally.
-- **2026-05** · **submitted** · `solo-fund` · Solo Founders Program (SFP). Form deadline + kickoff: 2026-05-22. Canonical: `03-applications/solo-fund.md`. Submitted answers not preserved locally.
+- **2026-05** · **submitted (×2)** · `a16z-speedrun` · a16z Speedrun apply form. Submission #1 pitch deck = `mos2es.com/benchmarks`. Result: rejected. Submission #2 pitch deck `[CONFIRM]`. Result: pending. Canonical: `04-applications/a16z-speedrun.md`.
+- **2026-05** · **submitted** · `unicorn-fund` · NextUnicorn.Fund (multi-track Google Forms). Status: L1 → L2 → pitch event completed → **15-min follow-up scheduled 2026-06-02** (active warm lead). Canonical: `04-applications/unicorn-fund.md`. Submitted answers not preserved locally.
+- **2026-05** · **submitted** · `solo-fund` · Solo Founders Program (SFP). Form deadline + kickoff: 2026-05-22. Canonical: `04-applications/solo-fund.md`. Submitted answers not preserved locally.
 
 ## Conventions
 
 - **Append, don't edit.** Once an event is logged, it stays. Corrections go in as a new line referencing the original.
 - **No status updates that change the original entry.** If a submission progresses (L1 → L2, rejected → reconsidered, etc.), add a new line. The original submission line stays as-is.
-- **Slugs match folder names** — `<slug>` in this log corresponds to `03-applications/<slug>.md`, `05-drafting/<slug>.md`, `04-questions/source/<slug>.md`, `06-answers/archive/<slug>.md`.
+- **Slugs match folder names** — `<slug>` in this log corresponds to `04-applications/<slug>.md`, `06-workshop/<slug>.md`, `05-questions/source/<slug>.md`, `07-answers/archive/<slug>.md`.
 - **No files in `01-inbox/done/`** — that folder is gone. This log is the proof of distribution.
