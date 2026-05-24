@@ -48,8 +48,8 @@ sessions:
   - id: claude-2026-05-24-qaapplication
     surface: vscode-claude
     started_at: 2026-05-24T00:00:00Z
-    heartbeat: 2026-05-24T18:00:00Z
-    status: active
+    heartbeat: 2026-05-24T16:49:01Z
+    status: wrapped
     note: qaapplication-scope restructure + per-program indexing (sequential pipeline). Coordinates with codex on parent migration work (Codex owns 047+).
 
 claims:
@@ -252,5 +252,6 @@ claims:
       anthonya-angel raw drop. All qaapplication-scope only; no parent
       Supabase or migration work (Codex owns that lane).
     acquired_at: 2026-05-24T00:00:00Z
-    heartbeat: 2026-05-24T18:00:00Z
-    released_at: null
+    heartbeat: 2026-05-24T16:49:01Z
+    released_at: 2026-05-24T16:49:01Z
+    landed_commits: [e326b08, aab0deb, 3f5cbe8, 4eba6eb, 01f8a4c, d5e7f9d, 99d04cb, 5155b28, b85cb94]
