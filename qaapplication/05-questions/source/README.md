@@ -4,6 +4,9 @@ The **source layer** for the question pipeline. One file per submitted
 program (`<slug>.md`), in uniform Q-only shape regardless of how the
 original submission was captured (form, chat, agent, wizard).
 
+This is the serialized `AQ` lane.
+See `../../src/archive-serialization-spec.md`.
+
 ## Naming
 
 `<slug>.md` — same slug as `../../04-applications/<slug>.md`,

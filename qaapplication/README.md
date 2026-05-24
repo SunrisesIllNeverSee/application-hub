@@ -28,6 +28,9 @@ snapshots/    immutable dated/point-in-time captures
 src/          canonical methodology docs
 ```
 
+See also:
+- `src/archive-serialization-spec.md` — canonical EN/AP/QU/AQ serialization contract
+
 ## How a file moves through the pipeline
 
 ```text
@@ -65,16 +68,19 @@ The bank compounds. Each step's output feeds the next.
 1. **One slug per program, used across every lane.** `<slug>.md` is the
    same filename in `03-programs/`, `04-applications/`,
    `05-questions/source/`, `06-workshop/`, `07-answers/archive/`.
-2. **Forward-only.** Files move forward through the pipeline.
-3. **The folder system carries state.** What lane a file lives in tells
+2. **Serial refs carry machine identity.** `EN-` = entity/program host,
+   `AP-` = application instance, `QU-` = canonical question, `AQ-` =
+   application-question instance.
+3. **Forward-only.** Files move forward through the pipeline.
+4. **The folder system carries state.** What lane a file lives in tells
    you what stage it's at.
-4. **`audit-log.md` is append-only.** Each move = one line at the top.
-5. **Strip happens on the way out of `01-inbox/`.** Drop a single-program
+5. **`audit-log.md` is append-only.** Each move = one line at the top.
+6. **Strip happens on the way out of `01-inbox/`.** Drop a single-program
    capture → strip produces entity + question entries + workshop draft,
    all at once.
-6. **Multi-program captures go through `02-processing/`** for triage
+7. **Multi-program captures go through `02-processing/`** for triage
    before stripping.
-7. **`index/` lanes are downstream of `source/`/`archive/`.** Built by
+8. **`index/` lanes are downstream of `source/`/`archive/`.** Built by
    harvesting across the source files. Not authored from scratch.
 
 ## Downstream (parent application-hub Supabase pipeline)

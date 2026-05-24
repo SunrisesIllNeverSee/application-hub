@@ -3,6 +3,9 @@
 One file per program/company. Mirrors the parent application-hub's
 `programs` table in Supabase.
 
+This is the serialized `EN` lane.
+See `../src/archive-serialization-spec.md`.
+
 A "program" is the entity Deric applies *to* — Y Combinator, Redbud VC,
 cyber.fund, NextUnicorn.Fund, 3xCapital, etc. The entity exists whether
 or not Deric has applied; one entity can have multiple applications over

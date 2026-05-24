@@ -1,0 +1,1465 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e5]:
+      - link "Artificial Analysis" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e9]: Artificial Analysis
+      - generic [ref=e10]:
+        - link "Log in" [ref=e11] [cursor=pointer]:
+          - /url: /login
+          - generic [ref=e12]: Log in
+        - button [ref=e13] [cursor=pointer]:
+          - img
+        - button [ref=e14] [cursor=pointer]:
+          - img
+    - generic [ref=e15]:
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - heading "Artificial Analysis Coding Agent Benchmarks" [level=1] [ref=e20]
+            - generic [ref=e21]:
+              - paragraph [ref=e22]: We measure real-world performance of coding agents on software engineering tasks, including cost, token usage, and execution time. We compare how performance changes across agents, models, and execution settings.
+              - paragraph [ref=e23]:
+                - text: To compare language models see our
+                - link "model benchmarks" [ref=e24] [cursor=pointer]:
+                  - /url: /models
+                - text: .
+          - generic [ref=e26]:
+            - navigation "Coding agents pages" [ref=e28]:
+              - link "Benchmarks" [ref=e29] [cursor=pointer]:
+                - /url: /agents/coding-agents
+                - img
+                - text: Benchmarks
+              - link "Features Overview" [ref=e30] [cursor=pointer]:
+                - /url: /agents/coding
+                - img
+                - text: Features Overview
+            - generic [ref=e31]:
+              - heading "Artificial Analysis Coding Agent Index" [level=2] [ref=e32]
+              - paragraph [ref=e33]: "Composite index of 3 benchmarks:"
+              - list [ref=e34]:
+                - listitem [ref=e35]:
+                  - text: SWE-Bench-Pro-Hard-AA
+                  - generic [ref=e36]: Code generation, 150 tasks
+                  - link "By Scale AI" [ref=e38] [cursor=pointer]:
+                    - /url: https://scale.com/leaderboard/swe_bench_pro_public
+                - listitem [ref=e39]:
+                  - text: Terminal-Bench v2
+                  - generic [ref=e40]: Agentic terminal use, 84 tasks
+                  - link "By Laude Institute" [ref=e42] [cursor=pointer]:
+                    - /url: https://www.tbench.ai/benchmarks/terminal-bench-2
+                - listitem [ref=e43]:
+                  - text: SWE-Atlas-QnA
+                  - generic [ref=e44]: Technical Q&A, 124 tasks
+                  - link "By Scale AI" [ref=e46] [cursor=pointer]:
+                    - /url: https://labs.scale.com/leaderboard/sweatlas-qna
+              - paragraph [ref=e47]:
+                - text: Index represents the average pass@1 across 3 runs of each benchmark.
+                - link "View methodology" [ref=e48] [cursor=pointer]:
+                  - /url: /methodology/coding-agents-benchmarking
+        - tablist [ref=e54]:
+          - tab "Coding Agents" [selected] [ref=e55] [cursor=pointer]:
+            - link "Coding Agents" [ref=e56]:
+              - /url: /agents/coding-agents
+              - img [ref=e57]
+              - text: Coding Agents
+          - tab "General Work" [ref=e60] [cursor=pointer]:
+            - link "General Work" [ref=e61]:
+              - /url: /agents
+              - img [ref=e62]
+              - text: General Work
+          - tab "Chatbots" [ref=e65] [cursor=pointer]:
+            - link "Chatbots" [ref=e66]:
+              - /url: /agents/chatbots
+              - img [ref=e67]
+              - text: Chatbots
+          - tab "Presentations" [ref=e70] [cursor=pointer]:
+            - link "Presentations" [ref=e71]:
+              - /url: /agents/presentations
+              - img [ref=e72]
+              - text: Presentations
+          - tab "OCR" [ref=e75] [cursor=pointer]:
+            - link "OCR" [ref=e76]:
+              - /url: /agents/ocr
+              - img [ref=e77]
+              - text: OCR
+          - tab "Data Analysis" [ref=e82] [cursor=pointer]:
+            - link "Data Analysis" [ref=e83]:
+              - /url: /agents/data
+              - img [ref=e84]
+              - text: Data Analysis
+          - tab "Customer Support" [ref=e88] [cursor=pointer]:
+            - link "Customer Support" [ref=e89]:
+              - /url: /agents/customer-support
+              - img [ref=e90]
+              - text: Customer Support
+      - generic [ref=e93]:
+        - paragraph [ref=e94]: Highlights
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - heading "Coding Agent Index" [level=3] [ref=e100]:
+              - link "Coding Agent Index" [ref=e101] [cursor=pointer]:
+                - /url: "#coding-agents-index"
+            - generic [ref=e102]: Artificial Analysis Coding Agent Index · Higher is better
+            - generic [ref=e105]:
+              - img
+              - application [ref=e109]:
+                - generic [ref=e150]:
+                  - generic [ref=e151]:
+                    - generic [ref=e153]:
+                      - img "Claude Code - Opus 4.7 (max)" [ref=e155]
+                      - generic [ref=e158]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Opus 4.7 (max)
+                    - generic [ref=e160]:
+                      - img "Codex - GPT-5.5 (xhigh)" [ref=e162]
+                      - generic [ref=e165]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Codex - GPT-5.5 (xhigh)
+                    - generic [ref=e167]:
+                      - img "Cursor CLI - Composer 2.5 Fast" [ref=e169]
+                      - generic [ref=e172]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - Composer 2.5 Fast
+                    - generic [ref=e174]:
+                      - img "Cursor CLI - Opus 4.7 (medium)" [ref=e176]
+                      - generic [ref=e179]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - Opus 4.7 (medium)
+                    - generic [ref=e181]:
+                      - img "Codex - GPT-5.5 (medium)" [ref=e183]
+                      - generic [ref=e186]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Codex - GPT-5.5 (medium)
+                    - generic [ref=e188]:
+                      - img "Claude Code - Opus 4.7 (medium)" [ref=e190]
+                      - generic [ref=e193]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Opus 4.7 (medium)
+                    - generic [ref=e195]:
+                      - img "Cursor CLI - GPT-5.5 (medium)" [ref=e197]
+                      - generic [ref=e200]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - GPT-5.5 (medium)
+                    - generic [ref=e202]:
+                      - img "Claude Code - GLM-5.1" [ref=e204]
+                      - generic [ref=e207]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - GLM-5.1
+                    - generic [ref=e209]:
+                      - img "Claude Code - Kimi K2.6" [ref=e211]
+                      - generic [ref=e214]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Kimi K2.6
+                    - generic [ref=e216]:
+                      - img "Claude Code - DeepSeek V4 Pro (high)" [ref=e218]
+                      - generic [ref=e221]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - DeepSeek V4 Pro (high)
+                    - generic [ref=e223]:
+                      - img "Gemini CLI - Gemini 3.1 Pro (high)" [ref=e225]
+                      - generic [ref=e228]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Gemini CLI - Gemini 3.1 Pro (high)
+                  - generic [ref=e229]:
+                    - generic [ref=e230]: "67"
+                    - generic [ref=e231]: "65"
+                    - generic [ref=e232]: "63"
+                    - generic [ref=e233]: "61"
+                    - generic [ref=e234]: "60"
+                    - generic [ref=e235]: "60"
+                    - generic [ref=e236]: "58"
+                    - generic [ref=e237]: "53"
+                    - generic [ref=e238]: "50"
+                    - generic [ref=e239]: "50"
+                    - generic [ref=e240]: "43"
+          - generic [ref=e241]:
+            - heading "Time per Task" [level=3] [ref=e244]:
+              - link "Time per Task" [ref=e245] [cursor=pointer]:
+                - /url: "#execution-time"
+            - generic [ref=e246]: Mean agent wall time per task · Lower is better
+            - generic [ref=e249]:
+              - img
+              - application [ref=e253]:
+                - generic [ref=e294]:
+                  - generic [ref=e295]:
+                    - generic [ref=e297]:
+                      - img "Claude Code - Opus 4.7 (medium) (Anthropic)" [ref=e299]
+                      - generic [ref=e302]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Opus 4.7 (medium) (Anthropic)
+                    - generic [ref=e304]:
+                      - img "Cursor CLI - GPT-5.5 (medium) (Cursor)" [ref=e306]
+                      - generic [ref=e309]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - GPT-5.5 (medium) (Cursor)
+                    - generic [ref=e311]:
+                      - img "Cursor CLI - Composer 2.5 Fast (Cursor)" [ref=e313]
+                      - generic [ref=e316]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - Composer 2.5 Fast (Cursor)
+                    - generic [ref=e318]:
+                      - img "Codex - GPT-5.5 (medium) (OpenAI)" [ref=e320]
+                      - generic [ref=e323]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Codex - GPT-5.5 (medium) (OpenAI)
+                    - generic [ref=e325]:
+                      - img "Gemini CLI - Gemini 3.1 Pro (high) (Gemini)" [ref=e327]
+                      - generic [ref=e330]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Gemini CLI - Gemini 3.1 Pro (high) (Gemini)
+                    - generic [ref=e332]:
+                      - img "Cursor CLI - Opus 4.7 (medium) (Cursor)" [ref=e334]
+                      - generic [ref=e337]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - Opus 4.7 (medium) (Cursor)
+                    - generic [ref=e339]:
+                      - img "Codex - GPT-5.5 (xhigh) (OpenAI)" [ref=e341]
+                      - generic [ref=e344]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Codex - GPT-5.5 (xhigh) (OpenAI)
+                    - generic [ref=e346]:
+                      - img "Claude Code - Opus 4.7 (max) (Anthropic)" [ref=e348]
+                      - generic [ref=e351]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Opus 4.7 (max) (Anthropic)
+                    - generic [ref=e353]:
+                      - img "Claude Code - DeepSeek V4 Pro (high) (DeepSeek)" [ref=e355]
+                      - generic [ref=e358]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - DeepSeek V4 Pro (high) (DeepSeek)
+                    - generic [ref=e360]:
+                      - img "Claude Code - GLM-5.1 (FriendliAI)" [ref=e362]
+                      - generic [ref=e365]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - GLM-5.1 (FriendliAI)
+                    - generic [ref=e367]:
+                      - img "Claude Code - Kimi K2.6 (Moonshot AI)" [ref=e369]
+                      - generic [ref=e372]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Kimi K2.6 (Moonshot AI)
+                  - generic [ref=e373]:
+                    - generic [ref=e374]: 5.8m
+                    - generic [ref=e375]: 6.2m
+                    - generic [ref=e376]: 6.7m
+                    - generic [ref=e377]: 7.1m
+                    - generic [ref=e378]: 7.6m
+                    - generic [ref=e379]: 7.8m
+                    - generic [ref=e380]: 8.7m
+                    - generic [ref=e381]: 13.8m
+                    - generic [ref=e382]: 18.0m
+                    - generic [ref=e383]: 21.6m
+                    - generic [ref=e384]: 41.5m
+          - generic [ref=e385]:
+            - heading "Cost per Task" [level=3] [ref=e388]:
+              - link "Cost per Task" [ref=e389] [cursor=pointer]:
+                - /url: "#cost-to-run"
+            - generic [ref=e390]: Mean API cost per task (USD) · Lower is better
+            - generic [ref=e393]:
+              - img
+              - application [ref=e397]:
+                - generic [ref=e438]:
+                  - generic [ref=e439]:
+                    - generic [ref=e441]:
+                      - img "Claude Code - DeepSeek V4 Pro (high) (DeepSeek)" [ref=e443]
+                      - generic [ref=e446]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - DeepSeek V4 Pro (high) (DeepSeek)
+                    - generic [ref=e448]:
+                      - img "Cursor CLI - Composer 2.5 Fast (Cursor)" [ref=e450]
+                      - generic [ref=e453]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - Composer 2.5 Fast (Cursor)
+                    - generic [ref=e455]:
+                      - img "Claude Code - Kimi K2.6 (Moonshot AI)" [ref=e457]
+                      - generic [ref=e460]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Kimi K2.6 (Moonshot AI)
+                    - generic [ref=e462]:
+                      - img "Claude Code - Opus 4.7 (medium) (Anthropic)" [ref=e464]
+                      - generic [ref=e467]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Opus 4.7 (medium) (Anthropic)
+                    - generic [ref=e469]:
+                      - img "Cursor CLI - Opus 4.7 (medium) (Cursor)" [ref=e471]
+                      - generic [ref=e474]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - Opus 4.7 (medium) (Cursor)
+                    - generic [ref=e476]:
+                      - img "Gemini CLI - Gemini 3.1 Pro (high) (Gemini)" [ref=e478]
+                      - generic [ref=e481]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Gemini CLI - Gemini 3.1 Pro (high) (Gemini)
+                    - generic [ref=e483]:
+                      - img "Cursor CLI - GPT-5.5 (medium) (Cursor)" [ref=e485]
+                      - generic [ref=e488]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Cursor CLI - GPT-5.5 (medium) (Cursor)
+                    - generic [ref=e490]:
+                      - img "Codex - GPT-5.5 (medium) (OpenAI)" [ref=e492]
+                      - generic [ref=e495]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Codex - GPT-5.5 (medium) (OpenAI)
+                    - generic [ref=e497]:
+                      - img "Claude Code - GLM-5.1 (FriendliAI)" [ref=e499]
+                      - generic [ref=e502]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - GLM-5.1 (FriendliAI)
+                    - generic [ref=e504]:
+                      - img "Claude Code - Opus 4.7 (max) (Anthropic)" [ref=e506]
+                      - generic [ref=e509]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Claude Code - Opus 4.7 (max) (Anthropic)
+                    - generic [ref=e511]:
+                      - img "Codex - GPT-5.5 (xhigh) (OpenAI)" [ref=e513]
+                      - generic [ref=e516]:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Codex - GPT-5.5 (xhigh) (OpenAI)
+                  - generic [ref=e517]:
+                    - generic [ref=e518]: $0.35
+                    - generic [ref=e519]: $0.44
+                    - generic [ref=e520]: $0.76
+                    - generic [ref=e521]: $1.24
+                    - generic [ref=e522]: $1.47
+                    - generic [ref=e523]: $1.60
+                    - generic [ref=e524]: $1.61
+                    - generic [ref=e525]: $2.21
+                    - generic [ref=e526]: $2.26
+                    - generic [ref=e527]: $4.14
+                    - generic [ref=e528]: $4.33
+      - generic [ref=e530]:
+        - complementary [ref=e531]:
+          - navigation [ref=e533]:
+            - link "Performance" [ref=e534] [cursor=pointer]:
+              - /url: "#coding-agents-index"
+              - generic [ref=e536]: Performance
+            - link "Harness Comparison" [ref=e537] [cursor=pointer]:
+              - /url: "#harness-comparison"
+              - generic [ref=e539]: Harness Comparison
+            - link "Token Usage" [ref=e540] [cursor=pointer]:
+              - /url: "#token-usage"
+              - generic [ref=e542]: Token Usage
+            - link "Cost" [ref=e543] [cursor=pointer]:
+              - /url: "#cost-to-run"
+              - generic [ref=e545]: Cost
+            - link "Execution Time" [ref=e546] [cursor=pointer]:
+              - /url: "#execution-time"
+              - generic [ref=e548]: Execution Time
+        - generic [ref=e549]:
+          - generic [ref=e550]:
+            - generic [ref=e551]:
+              - heading "Performance" [level=2] [ref=e553]:
+                - generic [ref=e555]: Performance
+              - paragraph [ref=e556]: Performance across the Artificial Analysis Coding Agent Index.
+            - generic [ref=e558]:
+              - tablist [ref=e560]:
+                - tab "Index" [selected] [ref=e561] [cursor=pointer]
+                - tab "Score by Benchmark" [ref=e562] [cursor=pointer]
+                - tab "SWE-Atlas-QnA" [ref=e563] [cursor=pointer]
+                - tab "SWE-Bench-Pro-Hard-AA" [ref=e564] [cursor=pointer]
+                - tab "Terminal-Bench v2" [ref=e565] [cursor=pointer]
+              - tabpanel "Index" [ref=e566]:
+                - generic [ref=e567]:
+                  - generic [ref=e568]:
+                    - generic [ref=e569]:
+                      - generic [ref=e570]:
+                        - heading "Artificial Analysis Coding Agent Index" [level=3] [ref=e571]
+                        - generic [ref=e574]: Composite average pass@1 across SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, and SWE-Atlas-QnA · Higher is better
+                      - generic [ref=e576]:
+                        - generic [ref=e578]:
+                          - generic [ref=e579]:
+                            - generic [ref=e580]: Color by
+                            - group [ref=e581]:
+                              - radio "Model" [checked] [ref=e582] [cursor=pointer]
+                              - radio "Agent" [ref=e583] [cursor=pointer]
+                          - combobox [ref=e585] [cursor=pointer]:
+                            - generic [ref=e586]: 13 of 17 models
+                            - img
+                        - generic [ref=e587]:
+                          - button "Copy link to this section" [ref=e588] [cursor=pointer]:
+                            - img
+                          - button "Download chart as image" [ref=e589] [cursor=pointer]:
+                            - img
+                    - generic [ref=e592]:
+                      - img
+                      - application [ref=e596]:
+                        - generic [ref=e643]:
+                          - generic [ref=e644]:
+                            - generic "Claude Code - Opus 4.7 (max)" [ref=e646]:
+                              - generic [ref=e647]:
+                                - generic [ref=e649]: Claude Code
+                                - generic [ref=e651]:
+                                  - text: Opus 4.7
+                                  - text: (max)
+                            - generic "Codex - GPT-5.5 (xhigh)" [ref=e653]:
+                              - generic [ref=e654]:
+                                - generic [ref=e656]: Codex
+                                - generic [ref=e658]:
+                                  - text: GPT-5.5
+                                  - text: (xhigh)
+                            - generic "Cursor CLI - Composer 2.5 Fast" [ref=e660]:
+                              - generic [ref=e661]:
+                                - generic [ref=e663]: Cursor CLI
+                                - generic [ref=e665]: Composer 2.5Fast
+                            - generic "Cursor CLI - Opus 4.7 (medium)" [ref=e667]:
+                              - generic [ref=e668]:
+                                - generic [ref=e670]: Cursor CLI
+                                - generic [ref=e672]:
+                                  - text: Opus 4.7
+                                  - text: (medium)
+                            - generic "Codex - GPT-5.5 (medium)" [ref=e674]:
+                              - generic [ref=e675]:
+                                - generic [ref=e677]: Codex
+                                - generic [ref=e679]:
+                                  - text: GPT-5.5
+                                  - text: (medium)
+                            - generic "Claude Code - Opus 4.7 (medium)" [ref=e681]:
+                              - generic [ref=e682]:
+                                - generic [ref=e684]: Claude Code
+                                - generic [ref=e686]:
+                                  - text: Opus 4.7
+                                  - text: (medium)
+                            - generic "Cursor CLI - GPT-5.5 (medium)" [ref=e688]:
+                              - generic [ref=e689]:
+                                - generic [ref=e691]: Cursor CLI
+                                - generic [ref=e693]:
+                                  - text: GPT-5.5
+                                  - text: (medium)
+                            - generic "Claude Code - GLM-5.1" [ref=e695]:
+                              - generic [ref=e696]:
+                                - generic [ref=e698]: Claude Code
+                                - generic [ref=e700]: GLM-5.1
+                            - generic "Claude Code - Opus 4.6 (medium)" [ref=e702]:
+                              - generic [ref=e703]:
+                                - generic [ref=e705]: Claude Code
+                                - generic [ref=e707]:
+                                  - text: Opus 4.6
+                                  - text: (medium)
+                            - generic "Claude Code - Kimi K2.6" [ref=e709]:
+                              - generic [ref=e710]:
+                                - generic [ref=e712]: Claude Code
+                                - generic [ref=e714]: Kimi K2.6
+                            - generic "Claude Code - DeepSeek V4 Pro (high)" [ref=e716]:
+                              - generic [ref=e717]:
+                                - generic [ref=e719]: Claude Code
+                                - generic [ref=e721]: DeepSeek V4Pro(high)
+                            - generic "Cursor CLI - Composer 2" [ref=e723]:
+                              - generic [ref=e724]:
+                                - generic [ref=e726]: Cursor CLI
+                                - generic [ref=e728]: Composer 2
+                            - generic "Gemini CLI - Gemini 3.1 Pro (high)" [ref=e730]:
+                              - generic [ref=e731]:
+                                - generic [ref=e733]: Gemini CLI
+                                - generic [ref=e735]: Gemini 3.1Pro(high)
+                          - generic [ref=e736]:
+                            - generic [ref=e737]: "67"
+                            - generic [ref=e738]: "65"
+                            - generic [ref=e739]: "63"
+                            - generic [ref=e740]: "61"
+                            - generic [ref=e741]: "60"
+                            - generic [ref=e742]: "60"
+                            - generic [ref=e743]: "58"
+                            - generic [ref=e744]: "53"
+                            - generic [ref=e745]: "51"
+                            - generic [ref=e746]: "50"
+                            - generic [ref=e747]: "50"
+                            - generic [ref=e748]: "48"
+                            - generic [ref=e749]: "43"
+                  - generic [ref=e753]:
+                    - heading "What this metric means" [level=3] [ref=e754]:
+                      - button "What this metric means" [ref=e755] [cursor=pointer]:
+                        - generic [ref=e756]:
+                          - img [ref=e757]
+                          - text: What this metric means
+                        - img [ref=e759]
+                    - region "What this metric means":
+                      - generic [ref=e762]:
+                        - paragraph [ref=e763]: The Artificial Analysis Coding Agent Index is a composite score built from SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, and SWE-Atlas-QnA.
+                        - paragraph [ref=e764]: It is useful for quick comparison, but it should be read alongside the per-eval breakdowns. Two agents with similar index values can still have different strengths across repository tasks, terminal workflows, and rubric-based evaluations.
+          - generic [ref=e765]:
+            - generic [ref=e766]:
+              - heading "Harness Comparison" [level=2] [ref=e768]:
+                - generic [ref=e770]: Harness Comparison
+              - paragraph [ref=e771]: Artificial Analysis Coding Agent Index by harness for Claude Opus 4.7.
+            - generic [ref=e773]:
+              - tablist [ref=e775]:
+                - tab "Artificial Analysis Coding Agent Index" [selected] [ref=e776] [cursor=pointer]
+                - tab "SWE-Atlas-QnA" [ref=e777] [cursor=pointer]
+                - tab "SWE-Bench-Pro-Hard-AA" [ref=e778] [cursor=pointer]
+                - tab "Terminal-Bench v2" [ref=e779] [cursor=pointer]
+              - tabpanel "Artificial Analysis Coding Agent Index" [ref=e780]:
+                - generic [ref=e781]:
+                  - generic [ref=e782]:
+                    - generic [ref=e783]:
+                      - generic [ref=e784]:
+                        - 'heading "Harness Comparison: Artificial Analysis Coding Agent Index" [level=3] [ref=e785]'
+                        - generic [ref=e788]: Composite average pass@1 across Claude Code and Cursor CLI for Claude Opus 4.7 · Higher is better
+                      - generic [ref=e791]:
+                        - button "Copy link to this section" [ref=e792] [cursor=pointer]:
+                          - img
+                        - button "Download chart as image" [ref=e793] [cursor=pointer]:
+                          - img
+                    - generic [ref=e796]:
+                      - img
+                      - application [ref=e800]:
+                        - generic [ref=e814]:
+                          - generic [ref=e815]:
+                            - generic "Cursor CLI - Opus 4.7 (medium)" [ref=e817]:
+                              - generic [ref=e818]:
+                                - generic [ref=e820]: Cursor CLI
+                                - generic [ref=e822]:
+                                  - text: Opus 4.7
+                                  - text: (medium)
+                            - generic "Claude Code - Opus 4.7 (medium)" [ref=e824]:
+                              - generic [ref=e825]:
+                                - generic [ref=e827]: Claude Code
+                                - generic [ref=e829]:
+                                  - text: Opus 4.7
+                                  - text: (medium)
+                          - generic [ref=e830]:
+                            - generic [ref=e831]: "61"
+                            - generic [ref=e832]: "60"
+                  - generic [ref=e836]:
+                    - heading "What this chart shows" [level=3] [ref=e837]:
+                      - button "What this chart shows" [ref=e838] [cursor=pointer]:
+                        - generic [ref=e839]:
+                          - img [ref=e840]
+                          - text: What this chart shows
+                        - img [ref=e842]
+                    - region "What this chart shows":
+                      - paragraph [ref=e845]: This chart holds the underlying model constant at Claude Opus 4.7 and compares how it performs across different coding-agent harnesses, including Cursor, Claude Code, and OpenCode.
+          - generic [ref=e846]:
+            - generic [ref=e847]:
+              - heading "Token Usage" [level=2] [ref=e849]:
+                - generic [ref=e851]: Token Usage
+              - paragraph [ref=e852]: Token consumption across the Artificial Analysis Coding Agent Index, including total usage, token mix, efficiency, and per-benchmark breakdowns.
+            - generic [ref=e854]:
+              - generic [ref=e855]:
+                - tablist [ref=e857]:
+                  - tab "Token Usage" [selected] [ref=e858] [cursor=pointer]
+                  - tab "Token Distribution" [ref=e859] [cursor=pointer]
+                  - tab "Cache Hit Rate" [ref=e860] [cursor=pointer]
+                  - tab "Input vs. Output" [ref=e861] [cursor=pointer]
+                  - tab "Tokens by Benchmark" [ref=e862] [cursor=pointer]
+                - tabpanel "Token Usage" [ref=e863]:
+                  - generic [ref=e864]:
+                    - generic [ref=e865]:
+                      - generic [ref=e866]:
+                        - generic [ref=e867]:
+                          - heading "Token Usage per Task" [level=3] [ref=e868]
+                          - generic [ref=e871]: Mean input, cache, and output tokens per task
+                        - generic [ref=e873]:
+                          - combobox [ref=e876] [cursor=pointer]:
+                            - generic [ref=e877]: 13 of 17 models
+                            - img
+                          - generic [ref=e878]:
+                            - button "Copy link to this section" [ref=e879] [cursor=pointer]:
+                              - img
+                            - button "Download chart as image" [ref=e880] [cursor=pointer]:
+                              - img
+                      - generic [ref=e882]:
+                        - generic [ref=e884]:
+                          - button "Input" [ref=e885] [cursor=pointer]:
+                            - generic [ref=e887]: Input
+                          - button "Cached Input" [ref=e888] [cursor=pointer]:
+                            - generic [ref=e890]: Cached Input
+                          - button "Output" [ref=e891] [cursor=pointer]:
+                            - generic [ref=e893]: Output
+                        - generic [ref=e894]:
+                          - img
+                          - application [ref=e898]:
+                            - generic [ref=e1029]:
+                              - generic [ref=e1030]:
+                                - generic "Claude Code - Opus 4.7 (max)" [ref=e1032]:
+                                  - generic [ref=e1033]:
+                                    - generic [ref=e1035]: Claude Code
+                                    - generic [ref=e1037]:
+                                      - text: Opus 4.7
+                                      - text: (max)(Anthropic)
+                                - generic "Claude Code - GLM-5.1" [ref=e1039]:
+                                  - generic [ref=e1040]:
+                                    - generic [ref=e1042]: Claude Code
+                                    - generic [ref=e1044]:
+                                      - text: GLM-5.1
+                                      - text: (FriendliAI)
+                                - generic "Codex - GPT-5.5 (xhigh)" [ref=e1046]:
+                                  - generic [ref=e1047]:
+                                    - generic [ref=e1049]: Codex
+                                    - generic [ref=e1051]:
+                                      - text: GPT-5.5
+                                      - text: (xhigh)(OpenAI)
+                                - generic "Claude Code - Kimi K2.6" [ref=e1053]:
+                                  - generic [ref=e1054]:
+                                    - generic [ref=e1056]: Claude Code
+                                    - generic [ref=e1058]:
+                                      - text: Kimi K2.6
+                                      - text: (Moonshot AI)
+                                - generic "Claude Code - DeepSeek V4 Pro (high)" [ref=e1060]:
+                                  - generic [ref=e1061]:
+                                    - generic [ref=e1063]: Claude Code
+                                    - generic [ref=e1065]: DeepSeek V4Pro(high)(DeepSeek)
+                                - generic "Codex - GPT-5.5 (medium)" [ref=e1067]:
+                                  - generic [ref=e1068]:
+                                    - generic [ref=e1070]: Codex
+                                    - generic [ref=e1072]:
+                                      - text: GPT-5.5
+                                      - text: (medium)(OpenAI)
+                                - generic "Claude Code - Opus 4.6 (medium)" [ref=e1074]:
+                                  - generic [ref=e1075]:
+                                    - generic [ref=e1077]: Claude Code
+                                    - generic [ref=e1079]:
+                                      - text: Opus 4.6
+                                      - text: (medium)(Anthropic)
+                                - generic "Gemini CLI - Gemini 3.1 Pro (high)" [ref=e1081]:
+                                  - generic [ref=e1082]:
+                                    - generic [ref=e1084]: Gemini CLI
+                                    - generic [ref=e1086]: Gemini 3.1Pro(high)(Gemini)
+                                - generic "Cursor CLI - Composer 2" [ref=e1088]:
+                                  - generic [ref=e1089]:
+                                    - generic [ref=e1091]: Cursor CLI
+                                    - generic [ref=e1093]:
+                                      - text: Composer 2
+                                      - text: (Cursor)
+                                - generic "Claude Code - Opus 4.7 (medium)" [ref=e1095]:
+                                  - generic [ref=e1096]:
+                                    - generic [ref=e1098]: Claude Code
+                                    - generic [ref=e1100]:
+                                      - text: Opus 4.7
+                                      - text: (medium)(Anthropic)
+                                - generic "Cursor CLI - Composer 2.5 Fast" [ref=e1102]:
+                                  - generic [ref=e1103]:
+                                    - generic [ref=e1105]: Cursor CLI
+                                    - generic [ref=e1107]: Composer 2.5Fast(Cursor)
+                                - generic "Cursor CLI - Opus 4.7 (medium)" [ref=e1109]:
+                                  - generic [ref=e1110]:
+                                    - generic [ref=e1112]: Cursor CLI
+                                    - generic [ref=e1114]:
+                                      - text: Opus 4.7
+                                      - text: (medium)(Cursor)
+                                - generic "Cursor CLI - GPT-5.5 (medium)" [ref=e1116]:
+                                  - generic [ref=e1117]:
+                                    - generic [ref=e1119]: Cursor CLI
+                                    - generic [ref=e1121]:
+                                      - text: GPT-5.5
+                                      - text: (medium)(Cursor)
+                              - generic [ref=e1122]:
+                                - generic [ref=e1123]: 752.3K
+                                - generic [ref=e1124]: 726.6K
+                              - generic [ref=e1125]:
+                                - generic [ref=e1126]: 5.5M
+                                - generic [ref=e1127]: 4M
+                                - generic [ref=e1128]: 4.5M
+                                - generic [ref=e1129]: 3.6M
+                                - generic [ref=e1130]: 2.7M
+                                - generic [ref=e1131]: 2.7M
+                                - generic [ref=e1132]: 2M
+                                - generic [ref=e1133]: 1.5M
+                                - generic [ref=e1134]: 1.6M
+                                - generic [ref=e1135]: 1.6M
+                                - generic [ref=e1136]: 1.5M
+                                - generic [ref=e1137]: 1.4M
+                                - generic [ref=e1138]: 1.3M
+                              - generic [ref=e1139]:
+                                - generic [ref=e1140]: 5.7M
+                                - generic [ref=e1141]: 4.8M
+                                - generic [ref=e1142]: 4.8M
+                                - generic [ref=e1143]: 3.7M
+                                - generic [ref=e1144]: 3.5M
+                                - generic [ref=e1145]: 2.8M
+                                - generic [ref=e1146]: 2.2M
+                                - generic [ref=e1147]: 1.7M
+                                - generic [ref=e1148]: 1.7M
+                                - generic [ref=e1149]: 1.7M
+                                - generic [ref=e1150]: 1.6M
+                                - generic [ref=e1151]: 1.5M
+                                - generic [ref=e1152]: 1.5M
+                        - generic [ref=e1154]:
+                          - img [ref=e1155]
+                          - text: Prompt cache hit rates can vary significantly by provider routing, which can materially change effective cost.
+                    - generic [ref=e1158]:
+                      - generic [ref=e1160]:
+                        - heading "Input tokens" [level=3] [ref=e1161]:
+                          - button "Input tokens" [ref=e1162] [cursor=pointer]:
+                            - generic [ref=e1163]:
+                              - img [ref=e1164]
+                              - text: Input tokens
+                            - img [ref=e1166]
+                        - region "Input tokens":
+                          - paragraph [ref=e1169]: Non-cached input tokens sent to the model, including prompts, instructions, tool context, and task context that were not served from prompt cache.
+                      - generic [ref=e1171]:
+                        - heading "Cached input tokens" [level=3] [ref=e1172]:
+                          - button "Cached input tokens" [ref=e1173] [cursor=pointer]:
+                            - generic [ref=e1174]:
+                              - img [ref=e1175]
+                              - text: Cached input tokens
+                            - img [ref=e1177]
+                        - region "Cached input tokens":
+                          - paragraph [ref=e1180]: Reused prompt tokens billed through provider prompt caching when that telemetry is available, rather than being processed as a fully fresh input each time.
+                      - generic [ref=e1182]:
+                        - heading "Why cache usage varies" [level=3] [ref=e1183]:
+                          - button "Why cache usage varies" [ref=e1184] [cursor=pointer]:
+                            - generic [ref=e1185]:
+                              - img [ref=e1186]
+                              - text: Why cache usage varies
+                            - img [ref=e1188]
+                        - region "Why cache usage varies":
+                          - generic [ref=e1191]:
+                            - paragraph [ref=e1192]: Some providers route repeated requests across different backend replicas. When prompt cache state is not shared consistently across those replicas, a model may receive fewer cache hits even when the benchmark task flow is otherwise identical.
+                            - paragraph [ref=e1193]: We do not add custom relay headers or provider-specific affinity controls to force higher cache reuse, because that would make the benchmark less representative of a typical user setup. As a result, reported costs reflect the cache behavior observed through the configured provider path, not an optimized best-case cache scenario.
+                      - generic [ref=e1195]:
+                        - heading "Output tokens" [level=3] [ref=e1196]:
+                          - button "Output tokens" [ref=e1197] [cursor=pointer]:
+                            - generic [ref=e1198]:
+                              - img [ref=e1199]
+                              - text: Output tokens
+                            - img [ref=e1201]
+                        - region "Output tokens":
+                          - paragraph [ref=e1204]: Tokens returned by the model in its visible response during the task.
+              - generic [ref=e1205]:
+                - generic [ref=e1206]:
+                  - generic [ref=e1207]:
+                    - generic [ref=e1208]:
+                      - heading "Artificial Analysis Coding Agent Index vs. Total Tokens" [level=3] [ref=e1209]
+                      - generic [ref=e1212]: Artificial Analysis Coding Agent Index vs. mean total tokens per task
+                    - generic [ref=e1214]:
+                      - generic [ref=e1216]:
+                        - generic [ref=e1217]:
+                          - generic [ref=e1218]: Color by
+                          - group [ref=e1219]:
+                            - radio "Model" [checked] [ref=e1220] [cursor=pointer]
+                            - radio "Agent" [ref=e1221] [cursor=pointer]
+                        - combobox [ref=e1223] [cursor=pointer]:
+                          - generic [ref=e1224]: 13 of 17 models
+                          - img
+                      - generic [ref=e1225]:
+                        - button "Copy link to this section" [ref=e1226] [cursor=pointer]:
+                          - img
+                        - button "Download chart as image" [ref=e1227] [cursor=pointer]:
+                          - img
+                  - generic [ref=e1229]:
+                    - generic [ref=e1231]:
+                      - generic [ref=e1235] [cursor=pointer]: Anthropic
+                      - generic [ref=e1239] [cursor=pointer]: OpenAI
+                      - generic [ref=e1243] [cursor=pointer]: Cursor
+                      - generic [ref=e1247] [cursor=pointer]: Z.ai
+                      - generic [ref=e1251] [cursor=pointer]: Moonshot AI
+                      - generic [ref=e1255] [cursor=pointer]: DeepSeek
+                      - generic [ref=e1259] [cursor=pointer]: Google
+                    - img [ref=e1263]:
+                      - generic [ref=e1265]:
+                        - img [ref=e1272]
+                        - generic [ref=e1276]:
+                          - generic [ref=e1278]: "0"
+                          - generic [ref=e1280]: 1M
+                          - generic [ref=e1282]: 2M
+                          - generic [ref=e1284]: 3M
+                          - generic [ref=e1286]: 4M
+                          - generic [ref=e1288]: 5M
+                          - generic [ref=e1290]: 6M
+                          - generic [ref=e1292]: 7M
+                          - generic [ref=e1294]: 8M
+                          - generic [ref=e1296]: 9M
+                          - generic [ref=e1298]: 10M
+                          - generic [ref=e1300]: 11M
+                          - generic [ref=e1302]: 12M
+                          - generic [ref=e1304]: 13M
+                          - generic [ref=e1305]: Total Tokens
+                        - generic [ref=e1306]:
+                          - generic [ref=e1308]: "0"
+                          - generic [ref=e1310]: "10"
+                          - generic [ref=e1312]: "20"
+                          - generic [ref=e1314]: "30"
+                          - generic [ref=e1316]: "40"
+                          - generic [ref=e1318]: "50"
+                          - generic [ref=e1320]: "60"
+                          - generic [ref=e1322]: "70"
+                          - generic [ref=e1324]: "80"
+                          - generic [ref=e1326]: "90"
+                          - generic [ref=e1328]: "100"
+                          - generic [ref=e1329]: Artificial Analysis Coding Agent Index
+                        - generic [ref=e1330]:
+                          - generic [ref=e1333]: Cursor CLI - GPT-5.5 (medium)
+                          - generic [ref=e1336]: Cursor CLI - Opus 4.7 (medium)
+                          - generic [ref=e1339]: Cursor CLI - Composer 2.5 Fast
+                          - generic [ref=e1342]: Gemini CLI - Gemini 3.1 Pro (high)
+                          - generic [ref=e1344]: Cursor CLI - Composer 2
+                          - generic [ref=e1347]: Claude Code - Opus 4.7 (medium)
+                          - generic [ref=e1350]: Claude Code - Opus 4.6 (medium)
+                          - generic [ref=e1353]: Codex - GPT-5.5 (medium)
+                          - generic [ref=e1356]: Claude Code - DeepSeek V4 Pro (high)
+                          - generic [ref=e1359]: Claude Code - Kimi K2.6
+                          - generic [ref=e1362]: Claude Code - GLM-5.1
+                          - generic [ref=e1365]: Codex - GPT-5.5 (xhigh)
+                          - generic [ref=e1368]: Claude Code - Opus 4.7 (max)
+                - generic [ref=e1387]:
+                  - heading "How to read this chart" [level=3] [ref=e1388]:
+                    - button "How to read this chart" [ref=e1389] [cursor=pointer]:
+                      - generic [ref=e1390]:
+                        - img [ref=e1391]
+                        - text: How to read this chart
+                      - img [ref=e1393]
+                  - region "How to read this chart":
+                    - paragraph [ref=e1396]: Each point represents a coding-agent variant. Farther right means higher benchmark performance, while lower token usage appears farther left. Agents toward the upper-left use fewer tokens for a given level of performance.
+          - generic [ref=e1397]:
+            - generic [ref=e1398]:
+              - heading "Cost" [level=2] [ref=e1400]:
+                - generic [ref=e1402]: Cost
+              - paragraph [ref=e1403]: Cost across the Artificial Analysis Coding Agent Index based on current per-token API pricing, including cache write pricing and cache discounts where available. Many users will access coding agent harnesses through subscription plan offerings rather than pay-per-token.
+            - generic [ref=e1405]:
+              - generic [ref=e1406]:
+                - tablist [ref=e1408]:
+                  - tab "Cost to Run" [selected] [ref=e1409] [cursor=pointer]
+                  - tab "Cost Distribution" [ref=e1410] [cursor=pointer]
+                  - tab "Total Cost" [ref=e1411] [cursor=pointer]
+                - tabpanel "Cost to Run" [ref=e1412]:
+                  - generic [ref=e1413]:
+                    - generic [ref=e1414]:
+                      - generic [ref=e1415]:
+                        - generic [ref=e1416]:
+                          - heading "Cost per Task" [level=3] [ref=e1417]
+                          - generic [ref=e1420]: Mean pay-per-token API cost per task (USD) · Lower is better
+                        - generic [ref=e1422]:
+                          - generic [ref=e1424]:
+                            - generic [ref=e1425]:
+                              - generic [ref=e1426]: Color by
+                              - group [ref=e1427]:
+                                - radio "Model" [checked] [ref=e1428] [cursor=pointer]
+                                - radio "Agent" [ref=e1429] [cursor=pointer]
+                            - combobox [ref=e1431] [cursor=pointer]:
+                              - generic [ref=e1432]: 13 of 17 models
+                              - img
+                          - generic [ref=e1433]:
+                            - button "Copy link to this section" [ref=e1434] [cursor=pointer]:
+                              - img
+                            - button "Download chart as image" [ref=e1435] [cursor=pointer]:
+                              - img
+                      - generic [ref=e1438]:
+                        - img
+                        - application [ref=e1442]:
+                          - generic [ref=e1489]:
+                            - generic [ref=e1490]:
+                              - generic "Cursor CLI - Composer 2" [ref=e1492]:
+                                - generic [ref=e1493]:
+                                  - generic [ref=e1495]: Cursor CLI
+                                  - generic [ref=e1497]:
+                                    - text: Composer 2
+                                    - text: (Cursor)
+                              - generic "Claude Code - DeepSeek V4 Pro (high)" [ref=e1499]:
+                                - generic [ref=e1500]:
+                                  - generic [ref=e1502]: Claude Code
+                                  - generic [ref=e1504]: DeepSeek V4Pro(high)(DeepSeek)
+                              - generic "Cursor CLI - Composer 2.5 Fast" [ref=e1506]:
+                                - generic [ref=e1507]:
+                                  - generic [ref=e1509]: Cursor CLI
+                                  - generic [ref=e1511]: Composer 2.5Fast(Cursor)
+                              - generic "Claude Code - Kimi K2.6" [ref=e1513]:
+                                - generic [ref=e1514]:
+                                  - generic [ref=e1516]: Claude Code
+                                  - generic [ref=e1518]:
+                                    - text: Kimi K2.6
+                                    - text: (Moonshot AI)
+                              - generic "Claude Code - Opus 4.7 (medium)" [ref=e1520]:
+                                - generic [ref=e1521]:
+                                  - generic [ref=e1523]: Claude Code
+                                  - generic [ref=e1525]:
+                                    - text: Opus 4.7
+                                    - text: (medium)(Anthropic)
+                              - generic "Claude Code - Opus 4.6 (medium)" [ref=e1527]:
+                                - generic [ref=e1528]:
+                                  - generic [ref=e1530]: Claude Code
+                                  - generic [ref=e1532]:
+                                    - text: Opus 4.6
+                                    - text: (medium)(Anthropic)
+                              - generic "Cursor CLI - Opus 4.7 (medium)" [ref=e1534]:
+                                - generic [ref=e1535]:
+                                  - generic [ref=e1537]: Cursor CLI
+                                  - generic [ref=e1539]:
+                                    - text: Opus 4.7
+                                    - text: (medium)(Cursor)
+                              - generic "Gemini CLI - Gemini 3.1 Pro (high)" [ref=e1541]:
+                                - generic [ref=e1542]:
+                                  - generic [ref=e1544]: Gemini CLI
+                                  - generic [ref=e1546]: Gemini 3.1Pro(high)(Gemini)
+                              - generic "Cursor CLI - GPT-5.5 (medium)" [ref=e1548]:
+                                - generic [ref=e1549]:
+                                  - generic [ref=e1551]: Cursor CLI
+                                  - generic [ref=e1553]:
+                                    - text: GPT-5.5
+                                    - text: (medium)(Cursor)
+                              - generic "Codex - GPT-5.5 (medium)" [ref=e1555]:
+                                - generic [ref=e1556]:
+                                  - generic [ref=e1558]: Codex
+                                  - generic [ref=e1560]:
+                                    - text: GPT-5.5
+                                    - text: (medium)(OpenAI)
+                              - generic "Claude Code - GLM-5.1" [ref=e1562]:
+                                - generic [ref=e1563]:
+                                  - generic [ref=e1565]: Claude Code
+                                  - generic [ref=e1567]:
+                                    - text: GLM-5.1
+                                    - text: (FriendliAI)
+                              - generic "Claude Code - Opus 4.7 (max)" [ref=e1569]:
+                                - generic [ref=e1570]:
+                                  - generic [ref=e1572]: Claude Code
+                                  - generic [ref=e1574]:
+                                    - text: Opus 4.7
+                                    - text: (max)(Anthropic)
+                              - generic "Codex - GPT-5.5 (xhigh)" [ref=e1576]:
+                                - generic [ref=e1577]:
+                                  - generic [ref=e1579]: Codex
+                                  - generic [ref=e1581]:
+                                    - text: GPT-5.5
+                                    - text: (xhigh)(OpenAI)
+                            - generic [ref=e1582]:
+                              - generic [ref=e1583]: $0.07
+                              - generic [ref=e1584]: $0.35
+                              - generic [ref=e1585]: $0.44
+                              - generic [ref=e1586]: $0.76
+                              - generic [ref=e1587]: $1.24
+                              - generic [ref=e1588]: $1.27
+                              - generic [ref=e1589]: $1.47
+                              - generic [ref=e1590]: $1.60
+                              - generic [ref=e1591]: $1.61
+                              - generic [ref=e1592]: $2.21
+                              - generic [ref=e1593]: $2.26
+                              - generic [ref=e1594]: $4.14
+                              - generic [ref=e1595]: $4.33
+                    - generic [ref=e1599]:
+                      - heading "What cost is measuring" [level=3] [ref=e1600]:
+                        - button "What cost is measuring" [ref=e1601] [cursor=pointer]:
+                          - generic [ref=e1602]:
+                            - img [ref=e1603]
+                            - text: What cost is measuring
+                          - img [ref=e1605]
+                      - region "What cost is measuring":
+                        - generic [ref=e1608]:
+                          - paragraph [ref=e1609]: This chart shows the mean pay-per-token API cost per task across the Artificial Analysis Coding Agent Index, which combines SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, and SWE-Atlas-QnA.
+                          - paragraph [ref=e1610]: Where applicable, that cost model includes standard input pricing, discounted cached-input pricing, separate cache-write charges, and output pricing rather than treating all prompt tokens as if they were billed at the same uncached input rate.
+                          - paragraph [ref=e1611]: It is intended to show pay-per-token API cost, not consumer plan pricing or the full operational cost of deploying the system in production. Infrastructure, engineering, and supervision costs are not the focus of this metric.
+              - generic [ref=e1612]:
+                - generic [ref=e1613]:
+                  - generic [ref=e1614]:
+                    - generic [ref=e1615]:
+                      - heading "Artificial Analysis Coding Agent Index vs. Cost per Task" [level=3] [ref=e1616]
+                      - generic [ref=e1619]: Artificial Analysis Coding Agent Index vs. mean pay-per-token API cost per task (USD)
+                    - generic [ref=e1621]:
+                      - generic [ref=e1623]:
+                        - generic [ref=e1624]:
+                          - generic [ref=e1625]: Color by
+                          - group [ref=e1626]:
+                            - radio "Model" [checked] [ref=e1627] [cursor=pointer]
+                            - radio "Agent" [ref=e1628] [cursor=pointer]
+                        - combobox [ref=e1630] [cursor=pointer]:
+                          - generic [ref=e1631]: 13 of 17 models
+                          - img
+                      - generic [ref=e1632]:
+                        - button "Copy link to this section" [ref=e1633] [cursor=pointer]:
+                          - img
+                        - button "Download chart as image" [ref=e1634] [cursor=pointer]:
+                          - img
+                  - generic [ref=e1636]:
+                    - generic [ref=e1638]:
+                      - generic [ref=e1642] [cursor=pointer]: Anthropic
+                      - generic [ref=e1646] [cursor=pointer]: OpenAI
+                      - generic [ref=e1650] [cursor=pointer]: Cursor
+                      - generic [ref=e1654] [cursor=pointer]: Z.ai
+                      - generic [ref=e1658] [cursor=pointer]: Moonshot AI
+                      - generic [ref=e1662] [cursor=pointer]: DeepSeek
+                      - generic [ref=e1666] [cursor=pointer]: Google
+                    - img [ref=e1670]:
+                      - generic [ref=e1672]:
+                        - img [ref=e1679]
+                        - generic [ref=e1683]:
+                          - generic [ref=e1685]: $0.00
+                          - generic [ref=e1687]: $0.50
+                          - generic [ref=e1689]: $1.00
+                          - generic [ref=e1691]: $1.50
+                          - generic [ref=e1693]: $2.00
+                          - generic [ref=e1695]: $2.50
+                          - generic [ref=e1697]: $3.00
+                          - generic [ref=e1699]: $3.50
+                          - generic [ref=e1701]: $4.00
+                          - generic [ref=e1703]: $4.50
+                          - generic [ref=e1705]: $5.00
+                          - generic [ref=e1706]: Cost per Task
+                        - generic [ref=e1707]:
+                          - generic [ref=e1709]: "0"
+                          - generic [ref=e1711]: "10"
+                          - generic [ref=e1713]: "20"
+                          - generic [ref=e1715]: "30"
+                          - generic [ref=e1717]: "40"
+                          - generic [ref=e1719]: "50"
+                          - generic [ref=e1721]: "60"
+                          - generic [ref=e1723]: "70"
+                          - generic [ref=e1725]: "80"
+                          - generic [ref=e1727]: "90"
+                          - generic [ref=e1729]: "100"
+                          - generic [ref=e1730]: Artificial Analysis Coding Agent Index
+                        - generic [ref=e1731]:
+                          - generic [ref=e1734]: Cursor CLI - Composer 2 (Cursor)
+                          - generic [ref=e1737]: Claude Code - DeepSeek V4 Pro (high) (DeepSeek)
+                          - generic [ref=e1740]: Cursor CLI - Composer 2.5 Fast (Cursor)
+                          - generic [ref=e1743]: Claude Code - Kimi K2.6 (Moonshot AI)
+                          - generic [ref=e1746]: Claude Code - Opus 4.6 (medium) (Anthropic)
+                          - generic [ref=e1749]: Claude Code - Opus 4.7 (medium) (Anthropic)
+                          - generic [ref=e1752]: Cursor CLI - Opus 4.7 (medium) (Cursor)
+                          - generic [ref=e1755]: Gemini CLI - Gemini 3.1 Pro (high) (Gemini)
+                          - generic [ref=e1758]: Cursor CLI - GPT-5.5 (medium) (Cursor)
+                          - generic [ref=e1761]: Codex - GPT-5.5 (medium) (OpenAI)
+                          - generic [ref=e1764]: Claude Code - GLM-5.1 (FriendliAI)
+                          - generic [ref=e1767]: Claude Code - Opus 4.7 (max) (Anthropic)
+                          - generic [ref=e1770]: Codex - GPT-5.5 (xhigh) (OpenAI)
+                - generic [ref=e1789]:
+                  - heading "How to read this chart" [level=3] [ref=e1790]:
+                    - button "How to read this chart" [ref=e1791] [cursor=pointer]:
+                      - generic [ref=e1792]:
+                        - img [ref=e1793]
+                        - text: How to read this chart
+                      - img [ref=e1795]
+                  - region "How to read this chart":
+                    - paragraph [ref=e1798]: "Each point represents a coding-agent variant. Farther right means higher benchmark performance, while lower on the chart means lower mean cost per task. The most efficient agents sit toward the lower-right: stronger results at lower cost."
+          - generic [ref=e1799]:
+            - generic [ref=e1800]:
+              - heading "Execution Time" [level=2] [ref=e1802]:
+                - generic [ref=e1804]: Execution Time
+              - paragraph [ref=e1805]: Active agent runtime across the Artificial Analysis Coding Agent Index.
+            - generic [ref=e1807]:
+              - generic [ref=e1808]:
+                - tablist [ref=e1810]:
+                  - tab "Execution Time" [selected] [ref=e1811] [cursor=pointer]
+                  - tab "Turns" [ref=e1812] [cursor=pointer]
+                - tabpanel "Execution Time" [ref=e1813]:
+                  - generic [ref=e1814]:
+                    - generic [ref=e1815]:
+                      - generic [ref=e1816]:
+                        - generic [ref=e1817]:
+                          - heading "Time per Task" [level=3] [ref=e1818]
+                          - generic [ref=e1821]: Mean agent wall time per task · Lower is better
+                        - generic [ref=e1823]:
+                          - generic [ref=e1825]:
+                            - generic [ref=e1826]:
+                              - generic [ref=e1827]: Color by
+                              - group [ref=e1828]:
+                                - radio "Model" [checked] [ref=e1829] [cursor=pointer]
+                                - radio "Agent" [ref=e1830] [cursor=pointer]
+                            - combobox [ref=e1832] [cursor=pointer]:
+                              - generic [ref=e1833]: 13 of 17 models
+                              - img
+                          - generic [ref=e1834]:
+                            - button "Copy link to this section" [ref=e1835] [cursor=pointer]:
+                              - img
+                            - button "Download chart as image" [ref=e1836] [cursor=pointer]:
+                              - img
+                      - generic [ref=e1839]:
+                        - img
+                        - application [ref=e1843]:
+                          - generic [ref=e1890]:
+                            - generic [ref=e1891]:
+                              - generic "Claude Code - Opus 4.7 (medium)" [ref=e1893]:
+                                - generic [ref=e1894]:
+                                  - generic [ref=e1896]: Claude Code
+                                  - generic [ref=e1898]:
+                                    - text: Opus 4.7
+                                    - text: (medium)(Anthropic)
+                              - generic "Cursor CLI - GPT-5.5 (medium)" [ref=e1900]:
+                                - generic [ref=e1901]:
+                                  - generic [ref=e1903]: Cursor CLI
+                                  - generic [ref=e1905]:
+                                    - text: GPT-5.5
+                                    - text: (medium)(Cursor)
+                              - generic "Cursor CLI - Composer 2.5 Fast" [ref=e1907]:
+                                - generic [ref=e1908]:
+                                  - generic [ref=e1910]: Cursor CLI
+                                  - generic [ref=e1912]: Composer 2.5Fast(Cursor)
+                              - generic "Claude Code - Opus 4.6 (medium)" [ref=e1914]:
+                                - generic [ref=e1915]:
+                                  - generic [ref=e1917]: Claude Code
+                                  - generic [ref=e1919]:
+                                    - text: Opus 4.6
+                                    - text: (medium)(Anthropic)
+                              - generic "Codex - GPT-5.5 (medium)" [ref=e1921]:
+                                - generic [ref=e1922]:
+                                  - generic [ref=e1924]: Codex
+                                  - generic [ref=e1926]:
+                                    - text: GPT-5.5
+                                    - text: (medium)(OpenAI)
+                              - generic "Gemini CLI - Gemini 3.1 Pro (high)" [ref=e1928]:
+                                - generic [ref=e1929]:
+                                  - generic [ref=e1931]: Gemini CLI
+                                  - generic [ref=e1933]: Gemini 3.1Pro(high)(Gemini)
+                              - generic "Cursor CLI - Opus 4.7 (medium)" [ref=e1935]:
+                                - generic [ref=e1936]:
+                                  - generic [ref=e1938]: Cursor CLI
+                                  - generic [ref=e1940]:
+                                    - text: Opus 4.7
+                                    - text: (medium)(Cursor)
+                              - generic "Cursor CLI - Composer 2" [ref=e1942]:
+                                - generic [ref=e1943]:
+                                  - generic [ref=e1945]: Cursor CLI
+                                  - generic [ref=e1947]:
+                                    - text: Composer 2
+                                    - text: (Cursor)
+                              - generic "Codex - GPT-5.5 (xhigh)" [ref=e1949]:
+                                - generic [ref=e1950]:
+                                  - generic [ref=e1952]: Codex
+                                  - generic [ref=e1954]:
+                                    - text: GPT-5.5
+                                    - text: (xhigh)(OpenAI)
+                              - generic "Claude Code - Opus 4.7 (max)" [ref=e1956]:
+                                - generic [ref=e1957]:
+                                  - generic [ref=e1959]: Claude Code
+                                  - generic [ref=e1961]:
+                                    - text: Opus 4.7
+                                    - text: (max)(Anthropic)
+                              - generic "Claude Code - DeepSeek V4 Pro (high)" [ref=e1963]:
+                                - generic [ref=e1964]:
+                                  - generic [ref=e1966]: Claude Code
+                                  - generic [ref=e1968]: DeepSeek V4Pro(high)(DeepSeek)
+                              - generic "Claude Code - GLM-5.1" [ref=e1970]:
+                                - generic [ref=e1971]:
+                                  - generic [ref=e1973]: Claude Code
+                                  - generic [ref=e1975]:
+                                    - text: GLM-5.1
+                                    - text: (FriendliAI)
+                              - generic "Claude Code - Kimi K2.6" [ref=e1977]:
+                                - generic [ref=e1978]:
+                                  - generic [ref=e1980]: Claude Code
+                                  - generic [ref=e1982]:
+                                    - text: Kimi K2.6
+                                    - text: (Moonshot AI)
+                            - generic [ref=e1983]:
+                              - generic [ref=e1984]: 5.8m
+                              - generic [ref=e1985]: 6.2m
+                              - generic [ref=e1986]: 6.7m
+                              - generic [ref=e1987]: 7.0m
+                              - generic [ref=e1988]: 7.1m
+                              - generic [ref=e1989]: 7.6m
+                              - generic [ref=e1990]: 7.8m
+                              - generic [ref=e1991]: 8.7m
+                              - generic [ref=e1992]: 8.7m
+                              - generic [ref=e1993]: 13.8m
+                              - generic [ref=e1994]: 18.0m
+                              - generic [ref=e1995]: 21.6m
+                              - generic [ref=e1996]: 41.5m
+                    - generic [ref=e2000]:
+                      - heading "What execution time is measuring" [level=3] [ref=e2001]:
+                        - button "What execution time is measuring" [ref=e2002] [cursor=pointer]:
+                          - generic [ref=e2003]:
+                            - img [ref=e2004]
+                            - text: What execution time is measuring
+                          - img [ref=e2006]
+                      - region "What execution time is measuring":
+                        - generic [ref=e2009]:
+                          - paragraph [ref=e2010]: "This chart uses agent wall time: how long the agent process was actively running on each task."
+                          - paragraph [ref=e2011]: It does not include environment startup, verifier or judge time, or other harness overhead, so it is a cleaner comparison of how long the agent itself was working.
+              - generic [ref=e2012]:
+                - generic [ref=e2013]:
+                  - generic [ref=e2014]:
+                    - generic [ref=e2015]:
+                      - heading "Artificial Analysis Coding Agent Index vs. Execution Time" [level=3] [ref=e2016]
+                      - generic [ref=e2019]: Artificial Analysis Coding Agent Index vs. mean agent wall time per task
+                    - generic [ref=e2021]:
+                      - generic [ref=e2023]:
+                        - generic [ref=e2024]:
+                          - generic [ref=e2025]: Color by
+                          - group [ref=e2026]:
+                            - radio "Model" [checked] [ref=e2027] [cursor=pointer]
+                            - radio "Agent" [ref=e2028] [cursor=pointer]
+                        - combobox [ref=e2030] [cursor=pointer]:
+                          - generic [ref=e2031]: 13 of 17 models
+                          - img
+                      - generic [ref=e2032]:
+                        - button "Copy link to this section" [ref=e2033] [cursor=pointer]:
+                          - img
+                        - button "Download chart as image" [ref=e2034] [cursor=pointer]:
+                          - img
+                  - generic [ref=e2036]:
+                    - generic [ref=e2038]:
+                      - generic [ref=e2042] [cursor=pointer]: Anthropic
+                      - generic [ref=e2046] [cursor=pointer]: OpenAI
+                      - generic [ref=e2050] [cursor=pointer]: Cursor
+                      - generic [ref=e2054] [cursor=pointer]: Z.ai
+                      - generic [ref=e2058] [cursor=pointer]: Moonshot AI
+                      - generic [ref=e2062] [cursor=pointer]: DeepSeek
+                      - generic [ref=e2066] [cursor=pointer]: Google
+                    - img [ref=e2070]:
+                      - generic [ref=e2072]:
+                        - img [ref=e2079]
+                        - generic [ref=e2083]:
+                          - generic [ref=e2085]: 0s
+                          - generic [ref=e2087]: 3.3m
+                          - generic [ref=e2089]: 6.7m
+                          - generic [ref=e2091]: 10.0m
+                          - generic [ref=e2093]: 13.3m
+                          - generic [ref=e2095]: 16.7m
+                          - generic [ref=e2097]: 20.0m
+                          - generic [ref=e2099]: 23.3m
+                          - generic [ref=e2101]: 26.7m
+                          - generic [ref=e2103]: 30.0m
+                          - generic [ref=e2105]: 33.3m
+                          - generic [ref=e2107]: 36.7m
+                          - generic [ref=e2109]: 40.0m
+                          - generic [ref=e2111]: 43.3m
+                          - generic [ref=e2113]: 46.7m
+                          - generic [ref=e2114]: Execution Time
+                        - generic [ref=e2115]:
+                          - generic [ref=e2117]: "0"
+                          - generic [ref=e2119]: "10"
+                          - generic [ref=e2121]: "20"
+                          - generic [ref=e2123]: "30"
+                          - generic [ref=e2125]: "40"
+                          - generic [ref=e2127]: "50"
+                          - generic [ref=e2129]: "60"
+                          - generic [ref=e2131]: "70"
+                          - generic [ref=e2133]: "80"
+                          - generic [ref=e2135]: "90"
+                          - generic [ref=e2137]: "100"
+                          - generic [ref=e2138]: Artificial Analysis Coding Agent Index
+                        - generic [ref=e2139]:
+                          - generic [ref=e2142]: Claude Code - Opus 4.7 (medium) (Anthropic)
+                          - generic [ref=e2144]: Cursor CLI - GPT-5.5 (medium) (Cursor)
+                          - generic [ref=e2147]: Cursor CLI - Composer 2.5 Fast (Cursor)
+                          - generic [ref=e2150]: Claude Code - Opus 4.6 (medium) (Anthropic)
+                          - generic [ref=e2153]: Codex - GPT-5.5 (medium) (OpenAI)
+                          - generic [ref=e2156]: Gemini CLI - Gemini 3.1 Pro (high) (Gemini)
+                          - generic [ref=e2159]: Cursor CLI - Opus 4.7 (medium) (Cursor)
+                          - generic [ref=e2162]: Cursor CLI - Composer 2 (Cursor)
+                          - generic [ref=e2165]: Codex - GPT-5.5 (xhigh) (OpenAI)
+                          - generic [ref=e2168]: Claude Code - Opus 4.7 (max) (Anthropic)
+                          - generic [ref=e2170]: Claude Code - DeepSeek V4 Pro (high) (DeepSeek)
+                          - generic [ref=e2173]: Claude Code - GLM-5.1 (FriendliAI)
+                          - generic [ref=e2176]: Claude Code - Kimi K2.6 (Moonshot AI)
+                - generic [ref=e2195]:
+                  - heading "How to read this chart" [level=3] [ref=e2196]:
+                    - button "How to read this chart" [ref=e2197] [cursor=pointer]:
+                      - generic [ref=e2198]:
+                        - img [ref=e2199]
+                        - text: How to read this chart
+                      - img [ref=e2201]
+                  - region "How to read this chart":
+                    - paragraph [ref=e2204]: Each point represents a coding-agent variant. Farther right means higher benchmark performance, while lower on the chart means shorter mean agent runtime per task. Agents toward the lower-right deliver stronger results in less active agent time.
+      - generic [ref=e2205]:
+        - button "Run Specifications" [ref=e2207] [cursor=pointer]:
+          - heading "Run Specifications" [level=2] [ref=e2208]
+          - img [ref=e2209]
+        - generic [ref=e2210]:
+          - heading "Frequently Asked Questions" [level=2] [ref=e2212]
+          - generic [ref=e2213]:
+            - generic [ref=e2214]:
+              - heading "What is the Artificial Analysis Coding Agent Index?" [level=3] [ref=e2215]:
+                - button "What is the Artificial Analysis Coding Agent Index?" [ref=e2216] [cursor=pointer]:
+                  - text: What is the Artificial Analysis Coding Agent Index?
+                  - img [ref=e2217]
+              - region "What is the Artificial Analysis Coding Agent Index?":
+                - paragraph [ref=e2220]: The Artificial Analysis Coding Agent Index is our composite score for coding-agent performance across the public benchmark suite on this page. It currently combines SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, and SWE-Atlas-QnA to capture implementation, terminal workflow, and repository-understanding performance in a single headline metric.
+            - generic [ref=e2221]:
+              - heading "Which benchmarks are included in the index right now?" [level=3] [ref=e2222]:
+                - button "Which benchmarks are included in the index right now?" [ref=e2223] [cursor=pointer]:
+                  - text: Which benchmarks are included in the index right now?
+                  - img [ref=e2224]
+              - region "Which benchmarks are included in the index right now?":
+                - paragraph [ref=e2227]: The current public index includes SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, and SWE-Atlas-QnA. These benchmarks are combined because they stress different parts of the coding-agent workflow rather than repeating the same task format.
+            - generic [ref=e2228]:
+              - heading "What kinds of tasks are these benchmarks actually testing?" [level=3] [ref=e2229]:
+                - button "What kinds of tasks are these benchmarks actually testing?" [ref=e2230] [cursor=pointer]:
+                  - text: What kinds of tasks are these benchmarks actually testing?
+                  - img [ref=e2231]
+              - region "What kinds of tasks are these benchmarks actually testing?":
+                - paragraph [ref=e2234]: The public benchmark suite mixes several software engineering task styles. Some tasks are Q&A and repository-understanding tasks that focus on reading a codebase, understanding architecture or behavior, and producing a correct technical answer. Some are implementation and bug-fix tasks that require code changes and are closer to the classic make-a-patch-that-works framing. Some are terminal workflow tasks that test whether the agent can navigate a shell-driven environment, execute tools correctly, and complete a multi-step command-line workflow. The suite also mixes effectively binary outcomes with rubric-scored partial-credit outcomes, which matters because an agent can show useful progress on a difficult task without fully solving it.
+            - generic [ref=e2235]:
+              - heading "How do Q&A-style tasks differ from SWE-Bench-Pro-Hard-AA-style tasks?" [level=3] [ref=e2236]:
+                - button "How do Q&A-style tasks differ from SWE-Bench-Pro-Hard-AA-style tasks?" [ref=e2237] [cursor=pointer]:
+                  - text: How do Q&A-style tasks differ from SWE-Bench-Pro-Hard-AA-style tasks?
+                  - img [ref=e2238]
+              - region "How do Q&A-style tasks differ from SWE-Bench-Pro-Hard-AA-style tasks?":
+                - paragraph [ref=e2241]: "Q&A-style tasks emphasize repository understanding, code reading, tracing behavior, and producing a correct technical explanation. SWE-Bench-Pro-Hard-AA-style tasks are closer to shipping a working change: the agent has to understand the task, navigate the repository, edit files correctly, and satisfy an evaluator or test-based outcome under execution constraints. Those are related capabilities, but they are not identical. An agent can be strong at repository reasoning and still be weaker at reliable patch execution, or vice versa, which is one reason the composite index should be interpreted alongside the per-benchmark chart."
+            - generic [ref=e2242]:
+              - heading "How are agents scored on each benchmark?" [level=3] [ref=e2243]:
+                - button "How are agents scored on each benchmark?" [ref=e2244] [cursor=pointer]:
+                  - text: How are agents scored on each benchmark?
+                  - img [ref=e2245]
+              - region "How are agents scored on each benchmark?":
+                - paragraph [ref=e2248]: "The benchmark page reports component scores using average pass@1. This is the evaluator-assigned score for a task, and depending on the benchmark it can be either binary or partial credit. A passed run is not automatically the same thing as a solved task: a run can complete cleanly and still receive a zero score. In the current methodology, a task is counted as solved only when it passed and received a positive score. This matters especially for rubric-scored tasks such as SWE-Atlas-QnA, where partial credit can capture useful progress that would be lost in a strict pass-fail metric."
+            - generic [ref=e2249]:
+              - heading "How is the overall index weighted?" [level=3] [ref=e2250]:
+                - button "How is the overall index weighted?" [ref=e2251] [cursor=pointer]:
+                  - text: How is the overall index weighted?
+                  - img [ref=e2252]
+              - region "How is the overall index weighted?":
+                - paragraph [ref=e2255]: The index is computed from the configured benchmark components that make up the current public suite. For the current Artificial Analysis Coding Agent Index, the public methodology is a simple average across the available component benchmark scores, and the current configuration treats the included benchmark components as equal components of that composite. Benchmark methodology can evolve as coverage improves, so comparability is best interpreted within the published benchmark suite and its current component set rather than as a timeless absolute score.
+            - generic [ref=e2256]:
+              - heading "What does execution time mean?" [level=3] [ref=e2257]:
+                - button "What does execution time mean?" [ref=e2258] [cursor=pointer]:
+                  - text: What does execution time mean?
+                  - img [ref=e2259]
+              - region "What does execution time mean?":
+                - paragraph [ref=e2262]: Execution time on this page refers to wall-clock task runtime per task, not just raw model latency. It is meant to reflect the user-facing time cost of running the whole agent workflow. That includes time spent reasoning, issuing tool calls, reading and writing files, executing shell steps, and waiting on model responses. So an agent can have a fast underlying model and still be slower overall if its workflow is longer or more tool-heavy.
+            - generic [ref=e2263]:
+              - heading "What does token usage mean, and why does it matter?" [level=3] [ref=e2264]:
+                - button "What does token usage mean, and why does it matter?" [ref=e2265] [cursor=pointer]:
+                  - text: What does token usage mean, and why does it matter?
+                  - img [ref=e2266]
+              - region "What does token usage mean, and why does it matter?":
+                - paragraph [ref=e2269]: Token usage is the average observed token consumption per task across the benchmark suite. On this page we break it out into input, cache, and output tokens. Input tokens are the tokens sent into the model, including prompts, instructions, tool context, and task context. Cache tokens are prompt tokens reused through prompt caching when the provider exposes that telemetry. Output tokens are tokens generated by the model in its response. Token usage matters because it often drives cost and can also indicate how much context an agent consumes to get work done, but token efficiency and cost are not identical because providers price token categories differently and caching can materially change the bill.
+            - generic [ref=e2270]:
+              - heading "Why can a higher-index agent still be worse for my use case?" [level=3] [ref=e2271]:
+                - button "Why can a higher-index agent still be worse for my use case?" [ref=e2272] [cursor=pointer]:
+                  - text: Why can a higher-index agent still be worse for my use case?
+                  - img [ref=e2273]
+              - region "Why can a higher-index agent still be worse for my use case?":
+                - paragraph [ref=e2276]: A higher index score means stronger performance across the included benchmark mix, but it does not mean the agent is best for every workflow. The index is a balance across benchmark quality, not a direct measure of your specific latency, cost, tooling, or task-type priorities. Real-world choice still depends on whether your workflow looks more like repository Q&A, patching, or terminal execution, and on practical constraints such as IDE integration, model availability, and reliability.
+            - generic [ref=e2277]:
+              - heading "How realistic are these tasks, and what setup was used for each agent?" [level=3] [ref=e2278]:
+                - button "How realistic are these tasks, and what setup was used for each agent?" [ref=e2279] [cursor=pointer]:
+                  - text: How realistic are these tasks, and what setup was used for each agent?
+                  - img [ref=e2280]
+              - region "How realistic are these tasks, and what setup was used for each agent?":
+                - paragraph [ref=e2283]:
+                  - text: "These benchmarks measure coding-agent performance across repositories, tools, multi-step workflows, and evaluator-based outcomes. Results on this page reflect specific evaluated agent variants, not just generic product names: model choice, settings, and execution configuration can materially change outcomes, which is why a single agent family may appear in multiple variants in the results. For more background on benchmark runs, task-level scoring, and methodology, see the coding-agents benchmarking methodology page."
+                  - link "View the coding-agents benchmarking methodology" [ref=e2284] [cursor=pointer]:
+                    - /url: /methodology/coding-agents-benchmarking
+    - button "Back to top":
+      - img
+    - region "Notifications alt+T"
+    - generic [ref=e2286]:
+      - generic [ref=e2287]:
+        - link "Artificial Analysis" [ref=e2289] [cursor=pointer]:
+          - /url: /
+          - img [ref=e2290]
+        - generic [ref=e2292]:
+          - paragraph [ref=e2293]: Get notified about new articles
+          - generic [ref=e2297]:
+            - generic [ref=e2298]: Email address
+            - textbox "Email address" [ref=e2299]:
+              - /placeholder: What's your email?
+            - button "Subscribe" [ref=e2300] [cursor=pointer]
+        - paragraph [ref=e2304]: Artificial Analysis
+        - generic [ref=e2305]:
+          - generic [ref=e2306]:
+            - paragraph [ref=e2307]: Explore
+            - list [ref=e2308]:
+              - listitem [ref=e2309]:
+                - link "LLM Leaderboard" [ref=e2310] [cursor=pointer]:
+                  - /url: /leaderboards/models
+              - listitem [ref=e2311]:
+                - link "Image Arena" [ref=e2312] [cursor=pointer]:
+                  - /url: /image/arena
+              - listitem [ref=e2313]:
+                - link "Video Arena" [ref=e2314] [cursor=pointer]:
+                  - /url: /video/arena
+              - listitem [ref=e2315]:
+                - link "AI Agents" [ref=e2316] [cursor=pointer]:
+                  - /url: /agents
+              - listitem [ref=e2317]:
+                - link "Evaluations" [ref=e2318] [cursor=pointer]:
+                  - /url: /evaluations
+          - generic [ref=e2319]:
+            - paragraph [ref=e2320]: Company
+            - list [ref=e2321]:
+              - listitem [ref=e2322]:
+                - link "Methodology" [ref=e2323] [cursor=pointer]:
+                  - /url: /methodology
+              - listitem [ref=e2324]:
+                - link "Services" [ref=e2325] [cursor=pointer]:
+                  - /url: /services
+              - listitem [ref=e2326]:
+                - link "Contact" [ref=e2327] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=e2328]:
+                - link "Articles" [ref=e2329] [cursor=pointer]:
+                  - /url: /articles
+              - listitem [ref=e2330]:
+                - link "FAQ" [ref=e2331] [cursor=pointer]:
+                  - /url: /faq
+        - generic [ref=e2332]:
+          - link "X" [ref=e2333] [cursor=pointer]:
+            - /url: https://x.com/ArtificialAnlys
+            - img [ref=e2334]
+            - generic [ref=e2336]: X
+          - link "LinkedIn" [ref=e2337] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/artificial-analysis/
+            - img [ref=e2338]
+            - generic [ref=e2340]: LinkedIn
+          - link "Rednote" [ref=e2341] [cursor=pointer]:
+            - /url: https://www.xiaohongshu.com/user/profile/69ea6345000000000d034c02
+            - img [ref=e2342]
+            - generic [ref=e2344]: Rednote
+          - link "Discord" [ref=e2345] [cursor=pointer]:
+            - /url: https://discord.gg/Mk298GPZ7V
+            - img [ref=e2346]
+            - generic [ref=e2348]: Discord
+      - generic [ref=e2349]:
+        - paragraph [ref=e2350]: © 2026 Artificial Analysis
+        - link "Terms of Use" [ref=e2351] [cursor=pointer]:
+          - /url: /docs/legal/Terms-of-Use.pdf
+        - link "Privacy Policy" [ref=e2352] [cursor=pointer]:
+          - /url: /docs/legal/Privacy-Policy.pdf
+  - alert [ref=e2353]
+  - generic [ref=e2354]: "1500000"

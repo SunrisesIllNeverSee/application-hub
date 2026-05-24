@@ -4,6 +4,9 @@ The **archive layer** for the answer pipeline. One file per submitted
 program (`<slug>.md`), containing Q+A pairs from that program, in the
 order they were asked.
 
+For machine pull, answer blocks should point back to `AQ` first and `QU`
+second. See `../../src/archive-serialization-spec.md`.
+
 Format per entry (answer-first):
 
 ```markdown

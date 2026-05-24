@@ -4,6 +4,9 @@ Cross-program index, built by harvesting across every file in
 `../source/`. Each entry = one unique question, with references to which
 programs asked it (and what variants of phrasing they used).
 
+This is the serialized `QU` lane.
+See `../../src/archive-serialization-spec.md`.
+
 ## What goes here
 
 For now, this folder is **scaffolded but empty**. The harvest pass that
