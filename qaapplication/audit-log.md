@@ -15,6 +15,7 @@ Most recent entries first. Append new entries at the top.
 
 ## 2026-05-24
 
+- **2026-05-24** · **stripped + indexed** · `anthonya-angel` · raw drop (Anthony Avedissian angel-investor startups page) extracted via the new strip flow: entity → `03-programs/anthonya-angel.md`, Q-only → `05-questions/source/anthonya-angel.md`, draft workspace → `06-workshop/anthonya-angel.md`. Raw moved to `06-workshop/_shared/raw/anthonya-angel.md`. Slug normalized from `anthonya_angel` to `anthonya-angel`. Not yet submitted.
 - **2026-05-24** · **restructure** · — · added `03-programs/` (entity index for companies/programs themselves; mirrors parent's `programs` table). Renamed `05-drafting/ → 06-workshop/`. Shifted numbering on downstream folders. Backfilled entity records for 5 submitted programs. Workshop programs (redbud, founding500, yc, cohort-5) still need entity backfill.
 - **2026-05-24** · **doc-only** · — · pipeline order corrected in docs: workshop now comes before answers in the flow (workshop is where Q's get answered; answers is the harvested bank that crystallizes out of accumulated workshop work).
 - **2026-05-24** · **restructure** · — · folders renamed for true sequential flow. `submitted/ → applications/`. `drafts/ → drafting/`. `01-inbox/processing/ → processing/` (promoted to top-level). `01-inbox/incoming/` flattened (raw drops land directly in `01-inbox/`).
