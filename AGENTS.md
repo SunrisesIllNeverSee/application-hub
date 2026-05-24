@@ -150,13 +150,13 @@ Protocol files:
 <claude-mem-context>
 # Memory Context
 
-# [application-hub] recent context, 2026-05-21 6:09pm EDT
+# [application-hub] recent context, 2026-05-24 12:57pm EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 7 obs (2,472t read) | 87,013t work | 97% savings
+Stats: 31 obs (11,322t read) | 304,229t work | 96% savings
 
 ### May 21, 2026
 1 5:42p 🟣 Safari QA Link Capture Installation Guide
@@ -166,6 +166,50 @@ Stats: 7 obs (2,472t read) | 87,013t work | 97% savings
 6 6:03p 🔵 Safari tab export script broken after delimiter refactor
 7 6:05p 🔴 Safari tab export script line ending parsing bug fixed
 8 6:06p ✅ Safari tab export feature committed and pushed to remote
+9 6:09p ✅ Safari tab export script verified working after fix deployment
+### May 22, 2026
+105 12:11p ⚖️ Multi-level loop architecture for project management
+106 12:12p 🔵 Pre-commit validation hook with strict mode enforcement
+S157 Investigate API usage costs and run Claude diagnostics tools after high spending (May 22 at 12:12 PM)
+S149 Multi-level loop architecture design with Hermes global communications and commit hardening verification (May 22 at 12:12 PM)
+107 12:16p 🔵 Claude Code historical usage data preserved in ccusage tool
+108 12:17p 🔵 May 2026 API usage shows $2,102 spending with peak days exceeding $230
+109 12:18p 🔵 Model-level cost breakdown reveals Opus-4-6 sessions driving $11-14 per session
+S167 Root cause analysis of token usage spike and claude-mem observer overload (May 22 at 12:19 PM)
+112 1:26p 🔵 Groq free-tier TPM limit blocks Hermes agent initialization
+S169 Refined timeline analysis of two-phase token drain: silent processing followed by compaction storm (May 22 at 1:53 PM)
+S171 Discovered built-in project exclusion setting in claude-mem to prevent future Hermes observation overhead (May 22 at 1:54 PM)
+S228 User asked about prompt caching documentation relevance and verified Hermes project exclusion status in claude-mem (May 22 at 1:55 PM)
+### May 23, 2026
+145 4:21p 🔵 User exploring Claude API prompt caching feature
+146 " 🔵 Claude-mem configuration reviewed showing infrastructure and provider settings
+S603 User requested to examine mos2es.com/benchmarks and review the "honest take" benchmark analysis (May 23 at 4:22 PM)
+### May 24, 2026
+337 9:47a 🔵 AQUA parallel vertical intake pipeline architecture documented
+338 9:48a 🔵 Application Hub current production architecture with MCP server and archive scale
+339 9:55a ⚖️ Layered development strategy for application-hub core system
+341 10:37a 🔵 Application hub data entry points identified in API layer
+342 10:38a 🔵 Application hub implements multi-channel data ingestion architecture with BYOK AI extraction
+343 10:39a 🔵 Import queue evolved from simple question mapper to multi-domain submission system with staged workflow
+348 10:50a 🟣 Manual intake review gate API with checkpoint-based approvals
+349 10:52a 🟣 Manual intake workbench UI with checkpoint review controls
+350 " ✅ Profile import page wired to new AQUA 7-layer intake workbench
+352 " 🔵 Migration 047_manual_intake_workflow.sql pending registration in agent coordination protocol
+353 " 🔵 Six TypeScript compilation errors in manual intake implementation
+354 10:53a 🔴 TypeScript compilation errors resolved with type annotations and guards
+355 " ✅ Migration 047 registered in agent coordination protocol
+356 10:54a 🔵 Production build succeeds with manual intake workflow integrated
+357 " 🔵 Manual intake workflow implementation spans 10 files with three new untracked directories
+S605 User requested to examine mos2es.com/benchmarks website and review the "honest take" benchmark analysis and comparison data (May 24 at 12:54 PM)
+S607 Review mos2es.com/benchmarks website and analyze the "honest take" benchmark comparison data showing MO§ES vs field average across five measured economic kernels (May 24 at 12:56 PM)
+**Investigated**: Located and examined three sources: (1) local benchmark markdown file with 5 categories and Opus 4.6 vs 4.7 split; (2) raw JSON extractor output (98 sessions, May 8–14); (3) live mos2es.com/benchmarks website via Playwright browser tool showing complete page structure with benchmark visualizations, honest comparison section, and methodology notes
 
-Access 87k tokens of past work via get_observations([IDs]) or mem-search skill.
+**Learned**: The "honest take" refers to raw JSONL extraction from 98 session files including all subagents (vs 21-session parent dashboard view). Five-kernel measurement framework shows MO§ES leads all categories: Cache Hit Rate 94.66% (+3.21pp), Output:Input 17.9× (102× field), Tokens/Task 810K (6.3× fewer), Time/Task 1.84m (6.9× faster), Cost/LOC $0.0007 (102× cheaper). Methodological distinction: AA field runs isolated per-task benchmarks; MO§ES measures sustained operator work on real product over 7-day window. Raw tokens (1.12B MO§ES vs 7.51B field) show cache reuse advantage and conservation cascade effect. Field cost $23.33 vs field ~$1,845 across 1,465 tasks with same LOC output.
+
+**Completed**: Read and extracted local benchmark source files (markdown + JSON). Successfully navigated to mos2es.com/benchmarks using Playwright after Chrome extension failures. Retrieved full page snapshot with complete page structure, interactive benchmark iframes, honest comparison visualizations (horizontal and portrait), raw token breakdowns, and methodology notes. Documented all five kernel metrics and field comparison data.
+
+**Next Steps**: Awaiting user direction on specific analysis. User asked "What specifically about it did you want to dig into?" — session is open for deeper investigation of specific aspects: methodological implications of isolated vs sustained measurement, cache reuse mechanics, token efficiency compounding, field model breakdown, or cost structure analysis across different pricing models.
+
+
+Access 304k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

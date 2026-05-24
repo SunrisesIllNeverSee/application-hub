@@ -1,0 +1,773 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: MO§ES™ · Sovereign Signal · Five Measured Kernels
+  - navigation [ref=e3]:
+    - generic [ref=e4]: MO§ES™
+    - generic [ref=e5]:
+      - link "Home" [ref=e6] [cursor=pointer]:
+        - /url: /
+      - link "Papers" [ref=e7] [cursor=pointer]:
+        - /url: /papers
+      - link "Architecture" [ref=e8] [cursor=pointer]:
+        - /url: /architecture
+      - link "Field Sheet" [ref=e9] [cursor=pointer]:
+        - /url: /field-sheet
+      - link "Press" [ref=e10] [cursor=pointer]:
+        - /url: /press
+      - link "Legal" [ref=e11] [cursor=pointer]:
+        - /url: /legal
+  - main [ref=e12]:
+    - heading "Five measured kernels. One operator." [level=1] [ref=e13]:
+      - text: Five measured kernels.
+      - emphasis [ref=e14]: One operator.
+    - paragraph [ref=e15]:
+      - text: Operator-augmented Claude Code + Opus 4.7 measured against the
+      - strong [ref=e16]: Artificial Analysis Coding Agent Index
+      - text: field average. Seven-day window. Raw JSONL extraction across 98 session files and all subagents. MO§ES leads every measured economic category — cache discipline, compression cascade, token efficiency, throughput, and cost per line of code shipped.
+    - iframe [ref=e18]:
+      - generic [active] [ref=f1e1]:
+        - generic [ref=f1e2]:
+          - heading "MO§ES™ × Artificial Analysis Coding Agent Benchmarks" [level=1] [ref=f1e3]
+          - generic [ref=f1e4]: "Operator-augmented Claude Code + Opus 4.7 vs. 13 published combinations · Field: artificialanalysis.ai/agents/coding-agents · 2026-05-14"
+        - generic [ref=f1e5]:
+          - generic [ref=f1e6]: MO§ES™ leads all 5 measured economic categories — 7-day window (2026-05-08 → 2026-05-14)
+          - generic [ref=f1e7]:
+            - generic [ref=f1e8]:
+              - generic [ref=f1e9]: Cache hit rate
+              - generic [ref=f1e10]: 96.88%
+              - generic [ref=f1e11]: "#1 — > field's 96.2%"
+              - generic [ref=f1e12]: "SRC: Token Dashboard 7d"
+            - generic [ref=f1e13]:
+              - generic [ref=f1e14]: "Output : Input"
+              - generic [ref=f1e15]: 31.7×
+              - generic [ref=f1e16]: 30d 42.5× · 90d 22.1×
+              - generic [ref=f1e17]: "#1 — 83× field leader (0.38)"
+              - generic [ref=f1e18]: "SRC: 3.90M out ÷ 123K in"
+            - generic [ref=f1e19]:
+              - generic [ref=f1e20]: Tokens / task
+              - generic [ref=f1e21]: 767K
+              - generic [ref=f1e22]: "#1 — 3.6× more efficient"
+              - generic [ref=f1e23]: "SRC: 1.12B ÷ 1,465 tasks"
+            - generic [ref=f1e24]:
+              - generic [ref=f1e25]: Time / task
+              - generic [ref=f1e26]: 1.84 min
+              - generic [ref=f1e27]: "#1 — 3.2× faster"
+              - generic [ref=f1e28]: "SRC: ~45 hr ÷ 1,465 tasks"
+            - generic [ref=f1e29]:
+              - generic [ref=f1e30]: Cost / LOC
+              - generic [ref=f1e31]: $0.0007
+              - generic [ref=f1e32]: "plan · API: $0.044 · ccusage: $0.018"
+              - generic [ref=f1e33]: "#1 — < 1¢ per line"
+              - generic [ref=f1e34]: "SRC: $23.33 ÷ 35,242 LOC"
+        - generic [ref=f1e35]:
+          - text: "Testing methodology — not the same thing being measured:"
+          - generic [ref=f1e36]: "AA field: per-task isolated runs on SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, SWE-Atlas-QnA. Each task = one bug/issue."
+          - generic [ref=f1e37]: "MO§ES™: sustained operator work on App Hub (real product) over 7-day measurement window (2026-05-08 → 2026-05-14), 21 sessions, 7,327 turns. App Hub = 5 build days within the window (5/10–5/14), 35,242 LOC shipped. Cost/task ($0.017 sub · $1.05 API) computed similarly but not on cards. $/LOC: AA = cost_per_task ÷ 20 LOC industry convention. MO§ES = $23.33/wk sub ÷ 35,242 actual LOC."
+        - generic [ref=f1e38]:
+          - generic [ref=f1e39]:
+            - heading "1. Cache Hit Rate" [level=3] [ref=f1e40]
+            - generic [ref=f1e41]: Cache reuse % · higher better · MO§ES sustained multi-project
+            - generic [ref=f1e42]:
+              - generic [ref=f1e43]: 96.9%
+              - generic [ref=f1e44]: 96.2%
+              - generic [ref=f1e45]: 96.2%
+              - generic [ref=f1e46]: 96.1%
+              - generic [ref=f1e47]: 94.9%
+              - generic [ref=f1e48]: 94.5%
+              - generic [ref=f1e49]: 93.7%
+              - generic [ref=f1e50]: 92.8%
+              - generic [ref=f1e51]: 91.7%
+              - generic [ref=f1e52]: 87.8%
+              - generic [ref=f1e53]: 86.1%
+              - generic [ref=f1e54]: 85.3%
+              - generic [ref=f1e55]: 83.7%
+              - generic [ref=f1e56]: 79.8%
+            - generic [ref=f1e57]:
+              - generic [ref=f1e58]:
+                - generic [ref=f1e59]: MO§ES™
+                - text: CC+Opus 4.7+op
+              - generic [ref=f1e60]:
+                - generic [ref=f1e61]: Cursor CLI
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e62]:
+                - generic [ref=f1e63]: Claude Code
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e64]:
+                - generic [ref=f1e65]: Claude Code
+                - text: Kimi K2.6
+              - generic [ref=f1e66]:
+                - generic [ref=f1e67]: Codex
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e68]:
+                - generic [ref=f1e69]: Claude Code
+                - text: Sonnet 4.6 (Medium)
+              - generic [ref=f1e70]:
+                - generic [ref=f1e71]: Claude Code
+                - text: Opus 4.6 (Medium)
+              - generic [ref=f1e72]:
+                - generic [ref=f1e73]: Codex
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e74]:
+                - generic [ref=f1e75]: Cursor CLI
+                - text: Composer 2
+              - generic [ref=f1e76]:
+                - generic [ref=f1e77]: Cursor CLI
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e78]:
+                - generic [ref=f1e79]: Gemini CLI
+                - text: Gemini 3.1 Pro (High)
+              - generic [ref=f1e80]:
+                - generic [ref=f1e81]: Cursor CLI
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e82]:
+                - generic [ref=f1e83]: Claude Code
+                - text: GLM-5.1
+              - generic [ref=f1e84]:
+                - generic [ref=f1e85]: Claude Code
+                - text: DeepSeek V4 Pro (High)
+            - generic [ref=f1e86]: "SRC: cache_read 1.084B ÷ (1.084B + 34.83M cache_create + 123K input) = 96.88%"
+          - generic [ref=f1e87]:
+            - 'heading "2. Output : Fresh Input (log scale)" [level=3] [ref=f1e88]'
+            - generic [ref=f1e89]: Output tokens per fresh-input token · higher = denser signal
+            - generic [ref=f1e90]:
+              - generic [ref=f1e91]: 31.7×
+              - generic [ref=f1e92]: "0.38"
+              - generic [ref=f1e93]: "0.25"
+              - generic [ref=f1e94]: "0.24"
+              - generic [ref=f1e95]: "0.24"
+              - generic [ref=f1e96]: "0.17"
+              - generic [ref=f1e97]: "0.16"
+              - generic [ref=f1e98]: "0.15"
+              - generic [ref=f1e99]: "0.15"
+              - generic [ref=f1e100]: "0.14"
+              - generic [ref=f1e101]: "0.07"
+              - generic [ref=f1e102]: "0.06"
+              - generic [ref=f1e103]: "0.05"
+              - generic [ref=f1e104]: "0.04"
+            - generic [ref=f1e105]:
+              - generic [ref=f1e106]:
+                - generic [ref=f1e107]: MO§ES™
+                - text: CC+Opus 4.7+op
+              - generic [ref=f1e108]:
+                - generic [ref=f1e109]: Cursor CLI
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e110]:
+                - generic [ref=f1e111]: Claude Code
+                - text: Kimi K2.6
+              - generic [ref=f1e112]:
+                - generic [ref=f1e113]: Claude Code
+                - text: Sonnet 4.6 (Medium)
+              - generic [ref=f1e114]:
+                - generic [ref=f1e115]: Claude Code
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e116]:
+                - generic [ref=f1e117]: Codex
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e118]:
+                - generic [ref=f1e119]: Cursor CLI
+                - text: Composer 2
+              - generic [ref=f1e120]:
+                - generic [ref=f1e121]: Claude Code
+                - text: Opus 4.6 (Medium)
+              - generic [ref=f1e122]:
+                - generic [ref=f1e123]: Codex
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e124]:
+                - generic [ref=f1e125]: Gemini CLI
+                - text: Gemini 3.1 Pro (High)
+              - generic [ref=f1e126]:
+                - generic [ref=f1e127]: Cursor CLI
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e128]:
+                - generic [ref=f1e129]: Cursor CLI
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e130]:
+                - generic [ref=f1e131]: Claude Code
+                - text: GLM-5.1
+              - generic [ref=f1e132]:
+                - generic [ref=f1e133]: Claude Code
+                - text: DeepSeek V4 Pro (High)
+            - generic [ref=f1e134]: "SRC: 3,902,803 output ÷ 123,246 fresh input = 31.7× · 30d 42.5× · 90d/all-time 22.1×"
+          - generic [ref=f1e135]:
+            - heading "3. Tokens per Task" [level=3] [ref=f1e136]
+            - generic [ref=f1e137]: Total tokens · lower better
+            - generic [ref=f1e138]:
+              - generic [ref=f1e139]: 767K
+              - generic [ref=f1e140]: 2.74M
+              - generic [ref=f1e141]: 2.93M
+              - generic [ref=f1e142]: 3.24M
+              - generic [ref=f1e143]: 3.33M
+              - generic [ref=f1e144]: 3.33M
+              - generic [ref=f1e145]: 3.75M
+              - generic [ref=f1e146]: 4.27M
+              - generic [ref=f1e147]: 4.41M
+              - generic [ref=f1e148]: 4.92M
+              - generic [ref=f1e149]: 5.42M
+              - generic [ref=f1e150]: 6.20M
+              - generic [ref=f1e151]: 7.28M
+              - generic [ref=f1e152]: 8.88M
+            - generic [ref=f1e153]:
+              - generic [ref=f1e154]:
+                - generic [ref=f1e155]: MO§ES™
+                - text: CC+Opus 4.7+op
+              - generic [ref=f1e156]:
+                - generic [ref=f1e157]: Cursor CLI
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e158]:
+                - generic [ref=f1e159]: Cursor CLI
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e160]:
+                - generic [ref=f1e161]: Gemini CLI
+                - text: Gemini 3.1 Pro (High)
+              - generic [ref=f1e162]:
+                - generic [ref=f1e163]: Cursor CLI
+                - text: Composer 2
+              - generic [ref=f1e164]:
+                - generic [ref=f1e165]: Claude Code
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e166]:
+                - generic [ref=f1e167]: Cursor CLI
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e168]:
+                - generic [ref=f1e169]: Claude Code
+                - text: Opus 4.6 (Medium)
+              - generic [ref=f1e170]:
+                - generic [ref=f1e171]: Claude Code
+                - text: Sonnet 4.6 (Medium)
+              - generic [ref=f1e172]:
+                - generic [ref=f1e173]: Codex
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e174]:
+                - generic [ref=f1e175]: Codex
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e176]:
+                - generic [ref=f1e177]: Claude Code
+                - text: DeepSeek V4 Pro (High)
+              - generic [ref=f1e178]:
+                - generic [ref=f1e179]: Claude Code
+                - text: Kimi K2.6
+              - generic [ref=f1e180]:
+                - generic [ref=f1e181]: Claude Code
+                - text: GLM-5.1
+            - generic [ref=f1e182]: "SRC: 1.123B 7d total ÷ 1,465 task-equivs (7,327 turns ÷ 5) = 767K"
+        - generic [ref=f1e183]:
+          - generic [ref=f1e184]:
+            - heading "4. Time per Task" [level=3] [ref=f1e185]
+            - generic [ref=f1e186]: Wall time · lower better
+            - generic [ref=f1e187]:
+              - generic [ref=f1e188]: 1.8m
+              - generic [ref=f1e189]: 5.8m
+              - generic [ref=f1e190]: 6.2m
+              - generic [ref=f1e191]: 6.9m
+              - generic [ref=f1e192]: 7.0m
+              - generic [ref=f1e193]: 7.1m
+              - generic [ref=f1e194]: 7.6m
+              - generic [ref=f1e195]: 7.6m
+              - generic [ref=f1e196]: 7.8m
+              - generic [ref=f1e197]: 8.7m
+              - generic [ref=f1e198]: 9.2m
+              - generic [ref=f1e199]: 18.0m
+              - generic [ref=f1e200]: 21.6m
+              - generic [ref=f1e201]: 41.5m
+            - generic [ref=f1e202]:
+              - generic [ref=f1e203]:
+                - generic [ref=f1e204]: MO§ES™
+                - text: CC+Opus 4.7+op
+              - generic [ref=f1e205]:
+                - generic [ref=f1e206]: Claude Code
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e207]:
+                - generic [ref=f1e208]: Cursor CLI
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e209]:
+                - generic [ref=f1e210]: Codex
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e211]:
+                - generic [ref=f1e212]: Claude Code
+                - text: Opus 4.6 (Medium)
+              - generic [ref=f1e213]:
+                - generic [ref=f1e214]: Codex
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e215]:
+                - generic [ref=f1e216]: Cursor CLI
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e217]:
+                - generic [ref=f1e218]: Gemini CLI
+                - text: Gemini 3.1 Pro (High)
+              - generic [ref=f1e219]:
+                - generic [ref=f1e220]: Cursor CLI
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e221]:
+                - generic [ref=f1e222]: Cursor CLI
+                - text: Composer 2
+              - generic [ref=f1e223]:
+                - generic [ref=f1e224]: Claude Code
+                - text: Sonnet 4.6 (Medium)
+              - generic [ref=f1e225]:
+                - generic [ref=f1e226]: Claude Code
+                - text: DeepSeek V4 Pro (High)
+              - generic [ref=f1e227]:
+                - generic [ref=f1e228]: Claude Code
+                - text: GLM-5.1
+              - generic [ref=f1e229]:
+                - generic [ref=f1e230]: Claude Code
+                - text: Kimi K2.6
+            - generic [ref=f1e231]: "SRC: ~45 hr active ÷ 1,465 = 1.84 min"
+          - generic [ref=f1e232]:
+            - heading "5. Cost per LOC — all field models + MO§ES™ (log scale)" [level=3] [ref=f1e233]
+            - generic [ref=f1e234]: USD per line shipped · lower better · MO§ES plan basis $0.0007 leads field
+            - generic [ref=f1e235]:
+              - generic [ref=f1e236]: $0.0007
+              - generic [ref=f1e237]: $0.0035
+              - generic [ref=f1e238]: $0.018
+              - generic [ref=f1e239]: $0.038
+              - generic [ref=f1e240]: $0.044
+              - generic [ref=f1e241]: $0.050
+              - generic [ref=f1e242]: $0.051
+              - generic [ref=f1e243]: $0.062
+              - generic [ref=f1e244]: $0.063
+              - generic [ref=f1e245]: $0.073
+              - generic [ref=f1e246]: $0.076
+              - generic [ref=f1e247]: $0.080
+              - generic [ref=f1e248]: $0.080
+              - generic [ref=f1e249]: $0.10
+              - generic [ref=f1e250]: $0.11
+              - generic [ref=f1e251]: $0.11
+              - generic [ref=f1e252]: $0.20
+              - generic [ref=f1e253]: $0.26
+              - generic [ref=f1e254]: $3.30
+            - generic [ref=f1e255]:
+              - generic [ref=f1e256]:
+                - generic [ref=f1e257]: MO§ES™
+                - text: Plan basis · subscription
+              - generic [ref=f1e258]:
+                - generic [ref=f1e259]: Cursor CLI
+                - text: Composer 2
+              - generic [ref=f1e260]:
+                - generic [ref=f1e261]: Claude Code
+                - text: DeepSeek V4 Pro (High)
+              - generic [ref=f1e262]:
+                - generic [ref=f1e263]: Claude Code
+                - text: Kimi K2.6
+              - generic [ref=f1e264]:
+                - generic [ref=f1e265]: MO§ES™
+                - text: API equiv basis
+              - generic [ref=f1e266]:
+                - generic [ref=f1e267]: Cursor
+                - text: Industry low est.
+              - generic [ref=f1e268]:
+                - generic [ref=f1e269]: Claude Code
+                - text: Sonnet 4.6 (Medium)
+              - generic [ref=f1e270]:
+                - generic [ref=f1e271]: Claude Code
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e272]:
+                - generic [ref=f1e273]: Claude Code
+                - text: Opus 4.6 (Medium)
+              - generic [ref=f1e274]:
+                - generic [ref=f1e275]: Cursor CLI
+                - text: Opus 4.7 (Medium)
+              - generic [ref=f1e276]:
+                - generic [ref=f1e277]: Cursor CLI
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e278]:
+                - generic [ref=f1e279]: Gemini CLI
+                - text: Gemini 3.1 Pro (High)
+              - generic [ref=f1e280]:
+                - generic [ref=f1e281]: Cursor CLI
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e282]:
+                - generic [ref=f1e283]: Codex
+                - text: GPT-5.4 (Medium)
+              - generic [ref=f1e284]:
+                - generic [ref=f1e285]: Codex
+                - text: GPT-5.5 (Medium)
+              - generic [ref=f1e286]:
+                - generic [ref=f1e287]: Claude Code
+                - text: GLM-5.1
+              - generic [ref=f1e288]:
+                - generic [ref=f1e289]: Cursor
+                - text: Industry high est.
+              - generic [ref=f1e290]:
+                - generic [ref=f1e291]: Devin
+                - text: Industry low est.
+              - generic [ref=f1e292]:
+                - generic [ref=f1e293]: Devin
+                - text: Industry high est.
+            - generic [ref=f1e294]: "AA models: cost_per_task ÷ 20 LOC · Cursor/Devin: industry estimates · MO§ES plan: $23.33/wk ÷ 35,242 = $0.000662 · MO§ES API: $1,564.47 ÷ 35,242 = $0.0444"
+        - generic [ref=f1e295]:
+          - generic [ref=f1e296]: RAW DATA — 7-DAY MEASUREMENT WINDOW (2026-05-08 → 2026-05-14)
+          - generic [ref=f1e297]:
+            - generic [ref=f1e298]:
+              - generic [ref=f1e299]: Input
+              - generic [ref=f1e300]:
+                - generic [ref=f1e301]: 123,246
+                - generic [ref=f1e302]: fresh tokens in
+              - generic [ref=f1e303]: drives cache hit · out:in
+            - generic [ref=f1e304]:
+              - generic [ref=f1e305]: Output
+              - generic [ref=f1e306]:
+                - generic [ref=f1e307]: 3.90 M
+                - generic [ref=f1e308]: 3,902,803
+              - generic [ref=f1e309]: drives out:in
+            - generic [ref=f1e310]:
+              - generic [ref=f1e311]: Cache create
+              - generic [ref=f1e312]:
+                - generic [ref=f1e313]: 34.83 M
+                - generic [ref=f1e314]: 34,826,779
+              - generic [ref=f1e315]: drives cache hit
+            - generic [ref=f1e316]:
+              - generic [ref=f1e317]: Cache read
+              - generic [ref=f1e318]:
+                - generic [ref=f1e319]: 1.084 B
+                - generic [ref=f1e320]: 1,084,399,183
+              - generic [ref=f1e321]: drives cache hit
+            - generic [ref=f1e322]:
+              - generic [ref=f1e323]: Total tokens
+              - generic [ref=f1e324]:
+                - generic [ref=f1e325]: 1.123 B
+                - generic [ref=f1e326]: 1,123,252,011
+              - generic [ref=f1e327]: drives tokens/task · time/task
+          - generic [ref=f1e328]:
+            - generic [ref=f1e329]: ancillary inputs › 21 sessions · 7,327 turns · 1,465 tasks · ~45 hr active · 35,242 LOC · $23.33/wk plan
+            - generic [ref=f1e330]: $1,564.47 API equiv
+        - generic [ref=f1e331]:
+          - strong [ref=f1e332]: MO§ES™
+          - text: "= operator-augmented Claude Code, concurrent sessions, $100/mo Max plan · 7d window (2026-05-08 → 2026-05-14): 21 sessions · 7,327 turns · 1.12B tokens · $1,564.47 API-equivalent · App Hub: 35,242 LOC in 5 days · Sources: Token Dashboard API, ccusage report, App Hub wc -l count, artificialanalysis.ai/agents/coding-agents"
+    - paragraph [ref=e19]:
+      - text: Live HTML · all 13 published field models · full fidelity ·
+      - link "open standalone ↗" [ref=e20] [cursor=pointer]:
+        - /url: /img/benchmarks/poster
+    - paragraph [ref=e21]: Note · Numbers above reflect dashboard window (21 parent sessions). Revised kernels below reflect raw JSONL extraction — 98 session files including all subagents.
+    - generic [ref=e22]: Honest Comparison · MO§ES vs. Raw Field Average
+    - iframe [ref=e24]:
+      - generic [active] [ref=f2e1]:
+        - generic [ref=f2e2]:
+          - generic [ref=f2e3]:
+            - generic [ref=f2e4]: MO§ES™
+            - generic [ref=f2e5]: Five Measured Kernels · vs. Field Average · Raw JSONL · 98 Sessions · All Subagents
+          - generic [ref=f2e6]: Honest Comparison · Full Data
+        - generic [ref=f2e7]:
+          - generic [ref=f2e8]: MO§ES™ (raw JSONL)
+          - generic [ref=f2e10]: Field average (AA Coding Agent Index)
+        - generic [ref=f2e12]:
+          - generic [ref=f2e13]:
+            - generic [ref=f2e14]: I · Cache
+            - generic [ref=f2e15]: Cache Hit Rate
+            - generic [ref=f2e16]:
+              - generic [ref=f2e18]: 94.66%
+              - generic [ref=f2e21]: 91.45%
+            - generic [ref=f2e24]:
+              - generic [ref=f2e25]: MO§ES
+              - generic [ref=f2e26]: Field avg
+            - generic [ref=f2e27]: "+3.21pp · #1"
+          - generic [ref=f2e28]:
+            - generic [ref=f2e29]: II · Compression
+            - generic [ref=f2e30]: "Output : Input Ratio"
+            - generic [ref=f2e31]:
+              - generic [ref=f2e33]: 17.9×
+              - generic [ref=f2e36]: 0.18×
+            - generic [ref=f2e39]:
+              - generic [ref=f2e40]: MO§ES
+              - generic [ref=f2e41]: Field avg
+            - generic [ref=f2e42]: "102× field avg · #1"
+          - generic [ref=f2e43]:
+            - generic [ref=f2e44]: III · Efficiency
+            - generic [ref=f2e45]: Tokens per Task
+            - generic [ref=f2e46]:
+              - generic [ref=f2e48]: 810K
+              - generic [ref=f2e51]: 5.1M
+            - generic [ref=f2e54]:
+              - generic [ref=f2e55]: MO§ES
+              - generic [ref=f2e56]: Field avg
+            - generic [ref=f2e57]: "6.3× fewer tokens · #1"
+          - generic [ref=f2e58]:
+            - generic [ref=f2e59]: IV · Speed
+            - generic [ref=f2e60]: Time per Task
+            - generic [ref=f2e61]:
+              - generic [ref=f2e63]: 1.84m
+              - generic [ref=f2e66]: 12.8m
+            - generic [ref=f2e69]:
+              - generic [ref=f2e70]: MO§ES
+              - generic [ref=f2e71]: Field avg
+            - generic [ref=f2e72]: "6.9× faster · #1"
+          - generic [ref=f2e73]:
+            - generic [ref=f2e74]: V · Cost
+            - generic [ref=f2e75]: Cost per LOC
+            - generic [ref=f2e76]:
+              - generic [ref=f2e78]: $0.0007
+              - generic [ref=f2e81]: $0.052
+            - generic [ref=f2e84]:
+              - generic [ref=f2e85]: MO§ES
+              - generic [ref=f2e86]: Field avg
+            - generic [ref=f2e87]: "102× cheaper · #1"
+        - generic [ref=f2e88]:
+          - generic [ref=f2e89]: Raw Token Extraction · 98 Session Files · All Subagents Included
+          - generic [ref=f2e90]:
+            - generic [ref=f2e91]:
+              - generic [ref=f2e92]: Input
+              - generic [ref=f2e93]: 123K
+              - generic [ref=f2e94]: 123,246 fresh
+            - generic [ref=f2e95]:
+              - generic [ref=f2e96]: Output
+              - generic [ref=f2e97]: 3.9M
+              - generic [ref=f2e98]: 3,902,803
+            - generic [ref=f2e99]:
+              - generic [ref=f2e100]: Cache Create
+              - generic [ref=f2e101]: 34.8M
+              - generic [ref=f2e102]: 34,826,779
+            - generic [ref=f2e103]:
+              - generic [ref=f2e104]: Cache Read
+              - generic [ref=f2e105]: 1.08B
+              - generic [ref=f2e106]: 1,084,399,183
+            - generic [ref=f2e107]:
+              - generic [ref=f2e108]: Total
+              - generic [ref=f2e109]: 1.12B
+              - generic [ref=f2e110]: 1,123,252,011
+        - generic [ref=f2e111]: "Field data: artificialanalysis.ai/agents/coding-agents · Extracted 2026-05-14 · MO§ES window: 2026-05-08 → 2026-05-14 · 21 sessions · 7,327 turns · 35,242 LOC shipped · Operator: DJM / Ello Cello LLC · DOI: 10.5281/zenodo.18792459"
+    - paragraph [ref=e25]:
+      - text: Raw JSONL · 98 session files · all subagents · 2 bars per chart ·
+      - link "open standalone ↗" [ref=e26] [cursor=pointer]:
+        - /url: /img/benchmarks/poster_honest
+    - generic [ref=e27]: Honest Comparison · Portrait · With Cross-Cost Analysis
+    - iframe [ref=e29]:
+      - generic [ref=f3e2]:
+        - generic [ref=f3e3]:
+          - generic [ref=f3e4]: MO§ES™
+          - generic [ref=f3e5]: Honest · Full Data · Raw JSONL
+        - generic [ref=f3e6]:
+          - generic [ref=f3e7]: Five Measured Kernels · vs. Field Average
+          - generic [ref=f3e8]: seven days · 1,465 tasks · 35,242 LOC
+        - generic [ref=f3e9]:
+          - generic [ref=f3e10]:
+            - generic [ref=f3e11]: Input
+            - generic [ref=f3e12]: 123K
+            - generic [ref=f3e13]: 123,246 fresh
+          - generic [ref=f3e14]:
+            - generic [ref=f3e15]: Output
+            - generic [ref=f3e16]: 3.9M
+            - generic [ref=f3e17]: 3,902,803
+          - generic [ref=f3e18]:
+            - generic [ref=f3e19]: Cache Create
+            - generic [ref=f3e20]: 34.8M
+            - generic [ref=f3e21]: 34,826,779
+          - generic [ref=f3e22]:
+            - generic [ref=f3e23]: Cache Read
+            - generic [ref=f3e24]: 1.08B
+            - generic [ref=f3e25]: 1,084,399,183
+          - generic [ref=f3e26]:
+            - generic [ref=f3e27]: Total
+            - generic [ref=f3e28]: 1.12B
+            - generic [ref=f3e29]: 1,123,252,011
+        - generic [ref=f3e30]:
+          - table [ref=f3e31]:
+            - rowgroup [ref=f3e32]:
+              - row "Input Output Cache Create Cache Read Total Tasks / Turns LOC" [ref=f3e33]:
+                - columnheader [ref=f3e34]
+                - columnheader "Input" [ref=f3e35]
+                - columnheader "Output" [ref=f3e36]
+                - columnheader "Cache Create" [ref=f3e37]
+                - columnheader "Cache Read" [ref=f3e38]
+                - columnheader "Total" [ref=f3e39]
+                - columnheader "Tasks / Turns" [ref=f3e40]
+                - columnheader "LOC" [ref=f3e41]
+            - rowgroup [ref=f3e42]:
+              - row "MO§ES™ 123K 3.9M 34.8M 1.08B 1.12B 1,465 / 7,327 35,242" [ref=f3e43]:
+                - cell "MO§ES™" [ref=f3e44]
+                - cell "123K" [ref=f3e45]
+                - cell "3.9M" [ref=f3e46]
+                - cell "34.8M" [ref=f3e47]
+                - cell "1.08B" [ref=f3e48]
+                - cell "1.12B" [ref=f3e49]
+                - cell "1,465 / 7,327" [ref=f3e50]
+                - cell "35,242" [ref=f3e51]
+              - row "Field avg ~274M ~29.2M ~35M ~3.59B ~7.51B 1,465 / ~7,325 ~29,300" [ref=f3e52]:
+                - cell "Field avg" [ref=f3e53]
+                - cell "~274M" [ref=f3e54]
+                - cell "~29.2M" [ref=f3e55]
+                - cell "~35M" [ref=f3e56]
+                - cell "~3.59B" [ref=f3e57]
+                - cell "~7.51B" [ref=f3e58]
+                - cell "1,465 / ~7,325" [ref=f3e59]
+                - cell "~29,300" [ref=f3e60]
+          - generic [ref=f3e61]: "Field avg = mean of 17 published AA models · Cache Create not reported by AA · Cost: $23.33 (MO§ES) vs ~$1,845 (field) · Time: 44.9 hrs vs 311.8 hrs · Cache Write ~equal; Cache Read 3.3× more for field"
+        - generic [ref=f3e62]:
+          - generic [ref=f3e63]: MO§ES™ (raw JSONL)
+          - generic [ref=f3e65]: Field average (AA Index)
+        - generic [ref=f3e67]:
+          - generic [ref=f3e68]:
+            - generic [ref=f3e69]: I · Cache
+            - generic [ref=f3e70]: Cache Hit Rate
+            - generic [ref=f3e71]:
+              - generic [ref=f3e73]: 94.66%
+              - generic [ref=f3e76]: 91.45%
+            - generic [ref=f3e79]:
+              - generic [ref=f3e80]: MO§ES
+              - generic [ref=f3e81]: Field avg
+            - generic [ref=f3e82]: "+3.21pp · #1"
+          - generic [ref=f3e83]:
+            - generic [ref=f3e84]: Less fresh compute per session
+            - generic [ref=f3e85]:
+              - text: Every MO§ES session starts with
+              - strong [ref=f3e86]: 5,162 tokens of governance context already cached
+              - text: "— constitutional framework, coordination state, project history. The field starts cold every task. That 3.21pp gap understates the real advantage: MO§ES reads 1.08B from cache across 1,465 sessions. The field writes 35M fresh per task, reads it a few times, and discards it. Cache reuse — not hit rate — is the structural edge."
+        - generic [ref=f3e87]:
+          - generic [ref=f3e88]:
+            - generic [ref=f3e89]: II · Compression
+            - generic [ref=f3e90]: "Output : Input Ratio"
+            - generic [ref=f3e91]:
+              - generic [ref=f3e93]: 17.9×
+              - generic [ref=f3e96]: 0.176×
+            - generic [ref=f3e99]:
+              - generic [ref=f3e100]: MO§ES
+              - generic [ref=f3e101]: Field avg
+            - generic [ref=f3e102]: 102× more output per input token
+          - generic [ref=f3e103]:
+            - generic [ref=f3e104]: More output per token of fresh input
+            - generic [ref=f3e105]:
+              - text: To produce the same
+              - strong [ref=f3e106]: 3.9M output tokens
+              - text: ", the field average needs 24.1M input tokens. MO§ES needed 218K. The conservation cascade: cached context carries the semantic load so fresh input drives maximum output."
+              - strong [ref=f3e107]: The field average uses 102× more input to produce the same output.
+        - generic [ref=f3e108]:
+          - generic [ref=f3e109]:
+            - generic [ref=f3e110]: III · Efficiency
+            - generic [ref=f3e111]: Tokens per Task
+            - generic [ref=f3e112]:
+              - generic [ref=f3e114]: 810K
+              - generic [ref=f3e117]: 5.1M
+            - generic [ref=f3e120]:
+              - generic [ref=f3e121]: MO§ES
+              - generic [ref=f3e122]: Field avg
+            - generic [ref=f3e123]: 6.3× fewer tokens · same output
+          - generic [ref=f3e124]:
+            - generic [ref=f3e125]: Extra tokens the field would burn
+            - generic [ref=f3e126]:
+              - text: "Across 1,465 tasks:"
+              - strong [ref=f3e127]: MO§ES uses 1.12B tokens. The field needs 7.51B.
+              - text: "That 6.39B gap isn't smaller tasks — MO§ES shipped 35,242 LOC. It's reuse: governance context injected once, cached across every session, never recomputed."
+        - generic [ref=f3e128]:
+          - generic [ref=f3e129]:
+            - generic [ref=f3e130]: IV · Speed
+            - generic [ref=f3e131]: Time per Task
+            - generic [ref=f3e132]:
+              - generic [ref=f3e134]: 1.84m
+              - generic [ref=f3e137]: 12.8m
+            - generic [ref=f3e140]:
+              - generic [ref=f3e141]: MO§ES
+              - generic [ref=f3e142]: Field avg
+            - generic [ref=f3e143]: 6.9× faster · 267 hrs saved
+          - generic [ref=f3e144]:
+            - generic [ref=f3e145]: Hours saved across the window
+            - generic [ref=f3e146]:
+              - strong [ref=f3e147]: 44.9 hrs of compute vs 311.8 hrs
+              - text: for the same 1,465 tasks. The speed advantage isn't hardware — it's session bootstrapping. MO§ES sessions start with full system state already loaded. No ramp-up. No re-establishing context.
+              - strong [ref=f3e148]: Direct task engagement from message one.
+        - generic [ref=f3e149]:
+          - generic [ref=f3e150]:
+            - generic [ref=f3e151]: V · Cost
+            - generic [ref=f3e152]: Cost per LOC
+            - generic [ref=f3e153]:
+              - generic [ref=f3e155]: $0.0007
+              - generic [ref=f3e158]: $0.045
+            - generic [ref=f3e161]:
+              - generic [ref=f3e162]: MO§ES
+              - generic [ref=f3e163]: Field avg
+            - generic [ref=f3e164]: 102× cheaper per line shipped
+          - generic [ref=f3e165]:
+            - generic [ref=f3e166]: On 35,242 lines of production code
+            - generic [ref=f3e167]:
+              - strong [ref=f3e168]: $23.33 vs ~$1,845
+              - text: "for the same LOC output. MO§ES runs on a $23.33/week subscription — flat rate regardless of volume. The field pays per token at market rates. Token efficiency compounds the gap:"
+              - strong [ref=f3e169]: even at pay-per-token pricing, the 3.58× token advantage alone would cut the field's bill by over half.
+        - generic [ref=f3e170]:
+          - generic [ref=f3e171]: "Field: artificialanalysis.ai · extracted 2026-05-14"
+          - generic [ref=f3e172]: "MO§ES window: 2026-05-08 → 2026-05-14 · 98 sessions · all subagents · DOI: 10.5281/zenodo.18792459"
+    - paragraph [ref=e30]:
+      - text: Token breakdown · field cross-cost · per-kernel significance ·
+      - link "open standalone ↗" [ref=e31] [cursor=pointer]:
+        - /url: /img/benchmarks/poster_honest_portrait
+    - generic [ref=e32]: The Five Kernels
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e35]: Cache hit
+        - generic [ref=e36]: 94·66%
+        - generic [ref=e37]: "#1 · field avg 91·45%"
+      - generic [ref=e38]:
+        - generic [ref=e39]: "Out : In"
+        - generic [ref=e40]: 17·9×
+        - generic [ref=e41]: "#1 · 102× field avg"
+      - generic [ref=e42]:
+        - generic [ref=e43]: Tokens / task
+        - generic [ref=e44]: 810K
+        - generic [ref=e45]: "#1 · field avg 5·13M"
+      - generic [ref=e46]:
+        - generic [ref=e47]: Time / task
+        - generic [ref=e48]: 1·84 min
+        - generic [ref=e49]: "#1 · 6·9× faster"
+      - generic [ref=e50]:
+        - generic [ref=e51]: $ / LOC
+        - generic [ref=e52]: ·0007
+        - generic [ref=e53]: "#1 · < 1¢ per line"
+    - generic [ref=e54]: From Five Token Categories
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - generic [ref=e57]: Input
+        - generic [ref=e58]: 123,246
+        - generic [ref=e59]: fresh tokens in
+      - generic [ref=e60]:
+        - generic [ref=e61]: Output
+        - generic [ref=e62]: 3·90 M
+        - generic [ref=e63]: 3,902,803
+      - generic [ref=e64]:
+        - generic [ref=e65]: Cache Create
+        - generic [ref=e66]: 34·83 M
+        - generic [ref=e67]: 34,826,779
+      - generic [ref=e68]:
+        - generic [ref=e69]: Cache Read
+        - generic [ref=e70]: 1·084 B
+        - generic [ref=e71]: 1,084,399,183
+      - generic [ref=e72]:
+        - generic [ref=e73]: Total Tokens
+        - generic [ref=e74]: 1·123 B
+        - generic [ref=e75]: 1,123,252,011
+    - generic [ref=e76]: Methodology — Not the Same Thing Being Measured
+    - generic [ref=e77]:
+      - text: "AA field: per-task isolated runs on SWE-Bench-Pro-Hard-AA, Terminal-Bench v2, and SWE-Atlas-QnA benchmarks. Each task = one bug/issue, agent runs in clean session. MO§ES: sustained operator work on a real product (Application Hub) over a 7-day measurement window (2026-05-08 → 2026-05-14) — 21 sessions, 7,327 turns, 35,242 LOC shipped in 5 build days. Task-equivalents derived from"
+      - code [ref=e78]: 7,327 ÷ 5 turns/task = 1,465 tasks
+      - text: ". $/LOC: AA ="
+      - code [ref=e79]: cost_per_task ÷ 20 LOC
+      - text: (industry SWE-Bench convention). MO§ES =
+      - code [ref=e80]: $23.33/wk subscription ÷ 35,242 actual LOC = $0.000662
+      - text: . The convergence of leadership across both regimes — isolated benchmark runs and sustained product builds — is the structural result.
+    - generic [ref=e81]: VI · The Full Instrument
+    - figure "VI · Five kernels → five token categories · updated to raw JSONL · 98 sessions · all subagents" [ref=e83]:
+      - link "Five kernels and five token categories — updated raw JSONL numbers" [ref=e84] [cursor=pointer]:
+        - /url: img/benchmarks/card_06_combined.png
+        - img "Five kernels and five token categories — updated raw JSONL numbers" [ref=e85]
+      - generic [ref=e86]: VI · Five kernels → five token categories · updated to raw JSONL · 98 sessions · all subagents
+    - generic [ref=e87]: Honest Comparison · MO§ES vs. Field Average
+    - figure "All five kernels · MO§ES vs. field average · raw JSONL · 98 session files · all subagents" [ref=e89]:
+      - link "MO§ES vs. field average — all 5 kernels, raw JSONL" [ref=e90] [cursor=pointer]:
+        - /url: img/benchmarks/MOSES_UPDATED_VSRAW.png
+        - img "MO§ES vs. field average — all 5 kernels, raw JSONL" [ref=e91]
+      - generic [ref=e92]: All five kernels · MO§ES vs. field average · raw JSONL · 98 session files · all subagents
+    - generic [ref=e93]: Downloads
+    - generic [ref=e94]:
+      - link "Full poster · PDF" [ref=e95] [cursor=pointer]:
+        - /url: img/benchmarks/MOSES_BENCHMARK_POSTER.pdf
+      - link "Portrait · PNG" [ref=e96] [cursor=pointer]:
+        - /url: img/benchmarks/MOSES_HONEST_PORTRAIT.png
+      - link "Landscape · PNG" [ref=e97] [cursor=pointer]:
+        - /url: img/benchmarks/MOSES_UPDATED_VSRAW.png
+      - link "Honest comparison · PDF" [ref=e98] [cursor=pointer]:
+        - /url: img/benchmarks/MOSES_UPDATED_VSRAW.pdf
+      - link "Combined slide · PNG" [ref=e99] [cursor=pointer]:
+        - /url: img/benchmarks/card_06_combined.png
+      - link "Field source · Artificial Analysis" [ref=e100] [cursor=pointer]:
+        - /url: https://artificialanalysis.ai/agents/coding-agents
+    - paragraph [ref=e101]:
+      - text: "Field data extracted from artificialanalysis.ai/agents/coding-agents on 2026-05-14. MO§ES values measured from operator-reported 7-day window. Operator:"
+      - link "DJM · burnmydays" [ref=e102] [cursor=pointer]:
+        - /url: https://medium.com/@burnmydays
+      - text: · Ello Cello LLC.
+  - contentinfo [ref=e103]: Patent Portfolio · 63/877,177 · 63/883,018 · 19/426,028 · 63/991,282 · TM 99408355
