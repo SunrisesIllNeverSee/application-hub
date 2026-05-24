@@ -1,6 +1,6 @@
 # 3xCapital — Answers
 
-Source: [`submitted/3xcapital.md`](../submitted/3xcapital.md)
+Source: [`applications/3xcapital.md`](../applications/3xcapital.md)
 Submission date: 2026-05-13
 
 ---

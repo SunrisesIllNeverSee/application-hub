@@ -1,6 +1,6 @@
 # cyber.fund Monastery — Answers
 
-Source: [`submitted/cyberfund.md`](../submitted/cyberfund.md)
+Source: [`applications/cyberfund.md`](../applications/cyberfund.md)
 Submission date: 2026-05-23
 
 ---

@@ -1,6 +1,6 @@
 # Solo Fund (SFP) — Q→A Index
 
-- **canonical:** [`submitted/solo-fund.md`](../submitted/solo-fund.md)
+- **canonical:** [`applications/solo-fund.md`](../applications/solo-fund.md)
 - **form host:** Solo Founders Program apply form
 - **deadline noted on form:** May 22, 2026 (also program kickoff date)
 - **status:** Submitted

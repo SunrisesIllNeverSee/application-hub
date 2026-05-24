@@ -1,7 +1,7 @@
 # questions/ — Normalized Q→A Index per Program
 
 This folder is the **formatted layer** between submitted canonical records
-(`../submitted/<slug>.md`) and the parent application-hub's question
+(`../applications/<slug>.md`) and the parent application-hub's question
 archive pipeline. One file per submitted program, in a uniform Q→A shape,
 regardless of what shape the original submission was in (form, chat,
 agent, multi-step wizard).
