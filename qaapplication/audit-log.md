@@ -29,6 +29,7 @@ Most recent entries first. Append new entries at the top.
 
 - **2026-05** · **submitted (×2)** · `a16z-speedrun` · a16z Speedrun apply form. Submission #1 pitch deck = `mos2es.com/benchmarks`. Result: rejected. Submission #2 pitch deck `[CONFIRM]`. Result: pending. Canonical: `submitted/a16z-speedrun.md`.
 - **2026-05** · **submitted** · `unicorn-fund` · NextUnicorn.Fund (multi-track Google Forms). Status: L1 → L2 → pitch event completed → **15-min follow-up scheduled 2026-06-02** (active warm lead). Canonical: `submitted/unicorn-fund.md`. Submitted answers not preserved locally.
+- **2026-05** · **submitted** · `solo-fund` · Solo Founders Program (SFP). Form deadline + kickoff: 2026-05-22. Canonical: `submitted/solo-fund.md`. Submitted answers not preserved locally.
 
 ## Conventions
 
