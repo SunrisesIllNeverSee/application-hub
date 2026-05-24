@@ -1,6 +1,6 @@
 # 3xCapital — Q→A Index
 
-- **canonical:** [`applications/3xcapital.md`](../applications/3xcapital.md)
+- **canonical:** [`03-applications/3xcapital.md`](../../03-applications/3xcapital.md)
 - **form host:** Tally — tally.so/r/mRdP14
 - **submission date:** 2026-05-13
 - **status:** Submitted, awaiting response

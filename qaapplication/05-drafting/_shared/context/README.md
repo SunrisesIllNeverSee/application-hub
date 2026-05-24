@@ -28,7 +28,7 @@ Anything that shapes the answer. Examples:
 - Project milestones, recent shipments, demo links, traction numbers
 - Voice / tone preferences ("write like X", "avoid Y")
 - Specific stories or proof points you want pulled in
-- **Counter-context**: things in `applications/a16z-speedrun.md` that are
+- **Counter-context**: things in `03-applications/a16z-speedrun.md` that are
   now OUT OF DATE and should not be reused as-is
 - Third-party answers (cofounder, advisor, customer, mentor) — paste their
   reply under a `### From <name>` header so I can attribute properly

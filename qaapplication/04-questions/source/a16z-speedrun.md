@@ -1,7 +1,7 @@
 # a16z Speedrun — Q→A Index
 
-- **canonical:** [`applications/a16z-speedrun.md`](../applications/a16z-speedrun.md)
-- **submission marker:** [`inbox/done/a16z-speedrun-submitted-2026-05.md`](../inbox/done/a16z-speedrun-submitted-2026-05.md)
+- **canonical:** [`03-applications/a16z-speedrun.md`](../../03-applications/a16z-speedrun.md)
+- **submission marker:** [`01-inbox/done/a16z-speedrun-submitted-2026-05.md`](../inbox/done/a16z-speedrun-submitted-2026-05.md)
 - **form host:** a16z.com/apply/form
 - **submission date:** Mid-May 2026 (×2 submissions; second pending)
 - **status:** Submission #1 rejected → Submission #2 pending

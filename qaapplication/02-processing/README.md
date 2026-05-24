@@ -1,15 +1,15 @@
-# processing/ — Multi-Program Captures Being Triaged
+# 02-processing/ — Multi-Program Captures Being Triaged
 
 **Step 2** of the pipeline. A capture that contains multiple programs
 at once (e.g. a Safari tabs export with 14 URLs inside) lives here
 until every program candidate inside is either:
 
-- extracted into its own `../drafting/<slug>.md`, or
+- extracted into its own `../05-drafting/<slug>.md`, or
 - marked `skip` in a sibling `<capture>.todo.md` triage file.
 
 Single-program captures don't pass through this folder — they go
-`inbox/ → drafting/` directly.
+`01-inbox/ → 05-drafting/` directly.
 
 Once every candidate in a multi-program capture is resolved, the
-capture and its todo file move together to `../drafting/_shared/raw/`
-(or get archived) and an entry lands in `../audit-log.md`.
+capture and its todo file move together to `../05-drafting/_shared/raw/`
+and an entry lands in `../audit-log.md`.

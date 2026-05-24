@@ -125,11 +125,11 @@ Each row is one tab. Status meaning:
    name, program type, visible deadline. Existing repo helpers live in
    `seed/staging/` (`apply_url_results/`, `extract_batch03.py`).
 2. For each confirmed candidate, write a YAML stub under
-   `inbox/processing/candidates/` mirroring the fields in
+   `01-inbox/processing/candidates/` mirroring the fields in
    `seed/programs/*.sql` (slug, name, type, url, host, applies_open_at).
 3. Promote validated stubs to `seed/staging/`, then write production SQL in
    `seed/programs/<slug>.sql` using an existing file as a template.
-4. Move this capture + verdicts to `inbox/done/`.
+4. Move this capture + verdicts to `01-inbox/done/`.
 
 ## Verdicts (filled in as items resolve)
 

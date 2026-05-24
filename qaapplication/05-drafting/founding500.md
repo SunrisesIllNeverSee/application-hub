@@ -6,7 +6,7 @@
 - **Type:** Cohort program for agent-first founders
 - **Form host:** Airtable
 - **Deadline:** Not visible on form (`[CONFIRM]`)
-- **Extracted from:** `inbox/done/founding500.html` (raw DOM dump, 2026-05-23)
+- **Extracted from:** `01-inbox/done/founding500.html` (raw DOM dump, 2026-05-23)
 
 ## Form structure (~13 fields, 4 sections, only 4 essays)
 
@@ -52,7 +52,7 @@
 - `context/003-fde-positioning.md` (for Q9 / category-gap)
 - `sources/mos2es-com-field-sheet.md` (for Q10 specifics)
 - `sources/mos2es-com-benchmarks.md` (for Q10 numbers)
-- `applications/a16z-speedrun.md` (for Q12 bio tone)
+- `03-applications/a16z-speedrun.md` (for Q12 bio tone)
 - `draft/redbud.md` Q19 (founder-essay beats — already drafted)
 
 ## Status

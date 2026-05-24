@@ -1,7 +1,7 @@
 # NextUnicorn.Fund — Q→A Index
 
-- **canonical:** [`applications/unicorn-fund.md`](../applications/unicorn-fund.md)
-- **submission marker:** [`inbox/done/unicorn-fund-submitted-2026-05.md`](../inbox/done/unicorn-fund-submitted-2026-05.md)
+- **canonical:** [`03-applications/unicorn-fund.md`](../../03-applications/unicorn-fund.md)
+- **submission marker:** [`01-inbox/done/unicorn-fund-submitted-2026-05.md`](../inbox/done/unicorn-fund-submitted-2026-05.md)
 - **form host:** Google Forms (multi-track: VC / Accelerator / Mentorship / Idea2Unicorn / StartUp Battle)
 - **submission date:** Mid-May 2026 `[CONFIRM]`
 - **status:** **L2 escalated · pitch event completed · 15-min follow-up scheduled 2026-06-02** (most advanced active lead)
@@ -12,7 +12,7 @@
 > **Note on this file:** the local capture is the form structure (questions
 > only) plus the auto "Thank You" page proving submission. Submitted
 > answer text is not preserved locally. Where helpful, the canonical
-> answer-shape from `applications/a16z-speedrun.md` and other records can
+> answer-shape from `03-applications/a16z-speedrun.md` and other records can
 > be inferred but should not be assumed verbatim.
 
 ## Form intro (as captured)
@@ -89,7 +89,7 @@
 
 ## Post-submission flow (as documented in the canonical record)
 
-1. **Confirmation page received** — auto "Thank You" page captured in `applications/unicorn-fund.md` lines 84-107.
+1. **Confirmation page received** — auto "Thank You" page captured in `03-applications/unicorn-fund.md` lines 84-107.
 2. **L1 Calendly meeting** — completed (Asia & ME calendly per the form's flow; `[CONFIRM L1 partner name and date]`).
 3. **L2 partner call** — escalated and completed (`[CONFIRM date + partner name]`).
 4. **Pitch event** — completed (likely NextUnicorn StartUp Battle; `[CONFIRM event date]`).
@@ -101,7 +101,7 @@ The questions in this file are the form's question SET (preserved cleanly
 for the question-archive pipeline). What's missing is your verbatim
 answer set. If you have a record of what you actually submitted (browser
 autofill, screenshot, copy-paste before submit), drop it into
-[`applications/unicorn-fund.md`](../applications/unicorn-fund.md) and
+[`03-applications/unicorn-fund.md`](../../03-applications/unicorn-fund.md) and
 I'll backfill this file. Otherwise this file stays as a question-only
 capture — still useful for the question archive, just not for the answer
 data bank from this program.

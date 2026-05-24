@@ -6,7 +6,7 @@ Sources drawn from (in priority order):
 - `context/003-fde-positioning.md` (category-gap argument)
 - `context/001-moses-constitutional-frame.md` + `002-moses-translation-layer.md`
 - `sources/mchenry-axioms.md` + `conservation-law-paper-notes.md` + `mos2es-com-field-sheet.md` + `mos2es-com-benchmarks.md` + `fde-thread-notes.md`
-- `applications/a16z-speedrun.md` (bio + tone reference)
+- `03-applications/a16z-speedrun.md` (bio + tone reference)
 
 Convention: each answer is plain prose drafted to be paste-able into the Tally form. Source footnote in italics. `[CONFIRM]` tag flags items Deric needs to verify.
 

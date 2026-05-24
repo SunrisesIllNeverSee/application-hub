@@ -50,4 +50,4 @@
 
 ## Raw source
 
-[`drafting/_shared/raw/3xcapital-raw.md`](../drafting/_shared/raw/3xcapital-raw.md) — original Tally form capture with both structure and filled answers.
+[`05-drafting/_shared/raw/3xcapital-raw.md`](../drafting/_shared/raw/3xcapital-raw.md) — original Tally form capture with both structure and filled answers.

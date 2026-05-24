@@ -6,7 +6,7 @@
 - **Type:** Top-tier accelerator
 - **Form host:** YC's own (custom React-ish form, well-structured field names)
 - **Deadline:** Summer 2026 batch — `[CONFIRM deadline; typically Feb/March for S-batch]`
-- **Extracted from:** `inbox/done/yc.html` (raw DOM dump, 2026-05-23)
+- **Extracted from:** `01-inbox/done/yc.html` (raw DOM dump, 2026-05-23)
 
 ## Form structure (~25 fields, including Summer 2026's experimental coding-agent question)
 
@@ -84,7 +84,7 @@
 - All four `context/` files (especially `004-commitment-physics-framing.md` and `003-fde-positioning.md`)
 - All `sources/` (paper notes, axioms, benchmarks, field-sheet, FDE thread)
 - `draft/redbud.md` (Q19 + Q22 already drafted, structurally reusable)
-- `applications/a16z-speedrun.md` (bio + tone reference)
+- `03-applications/a16z-speedrun.md` (bio + tone reference)
 
 ## Status
 

@@ -1,6 +1,6 @@
 # a16z Speedrun — Answers
 
-Source: [`applications/a16z-speedrun.md`](../applications/a16z-speedrun.md)
+Source: [`03-applications/a16z-speedrun.md`](../../03-applications/a16z-speedrun.md)
 Submission date: Mid-May 2026
 
 ---
