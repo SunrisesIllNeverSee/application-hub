@@ -45,6 +45,13 @@ sessions:
     status: wrapped
     note: canonical rebuild scaffold from Grok deep dive transcript — landed in b0f8baa
 
+  - id: claude-2026-05-24-qaapplication
+    surface: vscode-claude
+    started_at: 2026-05-24T00:00:00Z
+    heartbeat: 2026-05-24T18:00:00Z
+    status: active
+    note: qaapplication-scope restructure + per-program indexing (sequential pipeline). Coordinates with codex on parent migration work (Codex owns 047+).
+
 claims:
   - id: claim-2026-05-11-001
     session: vscode-claude-2026-05-11
@@ -231,3 +238,19 @@ claims:
     heartbeat: 2026-05-20T22:29:56Z
     released_at: 2026-05-20T22:29:56Z
     landed_commits: [b0f8baa]
+
+  - id: claim-2026-05-24-qaapplication-restructure
+    session: claude-2026-05-24-qaapplication
+    type: file_lane
+    paths:
+      - qaapplication/
+    purpose: >
+      qaapplication workspace restructure into sequential 7-lane pipeline
+      (01-inbox → 02-processing → 03-programs → 04-applications →
+      05-questions → 06-workshop → 07-answers) + audit-log.md. Per-program
+      indexing of 5 submitted applications + 4 in-workshop drafts +
+      anthonya-angel raw drop. All qaapplication-scope only; no parent
+      Supabase or migration work (Codex owns that lane).
+    acquired_at: 2026-05-24T00:00:00Z
+    heartbeat: 2026-05-24T18:00:00Z
+    released_at: null
