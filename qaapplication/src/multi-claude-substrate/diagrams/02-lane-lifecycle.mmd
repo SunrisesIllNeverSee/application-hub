@@ -1,0 +1,27 @@
+stateDiagram-v2
+    [*] --> unclaimed: lane exists, no holder
+
+    unclaimed --> claimed: session appends entry to claims.yaml<br/>(slug + session_id + claimed_at)
+
+    claimed --> active: session is working
+    active --> active: heartbeat updates<br/>(commit cadence)
+
+    active --> released: work lands<br/>(set released_at)
+    active --> abandoned: session crashes / context lost<br/>(no released_at, heartbeat goes stale)
+
+    released --> [*]: lane re-opens
+    abandoned --> reaped: another session marks abandoned<br/>(after stale heartbeat threshold)
+    reaped --> [*]: lane re-opens
+
+    note right of claimed
+        Claim is a commit.
+        Visible in git log.
+        Other sessions see it on start.
+    end note
+
+    note right of abandoned
+        Phase A has no automated reaping.
+        Stale claims must be manually
+        released by a future session
+        that notices them.
+    end note

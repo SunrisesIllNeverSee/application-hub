@@ -1,0 +1,29 @@
+flowchart TD
+    START([session opens repo]) --> R1[read .agents/registry.yaml]
+    R1 --> R2[read .agents/claims.yaml]
+    R2 --> R3[read SCRATCH.md tail]
+    R3 --> R4{any unreleased claims<br/>that overlap intended work?}
+
+    R4 -- yes --> WAIT[either: pick a different lane<br/>OR: coordinate via SCRATCH/MULTI_CLAUDE]
+    R4 -- no --> CLAIM[append claim entry<br/>to claims.yaml]
+
+    WAIT --> R4
+    CLAIM --> COMMIT[claim commit<br/>git push]
+    COMMIT --> WORK[work the lane]
+
+    WORK --> CHANGED{did counts /<br/>migration chain /<br/>shipped-state truth change?}
+
+    CHANGED -- yes --> REGUP[update registry.yaml<br/>in same commit as the work]
+    CHANGED -- no --> RELEASE
+
+    REGUP --> RELEASE[set released_at on claim]
+    RELEASE --> WRAP[optional: append to SCRATCH.md<br/>what shipped, what's next]
+    WRAP --> END([session wraps])
+
+    classDef io fill:#161616,stroke:#444,color:#ddd
+    classDef decision fill:#1a1a1a,stroke:#C4923A,color:#fff
+    classDef action fill:#161616,stroke:#555,color:#bbb
+
+    class R1,R2,R3 io
+    class R4,CHANGED decision
+    class CLAIM,COMMIT,WORK,REGUP,RELEASE,WRAP,WAIT action

@@ -1,0 +1,61 @@
+flowchart TB
+    subgraph Sessions["AI Sessions (parallel, any surface)"]
+        S1[Claude · vscode-claude<br/>session A]
+        S2[Codex · CLI<br/>session B]
+        S3[Cowork / Devin<br/>session C]
+    end
+
+    subgraph Ledgers[".agents/ — machine-readable truth"]
+        REG[(registry.yaml<br/>shipped state)]
+        CLM[(claims.yaml<br/>lane holders)]
+    end
+
+    subgraph Human["Human-readable mirror"]
+        STAT[STATUS.md]
+    end
+
+    subgraph Threads["Append-only conversation"]
+        SCR[SCRATCH.md<br/>repo-local thread]
+        MC[~/Desktop/MULTI_CLAUDE.md<br/>cross-workspace bus]
+    end
+
+    subgraph Durable["Durable audit"]
+        GIT[(git history<br/>commit graph)]
+    end
+
+    S1 -- reads on start --> REG
+    S1 -- reads on start --> CLM
+    S1 -- reads on start --> SCR
+    S2 -- reads on start --> REG
+    S2 -- reads on start --> CLM
+    S2 -- reads on start --> SCR
+    S3 -- reads on start --> REG
+    S3 -- reads on start --> CLM
+
+    S1 -. claims lane .-> CLM
+    S2 -. claims lane .-> CLM
+    S3 -. claims lane .-> CLM
+
+    S1 -. updates counts .-> REG
+    S2 -. updates counts .-> REG
+
+    REG -. rendered into .-> STAT
+
+    S1 -. appends .-> SCR
+    S2 -. appends .-> SCR
+    S1 -. cross-repo handoff .-> MC
+
+    REG --> GIT
+    CLM --> GIT
+    SCR --> GIT
+    STAT --> GIT
+
+    classDef session fill:#1a1a1a,stroke:#C4923A,color:#fff
+    classDef ledger fill:#161616,stroke:#444,color:#ddd
+    classDef thread fill:#161616,stroke:#555,color:#bbb
+    classDef durable fill:#0d0d0d,stroke:#C4923A,color:#C4923A
+
+    class S1,S2,S3 session
+    class REG,CLM,STAT ledger
+    class SCR,MC thread
+    class GIT durable
