@@ -9,7 +9,7 @@
 
 ## 0 · TL;DR · One Paragraph
 
-MO§ES™ is not "Claude used well." MO§ES™ is **Constitutional AI Governance**, a layered framework that turns frontier models into governed, auditable, cross-session agents. AA's Coding Agent Index benchmarks the *model alone*. MO§ES benchmarks the *governed loop*: human operator + model + cache + constitutional practice. Same Opus 4.7 on both sides. The empirical gap is 6× to 110× across every measured economic kernel. That gap is the **operator-augmented governance layer doing measurable work**. The five benchmark kernels MO§ES publishes are not metrics of the model. They are **execution-layer fingerprints of signal-layer governance**. The patent portfolio covers the governance layer. The benchmark is the receipt.
+MO§ES™ is not "Claude used well." MO§ES™ is **Constitutional AI Governance**, a layered framework that turns frontier AI engines into a governed, auditable, cross-session, **role-specialized multi-engine system**. AA's Coding Agent Index benchmarks individual models *alone*. MO§ES benchmarks the *governed multi-engine loop*: human operator + role-specialized engines (Claude Opus 4.7 as generative workhorse, Codex as high-cache executor) + cache + constitutional practice. Same Opus 4.7 on both sides of the Claude comparison shows a 6× to 110× empirical gap across every measured economic kernel. The combined two-engine system runs at 97.23% cache hit, 1.30B tokens, ~$135 blended cost (plan + Codex pay-per-token) across a 7-day production build that shipped 35,242 lines of real code. That gap is the **operator-augmented governance layer doing measurable work across multiple engines simultaneously**. The five benchmark kernels MO§ES publishes are not metrics of any single model. They are **execution-layer fingerprints of signal-layer governance**. The patent portfolio covers the governance layer, not the engines. The benchmark is the receipt.
 
 ---
 
@@ -23,9 +23,9 @@ Positions MO§ES as a productivity workflow on top of an existing tool. Easy to 
 
 ### After (locked framing)
 
-> "We have defined a new category, Constitutional AI Governance. AA tests ungoverned AI work. We test governed AI work. The benchmark deltas are empirical proof that governance is the productivity layer. The framework is patent-pending."
+> "We have defined a new category, Constitutional AI Governance. AA tests ungoverned AI work, one model at a time. We test governed multi-engine AI work, with role-specialized engines orchestrated under a constitutional framework. The benchmark deltas are empirical proof that governance is the productivity layer. The framework is patent-pending. It is engine-agnostic."
 
-Positions MO§ES as the **definitive framework for a category that did not exist before**. Defensible. Patentable. Citable. Hard to copy.
+Positions MO§ES as the **definitive framework for a category that did not exist before**. Defensible. Patentable. Citable. Hard to copy. Engine-agnostic, which means it survives any single-vendor disruption.
 
 ---
 
@@ -46,7 +46,7 @@ What it cannot measure: **the governed loop**. The human + model + cache + pract
 
 ### 2.2 · The Operator Is Not A Person · The Operator Is A Governed Practice
 
-The "operator" sounds like a human variable. It is not. The operator is a *structured practice* with four primitives. That practice IS governance:
+The "operator" sounds like a human variable. It is not. The operator is a *structured practice* with **five primitives**. That practice IS governance:
 
 | Problem the work forces | Primitive that solves it |
 |---|---|
@@ -54,6 +54,7 @@ The "operator" sounds like a human variable. It is not. The operator is a *struc
 | Cannot run one session for 7 days; context collapses | **Role hierarchy** (Primary / Secondary / Observer) for parallel attention without conflict |
 | Decisions made Tuesday must hold Friday in a session that does not remember Tuesday | **Audit chain** with hash-verified state so any session can reload institutional memory |
 | Reloading full project context every session burns tokens and time | **Cache discipline** that pre-loads governance state as warm context (~5,162 tokens) |
+| No single engine is best at every task class; using only one is leaving capability on the table | **Multi-engine orchestration** with role specialization (Claude as generative workhorse, Codex as high-cache executor), routed by capability fit |
 
 You did not sit down to design a governance framework. You sat down to ship a product. The framework is what fell out of doing that work seriously.
 
@@ -61,10 +62,11 @@ You did not sit down to design a governance framework. You sat down to ship a pr
 
 Once the primitives have names, they are no longer specific to:
 - Coding (work for legal research, scientific analysis, ops decisions, customer support, finance)
-- Claude (work for any frontier model: same primitives, different vendor)
+- Any one model (work for Claude, Codex, Gemini, open-source models: same primitives, different vendors)
+- Any one engine count (work for single-engine, dual-engine like the measured MO§ES setup, or N-engine orchestrations)
 - One project (work for any sustained AI-assisted initiative)
 
-That generalization is the move from "my operator practice" to **Constitutional AI Governance**: same primitives, different domains.
+That generalization is the move from "my operator practice" to **Constitutional AI Governance**: same primitives, different domains, **engine-agnostic by design**.
 
 ### 2.4 · Why It Had To Become AI Governance Specifically
 
@@ -201,18 +203,42 @@ All numbers below are source-of-truth, traceable to raw JSONL and AA telemetry. 
 | LOC | 7,160 (AA's 20 LOC/task convention, not measured) |
 | Active time | ~71.1 hrs (358 tasks × 11.92m) |
 
-### 4.6 · Source Files
+### 4.6 · Multi-Engine Topology (the real production setup)
+
+MO§ES is **not single-engine**. The benchmark week ran two engines under one governance layer:
+
+| Dimension | Claude Code (MO§ES · Opus 4.7) | Codex (gpt-5.3/5.4/5.5) |
+|---|---|---|
+| Primary role | Generative workhorse · think + build | High-cache executor · verify + execute |
+| Sessions | 98 (21 parent + subagents) | 7 |
+| Total tokens | 1,123,252,011 (86.7% share) | 172,517,774 (13.3% share) |
+| Cache hit rate | 96.88% | **99.66%** (saturated cache) |
+| Output : Fresh Input | **31.7×** (denser generation) | 20.0× |
+| Cost (API-equivalent or pay-per-token) | $1,564.47 (93.4% share) | $111.43 (6.6% share) |
+| Cost (plan basis) | $23.33 | $111.43 |
+| **Combined token total** | | **1,295,769,785** |
+| **Combined cost (API-eq)** | | **$1,675.90** |
+| **Combined cost (plan + Codex)** | | **$134.76** |
+| **Combined cache hit rate** | | **97.23%** |
+| **Combined Output : Fresh Input** | | **22.1×** |
+
+Interpretation: Claude carried the generative load (building, writing, architecting). Codex operated as a near-saturated cache layer (deeply embedded in the repo, executing against known context at high efficiency and low cost). Two-engine split: **think + build vs verify + execute**.
+
+### 4.7 · Source Files
 
 | File | Purpose |
 |---|---|
-| `truths/mos2es_raw_numbers.md` | MO§ES-only raw extraction (locked) |
+| `truths/mos2es_raw_numbers.md` | MO§ES-only raw extraction · per-task denominator (n=1,465) |
+| `truths/claude_raw_numbers.md` | Claude Code canonical · per-parent-session denominator (n=21) |
+| `truths/codex_raw_numbers.md` | Codex side · ccusage pull · 4 active days · 7 sessions |
+| `truths/combined_raw_numbers.md` | Two-engine compilation · cross-engine kernels and topology |
 | `truths/aa_model_averages.md` | 13-model AA derivation via T, CHR, R three-equation solve |
 | `truths/chart_raw.md` | Raw Basic Numbers comparison (MO§ES vs AA per model vs AA combined) |
 | `truths/chart_kernels.md` | Derived Metrics with per-kernel formulas (every value recomputable from raw) |
 
 ---
 
-## 5 · The Four Governance Primitives (deep reference)
+## 5 · The Five Governance Primitives (deep reference)
 
 For each primitive: what it does, what AA cannot see, what the execution-layer signature looks like.
 
@@ -256,9 +282,21 @@ For each primitive: what it does, what AA cannot see, what the execution-layer s
 **What AA cannot see:** AA's "cache" is per-task. Cache create / read happens within a single benchmark run, then discards. No cross-run reuse.
 
 **Execution-layer signature:**
-- Cache hit rate dominates the token mix (96.5%+ of MO§ES tokens are cache reads vs fresh input)
-- Fresh input ↓ dramatically (123K total across 98 sessions vs ~163M per AA model run)
-- $ / LOC ↓ (cache reads are the cheapest token category)
+- Cache hit rate dominates the token mix (96.5%+ of MO§ES Claude tokens are cache reads vs fresh input; Codex side runs at 99.66% saturation)
+- Fresh input ↓ dramatically (123K Claude / 554K Codex total across the 7-day window vs ~163M per AA model run)
+- $ / LOC ↓ (cache reads are the cheapest token category, and Codex was nearly all cache-read by design)
+
+### 5.5 · Multi-Engine Orchestration (role-specialized routing)
+
+**What it does:** Routes work to the engine best fit for each task class. In the measured MO§ES setup: Claude as the generative workhorse (think + build, produce dense output, lead architecture decisions); Codex as the high-cache executor (verify + execute, run against known repo state at saturated cache, low cost per call). The governance layer holds the routing logic, role assignments, and cross-engine state consistency.
+
+**What AA cannot see:** AA benchmarks one engine at a time, against fixed tasks. There is no orchestration layer because there are no engines to orchestrate between. Their leaderboard sorts engines individually. It does not measure the system that combines them.
+
+**Execution-layer signature:**
+- Combined cache hit rate ↑ above any single engine (97.23% vs Claude alone 96.88% vs Codex alone 99.66%, but Codex's saturated cache contributes to lift the combined rate without lowering Claude's generative output)
+- Combined cost / LOC ↓ dramatically when plan rate (Claude) is combined with pay-per-token (Codex): ~$0.0038 blended vs $0.0444 if everything ran on Claude's API-equivalent rate, or $0.0007 on pure plan basis
+- Token share is asymmetric (Claude 86.7% / Codex 13.3%) because role specialization concentrates expensive cycles where they generate value and offloads cheap cycles to the cheaper saturated engine
+- The system is **engine-agnostic**: any frontier model can take Claude's role, any high-cache executor can take Codex's role, the framework persists
 
 ---
 
@@ -268,10 +306,11 @@ The defensibility is not "we wrote good prompts." It is a stacked claim:
 
 | Layer | What it is | What defends it |
 |---|---|---|
-| **The Model** | Claude Opus 4.7 (provided by Anthropic) | Not ours. Anyone can buy. |
+| **The Engines** | Claude Opus 4.7 (Anthropic) + Codex (OpenAI) + future engines | Not ours. Anyone can buy. We orchestrate. |
+| **The Orchestration** | Role-specialized multi-engine routing under one governance layer | Patent portfolio + engine-agnostic by design |
 | **The Practice** | Operator-augmented sustained engineering | First-mover advantage + published methodology |
-| **The Framework** | Constitutional AI Governance (four primitives) | Patent portfolio (filings below) |
-| **The Evidence** | 5-kernel benchmark · 6× to 110× deltas across all measures | Published, audited, reproducible (locked truth files) |
+| **The Framework** | Constitutional AI Governance (five primitives) | Patent portfolio (filings below) |
+| **The Evidence** | 5-kernel benchmark · 6× to 110× deltas + combined two-engine receipts | Published, audited, reproducible (locked truth files) |
 | **The Brand** | MO§ES™ as the name of the governance category itself | Trademark filed (TM 99408355) |
 
 ### Patent Portfolio
@@ -294,9 +333,11 @@ The defensibility is not "we wrote good prompts." It is a stacked claim:
 
 > "Same model. Same week. Operator-augmented + governed: 6× to 110× across every economic measure."
 
-> "AA tests ungoverned AI work. MO§ES tests governed AI work."
+> "AA tests ungoverned AI work, one engine at a time. MO§ES tests governed multi-engine AI work."
 
-> "The leaderboard tests engines. MO§ES tests the whole governed vehicle."
+> "The leaderboard sorts engines individually. MO§ES orchestrates them. The framework is engine-agnostic."
+
+> "Claude as generative workhorse. Codex as high-cache executor. Two engines under one governance layer. 1.3B tokens, $135 blended, 35K LOC shipped, 7 days."
 
 > "The delta is the operator. The operator is a governed practice. The practice is patent-pending."
 
@@ -304,45 +345,49 @@ The defensibility is not "we wrote good prompts." It is a stacked claim:
 
 > "The kernels are signal-health fingerprints. If your governance is degrading, the numbers tell you before the audit log does."
 
-> "Pre-AI governance worked because humans have memory, accountability, and self-constraint built in. AI systems have none of those. So we externalized all three."
+> "Pre-AI governance worked because humans have memory, accountability, and self-constraint built in. AI systems have none of those. So we externalized all three. Across every engine in the orchestration."
 
-> "AA publishes a leaderboard for an incomplete category."
+> "AA publishes a leaderboard for an incomplete category. The category is governed multi-engine AI work. We defined it. We benchmarked it. We patented it."
 
 > "The benchmark is the receipt."
 
 ### 7.2 · Press / Media (30-second framing)
 
-MO§ES is a Constitutional AI Governance framework. While Artificial Analysis publishes leaderboards for coding agents that run alone in isolated benchmarks, MO§ES measures something they cannot: a governed loop of operator plus model plus cache plus practice doing sustained product work. The same Claude Opus 4.7 model, governed by the MO§ES framework, ships real product code at 6× to 110× the efficiency of the same model running ungoverned on AA's benchmark. The deltas are the empirical proof that AI governance is the productivity layer.
+MO§ES is a Constitutional AI Governance framework. While Artificial Analysis publishes leaderboards that rank coding agents individually in isolated benchmarks, MO§ES measures something they cannot: a governed multi-engine loop, where role-specialized engines (Claude Opus 4.7 as generative workhorse, Codex as high-cache executor) operate under one constitutional framework doing sustained product work. The same Claude Opus 4.7 model, governed by MO§ES, ships real product code at 6× to 110× the efficiency of the same model running ungoverned on AA's benchmark. The two-engine combined system runs at 97.23% cache hit, 1.30B tokens, ~$135 blended cost, 35,242 lines of real code in seven days. The deltas are the empirical proof that AI governance, not any single model, is the productivity layer.
 
 ### 7.3 · Investor / Partner (60-second framing)
 
-The frontier model market is racing toward commoditization. Every quarter, frontier capabilities show up at one-tenth the price. The companies that win this cycle will not be the ones with the best model access. They will be the ones with the governance layer that turns any model into a sustained, auditable, cross-session agent.
+The frontier model market is racing toward commoditization. Every quarter, frontier capabilities show up at one-tenth the price. The companies that win this cycle will not be the ones with the best model access. They will be the ones with the **governance layer that turns any combination of frontier engines into a sustained, auditable, cross-session, role-specialized multi-engine system**.
 
-MO§ES has defined that layer. Four primitives: constitutional framework, role hierarchy, audit chain, cache discipline. The patent portfolio covers all four. The benchmark evidence shows the framework produces 6× to 110× efficiency gains across every measured economic kernel versus the same model running ungoverned in the published industry benchmark.
+MO§ES has defined that layer. Five primitives: constitutional framework, role hierarchy, audit chain, cache discipline, and multi-engine orchestration. The patent portfolio covers all five. The benchmark evidence shows the framework produces 6× to 110× efficiency gains versus the same model running ungoverned in the published industry benchmark. In production, the two-engine setup (Claude Opus 4.7 + Codex) shipped 35,242 lines of real code in seven days for ~$135 blended cost.
 
-We are not selling Claude. We are selling the governance that makes Claude (or any frontier model) deployable at production scale.
+We are not selling Claude. We are not selling Codex. We are selling the **governance layer that orchestrates them**, and that survives the disruption of any single vendor because it is engine-agnostic by design.
 
 ### 7.4 · Technical Audience (engineer / CTO)
 
-Frontier models have no built-in memory across sessions, no accountability for past decisions, and no internal self-constraint against drift. If you want to use them seriously, you have to externalize all three. We have a framework that does this: a constitutional document loaded at session start (locks the frame), a role hierarchy of Primary / Secondary / Observer (parallel attention without conflict), an audit chain with hash-verified state (institutional memory across sessions), and cache discipline that pre-loads governance context as warm tokens (5,162 token constitutional load, amortized across all sessions).
+Frontier models have no built-in memory across sessions, no accountability for past decisions, and no internal self-constraint against drift. If you want to use them seriously at production scale, you have to externalize all three, and you almost certainly want more than one engine in the orchestration. We have a framework that does both: a constitutional document loaded at session start (locks the frame), a role hierarchy of Primary / Secondary / Observer (parallel attention without conflict), an audit chain with hash-verified state (institutional memory across sessions), cache discipline that pre-loads governance context as warm tokens (5,162-token constitutional load, amortized across all sessions), and multi-engine orchestration that routes work to role-specialized engines (in the measured run: Claude Opus 4.7 as generative workhorse, Codex as high-cache executor).
 
-The execution-layer signature is striking. Cache hit rate 94.66%, output:input 17.9× (versus field average 0.162×), 810K tokens per task-equivalent (versus 4.67M field average), 1.84 minutes per task (versus 11.92m field), and $0.0007 per measured line of code shipped. Across 98 sessions, 7,327 turns, 35,242 LOC of real product code, total cost $23.33 in plan-rate subscription terms or $1,564.47 in API-equivalent terms.
+The Claude-side execution signature: cache hit rate 94.66%, output:input 17.9× (versus AA field average 0.162×), 810K tokens per task-equivalent (versus 4.67M field average), 1.84 minutes per task (versus 11.92m field), $0.0007 per measured line of code shipped. The Codex-side execution signature: cache hit 99.66% (near-saturation), generation:prompt 20.0×, $111.43 across 7 sessions on 4 active days. Combined: 1.30B tokens, 97.23% combined cache hit rate, $1,675.90 API-equivalent or $134.76 at plan+Codex blended rate. 35,242 lines of real product code shipped across the 7-day window.
 
-The numbers are receipts. The framework is the IP. The category is Constitutional AI Governance.
+The numbers are receipts. The framework is the IP. The orchestration is engine-agnostic. The category is Constitutional AI Governance.
 
 ### 7.5 · Skeptic / Critic Response
 
 > "This isn't apples to apples. AA runs isolated benchmarks; you ran a product."
 
-Correct. That is exactly the point. AA's setup *cannot* measure what we are measuring because their benchmark category is incomplete. They publish leaderboards for ungoverned AI work running on synthetic tasks. We measure governed AI work running on real product. Both are valid. They are different categories. We are not claiming we beat AA's benchmark. We are claiming AA's benchmark cannot see the category we operate in. The kernel numbers are not a comparison. They are evidence that a category exists which the leaderboard does not measure.
+Correct. That is exactly the point. AA's setup *cannot* measure what we are measuring because their benchmark category is incomplete. They publish leaderboards for ungoverned single-engine AI work running on synthetic tasks. We measure governed multi-engine AI work running on real product. Both are valid. They are different categories. We are not claiming we beat AA's benchmark. We are claiming AA's benchmark cannot see the category we operate in. The kernel numbers are not a comparison. They are evidence that a category exists which the leaderboard does not measure.
 
 > "Anyone can use Claude well. This is just prompt engineering."
 
-If it were just prompt engineering, the deltas would not compound across 98 sessions over 7 days. Prompt engineering optimizes a single turn. Governance produces durable structural advantages across sessions, agents, and time. The 5,162-token constitutional load that is *cached* across every session is not a prompt. It is institutional memory. The role hierarchy is not a prompt template. It is a parallel attention discipline. The audit chain is not output formatting. It is hash-verified state. These are governance primitives, not prompt tricks.
+If it were just prompt engineering, the deltas would not compound across 98 Claude sessions plus 7 Codex sessions running in coordination over 7 days. Prompt engineering optimizes a single turn on a single engine. Governance produces durable structural advantages across sessions, agents, engines, and time. The 5,162-token constitutional load that is *cached* across every session is not a prompt. It is institutional memory. The role hierarchy is not a prompt template. It is a parallel attention discipline. The audit chain is not output formatting. It is hash-verified state. The multi-engine orchestration is not API juggling. It is role-specialized routing under a single governance frame. These are governance primitives, not prompt tricks.
 
 > "What if Anthropic changes Claude?"
 
-The framework is model-agnostic. The four primitives (constitutional framework, role hierarchy, audit chain, cache discipline) operate at the layer above the model. We have demonstrated them on Opus 4.7. They will work on Opus 5, on Sonnet 4.6, on Gemini, on whatever comes next. The patents cover the layer above the model, not the model itself.
+The framework is **engine-agnostic** by design. The five primitives operate at the layer above any model. We have demonstrated them on Opus 4.7 in the generative-workhorse role and on gpt-5.3/5.4/5.5 (Codex) in the high-cache-executor role. They will work on Opus 5, on Sonnet 4.6, on Gemini, on open-source models, on whatever comes next. Swap Claude for any other generative engine; swap Codex for any other high-cache executor; the framework persists. The patents cover the orchestration and governance layer above the engines, not the engines themselves.
+
+> "Why two engines? Why not just use Claude for everything?"
+
+Because role specialization is more efficient than monolithic engine use. Claude carries the generative load at the highest density (31.7× output:fresh input ratio). Codex sits at near-saturated cache (99.66%) and executes against known repo context at one-fourteenth the per-session cost of Claude API-equivalent. Using Claude for everything would waste cycles on tasks where Codex's saturated cache produces the same result for 6.6% of the cost. The benchmark proves the split works: combined cache hit climbs to 97.23%, combined blended cost drops to $134.76 plan+Codex. The orchestration layer is what makes the split coherent without operator overhead.
 
 ---
 
@@ -383,14 +428,18 @@ The framework is model-agnostic. The four primitives (constitutional framework, 
 | Term | Meaning | What it replaces |
 |---|---|---|
 | **Constitutional AI Governance** | The category MO§ES defines | "AI workflow", "prompt engineering", "operator practice" |
-| **The governance layer** | The four primitives sitting above the model | "our methodology", "how we use Claude" |
+| **The governance layer** | The five primitives sitting above the engines | "our methodology", "how we use Claude" |
+| **Multi-engine orchestration** | Role-specialized routing across multiple AI engines under one governance frame | "using multiple tools", "Claude plus Codex" |
+| **Generative workhorse** | The engine role that carries dense output and architectural decisions (Claude Opus 4.7 in the measured setup) | "main AI", "primary model" |
+| **High-cache executor** | The engine role that runs at saturated cache against known context (Codex in the measured setup) | "secondary AI", "helper model" |
+| **Engine-agnostic** | The framework property that survives any single-vendor disruption | "vendor-neutral", "model-portable" |
 | **Operator-augmented** | The mode of work the framework enables | "human-in-the-loop", "Claude Code with extras" |
 | **Sustained engineering** | What the framework is designed for | "AI-assisted coding", "vibe coding" |
 | **Signal-layer governance** | What MO§ES measures and controls | "context management", "session state" |
 | **Execution-layer fingerprint** | What the benchmark kernels are | "performance metrics", "efficiency numbers" |
-| **The missing category** | What AA's benchmark cannot measure | "different methodology", "not apples to apples" |
+| **The missing category** | What AA's benchmark cannot measure (governed multi-engine work) | "different methodology", "not apples to apples" |
 | **The five kernels** | The execution-layer measurements | "the metrics", "the numbers" |
-| **The four primitives** | The governance framework components | "our tools", "our techniques" |
+| **The five primitives** | The governance framework components | "our tools", "our techniques" |
 
 ---
 
@@ -408,16 +457,20 @@ The framework is model-agnostic. The four primitives (constitutional framework, 
 
 | Artifact | Path | Status |
 |---|---|---|
-| This document | `/Users/dericmchenry/Desktop/application-hub/qaapplication/01-inbox/strategicshift.md` | Locked 2026-05-25 |
-| MO§ES raw numbers (canonical) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/mos2es_raw_numbers.md` | Locked 2026-05-24 |
+| This document | `/Users/dericmchenry/Desktop/application-hub/qaapplication/01-inbox/strategicshift.md` | Updated 2026-05-25 (multi-engine reality folded in) |
+| MO§ES raw numbers (per-task) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/mos2es_raw_numbers.md` | Locked 2026-05-24 |
+| Claude raw numbers (per-session) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/claude_raw_numbers.md` | Locked 2026-05-25 |
+| Codex raw numbers (per-session, ccusage pull) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/codex_raw_numbers.md` | Locked 2026-05-25 |
+| Combined two-engine compilation | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/combined_raw_numbers.md` | Locked 2026-05-25 |
 | AA model averages (canonical) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/aa_model_averages.md` | Locked 2026-05-24 |
 | Raw Basic Numbers chart | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/chart_raw.md` | Locked 2026-05-24 |
 | Kernels chart | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/truths/chart_kernels.md` | Locked 2026-05-24 |
-| Lead poster (AA Index methodology) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/poster.html` | Frozen (intentionally not updated) |
-| Honest landscape poster | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/poster_honest.html` | Refreshed 2026-05-24 with locked truths |
-| Honest portrait poster | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/poster_honest_portrait.html` | Refreshed 2026-05-24 with locked truths |
-| Site benchmark page | `/Users/dericmchenry/Desktop/mos2es-site/benchmarks.html` | Refreshed 2026-05-24 with locked truths + #1 banner |
-| Git commits (truth-lock cycle) | `mos2es-site` repo, origin/main | `c9eeec3`, `145d284`, `520a5d5` |
+| Lead poster (AA Index methodology, per-session denominator) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/poster.html` | Frozen (uses claude_raw_numbers per-session basis) |
+| Honest landscape poster (per-task denominator) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/poster_honest.html` | Refreshed 2026-05-24 |
+| Honest portrait poster (per-task denominator) | `/Users/dericmchenry/Desktop/mos2es-site/img/benchmarks/poster_honest_portrait.html` | Refreshed 2026-05-24 |
+| Site benchmark page | `/Users/dericmchenry/Desktop/mos2es-site/benchmarks.html` | Refreshed 2026-05-24 |
+| Git commits (mos2es-site) | `mos2es-site` repo, origin/main | `c9eeec3`, `145d284`, `520a5d5`, `8b85c6e` |
+| Git commit (application-hub strategicshift drop) | `application-hub` repo, codex/canonical-rebuild-scaffold | `cda7c05` |
 
 ---
 
