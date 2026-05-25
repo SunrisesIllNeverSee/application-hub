@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQUA Pre-Fill</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 320px;
+      min-height: 200px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e5e5e5;
+      padding: 16px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      background: #4f46e5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-icon svg { width: 18px; height: 18px; color: white; }
+    .header-text h1 { font-size: 14px; font-weight: 600; }
+    .header-text p { font-size: 11px; color: #737373; }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #171717;
+      border: 1px solid #262626;
+      margin-bottom: 12px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .status-dot.connected { background: #22c55e; }
+    .status-dot.disconnected { background: #ef4444; }
+    .status-text { font-size: 12px; }
+
+    .fit-preview {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #171717;
+      border: 1px solid #262626;
+      margin-bottom: 12px;
+    }
+    .fit-preview-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #737373;
+      margin-bottom: 6px;
+    }
+    .fit-preview-score {
+      font-size: 20px;
+      font-weight: 700;
+      color: #818cf8;
+    }
+    .fit-preview-label {
+      font-size: 11px;
+      color: #a3a3a3;
+    }
+
+    .actions { display: flex; flex-direction: column; gap: 8px; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: #4f46e5;
+      color: white;
+    }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-secondary {
+      background: #171717;
+      color: #e5e5e5;
+      border: 1px solid #262626;
+    }
+    .btn-secondary:hover { background: #262626; }
+
+    .footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #262626;
+      text-align: center;
+    }
+    .footer a {
+      font-size: 11px;
+      color: #737373;
+      text-decoration: none;
+    }
+    .footer a:hover { color: #e5e5e5; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>AQUA</h1>
+      <p>Application Hub Pre-Fill</p>
+    </div>
+  </div>
+
+  <div class="status" id="status-container">
+    <span class="status-dot disconnected" id="status-dot"></span>
+    <span class="status-text" id="status-text">Checking connection...</span>
+  </div>
+
+  <div class="fit-preview" id="fit-container" style="display: none;">
+    <div class="fit-preview-title">Page Fit Score</div>
+    <span class="fit-preview-score" id="fit-score">—</span>
+    <span class="fit-preview-label" id="fit-label"></span>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="btn-prefill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+      </svg>
+      Pre-fill This Page
+    </button>
+    <button class="btn btn-secondary" id="btn-open-app">
+      Open AQUA Dashboard
+    </button>
+  </div>
+
+  <div class="footer">
+    <a href="https://mos2es.xyz/profile/settings" target="_blank">Extension Settings</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
