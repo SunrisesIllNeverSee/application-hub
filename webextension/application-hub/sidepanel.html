@@ -8,57 +8,83 @@
 </head>
 <body class="panel-body">
 
-  <!-- Header -->
   <header class="panel-header">
     <div class="panel-header-left">
       <span class="panel-logo">AQUA</span>
-      <span class="panel-sub">by Application Hub</span>
+      <span class="panel-sub">Application Hub Extension</span>
     </div>
-    <div id="panel-status" class="status-dot"></div>
+    <div class="panel-header-right">
+      <span id="panel-mode-badge" class="panel-badge panel-badge-dark">Manual Assist</span>
+      <div id="panel-status" class="status-dot"></div>
+    </div>
   </header>
 
-  <!-- Auth gate (shown when not connected) -->
   <section id="panel-auth" class="panel-section hidden">
-    <p class="panel-label">Connect your Application Hub account to get started.</p>
+    <p class="panel-label">Paste your session token to connect this browser to your answer bank.</p>
     <input id="panel-jwt" class="panel-input" type="password" placeholder="Paste session token…" />
+    <input id="panel-hub-url" class="panel-input" type="text" placeholder="https://mos2es.xyz" />
     <p class="panel-hint">
-      Get it from <strong>Profile → Settings → Appfeeder Extension → Show session token</strong>
+      Get the token from <strong>Profile → Settings</strong>. The hub URL can stay on the default production value.
     </p>
-    <button id="panel-connect-btn" class="btn-primary">Connect</button>
+    <div class="panel-actions-bar">
+      <button id="panel-connect-btn" class="btn-primary">Connect AQUA</button>
+      <button id="panel-send-agent-auth" class="btn-secondary">Send to local agent</button>
+    </div>
   </section>
 
-  <!-- No fields detected -->
   <section id="panel-idle" class="panel-section hidden">
-    <p class="panel-idle-msg">No application fields detected on this page.</p>
-    <p class="panel-hint">Navigate to an application form and AQUA will activate automatically.</p>
+    <p class="panel-idle-msg">No application fields detected on this page yet.</p>
+    <p class="panel-hint">Open an application form, then refresh the scan. Manual Assist stays lightweight; Automation Assist adds capture and matching flows when you need them.</p>
+    <div class="panel-actions-bar">
+      <button id="btn-rescan-idle" class="btn-secondary btn-sm">Refresh scan</button>
+      <button id="btn-send-agent-idle" class="btn-secondary btn-sm">Send to local agent</button>
+      <button id="btn-open-hub-idle" class="btn-ghost btn-sm">Open full hub</button>
+    </div>
   </section>
 
-  <!-- Main: fields detected -->
   <section id="panel-main" class="panel-section hidden">
-
     <div class="panel-page-info">
       <span id="panel-page-title" class="panel-page-title"></span>
       <span id="panel-field-count" class="panel-badge"></span>
     </div>
 
-    <div class="panel-actions-bar">
-      <button id="btn-generate-all" class="btn-primary btn-sm">
-        ✦ Generate all with AQUA
-      </button>
-      <button id="btn-fill-matched" class="btn-secondary btn-sm">
-        Fill matched
-      </button>
-      <button id="btn-export-md" class="btn-ghost btn-sm">
-        ↓ Export MD
-      </button>
+    <div class="mode-switch" role="tablist" aria-label="Extension mode">
+      <button id="mode-manual" class="mode-button active" type="button">Manual Assist</button>
+      <button id="mode-automation" class="mode-button" type="button">Automation Assist</button>
     </div>
 
-    <!-- Field list -->
-    <div id="panel-fields" class="panel-fields"></div>
+    <p id="panel-mode-copy" class="panel-hint panel-hint-tight"></p>
 
+    <div class="panel-actions-bar">
+      <button id="btn-generate-all" class="btn-primary btn-sm">Generate all</button>
+      <button id="btn-fill-matched" class="btn-secondary btn-sm">Fill matched</button>
+      <button id="btn-export-md" class="btn-ghost btn-sm">Export MD</button>
+      <button id="btn-rescan" class="btn-ghost btn-sm">Refresh scan</button>
+    </div>
+
+    <section id="automation-panel" class="automation-panel hidden">
+      <div class="automation-header">
+        <div>
+          <div class="automation-title">Automation Assist</div>
+          <div class="automation-copy">Capture the page into Canonical Hub, run Smart Matcher, and gate bulk assist by coverage and fidelity.</div>
+        </div>
+        <span id="automation-state" class="panel-badge">Ready</span>
+      </div>
+
+      <div class="panel-actions-bar">
+        <button id="btn-capture-hub" class="btn-primary btn-sm">Capture to Hub</button>
+        <button id="btn-smart-matcher" class="btn-secondary btn-sm">Run Smart Matcher</button>
+        <button id="btn-bulk-assist" class="btn-secondary btn-sm">Bulk Assist</button>
+        <button id="btn-send-agent" class="btn-ghost btn-sm">Send to local agent</button>
+      </div>
+
+      <div id="automation-feedback" class="callout callout-muted">Automation is off by default. Switching into this mode keeps the manual workflow intact and only adds these higher-trust actions.</div>
+      <div id="smart-matcher-results" class="smart-matcher-results"></div>
+    </section>
+
+    <div id="panel-fields" class="panel-fields"></div>
   </section>
 
-  <!-- Generating state -->
   <div id="panel-generating" class="panel-generating hidden">
     <div class="generating-spinner"></div>
     <span id="generating-label">AQUA is thinking…</span>

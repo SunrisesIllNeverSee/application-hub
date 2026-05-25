@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-12T22:00:00Z
+updated_at: 2026-05-24T18:15:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
@@ -9,10 +9,16 @@ truth_policy:
     summarized elsewhere. Human-readable context lives in STATUS.md.
 
 migrations:
-  next: 42
+  next: 48
   path: supabase/migrations/  # was: migrations/ (root)
   cli_synced: true  # supabase db push --dry-run confirmed clean 2026-05-11
   applied:
+    - { n: 47, file: 047_manual_intake_workflow.sql, commit: "pending", landed: "2026-05-24", note: "Manual-first intake workflow — staged submissions, entity/application/layer/question checkpoints, gate reviews, append-only intake events." }
+    - { n: 46, file: 046_seeding_system.sql, commit: "pending", landed: "2026-05-20", note: "Canonical seeding entities, review gate, source/TOS/deadline/requirements/data package lineage." }
+    - { n: 45, file: 045_aggregate_system.sql, commit: "pending", landed: "2026-05-20", note: "Canonical aggregate_stats, aggregate_versions history, high-fidelity variant aggregate trigger." }
+    - { n: 44, file: 044_rewards_system.sql, commit: "pending", landed: "2026-05-20", note: "Canonical user credits, contribution_rewards, approved-reward balance trigger, Stripe Connect metadata." }
+    - { n: 43, file: 043_canonical_rpc_functions.sql, commit: "pending", landed: "2026-05-20", note: "Canonical embedding column, semantic/hybrid search, package retrieval, smart matcher RPC." }
+    - { n: 42, file: 042_canonical_hub_and_lineage.sql, commit: "pending", landed: "2026-05-20", note: "Canonical commitments, answer variants, application packages, lineage events, RLS and indexes." }
     - { n: 41, file: 041_beta_mode.sql, commit: "pending", landed: "2026-05-12", note: "Beta mode — beta_settings, starter_packages, community_messages, enhanced outcome tracking, claim_starter_package() RPC" }
     - { n: 40, file: 040_onboarding_gate.sql, commit: "pending", landed: "2026-05-12", note: "Onboarding gate — onboarding_completed_at + backfill for legacy users." }
     - { n: 39, file: 039_program_cycles.sql, commit: "4a3dbe1", landed: "2026-05-12", note: "program_cycles Layer 3 schema — confirmed applied to Supabase 2026-05-12." }

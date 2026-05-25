@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    participant CC as Claude<br/>(qaapplication)
+    participant Files as .agents/ + git
+    participant CX as Codex<br/>(Supabase migrations)
+
+    CC->>Files: read claims.yaml + registry.yaml
+    Note over CC: sees Codex active on<br/>migration chain 047
+    CX->>Files: read claims.yaml + registry.yaml
+    Note over CX: sees no qaapplication claim
+
+    CC->>Files: append claim<br/>"qaapplication/* file_lane"
+    CX->>Files: append claim<br/>"supabase/migrations/047_*"
+    Note over Files: Two claims, two disjoint lanes —<br/>no overlap, no negotiation needed
+
+    par Parallel work
+        CC->>Files: restructure 04-applications/<br/>build 07-answers/index/
+    and
+        CX->>Files: write 047_manual_intake_workflow.sql<br/>update registry.migrations.next = 48
+    end
+
+    CC->>Files: commit restructure + push
+    CX->>Files: commit migration + push
+
+    CC->>Files: release claim<br/>(released_at = now)
+    CX->>Files: release claim<br/>(released_at = now)
+
+    Note over Files: registry.yaml now reflects<br/>both committed truths.<br/>git log shows the interleaved history.

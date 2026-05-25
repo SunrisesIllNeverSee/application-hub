@@ -37,13 +37,6 @@ const PROVIDERS: { id: ProviderKey; name: string; placeholder: string; hint: str
     model: 'gpt-4o-mini',
   },
   {
-    id: 'google',
-    name: 'Google (Gemini)',
-    placeholder: 'AIzaSy...',
-    hint: 'Get your key at aistudio.google.com → Get API Key',
-    model: 'gemini-2.0-flash',
-  },
-  {
     id: 'ollama',
     name: 'Ollama (local / self-hosted)',
     placeholder: 'https://your-tunnel.ngrok-free.app',

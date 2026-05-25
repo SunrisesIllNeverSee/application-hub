@@ -1,40 +1,56 @@
 # WebExtensions
 
-Browser extensions and userscripts for this repo.
+Browser extension work for Application Hub lives here.
 
----
+## Current truth
 
-## Browser reference
+`/Users/dericmchenry/Desktop/application-hub/webextension/application-hub` is the single live extension product.
 
-| Folder              | What's inside                                  |
-| ------------------- | ---------------------------------------------- |
-| [chrome/](chrome/)  | Dev setup, store info, deployment record       |
-| [firefox/](firefox/)| Dev setup, web-ext CLI, AMO record             |
-| [safari/](safari/)  | Userscript path + native extension path, store |
+It now ships as one MV3 extension with two modes inside the same codebase:
 
----
+- `Manual Assist`: detect, review, generate, fill, export, save-to-bank
+- `Automation Assist`: canonical capture, Smart Matcher, threshold-gated bulk assist
 
-## Projects
+The older Chrome-only `aqua-extension` scaffold has been archived under `_archive/` after its capture and Smart Matcher flows were folded into the live extension.
 
-| Folder                              | What it is                          | Browsers                      |
-| ----------------------------------- | ----------------------------------- | ----------------------------- |
-| application-hub/                    | Answer bank + AI drafting companion | Chrome, Firefox, Edge, Safari |
+## Folder map
 
----
+| Folder | Role |
+| --- | --- |
+| [application-hub/](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub) | Live extension implementation |
+| [x-bookmarks/userscript/](/Users/dericmchenry/Desktop/application-hub/webextension/x-bookmarks/userscript) | X bookmarks userscript lane for local Markdown / JSON sorting |
+| [chrome/](/Users/dericmchenry/Desktop/application-hub/webextension/chrome) | Browser-specific notes and store records |
+| [firefox/](/Users/dericmchenry/Desktop/application-hub/webextension/firefox) | Browser-specific notes and store records |
+| [safari/](/Users/dericmchenry/Desktop/application-hub/webextension/safari) | Safari notes and userscript lanes, including QA Link Capture |
+| [_archive/](/Users/dericmchenry/Desktop/application-hub/webextension/_archive) | Retired scaffolds and donor code |
 
-## Adding a new project
+## Live extension architecture
 
-1. Create `webextension/<project-name>/`
-2. Initialize WXT: `cd <project-name> && npx wxt@latest init .`
-3. Add a `README.md` inside the folder
-4. Add a userscript at `<project-name>/userscript/<name>.user.js` if needed
-5. Log the deployment in the relevant browser `README.md` files above
+- `manifest.json`: one MV3 manifest
+- `background.js`: orchestration, API calls, settings, routing
+- `content.js`: DOM detection, fill, export, blur capture, Safari fallback panel
+- `sidepanel.html/js`: main operator surface
+- `popup.html/js`: lightweight auth, mode, and quick actions
 
----
+Storage keys are standardized to:
 
-## Shared rules
+- `jwt`
+- `hubUrl`
+- `mode`
+- `automationEnabled`
+- `lastActiveTab`
 
-- Each project is self-contained — its own `package.json`, `node_modules`, build output
-- Use WXT as the build framework
-- Anon key (`sb_publishable_*`) is safe to ship in client code — RLS enforces isolation
-- Never put the Supabase service role key in any extension or userscript
+## API surface in use
+
+- `POST /api/match-question`
+- `GET /api/integrations/key`
+- `POST /api/answers/capture`
+- `POST /api/hub/ingest`
+- `POST /api/hub/smart-matcher`
+- `POST /api/hub/autofill-eligibility`
+
+## Guardrails
+
+- Keep `chrome.*` for the live extension in this pass.
+- Do not put the Supabase service role key in extension code.
+- Do not describe WXT, React, or a cross-browser TypeScript rebuild as current reality. That is future cleanup, not the present implementation.

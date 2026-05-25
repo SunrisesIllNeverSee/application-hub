@@ -38,6 +38,19 @@ sessions:
     heartbeat: 2026-05-11T23:30:00Z
     status: wrapped
     note: continuation session — Phase B/C enforcement work + strict-mode opt-in
+  - id: codex-2026-05-20-canonical-rebuild
+    surface: codex
+    started_at: 2026-05-20T21:53:01Z
+    heartbeat: 2026-05-20T22:29:56Z
+    status: wrapped
+    note: canonical rebuild scaffold from Grok deep dive transcript — landed in b0f8baa
+
+  - id: claude-2026-05-24-qaapplication
+    surface: vscode-claude
+    started_at: 2026-05-24T00:00:00Z
+    heartbeat: 2026-05-24T16:49:01Z
+    status: wrapped
+    note: qaapplication-scope restructure + per-program indexing (sequential pipeline). Coordinates with codex on parent migration work (Codex owns 047+).
 
 claims:
   - id: claim-2026-05-11-001
@@ -191,3 +204,54 @@ claims:
     heartbeat: 2026-05-19T10:30:00Z
     released_at: 2026-05-19T10:30:00Z
     landed_commits: [b4eaaee]
+
+  - id: codex-2026-05-20-canonical-rebuild
+    session: codex-2026-05-20-canonical-rebuild
+    surface: codex
+    type: file_lane
+    paths:
+      - REBUILD/CANONICAL_REBUILD_TASKS.md
+      - supabase/migrations/042_canonical_hub_and_lineage.sql
+      - supabase/migrations/043_canonical_rpc_functions.sql
+      - supabase/migrations/044_rewards_system.sql
+      - supabase/migrations/045_aggregate_system.sql
+      - supabase/migrations/046_seeding_system.sql
+      - supabase/functions/canonical-hub/
+      - supabase/functions/smart-matcher/
+      - app/app/api/hub/
+      - app/app/api/stripe/payout/
+      - app/components/ingestion/
+      - app/components/variations/
+      - app/components/editor/
+      - app/components/smart-matcher/
+      - app/app/page.tsx
+      - webextension/chrome/aqua-extension/
+      - application-hub-mcp-server/src/tools/aqua-hub.ts
+      - application-hub-mcp-server/src/index.ts
+      - docs/CANONICAL_HUB.md
+      - docs/CANONICAL_RESET_RECIPE.md
+    purpose: >
+      Canonical rebuild scaffold from Mos2esxyz_AQUA_Deep_Dive: hub schema,
+      edge functions, entry/exit APIs, UI spokes, Chrome MV3 extension, MCP
+      wrappers, docs, and proprietary-algorithm hooks.
+    acquired_at: 2026-05-20T21:53:01Z
+    heartbeat: 2026-05-20T22:29:56Z
+    released_at: 2026-05-20T22:29:56Z
+    landed_commits: [b0f8baa]
+
+  - id: claim-2026-05-24-qaapplication-restructure
+    session: claude-2026-05-24-qaapplication
+    type: file_lane
+    paths:
+      - qaapplication/
+    purpose: >
+      qaapplication workspace restructure into sequential 7-lane pipeline
+      (01-inbox → 02-processing → 03-programs → 04-applications →
+      05-questions → 06-workshop → 07-answers) + audit-log.md. Per-program
+      indexing of 5 submitted applications + 4 in-workshop drafts +
+      anthonya-angel raw drop. All qaapplication-scope only; no parent
+      Supabase or migration work (Codex owns that lane).
+    acquired_at: 2026-05-24T00:00:00Z
+    heartbeat: 2026-05-24T16:49:01Z
+    released_at: 2026-05-24T16:49:01Z
+    landed_commits: [e326b08, aab0deb, 3f5cbe8, 4eba6eb, 01f8a4c, d5e7f9d, 99d04cb, 5155b28, b85cb94]

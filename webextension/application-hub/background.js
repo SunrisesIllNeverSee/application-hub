@@ -1,32 +1,121 @@
-/**
- * background.js — Service worker
- *
- * Handles:
- * - Semantic question matching via /api/match-question
- * - Answer generation via user's BYOK key (Anthropic preferred, OpenAI fallback)
- * - Answer capture back to the answer bank
- * - Routing detected fields to the side panel
- * - Tab change notifications to the side panel
- */
-
-const APP_URL = 'https://mos2es.xyz'
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
-
-async function getAuth() {
-  return new Promise(resolve => chrome.storage.local.get(['jwt'], resolve))
+const DEFAULT_SETTINGS = {
+  hubUrl: 'https://mos2es.xyz',
+  agentUrl: 'http://127.0.0.1:4317',
+  jwt: '',
+  mode: 'manual',
+  automationEnabled: false,
+  lastActiveTab: null,
 }
 
-// ── Match questions ───────────────────────────────────────────────────────────
+function normalizeHubUrl(hubUrl) {
+  return (hubUrl || DEFAULT_SETTINGS.hubUrl).replace(/\/$/, '')
+}
+
+function normalizeAgentUrl(agentUrl) {
+  return (agentUrl || DEFAULT_SETTINGS.agentUrl).replace(/\/$/, '')
+}
+
+async function getSettings() {
+  const raw = await chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS))
+  return {
+    ...DEFAULT_SETTINGS,
+    ...raw,
+    hubUrl: normalizeHubUrl(raw.hubUrl),
+    agentUrl: normalizeAgentUrl(raw.agentUrl),
+    mode: raw.mode === 'automation' ? 'automation' : 'manual',
+    automationEnabled: Boolean(raw.automationEnabled),
+  }
+}
+
+async function saveSettings(partial) {
+  const next = { ...(await getSettings()), ...partial }
+  if (partial.hubUrl !== undefined) next.hubUrl = normalizeHubUrl(partial.hubUrl)
+  if (partial.agentUrl !== undefined) next.agentUrl = normalizeAgentUrl(partial.agentUrl)
+  if (partial.mode !== undefined) next.mode = partial.mode === 'automation' ? 'automation' : 'manual'
+  if (partial.automationEnabled !== undefined) next.automationEnabled = Boolean(partial.automationEnabled)
+  await chrome.storage.local.set(next)
+  return next
+}
+
+async function clearAuth() {
+  const current = await getSettings()
+  const next = {
+    ...current,
+    jwt: '',
+    mode: 'manual',
+    automationEnabled: false,
+  }
+  await chrome.storage.local.set(next)
+  return next
+}
+
+async function withActiveTab() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+  return tab || null
+}
+
+async function openPanelForTab(tabId) {
+  if (!tabId) return
+  if (chrome.sidePanel?.open) {
+    await chrome.sidePanel.open({ tabId }).catch(() => {})
+    return
+  }
+  if (chrome.sidebarAction?.open) {
+    await chrome.sidebarAction.open().catch(() => {})
+    return
+  }
+  await chrome.tabs.sendMessage(tabId, { type: 'OPEN_INJECTED_PANEL' }).catch(() => {})
+}
+
+async function hubFetch(path, body) {
+  const { hubUrl, jwt } = await getSettings()
+  if (!jwt) throw new Error('Paste your session token to use AQUA.')
+
+  const res = await fetch(`${hubUrl}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify(body),
+  })
+
+  const payload = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(payload.error || `AQUA request failed (${res.status})`)
+  return payload
+}
+
+async function localAgentFetch(path, body) {
+  const { agentUrl } = await getSettings()
+  const res = await fetch(`${agentUrl}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  const payload = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(payload.error || `Local agent failed (${res.status})`)
+  return payload
+}
+
+async function checkAuth() {
+  const settings = await getSettings()
+  return {
+    authenticated: Boolean(settings.jwt),
+    settings,
+  }
+}
 
 async function matchQuestions(questions) {
-  const { jwt } = await getAuth()
-  if (!jwt) return []
+  const { hubUrl, jwt } = await getSettings()
+  if (!jwt || !Array.isArray(questions) || questions.length === 0) return []
 
   const results = await Promise.all(
-    questions.map(async ({ fieldId, questionText }) => {
+    questions.map(async ({ fieldId, questionText, selector }) => {
       try {
-        const res = await fetch(`${APP_URL}/api/match-question`, {
+        const res = await fetch(`${hubUrl}/api/match-question`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -34,60 +123,57 @@ async function matchQuestions(questions) {
           },
           body: JSON.stringify({ text: questionText, limit: 1 }),
         })
-        if (!res.ok) return { fieldId, questionText, matchedAnswer: null, similarity: 0 }
+
+        if (!res.ok) {
+          return {
+            fieldId,
+            questionText,
+            selector: selector || null,
+            matchedAnswer: null,
+            similarity: 0,
+            autoFillSafe: false,
+          }
+        }
+
         const { matches } = await res.json()
         const top = matches?.[0]
+        const matchedAnswer =
+          top?.user_answer?.answer_content ??
+          top?.user_answer?.content ??
+          top?.answer_content ??
+          null
+
         return {
           fieldId,
           questionText,
-          matchedAnswer: top?.user_answer?.answer_content ?? null,
-          similarity: top?.similarity ?? 0,
-          autoFillSafe: top?.auto_fill_safe ?? false,
+          selector: selector || null,
+          matchedAnswer,
+          similarity: Number(top?.similarity ?? 0),
+          autoFillSafe: Boolean(top?.auto_fill_safe),
         }
       } catch {
-        return { fieldId, questionText, matchedAnswer: null, similarity: 0 }
+        return {
+          fieldId,
+          questionText,
+          selector: selector || null,
+          matchedAnswer: null,
+          similarity: 0,
+          autoFillSafe: false,
+        }
       }
     })
   )
+
   return results
 }
 
-// ── BYOK key fetch ────────────────────────────────────────────────────────────
-
-async function fetchByokKey(jwt) {
+async function fetchByokKey(jwt, hubUrl) {
   try {
-    const res = await fetch(`${APP_URL}/api/integrations/key`, {
+    const res = await fetch(`${hubUrl}/api/integrations/key`, {
       headers: { Authorization: `Bearer ${jwt}` },
     })
     if (!res.ok) return null
-    return await res.json() // { provider, key }
-  } catch {
-    return null
-  }
-}
-
-// ── Answer generation ─────────────────────────────────────────────────────────
-
-async function generateAnswer(question, matchedAnswer) {
-  const { jwt } = await getAuth()
-  if (!jwt) return null
-
-  const byok = await fetchByokKey(jwt)
-  if (!byok?.key) return null
-
-  const system = `You are AQUA, an AI assistant that helps people write compelling application answers.
-You have access to the user's existing answer bank. When given a question and an existing answer,
-improve and tailor it. When given only a question, write a strong draft.
-Be concise, authentic, and specific. Never generic. Max 300 words unless the question implies more.`
-
-  const prompt = matchedAnswer
-    ? `Question: ${question}\n\nExisting answer from my bank:\n${matchedAnswer}\n\nImprove and tailor this for the current application.`
-    : `Question: ${question}\n\nWrite a strong, authentic answer for this application question.`
-
-  try {
-    if (byok.provider === 'anthropic') return await callAnthropic(byok.key, system, prompt)
-    if (byok.provider === 'openai') return await callOpenAI(byok.key, system, prompt)
-    return null
+    return await res.json()
   } catch {
     return null
   }
@@ -133,13 +219,37 @@ async function callOpenAI(apiKey, system, prompt) {
   return data.choices?.[0]?.message?.content ?? null
 }
 
-// ── Capture answer back to bank ───────────────────────────────────────────────
+async function generateAnswer(question, matchedAnswer) {
+  const { hubUrl, jwt } = await getSettings()
+  if (!jwt) return null
+
+  const byok = await fetchByokKey(jwt, hubUrl)
+  if (!byok?.key) return null
+
+  const system = `You are AQUA, an AI assistant that helps people write compelling application answers.
+You have access to the user's existing answer bank. When given a question and an existing answer,
+improve and tailor it. When given only a question, write a strong draft.
+Be concise, authentic, and specific. Never generic. Max 300 words unless the question implies more.`
+
+  const prompt = matchedAnswer
+    ? `Question: ${question}\n\nExisting answer from my bank:\n${matchedAnswer}\n\nImprove and tailor this for the current application.`
+    : `Question: ${question}\n\nWrite a strong, authentic answer for this application question.`
+
+  try {
+    if (byok.provider === 'anthropic') return await callAnthropic(byok.key, system, prompt)
+    if (byok.provider === 'openai') return await callOpenAI(byok.key, system, prompt)
+    return null
+  } catch {
+    return null
+  }
+}
 
 async function captureAnswer(questionText, answerText) {
-  const { jwt } = await getAuth()
-  if (!jwt) return
+  const { hubUrl, jwt } = await getSettings()
+  if (!jwt) return { saved: false, reason: 'unauthorized' }
+
   try {
-    await fetch(`${APP_URL}/api/answers/capture`, {
+    const res = await fetch(`${hubUrl}/api/answers/capture`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -147,91 +257,186 @@ async function captureAnswer(questionText, answerText) {
       },
       body: JSON.stringify({ questionText, answerText }),
     })
-  } catch { /* best-effort */ }
+
+    return await res.json().catch(() => ({ saved: false, reason: 'invalid_response' }))
+  } catch {
+    return { saved: false, reason: 'network_error' }
+  }
 }
 
-// ── Route detected fields → side panel ───────────────────────────────────────
+async function requestPageCapture(tabId) {
+  return chrome.tabs.sendMessage(tabId, { type: 'CAPTURE_PAGE_REQUEST' })
+}
 
-async function routeFieldsToPanel(tabId, pageTitle, rawFields) {
+async function sendToLocalAgent(tabId) {
+  if (!tabId) throw new Error('No active application tab.')
+  const capture = await requestPageCapture(tabId)
+  return localAgentFetch('/assist', capture)
+}
+
+async function routeFieldsToConsumers(tabId, pageTitle, rawFields) {
   const matched = await matchQuestions(rawFields)
+  await saveSettings({ lastActiveTab: tabId ?? null })
+
   chrome.runtime.sendMessage({
-    type: 'FIELDS_DETECTED',
+    type: 'FIELDS_RESULTS_READY',
     fields: matched,
-    tabId,
     pageTitle,
-  }).catch(() => { /* panel not open */ })
+    tabId,
+  }).catch(() => {})
+
+  if (tabId) {
+    chrome.tabs.sendMessage(tabId, {
+      type: 'MATCH_RESULTS_READY',
+      matches: matched,
+    }).catch(() => {})
+  }
+
+  return matched
 }
 
-// ── Tab activated — tell panel to reset ──────────────────────────────────────
-
-chrome.tabs.onActivated.addListener(({ tabId }) => {
-  chrome.runtime.sendMessage({ type: 'TAB_CHANGED', tabId }).catch(() => {})
-})
-
-// ── Toolbar click → open side panel (Chrome/Firefox native, Safari injected) ──
-
-chrome.action.onClicked.addListener((tab) => {
-  if (chrome.sidePanel) {
-    // Chrome 114+
-    chrome.sidePanel.open({ tabId: tab.id })
-  } else if (chrome.sidebarAction) {
-    // Firefox
-    chrome.sidebarAction.open()
-  } else {
-    // Safari — trigger the injected iframe panel via content script
-    chrome.tabs.sendMessage(tab.id, { type: 'OPEN_INJECTED_PANEL' })
+chrome.runtime.onInstalled.addListener(() => {
+  if (chrome.sidePanel?.setPanelBehavior) {
+    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => {})
   }
 })
 
-// ── Message router ────────────────────────────────────────────────────────────
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+  await saveSettings({ lastActiveTab: tabId })
+  chrome.runtime.sendMessage({ type: 'FIELDS_CONTEXT_RESET', tabId }).catch(() => {})
+})
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  ;(async () => {
+    if (message.type === 'AUTH_SAVE_SETTINGS') {
+      return saveSettings(message.settings || {})
+    }
 
-  if (message.type === 'FIELDS_DETECTED_FROM_CONTENT') {
-    const tabId = sender.tab?.id
-    routeFieldsToPanel(tabId, message.pageTitle, message.fields)
-    // Send matches back to content script for the quick overlay
-    matchQuestions(message.fields).then(matches => {
-      if (tabId) chrome.tabs.sendMessage(tabId, { type: 'MATCHES_READY', matches }).catch(() => {})
-    })
-    return false
-  }
+    if (message.type === 'AUTH_CLEAR') {
+      return clearAuth()
+    }
 
-  if (message.type === 'MATCH_QUESTIONS') {
-    matchQuestions(message.questions).then(sendResponse)
-    return true
-  }
+    if (message.type === 'AUTH_CHECK') {
+      return checkAuth()
+    }
 
-  if (message.type === 'GENERATE_ANSWER') {
-    generateAnswer(message.question, message.matchedAnswer).then(sendResponse)
-    return true
-  }
+    if (message.type === 'AUTH_OPEN_PANEL') {
+      const tab = await withActiveTab()
+      if (tab?.id) await openPanelForTab(tab.id)
+      return { ok: Boolean(tab?.id) }
+    }
 
-  if (message.type === 'GENERATE_ALL') {
-    Promise.all(
-      message.fields.map(async f => ({
-        fieldId: f.fieldId,
-        answer: await generateAnswer(f.questionText, f.matchedAnswer),
-      }))
-    ).then(sendResponse)
-    return true
-  }
+    if (message.type === 'FIELDS_DETECTED_FROM_PAGE') {
+      const tabId = sender.tab?.id ?? null
+      return routeFieldsToConsumers(tabId, message.pageTitle, message.fields || [])
+    }
 
-  if (message.type === 'CAPTURE_ANSWER') {
-    captureAnswer(message.questionText, message.answerText)
-    return false
-  }
+    if (message.type === 'FIELDS_SCAN_REQUEST') {
+      const tab = await withActiveTab()
+      if (!tab?.id) return { ok: false, error: 'No active tab.' }
+      await chrome.tabs.sendMessage(tab.id, { type: 'FIELDS_SCAN_REQUEST' })
+      return { ok: true }
+    }
 
-  if (message.type === 'CHECK_AUTH') {
-    getAuth().then(({ jwt }) => sendResponse({ authenticated: !!jwt }))
-    return true
-  }
+    if (message.type === 'MATCH_REQUEST') {
+      return matchQuestions(message.questions || [])
+    }
 
-  if (message.type === 'GET_FIELDS') {
-    // Panel requesting a rescan — forward to the active tab
-    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab) chrome.tabs.sendMessage(tab.id, { type: 'GET_FIELDS' }).catch(() => {})
-    })
-    return false
-  }
+    if (message.type === 'GENERATE_REQUEST') {
+      return generateAnswer(message.question, message.matchedAnswer)
+    }
+
+    if (message.type === 'GENERATE_BULK_REQUEST') {
+      return Promise.all(
+        (message.fields || []).map(async (field) => ({
+          fieldId: field.fieldId,
+          answer: await generateAnswer(field.questionText, field.matchedAnswer || null),
+        }))
+      )
+    }
+
+    if (message.type === 'FILL_FIELD_REQUEST') {
+      const tabId = message.tabId || (await getSettings()).lastActiveTab
+      if (!tabId) return { ok: false, error: 'No active application tab.' }
+      await chrome.tabs.sendMessage(tabId, {
+        type: 'FILL_FIELD_REQUEST',
+        fieldId: message.fieldId,
+        text: message.text,
+      })
+      return { ok: true }
+    }
+
+    if (message.type === 'FILL_BULK_REQUEST') {
+      const tabId = message.tabId || (await getSettings()).lastActiveTab
+      if (!tabId) return { ok: false, error: 'No active application tab.' }
+      await chrome.tabs.sendMessage(tabId, {
+        type: 'FILL_BULK_REQUEST',
+        fills: message.fills || [],
+      })
+      return { ok: true }
+    }
+
+    if (message.type === 'CAPTURE_SAVE_ANSWER') {
+      return captureAnswer(message.questionText, message.answerText)
+    }
+
+    if (message.type === 'EXPORT_MARKDOWN_REQUEST') {
+      const tabId = message.tabId || (await getSettings()).lastActiveTab
+      if (!tabId) return { ok: false, error: 'No active application tab.' }
+      await chrome.tabs.sendMessage(tabId, { type: 'EXPORT_MARKDOWN_REQUEST' })
+      return { ok: true }
+    }
+
+    if (message.type === 'CANONICAL_INGEST_REQUEST') {
+      const tabId = message.tabId || (await getSettings()).lastActiveTab
+      if (!tabId) throw new Error('No active application tab.')
+
+      const capture = await requestPageCapture(tabId)
+      return hubFetch('/api/hub/ingest', {
+        vertical: message.vertical || 'founder',
+        entity: capture?.entity || message.entity || 'Captured application',
+        source: capture?.url || message.source || null,
+        content: capture?.content || '',
+        metadata: {
+          url: capture?.url || null,
+          title: capture?.title || null,
+          questions: capture?.questions || [],
+          mode: (await getSettings()).mode,
+        },
+      })
+    }
+
+    if (message.type === 'SMART_MATCHER_REQUEST') {
+      return hubFetch('/api/hub/smart-matcher', {
+        vertical_filter: message.vertical || 'founder',
+        match_limit: message.matchLimit || 5,
+      })
+    }
+
+    if (message.type === 'AUTOFILL_ASSESS_REQUEST') {
+      return hubFetch('/api/hub/autofill-eligibility', {
+        program_question_count: message.programQuestionCount,
+        matched_answer_count: message.matchedAnswerCount,
+        avg_fidelity: message.avgFidelity,
+        outcomes_available: Boolean(message.outcomesAvailable),
+      })
+    }
+
+    if (message.type === 'AGENT_SEND_REQUEST') {
+      const tabId = message.tabId || (await getSettings()).lastActiveTab
+      return sendToLocalAgent(tabId)
+    }
+
+    if (message.type === 'APP_OPEN_HUB') {
+      const settings = await getSettings()
+      await chrome.tabs.create({ url: `${settings.hubUrl}/applications` })
+      return { ok: true }
+    }
+
+    return { ok: false, error: `Unknown message type: ${message.type}` }
+  })()
+    .then((payload) => sendResponse(payload))
+    .catch((error) => sendResponse({ ok: false, error: error.message }))
+
+  return true
 })

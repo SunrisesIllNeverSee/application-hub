@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Application Hub",
-  "version": "0.2.0",
-  "description": "AQUA — your AI application agent. Fill any application from your answer bank.",
+  "version": "0.3.0",
+  "description": "AQUA — one extension with Manual Assist and Automation Assist for application work.",
   "permissions": [
     "storage",
     "activeTab",
@@ -33,6 +33,7 @@
   },
   "action": {
     "default_title": "Application Hub",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/16.png",
       "48": "icons/48.png",

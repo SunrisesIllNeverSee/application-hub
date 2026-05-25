@@ -22,6 +22,13 @@
   flex-shrink: 0;
 }
 
+.panel-header-left,
+.panel-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .panel-logo {
   font-weight: 800;
   font-size: 15px;
@@ -120,11 +127,130 @@
   white-space: nowrap;
 }
 
+.panel-badge-dark {
+  background: #27272a;
+  color: #fafafa;
+}
+
+.panel-hint-tight {
+  margin-top: -2px;
+  margin-bottom: 12px;
+}
+
+.mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mode-button {
+  border: 1px solid #d4d4d8;
+  background: #fff;
+  color: #52525b;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mode-button.active {
+  border-color: #18181b;
+  background: #18181b;
+  color: #fff;
+}
+
 .panel-actions-bar {
   display: flex;
   gap: 6px;
   margin-bottom: 14px;
   flex-wrap: wrap;
+}
+
+.automation-panel {
+  margin-bottom: 14px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+}
+
+.automation-header {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.automation-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #18181b;
+  margin-bottom: 4px;
+}
+
+.automation-copy {
+  font-size: 11px;
+  color: #71717a;
+  line-height: 1.5;
+}
+
+.callout {
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.callout-muted {
+  background: #f5f5f4;
+  color: #57534e;
+}
+
+.callout-success {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.callout-error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.smart-matcher-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.smart-match-card {
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fafafa;
+}
+
+.smart-match-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #18181b;
+  margin-bottom: 4px;
+}
+
+.smart-match-meta {
+  font-size: 10px;
+  color: #71717a;
+  margin-bottom: 6px;
+}
+
+.smart-match-why {
+  font-size: 11px;
+  color: #3f3f46;
+  line-height: 1.5;
 }
 
 .panel-fields {
@@ -155,6 +281,12 @@
   color: #3f3f46;
   margin-bottom: 7px;
   line-height: 1.4;
+}
+
+.field-meta {
+  font-size: 10px;
+  color: #71717a;
+  margin-bottom: 8px;
 }
 
 .field-answer-wrap {

@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AQUA</title>
+    <style>
+      body {
+        width: 380px;
+        margin: 0;
+        background: #09090b;
+        color: #f4f4f5;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main { padding: 16px; }
+      h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.04em; }
+      p { margin: 0 0 14px; color: #a1a1aa; font-size: 12px; line-height: 1.5; }
+      label { display: block; margin: 12px 0 6px; color: #a1a1aa; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+      input { box-sizing: border-box; width: 100%; border: 1px solid #27272a; border-radius: 8px; background: #18181b; color: #f4f4f5; padding: 9px 10px; font-size: 12px; }
+      button { width: 100%; margin-top: 8px; border: 1px solid #2563eb; border-radius: 8px; background: #1d4ed8; color: white; padding: 10px 12px; font-weight: 650; cursor: pointer; }
+      button.secondary { background: #18181b; border-color: #3f3f46; color: #e4e4e7; }
+      #status { min-height: 18px; margin-top: 12px; color: #93c5fd; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AQUA</h1>
+      <p>Capture questions, export portal markdown, and pre-fill from your answer bank.</p>
+      <label for="hubUrl">Hub URL</label>
+      <input id="hubUrl" placeholder="https://mos2es.xyz" />
+      <label for="jwt">Session JWT</label>
+      <input id="jwt" placeholder="Paste token from AQUA settings" />
+      <button id="save">Save Connection</button>
+      <button id="capture" class="secondary">Capture Current Page</button>
+      <button id="matcher" class="secondary">Smart Matcher</button>
+      <button id="openHub" class="secondary">Open Full Hub</button>
+      <button id="exportMd" class="secondary">Export MD</button>
+      <p id="status"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

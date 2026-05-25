@@ -16,7 +16,109 @@
 ---
 
 
-Last updated: 2026-05-19 (vscode-claude session)
+Last updated: 2026-05-21 (codex webextension consolidation session)
+
+---
+
+## 2026-05-21 — WebExtension consolidation
+
+**Session:** codex-2026-05-21-webextension-consolidation
+**Claim:** webextension/application-hub + donor scaffold + extension auth routes
+
+### What landed
+
+- `webextension/application-hub/` is now the single live extension implementation path.
+- The old Chrome-only donor scaffold was archived to `webextension/_archive/aqua-extension-donor-2026-05-21/`.
+- Live extension architecture was consolidated around one MV3 manifest and one message bus:
+  - `background.js` = orchestration, settings, API calls
+  - `content.js` = field detection, fill, blur capture, Markdown export, Safari fallback panel
+  - `sidepanel.html/js` = main operator UI
+  - `popup.html/js` = auth, mode, quick actions
+- Two explicit operating modes now exist in the live extension:
+  - `Local Agent Bridge`
+  - `Manual Assist`
+  - `Automation Assist`
+- Extension storage keys were normalized to:
+  - `jwt`
+  - `hubUrl`
+  - `agentUrl`
+  - `mode`
+  - `automationEnabled`
+  - `lastActiveTab`
+- Donor features migrated into the live extension:
+  - canonical capture flow
+  - Smart Matcher trigger
+  - popup connection fields and quick-action pattern
+- Extension-facing app routes were patched to accept bearer JWT auth from the extension in addition to cookie sessions:
+  - `/api/integrations/key`
+  - `/api/hub/ingest`
+  - `/api/hub/smart-matcher`
+  - `/api/hub/autofill-eligibility`
+- New helper added at `app/lib/supabase/request-auth.ts` to centralize cookie-or-bearer request auth.
+- Webextension docs updated to match reality:
+  - `webextension/README.md`
+  - `webextension/CLAUDE.md`
+  - `webextension/TASKS.md`
+  - `webextension/application-hub/README.md`
+- Added local helper server at `scripts/local-extension-agent.mjs` plus root command `npm run extension:agent`. The helper accepts current-page captures from the extension, saves them into `qaapplication/inbox/`, and returns nearest existing application files from the local corpus.
+- Added `scripts/export-open-tabs.mjs` plus `npm run tabs:export` for exporting open Safari or Chrome tabs into Markdown under `qaapplication/inbox/`; Safari is now grouped by real browser windows and tab counts after a parser fix.
+- Copied `SEEDING_PLAN.md` into `qaapplication/` so the category seeding / indexing instructions live beside the application corpus.
+- Imported the remaining `mcp_eval/` markdown docs into `qaapplication/` so the application/eval corpus lives in one place.
+- Added a separate `webextension/x-bookmarks/` userscript lane for exporting X bookmarks to Markdown or JSON. The exporter now auto-scrolls and accumulates more bookmarks before download. This is intentionally separate from AQUA.
+- Added a Safari-compatible `webextension/safari/qa-link-capture.user.js` userscript that sends the current page to the local QA agent with site/company/application hints and visible field capture.
+- Added `webextension/safari/INSTALL-QA-LINK-CAPTURE.md` as the quick setup guide for the Safari QA capture lane.
+- Added a `codex/README.md` index so the local application corpus and rough notes are easier to navigate.
+
+### Verification completed
+
+- `node --check` passed on extension JS files
+- `cd app && npm run type-check` passed
+- `cd app && npm run build` passed
+- `python3 .agents/check.py` passed
+- `git diff --check` passed
+
+### Important caveat
+
+This pass is structurally implemented and statically verified, but it is not yet runtime-certified in a real unpacked Chrome session. The next required check is a browser smoke pass covering:
+
+- popup save/clear flow
+- side panel open
+- field detection on a live/simple form
+- manual generate/fill/export
+- automation capture to hub
+- Smart Matcher
+- bulk-assist threshold gating
+
+---
+
+## 2026-05-20 — Canonical rebuild scaffold
+
+**Session:** codex-2026-05-20-canonical-rebuild
+**Claim:** canonical rebuild file lanes
+
+### What landed
+
+- `REBUILD/CANONICAL_REBUILD_TASKS.md` created as the implementation checklist for the Grok deep-dive rebuild.
+- Supabase migrations `042` through `046` added:
+  - Canonical commitments, answer variants, application packages, lineage events
+  - Canonical RPCs, embedding column, hybrid search, package retrieval, smart matcher search
+  - Rewards and payout-ready contribution ledger
+  - Aggregate stats/history for high-fidelity variants
+  - Seeding entities and manual review gate for real application data
+- Migration chain high-water mark in repo is now `001-047` (`048` next).
+- `supabase/functions/canonical-hub/` scaffolded with `ingest`, `qualify`, `export`, and `map_variant` actions.
+- `supabase/functions/smart-matcher/` scaffolded for persona-aware recommendations.
+- Next.js APIs added under `/api/hub/*` plus Stripe payout scaffold.
+- Reusable UI components added for ingestion, variant review, highlight refinement, and Smart Matcher feed.
+- Chrome MV3 extension scaffold added at `webextension/chrome/aqua-extension/`.
+- MCP wrapper tools added under the `aqua.*` namespace.
+- `docs/CANONICAL_HUB.md` and `docs/CANONICAL_RESET_RECIPE.md` added.
+- Supabase CLI migration history repaired: drift entries `20260512153021` and `20260513011652` marked reverted, local `040` and `041` marked applied, and migrations `042`-`046` pushed to the linked Supabase project.
+- Stress test pass 1: app/MCP/Edge checks passed, unauthenticated hub routes fail closed, remote canonical schema exists, and `canonical-hub` + `smart-matcher` Edge Functions are deployed. Edge Function identity handling was tightened to derive user identity from JWT instead of trusting payload `user_id`.
+
+### Important caveat
+
+The proprietary algorithms are intentionally placeholders and are marked with `TODO: Your IP` in the implementation. Production scoring still needs Deric's exact formulas for commitment similarity, language quantification, fidelity, SigTune/contextual scoring, and variant reduction thresholds.
 
 ---
 

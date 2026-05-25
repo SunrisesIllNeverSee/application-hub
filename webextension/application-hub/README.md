@@ -1,92 +1,82 @@
 # AQUA — Application Hub Browser Extension
 
-> v0.2 — AQUA agent panel + universal site support + BYOK generation
+One live extension. Two operating modes.
 
-AQUA is a browser extension that detects application form fields on any site,
-matches them to your answer bank, and generates tailored answers using your own AI key.
+- `Manual Assist`: detect, review, generate, fill, export, save
+- `Automation Assist`: capture to Canonical Hub, Smart Matcher, threshold-gated bulk assist
+- `Local Agent Bridge`: send the current application page into your local workspace without auth
 
----
+## Load locally
 
-## Dev setup
+### Chrome
 
-**Chrome (load unpacked):**
+1. Open `chrome://extensions`
+2. Enable Developer Mode
+3. Load unpacked from `/Users/dericmchenry/Desktop/application-hub/webextension/application-hub`
+4. Click the toolbar icon to open the popup
+5. Use `Open side panel` from the popup
+6. Optional local agent lane: run `npm run extension:agent` from the repo root, then use `Send to local agent`
 
-1. `chrome://extensions` → Enable Developer Mode
-2. Load unpacked → select this `webextension/application-hub/` folder
-3. Click toolbar icon → "Open AQUA panel" → side panel opens
+### Firefox
 
-**Firefox:**
+1. Open `about:debugging#/runtime/this-firefox`
+2. Load Temporary Add-on
+3. Select `/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/manifest.json`
 
-1. `about:debugging#/runtime/this-firefox` → Load Temporary Add-on
-2. Select `manifest.json` in this folder
-3. Click toolbar icon → sidebar opens automatically
+## File ownership map
 
-**Safari:**
+| File | Owns |
+| --- | --- |
+| [manifest.json](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/manifest.json) | MV3 wiring, permissions, popup, side panel, content injection |
+| [background.js](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/background.js) | Settings, message bus, API calls, canonical capture, Smart Matcher, autofill gating |
+| [content.js](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/content.js) | Field detection, fill commands, blur capture, page scrape/export, Safari fallback panel |
+| [sidepanel.html](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/sidepanel.html) | Main extension UI shell |
+| [sidepanel.js](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/sidepanel.js) | Manual and automation workflows, field cards, bulk assist UX |
+| [popup.html](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/popup.html) | Lightweight auth, mode toggle, quick actions |
+| [popup.js](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/popup.js) | Popup state, connection save/clear, quick action dispatch |
+| [styles.css](/Users/dericmchenry/Desktop/application-hub/webextension/application-hub/styles.css) | Panel, callout, field-card, and overlay styling |
 
-- Requires Xcode.app (not yet installed — see `webextension/safari/README.md`)
-- Fallback: the `userscript/application-hub.user.js` works in Safari today via the Userscripts app
+## Request flow map
 
----
+### Manual Assist
 
-## How it works
+1. `content.js` scans fields and sends `FIELDS_DETECTED_FROM_PAGE`
+2. `background.js` calls `POST /api/match-question`
+3. `sidepanel.js` renders matched fields
+4. Per-field generation uses `GET /api/integrations/key` plus the user's BYOK provider
+5. Fill commands route back through `content.js`
+6. Save-to-bank uses `POST /api/answers/capture`
+7. Export uses `content.js` page scrape to Markdown
 
-1. Content script scans any page for `<textarea>` and `<input>` fields + their labels
-2. Fields are sent to background → semantically matched against your answer bank
-3. AQUA panel opens (native side panel on Chrome/Firefox, injected iframe on Safari)
-4. Per field: "Generate" calls your BYOK AI key to write a tailored answer
-5. "Fill field" injects the answer into the live form (React-safe native setter)
-6. "Save to bank" captures the answer back to your Application Hub answer bank
-7. "Export MD" downloads the full page as structured markdown
+### Automation Assist
 
----
+1. `sidepanel.js` or `popup.js` triggers `CANONICAL_INGEST_REQUEST`
+2. `background.js` requests page capture from `content.js`
+3. `background.js` calls `POST /api/hub/ingest`
+4. Smart Matcher uses `POST /api/hub/smart-matcher`
+5. Bulk Assist checks `POST /api/hub/autofill-eligibility`
+6. If level 1 thresholds pass, the extension fills matched answers in bulk
 
-## Architecture
+### Local Agent Bridge
 
-```text
-content.js          — scans DOM, fills fields, export MD, captures on blur
-background.js       — semantic matching, BYOK fetch, Claude/OpenAI generation
-sidepanel.html/js   — AQUA agent UI (one card per detected field)
-popup.html/js       — auth token + "Open AQUA panel" button
-styles.css          — overlay + panel + button system
-manifest.json       — MV3, <all_urls>, sidePanel (Chrome), sidebar_action (Firefox)
-```
+1. Start the helper with `npm run extension:agent`
+2. The extension sends the current page capture to `http://127.0.0.1:4317/assist`
+3. The helper saves the page into `qaapplication/inbox/`
+4. The helper returns the closest files from `qaapplication/` so you can open the current application beside prior ones in VS Code
 
----
+## Auth model
 
-## Browser support
+The extension stores a user JWT in extension local storage for v1. Live app routes now accept either:
 
-| Browser | Panel | Status |
-| ------- | ----- | ------ |
-| Chrome 114+ | Native side panel | Ready — load unpacked |
-| Firefox | Native sidebar (`sidebar_action`) | Ready — load temp add-on |
-| Edge | Native side panel (same as Chrome) | Ready — same build |
-| Safari | Injected iframe (content script) | Needs Xcode for native install |
+- the standard session cookie
+- a bearer JWT from the extension
 
----
+That keeps one auth model across popup, panel, and background without introducing service-role behavior.
 
-## API endpoints used
+For the `Local Agent Bridge`, sign-in is not required. It is a purely local workspace assist lane.
 
-| Endpoint | Purpose |
-| -------- | ------- |
-| `GET /api/auth/token` | Session JWT for the extension |
-| `POST /api/match-question` | Semantic match: question → best answer |
-| `GET /api/integrations/key` | Retrieve decrypted BYOK key for generation |
-| `POST /api/answers/capture` | Save answer back to bank after editing |
+## Notes
 
----
-
-## Connect your account
-
-1. Go to **mos2es.xyz → Profile → Settings**
-2. Scroll to **"Appfeeder Extension"** → click **"Show session token"** → Copy
-3. Paste into the extension popup → Save
-
----
-
-## What's next
-
-- Stream generation responses token by token in the panel
-- Program DNA context: pull the program's weighted themes to inform generation
-- Multi-page form persistence across page navigations
-- Safari native extension (blocked on Xcode.app install)
-- Store submission (Chrome Web Store, Firefox AMO)
+- `chrome.*` is the live implementation for this pass.
+- The archived donor scaffold lives in `_archive/` and should not be treated as runnable current code.
+- A future WXT or TypeScript rebuild is fine later, but it is not the present architecture.

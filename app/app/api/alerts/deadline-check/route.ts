@@ -136,15 +136,12 @@ async function sendDeadlineEmail(
 
 function isAuthorized(req: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   const authHeader = req.headers.get('authorization') ?? ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
 
-  if (!token) return false
-  if (cronSecret && token === cronSecret) return true
-  if (serviceRoleKey && token === serviceRoleKey) return true
-  return false
+  if (!token || !cronSecret) return false
+  return token === cronSecret
 }
 
 // ------------------------------------------------------------
