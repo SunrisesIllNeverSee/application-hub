@@ -9,15 +9,16 @@ in pipeline order.
 01-inbox/         raw drops (single-program HTML / markdown captures)
 02-processing/    multi-program captures being triaged
 03-programs/      entity index — companies/programs themselves (one file per program)
-04-applications/  canonical filled records of submitted applications
+04-applications/  bare application form structure per program (no answers — filled records live in 07-answers/archive/)
 05-questions/
   ├── source/     normalized Q-only per program (where each Q came from)
   └── index/      master index of every unique question asked across all programs
 06-workshop/      active editing — where Q's get answered before submission
   └── _shared/    shared resources (context, sources, raw, uploads)
 07-answers/
+  ├── archived_applications/  full filled application records (moved from 04 after submission)
   ├── archive/    paired Q+A per submitted program
-  └── index/      flat bank of every answer text, indexed for retrieval
+  └── index/      rolling indexed answers per theme (bio.md, project.md, moat.md, …); entries keyed by QU-XXXX serialize code · slug · timestamp
 ```
 
 Plus orthogonal files/folders (don't carry forward in the flow):
@@ -42,11 +43,12 @@ new capture → 01-inbox/<raw>.html
 06-workshop/_shared/raw/<raw>.x    ← raw moved for audit
    ↓ fill in answers in workshop
    ↓ submit
-04-applications/<slug>.md          ← canonical filled record
+04-applications/<slug>.md          ← bare form structure (sections, field types, no answers)
+07-answers/archived_applications/<slug>.md  ← full filled application record
 07-answers/archive/<slug>.md       ← paired Q+A archived
    ↓ harvest across programs
-05-questions/index/                ← every unique Q seen, cross-referenced
-07-answers/index/                  ← every answer text, indexed for retrieval
+05-questions/index/                ← every unique Q seen, cross-referenced (QU-XXXX)
+07-answers/index/<theme>.md        ← rolling indexed answers per theme; entries keyed by QU-XXXX · slug · timestamp
    ↓ next draft
 06-workshop/<new-slug>.md          ← pulls reusable answers from 07-answers/index/
 ```

@@ -1,121 +1,57 @@
-solofund may22nd deadline
+---
+application_ref: AP-solo-fund-2026-05
+entity_ref: EN-solo-fund
+slug: solo-fund
+program_name: Solo Fund (SFP)
+status: bare
+source_url: https://solofounderprogram.com/
+form_host: custom
+---
 
+# Solo Fund (SFP) — Application (bare form)
 
-Linkedin profile *
+- **Program:** Solo Fund (SFP) — Solo Founders Program, San Francisco
+- **Kickoff:** 2026-05-22 (3-month in-person program)
+- **Form host:** custom apply form
 
-Linkedin profile:
-Twitter profile *
+## Form structure
 
-Twitter profile:
-What citizenship(s) do you currently hold? *
-(You can list more than one.)
+### Section 1 — Founder identity
 
-What citizenship(s) do you currently hold?:
-What best describes your current U.S. visa or immigration situation? *
-I do not need a visa to be in the U.S. (e.g. U.S. citizen or permanent resident)
-I already have a U.S. visa or status
-I would need a visa to be in the U.S.
-What best describes your current U.S. visa or immigration situation?:
-If applicable, please briefly specify your current visa or status.
+| Field | Type | Notes |
+| --- | --- | --- |
+| LinkedIn profile | url | required |
+| Twitter profile | url | required |
+| Citizenship(s) | short text | required · list multiple if applicable |
+| U.S. visa / immigration situation | select | required (no visa needed / have visa / need visa) |
+| Visa or status specifics | short text | conditional |
 
-If applicable, please briefly specify your current visa or status.:
-Where do you currently live?
-Country *
-United States
+### Section 2 — Location
 
+| Field | Type | Notes |
+| --- | --- | --- |
+| Country | select | default United States |
+| State | select | required |
+| City | short text | required |
 
-Country:
-State *
+### Section 3 — Program logistics
 
-State:
-City *
+| Field | Type | Notes |
+| --- | --- | --- |
+| Can you be fully in-person in SF for the 3-month program? | Yes / No | required |
+| Conflicting commitments + dates | long text | optional |
+| Housing preference | select (SFP house $1,500/mo / find own SF / already Bay Area / arrange own) | required |
 
-City:
-Can you be fully in-person in San Francisco for the 3-month program (no remote)? *
-Kickoff date: May 22, 2026.
-Yes
-No
-Can you be fully in-person in San Francisco for the 3-month program (no remote)?:
-If there are any commitments that may affect your availability, please briefly describe them and include dates (leave blank if none):
+### Section 4 — Startup
 
-If there are any commitments that may affect your availability, please briefly describe them and include dates (leave blank if none)::
-Housing: If accepted, would you prefer SFP housing ($1,500/month, private bedroom above the office) or arrange your own? Space is limited. *
-I’m interested in living at the Solo Founders house
-I’ll find my own housing in San Francisco
-I already live in the Bay Area
-Prefer to arrange my own housing in San Francisco
-Housing: If accepted, would you prefer SFP housing ($1,500/month, private bedroom above the office) or arrange your own? Space is limited.:
-Company website (if applicable)
+| Field | Type | Notes |
+| --- | --- | --- |
+| Company website | url | optional |
+| Stage | select (Building MVP / Exploring / Launched / Revenue / Pre-seed/Angel raised / Seed+ raised) | required |
 
-Company website (if applicable):
-What stage best describes you? *
-Building an MVP
-Exploring an idea
-Launched and have early users
-Generating revenue
-Raised pre-seed or angel funding
-Raised seed or later
-What stage best describes you?:
+## Filled record (submitted)
 
-
-
-
-
-Linkedin profile *
-
-Linkedin profile:
-Twitter profile *
-
-Twitter profile:
-What citizenship(s) do you currently hold? *
-(You can list more than one.)
-
-What citizenship(s) do you currently hold?:
-What best describes your current U.S. visa or immigration situation? *
-I do not need a visa to be in the U.S. (e.g. U.S. citizen or permanent resident)
-I already have a U.S. visa or status
-I would need a visa to be in the U.S.
-What best describes your current U.S. visa or immigration situation?:
-If applicable, please briefly specify your current visa or status.
-
-If applicable, please briefly specify your current visa or status.:
-Where do you currently live?
-Country *
-United States
-
-
-Country:
-State *
-
-State:
-City *
-
-City:
-Can you be fully in-person in San Francisco for the 3-month program (no remote)? *
-Kickoff date: May 22, 2026.
-Yes
-No
-Can you be fully in-person in San Francisco for the 3-month program (no remote)?:
-If there are any commitments that may affect your availability, please briefly describe them and include dates (leave blank if none):
-
-If there are any commitments that may affect your availability, please briefly describe them and include dates (leave blank if none)::
-Housing: If accepted, would you prefer SFP housing ($1,500/month, private bedroom above the office) or arrange your own? Space is limited. *
-I’m interested in living at the Solo Founders house
-I’ll find my own housing in San Francisco
-I already live in the Bay Area
-Prefer to arrange my own housing in San Francisco
-Housing: If accepted, would you prefer SFP housing ($1,500/month, private bedroom above the office) or arrange your own? Space is limited.:
-Company website (if applicable)
-
-Company website (if applicable):
-What stage best describes you? *
-Building an MVP
-Exploring an idea
-Launched and have early users
-Generating revenue
-Raised pre-seed or angel funding
-Raised seed or later
-What stage best describes you?:
-
-
-
+- **Submitted:** ~May 2026
+- **Status:** Submitted, awaiting response
+- **Filled record:** [`07-answers/archived_applications/solo-fund.md`](../07-answers/archived_applications/solo-fund.md)
+- **Paired Q+A:** [`07-answers/archive/solo-fund.md`](../07-answers/archive/solo-fund.md)
