@@ -61,7 +61,7 @@ This file is the granular task list. `ROADMAP.md` is the sequence. `SCRATCH.md` 
 
 ## Live State
 
-App is live at `https://mos2es.xyz`. Migrations through `037`. Stripe live (1 real checkout). GitHub OAuth live. Funders index, archive page, standalone Answer Bank, heat scores, deadline seeding, responsive QA, FundingCake pipeline, applicant modes, credits system all shipped. P2 complete. Moving to P3 + product rethink.
+App is live at `https://mos2es.xyz`. For current migration chain, shipped-state counts, and remote truth, use `STATUS.md` and `.agents/registry.yaml`. Stripe live (1 real checkout). GitHub OAuth live. Funders index, archive page, standalone Answer Bank, heat scores, deadline seeding, responsive QA, FundingCake pipeline, applicant modes, credits system all shipped. P2 complete. Moving to P3 + product rethink.
 
 ### Bugs to fix
 
@@ -103,8 +103,9 @@ These are the facts that make a soft launch possible now.
 **Owner**: Cowork + Codex
 **Status**: Done
 
-- 842 programs archived
-- 225 questions archived/scored
+- Current archive/opportunity counts: see `STATUS.md`
+- Current archive/question counts: see `STATUS.md`
+- A scored question archive substantial enough to support real founder workflows
 - Significance scoring and program DNA live
 - MCP server: 21 tools, 7 resources, 3 prompts
 - Next.js app: Hub, program detail, workspace, profile/answer bank
@@ -536,13 +537,12 @@ Canonical doc: `docs/06_rns_integrated_build_path.md`.
 - [x] Workspace opportunity ranking — `opportunityScore()` ranks active apps; best-unopened section shows top 5 unapplied
 - [x] Recruiter agent — weekly match email with dedup (`migrations/027`, edge function, `/api/cron/recruiter`)
 - [x] v3 schema design — global question archive as core asset
-- [x] Supabase migrations through 026
+- [x] Supabase migration chain established — see `STATUS.md` / `.agents/registry.yaml` for current high-water mark
 - [x] MCP server — 21 tools, 7 resources, 3 prompts, clean TypeScript build
 - [x] MCP server README for Claude Desktop, Cursor, Windsurf
 - [x] CI workflow for MCP server and Next.js app
 - [x] `docs/SECURITY.md`, `docs/ARCHITECTURE.md`, `STATUS.md`
-- [x] 842 programs available in Supabase
-- [x] 225 questions archived
+- [x] Archive seeded in Supabase — see `STATUS.md` for current opportunity/question counts
 - [x] `compute_significance_scores()` executed
 - [x] `compute_program_dna()` executed
 - [x] Next.js app scaffold

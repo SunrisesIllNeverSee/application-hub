@@ -62,6 +62,6 @@
 
 - **Submitted:** 2026-05-23
 - **Status:** Submitted, awaiting response
-- **Paired Q+A:** [`07-answers/archive/cyberfund.md`](../07-answers/archive/cyberfund.md)
-- **Raw transcript:** [`06-workshop/_shared/raw/cyberfund-transcript.md`](../06-workshop/_shared/raw/cyberfund-transcript.md)
+- **Paired Q+A:** [`09-submitted/archive/cyberfund.md`](../09-submitted/archive/cyberfund.md)
+- **Raw transcript:** [`08-apply/_shared/raw/cyberfund-transcript.md`](../08-apply/_shared/raw/cyberfund-transcript.md)
 - **Uploaded assets:** Conservation Law of Commitment V.05 (PDF · Zenodo DOI 10.5281/zenodo.20029607) · mos2es.com field-sheet · KASSA voice-demo brief

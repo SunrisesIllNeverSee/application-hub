@@ -274,9 +274,9 @@ The index file is where many `AQ` instances converge on one canonical question.
 
 ---
 
-## `06-workshop/<slug>.md`
+## `08-apply/<slug>.md`
 
-This is the active working surface.
+This is the active application-assembly surface.
 
 It may include interpretation, draft answers, and manual notes, but it should still be serializable.
 
@@ -307,11 +307,11 @@ What are you building?
 
 ### Relationship rule
 
-The workshop file is not the parent truth, but every draft block should still carry `AQ` and `QU` so the lineage remains machine-pullable.
+The apply file is not the parent truth, but every draft block should still carry `AQ` and `QU` so the lineage remains machine-pullable.
 
 ---
 
-## `07-answers/archive/<slug>.md`
+## `09-submitted/archive/<slug>.md`
 
 This is the answer archive per submitted application.
 
@@ -356,8 +356,8 @@ When automation ingests a slugged QA record set, it should pull in this order:
 2. `04-applications/<slug>.md` → application instance
 3. `05-questions/source/<slug>.md` → `AQ` rows
 4. `05-questions/index/*.md` → `QU` mappings
-5. `06-workshop/<slug>.md` → optional draft/review layer
-6. `07-answers/archive/<slug>.md` → answer archive layer
+5. `08-apply/<slug>.md` → optional draft/review layer
+6. `09-submitted/archive/<slug>.md` → answer archive layer
 
 This keeps parent ingestion deterministic:
 - entity first

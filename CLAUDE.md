@@ -221,10 +221,10 @@ Recommended MCPs to add for this project:
 | Component | Status |
 |---|---|
 | v3 schema design | ✅ Done |
-| Supabase migrations through 026 | ✅ Done |
+| Supabase migration chain | ✅ See `STATUS.md` / `.agents/registry.yaml` for the current high-water mark |
 | MCP server (21 tools, 7 resources, 3 prompts) | ✅ Done — clean build |
-| Program archive | ✅ Done — 842 programs in Supabase `betcyfbzsgusaghriptz` |
-| Intelligence layer (significance + DNA) | ✅ Done — RPCs executed, 225 questions scored |
+| Program archive | ✅ Done — current counts live in `STATUS.md` |
+| Intelligence layer (significance + DNA) | ✅ Done — current archive/question counts live in `STATUS.md` |
 | Next.js app scaffold | ✅ Done — auth, app router, Supabase SSR client, layouts |
 | Auth callback path | ✅ Done — magic links land at real `/auth/callback` route |
 | Hub UI (program directory + timeline) | ✅ Done — all column refs fixed, wired to live DB |

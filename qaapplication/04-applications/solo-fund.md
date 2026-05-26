@@ -53,5 +53,5 @@ form_host: custom
 
 - **Submitted:** ~May 2026
 - **Status:** Submitted, awaiting response
-- **Filled record:** [`07-answers/archived_applications/solo-fund.md`](../07-answers/archived_applications/solo-fund.md)
-- **Paired Q+A:** [`07-answers/archive/solo-fund.md`](../07-answers/archive/solo-fund.md)
+- **Filled record:** [`09-submitted/archived_applications/solo-fund.md`](../09-submitted/archived_applications/solo-fund.md)
+- **Paired Q+A:** [`09-submitted/archive/solo-fund.md`](../09-submitted/archive/solo-fund.md)

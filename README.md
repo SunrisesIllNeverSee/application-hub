@@ -31,8 +31,7 @@ The public wedge is startup opportunities. The underlying spine is broad enough 
 | Surface | State |
 |---|---|
 | Live app | `https://mos2es.xyz` |
-| Opportunity archive | 842 programs/opportunities |
-| Question archive | 225 scored questions |
+| Archive + migration counts | See `STATUS.md` and `.agents/registry.yaml` |
 | MCP server | 21 tools, 7 resources, 3 prompts |
 | Web product | Hub, Bank, workspace, profile split, imports, BYOK |
 | Review layer | persisted reviews + stress tests + starter reviewer family |
@@ -42,7 +41,7 @@ The public wedge is startup opportunities. The underlying spine is broad enough 
 ```mermaid
 flowchart TD
     A["Next.js app on Vercel"] --> B["App APIs + MCP server"]
-    B --> C["Supabase<br/>842 programs<br/>225 archived questions<br/>RLS + scoring"]
+    B --> C["Supabase<br/>portable application graph<br/>RLS + scoring"]
     B --> D["BYOK providers<br/>Anthropic / OpenAI / Ollama / Google"]
     B --> E["Stripe"]
 ```
@@ -67,7 +66,7 @@ npm run check
 ```
 
 Prerequisites:
-- live Supabase project with migrations through `027`
+- live Supabase project aligned with the current migration chain in `STATUS.md` / `.agents/registry.yaml`
 - app env vars for Supabase
 - MCP env vars for Supabase service-role + anon access
 

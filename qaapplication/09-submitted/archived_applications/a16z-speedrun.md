@@ -83,4 +83,4 @@ The protocol layer for semantic meaning at point of execution. What TCP/IP did f
 ## Source pointers
 
 - Bare form: [`04-applications/a16z-speedrun.md`](../../04-applications/a16z-speedrun.md)
-- Paired Q+A: [`07-answers/archive/a16z-speedrun.md`](../archive/a16z-speedrun.md)
+- Paired Q+A: [`09-submitted/archive/a16z-speedrun.md`](../archive/a16z-speedrun.md)

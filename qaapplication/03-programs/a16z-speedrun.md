@@ -18,4 +18,4 @@ agent benchmarks emphasis.
 
 - application form / Q set: ../05-questions/source/a16z-speedrun.md
 - submitted record: ../04-applications/a16z-speedrun.md
-- answer archive: ../07-answers/archive/a16z-speedrun.md
+- answer archive: ../09-submitted/archive/a16z-speedrun.md

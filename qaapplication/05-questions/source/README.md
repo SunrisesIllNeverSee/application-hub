@@ -10,7 +10,7 @@ See `../../src/archive-serialization-spec.md`.
 ## Naming
 
 `<slug>.md` — same slug as `../../04-applications/<slug>.md`,
-`../../06-workshop/<slug>.md`, and `../../07-answers/archive/<slug>.md`.
+`../../08-apply/<slug>.md`, and `../../09-submitted/archive/<slug>.md`.
 
 ## Why this folder exists
 
@@ -40,5 +40,5 @@ Verbatim questions. No editorial commentary.
 ## Downstream
 
 The cross-program index in `../index/` is built by harvesting across
-every file here. The answer-side companion at `../../07-answers/archive/`
+every file here. The answer-side companion at `../../09-submitted/archive/`
 holds the same questions paired with their answers.

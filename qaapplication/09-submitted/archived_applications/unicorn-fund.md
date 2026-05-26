@@ -32,5 +32,5 @@ for 2026-06-02.
 ## Source pointers
 
 - Bare form: [`04-applications/unicorn-fund.md`](../../04-applications/unicorn-fund.md)
-- Paired Q+A: [`07-answers/archive/unicorn-fund.md`](../archive/unicorn-fund.md)
+- Paired Q+A: [`09-submitted/archive/unicorn-fund.md`](../archive/unicorn-fund.md)
 - Question set: [`05-questions/source/unicorn-fund.md`](../../05-questions/source/unicorn-fund.md)

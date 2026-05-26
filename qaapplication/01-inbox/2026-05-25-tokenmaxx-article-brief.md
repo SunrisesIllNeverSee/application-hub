@@ -4,7 +4,7 @@ title: "Tokenmaxx article — premise, context, todos"
 captured_to_inbox: 2026-05-25
 companion: 2026-05-25-grok-tokenmaxx-conversation.md
 status: drafting-brief
-intended_destination: 06-workshop/_shared/ (once promoted out of inbox)
+intended_destination: 08-apply/_shared/ (once promoted out of inbox)
 ---
 
 # Tokenmaxx Article — Brief
@@ -193,10 +193,10 @@ Grok asked for these — they are the differentiator vs. generic essays:
 - [ ] Decide call-to-action phrasing (consistent with governance-vacuum
       article: "actively seeking collaboration, work, or funding").
 - [ ] Save to `~/Desktop/<slug>.md` (matches governance-vacuum location)
-      OR file under `06-workshop/_shared/` if we want it tracked in this
+      OR file under `08-apply/_shared/` if we want it tracked in this
       repo.
 - [ ] Publish via X CLI per
-      [`006-x-cli-printing-press.md`](../06-workshop/_shared/context/006-x-cli-printing-press.md).
+      [`006-x-cli-printing-press.md`](../08-apply/_shared/context/006-x-cli-printing-press.md).
       Note: X dev account was flagged previously — fallback to manual
       copy-paste is still available.
 - [ ] Cross-post on Zenodo if the article goes long-form enough to want

@@ -56,9 +56,9 @@ The product spine is already live. Current work is:
 
 | Component | Status | Notes |
 |---|---|---|
-| Supabase migrations | ✅ Through `026` | Duplicate numeric prefixes exist for parallel-track history; see migration policy docs |
-| Program archive | ✅ 842 programs | 30 manually seeded + large imported archive |
-| Question archive | ✅ 225 scored questions | significance + DNA live |
+| Supabase migrations | ✅ See `STATUS.md` / `.agents/registry.yaml` | Duplicate numeric prefixes exist for parallel-track history; see migration policy docs |
+| Program archive | ✅ See `STATUS.md` | Summarize here; keep numeric counts in canonical truth docs |
+| Question archive | ✅ See `STATUS.md` | significance + DNA live |
 | MCP server | ✅ 21 tools | review persistence + stress-test persistence included |
 | Next.js app | ✅ live-data wired | Hub, `/bank`, workspace, profile split, import flows |
 | BYOK | ✅ shipped | Anthropic/OpenAI/Ollama/Google path in repo |

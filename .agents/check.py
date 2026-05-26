@@ -263,6 +263,86 @@ def check_nextjs_async_params(findings: list) -> None:
             )
 
 
+def collect_slug_stems(path: Path) -> set[str]:
+    """Collect top-level markdown slug stems from a lane directory."""
+    if not path.exists():
+        return set()
+    return {p.stem for p in path.glob("*.md") if p.is_file() and p.name != "README.md"}
+
+
+def check_qaapplication_lane_parity(findings: list) -> None:
+    """Validate qaapplication lane parity for active apply and submitted flows."""
+    qa_root = REPO_ROOT / "qaapplication"
+    if not qa_root.exists():
+        return
+
+    programs = collect_slug_stems(qa_root / "03-programs")
+    applications = collect_slug_stems(qa_root / "04-applications")
+    question_sources = collect_slug_stems(qa_root / "05-questions" / "source")
+    active_apply = collect_slug_stems(qa_root / "08-apply")
+    submitted_archive = collect_slug_stems(qa_root / "09-submitted" / "archive")
+    submitted_records = collect_slug_stems(
+        qa_root / "09-submitted" / "archived_applications"
+    )
+
+    # Active apply packets should at least have an entity record and a question-source file.
+    for slug in sorted(active_apply):
+        if slug not in programs:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication active apply slug {slug} missing 03-programs/{slug}.md",
+                )
+            )
+        if slug not in question_sources:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication active apply slug {slug} missing 05-questions/source/{slug}.md",
+                )
+            )
+
+    # Submitted archive slugs should line up across the canonical submitted lanes.
+    submitted_union = submitted_archive | applications | question_sources | submitted_records
+    for slug in sorted(submitted_union):
+        if slug in submitted_archive or slug in applications or slug in submitted_records:
+            if slug not in programs:
+                findings.append(
+                    (
+                        "WARN",
+                        f"qaapplication submitted slug {slug} missing 03-programs/{slug}.md",
+                    )
+                )
+            if slug not in applications:
+                findings.append(
+                    (
+                        "WARN",
+                        f"qaapplication submitted slug {slug} missing 04-applications/{slug}.md",
+                    )
+                )
+            if slug not in question_sources:
+                findings.append(
+                    (
+                        "WARN",
+                        f"qaapplication submitted slug {slug} missing 05-questions/source/{slug}.md",
+                    )
+                )
+            if slug not in submitted_archive:
+                findings.append(
+                    (
+                        "WARN",
+                        f"qaapplication submitted slug {slug} missing 09-submitted/archive/{slug}.md",
+                    )
+                )
+            if slug not in submitted_records:
+                findings.append(
+                    (
+                        "WARN",
+                        f"qaapplication submitted slug {slug} missing 09-submitted/archived_applications/{slug}.md",
+                    )
+                )
+
+
 def format_report(findings: list, *, as_json: bool, quiet: bool) -> str:
     if as_json:
         return json.dumps(
@@ -322,6 +402,7 @@ def main() -> int:
     check_released_claims_have_commits(claims_doc, findings)
     check_status_md_agrees(registry, findings)
     check_nextjs_async_params(findings)
+    check_qaapplication_lane_parity(findings)
 
     out = format_report(findings, as_json=args.json, quiet=args.quiet)
     if out:

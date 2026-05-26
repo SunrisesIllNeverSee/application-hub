@@ -25,5 +25,5 @@ application_type: accelerator
 ## Source pointers
 
 - Bare form: [`04-applications/solo-fund.md`](../../04-applications/solo-fund.md)
-- Paired Q+A: [`07-answers/archive/solo-fund.md`](../archive/solo-fund.md)
+- Paired Q+A: [`09-submitted/archive/solo-fund.md`](../archive/solo-fund.md)
 - Question set: [`05-questions/source/solo-fund.md`](../../05-questions/source/solo-fund.md)

@@ -96,5 +96,5 @@ Everything I possibly can. There has been an uptick in interest and events for M
 ## Source pointers
 
 - Bare form: [`04-applications/cyberfund.md`](../../04-applications/cyberfund.md)
-- Paired Q+A: [`07-answers/archive/cyberfund.md`](../archive/cyberfund.md)
-- Raw transcript: [`06-workshop/_shared/raw/cyberfund-transcript.md`](../../06-workshop/_shared/raw/cyberfund-transcript.md)
+- Paired Q+A: [`09-submitted/archive/cyberfund.md`](../archive/cyberfund.md)
+- Raw transcript: [`08-apply/_shared/raw/cyberfund-transcript.md`](../../08-apply/_shared/raw/cyberfund-transcript.md)

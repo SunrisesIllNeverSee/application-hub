@@ -18,5 +18,5 @@ Doc answering the 9 questions in his startup framework (see
 ## Cross-references
 
 - application form / Q set: ../05-questions/source/anthonya-angel.md
-- active draft: ../06-workshop/anthonya-angel.md
-- raw capture: ../06-workshop/_shared/raw/anthonya-angel.md
+- active draft: ../08-apply/anthonya-angel.md
+- raw capture: ../08-apply/_shared/raw/anthonya-angel.md

@@ -82,5 +82,5 @@ form_host: custom
 
 - **Submitted:** Mid-May 2026
 - **Status:** Submitted, awaiting response
-- **Filled record:** [`07-answers/archived_applications/a16z-speedrun.md`](../07-answers/archived_applications/a16z-speedrun.md)
-- **Paired Q+A:** [`07-answers/archive/a16z-speedrun.md`](../07-answers/archive/a16z-speedrun.md)
+- **Filled record:** [`09-submitted/archived_applications/a16z-speedrun.md`](../09-submitted/archived_applications/a16z-speedrun.md)
+- **Paired Q+A:** [`09-submitted/archive/a16z-speedrun.md`](../09-submitted/archive/a16z-speedrun.md)

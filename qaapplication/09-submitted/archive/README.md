@@ -1,4 +1,4 @@
-# 07-answers/archive/ — Paired Q+A Archive per Program
+# 09-submitted/archive/ — Paired Q+A Archive per Program
 
 The **archive layer** for the answer pipeline. One file per submitted
 program (`<slug>.md`), containing Q+A pairs from that program, in the
@@ -20,7 +20,7 @@ Format per entry (answer-first):
 ## Naming
 
 `<slug>.md` — same slug as `../../04-applications/<slug>.md`,
-`../../05-questions/source/<slug>.md`, and `../../06-workshop/<slug>.md`.
+`../../05-questions/source/<slug>.md`, and `../../08-apply/<slug>.md`.
 
 ## archive/ vs index/
 

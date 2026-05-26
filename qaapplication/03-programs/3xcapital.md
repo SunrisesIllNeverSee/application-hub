@@ -20,4 +20,4 @@ non-Web3 founders since the taxonomy doesn't fit cleanly.
 
 - application form / Q set: ../05-questions/source/3xcapital.md
 - submitted record: ../04-applications/3xcapital.md
-- answer archive: ../07-answers/archive/3xcapital.md
+- answer archive: ../09-submitted/archive/3xcapital.md

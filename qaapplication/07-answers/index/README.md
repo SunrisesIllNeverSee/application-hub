@@ -19,7 +19,7 @@ in the **Question legend** table at the top of each theme file.
   question legend, or in the parent `05-questions/index/` lane once
   the question index is harvested)
 - `AP-cyberfund` — application identity (matches the slug used across
-  `03-programs/`, `04-applications/`, `07-answers/archived_applications/`)
+  `03-programs/`, `04-applications/`, `09-submitted/archived_applications/`)
 - `2026-05-23` — submission date
 
 ## Themes
@@ -40,10 +40,10 @@ in the **Question legend** table at the top of each theme file.
 
 Every `AP-<slug>` referenced in this lane resolves to:
 
-- Entity: `03-programs/<slug>.md`
-- Bare form: `04-applications/<slug>.md`
-- Filled record: `07-answers/archived_applications/<slug>.md`
-- Paired Q+A: `07-answers/archive/<slug>.md`
+- Entity: `../../03-programs/<slug>.md`
+- Bare form: `../../04-applications/<slug>.md`
+- Filled record: `../../09-submitted/archived_applications/<slug>.md`
+- Paired Q+A: `../../09-submitted/archive/<slug>.md`
 
 Currently indexed applications:
 
