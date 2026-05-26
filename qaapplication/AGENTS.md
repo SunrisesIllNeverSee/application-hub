@@ -1,18 +1,15 @@
 <claude-mem-context>
 # Memory Context
 
-# [qaapplication] recent context, 2026-05-26 5:02pm EDT
+# [qaapplication] recent context, 2026-05-26 5:04pm EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (22,770t read) | 552,985t work | 96% savings
+Stats: 50 obs (22,161t read) | 528,296t work | 96% savings
 
 ### May 25, 2026
-495 12:54a 🟣 Placeholder archived applications created for solo-fund and unicorn-fund with missing answers
-497 12:55a 🔄 All application files converted to bare form templates with structured schema
-498 " 🟣 Rolling indexed bio answers file created with serialized question codes
 499 12:58a 🟣 Background theme rolling indexed answers file created with QU-0019 and QU-0020
 500 12:59a 🟣 Project theme rolling indexed answers file created with QU-0021 through QU-0029
 501 " 🟣 Problem and moat theme rolling indexed answer files created with QU-0030 through QU-0034
@@ -71,6 +68,9 @@ S1225 Apply tokenmaxxing narrative edits to submitted YC Summer 2026 application
 801 " 🟣 Agent coordination checker extended with qaapplication lane parity validation
 802 " 🔵 Lane parity validation detected incomplete YC application record
 803 12:51p ✅ YC application lane parity restored with structural placeholder files
+804 5:03p 🔄 Application workflow folder structure restructured from workshop/answers to apply/submitted model
+805 " ✅ Lane hardening documentation and audit trail added for 08-apply and 09-submitted migration
+806 5:04p 🔵 Lane parity validation confirms clean five-lane consistency after restructure
 
-Access 553k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 528k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
