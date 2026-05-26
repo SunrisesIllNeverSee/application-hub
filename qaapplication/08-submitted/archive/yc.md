@@ -50,13 +50,6 @@ Constitutional governance for AI systems.
 
 ## Q8. What is your company going to make? Please describe your product and what it does or will do.
 
-MO§ES™ mathematically formalizes and measures "signal" in language, then uses that measurement as a constitutional layer for AI systems and agents.
-
-Signal is the commitment-bearing content in any language interaction — the part that carries meaning, intent, and obligation. We measure it. We extract it. We enforce it.
-
-When an AI pipeline compresses, paraphrases, summarizes, or passes language between agents, something either survives or it doesn't. MO§ES™ is the substrate that proves which — and blocks execution when it doesn't. Not a policy layer bolted on top. Not an audit log after the fact. Constitutional enforcement at the moment the action fires.
-
-
 The initial problem I set out to solve was building the first operator-based AI leaderboard — video-game-style metrics and stats for AI users, not models. Today's AI measurement is model-only: benchmark scores and like/dislike buttons. Nothing measures what the human operator is actually doing inside their sessions.
 
 That rabbit hole led me to Commitment Theory. To produce stats on users inside private conversations, you first have to identify what's being measured — and in AI, there's only one substrate rich enough to carry that signal: language itself. Commitment Theory quantifies the unquantifiable: it treats commitment as a conserved physical quantity in language, the way energy is conserved in classical mechanics.
