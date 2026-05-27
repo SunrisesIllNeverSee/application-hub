@@ -303,44 +303,45 @@ def check_qaapplication_lane_parity(findings: list) -> None:
             )
 
     # Submitted archive slugs should line up across the canonical submitted lanes.
-    submitted_union = submitted_archive | applications | question_sources | submitted_records
+    # A bare 04-applications record can exist before submission, so it should not
+    # by itself force 09-submitted companions to exist.
+    submitted_union = submitted_archive | submitted_records
     for slug in sorted(submitted_union):
-        if slug in submitted_archive or slug in applications or slug in submitted_records:
-            if slug not in programs:
-                findings.append(
-                    (
-                        "WARN",
-                        f"qaapplication submitted slug {slug} missing 03-programs/{slug}.md",
-                    )
+        if slug not in programs:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication submitted slug {slug} missing 03-programs/{slug}.md",
                 )
-            if slug not in applications:
-                findings.append(
-                    (
-                        "WARN",
-                        f"qaapplication submitted slug {slug} missing 04-applications/{slug}.md",
-                    )
+            )
+        if slug not in applications:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication submitted slug {slug} missing 04-applications/{slug}.md",
                 )
-            if slug not in question_sources:
-                findings.append(
-                    (
-                        "WARN",
-                        f"qaapplication submitted slug {slug} missing 05-questions/source/{slug}.md",
-                    )
+            )
+        if slug not in question_sources:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication submitted slug {slug} missing 05-questions/source/{slug}.md",
                 )
-            if slug not in submitted_archive:
-                findings.append(
-                    (
-                        "WARN",
-                        f"qaapplication submitted slug {slug} missing 09-submitted/archive/{slug}.md",
-                    )
+            )
+        if slug not in submitted_archive:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication submitted slug {slug} missing 09-submitted/archive/{slug}.md",
                 )
-            if slug not in submitted_records:
-                findings.append(
-                    (
-                        "WARN",
-                        f"qaapplication submitted slug {slug} missing 09-submitted/archived_applications/{slug}.md",
-                    )
+            )
+        if slug not in submitted_records:
+            findings.append(
+                (
+                    "WARN",
+                    f"qaapplication submitted slug {slug} missing 09-submitted/archived_applications/{slug}.md",
                 )
+            )
 
 
 def format_report(findings: list, *, as_json: bool, quiet: bool) -> str:

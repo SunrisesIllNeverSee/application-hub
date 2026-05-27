@@ -15,6 +15,7 @@ Most recent entries first. Append new entries at the top.
 
 ## 2026-05-26
 
+- **2026-05-26** · **submitted** · `redbud` · Redbud VC Pitch Us form sent. Archived to `09-submitted/archive/redbud.md` and `09-submitted/archived_applications/redbud.md`.
 - **2026-05-26** · **lane hardening** · — · active application workflow now encoded directly in the filesystem as `07-answers/` → `08-apply/` → `09-submitted/`. Moved the former `06-workshop/` lane to `08-apply/`, moved submitted materials out of `07-answers/` into `09-submitted/archive/` + `09-submitted/archived_applications/`, rewrote live docs/spec references, and extended `.agents/check.py` with qaapplication lane-parity enforcement so drift is flagged automatically.
 
 ## 2026-05-24

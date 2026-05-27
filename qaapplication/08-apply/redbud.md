@@ -2,11 +2,12 @@
 
 Drafted: 2026-05-23
 Sources drawn from (in priority order):
-- `context/004-commitment-physics-framing.md` (foundational reframe)
-- `context/003-fde-positioning.md` (category-gap argument)
-- `context/001-moses-constitutional-frame.md` + `002-moses-translation-layer.md`
-- `sources/mchenry-axioms.md` + `conservation-law-paper-notes.md` + `mos2es-com-field-sheet.md` + `mos2es-com-benchmarks.md` + `fde-thread-notes.md`
-- `04-applications/a16z-speedrun.md` (bio + tone reference)
+- `09-submitted/archive/a16z-speedrun.md`
+- `09-submitted/archive/cyberfund.md`
+- `09-submitted/archive/yc.md`
+- `08-apply/_shared/context/001-moses-constitutional-frame.md`
+- `08-apply/_shared/context/002-moses-translation-layer.md`
+- `08-apply/_shared/context/003-fde-positioning.md`
 
 Convention: each answer is plain prose drafted to be paste-able into the Tally form. Source footnote in italics. `[CONFIRM]` tag flags items Deric needs to verify.
 
@@ -90,9 +91,9 @@ Solo founder — no co-founders. MO§ES™ was designed team-agnostic by intent:
 
 ### Q16. Idea/company elevator pitch (1-2 sentences)
 
-MO§ES™ is the substrate that does for the preservation of meaning what TCP/IP did for data: enforcing commitment conservation at the execution level for AI systems and agents alike. Built from physics first, not policy — it doesn't describe governance, it executes it.
+MO§ES™ mathematically formalizes and measures "signal" in language, then uses that measurement as a constitutional layer to govern AI systems at the point of execution.
 
-*Two sentences exactly. Lines pulled from the mos2es.com hero (on-record canonical language) + the physics-first framing from `context/004`. The "doesn't describe governance, it executes it" close is the strongest single line you have on record.*
+*Directly grounded in the prior submitted application language, with the abstraction reduced per feedback.*
 
 ### Q17. Product phase
 
@@ -116,13 +117,15 @@ The full constitutional enforcement layer (Heartbeat, Mediator, Reflex Events, S
 
 ### Q19. Why you/your team?  *(the load-bearing essay)*
 
-Buffalo, NY. Solo founder. Twenty years of professional operating experience before my first AI session in July 2025. In the ten months since, I authored and published a falsifiable physics paper on commitment conservation in language (Zenodo DOI 10.5281/zenodo.20029607, five versioned releases), filed five patent applications and a trademark on the protocol layer, built a working measurement instrument that has processed 1.123 billion tokens across 21 production sessions, and shipped four live products on top — including a 270-endpoint Stripe-Connect agent marketplace and a voice-AI commitment-kernel demo.
+I bring a rare combination to this company: twenty years of professional operating experience, no formal AI credentials, and a level of obsession with the problem that forced me to build the answer myself. My first AI session was in July 2025. In the ten months since, I have published a falsifiable paper on the Conservation Law of Commitment, filed five patent applications plus a trademark, built a working measurement instrument that has processed 1.123 billion tokens across 21 production sessions, and shipped multiple live product surfaces on top of it.
 
-I am not credentialed in AI. I am a Rust Belt operator who got obsessed with a single question — what survives transformation when language is compressed, paraphrased, or recursed — and refused to outsource the answer. The result is the first treatment of commitment as a conserved physical quantity in language, with empirical falsification thresholds, a public test harness, and a patent-protected constitutional enforcement architecture ready to deploy.
+What makes that combination matter is that I did not arrive through the normal technical pipeline. I came at the problem from necessity and curiosity, then stayed because the gap was real. The lack of conventional AI background turned into an advantage because I was not optimizing for accepted language or existing categories. I was trying to understand what actually survives transformation in language and how to measure it.
 
-The "strengthened by struggle" framing isn't a sales angle for me. It's the literal arc. The fact that this work exists at all, came from Buffalo and not Stanford or Palo Alto, and has not yet collapsed under the kind of recursive stress the framework itself predicts as a failure mode, is the empirical proof that both the physics and the operator hold. Capital here doesn't pay for invention. It accelerates deployment of a substrate that's already built.
+That mix of passion, operating experience, and outsider perspective is what produced the results. I am not pitching a concept I still need to discover. I am already building from a body of work that includes empirical measurement, live products, and protected IP. The opportunity now is to turn that into a deployed category-defining company.
 
-*~290 words. Sources: a16z bio + field-sheet IP record + paper + the physics-framing from `context/004`. The "physics and the operator hold" line lands because it makes the founder and the technology share the same proof structure — recursive survivability. Don't soften it.*
+That body of work now includes recent benchmark performance that shows the system working under real production conditions: 1.123 billion tokens processed across 21 sessions, 35,242 lines of code shipped across five build days, 94.66% cache hit rate, and #1 performance across all five measured kernels in the SIGSYSTEM benchmark set against the Artificial Analysis Coding Agent Index.
+
+*Reframed to match the stronger founder positioning in the prior submitted applications, especially cyberfund, with less narrative color and more signal.*
 
 ### Q20. Traction
 
@@ -166,7 +169,7 @@ What I know they don't: **commitment is a conserved physical quantity in languag
 
 The structural reason none of these competitors can become MO§ES™: nobody else built it from physics first. They all built from policy first. **You can't retrofit physics onto a policy-layer system.** That's why every retroactive governance layer keeps failing — they're patching a system that has no conservation substrate underneath.
 
-*~280 words. Strongest competitive-moat block on record. Sources: paper §1.3 related-work + agent-marketplace article + Seema Amble + field-sheet structural-coherence inversion + `context/004` physics-first framing.*
+*~280 words. Strongest competitive-moat block on record. Sources: submitted competitor language plus the category-gap framing from `003-fde-positioning.md`.*
 
 ### Q23. Revenue opportunity and how does the opportunity expand with your vision?
 
@@ -241,10 +244,10 @@ https://mos2es.com/field-sheet
 ## Status
 
 - [x] Draft v1 written
-- [ ] Open questions resolved with Deric
-- [ ] Draft v2 (revisions)
-- [ ] Final review
-- [ ] Submitted
+- [x] Open questions resolved with Deric
+- [x] Draft v2 (revisions)
+- [x] Final review
+- [x] Submitted
 
 ## Word count summary
 
