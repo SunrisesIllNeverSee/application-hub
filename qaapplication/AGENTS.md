@@ -1,13 +1,13 @@
 <claude-mem-context>
 # Memory Context
 
-# [qaapplication] recent context, 2026-05-27 3:30am EDT
+# [qaapplication] recent context, 2026-05-27 3:48am EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (22,095t read) | 484,016t work | 95% savings
+Stats: 50 obs (22,289t read) | 453,275t work | 95% savings
 
 ### May 26, 2026
 S1175 Verify tokenmaxxing content separation between submitted YC application and planned article brief (May 26 at 4:20 AM)
@@ -20,16 +20,6 @@ S1456 Reframe redbud application problem statement from constitutional AI govern
 S1458 Finalize redbud application problem statement with discovery-based narrative positioning (May 26 at 5:41 PM)
 S1461 Refine and sharpen the redbud application problem statement to emphasize operator measurement gap and governance discovery (May 26 at 5:47 PM)
 S1464 Further condense and structure the redbud application problem statement into maximally precise format (May 26 at 6:01 PM)
-849 8:59p 🔵 qaapplication workspace is a subdirectory within application-hub git repository
-850 9:07p ✅ Investor application drafts committed and redbud submission archived
-851 9:10p 🔵 Founding 500 application attachment materials inventory completed
-852 9:13p 🔄 Founding 500 application Q11 restructured with five-attachment package
-853 9:14p ✅ Founding 500 attachment package zipped for submission
-854 " 🔄 Founding 500 Q11 polished with stronger attachment purpose statements
-855 9:16p 🔄 KASSA and Grok demo descriptions enhanced with concrete metrics and philosophical context
-856 9:29p 🔵 PROTOCOL.md missing from qaapplication .agents directory
-857 9:30p 🔄 Qaapplication workflow lanes restructured from 06-workshop/07-answers to 08-apply/09-submitted
-858 " 🔵 No recent Readwise Reader documents found for personalization context
 862 9:40p 🔵 qaapplication workspace coordination files located at parent directory level
 863 9:41p 🔵 qaapplication structured 7-lane investor application pipeline with 7+ submitted programs
 864 9:52p 🔵 QAApplication 7-lane investor application pipeline structure mapped
@@ -71,6 +61,16 @@ S1464 Further condense and structure the redbud application problem statement in
 912 3:25a 🔵 UserProgramFit type missing composite_score field causing type errors in fit scoring display
 913 " 🔴 Fixed UserProgramFit type mismatch by creating FitRow type alias with composite_score field
 914 3:26a ✅ Next.js build successful after completing async migration and TypeScript fixes
+916 3:37a 🔵 Desktop workspace search located burnmydays and Pickle AI project directories
+917 3:39a 🔵 Repository state verification reveals untracked files in Pickle AI and agent-karis after commit
+918 " 🔵 GitHub remote repositories located including newly created mirror repo from today
+919 " 🔵 Target branch devin/1779700047-merge-civitae-research found as default branch of agent-universe-pre-bfg remote repo
+920 " ✅ GitHub repositories renamed Burnmydays to fundscore and mirror to pickle
+921 3:40a ✅ Local directories reorganized to match GitHub renames with three directories deleted
+922 3:43a ✅ GitHub token scopes expanded to include delete_repo and workflow permissions
+923 " ✅ Six GitHub repositories successfully deleted completing repository cleanup operation
+924 3:46a 🔵 Application workspace structure and current state examined
+925 3:47a 🔵 Lane-parity drift detected between active drafting and submitted lanes
 
-Access 484k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 453k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

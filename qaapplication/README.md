@@ -35,6 +35,7 @@ active application assembly second, immutable submitted material third.
 06-answers/
   └── index/      rolling indexed answers per theme (bio.md, project.md, moat.md, …); entries keyed by QU-XXXX serialize code · slug · timestamp
 07-apply/      active application assembly — where Q's get answered before submission
+  ├── need-to-apply/ seeded and queued, but not yet actively pushed
   └── _shared/    shared resources (context, sources, raw, uploads)
 08-submitted/
   ├── archived_applications/  full filled application records
@@ -44,12 +45,14 @@ active application assembly second, immutable submitted material third.
 Notes:
 - `06-answers/` is now the compounding knowledge bank only.
 - `07-apply/` is the live application workbench.
+- `07-apply/need-to-apply/` is the seeded-but-not-yet-filed queue marker.
 - `08-submitted/` is the immutable submission lane.
 
 Plus orthogonal files/folders (don't carry forward in the flow):
 
 ```text
 audit-log.md  append-only ledger of every received/distributed event
+tracker.md    operator-facing status and deadline tracker
 snapshots/    immutable dated/point-in-time captures
 src/          canonical methodology docs
 ```
@@ -84,13 +87,16 @@ The bank compounds. Each step's output feeds the next.
 
 - `06-answers/` becomes the compounding knowledge asset.
 - `07-apply/` becomes the active workbench for one application at a time.
+- `07-apply/need-to-apply/` distinguishes queued applications from actively worked ones.
 - `08-submitted/` becomes the immutable record after the work is done.
 
 ## Current state
 
 - Treat folder placement as the truth of workflow state.
 - `07-apply/` is the only live drafting lane.
+- `07-apply/need-to-apply/` is the queue for seeded applications that still need filing.
 - `08-submitted/` is the only live submission lane.
+- `tracker.md` is the fast-glance status/deadline view.
 - `snapshots/` holds recovered or superseded structures that should not be used for new work.
 - `06-answers/index/` is the live reusable answer bank. Duplicate answer-index copies have been moved out of the active lane.
 
