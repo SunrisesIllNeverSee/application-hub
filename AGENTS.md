@@ -150,20 +150,15 @@ Protocol files:
 <claude-mem-context>
 # Memory Context
 
-# [application-hub] recent context, 2026-05-24 1:16pm EDT
+# [application-hub] recent context, 2026-05-27 7:49am EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 35 obs (13,145t read) | 321,410t work | 96% savings
+Stats: 50 obs (19,282t read) | 405,479t work | 95% savings
 
 ### May 21, 2026
-1 5:42p 🟣 Safari QA Link Capture Installation Guide
-2 5:43p ✅ Safari QA Capture Documentation Committed
-3 5:44p ✅ Safari QA Capture Documentation Pushed to Remote
-5 5:51p 🔵 Extension consolidation complete but runtime-unverified; canonical rebuild branch active
-6 6:03p 🔵 Safari tab export script broken after delimiter refactor
 7 6:05p 🔴 Safari tab export script line ending parsing bug fixed
 8 6:06p ✅ Safari tab export feature committed and pushed to remote
 9 6:09p ✅ Safari tab export script verified working after fix deployment
@@ -174,12 +169,9 @@ Stats: 35 obs (13,145t read) | 321,410t work | 96% savings
 108 12:17p 🔵 May 2026 API usage shows $2,102 spending with peak days exceeding $230
 109 12:18p 🔵 Model-level cost breakdown reveals Opus-4-6 sessions driving $11-14 per session
 112 1:26p 🔵 Groq free-tier TPM limit blocks Hermes agent initialization
-S171 Discovered built-in project exclusion setting in claude-mem to prevent future Hermes observation overhead (May 22 at 1:54 PM)
-S228 User asked about prompt caching documentation relevance and verified Hermes project exclusion status in claude-mem (May 22 at 1:55 PM)
 ### May 23, 2026
 145 4:21p 🔵 User exploring Claude API prompt caching feature
 146 " 🔵 Claude-mem configuration reviewed showing infrastructure and provider settings
-S603 User requested to examine mos2es.com/benchmarks and review the "honest take" benchmark analysis (May 23 at 4:22 PM)
 ### May 24, 2026
 337 9:47a 🔵 AQUA parallel vertical intake pipeline architecture documented
 338 9:48a 🔵 Application Hub current production architecture with MCP server and archive scale
@@ -196,25 +188,43 @@ S603 User requested to examine mos2es.com/benchmarks and review the "honest take
 355 " ✅ Migration 047 registered in agent coordination protocol
 356 10:54a 🔵 Production build succeeds with manual intake workflow integrated
 357 " 🔵 Manual intake workflow implementation spans 10 files with three new untracked directories
-S605 User requested to examine mos2es.com/benchmarks website and review the "honest take" benchmark analysis and comparison data (May 24 at 12:54 PM)
-S607 Review mos2es.com/benchmarks website and analyze the "honest take" benchmark comparison data showing MO§ES vs field average across five measured economic kernels (May 24 at 12:56 PM)
-S610 Examine LOC (Lines of Code) breakdown for the 35,242 lines shipped during the MO§ES benchmark measurement window (May 8–14, 2026) (May 24 at 12:56 PM)
-S624 User requested field average metrics across benchmark models from the MO§ES benchmark data (May 24 at 12:58 PM)
-S625 User requested individual model performance metrics breakdown from the benchmark visualization poster (May 24 at 1:08 PM)
 382 1:08p 🔵 qaapplication folder structure uses consistent slug-based naming across five parallel layers
 383 1:09p 🟣 Created canonical serialization specification for qaapplication workspace with stable reference IDs
 384 1:10p ✅ Updated qaapplication documentation to reference new serialization spec and serial ref conventions
 385 " ✅ Added serialization lane identification to questions and answers folder READMEs
-S626 User reviewed consolidated poster average metrics summary table from 13-model benchmark subset (May 24 at 1:10 PM)
-S627 User reviewed field average raw token breakdown from portrait poster showing detailed consumption across token categories (May 24 at 1:13 PM)
-**Investigated**: Raw token consumption breakdown from portrait poster detailing input tokens, output tokens, cache create tokens, and cache read tokens across the benchmark measurement period
+389 1:26p 🔵 Field benchmark raw data structure identified in Artificial Analysis scrape
+390 1:28p 🔵 Artificial Analysis page renders benchmark data without HTML tables
+391 1:29p 🔵 Complete token distribution data extracted from live Artificial Analysis page
+392 " 🔵 SVG text elements contain all benchmark chart data with 328 extractable values
+393 1:30p 🔵 Token distribution data structure parsed with 13 agents and three value rows
+394 1:34p 🔵 Git worktree deleted causing data loss
+S901 Strategy for continuing benchmark review conversation without cache overhead and extracting token data via Codex (May 24 at 1:34 PM)
+### May 25, 2026
+S906 User requested prompt templates for analyzing MO§ES™ benchmark session data (May 8-14) and extracting Codex usage statistics (May 25 at 1:50 AM)
+S916 Extract Codex usage statistics for May 8-14 benchmark build period after data loss event (May 25 at 2:08 AM)
+524 2:21a 🔵 Codex usage data shows daily aggregates but no session-level records for May 8-14 window
+526 2:22a 🔵 Codex session data found after correcting query field from 'id' to 'directory'
+S920 Extract Codex 5-kernel usage statistics for May 8-14 benchmark period after data loss event (May 25 at 2:22 AM)
+S925 Re-analyze Codex usage statistics for May 8-14 benchmark period with corrected token label mapping (Codex input/output are inverted vs Claude) (May 25 at 2:28 AM)
+532 2:36a 🔵 Token usage chart reading convention clarified for Codex vs Claude
+S926 Explain the practical meaning of Codex's corrected 5-kernel metrics and how the two-engine architecture (Claude Code + Codex) functioned during May 8-14 benchmark build (May 25 at 2:37 AM)
+S928 Display raw Codex daily and per-session usage data for May 8-14 with corrected label mapping for user verification before export (May 25 at 2:39 AM)
+534 2:42a 🔵 Codex May 8-14 window shows 4 active days with 70% cost concentration in single May 9 multi-model session
+S941 Recover benchmark data after data loss by extracting ccusage statistics and creating canonical truth files for May 8-14, 2026 benchmark period (May 25 at 2:43 AM)
+535 2:51a 🔵 Claude Code usage statistics extracted for May 8-14 benchmark period
+537 2:52a 🔵 Benchmark data discrepancy: fresh ccusage shows 21% higher cache reads than locked poster numbers
+538 2:53a ✅ Codex raw benchmark numbers documented for May 8-14 period
+539 " ✅ Claude Code MO§ES raw benchmark numbers documented with canonical JSONL extract methodology
+540 2:54a ✅ Combined two-engine benchmark truth file created showing Claude-Codex complementary roles
+S1164 User requested location of commitment kernel demo v7 file for sharing with external recipient (May 25 at 2:55 AM)
+### May 26, 2026
+S1165 User requested location of commitment kernel demo v7 file for external sharing (May 26 at 3:24 AM)
+### May 27, 2026
+941 7:45a 🔐 Postgres SECURITY DEFINER view bypasses RLS in public schema
+943 7:46a 🔵 program_next_cycle view created without security_invoker flag in migration 039
+944 " 🔴 program_next_cycle view fixed with security_invoker flag
+945 7:47a ✅ Migration 048 validated by agent coordination consistency check
+946 " ✅ Migration 048 security fix committed to repository
 
-**Learned**: Field average token distribution documented: 274M input tokens, 29.2M output tokens (9.6% of input), 35M cache create tokens, 3.59B cache read tokens (13.1× total non-cache tokens) totaling 7.51B tokens across 1,465 tasks spanning ~7,325 turns producing ~29,300 lines of code. Cache read volume represents 47.8% of total token consumption, demonstrating prompt caching as dominant architectural pattern. Task-level averages: 187K input, 19.9K output, 23.9K cache create, 2.45M cache read per task; turn-level averages: ~5 turns per task
-
-**Completed**: Field average raw token breakdown documented, completing the metric hierarchy with both high-level performance indicators (cache hit rate, output:input ratio, time, cost) and underlying token consumption mechanics now fully extracted from benchmark visualizations
-
-**Next Steps**: Primary session has complete benchmark dataset spanning performance metrics, cost metrics, and raw token breakdowns available for continued analysis or comparative work
-
-
-Access 321k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 405k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
