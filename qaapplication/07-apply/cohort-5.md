@@ -1,4 +1,4 @@
-# Solana Incubator Cohort 5 — Draft v1
+# Solana Incubator Cohort 5 — Draft v2
 
 Drafted: 2026-05-26
 Sources drawn from:
@@ -50,7 +50,7 @@ https://mos2es.com/field-sheet
 
 ### Q9. Product demo URL
 
-https://signomy.xyz `[CONFIRM if KASSA or another demo is stronger]`
+https://signomy.xyz
 
 ### Q10. Tell us about yourself and your cofounders
 
@@ -62,7 +62,7 @@ July 2025
 
 ### Q12. Are you all working full-time on this?
 
-Yes. Full-time since October 2025. `[CONFIRM]`
+Yes. Full-time since October 2025.
 
 ### Q13. Including co-founders, how many full-time employees / contractors does your company have?
 
@@ -70,11 +70,11 @@ Yes. Full-time since October 2025. `[CONFIRM]`
 
 ### Q14. Web3 / Solana development experience
 
-My direct background is AI infrastructure and agent systems rather than shipping on Solana today. I have not yet built a production Solana/Rust application, so I would be joining with strong governance / systems architecture and a clear willingness to go deep on the chain-specific layer. The reason Solana is interesting is that MO§ES™ already cares about identity, settlement, provenance, and governed transactions. That maps naturally to the parts of the stack Solana is strong at.
+My direct background is AI infrastructure and agent systems rather than shipping on Solana today. I have not yet built a production Solana or Rust application, so I would be entering with strong governance, systems architecture, and product execution rather than existing chain-native depth. What makes the fit real is that MO§ES™ already cares about identity, settlement, provenance, and governed transactions. Those are not decorative blockchain ideas for us. They are the parts of the stack where Solana can become structurally useful.
 
 ### Q15. Blockchain selection
 
-Today the product is chain-agnostic and not dependent on blockchain to function. The reason I am interested in Solana is as the settlement / provenance layer for governed agent transactions and lineage-bound artifacts. If we build the marketplace and trust layer correctly, Solana is a strong candidate for the economic and verification substrate because of performance, ecosystem depth, and mobile ambition.
+Today the product is chain-agnostic and not dependent on blockchain to function. The reason I am interested in Solana is as the settlement and provenance layer for governed agent transactions and lineage-bound artifacts. If we build the marketplace and trust layer correctly, Solana is a strong candidate for the economic and verification substrate because of performance, ecosystem depth, and mobile ambition. The fit is not AI on-chain for the sake of it. It is using Solana where governed agent systems actually need identity, settlement, and verifiable provenance.
 
 ### Q16. 1 minute intro video
 
@@ -88,7 +88,7 @@ Suggested outline: who you are, what MO§ES™ does, why governance is the bottl
 
 ### Q17. What is the problem your company is trying to solve? How are you solving it?
 
-AI systems can pass tests, hit SLAs, and still fail users because meaning silently drifts across prompts, summaries, and agent handoffs. Existing tooling measures uptime, latency, or output accuracy, but not whether the commitment in the input survived the transformation. MO§ES™ solves that by measuring commitment fidelity in language, then using that measurement as a constitutional layer that gates execution when fidelity breaks.
+AI systems can pass tests, hit SLAs, and still fail users because meaning silently drifts across prompts, summaries, and agent handoffs. Existing tooling measures uptime, latency, or output accuracy, but not whether the commitment in the input survived the transformation. MO§ES™ solves that by measuring commitment fidelity in language, then using that measurement as a constitutional layer that gates execution when fidelity breaks. Instead of adding policy after the fact, we make the action itself conditional on whether meaning survived.
 
 ### Q18. What drove you to this idea? How do you know that there is a burning need for what you are building?
 
@@ -96,7 +96,7 @@ I started by trying to build an operator-based AI leaderboard and realized the r
 
 ### Q19. Describe your founder-market fit. What makes you the right team to build this?
 
-I came at this from the measurement gap, not from inherited AI orthodoxy. In ten months I went from my first AI session to a published falsifiable paper, five patent filings, a working measurement instrument, and multiple live product surfaces. I am not just theorizing about agent systems; I have been building through them, measuring them, and turning the governance bottleneck into product. The founder fit is obsession plus execution velocity.
+I came at this from the measurement gap, not from inherited AI orthodoxy. I am a Rust Belt operator from Buffalo with 20 years of professional experience, and my first AI session was only in July 2025. In the ten months since, I have gone from zero formal AI credentials to a published falsifiable paper, five patent filings, a working measurement instrument, and multiple live product surfaces. I am not just theorizing about agent systems. I have been building through them, measuring them, and turning the governance bottleneck into product. The founder fit is obsession plus execution velocity.
 
 ### Q20. How does your product / idea use Solana?
 
@@ -104,7 +104,7 @@ The near-term fit is not "AI on-chain for the sake of it." It is using Solana wh
 
 ### Q21. Who is your competition, and what do you understand about your business that they don't?
 
-Our adjacent categories are DevOps observability, ML observability, and AI governance vendors. They tell you whether a system is running, whether an output matches ground truth, or whether a policy was declared. What they do not measure is whether meaning survived transformation. That is the category gap. We built from the signal upward, so governance is not an overlay. It is the execution substrate.
+Our adjacent categories are DevOps observability, ML observability, and AI governance vendors. They tell you whether a system is running, whether an output matches ground truth, or whether a policy was declared. What they do not measure is whether meaning survived transformation. That is the category gap. We built from the signal upward, so governance is not an overlay. It is the execution substrate. The simplest version is this: nobody sells the third row. They measure uptime or output quality. We measure whether meaning survived.
 
 ### Q22. What's the path to this business generating $10M in annual revenue? What needs to be true?
 
@@ -120,7 +120,7 @@ Yes. The marketplace, artifact, and governed-transaction layers all have strong 
 
 ### Q24. How far along are you?
 
-Pre-revenue, but unusually far along for a protocol-stage company. The core measurement instrument is running on real work, with 1.123B tokens processed across 21 sessions. I have shipped multiple live product surfaces on top of it, including a live agent marketplace, a voice-AI demo, and a founder-first application operating system. The company has a published falsifiable paper, five patent filings, and a trademark.
+Pre-revenue, but unusually far along for a protocol-stage company. The core measurement instrument is running on real work, with 1.123B tokens processed across 21 sessions and 7,327 conversational turns. I have shipped multiple live product surfaces on top of it, including Signomy, a live agent marketplace with 270 API endpoints and Stripe Connect, KASSA, a live voice-AI demo, and AQUA, a founder-first application operating system. The company also has a published falsifiable paper, five patent filings, and the MO§ES™ trademark.
 
 ### Q25. Active users
 
@@ -140,7 +140,7 @@ N/A
 
 ### Q29. How long is your runway?
 
-`[CONFIRM]`
+Founder-funded and open-ended during the current build phase.
 
 ---
 
@@ -171,7 +171,7 @@ Yes. I would be relocating from Buffalo, New York. `[CONFIRM the month in the li
 
 ## Status
 
-- [x] Draft v1 written
+- [x] Draft v2 written
 - [ ] Open questions resolved with Deric
 - [ ] Final review
 - [ ] Submitted
