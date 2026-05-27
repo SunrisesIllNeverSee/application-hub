@@ -1,13 +1,13 @@
 <claude-mem-context>
 # Memory Context
 
-# [qaapplication] recent context, 2026-05-27 4:24am EDT
+# [qaapplication] recent context, 2026-05-27 4:33am EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (23,001t read) | 418,281t work | 95% savings
+Stats: 50 obs (22,402t read) | 365,454t work | 94% savings
 
 ### May 26, 2026
 S1175 Verify tokenmaxxing content separation between submitted YC application and planned article brief (May 26 at 4:20 AM)
@@ -20,13 +20,7 @@ S1456 Reframe redbud application problem statement from constitutional AI govern
 S1458 Finalize redbud application problem statement with discovery-based narrative positioning (May 26 at 5:41 PM)
 S1461 Refine and sharpen the redbud application problem statement to emphasize operator measurement gap and governance discovery (May 26 at 5:47 PM)
 S1464 Further condense and structure the redbud application problem statement into maximally precise format (May 26 at 6:01 PM)
-880 11:12p 🔴 Fixed NameError in check.py script variable reference
-881 " 🔵 Next.js 15 async prop violations found in two page components
 ### May 27, 2026
-883 2:45a ⚖️ Repository cleanup and resource-constrained development strategy needed post-Founding 500 submission
-884 " 🔵 Repository structure shows extensive folder duplication and inflation across application workflow stages
-885 " 🔵 Two blocking Next.js 15 async prop violations prevent application from building
-886 2:46a 🔵 Extensive BYOK and Ollama integration infrastructure already implemented in application
 888 3:01a 🔵 Repository folder structure corruption from lost commit
 889 " 🔵 Multiple overlapping folder structure generations detected in qaapplication
 890 3:02a 🔵 Folder migration mapping identified between legacy and canonical structures
@@ -71,6 +65,12 @@ S1464 Further condense and structure the redbud application problem statement in
 932 4:05a ✅ Git repository initialized for qaapplication workspace with main branch
 933 4:06a 🟣 Answer compendium infrastructure and cohort-5 draft v2 with resolved confirmation items
 934 4:07a 🔵 Dual git repository state confirmed with qaapplication as fresh repo nested inside application-hub parent
+935 4:24a 🔵 Dual repository state examined before QA workspace publication
+936 4:25a 🔵 GitHub repository scan confirms no dedicated QA repository exists
+937 " ✅ Cohort-5 application upgraded to draft v2 with confirmation items resolved
+938 " ✅ Gitignore file created for QA repository excluding macOS metadata
+939 " ✅ QA workspace initial commit captures complete 8-lane application system
+940 4:26a 🟣 QA workspace published to GitHub as private repository
 
-Access 418k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 365k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
