@@ -81,6 +81,7 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Currently claimed
 
+- **codex** — security lint follow-up for `public.program_next_cycle` (`supabase/migrations/048_fix_program_next_cycle_security_invoker.sql`, `.agents/registry.yaml`, `STATUS.md`) — 2026-05-27
 - **codex** — manual intake workflow (`supabase/migrations/047_manual_intake_workflow.sql`, `app/app/api/hub/ingest/route.ts`, `app/app/api/hub/intake/*`, `app/components/ingestion/*`, `app/app/(app)/profile/import/page.tsx`) — 2026-05-24
 - **mcp-eval** — Appfeeder V1 scaffold done (`appfeeder/`, `docs/BROWSER_EXTENSION.md`, semantic match wired) — lane releasing
 

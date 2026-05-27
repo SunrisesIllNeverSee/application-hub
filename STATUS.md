@@ -105,7 +105,7 @@ This pass is structurally implemented and statically verified, but it is not yet
   - Rewards and payout-ready contribution ledger
   - Aggregate stats/history for high-fidelity variants
   - Seeding entities and manual review gate for real application data
-- Migration chain high-water mark in repo is now `001-047` (`048` next).
+- Migration chain high-water mark in repo is now `001-048` (`049` next).
 - `supabase/functions/canonical-hub/` scaffolded with `ingest`, `qualify`, `export`, and `map_variant` actions.
 - `supabase/functions/smart-matcher/` scaffolded for persona-aware recommendations.
 - Next.js APIs added under `/api/hub/*` plus Stripe payout scaffold.
