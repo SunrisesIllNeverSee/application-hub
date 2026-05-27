@@ -1,19 +1,28 @@
 ---
-application_ref: AP-alliance-pending
+application_ref: AP-alliance-2026-05
 entity_ref: EN-alliance
 slug: alliance
 program_name: Alliance
-status: placeholder
-source_url: [NEED SOURCE]
-form_host: [NEED SOURCE]
+status: submitted
+source_url: [LIVE FORM COMPLETED DIRECTLY]
+form_host: alliance
+submitted_at: 2026-05-26
 ---
 
-# Alliance — Application (placeholder)
+# Alliance — Application Record
 
 - **Program:** Alliance
-- **Status:** Waiting for source capture / form structure
+- **Status:** Submitted
+- **Submitted:** 2026-05-26
 
-## Next step
+## Notes
 
-Add the raw application capture or link, then replace this placeholder
-with the real bare form structure before drafting answers.
+- The application was completed live from the operator session rather than from a preserved raw export.
+- The fuller answer archive is the best available local record of what was submitted.
+
+## Cross-references
+
+- Question source: [`../05-questions/source/alliance.md`](../05-questions/source/alliance.md)
+- Working packet: [`../07-apply/alliance.md`](../07-apply/alliance.md)
+- Submitted archive: [`../08-submitted/archive/alliance.md`](../08-submitted/archive/alliance.md)
+- Submitted application record: [`../08-submitted/archived_applications/alliance.md`](../08-submitted/archived_applications/alliance.md)

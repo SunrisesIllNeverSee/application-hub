@@ -1,13 +1,13 @@
 <claude-mem-context>
 # Memory Context
 
-# [qaapplication] recent context, 2026-05-26 9:07pm EDT
+# [qaapplication] recent context, 2026-05-27 3:29am EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (20,998t read) | 599,411t work | 96% savings
+Stats: 50 obs (22,095t read) | 484,016t work | 95% savings
 
 ### May 26, 2026
 S1175 Verify tokenmaxxing content separation between submitted YC application and planned article brief (May 26 at 4:20 AM)
@@ -15,61 +15,62 @@ S1180 Application workflow folder reorganization: moving workshop to apply and e
 S1188 Clarifying the distinction between the AQUAS repository (operator workspace) and the running application (user-facing product) (May 26 at 4:30 AM)
 S1189 Distinguishing the AQUAS repository operator workspace from the running Next.js product application (May 26 at 4:43 AM)
 S1197 Restructure AQUAS repository to clarify distinction between operator workspace and running product with comprehensive lane documentation (May 26 at 4:44 AM)
-657 4:46a ✅ Lane specification documentation added for 07-answers compounding knowledge bank
-658 4:47a ✅ Lane specification documentation added for 08-submitted immutable submission archive
 S1225 Apply tokenmaxxing narrative edits to submitted YC Summer 2026 application final.md (May 26 at 4:47 AM)
 S1456 Reframe redbud application problem statement from constitutional AI governance to operator augmentation evaluation metrics gap (May 26 at 5:11 AM)
-785 12:10p 🔵 Application-hub project documentation located in parent directory
-786 " 🔵 QAapplication 7-lane workflow directory structure examined
-787 12:11p 🔵 QAapplication pipeline current state verified via directory inspection
-788 12:14p 🔵 Historical folder naming inconsistency discovered between documentation and actual structure
-789 12:15p ✅ README updated with recommended folder restructure documentation for future cleanup
-790 12:18p 🔵 Git status shows uncommitted qaapplication README update plus new untracked coordination files
-797 12:48p 🔵 Primary session successfully switched to application-hub workspace
-798 " 🔵 Application processing pipeline architecture with nine-stage workflow
-799 " 🔵 Five application drafts in progress targeting different investor types
-800 12:50p 🟣 Program metadata and question index files created for four applications
-801 " 🟣 Agent coordination checker extended with qaapplication lane parity validation
-802 " 🔵 Lane parity validation detected incomplete YC application record
-803 12:51p ✅ YC application lane parity restored with structural placeholder files
-804 5:03p 🔄 Application workflow folder structure restructured from workshop/answers to apply/submitted model
-805 " ✅ Lane hardening documentation and audit trail added for 08-apply and 09-submitted migration
-806 5:04p 🔵 Lane parity validation confirms clean five-lane consistency after restructure
-807 " ✅ Lane hardening refactor committed and pushed to GitHub main branch
-808 5:14p ⚖️ Application processing workflow sequenced with three-step prerequisite protocol
-810 5:19p 🔵 AQUA answer indexing system structure examined
-811 5:20p 🔵 Application workflow prerequisite gap discovered across four target programs
-812 " 🔵 Security-guidance plugin hook directory non-persistence discovered
-813 5:22p 🔄 Application prerequisite lane parity restored with bare form documentation and validator fix
-814 5:24p 🔵 QAApplication workspace lane structure and active application inventory examined
-818 5:29p ⚖️ Application completion workflow order and source material strategy established
-819 5:30p 🔵 Application source material structure examined for redbud/founding500/cohort-5 workflow
-820 " 🔵 Application Hub workspace context examined before starting application drafting
-822 5:31p 🔵 Keyword search executed across answer index to identify reusable content for three target applications
-823 " ✅ Security reminder hook disabled by creating no-op placeholder script
-824 5:33p 🟣 Two complete application drafts created (founding500, cohort-5) and redbud sources updated
-826 5:41p ⚖️ Application problem statement reframed from AI governance to operator augmentation metrics
 S1458 Finalize redbud application problem statement with discovery-based narrative positioning (May 26 at 5:41 PM)
-827 5:47p ⚖️ Redbud application narrative reframing from general to discovery-based positioning
 S1461 Refine and sharpen the redbud application problem statement to emphasize operator measurement gap and governance discovery (May 26 at 5:47 PM)
 S1464 Further condense and structure the redbud application problem statement into maximally precise format (May 26 at 6:01 PM)
-829 6:04p ✅ Security reminder hook disabled with no-op stub
-831 6:05p 🟣 Anthony Avedissian angel application draft completed
-832 6:14p 🔵 Investor application pipeline state examined across four completed drafts
-834 6:21p ✅ Redbud application updated with benchmark performance metrics
-835 6:30p ✅ Redbud investor application submitted
-837 " 🔵 Y Combinator Summer 2026 application in draft stage
-838 6:31p ✅ Y Combinator Summer 2026 application submitted
-839 6:32p ✅ Redbud VC application archived after submission
-840 6:33p 🔵 QAApplication lane parity validation passes after Redbud archival
-842 6:38p ✅ Security reminder hook disabled with stub implementation
-843 6:39p ✅ Founding500 application Q11 answer expanded to four-surface narrative
-844 6:49p 🔵 Application Hub qaapplication workspace shows active investor application pipeline across 5 programs
-845 6:51p 🔵 Alliance program placeholder lane scaffolding pattern reveals awaiting-source-capture workflow stage
-846 " 🔵 Readwise integration connected but contains only onboarding documents with zero user highlights
-847 8:43p 🔵 User querying agent platform inventory for application
-848 8:46p 🔵 QAApplication workspace structure examined for Codex suggestion generation
 849 8:59p 🔵 qaapplication workspace is a subdirectory within application-hub git repository
+850 9:07p ✅ Investor application drafts committed and redbud submission archived
+851 9:10p 🔵 Founding 500 application attachment materials inventory completed
+852 9:13p 🔄 Founding 500 application Q11 restructured with five-attachment package
+853 9:14p ✅ Founding 500 attachment package zipped for submission
+854 " 🔄 Founding 500 Q11 polished with stronger attachment purpose statements
+855 9:16p 🔄 KASSA and Grok demo descriptions enhanced with concrete metrics and philosophical context
+856 9:29p 🔵 PROTOCOL.md missing from qaapplication .agents directory
+857 9:30p 🔄 Qaapplication workflow lanes restructured from 06-workshop/07-answers to 08-apply/09-submitted
+858 " 🔵 No recent Readwise Reader documents found for personalization context
+862 9:40p 🔵 qaapplication workspace coordination files located at parent directory level
+863 9:41p 🔵 qaapplication structured 7-lane investor application pipeline with 7+ submitted programs
+864 9:52p 🔵 QAApplication 7-lane investor application pipeline structure mapped
+874 10:18p 🔵 qaapplication workspace structure and connected app exploration for hyperpersonalized suggestions
+876 10:25p 🔵 Resume content extracted for application narrative filtering
+877 " 🔵 Three investor application sources examined for template reuse workflow
+878 11:10p ✅ Security reminder hook stubbed with no-op implementation
+879 11:12p ✅ Alliance application submitted with full answer archive
+880 " 🔴 Fixed NameError in check.py script variable reference
+881 " 🔵 Next.js 15 async prop violations found in two page components
+### May 27, 2026
+883 2:45a ⚖️ Repository cleanup and resource-constrained development strategy needed post-Founding 500 submission
+884 " 🔵 Repository structure shows extensive folder duplication and inflation across application workflow stages
+885 " 🔵 Two blocking Next.js 15 async prop violations prevent application from building
+886 2:46a 🔵 Extensive BYOK and Ollama integration infrastructure already implemented in application
+888 3:01a 🔵 Repository folder structure corruption from lost commit
+889 " 🔵 Multiple overlapping folder structure generations detected in qaapplication
+890 3:02a 🔵 Folder migration mapping identified between legacy and canonical structures
+891 " 🔵 Two Next.js 15 async searchParams violations identified
+892 3:03a 🔵 Folder restructure attempt failed on non-empty submitted directory
+893 " 🔵 Partial folder migration left system in mixed state with duplicate submitted folder
+894 " 🔄 Qaapplication folder structure refactored to 6-7-8 lane numbering scheme
+895 3:04a 🔄 Completed 07-answers to 06-answers mass rename across codebase
+896 " 🔴 Next.js 15 async searchParams violations fixed in two page components
+897 " ✅ Qaapplication documentation updated to reflect 6-7-8 lane structure
+898 3:06a 🔵 Type-check reveals async Supabase client not being awaited in multiple pages
+899 3:17a ⚖️ QAApplication archive adopts 4-layer relational cataloging with stable serial refs
+901 3:18a ✅ Archive serialization spec written defining EN/AP/QU/AQ reference system and lane contracts
+902 " 🔄 QAApplication folder structure renumbered from 7-8-9 to 6-7-8 lanes with legacy cleanup
+903 3:19a ✅ Duplicate answer-index folder moved to snapshots after confirming byte-identical content
+904 3:20a ✅ AGENTS.md observation log cleared after lane restructure completion
+905 " ✅ Security reminder hook disabled by creating no-op stub
+906 3:22a 🔵 Security hook bypass attempt failed - directory does not exist
+907 3:23a ✅ Security reminder hook successfully disabled via symlink and no-op stub in versioned plugin directory
+908 " ✅ Founding 500 application submitted with 11 questions answered
+909 " ✅ Founding 500 application workflow completed with cross-lane status updates and audit trail
+910 3:24a 🔵 TypeScript errors confirm async Supabase client pattern violation in three Next.js pages
+911 " 🔴 Fixed async Supabase client violations in three Next.js pages by adding await and explicit types
+912 3:25a 🔵 UserProgramFit type missing composite_score field causing type errors in fit scoring display
+913 " 🔴 Fixed UserProgramFit type mismatch by creating FitRow type alias with composite_score field
+914 3:26a ✅ Next.js build successful after completing async migration and TypeScript fixes
 
-Access 599k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 484k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>

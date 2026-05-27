@@ -55,6 +55,6 @@ form_host: tally
 
 - **Submitted:** 2026-05-13
 - **Status:** Submitted, awaiting response
-- **Filled record:** [`09-submitted/archived_applications/3xcapital.md`](../09-submitted/archived_applications/3xcapital.md)
-- **Paired Q+A:** [`09-submitted/archive/3xcapital.md`](../09-submitted/archive/3xcapital.md)
-- **Raw source:** [`08-apply/_shared/raw/3xcapital-raw.md`](../08-apply/_shared/raw/3xcapital-raw.md)
+- **Filled record:** [`08-submitted/archived_applications/3xcapital.md`](../08-submitted/archived_applications/3xcapital.md)
+- **Paired Q+A:** [`08-submitted/archive/3xcapital.md`](../08-submitted/archive/3xcapital.md)
+- **Raw source:** [`07-apply/_shared/raw/3xcapital-raw.md`](../07-apply/_shared/raw/3xcapital-raw.md)

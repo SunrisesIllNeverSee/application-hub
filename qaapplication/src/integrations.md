@@ -12,9 +12,9 @@ Ranked by leverage (how much manual work each one removes).
 
 - `03-programs/<slug>.md` (entity record — metadata block)
 - `05-questions/source/<slug>.md` (Q-only normalized list)
-- `08-apply/<slug>.md` (Q + space-for-A workspace)
+- `07-apply/<slug>.md` (Q + space-for-A workspace)
 
-Plus moves the raw to `08-apply/_shared/raw/<slug>.<ext>` and
+Plus moves the raw to `07-apply/_shared/raw/<slug>.<ext>` and
 appends a line to `audit-log.md`.
 
 **Why high-leverage:** this is the single most repeated manual pass
@@ -51,7 +51,7 @@ the strip flow auto-triggers on every captured form.
 **Why high-leverage:** closes the loop between "Deric fills out an
 application in the browser" and "the answer enters the data bank
 automatically." Currently captures land in the app's database but
-don't feed back into this workspace's `09-submitted/archive/`.
+don't feed back into this workspace's `08-submitted/archive/`.
 
 **Hard parts:**
 
@@ -69,12 +69,12 @@ don't feed back into this workspace's `09-submitted/archive/`.
 
 **What:** Add a check that for every slug in any of the canonical
 lanes (`03-programs/`, `04-applications/`, `05-questions/source/`,
-`09-submitted/archive/`), the same slug exists in the others. Flag
+`08-submitted/archive/`), the same slug exists in the others. Flag
 missing lanes as warnings.
 
 **Why:** Right now the only enforcement is via Deric noticing
 ("hey, why isn't solo-fund in submitted?"). A check would catch this
-mechanically. Same check could verify `08-apply/` entries have
+mechanically. Same check could verify `07-apply/` entries have
 matching `03-programs/` + `05-questions/source/` entries (since strip
 should produce all three together).
 
@@ -83,7 +83,7 @@ and produces warnings — just add another check function for
 qaapplication-lane parity.
 
 **Hard parts:** distinguishing "lane gap" from "intentionally
-incomplete" (e.g. unicorn-fund's empty `09-submitted/archive/` because
+incomplete" (e.g. unicorn-fund's empty `08-submitted/archive/` because
 the verbatim answers weren't preserved). Could solve with a
 `[ACCEPTED-GAP]` marker in the file.
 
@@ -102,7 +102,7 @@ workspace through a typed API:
 - `qa.submit(slug)` → moves to applications/, splits to questions/
   + answers/, appends audit-log line
 - `qa.harvest(theme)` → builds `05-questions/index/` and
-  `07-answers/index/` entries
+  `06-answers/index/` entries
 
 **Why:** makes qaapplication addressable from outside its own VS Code
 window. Codex working at the parent level can hand off drops to this
@@ -123,7 +123,7 @@ heuristic: 8+), a `bin/harvest.py` script that:
 - Identifies recurring questions (Jaccard similarity on
   normalized question text)
 - Groups variants into `05-questions/index/q-<theme>.md`
-- Same for `09-submitted/archive/*.md` → `07-answers/index/*.md`
+- Same for `08-submitted/archive/*.md` → `06-answers/index/*.md`
 
 **Why:** the index/ lanes exist but are empty. Manual harvest is
 tedious; mechanical clustering is mostly straightforward. Once

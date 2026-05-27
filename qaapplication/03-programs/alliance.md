@@ -15,4 +15,4 @@ soon as source material arrives.
 ## Cross-references
 
 - application form / Q set: ../05-questions/source/alliance.md
-- active apply: ../08-apply/alliance.md
+- active apply: ../07-apply/alliance.md

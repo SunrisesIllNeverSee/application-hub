@@ -14,7 +14,7 @@ time (e.g. a16z Speedrun has two submissions on record).
 ## Naming
 
 `<slug>.md` — same slug used across `04-applications/`,
-`05-questions/source/`, `08-apply/`, `09-submitted/archive/`.
+`05-questions/source/`, `07-apply/`, `08-submitted/archive/`.
 
 ## File shape
 
@@ -37,8 +37,8 @@ time (e.g. a16z Speedrun has two submissions on record).
 
 - application form / Q set: ../05-questions/source/<slug>.md
 - submitted record (if applied): ../04-applications/<slug>.md
-- answer archive (if applied): ../09-submitted/archive/<slug>.md
-- active draft (if in flight): ../08-apply/<slug>.md
+- answer archive (if applied): ../08-submitted/archive/<slug>.md
+- active draft (if in flight): ../07-apply/<slug>.md
 ```
 
 ## Populated by

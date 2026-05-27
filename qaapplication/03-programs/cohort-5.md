@@ -10,8 +10,8 @@
 ## Description
 
 Solana Incubator Cohort 5 application. Current workspace record exists
-as an active apply packet at `../08-apply/cohort-5.md`.
+as an active apply packet at `../07-apply/cohort-5.md`.
 
 ## Cross-references
 
-- active apply: ../08-apply/cohort-5.md
+- active apply: ../07-apply/cohort-5.md

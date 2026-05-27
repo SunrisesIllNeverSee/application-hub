@@ -2,13 +2,13 @@
 
 ## What changed
 
-- Migrated the active drafting lane from `06-workshop/` to `08-apply/`.
-- Split submitted material out of `07-answers/` into a dedicated
-  `09-submitted/` lane:
-  - `09-submitted/archive/` — paired Q+A per submitted program
-  - `09-submitted/archived_applications/` — fuller filled-record snapshots
-- Reduced `07-answers/` to the compounding answer-bank role:
-  - `07-answers/index/`
+- Migrated the active drafting lane from `06-workshop/` to `07-apply/`.
+- Split submitted material out of `06-answers/` into a dedicated
+  `08-submitted/` lane:
+  - `08-submitted/archive/` — paired Q+A per submitted program
+  - `08-submitted/archived_applications/` — fuller filled-record snapshots
+- Reduced `06-answers/` to the compounding answer-bank role:
+  - `06-answers/index/`
 - Rewrote the live docs/spec references to match the new lane model.
 - Added `qaapplication` lane-parity enforcement to `.agents/check.py`.
 
@@ -22,22 +22,22 @@ answers → apply → submitted
 
 This makes the filesystem itself teach the workflow:
 
-- `07-answers/` = reusable knowledge bank
-- `08-apply/` = active application assembly
-- `09-submitted/` = immutable submission record
+- `06-answers/` = reusable knowledge bank
+- `07-apply/` = active application assembly
+- `08-submitted/` = immutable submission record
 
 ## Enforcement
 
 `.agents/check.py` now validates:
 
-- active `08-apply` slugs have matching `03-programs/` and
+- active `07-apply` slugs have matching `03-programs/` and
   `05-questions/source/`
 - submitted slugs line up across:
   - `03-programs/`
   - `04-applications/`
   - `05-questions/source/`
-  - `09-submitted/archive/`
-  - `09-submitted/archived_applications/`
+  - `08-submitted/archive/`
+  - `08-submitted/archived_applications/`
 
 ## Companion backfills added
 
@@ -53,7 +53,7 @@ added for active apply / submitted paths that were missing:
 - `05-questions/source/yc.md`
 - `05-questions/source/cohort-5.md`
 - `04-applications/yc.md`
-- `09-submitted/archived_applications/yc.md`
+- `08-submitted/archived_applications/yc.md`
 
 ## Verification
 

@@ -11,9 +11,9 @@
 
 Y Combinator application workspace record for the Summer 2026 intake.
 Current workspace record exists as an active apply packet at
-`../08-apply/yc.md`.
+`../07-apply/yc.md`.
 
 ## Cross-references
 
-- active apply: ../08-apply/yc.md
-- raw capture: ../08-apply/_shared/raw/yc.html
+- active apply: ../07-apply/yc.md
+- raw capture: ../07-apply/_shared/raw/yc.html

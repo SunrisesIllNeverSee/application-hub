@@ -11,9 +11,9 @@
 
 Redbud VC's "Pitch Us" intake form for early-stage companies. Current
 workspace record exists as an active apply packet at
-`../08-apply/redbud.md`.
+`../07-apply/redbud.md`.
 
 ## Cross-references
 
-- active apply: ../08-apply/redbud.md
-- raw capture: ../08-apply/_shared/raw/redbudraw.html
+- active apply: ../07-apply/redbud.md
+- raw capture: ../07-apply/_shared/raw/redbudraw.html

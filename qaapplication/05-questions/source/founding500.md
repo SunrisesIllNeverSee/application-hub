@@ -1,12 +1,12 @@
 # The Founding 500 — Q-Only Index
 
-- **canonical:** ../../08-apply/founding500.md
+- **canonical:** ../../07-apply/founding500.md
 - **form host:** Airtable
-- **submission date:** —
-- **status:** active apply / not yet submitted
+- **submission date:** 2026-05-27
+- **status:** submitted
 
 ## Q
 
-See `../../08-apply/founding500.md` for the current extracted question
-set and drafting notes. Promote verbatim question blocks here as the form
-is normalized into serialized `AQ` records.
+See `../../07-apply/founding500.md` for the extracted question set and
+drafting notes that fed submission. Final answers live in
+`../../08-submitted/archive/founding500.md`.

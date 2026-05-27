@@ -18,4 +18,4 @@ selected participants.
 
 - application form / Q set: ../05-questions/source/solo-fund.md
 - submitted record: ../04-applications/solo-fund.md
-- answer archive: ../09-submitted/archive/solo-fund.md
+- answer archive: ../08-submitted/archive/solo-fund.md

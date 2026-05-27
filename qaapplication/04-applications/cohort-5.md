@@ -46,5 +46,5 @@ form_host: airtable
 
 ## Active apply companion
 
-- **Current apply packet:** [`08-apply/cohort-5.md`](../08-apply/cohort-5.md)
+- **Current apply packet:** [`07-apply/cohort-5.md`](../07-apply/cohort-5.md)
 - **Question source:** [`05-questions/source/cohort-5.md`](../05-questions/source/cohort-5.md)

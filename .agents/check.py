@@ -251,7 +251,7 @@ def check_nextjs_async_params(findings: list) -> None:
         text = tsx.read_text(errors="replace")
         for lineno, line in enumerate(text.splitlines(), 1):
             if sync_pat.search(line):
-                rel = tsx.relative_to(ROOT)
+                rel = tsx.relative_to(REPO_ROOT)
                 offenders.append(f"{rel}:{lineno} — {line.strip()[:80]}")
     if offenders:
         for o in offenders:
@@ -279,10 +279,10 @@ def check_qaapplication_lane_parity(findings: list) -> None:
     programs = collect_slug_stems(qa_root / "03-programs")
     applications = collect_slug_stems(qa_root / "04-applications")
     question_sources = collect_slug_stems(qa_root / "05-questions" / "source")
-    active_apply = collect_slug_stems(qa_root / "08-apply")
-    submitted_archive = collect_slug_stems(qa_root / "09-submitted" / "archive")
+    active_apply = collect_slug_stems(qa_root / "07-apply")
+    submitted_archive = collect_slug_stems(qa_root / "08-submitted" / "archive")
     submitted_records = collect_slug_stems(
-        qa_root / "09-submitted" / "archived_applications"
+        qa_root / "08-submitted" / "archived_applications"
     )
 
     # Active apply packets should at least have an entity record and a question-source file.
@@ -304,7 +304,7 @@ def check_qaapplication_lane_parity(findings: list) -> None:
 
     # Submitted archive slugs should line up across the canonical submitted lanes.
     # A bare 04-applications record can exist before submission, so it should not
-    # by itself force 09-submitted companions to exist.
+    # by itself force 08-submitted companions to exist.
     submitted_union = submitted_archive | submitted_records
     for slug in sorted(submitted_union):
         if slug not in programs:
@@ -332,14 +332,14 @@ def check_qaapplication_lane_parity(findings: list) -> None:
             findings.append(
                 (
                     "WARN",
-                    f"qaapplication submitted slug {slug} missing 09-submitted/archive/{slug}.md",
+                    f"qaapplication submitted slug {slug} missing 08-submitted/archive/{slug}.md",
                 )
             )
         if slug not in submitted_records:
             findings.append(
                 (
                     "WARN",
-                    f"qaapplication submitted slug {slug} missing 09-submitted/archived_applications/{slug}.md",
+                    f"qaapplication submitted slug {slug} missing 08-submitted/archived_applications/{slug}.md",
                 )
             )
 

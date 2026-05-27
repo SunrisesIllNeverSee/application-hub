@@ -55,6 +55,6 @@ form_host: tally
 
 ## Active apply companion
 
-- **Current apply packet:** [`08-apply/redbud.md`](../08-apply/redbud.md)
+- **Current apply packet:** [`07-apply/redbud.md`](../07-apply/redbud.md)
 - **Question source:** [`05-questions/source/redbud.md`](../05-questions/source/redbud.md)
-- **Raw source:** [`08-apply/_shared/raw/redbudraw.html`](../08-apply/_shared/raw/redbudraw.html)
+- **Raw source:** [`07-apply/_shared/raw/redbudraw.html`](../07-apply/_shared/raw/redbudraw.html)

@@ -3,7 +3,7 @@ application_ref: AP-founding500-2026-05
 entity_ref: EN-founding500
 slug: founding500
 program_name: The Founding 500
-status: bare
+status: submitted
 source_url: https://hyperagent.com/s/6YBNB4VIO26vErBhadK36w
 form_host: airtable
 ---
@@ -54,8 +54,10 @@ form_host: airtable
 | --- | --- |
 | Agent tools used | multi-select `[CONFIRM]` |
 
-## Active apply companion
+## Submission companions
 
-- **Current apply packet:** [`08-apply/founding500.md`](../08-apply/founding500.md)
+- **Current apply packet:** [`07-apply/founding500.md`](../07-apply/founding500.md)
 - **Question source:** [`05-questions/source/founding500.md`](../05-questions/source/founding500.md)
-- **Raw source:** [`08-apply/_shared/raw/founding500.html`](../08-apply/_shared/raw/founding500.html)
+- **Raw source:** [`07-apply/_shared/raw/founding500.html`](../07-apply/_shared/raw/founding500.html)
+- **Submitted record:** [`08-submitted/archived_applications/founding500.md`](../08-submitted/archived_applications/founding500.md)
+- **Paired archive:** [`08-submitted/archive/founding500.md`](../08-submitted/archive/founding500.md)

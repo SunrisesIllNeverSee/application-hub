@@ -274,7 +274,7 @@ The index file is where many `AQ` instances converge on one canonical question.
 
 ---
 
-## `08-apply/<slug>.md`
+## `07-apply/<slug>.md`
 
 This is the active application-assembly surface.
 
@@ -311,7 +311,7 @@ The apply file is not the parent truth, but every draft block should still carry
 
 ---
 
-## `09-submitted/archive/<slug>.md`
+## `08-submitted/archive/<slug>.md`
 
 This is the answer archive per submitted application.
 
@@ -356,8 +356,8 @@ When automation ingests a slugged QA record set, it should pull in this order:
 2. `04-applications/<slug>.md` → application instance
 3. `05-questions/source/<slug>.md` → `AQ` rows
 4. `05-questions/index/*.md` → `QU` mappings
-5. `08-apply/<slug>.md` → optional draft/review layer
-6. `09-submitted/archive/<slug>.md` → answer archive layer
+5. `07-apply/<slug>.md` → optional draft/review layer
+6. `08-submitted/archive/<slug>.md` → answer archive layer
 
 This keeps parent ingestion deterministic:
 - entity first
