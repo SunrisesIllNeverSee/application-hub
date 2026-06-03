@@ -28,7 +28,7 @@ else
     echo "ERROR: Could not fetch sitemap from $SITEMAP_URL" >&2
     exit 1
   fi
-  mapfile -t URLS < <(echo "$SITEMAP_CONTENT" | grep -oP '(?<=<loc>)[^<]+')
+  mapfile -t URLS < <(echo "$SITEMAP_CONTENT" | sed -n 's/.*<loc>\(.*\)<\/loc>.*/\1/p')
 fi
 
 echo "Pinging ${#URLS[@]} URL(s) to ${#ENGINES[@]} engines..."
