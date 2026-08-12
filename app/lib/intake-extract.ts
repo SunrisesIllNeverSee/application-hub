@@ -257,6 +257,60 @@ export async function resolveAnthropicClient(
   return platformKey ? new Anthropic({ apiKey: platformKey }) : null
 }
 
+// ─── Groq (Llama) extraction fallback ───────────────────────────────────────
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY ?? ''
+const GROQ_MODEL = process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile'
+
+export async function extractQuestionsWithGroq(
+  text: string,
+  sourceKind: SourceKind,
+  programName: string
+): Promise<ExtractedQuestion[]> {
+  if (!GROQ_API_KEY) return []
+
+  const prompt = buildQuestionsOnlyPrompt(text, sourceKind, programName)
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        max_tokens: 4096,
+        temperature: 0,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: prompt },
+        ],
+        response_format: { type: 'json_object' },
+      }),
+    })
+    if (!res.ok) return []
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> }
+    const raw = data.choices?.[0]?.message?.content ?? '[]'
+    // Groq json_object mode may wrap array in {questions: [...]}
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(stripJsonFences(raw))
+    } catch {
+      return []
+    }
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const obj = parsed as Record<string, unknown>
+      for (const key of ['questions', 'data', 'results', 'items']) {
+        if (Array.isArray(obj[key])) { parsed = obj[key]; break }
+      }
+    }
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter(isExtractedQuestion)
+  } catch {
+    return []
+  }
+}
+
 export async function loadEmbeddingIntegrations(
   supabase: SupabaseLike,
   userId: string

@@ -9,6 +9,7 @@ import {
   parseQuestions,
   parseStructuredText,
   resolveAnthropicClient,
+  extractQuestionsWithGroq,
   loadEmbeddingIntegrations,
   findOrCreateArchivedQuestion,
   findOrCreateProgram,
@@ -50,6 +51,8 @@ export async function POST(req: NextRequest) {
 
     if (!user && authHeader?.startsWith('Bearer ')) {
       const jwt = authHeader.slice(7)
+      // Try Supabase auth API first, then fall back to local JWKS verification
+      // (Supabase has a known bug rejecting ES256 JWTs via /auth/v1/user)
       const { createClient: createBrowserClient } = await import('@supabase/supabase-js').then(m => m)
       const extClient = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -57,7 +60,16 @@ export async function POST(req: NextRequest) {
         { global: { headers: { Authorization: `Bearer ${jwt}` } } }
       )
       const { data } = await extClient.auth.getUser(jwt)
-      if (data.user) { user = data.user; supabase = extClient as typeof supabase }
+      if (data.user) {
+        user = data.user
+        supabase = extClient as typeof supabase
+      } else {
+        // Local JWKS verification fallback for ES256 tokens
+        const { verifySupabaseJWT } = await import('@/lib/verify-jwt')
+        const verified = await verifySupabaseJWT(jwt)
+        user = { id: verified.id, email: verified.email } as unknown as typeof user
+        supabase = extClient as typeof supabase
+      }
     }
 
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -105,6 +117,16 @@ export async function POST(req: NextRequest) {
         if (questions.length === 0) extractionError = 'AI extraction returned no questions'
       } catch (err) {
         extractionError = err instanceof Error ? err.message : 'AI extraction failed'
+      }
+    }
+
+    // Groq fallback (if Anthropic not configured or failed)
+    if (questions.length === 0) {
+      const groqQuestions = await extractQuestionsWithGroq(text, sourceKind, program_name)
+      if (groqQuestions.length > 0) {
+        questions = groqQuestions
+        extraction = 'ai'
+        extractionError = null
       }
     }
 

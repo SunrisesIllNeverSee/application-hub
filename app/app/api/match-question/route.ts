@@ -132,7 +132,15 @@ export async function POST(req: Request) {
       { global: { headers: { Authorization: `Bearer ${jwt}` } } }
     )
     const { data } = await extClient.auth.getUser(jwt)
-    if (data.user) { user = data.user; supabase = extClient as typeof supabase }
+    if (data.user) {
+      user = data.user
+      supabase = extClient as typeof supabase
+    } else {
+      const { verifySupabaseJWT } = await import('@/lib/verify-jwt')
+      const verified = await verifySupabaseJWT(jwt)
+      user = { id: verified.id, email: verified.email } as unknown as typeof user
+      supabase = extClient as typeof supabase
+    }
   }
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -32,6 +32,11 @@ export async function POST(req: Request) {
     if (data.user) {
       user = data.user
       supabase = extClient as typeof supabase
+    } else {
+      const { verifySupabaseJWT } = await import('@/lib/verify-jwt')
+      const verified = await verifySupabaseJWT(jwt)
+      user = { id: verified.id, email: verified.email } as unknown as typeof user
+      supabase = extClient as typeof supabase
     }
   }
 

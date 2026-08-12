@@ -43,3 +43,4 @@ application-hub-mcp-server/.plugin-eval/
 # infra IDs + local tooling (should never be public)
 .vercel/
 .playwright-mcp/
+.mcp.json
