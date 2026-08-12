@@ -1,0 +1,90 @@
+{
+  "dependency_graph": {
+    "vertex_count": 53,
+    "edge_count": 101,
+    "weak_components": 1,
+    "top_in_degree": [
+      {
+        "node": "auth.users",
+        "degree": 46
+      },
+      {
+        "node": "programs",
+        "degree": 15
+      },
+      {
+        "node": "archived_questions",
+        "degree": 8
+      },
+      {
+        "node": "intake_submissions",
+        "degree": 6
+      },
+      {
+        "node": "profile_answers",
+        "degree": 4
+      }
+    ],
+    "top_out_degree_nodes_observed": [
+      "application_answers",
+      "answer_stress_tests",
+      "team_answers",
+      "answer_reviews",
+      "community_messages",
+      "intake_events",
+      "program_questions",
+      "import_queue",
+      "ai_draft_runs",
+      "team_members"
+    ]
+  },
+  "intake_state_machine": {
+    "initial_state": "pending_review",
+    "reachable_states": [
+      "pending_review",
+      "in_progress",
+      "finalized",
+      "needs_revision",
+      "rejected",
+      "promoted"
+    ],
+    "promoted_reachable": true,
+    "shortest_path_to_promoted": [
+      "pending_review",
+      "finalized",
+      "promoted"
+    ],
+    "dead_ends": [
+      "rejected",
+      "promoted"
+    ],
+    "self_loops": [
+      [
+        "in_progress",
+        "in_progress"
+      ],
+      [
+        "needs_revision",
+        "needs_revision"
+      ]
+    ]
+  },
+  "boundary_priorities": [
+    {
+      "boundary": "reviewed intake -> operational archive",
+      "priority": "critical"
+    },
+    {
+      "boundary": "operational answer -> canonical knowledge",
+      "priority": "critical"
+    },
+    {
+      "boundary": "canonical knowledge -> intelligence",
+      "priority": "high"
+    },
+    {
+      "boundary": "intelligence -> export/reuse",
+      "priority": "medium"
+    }
+  ]
+}

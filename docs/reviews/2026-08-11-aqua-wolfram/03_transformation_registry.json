@@ -1,0 +1,977 @@
+{
+  "artifact": "03_transformation_registry",
+  "transformations": [
+    {
+      "id": "T01",
+      "name": "manual_intake_extract",
+      "input": "raw intake payload",
+      "output": [
+        "intake_submissions",
+        "intake_entities",
+        "intake_applications",
+        "intake_application_layers",
+        "intake_questions"
+      ],
+      "function_or_route": "POST /api/hub/ingest -> extractManualIntake",
+      "phase_change": "raw_source_to_staged_structure",
+      "loss_profile": "potentially lossy extraction; raw_input retained",
+      "reversible": "partially",
+      "validation_gate": "entity_checkpoint",
+      "observed": true
+    },
+    {
+      "id": "T02",
+      "name": "checkpoint_review",
+      "input": "staged intake layer",
+      "output": "approved/rejected/needs_revision staged layer + intake_gate_reviews + intake_events",
+      "function_or_route": "POST /api/hub/intake/review",
+      "phase_change": "candidate_to_human_validated",
+      "loss_profile": "edits alter structured representation; event captures workflow state and edited payload",
+      "reversible": "historically reconstructable where payload_before/after is complete",
+      "validation_gate": "human",
+      "observed": true
+    },
+    {
+      "id": "T03",
+      "name": "question_normalization",
+      "input": "program-specific question wording",
+      "output": "archived_questions + program_questions",
+      "function_or_route": "schema/import/matching pipeline",
+      "phase_change": "question_occurrence_to_normalized_question",
+      "loss_profile": "exact asked_as preserved in program_questions; normalization may collapse semantic distinctions",
+      "reversible": "yes to occurrence wording if program_questions exists",
+      "validation_gate": "none identified globally",
+      "observed": true
+    },
+    {
+      "id": "T04",
+      "name": "profile_to_application_answer",
+      "input": "profile_answers",
+      "output": "application_answers",
+      "function_or_route": "application creation/save workflow",
+      "phase_change": "reusable_answer_to_application_specific_answer",
+      "loss_profile": "application context may diverge after refinement; source marker exists in design",
+      "reversible": "partially",
+      "validation_gate": "user edit",
+      "observed": true
+    },
+    {
+      "id": "T05",
+      "name": "canonical_ingest_extract_commitments",
+      "input": "content or explicit commitments",
+      "output": "canonical_commitments",
+      "function_or_route": "canonical-hub handleIngest/extractCommitments/findOrCreateCanonical",
+      "phase_change": "prose_or_commitments_to_portable_canonical",
+      "loss_profile": "high-risk if using placeholder sentence/chunk extraction; canonicalization can merge or split claims",
+      "reversible": "no",
+      "validation_gate": "not required in canonical edge function",
+      "observed": true,
+      "algorithm_status": "placeholder in code"
+    },
+    {
+      "id": "T06",
+      "name": "canonical_map_variant",
+      "input": "user commitment content + canonical",
+      "output": "answer_variants + lineage_events",
+      "function_or_route": "canonical-hub handleIngest / handleMapVariant",
+      "phase_change": "user_expression_to_canonical_spoke",
+      "loss_profile": "content preserved; fidelity is derived",
+      "reversible": "yes for content",
+      "validation_gate": "none",
+      "observed": true,
+      "algorithm_status": "placeholder fidelity formula"
+    },
+    {
+      "id": "T07",
+      "name": "package_assembly",
+      "input": "canonical IDs + variant IDs",
+      "output": "application_packages + lineage_events",
+      "function_or_route": "canonical-hub handleIngest",
+      "phase_change": "individual_commitments_to_application_package",
+      "loss_profile": "soft JSON IDs create weaker referential integrity than FKs",
+      "reversible": "yes if referenced objects remain",
+      "validation_gate": "none",
+      "observed": true
+    },
+    {
+      "id": "T08",
+      "name": "semantic_canonical_search",
+      "input": "768d query embedding",
+      "output": "ranked canonical commitments",
+      "function_or_route": "semantic_search_canonicals",
+      "phase_change": "query_to_ranked_candidates",
+      "loss_profile": "ranking projection discards nonreturned candidates",
+      "reversible": "no",
+      "validation_gate": "threshold 0.55 default",
+      "observed": true
+    },
+    {
+      "id": "T09",
+      "name": "hybrid_canonical_search",
+      "input": "text + optional embedding + vertical",
+      "output": "ranked canonical commitments with fidelity_potential",
+      "function_or_route": "search_canonicals_hybrid",
+      "phase_change": "query_to_ranked_candidates",
+      "loss_profile": "weighted score compresses vector/text/significance signals",
+      "reversible": "no",
+      "validation_gate": "ranking only",
+      "observed": true
+    },
+    {
+      "id": "T10",
+      "name": "smart_matcher",
+      "input": "user persona + answer_variants + program/canonical signals",
+      "output": "ranked programs",
+      "function_or_route": "smart-matcher edge + smart_matcher_search RPC",
+      "phase_change": "knowledge_state_to_opportunity_ranking",
+      "loss_profile": "many features compressed to scalar fit score and snippet",
+      "reversible": "no",
+      "validation_gate": "none",
+      "observed": true
+    },
+    {
+      "id": "T11",
+      "name": "canonical_package_export",
+      "input": "application_package/canonical IDs",
+      "output": "JSON/Markdown/PDF-ready envelope",
+      "function_or_route": "canonical-hub handleExport + get_canonical_package",
+      "phase_change": "internal_graph_to_portable_export",
+      "loss_profile": "depends on export format; lineage flag preserved in envelope",
+      "reversible": "JSON mostly; Markdown less so",
+      "validation_gate": "auth/user scope",
+      "observed": true
+    },
+    {
+      "id": "T12",
+      "name": "answer_review_and_stress_test",
+      "input": "answer text + context",
+      "output": [
+        "answer_reviews",
+        "answer_stress_tests"
+      ],
+      "function_or_route": "MCP/API answer review and stress-test tools",
+      "phase_change": "answer_to_evaluated_answer",
+      "loss_profile": "evaluation is derived; source answer remains elsewhere",
+      "reversible": "not applicable",
+      "validation_gate": "user/tool invocation",
+      "observed": true
+    }
+  ],
+  "database_functions": [
+    {
+      "name": "update_updated_at",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "snapshot_profile_answer",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "compute_word_count",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "recompute_completion_pct",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "update_program_stats_on_signal",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "recompute_all_heat_scores",
+      "args": "",
+      "returns": "VOID AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "auto_update_program_status",
+      "args": "",
+      "returns": "VOID AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "increment_asked_by_count",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "decrement_asked_by_count",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "enforce_single_default_integration",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "name": "create_free_subscription_on_signup",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "007_monetization.sql"
+    },
+    {
+      "name": "increment_ai_usage",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "007_monetization.sql"
+    },
+    {
+      "name": "sync_profile_answer_columns",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "sync_draft_limit_on_tier_change",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "set_draft_limit_on_insert",
+      "args": "",
+      "returns": "TRIGGER AS $$",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "match_archived_questions",
+      "args": "query_embedding vector(1536), match_threshold float DEFAULT 0.7, match_count int DEFAULT 10",
+      "returns": "TABLE (",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "increment_draft_count",
+      "args": "p_user_id UUID, p_month_year TEXT",
+      "returns": "void",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "compute_significance_scores",
+      "args": "",
+      "returns": "void",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "compute_program_dna",
+      "args": "",
+      "returns": "void",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "compute_user_fit_scores",
+      "args": "p_user_id UUID DEFAULT NULL",
+      "returns": "void",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "name": "create_user_profile_on_signup",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "011_user_profiles.sql"
+    },
+    {
+      "name": "seed_signup_questions",
+      "args": "p_user_id UUID",
+      "returns": "INT",
+      "source": "014_question_bank_drip.sql"
+    },
+    {
+      "name": "run_daily_drip",
+      "args": "p_user_id UUID",
+      "returns": "TABLE (",
+      "source": "014_question_bank_drip.sql"
+    },
+    {
+      "name": "auto_seed_questions_on_signup",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "014_question_bank_drip.sql"
+    },
+    {
+      "name": "update_updated_at_column",
+      "args": "",
+      "returns": "TRIGGER LANGUAGE plpgsql AS $$",
+      "source": "025_teams_schema.sql"
+    },
+    {
+      "name": "match_archived_questions",
+      "args": "query_embedding vector(768), match_threshold float DEFAULT 0.72, match_count int DEFAULT 10",
+      "returns": "TABLE (",
+      "source": "029_embedding_resize_768.sql"
+    },
+    {
+      "name": "award_contribution_credits",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "030_applicant_modes_and_contributions.sql"
+    },
+    {
+      "name": "award_contribution_credits",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "031_fix_contribution_credit_amount.sql"
+    },
+    {
+      "name": "award_answer_credits",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "032_credits_and_achievements.sql"
+    },
+    {
+      "name": "award_submission_credits",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "032_credits_and_achievements.sql"
+    },
+    {
+      "name": "compute_heat_scores",
+      "args": "",
+      "returns": "void",
+      "source": "037_heat_score_compute.sql"
+    },
+    {
+      "name": "get_top_programs_by_value",
+      "args": "p_types program_type[] DEFAULT NULL, p_domain TEXT DEFAULT 'founder', p_equity_max NUMERIC DEFAULT NULL, p_status program_status[] DEFAULT ARRAY['open'::program_status], p_limit INT DEFAULT 20",
+      "returns": "TABLE (",
+      "source": "038_ranking_rpc.sql"
+    },
+    {
+      "name": "claim_starter_package",
+      "args": "p_user_id UUID",
+      "returns": "INTEGER",
+      "source": "041_beta_mode.sql"
+    },
+    {
+      "name": "semantic_search_canonicals",
+      "args": "query_embedding vector(768), limit_count INT DEFAULT 10, match_threshold FLOAT DEFAULT 0.55",
+      "returns": "TABLE (",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "name": "search_canonicals_hybrid",
+      "args": "query_text TEXT, vertical_filter TEXT DEFAULT NULL, limit_count INT DEFAULT 20, query_embedding vector(768) DEFAULT NULL",
+      "returns": "TABLE (",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "name": "get_canonical_package",
+      "args": "canonical_id UUID, user_id UUID DEFAULT NULL",
+      "returns": "JSONB",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "name": "calculate_fit_score",
+      "args": "program_value_score FLOAT, heat_score FLOAT, brand_score FLOAT, significance_score NUMERIC DEFAULT 0",
+      "returns": "NUMERIC",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "name": "smart_matcher_search",
+      "args": "user_persona JSONB DEFAULT '{}'::jsonb, vertical_filter TEXT DEFAULT 'founder', match_limit INT DEFAULT 10",
+      "returns": "TABLE (",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "name": "process_reward",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "044_rewards_system.sql"
+    },
+    {
+      "name": "refresh_canonical_aggregate",
+      "args": "",
+      "returns": "TRIGGER",
+      "source": "045_aggregate_system.sql"
+    }
+  ],
+  "route_table_touch_map": [
+    {
+      "source": "03_api_routes/mcp_server_src/src/resources/programs.ts",
+      "tables": [
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/resources/questions.ts",
+      "tables": [
+        "archived_questions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/resources/rankings.ts",
+      "tables": [
+        "archived_questions",
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/aqua-hub.ts",
+      "tables": [
+        "contribution_rewards"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_find_best_programs.ts",
+      "tables": [
+        "user_program_fit"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_get_fit_score.ts",
+      "tables": [
+        "user_program_fit"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_get_application_readiness.ts",
+      "tables": [
+        "profile_answers",
+        "program_questions",
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_get_answer_review_context.ts",
+      "tables": [
+        "archived_questions",
+        "profile_answer_history",
+        "profile_answers",
+        "program_dna",
+        "program_questions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_log_draft_run.ts",
+      "tables": [
+        "ai_draft_runs",
+        "ai_usage",
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_get_profile_answers.ts",
+      "tables": [
+        "profile_answers"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_rank_my_answers.ts",
+      "tables": [
+        "profile_answers"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_save_answer.ts",
+      "tables": [
+        "archived_questions",
+        "profile_answers"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_save_answer_review.ts",
+      "tables": [
+        "answer_reviews",
+        "profile_answers",
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/user/hub_stress_test_answer.helpers.ts",
+      "tables": [
+        "answer_stress_tests",
+        "archived_questions",
+        "profile_answers",
+        "program_dna",
+        "program_questions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/intelligence/hub_get_question_significance.ts",
+      "tables": [
+        "archived_questions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/intelligence/hub_get_acceptance_stats.ts",
+      "tables": [
+        "acceptance_reports",
+        "program_stats"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/programs/hub_get_program_by_slug.ts",
+      "tables": [
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/programs/hub_search_programs.ts",
+      "tables": [
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/programs/hub_get_program_detail.ts",
+      "tables": [
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/programs/hub_get_heat_scores.ts",
+      "tables": [
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/programs/hub_get_program_rankings.ts",
+      "tables": [],
+      "rpcs": [
+        "get_top_programs_by_value"
+      ]
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/questions/hub_get_program_questions.ts",
+      "tables": [
+        "program_questions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/questions/hub_find_similar_questions.ts",
+      "tables": [
+        "archived_questions"
+      ],
+      "rpcs": [
+        "match_archived_questions"
+      ]
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/questions/hub_get_program_dna.ts",
+      "tables": [
+        "program_dna",
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/tools/questions/hub_get_universal_questions.ts",
+      "tables": [
+        "archived_questions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/mcp_server_src/src/services/rate_limit.ts",
+      "tables": [
+        "ai_usage",
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/profile/identity/route.ts",
+      "tables": [
+        "user_profiles"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/profile/fms/route.ts",
+      "tables": [
+        "user_profiles"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/stress-test/route.ts",
+      "tables": [
+        "profile_answers",
+        "program_dna"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/match-question/route.ts",
+      "tables": [
+        "profile_answers",
+        "program_dna",
+        "user_integrations"
+      ],
+      "rpcs": [
+        "match_archived_questions"
+      ]
+    },
+    {
+      "source": "03_api_routes/api/credits/claim/route.ts",
+      "tables": [
+        "credit_events",
+        "user_achievements",
+        "user_credit_balance"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/teams/route.ts",
+      "tables": [
+        "team_members",
+        "teams",
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/teams/accept/route.ts",
+      "tables": [
+        "team_invites",
+        "team_members"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/teams/[id]/invite/route.ts",
+      "tables": [
+        "team_invites",
+        "team_members",
+        "teams"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/answers/capture/route.ts",
+      "tables": [
+        "profile_answers"
+      ],
+      "rpcs": [
+        "match_archived_questions"
+      ]
+    },
+    {
+      "source": "03_api_routes/api/alerts/deadline-check/route.ts",
+      "tables": [
+        "deadline_alerts",
+        "user_applications",
+        "user_profiles"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/import/submit-url/route.ts",
+      "tables": [
+        "import_queue",
+        "programs"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/import/paste/route.ts",
+      "tables": [
+        "app_import_sessions",
+        "archived_questions",
+        "profile_answers",
+        "user_integrations",
+        "user_question_unlocks"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/import/program/route.ts",
+      "tables": [
+        "import_queue"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/import/application/route.ts",
+      "tables": [
+        "app_import_sessions",
+        "archived_questions",
+        "user_integrations"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/import/application/save/route.ts",
+      "tables": [
+        "app_import_sessions",
+        "profile_answers"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/cron/recruiter/route.ts",
+      "tables": [
+        "recruiter_alerts",
+        "user_applications",
+        "user_program_fit"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/integrations/route.ts",
+      "tables": [
+        "user_integrations"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/integrations/key/route.ts",
+      "tables": [
+        "user_integrations"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/integrations/[id]/route.ts",
+      "tables": [
+        "user_integrations"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/hub/ingest/route.ts",
+      "tables": [
+        "intake_application_layers",
+        "intake_applications",
+        "intake_entities",
+        "intake_events",
+        "intake_questions",
+        "intake_submissions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/hub/intake/review/route.ts",
+      "tables": [
+        "intake_application_layers",
+        "intake_applications",
+        "intake_entities",
+        "intake_events",
+        "intake_gate_reviews",
+        "intake_questions",
+        "intake_submissions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/hub/intake/[submissionId]/route.ts",
+      "tables": [
+        "intake_application_layers",
+        "intake_applications",
+        "intake_entities",
+        "intake_events",
+        "intake_gate_reviews",
+        "intake_questions",
+        "intake_submissions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/onboarding/complete/route.ts",
+      "tables": [
+        "archived_questions",
+        "profile_answers",
+        "user_profiles"
+      ],
+      "rpcs": [
+        "claim_starter_package"
+      ]
+    },
+    {
+      "source": "03_api_routes/api/applications/[id]/outcome/route.ts",
+      "tables": [
+        "user_applications"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/beta/check/route.ts",
+      "tables": [
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/community/messages/route.ts",
+      "tables": [
+        "community_messages",
+        "import_queue"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/community/messages/[id]/route.ts",
+      "tables": [
+        "community_messages"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/draft/route.ts",
+      "tables": [
+        "ai_draft_runs",
+        "ai_usage",
+        "archived_questions",
+        "profile_answers",
+        "program_dna",
+        "program_questions",
+        "programs",
+        "user_integrations",
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/export/persona/route.ts",
+      "tables": [
+        "persona_profile_answers",
+        "profile_answers",
+        "profile_persona_enrichments",
+        "profiles",
+        "user_program_fit"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/stripe/payout/route.ts",
+      "tables": [
+        "canonical_user_credits",
+        "contribution_rewards"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/stripe/portal/route.ts",
+      "tables": [
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/stripe/webhook/route.ts",
+      "tables": [
+        "stripe_events",
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/api/stripe/checkout/route.ts",
+      "tables": [
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "03_api_routes/edge_functions/smart-matcher/index.ts",
+      "tables": [
+        "answer_variants"
+      ],
+      "rpcs": [
+        "smart_matcher_search"
+      ]
+    },
+    {
+      "source": "03_api_routes/edge_functions/canonical-hub/index.ts",
+      "tables": [
+        "answer_variants",
+        "application_packages",
+        "canonical_commitments",
+        "contribution_rewards",
+        "lineage_events"
+      ],
+      "rpcs": [
+        "get_canonical_package"
+      ]
+    },
+    {
+      "source": "04_ai_pipeline/stress_test_route/route.ts",
+      "tables": [
+        "profile_answers",
+        "program_dna"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "04_ai_pipeline/draft_route/route.ts",
+      "tables": [
+        "ai_draft_runs",
+        "ai_usage",
+        "archived_questions",
+        "profile_answers",
+        "program_dna",
+        "program_questions",
+        "programs",
+        "user_integrations",
+        "user_subscriptions"
+      ],
+      "rpcs": []
+    },
+    {
+      "source": "04_ai_pipeline/smart_matcher/edge_function/index.ts",
+      "tables": [
+        "answer_variants"
+      ],
+      "rpcs": [
+        "smart_matcher_search"
+      ]
+    },
+    {
+      "source": "04_ai_pipeline/match_question_route/route.ts",
+      "tables": [
+        "profile_answers",
+        "program_dna",
+        "user_integrations"
+      ],
+      "rpcs": [
+        "match_archived_questions"
+      ]
+    },
+    {
+      "source": "04_ai_pipeline/hub_ingest/route.ts",
+      "tables": [
+        "intake_application_layers",
+        "intake_applications",
+        "intake_entities",
+        "intake_events",
+        "intake_questions",
+        "intake_submissions"
+      ],
+      "rpcs": []
+    }
+  ]
+}

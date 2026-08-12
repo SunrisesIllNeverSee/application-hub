@@ -1,0 +1,4153 @@
+{
+  "package": "Aqua Wolfram Review",
+  "artifact": "01_entity_inventory",
+  "generated_from": "application-hub-for-gpt.zip",
+  "scope_note": "Inventory is extracted from SQL migrations. independence_class is an analysis label, not a proposed destructive refactor.",
+  "counts": {
+    "tables": 56,
+    "foreign_keys": 95,
+    "database_functions": 40
+  },
+  "representations": {
+    "intake": "captured/staged/reviewable source representation",
+    "archive": "operational application/question/answer representation",
+    "canonical": "portable commitment/variant/package representation",
+    "intelligence": "derived scores, reviews, program signatures, matching and evaluation",
+    "supporting": "commerce, integrations, teams, community, configuration and operations"
+  },
+  "entities": [
+    {
+      "entity": "app_import_sessions",
+      "representation": "archive",
+      "role": "import_state",
+      "independence_class": "supporting",
+      "defined_in": "017_app_import_sessions.sql",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "raw_text",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "program_name",
+          "definition": "TEXT"
+        },
+        {
+          "name": "status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending'"
+        },
+        {
+          "name": "extracted_pairs",
+          "definition": "JSONB"
+        },
+        {
+          "name": "saved_count",
+          "definition": "INT DEFAULT 0"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "app_import_sessions",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "017_app_import_sessions.sql"
+        },
+        {
+          "from_table": "app_import_sessions",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "020_app_import_sessions.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "application_answers",
+      "representation": "archive",
+      "role": "application_specific_answer",
+      "independence_class": "fundamental",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 12,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "application_id",
+          "definition": "UUID NOT NULL REFERENCES user_applications(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_question_id",
+          "definition": "UUID NOT NULL REFERENCES program_questions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "content",
+          "definition": "TEXT NOT NULL DEFAULT ''"
+        },
+        {
+          "name": "sourced_from_profile",
+          "definition": "BOOLEAN NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "divergence_pct",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "is_canonical",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "word_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "version",
+          "definition": "INT NOT NULL DEFAULT 1"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "application_answers",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "application_answers",
+          "from_column": "application_id",
+          "to_table": "user_applications",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "application_answers",
+          "from_column": "program_question_id",
+          "to_table": "program_questions",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "ai_draft_runs",
+          "from_column": "application_answer_id",
+          "to_table": "application_answers",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "archived_questions",
+      "representation": "archive",
+      "role": "normalized_question",
+      "independence_class": "fundamental",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 13,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "text",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "theme",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "subtheme",
+          "definition": "TEXT"
+        },
+        {
+          "name": "response_type",
+          "definition": "response_type NOT NULL DEFAULT 'text_long'"
+        },
+        {
+          "name": "typical_word_limit",
+          "definition": "INT"
+        },
+        {
+          "name": "asked_by_count",
+          "definition": "INT NOT NULL DEFAULT 1"
+        },
+        {
+          "name": "importance_score",
+          "definition": "FLOAT NOT NULL DEFAULT 0.5"
+        },
+        {
+          "name": "is_universal",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "example_programs",
+          "definition": "TEXT[] DEFAULT '{}'"
+        },
+        {
+          "name": "embedding",
+          "definition": "vector(1536)"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "program_questions",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "profile_answers",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "import_queue",
+          "from_column": "mapped_to",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        },
+        {
+          "from_table": "user_question_unlocks",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "014_question_bank_drip.sql"
+        },
+        {
+          "from_table": "team_answers",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "answer_reviews",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "import_queue",
+      "representation": "archive",
+      "role": "import_staging",
+      "independence_class": "supporting",
+      "defined_in": "003_intelligence_and_integrations.sql",
+      "column_count": 10,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "raw_text",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID REFERENCES programs(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "submitted_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "status",
+          "definition": "import_status NOT NULL DEFAULT 'pending'"
+        },
+        {
+          "name": "mapped_to",
+          "definition": "UUID REFERENCES archived_questions(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "confidence_score",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "reviewer_notes",
+          "definition": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "reviewed_at",
+          "definition": "TIMESTAMPTZ"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "import_queue",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "import_queue",
+          "from_column": "submitted_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "import_queue",
+          "from_column": "mapped_to",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "user_contributions",
+          "from_column": "import_queue_id",
+          "to_table": "import_queue",
+          "to_column": "id",
+          "source": "030_applicant_modes_and_contributions.sql"
+        },
+        {
+          "from_table": "community_messages",
+          "from_column": "submission_id",
+          "to_table": "import_queue",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "profile_answer_history",
+      "representation": "archive",
+      "role": "answer_version_history",
+      "independence_class": "provenance",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 6,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "profile_answer_id",
+          "definition": "UUID NOT NULL REFERENCES profile_answers(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "content",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "version",
+          "definition": "INT NOT NULL"
+        },
+        {
+          "name": "word_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "saved_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "profile_answer_history",
+          "from_column": "profile_answer_id",
+          "to_table": "profile_answers",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "profile_answers",
+      "representation": "archive",
+      "role": "reusable_user_answer",
+      "independence_class": "fundamental",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 9,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "archived_question_id",
+          "definition": "UUID NOT NULL REFERENCES archived_questions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "content",
+          "definition": "TEXT NOT NULL DEFAULT ''"
+        },
+        {
+          "name": "word_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "version",
+          "definition": "INT NOT NULL DEFAULT 1"
+        },
+        {
+          "name": "confidence",
+          "definition": "answer_confidence NOT NULL DEFAULT 'draft'"
+        },
+        {
+          "name": "last_updated",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "profile_answers",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "profile_answers",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "profile_answer_history",
+          "from_column": "profile_answer_id",
+          "to_table": "profile_answers",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "profile_answer_id",
+          "to_table": "profile_answers",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        },
+        {
+          "from_table": "answer_reviews",
+          "from_column": "profile_answer_id",
+          "to_table": "profile_answers",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "program_cycles",
+      "representation": "archive",
+      "role": "program_version_cycle",
+      "independence_class": "supporting",
+      "defined_in": "039_program_cycles.sql",
+      "column_count": 11,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID        PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID        NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "cycle_name",
+          "definition": "TEXT        NOT NULL"
+        },
+        {
+          "name": "opens_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "closes_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "cohort_name",
+          "definition": "TEXT"
+        },
+        {
+          "name": "cohort_size",
+          "definition": "INT"
+        },
+        {
+          "name": "apply_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "is_active",
+          "definition": "BOOLEAN     NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "program_cycles",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "039_program_cycles.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "program_questions",
+      "representation": "archive",
+      "role": "question_occurrence",
+      "independence_class": "fundamental",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 10,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "archived_question_id",
+          "definition": "UUID NOT NULL REFERENCES archived_questions(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "asked_as",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "word_limit",
+          "definition": "INT"
+        },
+        {
+          "name": "char_limit",
+          "definition": "INT"
+        },
+        {
+          "name": "is_required",
+          "definition": "BOOLEAN NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "section",
+          "definition": "TEXT"
+        },
+        {
+          "name": "order_index",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "program_questions",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "program_questions",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "application_answers",
+          "from_column": "program_question_id",
+          "to_table": "program_questions",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "programs",
+      "representation": "archive",
+      "role": "program_identity",
+      "independence_class": "fundamental",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 27,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "slug",
+          "definition": "TEXT UNIQUE NOT NULL"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "organization",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "type",
+          "definition": "program_type NOT NULL"
+        },
+        {
+          "name": "status",
+          "definition": "program_status NOT NULL DEFAULT 'upcoming'"
+        },
+        {
+          "name": "round",
+          "definition": "TEXT"
+        },
+        {
+          "name": "opens_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "closes_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "results_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "check_size_min",
+          "definition": "BIGINT"
+        },
+        {
+          "name": "check_size_max",
+          "definition": "BIGINT"
+        },
+        {
+          "name": "equity_taken",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "geo_focus",
+          "definition": "TEXT[]"
+        },
+        {
+          "name": "industry_tags",
+          "definition": "TEXT[]"
+        },
+        {
+          "name": "description",
+          "definition": "TEXT"
+        },
+        {
+          "name": "url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "logo_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "source",
+          "definition": "program_source NOT NULL DEFAULT 'seeded'"
+        },
+        {
+          "name": "funder_user_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "parent_program_id",
+          "definition": "UUID REFERENCES programs(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "heat_score",
+          "definition": "FLOAT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "applicant_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "scrape_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "last_scraped_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "programs",
+          "from_column": "funder_user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "programs",
+          "from_column": "parent_program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "programs",
+          "from_column": "parent_program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "program_questions",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "user_applications",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "program_signals",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "acceptance_reports",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "program_stats",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "import_queue",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "program_listings",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "007_monetization.sql"
+        },
+        {
+          "from_table": "program_dna",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "008_intelligence_layer_v2.sql"
+        },
+        {
+          "from_table": "user_program_fit",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "008_intelligence_layer_v2.sql"
+        },
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        },
+        {
+          "from_table": "deadline_alerts",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "024_deadline_alerts.sql"
+        },
+        {
+          "from_table": "answer_reviews",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        },
+        {
+          "from_table": "recruiter_alerts",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "027_recruiter_alerts.sql"
+        },
+        {
+          "from_table": "program_cycles",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "039_program_cycles.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "user_applications",
+      "representation": "archive",
+      "role": "application_instance",
+      "independence_class": "fundamental",
+      "defined_in": "002_core_tables.sql",
+      "column_count": 12,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "status",
+          "definition": "application_status NOT NULL DEFAULT 'saved'"
+        },
+        {
+          "name": "started_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "submitted_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "result_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "is_public_result",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "notes",
+          "definition": "TEXT"
+        },
+        {
+          "name": "completion_pct",
+          "definition": "FLOAT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_applications",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        },
+        {
+          "from_table": "user_applications",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "application_answers",
+          "from_column": "application_id",
+          "to_table": "user_applications",
+          "to_column": "id",
+          "source": "002_core_tables.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "user_profiles",
+      "representation": "archive",
+      "role": "user_identity_profile",
+      "independence_class": "fundamental",
+      "defined_in": "011_user_profiles.sql",
+      "column_count": 22,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "display_name",
+          "definition": "TEXT"
+        },
+        {
+          "name": "bio",
+          "definition": "TEXT"
+        },
+        {
+          "name": "avatar_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "company_name",
+          "definition": "TEXT"
+        },
+        {
+          "name": "company_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "company_one_liner",
+          "definition": "TEXT"
+        },
+        {
+          "name": "stage",
+          "definition": "TEXT CHECK (stage IN ("
+        },
+        {
+          "name": "industry_tags",
+          "definition": "TEXT[] NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "location_country",
+          "definition": "TEXT"
+        },
+        {
+          "name": "location_city",
+          "definition": "TEXT"
+        },
+        {
+          "name": "team_size",
+          "definition": "SMALLINT CHECK (team_size >= 1)"
+        },
+        {
+          "name": "is_technical_founder",
+          "definition": "BOOLEAN"
+        },
+        {
+          "name": "founder_type",
+          "definition": "TEXT CHECK (founder_type IN ("
+        },
+        {
+          "name": "linkedin_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "github_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "twitter_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "email_notifications",
+          "definition": "BOOLEAN NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "profile_visibility",
+          "definition": "TEXT NOT NULL DEFAULT 'private' CHECK (profile_visibility IN ('private'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_profiles",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "011_user_profiles.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "aggregate_versions",
+      "representation": "canonical",
+      "role": "aggregate_snapshot",
+      "independence_class": "derived",
+      "defined_in": "045_aggregate_system.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "canonical_id",
+          "definition": "UUID NOT NULL REFERENCES canonical_commitments(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "version",
+          "definition": "INT NOT NULL"
+        },
+        {
+          "name": "aggregate_stats",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "source_variant_id",
+          "definition": "UUID REFERENCES answer_variants(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "lineage",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "aggregate_versions",
+          "from_column": "canonical_id",
+          "to_table": "canonical_commitments",
+          "to_column": "id",
+          "source": "045_aggregate_system.sql"
+        },
+        {
+          "from_table": "aggregate_versions",
+          "from_column": "source_variant_id",
+          "to_table": "answer_variants",
+          "to_column": "id",
+          "source": "045_aggregate_system.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "answer_variants",
+      "representation": "canonical",
+      "role": "user_scoped_commitment_expression",
+      "independence_class": "fundamental",
+      "defined_in": "042_canonical_hub_and_lineage.sql",
+      "column_count": 12,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "canonical_id",
+          "definition": "UUID NOT NULL REFERENCES canonical_commitments(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "entity",
+          "definition": "TEXT"
+        },
+        {
+          "name": "flavor_text",
+          "definition": "TEXT"
+        },
+        {
+          "name": "fidelity_score",
+          "definition": "NUMERIC(5"
+        },
+        {
+          "name": "content",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "qualification",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "used_in_packages",
+          "definition": "UUID[] NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "lineage",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "answer_variants",
+          "from_column": "canonical_id",
+          "to_table": "canonical_commitments",
+          "to_column": "id",
+          "source": "042_canonical_hub_and_lineage.sql"
+        },
+        {
+          "from_table": "answer_variants",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "042_canonical_hub_and_lineage.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "aggregate_versions",
+          "from_column": "source_variant_id",
+          "to_table": "answer_variants",
+          "to_column": "id",
+          "source": "045_aggregate_system.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "application_packages",
+      "representation": "canonical",
+      "role": "reconstructed_portable_package",
+      "independence_class": "fundamental",
+      "defined_in": "042_canonical_hub_and_lineage.sql",
+      "column_count": 10,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_entity",
+          "definition": "TEXT"
+        },
+        {
+          "name": "vertical",
+          "definition": "TEXT NOT NULL CHECK (vertical IN ('founder'"
+        },
+        {
+          "name": "commitments",
+          "definition": "JSONB NOT NULL DEFAULT '[]'"
+        },
+        {
+          "name": "outcomes",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "hash",
+          "definition": "TEXT"
+        },
+        {
+          "name": "lineage",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "application_packages",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "042_canonical_hub_and_lineage.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "canonical_commitments",
+      "representation": "canonical",
+      "role": "portable_commitment",
+      "independence_class": "fundamental",
+      "defined_in": "042_canonical_hub_and_lineage.sql",
+      "column_count": 11,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "hash",
+          "definition": "TEXT UNIQUE NOT NULL"
+        },
+        {
+          "name": "version",
+          "definition": "TEXT NOT NULL DEFAULT '1.0'"
+        },
+        {
+          "name": "vertical",
+          "definition": "TEXT NOT NULL CHECK (vertical IN ('founder'"
+        },
+        {
+          "name": "title",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "aggregate_description",
+          "definition": "TEXT"
+        },
+        {
+          "name": "significance_score",
+          "definition": "NUMERIC(5"
+        },
+        {
+          "name": "qualification_tags",
+          "definition": "TEXT[] NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "lineage",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "answer_variants",
+          "from_column": "canonical_id",
+          "to_table": "canonical_commitments",
+          "to_column": "id",
+          "source": "042_canonical_hub_and_lineage.sql"
+        },
+        {
+          "from_table": "aggregate_versions",
+          "from_column": "canonical_id",
+          "to_table": "canonical_commitments",
+          "to_column": "id",
+          "source": "045_aggregate_system.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "lineage_events",
+      "representation": "canonical",
+      "role": "knowledge_provenance",
+      "independence_class": "provenance",
+      "defined_in": "042_canonical_hub_and_lineage.sql",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "entity_type",
+          "definition": "TEXT NOT NULL CHECK (entity_type IN ('canonical'"
+        },
+        {
+          "name": "entity_id",
+          "definition": "UUID NOT NULL"
+        },
+        {
+          "name": "action",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "parent_hashes",
+          "definition": "TEXT[] NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "new_hash",
+          "definition": "TEXT"
+        },
+        {
+          "name": "metadata",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "seeding_entities",
+      "representation": "canonical",
+      "role": "seed_provenance",
+      "independence_class": "supporting",
+      "defined_in": "046_seeding_system.sql",
+      "column_count": 17,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "entity_id",
+          "definition": "TEXT UNIQUE"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "vertical",
+          "definition": "TEXT NOT NULL CHECK (vertical IN ('founder'"
+        },
+        {
+          "name": "url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "tos_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "deadline",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "rolling",
+          "definition": "BOOLEAN NOT NULL DEFAULT false"
+        },
+        {
+          "name": "requirements",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "data_package",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "outcomes_example",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "seeded_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "review_status",
+          "definition": "TEXT NOT NULL DEFAULT 'staged' CHECK (review_status IN ('staged'"
+        },
+        {
+          "name": "hash",
+          "definition": "TEXT"
+        },
+        {
+          "name": "lineage",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "seeding_entities",
+          "from_column": "seeded_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "046_seeding_system.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "team_answers",
+      "representation": "collaboration",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "025_teams_schema.sql",
+      "column_count": 9,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "team_id",
+          "definition": "UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "archived_question_id",
+          "definition": "UUID NOT NULL REFERENCES archived_questions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "content",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "confidence",
+          "definition": "TEXT NOT NULL DEFAULT 'draft' CHECK (confidence IN ('draft'"
+        },
+        {
+          "name": "created_by",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id)"
+        },
+        {
+          "name": "updated_by",
+          "definition": "UUID REFERENCES auth.users(id)"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "team_answers",
+          "from_column": "team_id",
+          "to_table": "teams",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_answers",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_answers",
+          "from_column": "created_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_answers",
+          "from_column": "updated_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "team_invites",
+      "representation": "collaboration",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "025_teams_schema.sql",
+      "column_count": 9,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "team_id",
+          "definition": "UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "email",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "token",
+          "definition": "TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(24)"
+        },
+        {
+          "name": "role",
+          "definition": "TEXT NOT NULL DEFAULT 'member'"
+        },
+        {
+          "name": "invited_by",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id)"
+        },
+        {
+          "name": "accepted_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "expires_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '7 days'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "team_invites",
+          "from_column": "team_id",
+          "to_table": "teams",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_invites",
+          "from_column": "invited_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "team_members",
+      "representation": "collaboration",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "025_teams_schema.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "team_id",
+          "definition": "UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "role",
+          "definition": "TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner'"
+        },
+        {
+          "name": "invited_by",
+          "definition": "UUID REFERENCES auth.users(id)"
+        },
+        {
+          "name": "joined_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "invited_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "team_members",
+          "from_column": "team_id",
+          "to_table": "teams",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_members",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_members",
+          "from_column": "invited_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "teams",
+      "representation": "collaboration",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "025_teams_schema.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "slug",
+          "definition": "TEXT UNIQUE NOT NULL"
+        },
+        {
+          "name": "owner_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "plan",
+          "definition": "TEXT NOT NULL DEFAULT 'team' CHECK (plan IN ('team'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "teams",
+          "from_column": "owner_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "team_members",
+          "from_column": "team_id",
+          "to_table": "teams",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_invites",
+          "from_column": "team_id",
+          "to_table": "teams",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        },
+        {
+          "from_table": "team_answers",
+          "from_column": "team_id",
+          "to_table": "teams",
+          "to_column": "id",
+          "source": "025_teams_schema.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "ai_usage",
+      "representation": "commerce",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "007_monetization.sql",
+      "column_count": 5,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "month_year",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "draft_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "ai_usage",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "007_monetization.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "program_listings",
+      "representation": "commerce",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "007_monetization.sql",
+      "column_count": 11,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID UNIQUE NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "tier",
+          "definition": "listing_tier NOT NULL DEFAULT 'standard'"
+        },
+        {
+          "name": "status",
+          "definition": "listing_status NOT NULL DEFAULT 'active'"
+        },
+        {
+          "name": "funder_user_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "stripe_payment_intent",
+          "definition": "TEXT"
+        },
+        {
+          "name": "amount_paid_cents",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "starts_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "expires_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "program_listings",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "007_monetization.sql"
+        },
+        {
+          "from_table": "program_listings",
+          "from_column": "funder_user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "007_monetization.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "stripe_events",
+      "representation": "commerce",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "022_stripe_events.sql",
+      "column_count": 6,
+      "columns": [
+        {
+          "name": "event_id",
+          "definition": "TEXT PRIMARY KEY"
+        },
+        {
+          "name": "event_type",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "livemode",
+          "definition": "BOOLEAN NOT NULL"
+        },
+        {
+          "name": "received_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "processed_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "error_text",
+          "definition": "TEXT                         -- non-null if handler raised"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "subscription_plans",
+      "representation": "commerce",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "007_monetization.sql",
+      "column_count": 14,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "tier",
+          "definition": "subscription_tier UNIQUE NOT NULL"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "price_monthly_cents",
+          "definition": "INT NOT NULL"
+        },
+        {
+          "name": "price_annual_cents",
+          "definition": "INT"
+        },
+        {
+          "name": "stripe_product_id",
+          "definition": "TEXT"
+        },
+        {
+          "name": "stripe_price_id_monthly",
+          "definition": "TEXT"
+        },
+        {
+          "name": "stripe_price_id_annual",
+          "definition": "TEXT"
+        },
+        {
+          "name": "max_active_applications",
+          "definition": "INT NOT NULL DEFAULT 3"
+        },
+        {
+          "name": "ai_drafts_per_month",
+          "definition": "INT NOT NULL DEFAULT 10"
+        },
+        {
+          "name": "can_export",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "can_see_acceptance_rates",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "can_see_heat_scores",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "user_subscriptions",
+      "representation": "commerce",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "007_monetization.sql",
+      "column_count": 12,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "tier",
+          "definition": "subscription_tier NOT NULL DEFAULT 'free'"
+        },
+        {
+          "name": "status",
+          "definition": "subscription_status NOT NULL DEFAULT 'active'"
+        },
+        {
+          "name": "stripe_customer_id",
+          "definition": "TEXT"
+        },
+        {
+          "name": "stripe_subscription_id",
+          "definition": "TEXT"
+        },
+        {
+          "name": "current_period_start",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "current_period_end",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "cancel_at_period_end",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "trial_end",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_subscriptions",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "007_monetization.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "canonical_user_credits",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "044_rewards_system.sql",
+      "column_count": 6,
+      "columns": [
+        {
+          "name": "user_id",
+          "definition": "UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "balance",
+          "definition": "INT NOT NULL DEFAULT 0 CHECK (balance >= 0)"
+        },
+        {
+          "name": "lifetime_earned",
+          "definition": "INT NOT NULL DEFAULT 0 CHECK (lifetime_earned >= 0)"
+        },
+        {
+          "name": "stripe_account_id",
+          "definition": "TEXT"
+        },
+        {
+          "name": "payouts_enabled",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "canonical_user_credits",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "044_rewards_system.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "community_messages",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "041_beta_mode.sql",
+      "column_count": 9,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "from_user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "to_user_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID REFERENCES import_queue(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "parent_id",
+          "definition": "UUID REFERENCES community_messages(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "subject",
+          "definition": "TEXT NOT NULL CHECK (char_length(subject) BETWEEN 1 AND 200)"
+        },
+        {
+          "name": "body",
+          "definition": "TEXT NOT NULL CHECK (char_length(body) BETWEEN 1 AND 5000)"
+        },
+        {
+          "name": "is_read",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "community_messages",
+          "from_column": "from_user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        },
+        {
+          "from_table": "community_messages",
+          "from_column": "to_user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        },
+        {
+          "from_table": "community_messages",
+          "from_column": "submission_id",
+          "to_table": "import_queue",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        },
+        {
+          "from_table": "community_messages",
+          "from_column": "parent_id",
+          "to_table": "community_messages",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "community_messages",
+          "from_column": "parent_id",
+          "to_table": "community_messages",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "contribution_rewards",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "044_rewards_system.sql",
+      "column_count": 16,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "entity_type",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "entity_id",
+          "definition": "UUID"
+        },
+        {
+          "name": "action",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "credit_amount",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "cash_amount_cents",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "currency",
+          "definition": "TEXT NOT NULL DEFAULT 'usd'"
+        },
+        {
+          "name": "status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending'"
+        },
+        {
+          "name": "stripe_account_id",
+          "definition": "TEXT"
+        },
+        {
+          "name": "stripe_transfer_id",
+          "definition": "TEXT"
+        },
+        {
+          "name": "metadata",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "approved_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "paid_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "contribution_rewards",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "044_rewards_system.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "credit_events",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "032_credits_and_achievements.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "event_type",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "amount",
+          "definition": "INT  NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "metadata",
+          "definition": "JSONB NOT NULL DEFAULT '{}'"
+        },
+        {
+          "name": "dedup_key",
+          "definition": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "credit_events",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "032_credits_and_achievements.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "starter_packages",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "041_beta_mode.sql",
+      "column_count": 6,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL UNIQUE"
+        },
+        {
+          "name": "description",
+          "definition": "TEXT"
+        },
+        {
+          "name": "question_ids",
+          "definition": "UUID[] NOT NULL"
+        },
+        {
+          "name": "is_active",
+          "definition": "BOOLEAN NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "user_starter_claims",
+          "from_column": "starter_package_id",
+          "to_table": "starter_packages",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "user_achievements",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "032_credits_and_achievements.sql",
+      "column_count": 4,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "achievement_id",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "earned_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_achievements",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "032_credits_and_achievements.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "user_contributions",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "030_applicant_modes_and_contributions.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "import_queue_id",
+          "definition": "UUID NOT NULL REFERENCES import_queue(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "credit_type",
+          "definition": "TEXT NOT NULL DEFAULT 'drip_unlock'"
+        },
+        {
+          "name": "credit_amount",
+          "definition": "INT  NOT NULL DEFAULT 5 CHECK (credit_amount > 0)"
+        },
+        {
+          "name": "kind",
+          "definition": "opportunity_kind"
+        },
+        {
+          "name": "awarded_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_contributions",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "030_applicant_modes_and_contributions.sql"
+        },
+        {
+          "from_table": "user_contributions",
+          "from_column": "import_queue_id",
+          "to_table": "import_queue",
+          "to_column": "id",
+          "source": "030_applicant_modes_and_contributions.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "user_question_unlocks",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "014_question_bank_drip.sql",
+      "column_count": 5,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "archived_question_id",
+          "definition": "UUID NOT NULL REFERENCES archived_questions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "unlocked_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "source",
+          "definition": "TEXT NOT NULL DEFAULT 'drip'"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_question_unlocks",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "014_question_bank_drip.sql"
+        },
+        {
+          "from_table": "user_question_unlocks",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "014_question_bank_drip.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "user_starter_claims",
+      "representation": "community",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "041_beta_mode.sql",
+      "column_count": 4,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "starter_package_id",
+          "definition": "UUID NOT NULL REFERENCES starter_packages(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "claimed_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_starter_claims",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        },
+        {
+          "from_table": "user_starter_claims",
+          "from_column": "starter_package_id",
+          "to_table": "starter_packages",
+          "to_column": "id",
+          "source": "041_beta_mode.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "beta_settings",
+      "representation": "config",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "041_beta_mode.sql",
+      "column_count": 5,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "is_beta_mode",
+          "definition": "BOOLEAN NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "beta_end_date",
+          "definition": "TIMESTAMPTZ NOT NULL"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "intake_application_layers",
+      "representation": "intake",
+      "role": "staged_structure",
+      "independence_class": "supporting",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 11,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID NOT NULL REFERENCES intake_submissions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "application_id",
+          "definition": "UUID NOT NULL REFERENCES intake_applications(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "layer_key",
+          "definition": "TEXT NOT NULL CHECK (layer_key IN ('obtained'"
+        },
+        {
+          "name": "layer_order",
+          "definition": "INT NOT NULL CHECK (layer_order IN (4"
+        },
+        {
+          "name": "payload",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "review_status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending_review' CHECK (review_status IN ('pending_review'"
+        },
+        {
+          "name": "approved_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "approved_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_application_layers",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_application_layers",
+          "from_column": "application_id",
+          "to_table": "intake_applications",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_application_layers",
+          "from_column": "approved_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "intake_applications",
+      "representation": "intake",
+      "role": "staged_application",
+      "independence_class": "fundamental",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 17,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "ref_seq",
+          "definition": "BIGSERIAL UNIQUE"
+        },
+        {
+          "name": "ref",
+          "definition": "TEXT GENERATED ALWAYS AS ('AP-' || LPAD(ref_seq::TEXT"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID NOT NULL REFERENCES intake_submissions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "entity_id",
+          "definition": "UUID REFERENCES intake_entities(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "vertical",
+          "definition": "TEXT NOT NULL CHECK (vertical IN ('tech'"
+        },
+        {
+          "name": "title",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "cycle_label",
+          "definition": "TEXT"
+        },
+        {
+          "name": "deadline_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "application_status",
+          "definition": "TEXT NOT NULL DEFAULT 'indexed'"
+        },
+        {
+          "name": "source_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "payload",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "review_status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending_review' CHECK (review_status IN ('pending_review'"
+        },
+        {
+          "name": "approved_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "approved_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_applications",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_applications",
+          "from_column": "entity_id",
+          "to_table": "intake_entities",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_applications",
+          "from_column": "approved_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "intake_application_layers",
+          "from_column": "application_id",
+          "to_table": "intake_applications",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_questions",
+          "from_column": "application_id",
+          "to_table": "intake_applications",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "intake_entities",
+      "representation": "intake",
+      "role": "staged_entity",
+      "independence_class": "fundamental",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 15,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "ref_seq",
+          "definition": "BIGSERIAL UNIQUE"
+        },
+        {
+          "name": "ref",
+          "definition": "TEXT GENERATED ALWAYS AS ('EN-' || LPAD(ref_seq::TEXT"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID NOT NULL REFERENCES intake_submissions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "slug",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "host_domain",
+          "definition": "TEXT"
+        },
+        {
+          "name": "entity_type",
+          "definition": "TEXT"
+        },
+        {
+          "name": "vertical",
+          "definition": "TEXT NOT NULL DEFAULT 'unknown' CHECK (vertical IN ('tech'"
+        },
+        {
+          "name": "payload",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "review_status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending_review' CHECK (review_status IN ('pending_review'"
+        },
+        {
+          "name": "approved_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "approved_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_entities",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_entities",
+          "from_column": "approved_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "intake_applications",
+          "from_column": "entity_id",
+          "to_table": "intake_entities",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "intake_events",
+      "representation": "intake",
+      "role": "workflow_provenance",
+      "independence_class": "provenance",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 13,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID NOT NULL REFERENCES intake_submissions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "parent_event_id",
+          "definition": "UUID REFERENCES intake_events(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "event_type",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "layer_number",
+          "definition": "INT NOT NULL CHECK (layer_number BETWEEN 0 AND 8)"
+        },
+        {
+          "name": "layer_name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "checkpoint",
+          "definition": "TEXT"
+        },
+        {
+          "name": "actor_type",
+          "definition": "TEXT NOT NULL CHECK (actor_type IN ('user'"
+        },
+        {
+          "name": "actor_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "payload_before",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "payload_after",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "notes",
+          "definition": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_events",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_events",
+          "from_column": "parent_event_id",
+          "to_table": "intake_events",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_events",
+          "from_column": "actor_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "intake_events",
+          "from_column": "parent_event_id",
+          "to_table": "intake_events",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "intake_gate_reviews",
+      "representation": "intake",
+      "role": "human_validation",
+      "independence_class": "provenance",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID NOT NULL REFERENCES intake_submissions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "checkpoint",
+          "definition": "TEXT NOT NULL CHECK (checkpoint IN ("
+        },
+        {
+          "name": "decision",
+          "definition": "TEXT NOT NULL CHECK (decision IN ('approve'"
+        },
+        {
+          "name": "notes",
+          "definition": "TEXT"
+        },
+        {
+          "name": "edited_payload",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "reviewed_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_gate_reviews",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_gate_reviews",
+          "from_column": "reviewed_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "intake_questions",
+      "representation": "intake",
+      "role": "staged_question",
+      "independence_class": "fundamental",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 17,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "ref_seq",
+          "definition": "BIGSERIAL UNIQUE"
+        },
+        {
+          "name": "ref",
+          "definition": "TEXT GENERATED ALWAYS AS ('QU-' || LPAD(ref_seq::TEXT"
+        },
+        {
+          "name": "submission_id",
+          "definition": "UUID NOT NULL REFERENCES intake_submissions(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "application_id",
+          "definition": "UUID NOT NULL REFERENCES intake_applications(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "question_text",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "normalized_text",
+          "definition": "TEXT"
+        },
+        {
+          "name": "order_index",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "is_required",
+          "definition": "BOOLEAN NOT NULL DEFAULT TRUE"
+        },
+        {
+          "name": "word_limit",
+          "definition": "INT"
+        },
+        {
+          "name": "char_limit",
+          "definition": "INT"
+        },
+        {
+          "name": "payload",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "review_status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending_review' CHECK (review_status IN ('pending_review'"
+        },
+        {
+          "name": "approved_by",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "approved_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_questions",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_questions",
+          "from_column": "application_id",
+          "to_table": "intake_applications",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_questions",
+          "from_column": "approved_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "intake_submissions",
+      "representation": "intake",
+      "role": "source_capture",
+      "independence_class": "fundamental",
+      "defined_in": "047_manual_intake_workflow.sql",
+      "column_count": 17,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT gen_random_uuid()"
+        },
+        {
+          "name": "ref_seq",
+          "definition": "BIGSERIAL UNIQUE"
+        },
+        {
+          "name": "ref",
+          "definition": "TEXT GENERATED ALWAYS AS ('IN-' || LPAD(ref_seq::TEXT"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "source_type",
+          "definition": "TEXT NOT NULL CHECK (source_type IN ("
+        },
+        {
+          "name": "raw_input",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "source_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "source_title",
+          "definition": "TEXT"
+        },
+        {
+          "name": "vertical_hint",
+          "definition": "TEXT NOT NULL DEFAULT 'unknown' CHECK (vertical_hint IN ('tech'"
+        },
+        {
+          "name": "kind_hint",
+          "definition": "TEXT"
+        },
+        {
+          "name": "captured_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "capture_method",
+          "definition": "TEXT NOT NULL CHECK (capture_method IN ("
+        },
+        {
+          "name": "metadata",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "workflow_status",
+          "definition": "TEXT NOT NULL DEFAULT 'pending_review' CHECK (workflow_status IN ("
+        },
+        {
+          "name": "current_checkpoint",
+          "definition": "TEXT NOT NULL DEFAULT 'entity_checkpoint' CHECK (current_checkpoint IN ("
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "intake_submissions",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "intake_entities",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_applications",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_application_layers",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_questions",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_gate_reviews",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        },
+        {
+          "from_table": "intake_events",
+          "from_column": "submission_id",
+          "to_table": "intake_submissions",
+          "to_column": "id",
+          "source": "047_manual_intake_workflow.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "connected_integrations",
+      "representation": "integration",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "003_intelligence_and_integrations.sql",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "type",
+          "definition": "integration_type NOT NULL"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "config",
+          "definition": "BYTEA"
+        },
+        {
+          "name": "is_default",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "connected_integrations",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "incoming_foreign_keys": [
+        {
+          "from_table": "ai_draft_runs",
+          "from_column": "integration_id",
+          "to_table": "connected_integrations",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "observed": true
+    },
+    {
+      "entity": "user_integrations",
+      "representation": "integration",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "012_launch_hardening.sql",
+      "column_count": 14,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "provider",
+          "definition": "ai_provider_type NOT NULL"
+        },
+        {
+          "name": "label",
+          "definition": "TEXT NOT NULL DEFAULT 'Default'"
+        },
+        {
+          "name": "status",
+          "definition": "integration_status NOT NULL DEFAULT 'pending'"
+        },
+        {
+          "name": "is_default",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "key_storage_ref",
+          "definition": "TEXT"
+        },
+        {
+          "name": "key_fingerprint",
+          "definition": "TEXT"
+        },
+        {
+          "name": "base_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "model_preference",
+          "definition": "TEXT"
+        },
+        {
+          "name": "last_verified_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "last_error",
+          "definition": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_integrations",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "acceptance_reports",
+      "representation": "intelligence",
+      "role": "outcome_aggregate",
+      "independence_class": "derived",
+      "defined_in": "003_intelligence_and_integrations.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "reported_by",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "outcome",
+          "definition": "outcome_type NOT NULL"
+        },
+        {
+          "name": "cohort_round",
+          "definition": "TEXT"
+        },
+        {
+          "name": "verified",
+          "definition": "BOOLEAN NOT NULL DEFAULT FALSE"
+        },
+        {
+          "name": "reported_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "acceptance_reports",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "acceptance_reports",
+          "from_column": "reported_by",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "ai_draft_runs",
+      "representation": "intelligence",
+      "role": "generation_audit",
+      "independence_class": "provenance",
+      "defined_in": "003_intelligence_and_integrations.sql",
+      "column_count": 14,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "application_answer_id",
+          "definition": "UUID NOT NULL REFERENCES application_answers(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "integration_id",
+          "definition": "UUID REFERENCES connected_integrations(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "prompt_used",
+          "definition": "TEXT"
+        },
+        {
+          "name": "model_used",
+          "definition": "TEXT"
+        },
+        {
+          "name": "output_content",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "word_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "score_specificity",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "score_alignment",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "score_authenticity",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "score_fluency",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "score_composite",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "ai_draft_runs",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "ai_draft_runs",
+          "from_column": "application_answer_id",
+          "to_table": "application_answers",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "ai_draft_runs",
+          "from_column": "integration_id",
+          "to_table": "connected_integrations",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "answer_reviews",
+      "representation": "intelligence",
+      "role": "answer_evaluation",
+      "independence_class": "provenance",
+      "defined_in": "026_answer_reviews.sql",
+      "column_count": 17,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "profile_answer_id",
+          "definition": "UUID NOT NULL REFERENCES profile_answers(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID REFERENCES programs(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "archived_question_id",
+          "definition": "UUID REFERENCES archived_questions(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "reviewer_name",
+          "definition": "TEXT NOT NULL DEFAULT 'unknown_reviewer'"
+        },
+        {
+          "name": "reviewer_type",
+          "definition": "TEXT NOT NULL DEFAULT 'agent'"
+        },
+        {
+          "name": "reviewer_version",
+          "definition": "TEXT"
+        },
+        {
+          "name": "provider",
+          "definition": "TEXT"
+        },
+        {
+          "name": "model_used",
+          "definition": "TEXT"
+        },
+        {
+          "name": "overall_status",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "summary",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "comments",
+          "definition": "JSONB NOT NULL DEFAULT '[]'::jsonb"
+        },
+        {
+          "name": "scores",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "certification",
+          "definition": "JSONB"
+        },
+        {
+          "name": "source_tool",
+          "definition": "TEXT NOT NULL DEFAULT 'hub_save_answer_review'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "answer_reviews",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        },
+        {
+          "from_table": "answer_reviews",
+          "from_column": "profile_answer_id",
+          "to_table": "profile_answers",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        },
+        {
+          "from_table": "answer_reviews",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        },
+        {
+          "from_table": "answer_reviews",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "026_answer_reviews.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "answer_stress_tests",
+      "representation": "intelligence",
+      "role": "answer_adversarial_evaluation",
+      "independence_class": "provenance",
+      "defined_in": "012_launch_hardening.sql",
+      "column_count": 18,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "profile_answer_id",
+          "definition": "UUID NOT NULL REFERENCES profile_answers(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID REFERENCES programs(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "archived_question_id",
+          "definition": "UUID REFERENCES archived_questions(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "depth",
+          "definition": "answer_stress_depth NOT NULL DEFAULT 'medium'"
+        },
+        {
+          "name": "mode",
+          "definition": "TEXT NOT NULL DEFAULT 'stub_no_llm'"
+        },
+        {
+          "name": "provider",
+          "definition": "TEXT"
+        },
+        {
+          "name": "model_used",
+          "definition": "TEXT"
+        },
+        {
+          "name": "prompt_used",
+          "definition": "TEXT"
+        },
+        {
+          "name": "detected_signals",
+          "definition": "JSONB NOT NULL DEFAULT '{}'::jsonb"
+        },
+        {
+          "name": "follow_up_prompts",
+          "definition": "JSONB NOT NULL DEFAULT '[]'::jsonb"
+        },
+        {
+          "name": "checklist",
+          "definition": "JSONB NOT NULL DEFAULT '[]'::jsonb"
+        },
+        {
+          "name": "risk_flags",
+          "definition": "JSONB NOT NULL DEFAULT '[]'::jsonb"
+        },
+        {
+          "name": "score_payload",
+          "definition": "JSONB"
+        },
+        {
+          "name": "fidelity_certificate",
+          "definition": "JSONB"
+        },
+        {
+          "name": "persisted_from_tool",
+          "definition": "TEXT NOT NULL DEFAULT 'hub_stress_test_answer'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        },
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "profile_answer_id",
+          "to_table": "profile_answers",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        },
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        },
+        {
+          "from_table": "answer_stress_tests",
+          "from_column": "archived_question_id",
+          "to_table": "archived_questions",
+          "to_column": "id",
+          "source": "012_launch_hardening.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "deadline_alerts",
+      "representation": "intelligence",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "024_deadline_alerts.sql",
+      "column_count": 6,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id)   ON DELETE CASCADE"
+        },
+        {
+          "name": "alert_window",
+          "definition": "TEXT NOT NULL CHECK (alert_window IN ('30d'"
+        },
+        {
+          "name": "sent_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "deadline_alerts",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "024_deadline_alerts.sql"
+        },
+        {
+          "from_table": "deadline_alerts",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "024_deadline_alerts.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "program_dna",
+      "representation": "intelligence",
+      "role": "derived_program_signature",
+      "independence_class": "derived",
+      "defined_in": "008_intelligence_layer_v2.sql",
+      "column_count": 7,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "theme",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "question_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "word_limit_sum",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "weight_pct",
+          "definition": "FLOAT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "computed_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "program_dna",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "008_intelligence_layer_v2.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "program_signals",
+      "representation": "intelligence",
+      "role": "behavioral_signal",
+      "independence_class": "supporting",
+      "defined_in": "003_intelligence_and_integrations.sql",
+      "column_count": 5,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "signal_type",
+          "definition": "signal_type NOT NULL"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "program_signals",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        },
+        {
+          "from_table": "program_signals",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "program_stats",
+      "representation": "intelligence",
+      "role": "derived_program_metrics",
+      "independence_class": "derived",
+      "defined_in": "003_intelligence_and_integrations.sql",
+      "column_count": 8,
+      "columns": [
+        {
+          "name": "program_id",
+          "definition": "UUID PRIMARY KEY REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "application_count",
+          "definition": "INT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "mean_score",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "score_distribution",
+          "definition": "JSONB"
+        },
+        {
+          "name": "acceptance_rate",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "last_submission_at",
+          "definition": "TIMESTAMPTZ"
+        },
+        {
+          "name": "trending_score",
+          "definition": "FLOAT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "program_stats",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "003_intelligence_and_integrations.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "recruiter_alerts",
+      "representation": "intelligence",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "027_recruiter_alerts.sql",
+      "column_count": 6,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "sent_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "week_bucket",
+          "definition": "DATE NOT NULL DEFAULT DATE_TRUNC('week'"
+        },
+        {
+          "name": "composite_score",
+          "definition": "NUMERIC"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "recruiter_alerts",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "027_recruiter_alerts.sql"
+        },
+        {
+          "from_table": "recruiter_alerts",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "027_recruiter_alerts.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "user_program_fit",
+      "representation": "intelligence",
+      "role": "derived_fit",
+      "independence_class": "derived",
+      "defined_in": "008_intelligence_layer_v2.sql",
+      "column_count": 9,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "user_id",
+          "definition": "UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "program_id",
+          "definition": "UUID NOT NULL REFERENCES programs(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "fit_score",
+          "definition": "FLOAT NOT NULL DEFAULT 0"
+        },
+        {
+          "name": "coverage_pct",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "theme_alignment",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "criteria_match",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "quality_signal",
+          "definition": "FLOAT"
+        },
+        {
+          "name": "computed_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [
+        {
+          "from_table": "user_program_fit",
+          "from_column": "user_id",
+          "to_table": "auth.users",
+          "to_column": "id",
+          "source": "008_intelligence_layer_v2.sql"
+        },
+        {
+          "from_table": "user_program_fit",
+          "from_column": "program_id",
+          "to_table": "programs",
+          "to_column": "id",
+          "source": "008_intelligence_layer_v2.sql"
+        }
+      ],
+      "incoming_foreign_keys": [],
+      "observed": true
+    },
+    {
+      "entity": "funders",
+      "representation": "organization",
+      "role": "supporting",
+      "independence_class": "supporting",
+      "defined_in": "023_funders_schema.sql",
+      "column_count": 12,
+      "columns": [
+        {
+          "name": "id",
+          "definition": "UUID PRIMARY KEY DEFAULT uuid_generate_v4()"
+        },
+        {
+          "name": "slug",
+          "definition": "TEXT UNIQUE NOT NULL"
+        },
+        {
+          "name": "name",
+          "definition": "TEXT NOT NULL"
+        },
+        {
+          "name": "type",
+          "definition": "TEXT NOT NULL DEFAULT 'accelerator'"
+        },
+        {
+          "name": "website",
+          "definition": "TEXT"
+        },
+        {
+          "name": "logo_url",
+          "definition": "TEXT"
+        },
+        {
+          "name": "description",
+          "definition": "TEXT"
+        },
+        {
+          "name": "hq_location",
+          "definition": "TEXT"
+        },
+        {
+          "name": "founded_year",
+          "definition": "INT"
+        },
+        {
+          "name": "domain",
+          "definition": "TEXT NOT NULL DEFAULT 'founder'"
+        },
+        {
+          "name": "created_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        },
+        {
+          "name": "updated_at",
+          "definition": "TIMESTAMPTZ NOT NULL DEFAULT NOW()"
+        }
+      ],
+      "outgoing_foreign_keys": [],
+      "incoming_foreign_keys": [],
+      "observed": true
+    }
+  ]
+}

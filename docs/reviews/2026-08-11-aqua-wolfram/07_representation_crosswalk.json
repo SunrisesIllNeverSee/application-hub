@@ -1,0 +1,130 @@
+{
+  "artifact": "07_representation_crosswalk",
+  "crosswalk": [
+    {
+      "concept": "organization/entity",
+      "intake": [
+        "intake_entities"
+      ],
+      "archive": [
+        "programs.organization (attribute)",
+        "funders"
+      ],
+      "canonical": [
+        "answer_variants.entity",
+        "application_packages.program_entity (text)"
+      ],
+      "intelligence": [
+        "program-level derived records"
+      ],
+      "bridge_status": "heterogeneous identity",
+      "review_question": "Should entity identity remain textual at canonical layer or carry an immutable entity/program identifier alongside display text?"
+    },
+    {
+      "concept": "application/program",
+      "intake": [
+        "intake_applications",
+        "intake_application_layers"
+      ],
+      "archive": [
+        "programs",
+        "program_cycles",
+        "user_applications",
+        "app_import_sessions"
+      ],
+      "canonical": [
+        "application_packages"
+      ],
+      "intelligence": [
+        "program_dna",
+        "user_program_fit",
+        "program_stats"
+      ],
+      "bridge_status": "multiple intentional projections; promotion edge needs explicit tracing",
+      "review_question": "Which object is authoritative for cycle-specific application identity?"
+    },
+    {
+      "concept": "question",
+      "intake": [
+        "intake_questions"
+      ],
+      "archive": [
+        "program_questions",
+        "archived_questions"
+      ],
+      "canonical": [
+        "canonical_commitments are not questions but may be derived from answers to them"
+      ],
+      "intelligence": [
+        "question embedding/significance/universal-question tooling"
+      ],
+      "bridge_status": "clear occurrence/normalized distinction in archive; intake-to-archive promotion identity not explicit in inspected schema",
+      "review_question": "Persist promotion IDs to distinguish transformed identity from semantic similarity."
+    },
+    {
+      "concept": "answer/commitment",
+      "intake": [
+        "raw input may contain answers but intake tables do not model answer rows directly"
+      ],
+      "archive": [
+        "profile_answers",
+        "profile_answer_history",
+        "application_answers",
+        "team_answers"
+      ],
+      "canonical": [
+        "canonical_commitments",
+        "answer_variants"
+      ],
+      "intelligence": [
+        "answer_reviews",
+        "answer_stress_tests",
+        "ai_draft_runs"
+      ],
+      "bridge_status": "two strong answer systems with canonical mapping handled by canonical-hub, but no universal source bridge field is visible",
+      "review_question": "Can every variant name its operational/source answer record and source question occurrence when applicable?"
+    },
+    {
+      "concept": "provenance",
+      "intake": [
+        "intake_events",
+        "intake_gate_reviews"
+      ],
+      "archive": [
+        "profile_answer_history",
+        "import session metadata"
+      ],
+      "canonical": [
+        "lineage_events",
+        "lineage JSON/hash fields"
+      ],
+      "intelligence": [
+        "ai_draft_runs/reviews/stress tests"
+      ],
+      "bridge_status": "separate provenance domains",
+      "review_question": "Define a cross-domain provenance envelope so one trace can traverse workflow event -> promoted record -> canonical hash -> variant -> package -> export."
+    },
+    {
+      "concept": "score/evaluation",
+      "intake": [
+        "review decisions"
+      ],
+      "archive": [
+        "importance_score/completion_pct/heat_score"
+      ],
+      "canonical": [
+        "significance_score",
+        "fidelity_score"
+      ],
+      "intelligence": [
+        "fit scores",
+        "reviews",
+        "stress tests",
+        "rankings"
+      ],
+      "bridge_status": "intentionally derived but semantically overloaded risk",
+      "review_question": "Keep each score decomposable into named components + versioned algorithm rather than treating scalars as interchangeable."
+    }
+  ],
+  "normalization_principle": "Normalize identity and provenance, not necessarily every representation. Preserve phase-specific tables where they encode different semantics or workflow guarantees."
+}

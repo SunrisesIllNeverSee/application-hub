@@ -9,9 +9,9 @@
 | Phase | State | Notes |
 |---|---|---|
 | 1 — Preserve | ✅ **COMPLETE** | commit `33c39a4` on `repair/2026-08-12-preservation`, pushed to origin. Backup: `~/backups/apphub-prerepair-2026-08-12.tgz` (53M) |
-| 2 — Re-attach + ff | 🔶 **HALF DONE** | `git switch main` done (HEAD re-attached); fetch/ff-merge **still pending** |
-| 3 — Fresh clone | ⬜ pending | |
-| 3.5 — Wolfram review import | ⬜ pending | **new in v2** — first content commit of the fresh clone |
+| 2 — Re-attach + ff | ✅ **COMPLETE** | `main` fast-forwarded `d101c18` → `bb56cf1`. Runbook v2 committed `e18f608` on repair branch, pushed. |
+| 3 — Fresh clone | ✅ **COMPLETE** | Fresh clone at canonical path, fsck-clean, all Checkpoint B gates green (type-check, MCP check, check.py 0 blockers/19 warnings). Old clone renamed `application-hub-CORRUPT-keep`. Preservation merged to main (`c7c2924`). |
+| 3.5 — Wolfram review import | 🔶 **IN PROGRESS** | 14-file package copied to `docs/reviews/2026-08-11-aqua-wolfram/`; committing in this phase. |
 | 4 — Coordination sync | ⬜ pending | |
 | 5 — Archival banner | ⬜ DECISION REQUIRED | Deric answers (a)/(b) |
 | 6 — START_HERE refresh | ⬜ pending | |

@@ -1,0 +1,144 @@
+{
+  "artifact": "08_phase_shift_analysis",
+  "phase_model": [
+    {
+      "phase": 0,
+      "name": "capture",
+      "representation": "raw source",
+      "objects": [
+        "intake_submissions.raw_input"
+      ],
+      "entry": "paste/url/upload/extension/api/legacy",
+      "exit_condition": "staged extraction exists"
+    },
+    {
+      "phase": 1,
+      "name": "staging",
+      "representation": "candidate structured source",
+      "objects": [
+        "intake_entities",
+        "intake_applications",
+        "intake_application_layers",
+        "intake_questions"
+      ],
+      "exit_condition": "checkpoint approvals"
+    },
+    {
+      "phase": 2,
+      "name": "validation",
+      "representation": "human-reviewed staged knowledge",
+      "objects": [
+        "intake_gate_reviews",
+        "review_status",
+        "intake_events"
+      ],
+      "exit_condition": "questions checkpoint approved -> finalized"
+    },
+    {
+      "phase": 3,
+      "name": "promotion",
+      "representation": "operational archive",
+      "objects": [
+        "programs",
+        "program_cycles",
+        "program_questions",
+        "archived_questions"
+      ],
+      "exit_condition": "records usable by operational system",
+      "status": "state promoted exists, but explicit promotion bridge should be tested in implementation"
+    },
+    {
+      "phase": 4,
+      "name": "user operationalization",
+      "representation": "user answer/application state",
+      "objects": [
+        "profile_answers",
+        "application_answers",
+        "user_applications"
+      ],
+      "exit_condition": "answer available for reuse/submission"
+    },
+    {
+      "phase": 5,
+      "name": "canonicalization",
+      "representation": "portable knowledge",
+      "objects": [
+        "canonical_commitments",
+        "answer_variants",
+        "application_packages"
+      ],
+      "exit_condition": "commitment/variant/package hashes and lineage recorded"
+    },
+    {
+      "phase": 6,
+      "name": "intelligence",
+      "representation": "derived analysis",
+      "objects": [
+        "program_dna",
+        "user_program_fit",
+        "answer_reviews",
+        "answer_stress_tests",
+        "smart matcher outputs"
+      ],
+      "exit_condition": "rank/review/recommendation produced"
+    },
+    {
+      "phase": 7,
+      "name": "export/reuse",
+      "representation": "portable external package",
+      "objects": [
+        "canonical package export",
+        "future application composition"
+      ],
+      "exit_condition": "external consumption or next-cycle ingestion"
+    }
+  ],
+  "phase_boundaries_to_test": [
+    {
+      "boundary": "2->3",
+      "name": "reviewed intake to operational archive",
+      "priority": "critical",
+      "test": "Does every promoted program/question preserve the intake submission/question identity and review provenance?"
+    },
+    {
+      "boundary": "4->5",
+      "name": "operational answer to canonical knowledge",
+      "priority": "critical",
+      "test": "Can every canonical variant be traced to exact source answer/question/application when created from existing Aqua data?"
+    },
+    {
+      "boundary": "5->6",
+      "name": "canonical knowledge to intelligence",
+      "priority": "high",
+      "test": "Are fidelity/significance/fit formulas versioned, decomposable, and calibrated against outcomes?"
+    },
+    {
+      "boundary": "6->7",
+      "name": "intelligence to export/reuse",
+      "priority": "medium",
+      "test": "Are explanation/provenance fields retained when a scalar ranking or generated answer is exported?"
+    }
+  ],
+  "normalization_target": {
+    "keep_separate": [
+      "intake staging vs production/archive",
+      "question occurrence vs normalized question",
+      "profile/master answer vs application-specific answer",
+      "canonical commitment vs user variant",
+      "workflow events vs knowledge lineage"
+    ],
+    "strengthen_bridges": [
+      "persistent promotion mapping IDs",
+      "source answer/question IDs on variants or lineage metadata",
+      "program/application immutable ID alongside text entity names",
+      "algorithm_version on derived scoring/qualification records",
+      "cross-domain trace_id/correlation_id"
+    ],
+    "avoid": [
+      "merging tables solely because labels overlap",
+      "replacing exact source wording with normalized wording",
+      "treating semantic similarity as identity",
+      "overwriting historical submitted/application-specific answers"
+    ]
+  }
+}

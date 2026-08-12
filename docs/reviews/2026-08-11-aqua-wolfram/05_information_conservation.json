@@ -1,0 +1,129 @@
+{
+  "artifact": "05_information_conservation",
+  "principle": "A phase change is acceptable when source identity/provenance remains recoverable and the loss is intentional, measurable, and appropriate to the target representation.",
+  "transitions": [
+    {
+      "transition": "raw_input -> staged entity/application/layers/questions",
+      "preserved": [
+        "raw_input retained",
+        "source_url/source_title",
+        "capture timestamp/method",
+        "metadata"
+      ],
+      "compressed_or_derived": [
+        "entity identity",
+        "vertical",
+        "application title/cycle/deadline",
+        "question segmentation/normalization"
+      ],
+      "loss_risk": "medium",
+      "reason": "structured extraction may omit material not represented by staged fields; raw source allows audit/recovery"
+    },
+    {
+      "transition": "staged -> reviewed staged",
+      "preserved": [
+        "submission identity",
+        "review record",
+        "workflow event"
+      ],
+      "compressed_or_derived": [
+        "edited structured payload",
+        "approval decision"
+      ],
+      "loss_risk": "low-medium",
+      "reason": "edits are recorded as edited_payload/event state, but full object before/after coverage depends on event payload completeness"
+    },
+    {
+      "transition": "question occurrence -> archived question",
+      "preserved": [
+        "exact asked_as in program_questions",
+        "limits/order/section"
+      ],
+      "compressed_or_derived": [
+        "canonical text/theme/subtheme/embedding/importance"
+      ],
+      "loss_risk": "medium",
+      "reason": "semantic dedup can collapse distinct burden/intent if normalization criteria are weak"
+    },
+    {
+      "transition": "profile answer -> application answer",
+      "preserved": [
+        "answer text at creation/source intent"
+      ],
+      "compressed_or_derived": [
+        "application-specific refinement"
+      ],
+      "loss_risk": "low if history/source link maintained",
+      "reason": "expected specialization is not loss if provenance remains"
+    },
+    {
+      "transition": "content -> canonical commitment",
+      "preserved": [
+        "canonical aggregate_description/title/hash",
+        "user variant content"
+      ],
+      "compressed_or_derived": [
+        "commitment boundaries",
+        "similarity match",
+        "significance",
+        "tags"
+      ],
+      "loss_risk": "high under current placeholder extractor",
+      "reason": "extractCommitments uses paragraph/sentence chunking; findOrCreateCanonical uses lexical Jaccard-like fallback with 0.78 merge threshold"
+    },
+    {
+      "transition": "variant -> fidelity qualification",
+      "preserved": [
+        "variant content",
+        "canonical link"
+      ],
+      "compressed_or_derived": [
+        "scalar fidelity_score",
+        "reward eligibility"
+      ],
+      "loss_risk": "high for decision semantics, low for source content",
+      "reason": "current calculateFidelity is explicitly placeholder lexical similarity"
+    },
+    {
+      "transition": "package -> export",
+      "preserved": [
+        "canonical/variant package retrieval",
+        "lineage flag",
+        "timestamp"
+      ],
+      "compressed_or_derived": [
+        "Markdown rendering drops some relational structure compared with JSON"
+      ],
+      "loss_risk": "format-dependent"
+    },
+    {
+      "transition": "knowledge graph -> smart matcher rank",
+      "preserved": [
+        "program id/name/deadline",
+        "fit/significance outputs"
+      ],
+      "compressed_or_derived": [
+        "value, heat, brand, significance and persona-related signals into score/rank/snippet"
+      ],
+      "loss_risk": "high for explainability unless component scores retained",
+      "reason": "rank is intentionally reductive"
+    }
+  ],
+  "conservation_fields_recommended_for_analysis": [
+    "source_object_id",
+    "source_representation",
+    "target_object_id",
+    "target_representation",
+    "transformation_id",
+    "event_id",
+    "parent_hash",
+    "new_hash",
+    "timestamp",
+    "actor",
+    "confidence",
+    "algorithm_version",
+    "fields_preserved",
+    "fields_created",
+    "fields_dropped"
+  ]
+}

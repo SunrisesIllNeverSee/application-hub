@@ -1,0 +1,118 @@
+{
+  "artifact": "04_state_transition_model",
+  "machines": [
+    {
+      "object": "intake_submission",
+      "states": [
+        "draft",
+        "pending_review",
+        "in_progress",
+        "needs_revision",
+        "rejected",
+        "finalized",
+        "promoted"
+      ],
+      "initial": "pending_review",
+      "checkpoint_sequence": [
+        "entity_checkpoint",
+        "application_checkpoint",
+        "structured_layers_checkpoint",
+        "questions_checkpoint",
+        "finalized"
+      ],
+      "transitions": [
+        {
+          "from": "pending_review|in_progress|needs_revision",
+          "event": "approve entity/application/structured layer",
+          "to": "in_progress",
+          "checkpoint_effect": "advance nextCheckpoint"
+        },
+        {
+          "from": "pending_review|in_progress|needs_revision",
+          "event": "approve questions_checkpoint",
+          "to": "finalized",
+          "checkpoint_effect": "finalized"
+        },
+        {
+          "from": "any reviewable",
+          "event": "needs_revision",
+          "to": "needs_revision"
+        },
+        {
+          "from": "any reviewable",
+          "event": "reject",
+          "to": "rejected"
+        },
+        {
+          "from": "finalized",
+          "event": "promotion (state exists in schema)",
+          "to": "promoted",
+          "implementation_status": "promotion transition not established by inspected review route"
+        }
+      ]
+    },
+    {
+      "object": "intake_layer_review",
+      "states": [
+        "pending_review",
+        "approved",
+        "rejected",
+        "needs_revision"
+      ],
+      "applies_to": [
+        "intake_entities",
+        "intake_applications",
+        "intake_application_layers",
+        "intake_questions"
+      ]
+    },
+    {
+      "object": "user_application",
+      "states": [
+        "saved",
+        "drafting",
+        "submitted",
+        "accepted",
+        "rejected",
+        "waitlist"
+      ],
+      "source": "application_status enum"
+    },
+    {
+      "object": "profile_answer",
+      "states": [
+        "draft",
+        "solid",
+        "locked"
+      ],
+      "source": "answer_confidence enum",
+      "versioning": "profile_answer_history on save"
+    },
+    {
+      "object": "canonical_knowledge",
+      "states": [
+        "candidate content",
+        "canonical created or matched",
+        "variant mapped",
+        "package assembled",
+        "qualified",
+        "exported"
+      ],
+      "note": "These are process states inferred from canonical-hub actions, not a persisted enum."
+    },
+    {
+      "object": "lineage_event",
+      "states": [
+        "append-only event record"
+      ],
+      "graph_form": "DAG by hash ancestry for canonical system; intake_events also supports parent_event_id DAG"
+    }
+  ],
+  "consistency_tests_for_wolfram": [
+    "Reachability of promoted from finalized",
+    "Dead states and unreachable states",
+    "Cycles that bypass human checkpoints",
+    "Parallel transitions that write equivalent representations without a shared bridge ID",
+    "Whether event histories are sufficient to reconstruct state at time t"
+  ]
+}

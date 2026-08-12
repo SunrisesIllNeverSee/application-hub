@@ -1,0 +1,1333 @@
+{
+  "artifact": "06_dependency_graph",
+  "nodes": [
+    {
+      "id": "archived_questions",
+      "representation": "archive",
+      "role": "normalized_question",
+      "type": "table"
+    },
+    {
+      "id": "programs",
+      "representation": "archive",
+      "role": "program_identity",
+      "type": "table"
+    },
+    {
+      "id": "program_questions",
+      "representation": "archive",
+      "role": "question_occurrence",
+      "type": "table"
+    },
+    {
+      "id": "profile_answers",
+      "representation": "archive",
+      "role": "reusable_user_answer",
+      "type": "table"
+    },
+    {
+      "id": "profile_answer_history",
+      "representation": "archive",
+      "role": "answer_version_history",
+      "type": "table"
+    },
+    {
+      "id": "user_applications",
+      "representation": "archive",
+      "role": "application_instance",
+      "type": "table"
+    },
+    {
+      "id": "application_answers",
+      "representation": "archive",
+      "role": "application_specific_answer",
+      "type": "table"
+    },
+    {
+      "id": "program_signals",
+      "representation": "intelligence",
+      "role": "behavioral_signal",
+      "type": "table"
+    },
+    {
+      "id": "acceptance_reports",
+      "representation": "intelligence",
+      "role": "outcome_aggregate",
+      "type": "table"
+    },
+    {
+      "id": "program_stats",
+      "representation": "intelligence",
+      "role": "derived_program_metrics",
+      "type": "table"
+    },
+    {
+      "id": "import_queue",
+      "representation": "archive",
+      "role": "import_staging",
+      "type": "table"
+    },
+    {
+      "id": "connected_integrations",
+      "representation": "integration",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "ai_draft_runs",
+      "representation": "intelligence",
+      "role": "generation_audit",
+      "type": "table"
+    },
+    {
+      "id": "subscription_plans",
+      "representation": "commerce",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "user_subscriptions",
+      "representation": "commerce",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "program_listings",
+      "representation": "commerce",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "ai_usage",
+      "representation": "commerce",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "program_dna",
+      "representation": "intelligence",
+      "role": "derived_program_signature",
+      "type": "table"
+    },
+    {
+      "id": "user_program_fit",
+      "representation": "intelligence",
+      "role": "derived_fit",
+      "type": "table"
+    },
+    {
+      "id": "user_profiles",
+      "representation": "archive",
+      "role": "user_identity_profile",
+      "type": "table"
+    },
+    {
+      "id": "user_integrations",
+      "representation": "integration",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "answer_stress_tests",
+      "representation": "intelligence",
+      "role": "answer_adversarial_evaluation",
+      "type": "table"
+    },
+    {
+      "id": "user_question_unlocks",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "app_import_sessions",
+      "representation": "archive",
+      "role": "import_state",
+      "type": "table"
+    },
+    {
+      "id": "stripe_events",
+      "representation": "commerce",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "funders",
+      "representation": "organization",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "deadline_alerts",
+      "representation": "intelligence",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "teams",
+      "representation": "collaboration",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "team_members",
+      "representation": "collaboration",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "team_invites",
+      "representation": "collaboration",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "team_answers",
+      "representation": "collaboration",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "answer_reviews",
+      "representation": "intelligence",
+      "role": "answer_evaluation",
+      "type": "table"
+    },
+    {
+      "id": "recruiter_alerts",
+      "representation": "intelligence",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "user_contributions",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "credit_events",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "user_achievements",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "program_cycles",
+      "representation": "archive",
+      "role": "program_version_cycle",
+      "type": "table"
+    },
+    {
+      "id": "beta_settings",
+      "representation": "config",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "starter_packages",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "user_starter_claims",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "community_messages",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "canonical_commitments",
+      "representation": "canonical",
+      "role": "portable_commitment",
+      "type": "table"
+    },
+    {
+      "id": "answer_variants",
+      "representation": "canonical",
+      "role": "user_scoped_commitment_expression",
+      "type": "table"
+    },
+    {
+      "id": "application_packages",
+      "representation": "canonical",
+      "role": "reconstructed_portable_package",
+      "type": "table"
+    },
+    {
+      "id": "lineage_events",
+      "representation": "canonical",
+      "role": "knowledge_provenance",
+      "type": "table"
+    },
+    {
+      "id": "canonical_user_credits",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "contribution_rewards",
+      "representation": "community",
+      "role": "supporting",
+      "type": "table"
+    },
+    {
+      "id": "aggregate_versions",
+      "representation": "canonical",
+      "role": "aggregate_snapshot",
+      "type": "table"
+    },
+    {
+      "id": "seeding_entities",
+      "representation": "canonical",
+      "role": "seed_provenance",
+      "type": "table"
+    },
+    {
+      "id": "intake_submissions",
+      "representation": "intake",
+      "role": "source_capture",
+      "type": "table"
+    },
+    {
+      "id": "intake_entities",
+      "representation": "intake",
+      "role": "staged_entity",
+      "type": "table"
+    },
+    {
+      "id": "intake_applications",
+      "representation": "intake",
+      "role": "staged_application",
+      "type": "table"
+    },
+    {
+      "id": "intake_application_layers",
+      "representation": "intake",
+      "role": "staged_structure",
+      "type": "table"
+    },
+    {
+      "id": "intake_questions",
+      "representation": "intake",
+      "role": "staged_question",
+      "type": "table"
+    },
+    {
+      "id": "intake_gate_reviews",
+      "representation": "intake",
+      "role": "human_validation",
+      "type": "table"
+    },
+    {
+      "id": "intake_events",
+      "representation": "intake",
+      "role": "workflow_provenance",
+      "type": "table"
+    },
+    {
+      "id": "update_updated_at",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "snapshot_profile_answer",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "compute_word_count",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "recompute_completion_pct",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "update_program_stats_on_signal",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "recompute_all_heat_scores",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "auto_update_program_status",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "increment_asked_by_count",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "decrement_asked_by_count",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "enforce_single_default_integration",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "004_functions_and_triggers.sql"
+    },
+    {
+      "id": "create_free_subscription_on_signup",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "007_monetization.sql"
+    },
+    {
+      "id": "increment_ai_usage",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "007_monetization.sql"
+    },
+    {
+      "id": "sync_profile_answer_columns",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "sync_draft_limit_on_tier_change",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "set_draft_limit_on_insert",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "match_archived_questions",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "increment_draft_count",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "compute_significance_scores",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "compute_program_dna",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "compute_user_fit_scores",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "008_intelligence_layer_v2.sql"
+    },
+    {
+      "id": "create_user_profile_on_signup",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "011_user_profiles.sql"
+    },
+    {
+      "id": "seed_signup_questions",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "014_question_bank_drip.sql"
+    },
+    {
+      "id": "run_daily_drip",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "014_question_bank_drip.sql"
+    },
+    {
+      "id": "auto_seed_questions_on_signup",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "014_question_bank_drip.sql"
+    },
+    {
+      "id": "update_updated_at_column",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "025_teams_schema.sql"
+    },
+    {
+      "id": "match_archived_questions",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "029_embedding_resize_768.sql"
+    },
+    {
+      "id": "award_contribution_credits",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "030_applicant_modes_and_contributions.sql"
+    },
+    {
+      "id": "award_contribution_credits",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "031_fix_contribution_credit_amount.sql"
+    },
+    {
+      "id": "award_answer_credits",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "032_credits_and_achievements.sql"
+    },
+    {
+      "id": "award_submission_credits",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "032_credits_and_achievements.sql"
+    },
+    {
+      "id": "compute_heat_scores",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "037_heat_score_compute.sql"
+    },
+    {
+      "id": "get_top_programs_by_value",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "038_ranking_rpc.sql"
+    },
+    {
+      "id": "claim_starter_package",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "041_beta_mode.sql"
+    },
+    {
+      "id": "semantic_search_canonicals",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "id": "search_canonicals_hybrid",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "id": "get_canonical_package",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "id": "calculate_fit_score",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "id": "smart_matcher_search",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "043_canonical_rpc_functions.sql"
+    },
+    {
+      "id": "process_reward",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "044_rewards_system.sql"
+    },
+    {
+      "id": "refresh_canonical_aggregate",
+      "representation": "transformation",
+      "role": "database_function",
+      "type": "function",
+      "source": "045_aggregate_system.sql"
+    }
+  ],
+  "edges": [
+    {
+      "source": "programs",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "programs",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_questions",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_questions",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "profile_answers",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "profile_answers",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "profile_answer_history",
+      "target": "profile_answers",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_applications",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_applications",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "application_answers",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "application_answers",
+      "target": "user_applications",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "application_answers",
+      "target": "program_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_signals",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_signals",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "acceptance_reports",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "acceptance_reports",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_stats",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "import_queue",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "import_queue",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "import_queue",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "connected_integrations",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "ai_draft_runs",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "ai_draft_runs",
+      "target": "application_answers",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "ai_draft_runs",
+      "target": "connected_integrations",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_subscriptions",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_listings",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_listings",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "ai_usage",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_dna",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_program_fit",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_program_fit",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_profiles",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_integrations",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_stress_tests",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_stress_tests",
+      "target": "profile_answers",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_stress_tests",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_stress_tests",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_question_unlocks",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_question_unlocks",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "app_import_sessions",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "app_import_sessions",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "deadline_alerts",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "deadline_alerts",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "teams",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_members",
+      "target": "teams",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_members",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_members",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_invites",
+      "target": "teams",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_invites",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_answers",
+      "target": "teams",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_answers",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_answers",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "team_answers",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_reviews",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_reviews",
+      "target": "profile_answers",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_reviews",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_reviews",
+      "target": "archived_questions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "recruiter_alerts",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "recruiter_alerts",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_contributions",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_contributions",
+      "target": "import_queue",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "credit_events",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_achievements",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "program_cycles",
+      "target": "programs",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_starter_claims",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "user_starter_claims",
+      "target": "starter_packages",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "community_messages",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "community_messages",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "community_messages",
+      "target": "import_queue",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "community_messages",
+      "target": "community_messages",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_variants",
+      "target": "canonical_commitments",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "answer_variants",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "application_packages",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "canonical_user_credits",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "contribution_rewards",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "aggregate_versions",
+      "target": "canonical_commitments",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "aggregate_versions",
+      "target": "answer_variants",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "seeding_entities",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_submissions",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_entities",
+      "target": "intake_submissions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_entities",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_applications",
+      "target": "intake_submissions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_applications",
+      "target": "intake_entities",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_applications",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_application_layers",
+      "target": "intake_submissions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_application_layers",
+      "target": "intake_applications",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_application_layers",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_questions",
+      "target": "intake_submissions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_questions",
+      "target": "intake_applications",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_questions",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_gate_reviews",
+      "target": "intake_submissions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_gate_reviews",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_events",
+      "target": "intake_submissions",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_events",
+      "target": "intake_events",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "intake_events",
+      "target": "auth.users",
+      "kind": "foreign_key",
+      "hard": true
+    },
+    {
+      "source": "application_packages",
+      "target": "canonical_commitments",
+      "kind": "json_reference",
+      "hard": false
+    },
+    {
+      "source": "application_packages",
+      "target": "answer_variants",
+      "kind": "json_reference",
+      "hard": false
+    },
+    {
+      "source": "intake_events",
+      "target": "intake_events",
+      "kind": "self_dag",
+      "hard": false
+    },
+    {
+      "source": "intake_submissions",
+      "target": "intake_*",
+      "kind": "workflow_root",
+      "hard": false
+    },
+    {
+      "source": "program_questions",
+      "target": "archived_questions",
+      "kind": "normalized_question_mapping",
+      "hard": false
+    },
+    {
+      "source": "application_answers",
+      "target": "profile_answers",
+      "kind": "source_projection",
+      "hard": false
+    }
+  ],
+  "degree_leaders": [
+    [
+      "auth.users",
+      46
+    ],
+    [
+      "programs",
+      17
+    ],
+    [
+      "archived_questions",
+      8
+    ],
+    [
+      "intake_submissions",
+      8
+    ],
+    [
+      "profile_answers",
+      6
+    ],
+    [
+      "intake_events",
+      6
+    ],
+    [
+      "application_answers",
+      5
+    ],
+    [
+      "import_queue",
+      5
+    ],
+    [
+      "community_messages",
+      5
+    ],
+    [
+      "intake_applications",
+      5
+    ],
+    [
+      "program_questions",
+      4
+    ],
+    [
+      "answer_stress_tests",
+      4
+    ],
+    [
+      "teams",
+      4
+    ],
+    [
+      "team_answers",
+      4
+    ],
+    [
+      "answer_reviews",
+      4
+    ],
+    [
+      "answer_variants",
+      4
+    ],
+    [
+      "user_applications",
+      3
+    ],
+    [
+      "ai_draft_runs",
+      3
+    ],
+    [
+      "team_members",
+      3
+    ],
+    [
+      "canonical_commitments",
+      3
+    ]
+  ],
+  "critical_convergence_candidates": [
+    "programs",
+    "archived_questions",
+    "profile_answers",
+    "canonical_commitments",
+    "answer_variants",
+    "application_packages",
+    "intake_submissions"
+  ],
+  "soft_edge_risks": [
+    "application_packages.commitments stores canonical/variant references in JSON rather than FKs",
+    "lineage_events is polymorphic and hash-based, so referential integrity is application-enforced",
+    "promotion from intake representation to operational/archive representation is not represented by an explicit FK in the inspected schema"
+  ],
+  "wolfram_graph_tasks": [
+    "ConnectedComponents by representation",
+    "BetweennessCentrality and VertexDegree",
+    "FindCycle and reachability",
+    "MinimumCut between intake and canonical layers",
+    "CommunityGraphPlot / modularity",
+    "Compare hard-FK graph with logical transformation graph"
+  ]
+}
