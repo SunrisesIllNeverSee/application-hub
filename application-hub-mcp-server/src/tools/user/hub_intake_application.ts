@@ -66,11 +66,10 @@ function parseStructuredText(text: string): ExtractedQuestion[] {
   return questions;
 }
 
-// Optional AI extraction when ANTHROPIC_API_KEY is set in the server env.
+// Optional AI extraction. Tries Anthropic first (if ANTHROPIC_API_KEY is set),
+// then Groq (if GROQ_API_KEY is set — OpenAI-compatible API). Falls back to
+// deterministic parser if neither key is configured or both fail.
 async function extractWithAI(text: string, programName: string, sourceKind: string): Promise<ExtractedQuestion[]> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return [];
-
   const prompt = `Source: ${sourceKind} — ${programName}
 
 Extract every distinct question from this application form. Questions may be explicit ("1.", "Q:", "Tell us..."), section headings above blank fields, or essay prompts.
@@ -83,30 +82,83 @@ Application text:
 ${text}
 """`;
 
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
+  const groqModel = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+
+  // Try Anthropic first
+  if (anthropicKey) {
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": anthropicKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 4096,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+        const raw = data.content?.[0]?.type === "text" ? data.content[0].text ?? "[]" : "[]";
+        return parseAIQuestions(raw);
+      }
+    } catch { /* fall through to Groq */ }
+  }
+
+  // Try Groq (OpenAI-compatible chat completions)
+  if (groqKey) {
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${groqKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: groqModel,
+          max_tokens: 4096,
+          temperature: 0,
+          messages: [
+            { role: "system", content: "You extract questions from application forms. Return ONLY a JSON array, no markdown, no commentary." },
+            { role: "user", content: prompt },
+          ],
+          response_format: { type: "json_object" },
+        }),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+        const raw = data.choices?.[0]?.message?.content ?? "[]";
+        // Groq with json_object response format wraps in an object — try to extract array
+        return parseAIQuestions(raw);
+      }
+    } catch { /* fall through to deterministic */ }
+  }
+
+  return [];
+}
+
+function parseAIQuestions(raw: string): ExtractedQuestion[] {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 4096,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-    if (!res.ok) return [];
-    const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
-    const raw = data.content?.[0]?.type === "text" ? data.content[0].text ?? "[]" : "[]";
-    const parsed: unknown = JSON.parse(raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim());
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+    let parsed: unknown = JSON.parse(cleaned);
+    // Groq json_object mode may wrap array in {questions: [...]} or similar
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const obj = parsed as Record<string, unknown>;
+      for (const key of ["questions", "data", "results", "items"]) {
+        if (Array.isArray(obj[key])) { parsed = obj[key]; break; }
+      }
+    }
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(
       (q): q is ExtractedQuestion =>
         !!q && typeof q === "object" &&
         typeof (q as any).question_text === "string" && (q as any).question_text.length > 0
-    ).map((q) => ({ question_text: q.question_text.trim(), theme: typeof q.theme === "string" ? q.theme : "personal" }));
+    ).map((q) => ({ question_text: (q as any).question_text.trim(), theme: typeof (q as any).theme === "string" ? (q as any).theme : "personal" }));
   } catch {
     return [];
   }
@@ -167,7 +219,7 @@ export function registerIntakeApplication(server: McpServer) {
 
 Then call hub_fill_application with the returned application_id to fill it from the answer bank.
 
-Question extraction: AI when ANTHROPIC_API_KEY is set in the server env, otherwise a deterministic Q:/A: / markdown-header parser (format text accordingly when no AI key is available).`,
+Question extraction: AI when ANTHROPIC_API_KEY or GROQ_API_KEY is set in the server env (Anthropic tried first, then Groq/Llama), otherwise a deterministic Q:/A: / markdown-header parser (format text accordingly when no AI key is available).`,
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   }, async ({ user_token, program_name, program_url, application_text, source_kind, response_format }) => {

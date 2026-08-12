@@ -1,25 +1,29 @@
 import { supabase } from "./supabase.js";
 
-// Shared embedding helper for the MCP server.
+// Keep in sync with app/lib/embed.ts — single source of truth is the app layer.
+// The MCP server can't import app/lib/embed.ts directly (separate package).
 //
 // The archived_questions.embedding column is 768d and was seeded with
-// nomic-embed-text via Ollama. The MCP server runs locally (stdio), so
-// localhost Ollama is reachable — that is the preferred (and only default)
-// provider, keeping all embeddings in the same vector space as the archive.
+// nomic-embed-text via Ollama. All new embeddings MUST come from the same
+// vector space, so Ollama is the default and preferred provider.
+//
+// OpenAI text-embedding-3-small at 768d is a DIFFERENT vector space — only
+// used as a fallback when explicitly enabled (ALLOW_OPENAI_EMBED_FALLBACK=1),
+// otherwise cross-space similarity scores are garbage.
 
 const OLLAMA_URL = (process.env.OLLAMA_URL ?? "http://localhost:11434").replace(/\/$/, "");
 const OLLAMA_MODEL = process.env.OLLAMA_EMBED_MODEL ?? "nomic-embed-text";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "";
+const OPENAI_MODEL = "text-embedding-3-small";
 
 export const EMBED_DIMS = 768;
 
-export async function embedText(text: string): Promise<number[] | null> {
-  const trimmed = text.trim();
-  if (trimmed.length < 3) return null;
+async function embedOllama(text: string, baseUrl: string, model: string): Promise<number[] | null> {
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+    const res = await fetch(`${baseUrl.replace(/\/$/, "")}/api/embeddings`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: OLLAMA_MODEL, prompt: trimmed }),
+      body: JSON.stringify({ model, prompt: text }),
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { embedding?: number[] };
@@ -28,6 +32,40 @@ export async function embedText(text: string): Promise<number[] | null> {
   } catch {
     return null;
   }
+}
+
+async function embedOpenAI(text: string, apiKey: string): Promise<number[] | null> {
+  try {
+    const res = await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ input: text, model: OPENAI_MODEL, dimensions: EMBED_DIMS }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { data: [{ embedding: number[] }] };
+    return data.data[0].embedding;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Embed text. Ollama first (matches the archive's vector space).
+ * OpenAI ONLY when ALLOW_OPENAI_EMBED_FALLBACK=1 — different vector
+ * space, off by default to prevent silent garbage similarity scores.
+ */
+export async function embedText(text: string): Promise<number[] | null> {
+  const trimmed = text.trim();
+  if (trimmed.length < 3) return null;
+
+  const ollama = await embedOllama(trimmed, OLLAMA_URL, OLLAMA_MODEL);
+  if (ollama) return ollama;
+
+  if (process.env.ALLOW_OPENAI_EMBED_FALLBACK === "1" && OPENAI_API_KEY) {
+    return await embedOpenAI(trimmed, OPENAI_API_KEY);
+  }
+
+  return null;
 }
 
 /**

@@ -32,10 +32,23 @@ const DEFAULT_BORROW_THRESHOLD = 0.8
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    // Auth: session cookie (browser) OR Authorization: Bearer <jwt> (extension/MCP)
+    const authHeader = req.headers.get('authorization')
+    let supabase = await createClient()
+    let user = (await supabase.auth.getUser()).data.user
+
+    if (!user && authHeader?.startsWith('Bearer ')) {
+      const jwt = authHeader.slice(7)
+      const { createClient: createBrowserClient } = await import('@supabase/supabase-js').then(m => m)
+      const extClient = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { global: { headers: { Authorization: `Bearer ${jwt}` } } }
+      )
+      const { data } = await extClient.auth.getUser(jwt)
+      if (data.user) { user = data.user; supabase = extClient as typeof supabase }
+    }
+
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await req.json().catch(() => ({}))

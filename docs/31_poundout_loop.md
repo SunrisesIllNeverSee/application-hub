@@ -64,11 +64,13 @@ Confidence mapping:
 
 Re-run any time; it's idempotent on `(user, archived_question_id, version)`.
 
-### 4. (Optional) Anthropic key for AI extraction
+### 4. (Optional) AI key for extraction
 
 Without it, intake falls back to a deterministic `Q:` / `A:` / markdown-header parser. With it, blank-form extraction is much stronger.
 
-Set `ANTHROPIC_API_KEY` in the **MCP server's** environment (not the browser app's) to enable AI extraction from `hub_intake_application`.
+Set `ANTHROPIC_API_KEY` **or** `GROQ_API_KEY` in the **MCP server's** environment (not the browser app's) to enable AI extraction from `hub_intake_application`. Anthropic is tried first; Groq (Llama, OpenAI-compatible API) is the fallback. Optional: `GROQ_MODEL` to override the default `llama-3.3-70b-versatile`.
+
+> **Embeddings** default to local Ollama (`nomic-embed-text`, 768d — matches the archive). OpenAI fallback is gated behind `ALLOW_OPENAI_EMBED_FALLBACK=1` because `text-embedding-3-small` is a different vector space; only enable it if you know you haven't seeded the archive with Ollama embeddings.
 
 ---
 
@@ -134,7 +136,8 @@ Add to your editor's MCP config (Claude Code, Cursor, Windsurf all support stdio
         "SUPABASE_ANON_KEY": "<anon key>",
         "OLLAMA_URL": "http://localhost:11434",
         "OLLAMA_EMBED_MODEL": "nomic-embed-text",
-        "ANTHROPIC_API_KEY": "<optional, for AI extraction>"
+        "GROQ_API_KEY": "<optional, for AI extraction>",
+        "ANTHROPIC_API_KEY": "<optional, for AI extraction (tried first)>"
       }
     }
   }
