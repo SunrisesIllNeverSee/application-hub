@@ -14,8 +14,8 @@
  *   - Portfolio  — non-tech surrogate (future)
  *
  * MoatScore = AQUAscore + boost layers, weighted by active_identity.
- * For V1, MoatScore = AQUAscore (boost layers are placeholders until
- * the FMS/FundScore wiring lands).
+ * FundScore boost is now wired — scales the repo's overall score (0-100)
+ * into a 0-10 additive boost on top of AQUAscore.
  */
 
 export interface AquaScoreInputs {
@@ -173,4 +173,47 @@ export function aquaScoreTier(composite: number): { tier: string; description: s
   if (composite >= 55) return { tier: 'Tier 3', description: 'Top 35% — solid foundation' }
   if (composite >= 35) return { tier: 'Tier 2', description: 'Building — growing fast' }
   return { tier: 'Tier 1', description: 'Just getting started' }
+}
+
+// ── Boost layers ────────────────────────────────────────────────────────
+
+export interface FundScoreData {
+  overall: number
+  artifacts: number
+  business: number
+  quality: number
+  round: string
+  status: string
+  top_fixes: Array<{ label: string; delta: number }>
+  scanned_at: string
+}
+
+/**
+ * FundScore boost — scales the repo's overall score (0-100) into a
+ * 0-10 additive boost on top of AQUAscore. A repo scoring 80+ gets
+ * the full 10-point boost; a repo scoring 50 gets ~6 points.
+ */
+export function fundScoreBoost(score: FundScoreData | null | undefined): number {
+  if (!score || typeof score.overall !== 'number') return 0
+  return Math.round((Math.min(100, score.overall) / 100) * 10)
+}
+
+/**
+ * FMS tier boost — tier 1 = 0, tier 5 = 8 points.
+ * Additive on top of AQUAscore.
+ */
+export function fmsTierBoost(tier: number | null | undefined): number {
+  if (!tier || typeof tier !== 'number') return 0
+  return Math.min(8, Math.round((tier / 5) * 8))
+}
+
+/**
+ * MoatScore = AQUAscore + all boost layers. Capped at 100.
+ */
+export function computeMoatScore(
+  composite: number,
+  fundScore: FundScoreData | null | undefined,
+  fmsTier: number | null | undefined,
+): number {
+  return Math.min(100, composite + fundScoreBoost(fundScore) + fmsTierBoost(fmsTier))
 }

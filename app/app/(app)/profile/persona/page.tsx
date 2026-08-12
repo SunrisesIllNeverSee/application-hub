@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { computeAquaScore, nextTierDelta, aquaScoreTier, type AquaScoreInputs } from '@/lib/aquascore'
+import { computeAquaScore, nextTierDelta, aquaScoreTier, computeMoatScore, type AquaScoreInputs, type FundScoreData } from '@/lib/aquascore'
 import { DnaRadarChart } from '@/components/DnaRadarChart'
 import { ThemeTag } from '@/components/ThemeTag'
 import { FmsQuickAssess } from '@/components/FmsQuickAssess'
+import { FundScoreScanButton } from '@/components/FundScoreScanButton'
 import { cn } from '@/lib/utils'
 
 export const metadata = { title: 'Persona' }
@@ -157,10 +158,14 @@ export default async function PersonaPage() {
 
   // ── Boost-layer availability ──────────────────────────────────────────
   const hasGithub = !!profile?.github_url
-  const fmsTier = (profile?.applicant_context as Record<string, unknown> | null)?.fms_tier
+  const fmsTier = (profile?.applicant_context as Record<string, unknown> | null)?.fms_tier as number | null | undefined
   const hasFmsAssessment = !!(fmsTier && typeof fmsTier === 'number')
-  const hasFundScore = false     // wired when fundscore CLI is vendored
+  const fundScoreData = (profile?.applicant_context as Record<string, unknown> | null)?.fund_score as FundScoreData | null | undefined
+  const hasFundScore = !!(fundScoreData && typeof fundScoreData.overall === 'number')
   const hasPortfolio = !!profile?.linkedin_url
+
+  // MoatScore = AQUAscore + boost layers
+  const moatScore = computeMoatScore(score.composite, fundScoreData, fmsTier)
 
   const topThemes = Object.entries(themeCount)
     .sort(([, a], [, b]) => b - a)
@@ -196,15 +201,20 @@ export default async function PersonaPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-xs font-semibold text-brand-700 dark:text-brand-300 uppercase tracking-wider mb-1">
-              AQUAscore
+              {moatScore > score.composite ? 'MoatScore' : 'AQUAscore'}
             </p>
             <div className="flex items-baseline gap-3">
               <span className="text-5xl font-bold text-neutral-900 dark:text-white tabular-nums">
-                {score.composite}
+                {moatScore > score.composite ? moatScore : score.composite}
               </span>
               <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 / 100
               </span>
+              {moatScore > score.composite && (
+                <span className="text-xs text-success-600 dark:text-success-400 font-medium">
+                  +{moatScore - score.composite} boosts
+                </span>
+              )}
             </div>
             <p className="mt-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
               {tier.tier} · <span className="text-neutral-500 dark:text-neutral-400 font-normal">{tier.description}</span>
@@ -378,13 +388,32 @@ export default async function PersonaPage() {
             cta={hasFmsAssessment ? `Tier ${fmsTier as number} — Edit` : 'Rate your moat below'}
             href={hasFmsAssessment ? '/profile/about' : undefined}
           />
-          <BoostRow
-            name="FundScore"
-            connected={hasFundScore}
-            description="Deterministic investor-readiness score from your GitHub repo's structure."
-            cta="Coming soon"
-            disabled
-          />
+          {/* FundScore — custom row with client-side scan button */}
+          <div className="flex items-start justify-between gap-4 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span
+                className={cn(
+                  'mt-1 w-2 h-2 rounded-full flex-shrink-0',
+                  hasFundScore ? 'bg-success-500' : 'bg-neutral-300 dark:bg-neutral-700'
+                )}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-neutral-900 dark:text-white">FundScore</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  {hasFundScore
+                    ? `Overall ${fundScoreData!.overall}/100 — Artifacts ${fundScoreData!.artifacts}, Business ${fundScoreData!.business}, Quality ${fundScoreData!.quality} (${fundScoreData!.round})`
+                    : hasGithub
+                    ? "Deterministic investor-readiness score from your GitHub repo's structure."
+                    : 'Add a GitHub URL in About to unlock repo scoring.'}
+                </p>
+              </div>
+            </div>
+            <FundScoreScanButton
+              hasGithub={hasGithub}
+              hasScore={hasFundScore}
+              label={hasFundScore ? `${fundScoreData!.overall}/100 — Rescan` : 'Scan repo'}
+            />
+          </div>
         </div>
       </div>
     </div>
