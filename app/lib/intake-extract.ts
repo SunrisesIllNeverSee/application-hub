@@ -332,7 +332,7 @@ export async function findOrCreateArchivedQuestion(
 
   const richInsert = (await supabase
     .from('archived_questions')
-    .insert({ text: questionText, theme: dbTheme, is_user_contributed: true })
+    .insert({ text: questionText, theme: dbTheme })
     .select('id')
     .single()) as unknown as InsertResp
 

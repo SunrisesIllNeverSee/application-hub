@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
         raw_text: text,
         extracted_count: questions.length,
         error_text: extractionError,
-        status: extractionError ? 'failed' : 'completed',
+        status: extractionError ? 'failed' : 'complete',
       })
       .select('id')
       .single()

@@ -139,7 +139,7 @@ async function findOrCreateArchivedQuestion(questionText: string, theme: string)
   const dbTheme = DB_THEME_FALLBACK.get(theme) ?? "personal";
   const insert = await supabase
     .from("archived_questions")
-    .insert({ text: trimmed, theme: dbTheme, is_user_contributed: true })
+    .insert({ text: trimmed, theme: dbTheme })
     .select("id")
     .single();
 
@@ -185,7 +185,7 @@ Question extraction: AI when ANTHROPIC_API_KEY is set in the server env, otherwi
       program_name: program_name.trim(),
       raw_text: application_text,
       extracted_count: questions.length,
-      status: questions.length > 0 ? "completed" : "failed",
+      status: questions.length > 0 ? "complete" : "failed",
       error_text: questions.length > 0 ? null : "no extractable questions",
     });
 

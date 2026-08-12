@@ -96,18 +96,34 @@ export async function POST(req: Request) {
     }
   }
 
-  // Insert new version — matches actual profile_answers schema
+  // Upsert the answer. profile_answers has UNIQUE(user_id, archived_question_id)
+  // — one row per user+question. Versioning works by UPDATE-in-place: the
+  // profile_answer_history_snapshot trigger archives each new version to
+  // profile_answer_history on content change.
   const trimmed = answerText.trim()
-  const { error } = await supabase.from('profile_answers').insert({
-    user_id: user.id,
-    archived_question_id: questionId,
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length
+  const payload = {
     content: trimmed,
     answer_content: trimmed,
     question_text: questionText.trim(),
-    word_count: trimmed.split(/\s+/).filter(Boolean).length,
+    word_count: wordCount,
     version: nextVersion,
-    confidence: 'draft',
-  })
+    confidence: 'draft' as const,
+  }
+
+  let error
+  if (existing && existing.length > 0) {
+    ;({ error } = await supabase
+      .from('profile_answers')
+      .update(payload)
+      .eq('id', existing[0].id))
+  } else {
+    ;({ error } = await supabase.from('profile_answers').insert({
+      user_id: user.id,
+      archived_question_id: questionId,
+      ...payload,
+    }))
+  }
 
   if (error) return NextResponse.json({ saved: false, reason: error.message })
 

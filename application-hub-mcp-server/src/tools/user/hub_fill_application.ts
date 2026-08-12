@@ -151,6 +151,9 @@ Deterministic: no AI-generated text is written. Review happens in the workspace 
     }
 
     // 5. Write borrowed drafts (unless dry run)
+    // Upsert: profile_answers has UNIQUE(user_id, archived_question_id) —
+    // one row per user+question. UPDATE in place; the
+    // profile_answer_history_snapshot trigger archives each new version.
     let written = 0;
     if (!dry_run) {
       for (const plan of borrowPlan) {
@@ -170,16 +173,29 @@ Deterministic: no AI-generated text is written. Review happens in the workspace 
         }
 
         const trimmed = plan.source_answer.trim();
-        const { error } = await supabase.from("profile_answers").insert({
-          user_id,
-          archived_question_id: plan.archived_question_id,
+        const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+        const payload = {
           content: trimmed,
           answer_content: trimmed,
           question_text: plan.asked_as,
-          word_count: trimmed.split(/\s+/).filter(Boolean).length,
+          word_count: wordCount,
           version: nextVersion,
-          confidence: "draft",
-        });
+          confidence: "draft" as const,
+        };
+
+        let error;
+        if (existing && existing.length > 0) {
+          ({ error } = await supabase
+            .from("profile_answers")
+            .update(payload)
+            .eq("id", existing[0].id as string));
+        } else {
+          ({ error } = await supabase.from("profile_answers").insert({
+            user_id,
+            archived_question_id: plan.archived_question_id,
+            ...payload,
+          }));
+        }
         if (!error) written++;
       }
     }

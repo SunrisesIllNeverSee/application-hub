@@ -172,12 +172,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     // ── 5. Write borrowed drafts (unless dry run) ───────────────────────────
+    // Upsert: profile_answers has UNIQUE(user_id, archived_question_id) —
+    // one row per user+question. UPDATE in place; the
+    // profile_answer_history_snapshot trigger archives each new version.
     let written = 0
     const writeErrors: string[] = []
 
     if (!dry_run && borrowPlan.length > 0) {
       for (const plan of borrowPlan) {
-        // Current max version for THIS question
         const { data: existing } = await supabase
           .from('profile_answers')
           .select('id, version, answer_content, content')
@@ -195,16 +197,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         }
 
         const trimmed = plan.source_answer.trim()
-        const { error } = await supabase.from('profile_answers').insert({
-          user_id: user.id,
-          archived_question_id: plan.archived_question_id,
+        const wordCount = trimmed.split(/\s+/).filter(Boolean).length
+        const payload = {
           content: trimmed,
           answer_content: trimmed,
           question_text: plan.asked_as,
-          word_count: trimmed.split(/\s+/).filter(Boolean).length,
+          word_count: wordCount,
           version: nextVersion,
-          confidence: 'draft',
-        })
+          confidence: 'draft' as const,
+        }
+
+        let error
+        if (existing && existing.length > 0) {
+          ;({ error } = await supabase
+            .from('profile_answers')
+            .update(payload)
+            .eq('id', existing[0].id))
+        } else {
+          ;({ error } = await supabase.from('profile_answers').insert({
+            user_id: user.id,
+            archived_question_id: plan.archived_question_id,
+            ...payload,
+          }))
+        }
         if (error) writeErrors.push(plan.asked_as.slice(0, 80))
         else written++
       }

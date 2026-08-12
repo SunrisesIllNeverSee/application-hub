@@ -235,12 +235,9 @@ async function findOrCreateQuestion(
   const insert = await sbInsert('archived_questions', {
     text: text.trim(),
     theme: 'personal',
-    is_user_contributed: true,
   })
   if (insert.error) {
-    const fallback = await sbInsert('archived_questions', { text: text.trim(), theme: 'personal' })
-    if (fallback.error) return null
-    insert.data = fallback.data
+    return null
   }
 
   // Flywheel: embed on create (best-effort)
@@ -296,7 +293,7 @@ async function main() {
         program_name: slug,
         raw_text: content.slice(0, 50_000),
         extracted_count: sections.length,
-        status: 'completed',
+        status: 'complete',
       }).then((r) => { if (!r.error) stats.sessions++ })
     }
 
@@ -331,19 +328,33 @@ async function main() {
       }
 
       const nextVersion = existing.length > 0 ? (existing[0].version ?? 1) + 1 : 1
-      const insert = await sbInsert('profile_answers', {
-        user_id: userId,
-        archived_question_id: question.id,
+      const wordCount = trimmed.split(/\s+/).filter(Boolean).length
+      const payload = {
         content: trimmed,
         answer_content: trimmed,
         question_text: section.question,
         theme: 'personal',
-        word_count: trimmed.split(/\s+/).filter(Boolean).length,
+        word_count: wordCount,
         version: nextVersion,
         confidence,
-      })
-      if (insert.error) {
-        console.error(`  answer insert failed (${section.question.slice(0, 60)}): ${insert.error}`)
+      }
+
+      // Upsert: profile_answers has UNIQUE(user_id, archived_question_id).
+      // UPDATE in place when a row exists; the profile_answer_history_snapshot
+      // trigger archives each new version. INSERT only on first write.
+      let ok: boolean
+      if (existing.length > 0) {
+        ok = await sbPatch('profile_answers', `id=eq.${existing[0].id}`, payload)
+      } else {
+        const insert = await sbInsert('profile_answers', {
+          user_id: userId,
+          archived_question_id: question.id,
+          ...payload,
+        })
+        ok = !insert.error
+      }
+      if (!ok) {
+        console.error(`  answer save failed (${section.question.slice(0, 60)})`)
         stats.answersSkippedError++
       } else {
         stats.answersInserted++
