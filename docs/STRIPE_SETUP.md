@@ -2,7 +2,7 @@
 
 > Walkthrough to wire up Stripe Billing for the freemium SaaS model.
 >
-> Pricing model (per `CLAUDE.md`):
+> Pricing model (per `docs/archive/build-era/CLAUDE.md`):
 > - **Free** — $0, 10 AI drafts/month, drip cap
 > - **Pro** — $19/mo or $190/yr — unlimited drafts, all 225+ questions, fit scores
 > - **Team** — $49/mo or $490/yr — Pro + shared answer library + multi-seat

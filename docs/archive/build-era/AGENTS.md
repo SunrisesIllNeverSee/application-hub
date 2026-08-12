@@ -2,9 +2,10 @@
 
 > Read this before touching anything. Both Cowork (Claude) and Codex should read this file at the start of every session.
 > Then read `.agents/PROTOCOL.md` for the machine-readable coordination workflow.
-> Then check `SCRATCH.md` for active claims before editing.
-> Then check `ROADMAP.md` for sequence and `TASKS.md` for implementation detail.
-> For factual counts/state, treat `STATUS.md` as the single fact source and link back to it instead of restating counts in multiple places.
+> Then check `docs/archive/build-era/SCRATCH.md` for active claims before editing.
+> Then check `docs/ROADMAP.md` for sequence and `docs/archive/build-era/TASKS.md` for implementation detail.
+> For factual counts/state, treat `docs/STATUS.md` as the single fact source and link back to it instead of restating counts in multiple places.
+> For a full repo map, see `REPO_INDEX.md`.
 
 ---
 
@@ -56,9 +57,9 @@ The product spine is already live. Current work is:
 
 | Component | Status | Notes |
 |---|---|---|
-| Supabase migrations | ✅ See `STATUS.md` / `.agents/registry.yaml` | Duplicate numeric prefixes exist for parallel-track history; see migration policy docs |
-| Program archive | ✅ See `STATUS.md` | Summarize here; keep numeric counts in canonical truth docs |
-| Question archive | ✅ See `STATUS.md` | significance + DNA live |
+| Supabase migrations | ✅ See `docs/STATUS.md` / `.agents/registry.yaml` | Duplicate numeric prefixes exist for parallel-track history; see migration policy docs |
+| Program archive | ✅ See `docs/STATUS.md` | Summarize here; keep numeric counts in canonical truth docs |
+| Question archive | ✅ See `docs/STATUS.md` | significance + DNA live |
 | MCP server | ✅ 21 tools | review persistence + stress-test persistence included |
 | Next.js app | ✅ live-data wired | Hub, `/bank`, workspace, profile split, import flows |
 | BYOK | ✅ shipped | Anthropic/OpenAI/Ollama/Google path in repo |
@@ -80,9 +81,9 @@ These are defaults, not walls. Shared files are fine when the commit scope is cl
 | `application-hub-mcp-server/package.json` | **Shared** | may change from MCP or eval work |
 | `.github/workflows/` | **Codex** | CI/CD |
 | `README.md` | **Shared** | public-facing repo surface |
-| `ROADMAP.md`, `TASKS.md`, `STATUS.md` | **Shared** | canonical planning/state docs |
-| `CLAUDE.md`, `AGENTS.md`, `SCRATCH.md` | **Shared** | coordination/memory layer |
-| `VISION.md` | **Shared** | product thesis and portability story |
+| `docs/ROADMAP.md`, `docs/archive/build-era/TASKS.md`, `docs/STATUS.md` | **Shared** | canonical planning/state docs |
+| `docs/archive/build-era/CLAUDE.md`, `AGENTS.md`, `docs/archive/build-era/SCRATCH.md` | **Shared** | coordination/memory layer |
+| `docs/VISION.md` | **Shared** | product thesis and portability story |
 | `docs/` | **Shared** | active operational docs + archive policy |
 
 If a shared file is touched, keep the commit tight and explicit.
@@ -91,26 +92,26 @@ If a shared file is touched, keep the commit tight and explicit.
 
 ## Coordination rules
 
-1. **Read `SCRATCH.md` first.**
+1. **Read `docs/archive/build-era/SCRATCH.md` first.**
 2. **Pull before starting.**
 3. **Prefer small commits with clear scope.**
 4. **Do not “helpfully” rewrite unrelated files.**
 5. **If a file is already in flight, either avoid it or make the overlap explicit in the commit message.**
-6. **Before writing a migration, claim the next migration number in `SCRATCH.md`.**
+6. **Before writing a migration, claim the next migration number in `docs/archive/build-era/SCRATCH.md`.**
 7. **Prefer `.agents/registry.yaml` and `.agents/claims.yaml` for machine-readable state and claims.**
 
 Cross-workspace session state belongs in:
 - `~/Desktop/MULTI_CLAUDE.md`
 
 Repo-local active claims belong in:
-- `SCRATCH.md`
+- `docs/archive/build-era/SCRATCH.md`
 
 Cold-start note:
 - if a session lands without desktop context, tell it that cross-workspace coordination lives at `~/Desktop/MULTI_CLAUDE.md` on the operator machine and ask for it if needed
 
 Fact-source rule:
-- `STATUS.md` is the canonical source for counts, migration chain, shipped features, and current remote truth
-- `README.md`, `AGENTS.md`, and `CLAUDE.md` should summarize and link, not maintain their own competing fact tables unless there is a good reason
+- `docs/STATUS.md` is the canonical source for counts, migration chain, shipped features, and current remote truth
+- `README.md`, `AGENTS.md`, and `docs/archive/build-era/CLAUDE.md` should summarize and link, not maintain their own competing fact tables unless there is a good reason
 - `.agents/registry.yaml` is the machine-readable truth ledger that future tooling can validate against
 
 Review-gate rule:

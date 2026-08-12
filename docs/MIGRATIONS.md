@@ -5,8 +5,8 @@ _Last updated: 2026-08-12_
 ## Canonical chain
 
 The canonical migration chain lives in `supabase/migrations/`. The current
-high-water mark is recorded in `.agents/registry.yaml` (machine-readable) and
-`STATUS.md` (human-readable). Check those files for the current applied/next
+high-water mark is recorded in `docs/archive/build-era/agents/registry.yaml` (machine-readable) and
+`docs/STATUS.md` (human-readable). Check those files for the current applied/next
 numbers rather than relying on this doc.
 
 ## Legacy root `migrations/` — frozen
@@ -77,7 +77,7 @@ same day, not signs of a broken database history.
 ## Policy
 
 - Do **not** rename already-applied migration files casually just to make the numbers prettier.
-- When documenting state, refer to `.agents/registry.yaml` for the current high-water mark.
+- When documenting state, refer to `docs/archive/build-era/agents/registry.yaml` for the current high-water mark.
 - When adding new work, use the next clear numeric prefix rather than trying to retroactively normalize old collisions.
 
 ## Practical guidance

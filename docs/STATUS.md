@@ -10,7 +10,7 @@
 > user-generated data — `profile_answers`, `user_applications`, BYOK
 > integrations, etc. — is REAL.
 >
-> See `ARCHIVE_NOTES.md` for the engine-vs-data split.
+> See `docs/archive/build-era/ARCHIVE_NOTES.md` for the engine-vs-data split.
 
 ---
 
@@ -97,7 +97,7 @@ This pass is structurally implemented and statically verified, but it is not yet
 
 ### What landed
 
-- `REBUILD/CANONICAL_REBUILD_TASKS.md` created as the implementation checklist for the Grok deep-dive rebuild.
+- `docs/archive/build-era/REBUILD/CANONICAL_REBUILD_TASKS.md` created as the implementation checklist for the Grok deep-dive rebuild.
 - Supabase migrations `042` through `046` added:
   - Canonical commitments, answer variants, application packages, lineage events
   - Canonical RPCs, embedding column, hybrid search, package retrieval, smart matcher search
@@ -430,9 +430,9 @@ P1 sprint is complete as of 2026-05-11 (second session). Moving to P2:
 - `.claude/agents/fidelity-certifier.md` — answer fidelity/certification review
 - `.claude/agents/stress-test-conductor.md` — deterministic stress-test orchestration and persistence
 - `.claude/commands/review-answer.md`, `.claude/commands/review-answer-fit.md`, `.claude/commands/certify-answer.md`, `.claude/commands/stress-test-answer.md` — command entrypoints for the reviewer family
-- `VISION.md` — new product vision doc
-- `TASKS.md` — captured 16 follow-ups from smoke test
-- `ROADMAP.md` — reframed around Launch Milestones 1/2/3
+- `docs/VISION.md` — new product vision doc
+- `docs/archive/build-era/TASKS.md` — captured 16 follow-ups from smoke test
+- `docs/ROADMAP.md` — reframed around Launch Milestones 1/2/3
 - `docs/archive/` — created for superseded planning docs
 - `seed/staging/application_targets_watchlist.csv` — staging lane for candidate targets before seed promotion
 - `app/.env.local` (worktree + main) — populated with Supabase URL + publishable key
