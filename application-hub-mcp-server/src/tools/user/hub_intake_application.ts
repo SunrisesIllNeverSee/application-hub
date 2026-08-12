@@ -89,6 +89,8 @@ ${text}
   // Try Anthropic first
   if (anthropicKey) {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15_000);
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -101,7 +103,9 @@ ${text}
           max_tokens: 4096,
           messages: [{ role: "user", content: prompt }],
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       if (res.ok) {
         const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
         const raw = data.content?.[0]?.type === "text" ? data.content[0].text ?? "[]" : "[]";
@@ -113,6 +117,8 @@ ${text}
   // Try Groq (OpenAI-compatible chat completions)
   if (groqKey) {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30_000);
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -129,7 +135,9 @@ ${text}
           ],
           response_format: { type: "json_object" },
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       if (res.ok) {
         const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
         const raw = data.choices?.[0]?.message?.content ?? "[]";
