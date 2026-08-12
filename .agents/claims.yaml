@@ -1,5 +1,5 @@
 schema_version: 1
-updated_at: 2026-05-12T00:15:00Z
+updated_at: 2026-08-12T02:45:00Z
 
 note: >
   Phase A scaffold. This file is the machine-readable claim ledger. Sessions and
@@ -255,3 +255,35 @@ claims:
     heartbeat: 2026-05-24T16:49:01Z
     released_at: 2026-05-24T16:49:01Z
     landed_commits: [e326b08, aab0deb, 3f5cbe8, 4eba6eb, 01f8a4c, d5e7f9d, 99d04cb, 5155b28, b85cb94]
+
+  - id: claim-2026-05-24-codex-manual-intake
+    session: codex-2026-05-24
+    surface: codex
+    type: file_lane
+    paths:
+      - supabase/migrations/047_manual_intake_workflow.sql
+      - app/app/api/hub/ingest/route.ts
+      - app/app/api/hub/intake/
+      - app/components/ingestion/
+      - app/app/(app)/profile/import/page.tsx
+    purpose: >
+      Manual-first intake workflow — staged submissions, entity/application/
+      layer/question checkpoints, gate reviews, append-only intake events.
+    acquired_at: 2026-05-24T00:00:00Z
+    released_at: 2026-08-12T02:45:00Z
+    landed_commits: [7ab4462]
+
+  - id: claim-2026-05-27-codex-program-next-cycle-security
+    session: codex-2026-05-27
+    surface: codex
+    type: file_lane
+    paths:
+      - supabase/migrations/048_fix_program_next_cycle_security_invoker.sql
+      - .agents/registry.yaml
+      - STATUS.md
+    purpose: >
+      Recreate public.program_next_cycle with security_invoker = true so RLS
+      and caller permissions apply normally.
+    acquired_at: 2026-05-27T00:00:00Z
+    released_at: 2026-08-12T02:45:00Z
+    landed_commits: [2378c78]

@@ -12,7 +12,7 @@
 | 2 — Re-attach + ff | ✅ **COMPLETE** | `main` fast-forwarded `d101c18` → `bb56cf1`. Runbook v2 committed `e18f608` on repair branch, pushed. |
 | 3 — Fresh clone | ✅ **COMPLETE** | Fresh clone at canonical path, fsck-clean, all Checkpoint B gates green (type-check, MCP check, check.py 0 blockers/19 warnings). Old clone renamed `application-hub-CORRUPT-keep`. Preservation merged to main (`c7c2924`). |
 | 3.5 — Wolfram review import | ✅ **COMPLETE** | 14-file package at `docs/reviews/2026-08-11-aqua-wolfram/`. Four actions wired: TASKS.md hardening priorities, CLAUDE.md conservation rule, SCRATCH.md FundingCake pre-flight note, regeneration path documented. |
-| 4 — Coordination sync | ⬜ pending | |
+| 4 — Coordination sync | ✅ **COMPLETE** | Two codex claims (047 `7ab4462`, 048 `2378c78`) moved to Recently released in SCRATCH.md + claims.yaml. Stale mcp-eval Appfeeder line removed. "Current state" migration chain fixed to 048/049. check.py: 0 blockers, 19 warnings. |
 | 5 — Archival banner | ⬜ DECISION REQUIRED | Deric answers (a)/(b) |
 | 6 — START_HERE refresh | ⬜ pending | |
 | 7 — Legacy migrations doc | ⬜ pending | |

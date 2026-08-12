@@ -10,7 +10,7 @@
 
 ## Current state (2026-05-13, vscode-claude session — updated)
 
-AQUA Phase shipped. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 040, next = 041.
+AQUA Phase shipped. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migration chain at 048 applied, next = 049 (per `.agents/registry.yaml`).
 
 ### What's shipped (confirmed this session)
 
@@ -81,11 +81,11 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Currently claimed
 
-- **codex** — security lint follow-up for `public.program_next_cycle` (`supabase/migrations/048_fix_program_next_cycle_security_invoker.sql`, `.agents/registry.yaml`, `STATUS.md`) — 2026-05-27
-- **codex** — manual intake workflow (`supabase/migrations/047_manual_intake_workflow.sql`, `app/app/api/hub/ingest/route.ts`, `app/app/api/hub/intake/*`, `app/components/ingestion/*`, `app/app/(app)/profile/import/page.tsx`) — 2026-05-24
-- **mcp-eval** — Appfeeder V1 scaffold done (`appfeeder/`, `docs/BROWSER_EXTENSION.md`, semantic match wired) — lane releasing
+_(none active)_
 
 ## Recently released
+- **codex** — security lint follow-up for `public.program_next_cycle` (`supabase/migrations/048_fix_program_next_cycle_security_invoker.sql`, `.agents/registry.yaml`, `STATUS.md`) — landed `2378c78` — 2026-05-27
+- **codex** — manual intake workflow (`supabase/migrations/047_manual_intake_workflow.sql`, `app/app/api/hub/ingest/route.ts`, `app/app/api/hub/intake/*`, `app/components/ingestion/*`, `app/app/(app)/profile/import/page.tsx`) — landed `7ab4462` — 2026-05-24
 - **claude (vscode-claude qaapplication)** — qaapplication 7-lane pipeline + per-program indexing + audit-log + multi-claude registration — commits `e326b08`..`b85cb94` — 2026-05-24
 
 - **codex** — webextension consolidation pass (`webextension/application-hub/`, archived donor scaffold, bearer-auth route cleanup) — 2026-05-21
