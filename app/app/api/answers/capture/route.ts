@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { loadEmbeddingIntegrations } from '@/lib/intake-extract'
+import { embedQuestionText } from '@/lib/embed'
 
 // POST /api/answers/capture
 // Called by the Appfeeder extension when a user finishes typing in a form field.
@@ -10,24 +12,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 // Request:  { questionText: string, answerText: string }
 // Response: { saved: boolean, questionId?: string, version?: number }
 
-const OPENAI_API_KEY  = process.env.OPENAI_API_KEY ?? ''
-const EMBEDDING_MODEL = 'text-embedding-3-small'
-const EMBED_DIMS      = 768
 const MATCH_THRESHOLD = 0.72
-
-async function embedText(text: string): Promise<number[] | null> {
-  if (!OPENAI_API_KEY) return null
-  try {
-    const res = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: text, model: EMBEDDING_MODEL, dimensions: EMBED_DIMS }),
-    })
-    if (!res.ok) return null
-    const data = await res.json() as { data: [{ embedding: number[] }] }
-    return data.data[0].embedding
-  } catch { return null }
-}
 
 export async function POST(req: Request) {
   // Auth: session cookie OR Bearer JWT (extension)
@@ -37,14 +22,17 @@ export async function POST(req: Request) {
 
   if (!user && authHeader?.startsWith('Bearer ')) {
     const jwt = authHeader.slice(7)
-    const { createClient: createBrowserClient } = await import('@supabase/supabase-js').then(m => m)
+    const { createClient: createBrowserClient } = await import('@supabase/supabase-js').then((m) => m)
     const extClient = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       { global: { headers: { Authorization: `Bearer ${jwt}` } } }
     )
     const { data } = await extClient.auth.getUser(jwt)
-    if (data.user) { user = data.user; supabase = extClient as typeof supabase }
+    if (data.user) {
+      user = data.user
+      supabase = extClient as typeof supabase
+    }
   }
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -61,13 +49,15 @@ export async function POST(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // Match question text against archive
-  const embedding = await embedText(questionText.trim())
+  // Match question text against archive.
+  // Embedding: BYOK (Ollama/OpenAI integrations) → local Ollama → (opt-in) OpenAI.
+  const byok = await loadEmbeddingIntegrations(supabase, user.id)
+  const embedResult = await embedQuestionText(questionText.trim(), byok)
   let questionId: string | null = null
 
-  if (embedding) {
+  if (embedResult) {
     const { data: matches } = await adminClient.rpc('match_archived_questions', {
-      query_embedding: embedding,
+      query_embedding: JSON.stringify(embedResult.embedding),
       match_threshold: MATCH_THRESHOLD,
       match_count: 1,
     })
@@ -76,7 +66,10 @@ export async function POST(req: Request) {
 
   if (!questionId) {
     // No match above threshold — skip saving (don't pollute bank with unmatched answers)
-    return NextResponse.json({ saved: false, reason: 'no_match' })
+    return NextResponse.json({
+      saved: false,
+      reason: embedResult ? 'no_match' : 'embedding_unavailable',
+    })
   }
 
   // Get current max version for this user + question
@@ -105,18 +98,16 @@ export async function POST(req: Request) {
 
   // Insert new version — matches actual profile_answers schema
   const trimmed = answerText.trim()
-  const { error } = await supabase
-    .from('profile_answers')
-    .insert({
-      user_id: user.id,
-      archived_question_id: questionId,
-      content: trimmed,
-      answer_content: trimmed,
-      question_text: questionText.trim(),
-      word_count: trimmed.split(/\s+/).filter(Boolean).length,
-      version: nextVersion,
-      confidence: 'medium',
-    })
+  const { error } = await supabase.from('profile_answers').insert({
+    user_id: user.id,
+    archived_question_id: questionId,
+    content: trimmed,
+    answer_content: trimmed,
+    question_text: questionText.trim(),
+    word_count: trimmed.split(/\s+/).filter(Boolean).length,
+    version: nextVersion,
+    confidence: 'draft',
+  })
 
   if (error) return NextResponse.json({ saved: false, reason: error.message })
 
