@@ -21,10 +21,16 @@ answers versioned.
 - [x] Verified: `npm run type-check` clean, `npm run build` green (both routes in output)
 
 **Operator runbook (local daily driver):**
-1. Paste the service role key into `app/.env.local` as `SUPABASE_SERVICE_ROLE_KEY` (Supabase dashboard → Settings → API) — currently empty
-2. `ollama pull nomic-embed-text` and keep Ollama running
-3. `npx tsx scripts/import-qaapplication-corpus.ts --write` — loads the real corpus into the bank
-4. `cd app && npm run dev` → `/workspace` → "+ New application" → paste a form → review → submit by hand
+0. Anthropic key connected at `/profile/integrations` (BYOK) — needed only for blank-form AI extraction; Q:/A:-formatted pastes work without it
+1. Copy the service role key from Supabase dashboard → Settings → API. **Do NOT save it to `.env.local`** (repo rule, CLAUDE.md §Env) — pass it inline per command, like the existing seeder script does
+2. `ollama pull nomic-embed-text` (one-time) and keep Ollama running — embeddings are local + free and match the archive's vector space
+3. `SUPABASE_SERVICE_ROLE_KEY="<paste>" npx tsx scripts/import-qaapplication-corpus.ts --write` — loads the real corpus into the bank
+4. `cd app && SUPABASE_SERVICE_ROLE_KEY="<paste>" npm run dev` → `/workspace` → "+ New application" → paste a form → review → submit by hand
+
+Why local-first: embedding + borrow-fill need Ollama at localhost, which Vercel
+can't reach. On the live site, intake and direct-hit fill still work, but new
+questions won't embed and borrow-fill stays off unless `ALLOW_OPENAI_EMBED_FALLBACK=1`
++ an OpenAI key are set in Vercel env.
 
 Open follow-ups:
 - [ ] Deploy to Vercel (verify `SUPABASE_SERVICE_ROLE_KEY` set there — match-question already needs it)
