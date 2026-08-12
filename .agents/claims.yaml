@@ -52,6 +52,13 @@ sessions:
     status: wrapped
     note: qaapplication-scope restructure + per-program indexing (sequential pipeline). Coordinates with codex on parent migration work (Codex owns 047+).
 
+  - id: devin-2026-08-12
+    surface: devin-cli
+    started_at: 2026-08-12T05:30:00Z
+    heartbeat: 2026-08-12T07:15:00Z
+    status: wrapped
+    note: repo audit + repair runbook v1/v2, then pound-out loop build (intake + fill + corpus loader)
+
 claims:
   - id: claim-2026-05-11-001
     session: vscode-claude-2026-05-11
@@ -255,6 +262,30 @@ claims:
     heartbeat: 2026-05-24T16:49:01Z
     released_at: 2026-05-24T16:49:01Z
     landed_commits: [e326b08, aab0deb, 3f5cbe8, 4eba6eb, 01f8a4c, d5e7f9d, 99d04cb, 5155b28, b85cb94]
+
+  - id: claim-2026-08-12-poundout-loop
+    session: devin-2026-08-12
+    type: file_lane
+    paths:
+      - app/lib/embed.ts
+      - app/lib/intake-extract.ts
+      - app/app/api/applications/intake/route.ts
+      - app/app/api/applications/[id]/fill/route.ts
+      - app/app/api/answers/capture/route.ts
+      - app/app/api/import/paste/route.ts
+      - app/components/IntakeForm.tsx
+      - app/app/(app)/workspace/page.tsx
+      - scripts/import-qaapplication-corpus.ts
+      - TASKS.md
+      - SCRATCH.md
+      - .agents/claims.yaml
+    purpose: >
+      Pound-out loop — one-call application intake endpoint, deterministic
+      bank-fill endpoint, shared embed/intake libs, capture-route fixes,
+      corpus loader script, workspace IntakeForm surface.
+    acquired_at: 2026-08-12T06:30:00Z
+    released_at: 2026-08-12T07:15:00Z
+    landed_commits: [1474b90, 960b011]
 
   - id: claim-2026-05-24-codex-manual-intake
     session: codex-2026-05-24

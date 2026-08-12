@@ -1,8 +1,37 @@
 # Application Hub — Task List
 
-Current phase: **AQUA shipped — extension consolidation landed, browser runtime QA next (2026-05-21)**
+Current phase: **Pound-out loop shipped (2026-08-12) — operator corpus load + daily-driver verification next**
 
-Last updated: 2026-05-21
+Last updated: 2026-08-12
+
+## 2026-08-12 — Pound-out loop (application intake + bank fill)
+
+The core loop, working end to end: grab application → archive source +
+company + questions → bank fills it → review in workspace → submit by hand →
+answers versioned.
+
+- [x] `POST /api/applications/intake` — one call: source archived (`app_import_sessions`), program indexed, questions indexed individually (`asked_as` exact wording), embedded on create, application opened
+- [x] `POST /api/applications/[id]/fill` — bank fill: direct answers used as-is, vector-borrowed drafts at ≥0.80 similarity for misses, gaps reported. Deterministic — no generated text enters the bank
+- [x] `app/lib/embed.ts` — shared 768d embedding helper, Ollama-first (matches seeded archive space); OpenAI fallback gated behind `ALLOW_OPENAI_EMBED_FALLBACK=1`
+- [x] `app/lib/intake-extract.ts` — shared extraction / find-or-create / program helpers (used by import/paste + intake)
+- [x] import/paste refactored onto shared lib + **embed-on-create** (flywheel fix — new questions stay matchable)
+- [x] capture route fixed: BYOK/Ollama embedding fallback + confidence enum bug (`'medium'` → `'draft'`; every capture insert was failing)
+- [x] `IntakeForm` on `/workspace` — paste → index + fill → open workspace
+- [x] `scripts/import-qaapplication-corpus.ts` — corpus loader, dry-run verified (41 files, 128 sections; canonical→solid, submitted→locked, drafts→draft)
+- [x] Verified: `npm run type-check` clean, `npm run build` green (both routes in output)
+
+**Operator runbook (local daily driver):**
+1. Paste the service role key into `app/.env.local` as `SUPABASE_SERVICE_ROLE_KEY` (Supabase dashboard → Settings → API) — currently empty
+2. `ollama pull nomic-embed-text` and keep Ollama running
+3. `npx tsx scripts/import-qaapplication-corpus.ts --write` — loads the real corpus into the bank
+4. `cd app && npm run dev` → `/workspace` → "+ New application" → paste a form → review → submit by hand
+
+Open follow-ups:
+- [ ] Deploy to Vercel (verify `SUPABASE_SERVICE_ROLE_KEY` set there — match-question already needs it)
+- [ ] Browser runtime smoke of the extension fill path (carried from 2026-05-21)
+- [ ] Promotion-bridge verification (Wolfram critical boundary #1) before FundingCake Phase C promotion
+- [ ] Embedding backfill for pre-existing un-embedded questions: `npx tsx scripts/seed-question-embeddings.ts`
+
 
 ## 2026-05-21 — WebExtension consolidation log
 
