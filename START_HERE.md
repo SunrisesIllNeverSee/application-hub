@@ -73,15 +73,9 @@ If `check.py` returns warnings, fix them before committing. Warnings now block b
 
 ---
 
-## Key facts (check `STATUS.md` for full detail)
+## Key facts
 
-- **Live site**: https://mos2es.xyz
-- **Supabase project**: `betcyfbzsgusaghriptz`
-- **Migrations applied**: 001–031
-- **Programs**: 843 (31 with mapped questions, 812 shells)
-- **Questions**: 225 archived, 0 embeddings seeded yet
-- **Stripe**: fully live
-- **BYOK**: Anthropic / OpenAI / Ollama — all working
+Counts, migration chain, and shipped-state facts live in `.agents/registry.yaml` (machine-readable) and `STATUS.md` (human-readable). This file intentionally restates none of them.
 
 ---
 
@@ -92,18 +86,6 @@ If `check.py` returns warnings, fix them before committing. Warnings now block b
 - Auto-submit applications — this is a preparation layer
 - Write a migration without claiming the number first
 - Touch `user_program_fit` or `archived_questions.embedding` without noting it in your claim
-
----
-
-## Seed embeddings (one-time, not done yet)
-
-```bash
-# Requires Ollama running with nomic-embed-text pulled
-ollama pull nomic-embed-text
-SUPABASE_URL="https://betcyfbzsgusaghriptz.supabase.co" \
-SUPABASE_SERVICE_ROLE_KEY="<service role key from Supabase dashboard>" \
-npx tsx scripts/seed-question-embeddings.ts
-```
 
 ---
 

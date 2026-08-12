@@ -1,14 +1,15 @@
 # Application Hub — Claude Context
 
-> ⚠️ **READ THIS FIRST — DATA REALITY CHECK (2026-05-14)**
+> ⚠️ **READ THIS FIRST — DATA REALITY CHECK (updated 2026-08-12)**
 >
-> The intelligence engine in this repo is REAL and works. The seed data it's
-> currently operating on is SYNTHESIZED. Treat every `program_questions` row
-> attached to the 30 originally-seeded programs as fiction until verified
-> against a real imported application. The deric-rebuild is on a separate
-> branch / session; this state is **archival** for that reference, not active
-> development. See `ARCHIVE_NOTES.md` for the engine-vs-data split and the
-> communication structure spec for the new build.
+> The 2026-05-14 archive event is historical; this repo continued as the
+> active build. The intelligence engine (formulas, RPCs, MCP tools, schema)
+> is REAL and works. The seed data for the originally-seeded 30 programs is
+> SYNTHESIZED — treat every `program_questions` row attached to those
+> programs as fiction until verified against a real imported application.
+> All real user-generated data — `profile_answers`, `user_applications`,
+> BYOK integrations, etc. — is REAL. See `ARCHIVE_NOTES.md` for the
+> engine-vs-data split.
 
 ---
 

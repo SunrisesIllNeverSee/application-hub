@@ -1,17 +1,16 @@
 # AQUA — Status
 
-> ⚠️ **ARCHIVAL — DATA REALITY CHECK (2026-05-14)**
+> ⚠️ **DATA REALITY CHECK (updated 2026-08-12)**
 >
-> This repo's state is being preserved as a reference for the deric-led rebuild.
-> Active development moves to a new build context. The intelligence engine
-> (formulas, RPCs, MCP tools, schema) is REAL. The seed data for the
-> originally-seeded 30 programs is SYNTHESIZED (fake `program_questions`,
-> derived `program_dna`, derived `user_program_fit`, derived
-> `significance_score`). All real user-generated data — `profile_answers`,
-> `user_applications`, BYOK integrations, etc. — is REAL.
+> The 2026-05-14 archive event is historical; this repo continued as the
+> active build. The intelligence engine (formulas, RPCs, MCP tools, schema)
+> is REAL. The seed data for the originally-seeded 30 programs is
+> SYNTHESIZED (fake `program_questions`, derived `program_dna`, derived
+> `user_program_fit`, derived `significance_score`). All real
+> user-generated data — `profile_answers`, `user_applications`, BYOK
+> integrations, etc. — is REAL.
 >
-> See `ARCHIVE_NOTES.md` for: engine-vs-data split, final post-mortem, and
-> the comms-structure spec for the new build.
+> See `ARCHIVE_NOTES.md` for the engine-vs-data split.
 
 ---
 

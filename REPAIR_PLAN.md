@@ -13,9 +13,9 @@
 | 3 — Fresh clone | ✅ **COMPLETE** | Fresh clone at canonical path, fsck-clean, all Checkpoint B gates green (type-check, MCP check, check.py 0 blockers/19 warnings). Old clone renamed `application-hub-CORRUPT-keep`. Preservation merged to main (`c7c2924`). |
 | 3.5 — Wolfram review import | ✅ **COMPLETE** | 14-file package at `docs/reviews/2026-08-11-aqua-wolfram/`. Four actions wired: TASKS.md hardening priorities, CLAUDE.md conservation rule, SCRATCH.md FundingCake pre-flight note, regeneration path documented. |
 | 4 — Coordination sync | ✅ **COMPLETE** | Two codex claims (047 `7ab4462`, 048 `2378c78`) moved to Recently released in SCRATCH.md + claims.yaml. Stale mcp-eval Appfeeder line removed. "Current state" migration chain fixed to 048/049. check.py: 0 blockers, 19 warnings. |
-| 5 — Archival banner | ⬜ DECISION REQUIRED | Deric answers (a)/(b) |
-| 6 — START_HERE refresh | ⬜ pending | |
-| 7 — Legacy migrations doc | ⬜ pending | |
+| 5 — Archival banner | ✅ **COMPLETE** | Deric chose (a) active build. CLAUDE.md + STATUS.md banners reworded: archive event historical, repo is active build, synthesized-data caveat for 30 seeded programs retained. |
+| 6 — START_HERE refresh | ✅ **COMPLETE** | "Key facts" replaced with pointer to registry.yaml + STATUS.md. "Seed embeddings" section deleted (done since May, 768d nomic-embed-text). |
+| 7 — Legacy migrations doc | ✅ **COMPLETE** | `docs/MIGRATIONS.md` rewritten with legacy root provenance table (022/033 byte-identical, 042/043 collide with canonical). Live-DB verification SQL provided for Deric. Duplicate `26_` doc renumbered: `26_fundingcake_ingest_pipeline.md` → `30_`. References in SCRATCH.md + qaapplication/src/seeding-plan.md updated. |
 | 8 — Local-junk decisions | ⬜ DECISION REQUIRED (small) | |
 
 ---

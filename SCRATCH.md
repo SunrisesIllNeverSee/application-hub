@@ -66,7 +66,7 @@ AQUA Phase shipped. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migratio
 - Phase B: 88 questions extracted, 39 promote-ready (`seed/staging/fundingcake_questions_promote.csv`)
 - `apply_url` now renders on hub program detail with "verify link" badge (`7e2fe35`)
 - 13 JS-gated programs listed as needs-validation: `seed/staging/needs_validation.md`
-- Full methodology: `docs/26_fundingcake_ingest_pipeline.md`
+- Full methodology: `docs/30_fundingcake_ingest_pipeline.md`
 
 **Pending human action:**
 

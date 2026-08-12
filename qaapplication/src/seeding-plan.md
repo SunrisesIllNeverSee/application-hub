@@ -230,7 +230,7 @@ Estimated time for 250 universities: 3-4 hours agent time, 2 hours human review.
 - scripts/aggregate-question-frequency.py — deduplication + scoring
 - seed/staging/fundingcake_apply_urls.csv — reference input format
 - seed/staging/extracted_questions.jsonl — reference output format
-- docs/26_fundingcake_ingest_pipeline.md — full FundingCake methodology audit trail
+- docs/30_fundingcake_ingest_pipeline.md — full FundingCake methodology audit trail
 - migrations/002_core_tables.sql — schema reference
 - .agents/registry.yaml — canonical count tracker (update after each Phase E)
 
