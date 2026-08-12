@@ -6,7 +6,7 @@ Read this before editing anything in `webextension/`.
 
 The live extension is plain JavaScript MV3 in:
 
-- `/Users/dericmchenry/Desktop/application-hub/webextension/application-hub`
+- `/Users/dericmchenry/Developer/built/application-hub/webextension/application-hub`
 
 Do not treat the archived donor scaffold or older WXT notes as the active implementation.
 
