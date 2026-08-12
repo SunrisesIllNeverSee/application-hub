@@ -31,6 +31,9 @@ import { registerSaveAnswer } from "./tools/user/hub_save_answer.js";
 import { registerGetAnswerReviewContext } from "./tools/user/hub_get_answer_review_context.js";
 import { registerSaveAnswerReview } from "./tools/user/hub_save_answer_review.js";
 import { registerStressTestAnswer } from "./tools/user/hub_stress_test_answer.js";
+import { registerIntakeApplication } from "./tools/user/hub_intake_application.js";
+import { registerFillApplication } from "./tools/user/hub_fill_application.js";
+import { registerSearchAnswerBank } from "./tools/user/hub_search_answer_bank.js";
 import { registerAquaHubTools } from "./tools/aqua-hub.js";
 
 // ── Resources ───────────────────────────────────────────────────────────────
@@ -75,6 +78,9 @@ async function main() {
   registerGetAnswerReviewContext(server);
   registerSaveAnswerReview(server);
   registerStressTestAnswer(server);
+  registerIntakeApplication(server);
+  registerFillApplication(server);
+  registerSearchAnswerBank(server);
   registerAquaHubTools(server);
 
   // Register resources

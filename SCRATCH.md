@@ -81,7 +81,7 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Currently claimed
 
-_(none active)_
+- **devin** — MCP pound-out loop: `hub_intake_application`, `hub_fill_application`, `hub_search_answer_bank` + `docs/31_poundout_loop.md` (`application-hub-mcp-server/src/services/embed.ts`, `application-hub-mcp-server/src/tools/user/hub_*.ts`, `application-hub-mcp-server/src/index.ts`, `docs/31_poundout_loop.md`) — in progress, 2026-08-12
 
 ## Recently released
 - **devin** — pound-out loop: one-call intake + bank fill + shared embed/intake libs + capture fix + corpus loader (`app/lib/embed.ts`, `app/lib/intake-extract.ts`, `app/app/api/applications/intake/`, `app/app/api/applications/[id]/fill/`, `app/components/IntakeForm.tsx`, `scripts/import-qaapplication-corpus.ts`) — commits `1474b90`, `960b011` + coordination commit — 2026-08-12

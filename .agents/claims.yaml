@@ -58,6 +58,12 @@ sessions:
     heartbeat: 2026-08-12T07:15:00Z
     status: wrapped
     note: repo audit + repair runbook v1/v2, then pound-out loop build (intake + fill + corpus loader)
+  - id: devin-2026-08-12-mcp
+    surface: devin-cli
+    started_at: 2026-08-12T08:00:00Z
+    heartbeat: 2026-08-12T08:30:00Z
+    status: active
+    note: MCP pound-out loop — hub_intake_application, hub_fill_application, hub_search_answer_bank + docs/31_poundout_loop.md
 
 claims:
   - id: claim-2026-05-11-001
@@ -318,3 +324,24 @@ claims:
     acquired_at: 2026-05-27T00:00:00Z
     released_at: 2026-08-12T02:45:00Z
     landed_commits: [2378c78]
+
+  - id: claim-2026-08-12-mcp-poundout
+    session: devin-2026-08-12-mcp
+    type: file_lane
+    paths:
+      - application-hub-mcp-server/src/services/embed.ts
+      - application-hub-mcp-server/src/tools/user/hub_intake_application.ts
+      - application-hub-mcp-server/src/tools/user/hub_fill_application.ts
+      - application-hub-mcp-server/src/tools/user/hub_search_answer_bank.ts
+      - application-hub-mcp-server/src/index.ts
+      - docs/31_poundout_loop.md
+      - SCRATCH.md
+      - .agents/claims.yaml
+    purpose: >
+      MCP pound-out loop — three new authenticated tools (intake, fill,
+      search-answer-bank) exposing the browser-built application workflow
+      to VS Code/Cursor/Claude via stdio MCP, plus operator guide.
+    acquired_at: 2026-08-12T08:00:00Z
+    heartbeat: 2026-08-12T08:30:00Z
+    released_at: ~
+    landed_commits: []
