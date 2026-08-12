@@ -12,7 +12,7 @@ The goal is simple:
 This is the **Phase A scaffold**:
 - `.agents/registry.yaml` is the machine-readable truth ledger
 - `.agents/claims.yaml` is the machine-readable claim ledger
-- `STATUS.md` is the human-readable truth report
+- `docs/STATUS.md` is the human-readable truth report
 - `~/Desktop/MULTI_CLAUDE.md` is the cross-workspace coordination bus on the operator machine
 
 There is **no automated enforcement yet**. Sessions should still follow this protocol manually.
@@ -23,9 +23,9 @@ There is **no automated enforcement yet**. Sessions should still follow this pro
    - if you mention counts, migration chain, or shipped-state facts, use these values
 2. Read `.agents/claims.yaml`
    - identify active sessions and unreleased claims
-3. Read `SCRATCH.md`
+3. Read `docs/archive/build-era/SCRATCH.md`
    - repo-local active claims only
-4. Read `STATUS.md`
+4. Read `docs/STATUS.md`
    - human-readable truth and confirmed live state
 
 ## To work on a file lane
@@ -62,7 +62,7 @@ If a session is obviously stale, the next session may mark it wrapped or release
 ## Truth policy
 
 - quantitative facts live in `.agents/registry.yaml`
-- `STATUS.md` is the readable mirror/report
+- `docs/STATUS.md` is the readable mirror/report
 - other docs should summarize or link instead of keeping their own competing fact tables
 
 ## Review-gate policy
@@ -93,7 +93,7 @@ What it validates:
 - no active migration-number claim duplicates an applied number
 - sessions marked `active` have heartbeat within 24h
 - released claims have at least one `landed_commits` entry
-- `STATUS.md` migration chain reference matches the registry high-water mark
+- `docs/STATUS.md` migration chain reference matches the registry high-water mark
 
 Exit codes: `0` clean, `1` warnings (advisory), `2` blockers (CI red).
 

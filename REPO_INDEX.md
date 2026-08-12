@@ -38,13 +38,13 @@
 | `scripts/` | Operator tooling — corpus loader, embedders, scrapers | Active |
 | `docs/` | Numbered design docs + ADRs + reviews + archive | Active |
 | `.github/` | CI workflows (`ci.yml`, `agents-check.yml`) + issue templates | Active |
-| `migrations/` | **Legacy** — root migration dir, abandoned for `supabase/migrations/` | Archive candidate |
-| `codex/` | **Build-era** — raw LLM dumps, scratch notes | Archive candidate |
-| `REBUILD/` | **Build-era** — ChatGPT reviews, brainstorm docs | Archive candidate |
-| `inbox/` | **Stale** — Safari tab export from 2026-05-21 | Archive candidate |
-| `.planning/codebase/` | **Build-era** — codebase analysis (ARCHITECTURE/CONCERNS/etc.) | Archive candidate |
-| `.agents/` | **Stale** — multi-agent coordination protocol (registry, claims, check.py) | Archive candidate |
-| `.claude/` `.codex/` | Tool-local agent config dirs | Archive candidate |
+| `migrations/` | **Legacy** — root migration dir, abandoned for `supabase/migrations/` | **Archived to `docs/archive/build-era/`** candidate |
+| `codex/` | **Build-era** — raw LLM dumps, scratch notes | **Archived to `docs/archive/build-era/`** candidate |
+| `REBUILD/` | **Build-era** — ChatGPT reviews, brainstorm docs | **Archived to `docs/archive/build-era/`** candidate |
+| `inbox/` | **Stale** — Safari tab export from 2026-05-21 | **Archived to `docs/archive/build-era/`** candidate |
+| `.planning/codebase/` | **Build-era** — codebase analysis (ARCHITECTURE/CONCERNS/etc.) | **Archived to `docs/archive/build-era/`** candidate |
+| `.agents/` | **Stale** — multi-agent coordination protocol (registry, claims, check.py) | **Archived to `docs/archive/build-era/`** candidate |
+| `.claude/` `.codex/` | Tool-local agent config dirs | **Archived to `docs/archive/build-era/`** candidate |
 
 ---
 
@@ -54,17 +54,17 @@
 |---|---|---|
 | `README.md` | Public repo face — badges, what it does, quickstart | **Keep at root** |
 | `CONTRIBUTING.md` | Public contributor guide — program/question enrichment | **Keep at root** |
-| `AGENTS.md` | Multi-agent coordination protocol — references `.agents/` | Archive with `.agents/` (Phase 4) |
+| `AGENTS.md` | Multi-agent coordination protocol — references `.agents/` | **Archived to `docs/archive/build-era/`** with `.agents/` (Phase 4) |
 | `REPO_INDEX.md` | This file — the navigational map | **Keep at root** |
-| `VISION.md` | Product vision — north star, positioning, landscape | Move to `docs/` |
-| `ROADMAP.md` | Sequence + milestones | Move to `docs/` |
-| `STATUS.md` | Canonical shipped-state truth (counts, migration chain) | Move to `docs/` |
-| `REPAIR_PLAN.md` | Repo rehabilitation runbook (Phase 1–8, all complete) | Move to `docs/` |
-| `START_HERE.md` | Cold-start pointer doc | Move to `docs/` |
-| `ARCHIVE_NOTES.md` | Frozen 2026-05-14 — closes out "first build" | Archive |
-| `TASKS.md` | Build-era task ledger — last real entry 2026-08-12 (shipped) | Archive |
-| `SCRATCH.md` | Active claims section is empty; protocol retired | Archive |
-| `CLAUDE.md` | Build-era Claude-specific instructions | Archive |
+| `VISION.md` | Product vision — north star, positioning, landscape | **Moved to `docs/`** |
+| `ROADMAP.md` | Sequence + milestones | **Moved to `docs/`** |
+| `STATUS.md` | Canonical shipped-state truth (counts, migration chain) | **Moved to `docs/`** |
+| `REPAIR_PLAN.md` | Repo rehabilitation runbook (Phase 1–8, all complete) | **Moved to `docs/`** |
+| `START_HERE.md` | Cold-start pointer doc | **Moved to `docs/`** |
+| `ARCHIVE_NOTES.md` | Frozen 2026-05-14 — closes out "first build" | **Archived to `docs/archive/build-era/`** |
+| `TASKS.md` | Build-era task ledger — last real entry 2026-08-12 (shipped) | **Archived to `docs/archive/build-era/`** |
+| `SCRATCH.md` | Active claims section is empty; protocol retired | **Archived to `docs/archive/build-era/`** |
+| `CLAUDE.md` | Build-era Claude-specific instructions | **Archived to `docs/archive/build-era/`** |
 
 ---
 
@@ -190,7 +190,7 @@ Loaded by `scripts/import-qaapplication-corpus.ts`.
 
 ---
 
-## Archive candidates (proposed `docs/archive/build-era/`)
+## **Archived to `docs/archive/build-era/`** candidates (proposed `docs/archive/build-era/`)
 
 These are build-era or stale materials. Nothing deletes — all move to `docs/archive/build-era/` with original structure preserved.
 

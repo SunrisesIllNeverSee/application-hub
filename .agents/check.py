@@ -47,7 +47,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 AGENTS_DIR = REPO_ROOT / ".agents"
 REGISTRY = AGENTS_DIR / "registry.yaml"
 CLAIMS = AGENTS_DIR / "claims.yaml"
-STATUS = REPO_ROOT / "STATUS.md"
+STATUS = REPO_ROOT / "docs" / "STATUS.md"
 
 # Migration path is read from registry at runtime (see load_migrations_path).
 # Fallback to legacy location if registry doesn't specify.

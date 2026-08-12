@@ -1,6 +1,6 @@
 # Canonical Rebuild Data Reset Recipe
 
-This is the reset lane from `ARCHIVE_NOTES.md`, rewritten as an explicit operator checklist. Do not run it casually. Back up Supabase first and confirm the real-data import path is ready.
+This is the reset lane from `docs/archive/build-era/ARCHIVE_NOTES.md`, rewritten as an explicit operator checklist. Do not run it casually. Back up Supabase first and confirm the real-data import path is ready.
 
 ## Purpose
 

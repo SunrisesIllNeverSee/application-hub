@@ -228,7 +228,7 @@ Returns: hits with question text, theme, your latest answer, version, confidence
 | `Application not found` in fill | Wrong `application_id` or not yours | Re-run intake, check the returned `application_id` |
 | Borrow threshold too loose / tight | Default 0.8 is conservative | Lower to 0.7 for more borrows (more false positives), raise to 0.9 for fewer |
 | Direct hits missing | Answer bank not loaded | Run the corpus loader (see Prerequisites §3) |
-| `match_archived_questions` RPC error | Schema drift or RPC not deployed | Check `STATUS.md` migration chain; the RPC ships with the embedding migration |
+| `match_archived_questions` RPC error | Schema drift or RPC not deployed | Check `docs/STATUS.md` migration chain; the RPC ships with the embedding migration |
 
 ---
 

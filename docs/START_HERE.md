@@ -61,13 +61,13 @@ If `check.py` returns warnings, fix them before committing. Warnings now block b
 
 | What | Where |
 |---|---|
-| Task list | `TASKS.md` |
-| Current roadmap | `ROADMAP.md` |
-| Confirmed live state | `STATUS.md` |
+| Task list | `docs/archive/build-era/TASKS.md` |
+| Current roadmap | `docs/ROADMAP.md` |
+| Confirmed live state | `docs/STATUS.md` |
 | Machine-readable truth | `.agents/registry.yaml` |
 | Active claims | `.agents/claims.yaml` |
 | Coordination protocol | `.agents/PROTOCOL.md` |
-| Active work / claims | `SCRATCH.md` |
+| Active work / claims | `docs/archive/build-era/SCRATCH.md` |
 | Cross-session bus | `~/Desktop/MULTI_CLAUDE.md` |
 | All feature docs | `docs/` |
 
@@ -75,7 +75,7 @@ If `check.py` returns warnings, fix them before committing. Warnings now block b
 
 ## Key facts
 
-Counts, migration chain, and shipped-state facts live in `.agents/registry.yaml` (machine-readable) and `STATUS.md` (human-readable). This file intentionally restates none of them.
+Counts, migration chain, and shipped-state facts live in `.agents/registry.yaml` (machine-readable) and `docs/STATUS.md` (human-readable). This file intentionally restates none of them.
 
 ---
 
@@ -89,4 +89,4 @@ Counts, migration chain, and shipped-state facts live in `.agents/registry.yaml`
 
 ---
 
-*For full context: `CLAUDE.md` (project) · `AGENTS.md` (coordination) · `VISION.md` (product thesis)*
+*For full context: `docs/archive/build-era/CLAUDE.md` (project) · `AGENTS.md` (coordination) · `docs/VISION.md` (product thesis)*

@@ -6,7 +6,7 @@ _Last updated: 2026-08-12_
 
 The canonical migration chain lives in `supabase/migrations/`. The current
 high-water mark is recorded in `.agents/registry.yaml` (machine-readable) and
-`STATUS.md` (human-readable). Check those files for the current applied/next
+`docs/STATUS.md` (human-readable). Check those files for the current applied/next
 numbers rather than relying on this doc.
 
 ## Legacy root `migrations/` — frozen

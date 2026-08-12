@@ -3,10 +3,10 @@ updated_at: 2026-05-27T09:10:00Z
 
 truth_policy:
   machine_source: .agents/registry.yaml
-  human_report: STATUS.md
+  human_report: docs/STATUS.md
   note: >
     Quantitative and shipped-state facts should originate here and be rendered or
-    summarized elsewhere. Human-readable context lives in STATUS.md.
+    summarized elsewhere. Human-readable context lives in docs/STATUS.md.
 
 migrations:
   next: 49
