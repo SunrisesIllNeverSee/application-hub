@@ -97,7 +97,7 @@ This pass is structurally implemented and statically verified, but it is not yet
 
 ### What landed
 
-- `REBUILD/CANONICAL_REBUILD_TASKS.md` created as the implementation checklist for the Grok deep-dive rebuild.
+- `docs/archive/build-era/REBUILD/CANONICAL_REBUILD_TASKS.md` created as the implementation checklist for the Grok deep-dive rebuild.
 - Supabase migrations `042` through `046` added:
   - Canonical commitments, answer variants, application packages, lineage events
   - Canonical RPCs, embedding column, hybrid search, package retrieval, smart matcher search

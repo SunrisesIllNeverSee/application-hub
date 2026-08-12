@@ -31,29 +31,27 @@ Core asset: a **question archive** + reusable **answer bank**. Answer once, appl
 # 1. Pull latest
 git pull
 
-# 2. Install the coordination hook (once per clone, strict mode)
-.agents/install-hook.sh --strict
-
-# 3. Verify registry is clean
-python3 .agents/check.py
+# 2. Verify the build
+cd app && npm run type-check && npm run build
+cd ../application-hub-mcp-server && npm run check && npm test
 ```
 
-If `check.py` returns warnings, fix them before committing. Warnings now block both local commits and CI.
+The multi-agent coordination protocol (`.agents/`, pre-commit hook, `check.py`)
+has been archived to `docs/archive/build-era/agents/`. It was build-era
+scaffolding for parallel Cowork/Codex/VSCode-Claude sessions and is no longer
+active. See `REPO_INDEX.md` for the current repo map.
 
 ---
 
 ## Before writing a migration
 
-1. Check `migrations.next` in `.agents/registry.yaml`
-2. Claim that number in `.agents/claims.yaml` **before** writing SQL
-3. Create the file in `supabase/migrations/` (NOT the legacy `migrations/` root)
-4. Run `supabase db push` to apply it to production
-5. Update `migrations.next` in the registry and release your claim
+1. Check the current high-water mark in `docs/STATUS.md` or `docs/archive/build-era/agents/registry.yaml`
+2. Create the file in `supabase/migrations/` (NOT the legacy `migrations/` root — that's archived)
+3. Run `supabase db push` to apply it to production
+4. Update `docs/STATUS.md` with the new high-water mark
 
 
-**Do not skip step 2.** The 027 collision happened because two sessions both claimed the same number without checking first.
-
-**Migration home has moved**: `supabase/migrations/` is the canonical location. The CLI is linked (`supabase db push --dry-run` returns "Remote database is up to date"). The old `migrations/` root folder is the legacy location — new files must go in `supabase/migrations/`.
+**Migration home:** `supabase/migrations/` is the canonical location. The old `migrations/` root folder is archived at `docs/archive/build-era/migrations/`.
 
 ---
 
@@ -61,21 +59,19 @@ If `check.py` returns warnings, fix them before committing. Warnings now block b
 
 | What | Where |
 |---|---|
-| Task list | `docs/archive/build-era/TASKS.md` |
+| Repo map | `REPO_INDEX.md` (root) |
 | Current roadmap | `docs/ROADMAP.md` |
 | Confirmed live state | `docs/STATUS.md` |
-| Machine-readable truth | `.agents/registry.yaml` |
-| Active claims | `.agents/claims.yaml` |
-| Coordination protocol | `.agents/PROTOCOL.md` |
-| Active work / claims | `docs/archive/build-era/SCRATCH.md` |
-| Cross-session bus | `~/Desktop/MULTI_CLAUDE.md` |
+| Migration chain | `supabase/migrations/` + `docs/STATUS.md` |
 | All feature docs | `docs/` |
+| Archived coordination | `docs/archive/build-era/agents/` |
+| Cross-session bus | `~/Desktop/MULTI_CLAUDE.md` (operator machine) |
 
 ---
 
 ## Key facts
 
-Counts, migration chain, and shipped-state facts live in `.agents/registry.yaml` (machine-readable) and `docs/STATUS.md` (human-readable). This file intentionally restates none of them.
+Counts, migration chain, and shipped-state facts live in `docs/STATUS.md` (human-readable). The machine-readable registry is archived at `docs/archive/build-era/agents/registry.yaml`. This file intentionally restates none of them.
 
 ---
 

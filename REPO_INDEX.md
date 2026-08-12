@@ -43,8 +43,8 @@
 | `REBUILD/` | **Build-era** — ChatGPT reviews, brainstorm docs | **Archived to `docs/archive/build-era/`** candidate |
 | `inbox/` | **Stale** — Safari tab export from 2026-05-21 | **Archived to `docs/archive/build-era/`** candidate |
 | `.planning/codebase/` | **Build-era** — codebase analysis (ARCHITECTURE/CONCERNS/etc.) | **Archived to `docs/archive/build-era/`** candidate |
-| `.agents/` | **Stale** — multi-agent coordination protocol (registry, claims, check.py) | **Archived to `docs/archive/build-era/`** candidate |
-| `.claude/` `.codex/` | Tool-local agent config dirs | **Archived to `docs/archive/build-era/`** candidate |
+| `.agents/` | **Archived** — multi-agent coordination protocol (registry, claims, check.py) | `docs/archive/build-era/agents/` |
+| `.claude/` `.codex/` | **Archived** — tool-local agent config dirs | `docs/archive/build-era/` |
 
 ---
 
@@ -54,7 +54,7 @@
 |---|---|---|
 | `README.md` | Public repo face — badges, what it does, quickstart | **Keep at root** |
 | `CONTRIBUTING.md` | Public contributor guide — program/question enrichment | **Keep at root** |
-| `AGENTS.md` | Multi-agent coordination protocol — references `.agents/` | **Archived to `docs/archive/build-era/`** with `.agents/` (Phase 4) |
+| `AGENTS.md` | Multi-agent coordination protocol — references `.agents/` | `docs/archive/build-era/AGENTS.md` |
 | `REPO_INDEX.md` | This file — the navigational map | **Keep at root** |
 | `VISION.md` | Product vision — north star, positioning, landscape | **Moved to `docs/`** |
 | `ROADMAP.md` | Sequence + milestones | **Moved to `docs/`** |
@@ -116,7 +116,7 @@
 | `supabase/functions/` | Edge functions — `canonical-hub`, `deadline-alerts`, `recruiter-agent`, `smart-matcher` |
 | `supabase/config.toml` | Supabase project config |
 
-**Migration high-water mark:** 048 applied. Registry: `.agents/registry.yaml` (will move with `.agents/` archive).
+**Migration high-water mark:** 048 applied. Registry archived at `docs/archive/build-era/agents/registry.yaml`.
 
 **Key schema facts:**
 - `archived_questions.embedding` — `vector(768)`, seeded with `nomic-embed-text`

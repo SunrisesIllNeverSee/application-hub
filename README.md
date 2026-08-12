@@ -31,7 +31,7 @@ The public wedge is startup opportunities. The underlying spine is broad enough 
 | Surface | State |
 |---|---|
 | Live app | `https://mos2es.xyz` |
-| Archive + migration counts | See `docs/STATUS.md` and `.agents/registry.yaml` |
+| Archive + migration counts | See `docs/STATUS.md` (registry archived to `docs/archive/build-era/agents/`) |
 | MCP server | 21 tools, 7 resources, 3 prompts |
 | Web product | Hub, Bank, workspace, profile split, imports, BYOK |
 | Review layer | persisted reviews + stress tests + starter reviewer family |
@@ -66,7 +66,7 @@ npm run check
 ```
 
 Prerequisites:
-- live Supabase project aligned with the current migration chain in `docs/STATUS.md` / `.agents/registry.yaml`
+- live Supabase project aligned with the current migration chain in `docs/STATUS.md`
 - app env vars for Supabase
 - MCP env vars for Supabase service-role + anon access
 
@@ -76,7 +76,6 @@ Prerequisites:
 - `docs/ROADMAP.md` — sequence and leverage
 - `docs/STATUS.md` — confirmed repo state
 - `docs/VISION.md` — product thesis and future shape
-- `AGENTS.md` — active coordination layer
 - `docs/ARCHITECTURE.md` — architecture overview
 - `docs/MIGRATIONS.md` — migration chain and duplicate-prefix policy
 - `docs/STRIPE_SETUP.md` — Stripe activation walkthrough

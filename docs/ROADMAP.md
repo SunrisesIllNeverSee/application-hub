@@ -12,7 +12,7 @@
 
 Application Hub already has a shippable spine:
 
-- **Database**: the live Supabase project, migration chain, and archive counts are tracked canonically in `docs/STATUS.md` and `.agents/registry.yaml`.
+- **Database**: the live Supabase project, migration chain, and archive counts are tracked canonically in `docs/STATUS.md` and `docs/archive/build-era/agents/registry.yaml`.
 - **Intelligence**: significance scores, program DNA, fit scoring, pgvector retrieval.
 - **MCP server**: 21 tools, 7 resources, 3 prompts. Power-user path is real today.
 - **Next.js app**: Hub, timeline-in-Hub, Question Bank, workspace (/workspace with opportunity ranking), profile split, BYOK integrations, live Supabase wiring, home dashboard (`/today`), stress-test UI, DNA radar chart, significance stars display.
@@ -178,7 +178,7 @@ Completed, outdated, duplicate, or exploratory planning files should move to `do
 
 Use this rule:
 
-- **Active direction**: `docs/ROADMAP.md`, `docs/archive/build-era/TASKS.md`, `docs/STATUS.md`, `docs/VISION.md`, `docs/archive/build-era/SCRATCH.md`, `AGENTS.md`.
+- **Active direction**: `docs/ROADMAP.md`, `docs/archive/build-era/TASKS.md`, `docs/STATUS.md`, `docs/VISION.md`, `docs/archive/build-era/SCRATCH.md`, `docs/archive/build-era/AGENTS.md`.
 - **Reference docs**: keep in `docs/` if they are still linked by active work.
 - **Historical docs**: move to `docs/archive/` with a short note in `docs/archive/README.md` explaining why it moved.
 
