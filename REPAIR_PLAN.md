@@ -16,7 +16,7 @@
 | 5 — Archival banner | ✅ **COMPLETE** | Deric chose (a) active build. CLAUDE.md + STATUS.md banners reworded: archive event historical, repo is active build, synthesized-data caveat for 30 seeded programs retained. |
 | 6 — START_HERE refresh | ✅ **COMPLETE** | "Key facts" replaced with pointer to registry.yaml + STATUS.md. "Seed embeddings" section deleted (done since May, 768d nomic-embed-text). |
 | 7 — Legacy migrations doc | ✅ **COMPLETE** | `docs/MIGRATIONS.md` rewritten with legacy root provenance table (022/033 byte-identical, 042/043 collide with canonical). Live-DB verification SQL provided for Deric. Duplicate `26_` doc renumbered: `26_fundingcake_ingest_pipeline.md` → `30_`. References in SCRATCH.md + qaapplication/src/seeding-plan.md updated. |
-| 8 — Local-junk decisions | ⬜ DECISION REQUIRED (small) | |
+| 8 — Local-junk decisions | ✅ **COMPLETE** | `qaapplication/.claude/` added to `.gitignore` (tool-local settings). `qaapplication/tmp/` kept in history per Deric's decision. 19 lane warnings out of scope (clear when August outreach lanes completed). | |
 
 ---
 
@@ -161,9 +161,15 @@ Root `migrations/` holds 4 tracked files; `042_persona_profiles.sql` / `043_smar
 
 ## Final checklist
 
-- [ ] New clone at canonical path, fsck-clean, hook installed, all verifications green
-- [ ] August work + runbook merged to main; pushed after Checkpoint C
-- [ ] Wolfram package imported at `docs/reviews/2026-08-11-aqua-wolfram/` + four actions wired
-- [ ] SCRATCH/claims synced; check.py shows only the 19 known lane warnings
-- [ ] Banner resolved per Phase 5; START_HERE fact-free; MIGRATIONS.md records legacy provenance
-- [ ] `~/backups/apphub-prerepair-2026-08-12.tgz` kept until Deric deletes it
+- [x] New clone at canonical path, fsck-clean, hook installed, all verifications green
+- [x] August work + runbook merged to main; pushed after Checkpoint C (preservation branch pushed; main push pending Deric sign-off)
+- [x] Wolfram package imported at `docs/reviews/2026-08-11-aqua-wolfram/` + four actions wired
+- [x] SCRATCH/claims synced; check.py shows only the 19 known lane warnings
+- [x] Banner resolved per Phase 5; START_HERE fact-free; MIGRATIONS.md records legacy provenance
+- [x] `~/backups/apphub-prerepair-2026-08-12.tgz` kept until Deric deletes it
+
+### Remaining (Deric's call)
+
+- [ ] Checkpoint C: after a few days of confirmed work in the new clone, delete `application-hub-CORRUPT-keep` (tarball remains as fallback)
+- [ ] Checkpoint C: push `main` to origin (CI will run agents-check + build jobs)
+- [ ] Phase 7 follow-up: run the live-DB verification SQL in `docs/MIGRATIONS.md` to confirm whether legacy 042/043 objects exist on Supabase
