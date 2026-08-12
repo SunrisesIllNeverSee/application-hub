@@ -13,6 +13,19 @@ Most recent entries first. Append new entries at the top.
 
 ---
 
+## 2026-08-03
+
+- **2026-08-03** · **received + drafting** · `euclid-ventures` · Official founder outreach route identified at hello@euclid.vc; outbound draft prepared with a transparent vertical-AI fit question.
+- **2026-08-03** · **received + drafting** · `daybreak` · Official founder outreach routes identified at rex@daybreakventures.com and jared@daybreakventures.com; first-check/proof-of-life outbound draft prepared.
+- **2026-08-03** · **scope decision** · `twin-track`, `cleo-ventures`, `common-magic` · Excluded from the active investor queue because the raise is limited to US/North American investors.
+- **2026-08-03** · **received + extracted + drafting** · `hannah-grey` · Public investment-consideration form captured and distributed to entity, bare-form, question-source, and active-draft lanes. Submission blocked on C-corporation eligibility, current raise details, TAM, and deck confirmation.
+- **2026-08-03** · **received + extracted + fit-gated** · `twin-track` · Public dual-use pitch form captured and distributed to entity, bare-form, question-source, and active-draft lanes. No defence or NATO-aligned claim will be made without verified product evidence.
+
+## 2026-08-02
+
+- **2026-08-02** · **received + filed** · `yc-fall-2026` · Founder-provided YC Fall 2026 application captured as a separate active application record at `07-apply/yc-fall-2026.md`; existing Summer 2026 YC materials remain unchanged.
+- **2026-08-02** · **received + extracted + drafting** · `catalyst-outcast` · Catalyst from Outcast Ventures form captured and distributed to `03-programs/`, `04-applications/`, `05-questions/source/`, and `07-apply/`. Founder-provided YC Fall 2026 application preserved as drafting source at `07-apply/yc-fall-2026.md`. Open items: references and the required full-time SF/no-side-project commitment.
+
 ## 2026-05-27
 
 - **2026-05-27** · **submitted** · `founding500` · The Founding 500 form submitted. Archived to `08-submitted/archive/founding500.md` and `08-submitted/archived_applications/founding500.md`. Attachment bundle preserved at `07-apply/_shared/packages/founding500-2026-05-26.zip`.

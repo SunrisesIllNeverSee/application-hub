@@ -198,7 +198,7 @@ Recommended MCPs to add for this project:
   "mcpServers": {
     "application-hub": {
       "command": "node",
-      "args": ["/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js"],
+      "args": ["/Users/dericmchenry/Developer/built/application-hub/application-hub-mcp-server/dist/index.js"],
       "env": {
         "SUPABASE_URL": "https://betcyfbzsgusaghriptz.supabase.co",
         "SUPABASE_SERVICE_ROLE_KEY": "<service role key>",

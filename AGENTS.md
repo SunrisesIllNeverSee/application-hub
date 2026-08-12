@@ -129,7 +129,7 @@ Protocol files:
 - Site: `https://mos2es.xyz`
 - Supabase project: `betcyfbzsgusaghriptz`
 - MCP server local rebuild path:
-  - `/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js`
+  - `/Users/dericmchenry/Developer/built/application-hub/application-hub-mcp-server/dist/index.js`
 - App builds currently use:
   - `cd app && npm run type-check`
   - `cd app && npm run build`
