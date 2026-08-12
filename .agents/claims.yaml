@@ -61,9 +61,9 @@ sessions:
   - id: devin-2026-08-12-mcp
     surface: devin-cli
     started_at: 2026-08-12T08:00:00Z
-    heartbeat: 2026-08-12T08:30:00Z
-    status: active
-    note: MCP pound-out loop — hub_intake_application, hub_fill_application, hub_search_answer_bank + docs/31_poundout_loop.md
+    heartbeat: 2026-08-12T08:45:00Z
+    status: wrapped
+    note: MCP pound-out loop — hub_intake_application, hub_fill_application, hub_search_answer_bank + docs/31_poundout_loop.md — landed 9f72ec7
 
 claims:
   - id: claim-2026-05-11-001
@@ -342,6 +342,6 @@ claims:
       search-answer-bank) exposing the browser-built application workflow
       to VS Code/Cursor/Claude via stdio MCP, plus operator guide.
     acquired_at: 2026-08-12T08:00:00Z
-    heartbeat: 2026-08-12T08:30:00Z
-    released_at: ~
-    landed_commits: []
+    heartbeat: 2026-08-12T08:45:00Z
+    released_at: 2026-08-12T08:45:00Z
+    landed_commits: [9f72ec7]

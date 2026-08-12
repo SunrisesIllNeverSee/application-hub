@@ -81,9 +81,10 @@ Updated 2026-05-12 (vscode-claude) — migration chain at 039, next=040. Next.js
 
 ## Currently claimed
 
-- **devin** — MCP pound-out loop: `hub_intake_application`, `hub_fill_application`, `hub_search_answer_bank` + `docs/31_poundout_loop.md` (`application-hub-mcp-server/src/services/embed.ts`, `application-hub-mcp-server/src/tools/user/hub_*.ts`, `application-hub-mcp-server/src/index.ts`, `docs/31_poundout_loop.md`) — in progress, 2026-08-12
+_(none active)_
 
 ## Recently released
+- **devin** — MCP pound-out loop: `hub_intake_application`, `hub_fill_application`, `hub_search_answer_bank` + `docs/31_poundout_loop.md` (`application-hub-mcp-server/src/services/embed.ts`, `application-hub-mcp-server/src/tools/user/hub_*.ts`, `application-hub-mcp-server/src/index.ts`, `docs/31_poundout_loop.md`) — landed `9f72ec7` — 2026-08-12
 - **devin** — pound-out loop: one-call intake + bank fill + shared embed/intake libs + capture fix + corpus loader (`app/lib/embed.ts`, `app/lib/intake-extract.ts`, `app/app/api/applications/intake/`, `app/app/api/applications/[id]/fill/`, `app/components/IntakeForm.tsx`, `scripts/import-qaapplication-corpus.ts`) — commits `1474b90`, `960b011` + coordination commit — 2026-08-12
 - **codex** — security lint follow-up for `public.program_next_cycle` (`supabase/migrations/048_fix_program_next_cycle_security_invoker.sql`, `.agents/registry.yaml`, `STATUS.md`) — landed `2378c78` — 2026-05-27
 - **codex** — manual intake workflow (`supabase/migrations/047_manual_intake_workflow.sql`, `app/app/api/hub/ingest/route.ts`, `app/app/api/hub/intake/*`, `app/components/ingestion/*`, `app/app/(app)/profile/import/page.tsx`) — landed `7ab4462` — 2026-05-24
