@@ -273,3 +273,4 @@ See `TASKS.md` for the prioritized task list.
 - Don't use the service role key client-side or expose it in any frontend code
 - Don't add community/social features before the data layer and review loop are genuinely useful (noise before signal)
 - Don't auto-submit applications — this is a preparation layer, not a submission layer
+- Don't let any downstream statement carry stronger factual status than its strongest upstream source (information conservation rule from the Aqua × Wolfram review, `docs/reviews/2026-08-11-aqua-wolfram/13_final_integrated_review.md`)

@@ -49,7 +49,7 @@ AQUA Phase shipped. Build clean, tsc 0 errors. Site live at mos2es.xyz. Migratio
 
 ### Remaining open work
 
-- **FundingCake Phase C** — HOLD — 39 rows staged but quality mixed (MaRS rows similarity 0.38–0.46, false positives). Manual review of `seed/staging/fundingcake_questions_promote.csv` before any Supabase write
+- **FundingCake Phase C** — HOLD — 39 rows staged but quality mixed (MaRS rows similarity 0.38–0.46, false positives). Manual review of `seed/staging/fundingcake_questions_promote.csv` before any Supabase write. **Pre-flight check (per Aqua × Wolfram review §3):** the `finalized → promoted` identity bridge is the review's #1 critical boundary — before promoting any staged rows, verify that promotion persists source intake IDs rather than relying on text similarity. See `docs/reviews/2026-08-11-aqua-wolfram/10_findings_and_recommendations.md` and `TASKS.md` "Promotion registry".
 - **ROADMAP.md Vision Tier pruning** — move distant future items to AFTER_LAUNCH.md Future Products section
 
 ### Deric to drive

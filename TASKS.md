@@ -511,6 +511,41 @@ Open program and question data to partners with tiered access.
 
 ---
 
+## Wolfram structural review — hardening priorities
+
+Source: `docs/reviews/2026-08-11-aqua-wolfram/` (2026-08-11 snapshot). The review found Aqua is already a multi-representation knowledge system; the high-leverage work is making identity and provenance survive every phase shift. Four priorities, in order:
+
+### [ ] Promotion registry (intake → archive identity bridge)
+**Owner**: Shared
+**Priority**: P1 — review's #1 critical boundary
+
+Record the deterministic bridge from reviewed intake (`intake_applications` / `intake_questions` in `finalized` → `promoted` state) to operational archive (`programs` / `program_questions` / `archived_questions`). Every production application/question created from intake must be traceable to its intake submission and approval lineage via persisted IDs, not text similarity.
+
+Fields to capture: source representation, destination representation, transformation function, preserved identity, provenance reference, validation requirement, reversibility, idempotency.
+
+### [ ] Representation crosswalk contract
+**Owner**: Shared
+**Priority**: P1
+
+Classify every cross-representation relationship as: (1) same object different phase, (2) same object different projection, (3) independently meaningful object, (4) derived object, (5) redundant persistence. Only category 5 is a normalization candidate. Covers questions, answers, applications, and commitments.
+
+### [ ] Provenance bridge (intake_events ↔ lineage_events)
+**Owner**: Shared
+**Priority**: P1
+
+`intake_events` (workflow provenance) and `lineage_events` (knowledge provenance) are different semantics and should remain separate. Add a cross-domain trace bridge so one traversal can move from workflow provenance into knowledge provenance. Ideal reconstructable chain: source application → intake submission → extracted question → reviewed intake object → operational answer → canonical commitment → answer variant → application package → export/submission.
+
+### [ ] `algorithm_version` on derived scores
+**Owner**: Shared
+**Priority**: P2
+
+Derived objects (fit scores, significance, DNA, stress-test results, Smart Matcher rankings) should carry: algorithm/version, source object/version, timestamp, parameters where relevant. Ensures reproducibility and version invalidation when placeholder formulas are replaced.
+
+### Regeneration
+`docs/reviews/2026-08-11-aqua-wolfram/09_wolfram_analysis_prompts.md` is the instrument to re-run after the next migration batch. Files 01-08 are derived snapshots that rot on next migration; 09-13 are durable method + invariants.
+
+---
+
 ## RNS / Research Differentiation
 
 These are additive above the current app, not blockers for launch:
