@@ -10,13 +10,14 @@ import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 // near-identical questions; gaps reported. Deterministic — no generated
 // text enters the bank.
 
-const DEFAULT_BORROW_THRESHOLD = 0.8;
+const DEFAULT_BORROW_THRESHOLD = 0.65;
 
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT from client auth"),
   application_id: z.string().uuid().describe("user_applications UUID (from hub_intake_application)"),
-  borrow_threshold: z.number().min(0.5).max(1).default(DEFAULT_BORROW_THRESHOLD)
-    .describe("Minimum similarity to borrow an answer from a sibling question"),
+  borrow_threshold: z.number().min(0.5).max(1).optional()
+    .describe("Minimum similarity to borrow an answer from a sibling question. If omitted, uses your saved preference (hub_set_borrow_threshold) or the 0.65 default."),
+  dual_pass: z.boolean().default(false).describe("Run two passes (aggressive 0.5 + strict 0.75) and compare. Writes the strict pass; reports the aggressive-only borrows as review candidates."),
   dry_run: z.boolean().default(false).describe("Report the fill plan without writing anything"),
   response_format: z.nativeEnum(ResponseFormat).default(ResponseFormat.MARKDOWN),
 }).strict();
@@ -28,6 +29,133 @@ type AnswerRow = {
   content: string | null;
   version: number | null;
 };
+
+type BorrowCandidate = {
+  archived_question_id: string;
+  asked_as: string;
+  source_question_text: string;
+  similarity: number;
+  source_answer: string;
+  word_limit: number | null;
+};
+
+// ── Borrow pass (extracted so dual_pass can call it twice) ──────────────────
+async function runBorrowPass(
+  misses: Array<{ archived_question_id: string; asked_as: string; word_limit: number | null }>,
+  user_id: string,
+  threshold: number,
+): Promise<{ borrowPlan: BorrowCandidate[]; gaps: string[]; embedAvailable: boolean }> {
+  const borrowPlan: BorrowCandidate[] = [];
+  const gaps: string[] = [];
+  let embedAvailable = true;
+
+  for (const q of misses) {
+    let borrowed = false;
+    if (embedAvailable) {
+      const embedding = await embedText(q.asked_as);
+      if (!embedding) {
+        embedAvailable = false;
+      } else {
+        const { data: matches } = await supabase.rpc("match_archived_questions", {
+          query_embedding: JSON.stringify(embedding),
+          match_threshold: threshold,
+          match_count: 20,
+        });
+
+        const candidates = ((matches ?? []) as Array<{ id: string; text: string; similarity: number }>)
+          .filter((m) => m.id !== q.archived_question_id);
+
+        if (candidates.length > 0) {
+          const { data: sourceAnswers } = await supabase
+            .from("profile_answers")
+            .select("archived_question_id, answer_content, content, version")
+            .eq("user_id", user_id)
+            .in("archived_question_id", candidates.map((c) => c.id))
+            .order("version", { ascending: false });
+
+          const sourceByQuestion = new Map<string, string>();
+          for (const sa of (sourceAnswers ?? []) as Array<Record<string, any>>) {
+            if (!sourceByQuestion.has(sa.archived_question_id)) {
+              sourceByQuestion.set(sa.archived_question_id, sa.answer_content ?? sa.content ?? "");
+            }
+          }
+
+          for (const candidate of candidates) {
+            const source = sourceByQuestion.get(candidate.id);
+            if (source && source.trim().length >= 10) {
+              borrowPlan.push({
+                archived_question_id: q.archived_question_id,
+                asked_as: q.asked_as,
+                source_question_text: candidate.text,
+                similarity: candidate.similarity,
+                source_answer: source,
+                word_limit: q.word_limit,
+              });
+              borrowed = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (!borrowed) gaps.push(q.asked_as);
+  }
+
+  return { borrowPlan, gaps, embedAvailable };
+}
+
+// ── Write borrowed drafts ───────────────────────────────────────────────────
+async function writeBorrowDrafts(
+  borrowPlan: BorrowCandidate[],
+  user_id: string,
+  dry_run: boolean,
+): Promise<number> {
+  if (dry_run) return 0;
+  let written = 0;
+  for (const plan of borrowPlan) {
+    const { data: existing } = await supabase
+      .from("profile_answers")
+      .select("id, version, answer_content, content")
+      .eq("user_id", user_id)
+      .eq("archived_question_id", plan.archived_question_id)
+      .order("version", { ascending: false })
+      .limit(1);
+
+    const nextVersion = existing && existing.length > 0 ? ((existing[0].version as number) ?? 1) + 1 : 1;
+
+    if (existing && existing.length > 0) {
+      const latestContent = (existing[0].answer_content as string) ?? (existing[0].content as string) ?? "";
+      if (latestContent.trim() === plan.source_answer.trim()) continue;
+    }
+
+    const trimmed = plan.source_answer.trim();
+    const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+    const payload = {
+      content: trimmed,
+      answer_content: trimmed,
+      question_text: plan.asked_as,
+      word_count: wordCount,
+      version: nextVersion,
+      confidence: "draft" as const,
+    };
+
+    let error;
+    if (existing && existing.length > 0) {
+      ({ error } = await supabase
+        .from("profile_answers")
+        .update(payload)
+        .eq("id", existing[0].id as string));
+    } else {
+      ({ error } = await supabase.from("profile_answers").insert({
+        user_id,
+        archived_question_id: plan.archived_question_id,
+        ...payload,
+      }));
+    }
+    if (!error) written++;
+  }
+  return written;
+}
 
 export function registerFillApplication(server: McpServer) {
   server.registerTool("hub_fill_application", {
@@ -42,8 +170,23 @@ Per question, in order:
 Deterministic: no AI-generated text is written. Review happens in the workspace (/workspace/[program_id]).`,
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-  }, async ({ user_token, application_id, borrow_threshold, dry_run, response_format }) => {
+  }, async ({ user_token, application_id, borrow_threshold, dual_pass, dry_run, response_format }) => {
     const user_id = await validateUserToken(user_token);
+
+    // 0. Resolve borrow threshold: explicit arg > saved preference > default
+    let effectiveThreshold = borrow_threshold ?? DEFAULT_BORROW_THRESHOLD;
+    if (borrow_threshold === undefined) {
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("applicant_context")
+        .eq("user_id", user_id)
+        .maybeSingle();
+      const ctx = profile?.applicant_context as Record<string, unknown> | null;
+      const saved = ctx?.borrow_threshold;
+      if (typeof saved === "number" && saved >= 0.5 && saved <= 1) {
+        effectiveThreshold = saved;
+      }
+    }
 
     // 1. Application (must be the caller's)
     const { data: application } = await supabase
@@ -85,130 +228,117 @@ Deterministic: no AI-generated text is written. Review happens in the workspace 
       if (!latestByQuestion.has(a.archived_question_id)) latestByQuestion.set(a.archived_question_id, a);
     }
 
-    // 4. Borrow pass for misses
+    const directCount = latestByQuestion.size;
     const misses = questions.filter((q) => !latestByQuestion.has(q.archived_question_id));
-    const borrowPlan: Array<{
-      archived_question_id: string;
-      asked_as: string;
-      source_question_text: string;
-      similarity: number;
-      source_answer: string;
-      word_limit: number | null;
-    }> = [];
-    const gaps: string[] = [];
-    let embedAvailable = true;
 
-    for (const q of misses) {
-      let borrowed = false;
-      if (embedAvailable) {
-        const embedding = await embedText(q.asked_as);
-        if (!embedding) {
-          embedAvailable = false;
-        } else {
-          const { data: matches } = await supabase.rpc("match_archived_questions", {
-            query_embedding: JSON.stringify(embedding),
-            match_threshold: borrow_threshold,
-            match_count: 6,
-          });
+    // ── Dual pass: aggressive 0.5 + strict 0.75, compare ────────────────────
+    if (dual_pass) {
+      const AGGRESSIVE = 0.5;
+      const STRICT = 0.75;
 
-          const candidates = ((matches ?? []) as Array<{ id: string; text: string; similarity: number }>)
-            .filter((m) => m.id !== q.archived_question_id);
+      const aggressiveResult = await runBorrowPass(misses, user_id, AGGRESSIVE);
+      const strictResult = await runBorrowPass(misses, user_id, STRICT);
 
-          if (candidates.length > 0) {
-            const { data: sourceAnswers } = await supabase
-              .from("profile_answers")
-              .select("archived_question_id, answer_content, content, version")
-              .eq("user_id", user_id)
-              .in("archived_question_id", candidates.map((c) => c.id))
-              .order("version", { ascending: false });
+      // Write the strict pass (high-confidence borrows)
+      const strictWritten = await writeBorrowDrafts(strictResult.borrowPlan, user_id, dry_run);
 
-            const sourceByQuestion = new Map<string, string>();
-            for (const sa of (sourceAnswers ?? []) as Array<Record<string, any>>) {
-              if (!sourceByQuestion.has(sa.archived_question_id)) {
-                sourceByQuestion.set(sa.archived_question_id, sa.answer_content ?? sa.content ?? "");
-              }
-            }
+      // Find borrows that only exist in the aggressive pass (review candidates)
+      const strictQids = new Set(strictResult.borrowPlan.map((b) => b.archived_question_id));
+      const aggressiveOnly = aggressiveResult.borrowPlan.filter(
+        (b) => !strictQids.has(b.archived_question_id),
+      );
 
-            for (const candidate of candidates) {
-              const source = sourceByQuestion.get(candidate.id);
-              if (source && source.trim().length >= 10) {
-                borrowPlan.push({
-                  archived_question_id: q.archived_question_id,
-                  asked_as: q.asked_as,
-                  source_question_text: candidate.text,
-                  similarity: candidate.similarity,
-                  source_answer: source,
-                  word_limit: q.word_limit,
-                });
-                borrowed = true;
-                break;
-              }
-            }
-          }
-        }
-      }
-      if (!borrowed) gaps.push(q.asked_as);
-    }
+      // Gaps are questions neither pass could fill
+      const aggressiveQids = new Set(aggressiveResult.borrowPlan.map((b) => b.archived_question_id));
+      const realGaps = misses
+        .filter((q) => !aggressiveQids.has(q.archived_question_id))
+        .map((q) => q.asked_as);
 
-    // 5. Write borrowed drafts (unless dry run)
-    // Upsert: profile_answers has UNIQUE(user_id, archived_question_id) —
-    // one row per user+question. UPDATE in place; the
-    // profile_answer_history_snapshot trigger archives each new version.
-    let written = 0;
-    if (!dry_run) {
-      for (const plan of borrowPlan) {
-        const { data: existing } = await supabase
-          .from("profile_answers")
-          .select("id, version, answer_content, content")
-          .eq("user_id", user_id)
-          .eq("archived_question_id", plan.archived_question_id)
-          .order("version", { ascending: false })
-          .limit(1);
+      const strictCoverage = Math.round(((directCount + (dry_run ? strictResult.borrowPlan.length : strictWritten)) / questions.length) * 100);
+      const aggressiveCoverage = Math.round(((directCount + aggressiveResult.borrowPlan.length) / questions.length) * 100);
 
-        const nextVersion = existing && existing.length > 0 ? ((existing[0].version as number) ?? 1) + 1 : 1;
+      const output = {
+        application_id,
+        program_id: application.program_id,
+        total: questions.length,
+        direct: directCount,
+        dual_pass: true,
+        strict_pass: {
+          threshold: STRICT,
+          borrowed: strictResult.borrowPlan.map((b) => ({
+            asked_as: b.asked_as,
+            source_question: b.source_question_text,
+            similarity: Math.round(b.similarity * 1000) / 1000,
+          })),
+          borrowed_written: dry_run ? 0 : strictWritten,
+          coverage_pct: strictCoverage,
+        },
+        aggressive_pass: {
+          threshold: AGGRESSIVE,
+          borrowed: aggressiveResult.borrowPlan.map((b) => ({
+            asked_as: b.asked_as,
+            source_question: b.source_question_text,
+            similarity: Math.round(b.similarity * 1000) / 1000,
+          })),
+          coverage_pct: aggressiveCoverage,
+        },
+        review_candidates: aggressiveOnly.map((b) => ({
+          asked_as: b.asked_as,
+          source_question: b.source_question_text,
+          similarity: Math.round(b.similarity * 1000) / 1000,
+          note: "Below strict threshold — review before accepting",
+        })),
+        gaps: realGaps,
+        dry_run,
+        embedding_available: aggressiveResult.embedAvailable,
+        workspace_url: `/workspace/${application.program_id}`,
+      };
 
-        if (existing && existing.length > 0) {
-          const latestContent = (existing[0].answer_content as string) ?? (existing[0].content as string) ?? "";
-          if (latestContent.trim() === plan.source_answer.trim()) continue;
-        }
-
-        const trimmed = plan.source_answer.trim();
-        const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
-        const payload = {
-          content: trimmed,
-          answer_content: trimmed,
-          question_text: plan.asked_as,
-          word_count: wordCount,
-          version: nextVersion,
-          confidence: "draft" as const,
+      if (response_format === ResponseFormat.JSON) {
+        return {
+          content: [{ type: "text", text: JSON.stringify(output, null, 2).slice(0, CHARACTER_LIMIT) }],
+          structuredContent: output,
         };
-
-        let error;
-        if (existing && existing.length > 0) {
-          ({ error } = await supabase
-            .from("profile_answers")
-            .update(payload)
-            .eq("id", existing[0].id as string));
-        } else {
-          ({ error } = await supabase.from("profile_answers").insert({
-            user_id,
-            archived_question_id: plan.archived_question_id,
-            ...payload,
-          }));
-        }
-        if (!error) written++;
       }
+
+      const lines = [
+        `# Fill ${dry_run ? "Plan (dry run) " : ""}— Dual Pass`,
+        ``,
+        `## Strict pass (written${dry_run ? " — dry run" : ""}) — threshold ${STRICT}`,
+        `**Coverage**: ${strictCoverage}% — ${directCount} direct, ${dry_run ? strictResult.borrowPlan.length : strictWritten} borrowed, ${questions.length - directCount - (dry_run ? strictResult.borrowPlan.length : strictWritten)} unfilled`,
+        ...(strictResult.borrowPlan.length > 0 ? ["", "### Borrows:"] : []),
+        ...strictResult.borrowPlan.map((b) => `- **${b.asked_as.slice(0, 80)}** ← _${b.source_question_text.slice(0, 60)}_ (${Math.round(b.similarity * 100)}%)`),
+        ``,
+        `## Aggressive pass (review only) — threshold ${AGGRESSIVE}`,
+        `**Coverage**: ${aggressiveCoverage}% — ${directCount} direct, ${aggressiveResult.borrowPlan.length} borrowed`,
+        ...(aggressiveOnly.length > 0 ? ["", "### Review candidates (below strict, above aggressive):"] : []),
+        ...aggressiveOnly.map((b) => `- **${b.asked_as.slice(0, 80)}** ← _${b.source_question_text.slice(0, 60)}_ (${Math.round(b.similarity * 100)}%) ⚠️ review`),
+        ``,
+        realGaps.length > 0 ? `## Gaps (no match at any threshold)` : null,
+        ...realGaps.map((g) => `- ${g.slice(0, 100)}`),
+        ``,
+        `Review at ${output.workspace_url}`,
+        aggressiveResult.embedAvailable ? null : "Note: embedding unavailable (is Ollama running?) — borrow pass skipped; direct hits only.",
+      ].filter((l): l is string => l !== null);
+
+      return {
+        content: [{ type: "text", text: lines.join("\n").slice(0, CHARACTER_LIMIT) }],
+        structuredContent: output,
+      };
     }
 
-    const direct = questions.length - misses.length;
-    const filled = direct + (dry_run ? borrowPlan.length : written);
+    // ── Single pass (standard) ──────────────────────────────────────────────
+    const { borrowPlan, gaps, embedAvailable } = await runBorrowPass(misses, user_id, effectiveThreshold);
+    const written = await writeBorrowDrafts(borrowPlan, user_id, dry_run);
+
+    const filled = directCount + (dry_run ? borrowPlan.length : written);
     const coveragePct = Math.round((filled / questions.length) * 100);
 
     const output = {
       application_id,
       program_id: application.program_id,
       total: questions.length,
-      direct,
+      direct: directCount,
       borrowed: borrowPlan.map((b) => ({
         asked_as: b.asked_as,
         source_question: b.source_question_text,
@@ -217,6 +347,7 @@ Deterministic: no AI-generated text is written. Review happens in the workspace 
       borrowed_written: dry_run ? 0 : written,
       gaps,
       coverage_pct: coveragePct,
+      borrow_threshold_used: effectiveThreshold,
       dry_run,
       embedding_available: embedAvailable,
       workspace_url: `/workspace/${application.program_id}`,
@@ -231,7 +362,8 @@ Deterministic: no AI-generated text is written. Review happens in the workspace 
 
     const lines = [
       `# Fill ${dry_run ? "Plan (dry run)" : "Complete"}`,
-      `**Coverage**: ${coveragePct}% — ${direct} direct, ${dry_run ? borrowPlan.length : written} borrowed, ${gaps.length} gaps`,
+      `**Coverage**: ${coveragePct}% — ${directCount} direct, ${dry_run ? borrowPlan.length : written} borrowed, ${gaps.length} gaps`,
+      `**Borrow threshold**: ${effectiveThreshold} ${borrow_threshold === undefined ? "(saved preference)" : "(override)"}`,
       "",
       borrowPlan.length > 0 ? "## Borrowed" : null,
       ...borrowPlan.map((b) => `- **${b.asked_as.slice(0, 80)}** ← _${b.source_question_text.slice(0, 60)}_ (${Math.round(b.similarity * 100)}%)`),
