@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Devin Preview Testing Handoff
+description: Devin Preview Testing Handoff — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Devin Preview Testing Handoff
 
 This is the compact handoff for the applicant-mode preview testing lane so another session can pick it up without re-spending context.

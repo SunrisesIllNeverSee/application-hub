@@ -1,3 +1,11 @@
+---
+type: Reference
+title: devanbuild2
+description: devanbuild2 — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 Bolt On 8 Future Work Features to AQUA
 Repository: SunrisesIllNeverSee/application-hub
 Context

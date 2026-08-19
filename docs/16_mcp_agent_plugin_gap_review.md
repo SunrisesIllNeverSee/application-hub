@@ -1,3 +1,11 @@
+---
+type: Reference
+title: MCP, Agent, and Plugin Gap Review
+description: MCP, Agent, and Plugin Gap Review — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # MCP, Agent, and Plugin Gap Review
 
 _Reviewed 2026-05-11_

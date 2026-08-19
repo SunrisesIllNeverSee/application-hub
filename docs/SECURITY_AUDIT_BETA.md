@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Security Audit — Beta Mode
+description: Security Audit — Beta Mode — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Security Audit — Beta Mode
 
 _Pre-launch checklist for the beta-mode features introduced in migration 041._

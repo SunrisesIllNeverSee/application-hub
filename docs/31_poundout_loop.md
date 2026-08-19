@@ -1,3 +1,11 @@
+---
+type: Reference
+title: 31 — The Pound-Out Loop
+description: 31 — The Pound-Out Loop — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # 31 — The Pound-Out Loop
 
 > How to grab an application, fill it from your answer bank, review, and submit — manually — over and over.

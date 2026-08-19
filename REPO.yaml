@@ -1,0 +1,39 @@
+standard:
+  name: ello-repo-standard
+  version: "1.0.0"
+  mode: migrate
+
+repo:
+  name: application-hub
+  type: platform
+  lifecycle: active
+  repo_id: application_hub
+  family: moses
+  purpose: Application Hub — founder-first application infrastructure, live at mos2es.xyz. Next.js app, browser extension, MCP server, Supabase backend, QA pipeline.
+
+structure:
+  profile: platform
+  allowed_root_dirs_extra: [.firecrawl, .vercel, app, appfeeder, application-hub-mcp-server, qaapplication, seed, supabase, webextension, system-devin]
+  allowed_root_files_extra: [.claudeignore, .mcp.json, REPO_INDEX.md]
+  document_roots: [docs]
+  artifact_roots: [artifacts, seed]
+  archive_roots: [archive, docs/archive]
+
+naming:
+  forbid_version_suffixes: true
+  forbidden_suffixes: [_final, _final2, _new, _updated, _revised, _copy]
+
+knowledge:
+  okf_enabled: true
+  okf_roots: [docs, .coord]
+  okf_severity: warn
+
+coordination:
+  micro_enabled: true
+  micro_root: .coord/micro
+  macro_enabled: true
+  macro_root: .coord/macro
+
+github:
+  ruleset_profile: solo-fast
+  required_check: repo-standard

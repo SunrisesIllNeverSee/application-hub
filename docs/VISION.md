@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Product Vision
+description: Application Hub — Product Vision — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Product Vision
 
 > A living document. The product is built schema-first; vision lives downstream of that asset.

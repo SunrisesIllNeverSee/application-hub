@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Rewards System Design
+description: Rewards System Design — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Rewards System Design
 
 _Last updated: 2026-05-11_

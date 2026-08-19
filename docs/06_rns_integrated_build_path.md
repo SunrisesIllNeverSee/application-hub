@@ -1,3 +1,11 @@
+---
+type: Reference
+title: RNS-Integrated Build Path
+description: RNS-Integrated Build Path — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # RNS-Integrated Build Path
 
 Application Hub should ship as a practical product first: a question archive, answer bank, program workspace, hosted drafting, and external apply path. RNS is not a reason to restart or simplify the current repo. It is the deeper intelligence layer that can sit on top of the existing Supabase + MCP + Next.js spine.

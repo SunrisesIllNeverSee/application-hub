@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Feedback & Roadmap Notes
+description: Feedback & Roadmap Notes — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Feedback & Roadmap Notes
 
 ---

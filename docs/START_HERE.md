@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Start Here
+description: Start Here — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Start Here
 
 > Read this first. Every session. Every agent. It's short on purpose.

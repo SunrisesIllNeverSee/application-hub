@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Registry gaps surfaced by `.agents/check.py`
+description: Registry gaps surfaced by `.agents/check.py` — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Registry gaps surfaced by `.agents/check.py`
 
 _Snapshot taken 2026-05-11. Run `python3 .agents/check.py` for the current state._

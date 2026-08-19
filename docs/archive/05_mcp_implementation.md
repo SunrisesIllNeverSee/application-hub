@@ -1,3 +1,11 @@
+---
+type: Reference
+title: MCP Server — Full Implementation Map
+description: MCP Server — Full Implementation Map — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # MCP Server — Full Implementation Map
 > application-hub-mcp-server
 > TypeScript · @modelcontextprotocol/sdk · Streamable HTTP

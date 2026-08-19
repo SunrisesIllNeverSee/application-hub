@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: stress test conductor
+description: stress test conductor — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: stress-test-conductor
 description: Generates and persists deterministic stress-test runs for one saved answer, then summarizes the highest-risk follow-ups. Use when the goal is challenge generation and evidence pressure, not full review scoring.
 ---

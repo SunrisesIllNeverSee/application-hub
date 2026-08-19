@@ -1,3 +1,11 @@
+---
+type: Reference
+title: wellllll what do you think? On to something new or...
+description: wellllll what do you think? On to something new or... — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # wellllll what do you think? On to something new or...
 
 ## You

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Scratch — active work in progress
+description: Scratch — active work in progress — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Scratch — active work in progress
 
 > **Both agents check this BEFORE picking up a task from `TASKS.md`.**

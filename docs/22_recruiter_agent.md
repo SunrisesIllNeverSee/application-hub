@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Recruiter Agent — Deployment & Operations Guide
+description: Recruiter Agent — Deployment & Operations Guide — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Recruiter Agent — Deployment & Operations Guide
 
 _Last updated: 2026-05-11_

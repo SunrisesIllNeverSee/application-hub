@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Stress-Test Persistence
+description: Stress-Test Persistence — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Stress-Test Persistence
 
 `hub_stress_test_answer` already provides deterministic answer review context and can now persist generated runs when `persist_result=true`. Migration `012_launch_hardening.sql` provides the backing table.

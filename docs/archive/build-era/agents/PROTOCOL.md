@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Agent Coordination Protocol
+description: Agent Coordination Protocol — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Agent Coordination Protocol
 
 This repo operates in a nonlinear and temporal way, but the coordination rules should still be crisp.

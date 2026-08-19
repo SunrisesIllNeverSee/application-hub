@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Aqua / Wolfram Structural Review — Findings
+description: Aqua / Wolfram Structural Review — Findings — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Aqua / Wolfram Structural Review — Findings
 
 ## Executive result

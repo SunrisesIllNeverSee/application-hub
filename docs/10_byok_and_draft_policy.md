@@ -1,3 +1,11 @@
+---
+type: Reference
+title: BYOK and Draft Policy
+description: BYOK and Draft Policy — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # BYOK and Draft Policy
 
 Application Hub should not subsidize unbounded AI drafts. The launch-safe model is:

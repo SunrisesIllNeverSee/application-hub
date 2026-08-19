@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Mos2es.xyz AQUA Deep Dive Analysis — Formatted Conversation
+description: Mos2es.xyz AQUA Deep Dive Analysis — Formatted Conversation — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Mos2es.xyz AQUA Deep Dive Analysis — Formatted Conversation
 > Copy 1 of 3 | Source: `Raw Conversation/Grok_Mos2esxyz_AQUA_Deep_Dive_Analysis_2026-05-19_09_40_13.md` | Date: May 2026
 > Format: Clean linear read. Speaker labels throughout. Code blocks fenced. Tables formatted. All junk markers removed.

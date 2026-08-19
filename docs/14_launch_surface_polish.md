@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Launch Surface Polish
+description: Launch Surface Polish — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Launch Surface Polish
 
 This note captures the UI/UX hardening that landed after the core MVP spine was already live.

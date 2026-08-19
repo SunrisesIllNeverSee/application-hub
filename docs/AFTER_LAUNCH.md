@@ -1,3 +1,11 @@
+---
+type: Reference
+title: After Launch — Deferred Feature List
+description: After Launch — Deferred Feature List — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # After Launch — Deferred Feature List
 
 These are confirmed-valuable features that were explicitly deferred until after the initial launch.

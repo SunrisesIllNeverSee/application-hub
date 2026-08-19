@@ -1,3 +1,11 @@
+---
+type: Reference
+title: FundingCake Programs
+description: FundingCake Programs — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # FundingCake Programs
 
 ## What they are

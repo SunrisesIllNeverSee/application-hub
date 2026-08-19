@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Mos2es.xyz AQUA Deep Dive Analysis
+description: Mos2es.xyz AQUA Deep Dive Analysis — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Mos2es.xyz AQUA Deep Dive Analysis
 *Source: https://grok.com/c/789ad9f4-6121-4b99-aa2f-ab5d40786409?rid=d1c239ef-ed4c-42ff-a532-ee1166c97ded*
 

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Browser Extension V1 — Spec
+description: Browser Extension V1 — Spec — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Browser Extension V1 — Spec
 
 **Status:** Scaffold complete, build pending  

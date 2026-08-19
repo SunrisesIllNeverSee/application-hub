@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: open tabs safari 2026 05 21.todo
+description: open tabs safari 2026 05 21.todo — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 source_capture: open-tabs-safari-2026-05-21T22-09-49-989Z.md
 captured_at: 2026-05-21T22:09:49Z
 triaged_at: 2026-05-22

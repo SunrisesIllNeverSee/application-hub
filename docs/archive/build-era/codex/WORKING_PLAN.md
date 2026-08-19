@@ -1,3 +1,11 @@
+---
+type: Reference
+title: My Working Plan — Application Hub Next Phase
+description: My Working Plan — Application Hub Next Phase — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # My Working Plan — Application Hub Next Phase
 
 _Personal notes. Claude Sonnet 4.6. Updated 2026-05-12._

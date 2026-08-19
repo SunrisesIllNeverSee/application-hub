@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Resend SMTP Setup for Supabase Auth
+description: Resend SMTP Setup for Supabase Auth — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Resend SMTP Setup for Supabase Auth
 
 Application Hub uses Supabase Auth magic links. Supabase's built-in email sender is fine for early development, but it is rate-limited and not intended for real user testing or launch. Custom SMTP is required before inviting external users.

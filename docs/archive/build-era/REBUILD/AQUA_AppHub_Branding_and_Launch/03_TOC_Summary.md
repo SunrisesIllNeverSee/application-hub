@@ -1,3 +1,11 @@
+---
+type: Reference
+title: AQUA / Application Hub Branding & Launch — Conversation TOC & Summary
+description: AQUA / Application Hub Branding & Launch — Conversation TOC & Summary — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # AQUA / Application Hub Branding & Launch — Conversation TOC & Summary
 > Source: `Raw Conversation/XGrok_Grok_X_2026-05-20_08_43_51.md`
 > Format: 45 numbered turns. Spans Jeremy Howard viral story → deep dives on mos2es.xyz / MO§ES™ → branding alternatives → competitor analysis → Chrome extension / persona data structures → portability standards → investor outreach targets → ElevenLabs grant → final AQUA launch post + hashtags.

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Cold Outreach Platform Brainstorm (coldoutreach.com) — Conversation TOC & Summary
+description: Cold Outreach Platform Brainstorm (coldoutreach.com) — Conversation TOC & Summary — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Cold Outreach Platform Brainstorm (coldoutreach.com) — Conversation TOC & Summary
 > Source: `Raw Conversation/XGrok_Grok_X_2026-05-20_08_54_00.md`
 > Format: 4 numbered turns. The arc moves from concept spark → distribution hook → spam control → build/validate decision.

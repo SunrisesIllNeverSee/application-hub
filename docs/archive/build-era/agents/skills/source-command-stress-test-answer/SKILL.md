@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: SKILL
+description: SKILL — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: "source-command-stress-test-answer"
 description: "Generate and persist a saved-answer stress test, then summarize the highest-risk prompts."
 ---

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: External Integrations
+description: External Integrations — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # External Integrations
 
 **Analysis Date:** 2026-05-21

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Portal ToS Audit — V1 Extension Whitelist
+description: Portal ToS Audit — V1 Extension Whitelist — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Portal ToS Audit — V1 Extension Whitelist
 
 _Last updated: 2026-05-11_

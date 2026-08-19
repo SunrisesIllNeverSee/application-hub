@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Architecture
+description: Architecture — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Architecture
 
 **Analysis Date:** 2026-05-21

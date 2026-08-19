@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Launch Checklist
+description: Launch Checklist — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Launch Checklist
 
 This is the practical ship/no-ship checklist for a Milestone 3 push.

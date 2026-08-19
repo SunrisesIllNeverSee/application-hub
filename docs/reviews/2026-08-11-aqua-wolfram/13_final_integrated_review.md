@@ -1,3 +1,11 @@
+---
+type: Reference
+title: 13 — Final Integrated Aqua × Wolfram Review
+description: 13 — Final Integrated Aqua × Wolfram Review — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # 13 — Final Integrated Aqua × Wolfram Review
 
 ## Executive conclusion

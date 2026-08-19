@@ -1,3 +1,11 @@
+---
+type: Reference
+title: ARCHIVE NOTES — Application Hub / AQUA
+description: ARCHIVE NOTES — Application Hub / AQUA — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # ARCHIVE NOTES — Application Hub / AQUA
 
 _Frozen: 2026-05-14_

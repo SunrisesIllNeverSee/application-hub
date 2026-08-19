@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: SKILL
+description: SKILL — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: "source-command-review-answer-fit"
 description: "Review one saved answer against a specific program and persist the result."
 ---

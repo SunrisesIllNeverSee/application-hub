@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Three Infrastructure Tasks — 2026-05-12
+description: Three Infrastructure Tasks — 2026-05-12 — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Three Infrastructure Tasks — 2026-05-12
 
 Completed three queued items from the roadmap: Ranking RPC, dependency audit, and portability guardrail.

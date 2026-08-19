@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Task List
+description: Application Hub — Task List — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Task List
 
 Current phase: **Pound-out loop shipped (2026-08-12) — operator corpus load + daily-driver verification next**

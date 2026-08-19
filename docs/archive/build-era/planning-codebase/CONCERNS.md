@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Codebase Concerns
+description: Codebase Concerns — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Codebase Concerns
 
 **Analysis Date:** 2026-05-21

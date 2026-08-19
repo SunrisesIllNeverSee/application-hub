@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: stress test answer
+description: stress test answer — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 description: Generate and persist a saved-answer stress test, then summarize the highest-risk prompts.
 argument-hint: "<answer_id> [program_id] [light|medium|deep]"
 ---

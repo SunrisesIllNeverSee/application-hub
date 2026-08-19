@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Architecture
+description: Application Hub — Architecture — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Architecture
 
 _Last updated: 2026-05-11_

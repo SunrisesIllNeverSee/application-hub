@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Build Plan — Application Hub
+description: Build Plan — Application Hub — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Build Plan — Application Hub
 > Ello Cello LLC
 

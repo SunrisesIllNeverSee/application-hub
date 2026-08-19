@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Claude Context
+description: Application Hub — Claude Context — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Claude Context
 
 > ⚠️ **READ THIS FIRST — DATA REALITY CHECK (updated 2026-08-12)**

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: ADR-001 — Cross-Theme Portability
+description: ADR-001 — Cross-Theme Portability — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # ADR-001 — Cross-Theme Portability
 
 **Status:** Accepted  

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Full Product Roadmap
+description: Application Hub — Full Product Roadmap — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Full Product Roadmap
 
 **Ello Cello LLC · From MCP server to funded platform intelligence layer**

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: devan1
+description: devan1 — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 This is a strong rebrand — "AQUA" (Applications. Questions. Answers.) is memorable and the positioning is much clearer. The core concept maps directly to the three pillars you want in the sidebar.
 
 ## Proposed Sidebar Structure

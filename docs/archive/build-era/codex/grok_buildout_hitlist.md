@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Grok Buildout Hit List
+description: Grok Buildout Hit List — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Grok Buildout Hit List
 > Derived from codex/Grokraw.md — Grok's full strategic + technical session.
 > Ordered by dependency chain, not arbitrary priority.

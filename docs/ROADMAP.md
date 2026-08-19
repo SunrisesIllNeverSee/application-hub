@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Launch Roadmap
+description: Application Hub — Launch Roadmap — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Launch Roadmap
 
 > **We are nonlinear and temporal.** This project does not run on calendar sprints.

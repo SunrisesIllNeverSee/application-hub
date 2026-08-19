@@ -1,3 +1,11 @@
+---
+type: Reference
+title: 11 — Wolfram Computational Results
+description: 11 — Wolfram Computational Results — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # 11 — Wolfram Computational Results
 
 ## Scope

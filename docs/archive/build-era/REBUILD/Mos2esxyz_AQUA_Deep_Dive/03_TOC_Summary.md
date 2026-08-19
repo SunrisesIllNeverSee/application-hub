@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Mos2es.xyz AQUA Deep Dive Analysis — Conversation TOC & Summary
+description: Mos2es.xyz AQUA Deep Dive Analysis — Conversation TOC & Summary — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Mos2es.xyz AQUA Deep Dive Analysis — Conversation TOC & Summary
 > Source: `Raw Conversation/Grok_Mos2esxyz_AQUA_Deep_Dive_Analysis_2026-05-19_09_40_13.md`
 > Format: 15 numbered turns. The conversation moves from transfer-points analysis into the Hub-and-Spoke + Canonical Commitment Engine architecture, full Supabase schema + Edge Function delivery, rewards/monetization, UI components (ingestion, variation, smart matcher), Chrome extension, Okara-style landing, foundational sources recipe, and an enhanced bidirectional web extension.

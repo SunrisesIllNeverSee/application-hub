@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Milestone: 2026-05-11 — End-to-end BYOK + AI drafting live
+description: Milestone: 2026-05-11 — End-to-end BYOK + AI drafting live — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Milestone: 2026-05-11 — End-to-end BYOK + AI drafting live
 
 > The day Application Hub became a real AI-native SaaS that anyone can sign up to and use.

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Canonical Rebuild Implementation Tasks
+description: Canonical Rebuild Implementation Tasks — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Canonical Rebuild Implementation Tasks
 
 Source: `REBUILD/Mos2esxyz_AQUA_Deep_Dive/01_Formatted_Conversation.md` and Deric's May 20 implementation request.

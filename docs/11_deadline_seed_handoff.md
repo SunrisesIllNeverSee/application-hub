@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Deadline Seed Handoff
+description: Deadline Seed Handoff — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Deadline Seed Handoff
 
 The product should not show every program as "Rolling" at public launch, but deadlines change too often to guess.

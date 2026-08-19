@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Stripe webhook diagnostic — 2026-05-11
+description: Stripe webhook diagnostic — 2026-05-11 — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Stripe webhook diagnostic — 2026-05-11
 
 Archived from commit `9d6e6b4` (debug log) before removing it from production code in a follow-up commit.

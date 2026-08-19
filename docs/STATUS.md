@@ -1,3 +1,11 @@
+---
+type: Reference
+title: AQUA — Status
+description: AQUA — Status — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # AQUA — Status
 
 > ⚠️ **DATA REALITY CHECK (updated 2026-08-12)**

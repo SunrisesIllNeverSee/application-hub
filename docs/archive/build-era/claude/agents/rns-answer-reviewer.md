@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: rns answer reviewer
+description: rns answer reviewer — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: rns-answer-reviewer
 description: Reviews one saved Application Hub answer, produces structured comments and scores, and persists the result through MCP. Use when you need an actual stored answer review rather than a draft.
 ---

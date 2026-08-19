@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Beta Mode — Operator Runbook
+description: Beta Mode — Operator Runbook — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Beta Mode — Operator Runbook
 
 How beta mode works, how to toggle it, how to end it.

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: V1 Automation — Architecture Plan
+description: V1 Automation — Architecture Plan — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # V1 Automation — Architecture Plan
 
 _Last updated: 2026-05-11_

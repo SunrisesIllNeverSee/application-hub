@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Testing Patterns
+description: Testing Patterns — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Testing Patterns
 
 **Analysis Date:** 2026-05-21

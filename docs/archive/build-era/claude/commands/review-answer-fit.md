@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: review answer fit
+description: review answer fit — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 description: Review one saved answer against a specific program and persist the result.
 argument-hint: "<answer_id> <program_id>"
 ---

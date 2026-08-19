@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Curated Ingest Lane
+description: Curated Ingest Lane — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Curated Ingest Lane
 
 Application Hub does not need a broad startup-ecosystem database.

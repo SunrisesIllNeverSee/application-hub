@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Security Policy
+description: Application Hub — Security Policy — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Security Policy
 
 _Last updated: 2026-05-11_

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Plan: Funders / Organizations Archive
+description: Plan: Funders / Organizations Archive — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Plan: Funders / Organizations Archive
 
 _Written 2026-05-11. Implementation blocked on repo cleanup (issue #1) first._

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: raw
+description: raw — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 this product was built of of need for founders... however also realized its cross over use for all applications specialized and generic like jobs.... we were supposed to create a kind of toggle swittch to turn on tech start mode or switch inbetween generalization application questions for all main areas and then have modes or themes geared towards tech start ups, grants, universiy, jobs and then jobs could fucking be broken down... i dont mind building out the specialy modes or themes later however right now i need the site to be able to communicate it is doing both right now ...  not just doing but cover both general and specialized... with the specialized first theme beign tech start up
 
 

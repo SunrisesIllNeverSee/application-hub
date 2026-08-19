@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Program Directory
+description: Program Directory — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Program Directory
 **30 programs · Last updated May 2026**
 

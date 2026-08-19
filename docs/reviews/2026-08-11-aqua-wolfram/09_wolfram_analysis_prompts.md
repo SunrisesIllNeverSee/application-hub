@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Aqua × Wolfram Analysis Prompt Pack
+description: Aqua × Wolfram Analysis Prompt Pack — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Aqua × Wolfram Analysis Prompt Pack
 
 ## Purpose

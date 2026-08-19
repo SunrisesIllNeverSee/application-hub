@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Migration Policy
+description: Application Hub — Migration Policy — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Migration Policy
 
 _Last updated: 2026-08-12_

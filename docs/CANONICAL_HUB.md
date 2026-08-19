@@ -1,3 +1,11 @@
+---
+type: Reference
+title: AQUA Canonical Hub
+description: AQUA Canonical Hub — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # AQUA Canonical Hub
 
 The Canonical Hub is the portable application core for AQUA. It lets one user answer become reusable across founder programs, college applications, grants, and jobs without collapsing everything into a founder-only model.

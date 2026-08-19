@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Branding Research Session — ChatGPT Deep Dive
+description: Branding Research Session — ChatGPT Deep Dive — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Branding Research Session — ChatGPT Deep Dive
 
 > Raw conversation preserved. Formatted for readability. All ChatGPT analysis kept verbatim.

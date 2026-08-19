@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Mos2es.xyz AQUA Deep Dive Analysis — Structured by Turns
+description: Mos2es.xyz AQUA Deep Dive Analysis — Structured by Turns — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Mos2es.xyz AQUA Deep Dive Analysis — Structured by Turns
 > Copy 2 of 3 | Source: `Raw Conversation/Grok_Mos2esxyz_AQUA_Deep_Dive_Analysis_2026-05-19_09_40_13.md`
 > Each turn is a numbered section. USER = Deric's messages. GROK = responses.

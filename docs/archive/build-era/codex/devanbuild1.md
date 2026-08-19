@@ -1,3 +1,11 @@
+---
+type: Reference
+title: devanbuild1
+description: devanbuild1 — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 AQUA UX Restructure — Sidebar, Routes, and Branding
 Repository: SunrisesIllNeverSee/application-hub
 Context

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Research & Build Plan
+description: Application Hub — Research & Build Plan — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Research & Build Plan
 
 ---

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Hub — Agent Coordination
+description: Application Hub — Agent Coordination — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Application Hub — Agent Coordination
 
 > Read this before touching anything. Both Cowork (Claude) and Codex should read this file at the start of every session.

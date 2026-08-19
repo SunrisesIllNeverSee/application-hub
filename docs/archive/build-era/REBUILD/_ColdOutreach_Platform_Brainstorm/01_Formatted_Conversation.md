@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Cold Outreach Platform Brainstorm (coldoutreach.com) — Formatted Conversation
+description: Cold Outreach Platform Brainstorm (coldoutreach.com) — Formatted Conversation — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Cold Outreach Platform Brainstorm (coldoutreach.com) — Formatted Conversation
 > Copy 1 of 3 | Source: `Raw Conversation/XGrok_Grok_X_2026-05-20_08_54_00.md` | Date: May 2026
 > Format: Clean linear read. Speaker labels throughout. Code blocks fenced. Tables formatted. All junk markers removed.

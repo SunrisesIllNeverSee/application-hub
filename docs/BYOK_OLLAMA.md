@@ -1,3 +1,11 @@
+---
+type: Reference
+title: BYOK Ollama setup — local model on production
+description: BYOK Ollama setup — local model on production — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # BYOK Ollama setup — local model on production
 
 > Verified working on 2026-05-11. End-to-end: `mos2es.xyz` → Cloudflare tunnel → laptop Ollama → llama3.1:8b → draft text streamed back into the workspace UI.

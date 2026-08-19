@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: SKILL
+description: SKILL — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: testing-application-hub
 description: Test the Application Hub Next.js app end-to-end. Use when verifying UI changes, API endpoints, branding updates, or new page routes.
 ---

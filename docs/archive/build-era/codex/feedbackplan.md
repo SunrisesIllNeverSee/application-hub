@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Product Direction Plan — from feedback.md
+description: Product Direction Plan — from feedback.md — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Product Direction Plan — from feedback.md
 
 _Derived from Deric's feedback + Claude addendum. 2026-05-12._

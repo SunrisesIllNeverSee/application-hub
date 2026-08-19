@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Plan: Questions Archive
+description: Plan: Questions Archive — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Plan: Questions Archive
 
 _Written 2026-05-11. Implementation blocked on repo cleanup (issue #1) first._

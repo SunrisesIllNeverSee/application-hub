@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Canonical Rebuild Data Reset Recipe
+description: Canonical Rebuild Data Reset Recipe — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Canonical Rebuild Data Reset Recipe
 
 This is the reset lane from `docs/archive/build-era/ARCHIVE_NOTES.md`, rewritten as an explicit operator checklist. Do not run it casually. Back up Supabase first and confirm the real-data import path is ready.

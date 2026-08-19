@@ -1,3 +1,11 @@
+---
+type: Reference
+title: FundingCake Ingest Pipeline — Methodology & Results
+description: FundingCake Ingest Pipeline — Methodology & Results — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # FundingCake Ingest Pipeline — Methodology & Results
 
 _Completed: 2026-05-12 (mcp-eval session, Claude Sonnet 4.6)_

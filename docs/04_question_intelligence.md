@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Question Intelligence Layer
+description: Question Intelligence Layer — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Question Intelligence Layer
 > What the questions reveal. How we score it all.
 

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Cold Outreach Platform Brainstorm (coldoutreach.com) — Structured by Turns
+description: Cold Outreach Platform Brainstorm (coldoutreach.com) — Structured by Turns — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Cold Outreach Platform Brainstorm (coldoutreach.com) — Structured by Turns
 > Copy 2 of 3 | Source: `Raw Conversation/XGrok_Grok_X_2026-05-20_08_54_00.md`
 > Each turn is a numbered section. USER = Deric's messages. GROK = responses.

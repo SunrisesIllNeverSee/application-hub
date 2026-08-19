@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Repo Cleanup Review Gate
+description: Repo Cleanup Review Gate — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Repo Cleanup Review Gate
 
 _Published 2026-05-11_

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: SMTP Launch Handoff
+description: SMTP Launch Handoff — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # SMTP Launch Handoff
 
 Canonical setup guide: `docs/08_resend_smtp_setup.md`.

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: AQUA — Build Foundation
+description: AQUA — Build Foundation — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # AQUA — Build Foundation
 
 _Claude Sonnet 4.6. 2026-05-12._

@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Application Intake Taxonomy
+description: Application Intake Taxonomy — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Application Intake Taxonomy
 
 > Internal architecture doc. Public product stays founder-first. This is the engine layer.

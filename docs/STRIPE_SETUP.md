@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Stripe setup checklist — Application Hub
+description: Stripe setup checklist — Application Hub — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Stripe setup checklist — Application Hub
 
 > Walkthrough to wire up Stripe Billing for the freemium SaaS model.

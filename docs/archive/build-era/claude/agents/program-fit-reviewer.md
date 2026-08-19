@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: program fit reviewer
+description: program fit reviewer — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: program-fit-reviewer
 description: Reviews one saved answer against a specific program's DNA and application context, then persists the review through MCP. Use when fit-to-program matters more than broad answer reuse.
 ---

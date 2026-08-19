@@ -1,3 +1,11 @@
+---
+type: Reference
+title: AQUA / Application Hub Branding & Launch — Formatted Conversation
+description: AQUA / Application Hub Branding & Launch — Formatted Conversation — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # AQUA / Application Hub Branding & Launch — Formatted Conversation
 > Copy 1 of 3 | Source: `Raw Conversation/XGrok_Grok_X_2026-05-20_08_43_51.md` | Date: May 2026
 > Format: Clean linear read. Speaker labels throughout. Code blocks fenced. Tables formatted. All junk markers removed.

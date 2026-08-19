@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: review answer
+description: review answer — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 description: Run the saved-answer reviewer loop for one answer and persist the result.
 argument-hint: "<answer_id> [program_id]"
 ---

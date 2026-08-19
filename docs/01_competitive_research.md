@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Competitive Research — Application Hub
+description: Competitive Research — Application Hub — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Competitive Research — Application Hub
 
 > Last updated: May 2026. Revisit after the next archive-quality pass, not after a fixed seed-count milestone.

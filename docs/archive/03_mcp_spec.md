@@ -1,3 +1,11 @@
+---
+type: Reference
+title: MCP Server Spec — Application Hub
+description: MCP Server Spec — Application Hub — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # MCP Server Spec — Application Hub
 > Ello Cello LLC
 

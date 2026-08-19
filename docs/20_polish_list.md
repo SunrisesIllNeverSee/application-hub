@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Polish List
+description: Polish List — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Polish List
 
 _Last updated: 2026-05-11_

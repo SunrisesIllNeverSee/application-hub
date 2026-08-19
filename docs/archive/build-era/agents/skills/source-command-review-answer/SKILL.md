@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: SKILL
+description: SKILL — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: "source-command-review-answer"
 description: "Run the saved-answer reviewer loop for one answer and persist the result."
 ---

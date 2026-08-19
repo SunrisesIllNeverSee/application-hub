@@ -1,3 +1,11 @@
+---
+type: Reference
+title: feedback2
+description: feedback2 — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 Found it. This is the original product vision document that many of the deferred features in `AFTER_LAUNCH.md` were drawn from. It includes a recent addendum (2026-05-12) with strategic commentary.
 
 ## Key Sections:

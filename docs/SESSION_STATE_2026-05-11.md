@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Session state — 2026-05-11 evening
+description: Session state — 2026-05-11 evening — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Session state — 2026-05-11 evening
 
 > Snapshot of what's running, where it's pointing, and what's coordinated across the parallel sessions.

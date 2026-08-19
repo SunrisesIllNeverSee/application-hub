@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Grok Research Session — Application Hub Strategic Analysis
+description: Grok Research Session — Application Hub Strategic Analysis — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
 # Grok Research Session — Application Hub Strategic Analysis
 
 > Raw conversation preserved. Formatted for readability. All Grok suggestions kept verbatim.

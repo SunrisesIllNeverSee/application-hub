@@ -1,3 +1,11 @@
+---
+type: Reference
+title: REPAIR PLAN v2 — application-hub repo rehabilitation
+description: REPAIR PLAN v2 — application-hub repo rehabilitation — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # REPAIR PLAN v2 — application-hub repo rehabilitation
 
 > **Regenerated:** 2026-08-12 (v2) by the Devin audit session after the v1 file was lost uncommitted.

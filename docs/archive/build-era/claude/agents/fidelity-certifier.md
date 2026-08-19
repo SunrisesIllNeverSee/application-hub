@@ -1,4 +1,12 @@
 ---
+type: Reference
+title: fidelity certifier
+description: fidelity certifier — documentation in docs/.
+tags: [documentation, archive, docs]
+timestamp: 2026-08-19
+---
+
+---
 name: fidelity-certifier
 description: Reviews a saved answer for claim support, reuse safety, and certification readiness, then persists the result. Use when the main question is whether an answer is strong enough to reuse widely.
 ---

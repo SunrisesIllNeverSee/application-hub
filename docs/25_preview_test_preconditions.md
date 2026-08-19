@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Preview Test Preconditions
+description: Preview Test Preconditions — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Preview Test Preconditions
 
 This document exists to stop the team from burning time and usage on preview tests that are structurally blocked before they start.

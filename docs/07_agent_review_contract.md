@@ -1,3 +1,11 @@
+---
+type: Reference
+title: Agent-Side Answer Review Contract
+description: Agent-Side Answer Review Contract — documentation in docs/.
+tags: [documentation, docs]
+timestamp: 2026-08-19
+---
+
 # Agent-Side Answer Review Contract
 
 Application Hub separates hosted drafting from deeper review. The app can create a first-pass draft through `POST /api/draft`, save it to the answer bank, and keep the product loop fast. Review comments, RNS signal analysis, answer fidelity, commitment conservation, and certification can run from Deric's side through MCP/agent workflows over saved answers.
