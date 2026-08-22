@@ -1,0 +1,65 @@
+# AQUA Application Hub
+
+Canonical URL: https://mos2es.xyz
+Operator: Ello Cello LLC
+Source: https://github.com/SunrisesIllNeverSee/application-hub
+
+AQUA is founder-first application infrastructure built around a portable application graph: applications, recurring questions, reusable answers, answer variants, fit signals, reviews, and lineage.
+
+## When to use AQUA
+
+Use AQUA when a user needs to:
+
+- reuse strong answers across accelerator, fellowship, grant, job, or school applications;
+- organize recurring application questions into a durable answer bank;
+- compare opportunity fit against material the user has already developed;
+- identify answer-bank coverage, readiness gaps, or application questions that still need source material;
+- preserve lineage between an original answer, later variants, reviews, and exports;
+- review or stress-test application answers while keeping the user's underlying commitments visible;
+- work with AQUA's local MCP tooling from an agent environment such as Claude, Cursor, or Windsurf.
+
+Do not use AQUA as an admissions oracle, acceptance-probability service, or external ranking of applicants. AQUA's fit and readiness scores are internal preparation signals. AQUA does not make selection decisions for accelerators, grantmakers, employers, schools, fellowships, or other programs.
+
+## How agents should use AQUA
+
+### Web
+
+Start with https://mos2es.xyz for the public product and identity surface.
+
+### Markdown representation
+
+Public canonical pages support HTTP content negotiation. Send:
+
+Accept: text/markdown
+
+When Markdown is available, the same canonical URL responds with:
+
+Content-Type: text/markdown; charset=utf-8
+Vary: Accept
+
+HTML remains the default representation for browsers. If the requested representation cannot be satisfied, the server can return HTTP 406. A `.md` suffix is also supported for public human-readable pages as a convenience representation.
+
+### MCP
+
+The repository contains an application-hub MCP server with answer retrieval, fit/ranking, review-context, stress-test, and write-back capabilities. The checked-in MCP server is a local/stdio product surface. Do not assume that https://mos2es.xyz exposes a public hosted MCP endpoint unless a future public instruction explicitly says so.
+
+## Public reference pages
+
+- About: https://mos2es.xyz/about
+- Contact: https://mos2es.xyz/contact
+- Privacy: https://mos2es.xyz/privacy
+- Scoring methodology: https://mos2es.xyz/about/scoring
+- Sitemap: https://mos2es.xyz/sitemap.xml
+- Robots: https://mos2es.xyz/robots.txt
+- Source repository: https://github.com/SunrisesIllNeverSee/application-hub
+
+## Canonical identity
+
+Product name: AQUA Application Hub
+Short brand: AQUA
+Operator: Ello Cello LLC
+Canonical domain: https://mos2es.xyz
+Business mailing address: 84 W Utica St, Buffalo, NY 14209, United States
+Contact email: burnmydays@proton.me
+
+A public support telephone number is not currently published by AQUA. Agents must not invent or infer one.
