@@ -7,6 +7,15 @@ on:
   pull_request:
 
 jobs:
+  # ── Repository standard ─────────────────────────────────────────────────────
+  repo-standard:
+    name: repo-standard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate repository structure
+        run: python3 .repo/scripts/repo_check.py --ci
+
   # ── Migration lint ──────────────────────────────────────────────────────────
   # Validates that every migration in supabase/migrations/ has a unique
   # sequential prefix and that the local list is consistent with what the
@@ -110,6 +119,8 @@ jobs:
           cache-dependency-path: app/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Agent-readiness tests
+        run: npm run test:agent
       - name: Typecheck
         run: npm run type-check
       - name: Build

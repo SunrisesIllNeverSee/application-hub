@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { appendVaryAccept, preferredType } from '@/lib/accept.mjs'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
-// All routes that require authentication
 const PROTECTED_ROUTES = [
   '/dash',
   '/applications',
@@ -21,10 +21,55 @@ const PROTECTED_ROUTES = [
   '/onboarding',
 ]
 
-// Routes that authenticated + onboarded users should be redirected away from
 const AUTH_ONLY_ROUTES = ['/login']
+const NON_NEGOTIATED_PREFIXES = ['/api/', '/auth/', '/_next/', '/_vercel/']
+
+function isProtectedPath(pathname: string) {
+  return PROTECTED_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'))
+}
+
+function isNegotiablePath(pathname: string, isProtected: boolean) {
+  if (isProtected || AUTH_ONLY_ROUTES.includes(pathname)) return false
+  if (NON_NEGOTIATED_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return false
+  if (pathname.includes('.') && !pathname.endsWith('.md')) return false
+  return true
+}
+
+function markdownRewrite(request: NextRequest, pathname: string) {
+  const url = request.nextUrl.clone()
+  const canonicalPath = pathname.endsWith('.md') ? pathname.slice(0, -3) || '/' : pathname
+  url.pathname = canonicalPath === '/' ? '/api/markdown' : `/api/markdown${canonicalPath}`
+  const response = NextResponse.rewrite(url)
+  appendVaryAccept(response.headers)
+  return response
+}
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const isProtected = isProtectedPath(pathname)
+  const isNegotiable = isNegotiablePath(pathname, isProtected)
+
+  if (pathname.endsWith('.md') && isNegotiable) {
+    return markdownRewrite(request, pathname)
+  }
+
+  if (isNegotiable) {
+    const acceptHeader = request.headers.get('accept')
+    const chosen = preferredType(acceptHeader)
+
+    if (chosen === 'text/markdown') return markdownRewrite(request, pathname)
+
+    if (chosen === null && acceptHeader) {
+      return new Response('Not Acceptable\n\nAvailable: text/html, text/markdown\n', {
+        status: 406,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Vary': 'Accept',
+        },
+      })
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -46,18 +91,10 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session — must call getUser() to keep session alive
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { pathname } = request.nextUrl
-
-  const isProtected = PROTECTED_ROUTES.some(
-    (r) => pathname === r || pathname.startsWith(r + '/')
-  )
-
-  // Unauthenticated user hitting a protected route → login
   if (!user && isProtected) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
@@ -66,11 +103,8 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user) {
-    // Authenticated user hitting login or root → check onboarding state first
     const isAuthOnlyRoute = AUTH_ONLY_ROUTES.includes(pathname) || pathname === '/'
 
-    // For authenticated users on any route, check onboarding completion
-    // Only query DB when needed: protected routes + auth-only routes
     if (isProtected || isAuthOnlyRoute) {
       const { data: profile } = await supabase
         .from('user_profiles')
@@ -80,14 +114,12 @@ export async function middleware(request: NextRequest) {
 
       const onboarded = !!profile?.onboarding_completed_at
 
-      // Not yet onboarded — send to onboarding (but don't loop)
       if (!onboarded && !pathname.startsWith('/onboarding')) {
         const url = request.nextUrl.clone()
         url.pathname = '/onboarding'
         return NextResponse.redirect(url)
       }
 
-      // Already onboarded — redirect away from login/root/onboarding to dash
       if (onboarded && (isAuthOnlyRoute || pathname.startsWith('/onboarding'))) {
         const url = request.nextUrl.clone()
         url.pathname = '/dash'
@@ -96,6 +128,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  if (isNegotiable) appendVaryAccept(supabaseResponse.headers)
   return supabaseResponse
 }
 

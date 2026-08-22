@@ -6,10 +6,8 @@ import { join } from 'path'
 import { tmpdir } from 'os'
 
 // fundscore is a CJS module — use dynamic import to avoid ESM issues
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let fundscore: any
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   fundscore = require('fundscore')
 } catch {
   fundscore = null
@@ -97,7 +95,6 @@ export async function POST() {
     const repoPath = join(tempDir, 'repo')
 
     // Run fundscore
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const report = fundscore.score(repoPath) as any
 
     const result: FundScoreResult = {
@@ -128,10 +125,8 @@ export async function POST() {
 
     const { error: upsertError } = await supabase
       .from('user_profiles')
-      .upsert(
-        { user_id: user.id, applicant_context: next },
-        { onConflict: 'user_id' }
-      )
+      .update({ applicant_context: next })
+      .eq('user_id', user.id)
 
     if (upsertError) {
       return NextResponse.json({ error: upsertError.message }, { status: 500 })
@@ -140,7 +135,11 @@ export async function POST() {
     return NextResponse.json(result)
   } finally {
     if (tempDir) {
-      rmSync(tempDir, { recursive: true, force: true })
+      try {
+        rmSync(tempDir, { recursive: true, force: true })
+      } catch {
+        // best-effort cleanup
+      }
     }
   }
 }
