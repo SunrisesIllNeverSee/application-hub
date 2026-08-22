@@ -30,11 +30,15 @@ test('Vary preserves framework dimensions and includes Accept once', () => {
   assert.equal(vary.toLowerCase().split('accept').length - 1, 1)
 })
 
-test('public HTML routes declare Accept in framework Vary headers', async () => {
+test('public HTML routes declare Accept in framework and Vercel Vary headers', async () => {
   const config = await read('next.config.mjs')
-  assert.match(config, /Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch/)
-  for (const pathname of ["'/'", "'/about'", "'/about/scoring'", "'/contact'", "'/privacy'"]) {
-    assert.ok(config.includes(pathname), `missing public Vary route ${pathname}`)
+  const vercel = JSON.parse(await read('vercel.json'))
+  const expected = 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch'
+  assert.ok(config.includes(expected))
+
+  const expectedRoutes = ['/', '/about', '/about/scoring', '/contact', '/privacy']
+  for (const pathname of expectedRoutes) {
+    assert.ok(vercel.headers.some((entry) => entry.source === pathname && entry.headers.some((header) => header.key === 'Vary' && header.value === expected)), `missing Vercel Vary route ${pathname}`)
   }
 })
 
