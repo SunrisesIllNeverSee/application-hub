@@ -12,45 +12,35 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://mos2es.xyz'),
   title: {
-    default: 'AQUA',
+    default: 'AQUA Application Hub',
     template: '%s — AQUA',
   },
   description:
-    'Applications. Questions. Answers. A structured intelligence system for reusable applications. Fill once, improve continuously, apply everywhere.',
+    'AQUA Application Hub turns recurring application questions, reusable answers, fit signals, and review history into a portable application graph.',
   keywords: [
-    'applications',
-    'questions',
-    'answers',
-    'accelerator',
-    'grants',
-    'fellowship',
-    'startup',
-    'YC',
-    'Techstars',
+    'AQUA Application Hub',
+    'AQUA',
+    'application answer bank',
+    'application infrastructure',
+    'accelerator applications',
+    'grant applications',
+    'fellowship applications',
+    'startup applications',
     'job applications',
     'school applications',
-    'common app',
-    'NSF',
-    'NIH',
-    'university applications',
-    'graduate school',
   ],
   authors: [{ name: 'Ello Cello LLC' }],
   openGraph: {
     type: 'website',
     url: 'https://mos2es.xyz',
-    siteName: 'AQUA',
-    title: 'AQUA — Applications. Questions. Answers.',
+    siteName: 'AQUA Application Hub',
+    title: 'AQUA Application Hub — Applications. Questions. Answers.',
     description:
-      'Applications. Questions. Answers. A structured intelligence system for reusable applications. Fill once, improve continuously, apply everywhere.',
+      'Build a reusable answer bank, preserve source lineage, and understand opportunity fit across applications.',
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
