@@ -1,8 +1,76 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 const logos = ['Y Combinator', 'Techstars', 'a16z', '500 Global', 'Stanford', 'NSF', 'Stripe', 'Google']
+
+export const metadata: Metadata = {
+  title: 'AQUA Application Hub',
+  description:
+    'AQUA Application Hub turns recurring application questions, reusable answers, fit signals, and review history into a portable application graph.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    url: 'https://mos2es.xyz',
+    siteName: 'AQUA Application Hub',
+    title: 'AQUA Application Hub — Applications. Questions. Answers.',
+    description: 'Build a reusable answer bank, preserve source lineage, and understand opportunity fit across applications.',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'AQUA Application Hub' }],
+  },
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://mos2es.xyz/#organization',
+      name: 'Ello Cello LLC',
+      url: 'https://mos2es.xyz',
+      email: 'burnmydays@proton.me',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '84 W Utica St',
+        addressLocality: 'Buffalo',
+        addressRegion: 'NY',
+        postalCode: '14209',
+        addressCountry: 'US',
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'burnmydays@proton.me',
+        url: 'https://mos2es.xyz/contact',
+        availableLanguage: ['English'],
+      },
+      sameAs: [
+        'https://mos2es.com',
+        'https://github.com/SunrisesIllNeverSee/application-hub',
+      ],
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': 'https://mos2es.xyz/#aqua',
+      name: 'AQUA Application Hub',
+      alternateName: 'AQUA',
+      url: 'https://mos2es.xyz',
+      description:
+        'Founder-first application infrastructure for reusable questions, answers, opportunity fit, review history, and source lineage.',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      provider: { '@id': 'https://mos2es.xyz/#organization' },
+      featureList: [
+        'Reusable application answer bank',
+        'Application question archive',
+        'Opportunity fit and readiness signals',
+        'Answer lineage and variants',
+        'Persisted reviews and stress tests',
+        'Local MCP agent tools',
+      ],
+    },
+  ],
+}
 
 export default async function RootPage() {
   const supabase = await createClient()
@@ -14,10 +82,15 @@ export default async function RootPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
+
       <header className="sticky top-0 z-30 border-b border-neutral-800/70 bg-neutral-950/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="text-xl font-bold tracking-tight">AQUA</Link>
-          <nav className="flex items-center gap-5 text-sm text-neutral-400">
+          <nav className="flex items-center gap-5 text-sm text-neutral-400" aria-label="Primary navigation">
             <a className="hidden transition-colors hover:text-neutral-100 sm:inline" href="#matcher">Smart Matcher</a>
             <a className="hidden transition-colors hover:text-neutral-100 sm:inline" href="#features">Features</a>
             <Link className="btn-primary px-3 py-1.5 text-xs" href="/login">Start Free</Link>
@@ -91,9 +164,21 @@ export default async function RootPage() {
         </section>
 
         <section className="border-y border-neutral-900 bg-neutral-950 px-4 py-10 sm:px-6">
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-neutral-500">Trusted at top accelerators, universities and companies</p>
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-neutral-500">Works across accelerator, grant, fellowship, school and company application workflows</p>
           <div className="mx-auto mt-6 flex max-w-5xl flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-neutral-300">
             {logos.map((logo) => <span key={logo}>{logo}</span>)}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-5xl px-4 py-20 sm:px-6">
+          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">AQUA Application Hub turns repeated application work into reusable infrastructure.</h2>
+          <div className="mt-6 grid gap-6 text-base leading-7 text-neutral-300 md:grid-cols-2">
+            <p>
+              Many applications ask different versions of the same underlying questions about a team, project, evidence, goals, traction, or impact. AQUA stores those questions and the user&apos;s source answers as durable assets instead of treating every form as a blank page. Strong answers can be improved, adapted, reviewed, and reused while remaining connected to the material that produced them.
+            </p>
+            <p>
+              The result is a portable application graph: applications, questions, answers, variants, reviews, and exports share lineage. AQUA can then compare an opportunity with the material already in the bank, surface coverage and readiness gaps, and help the user decide where additional work is actually needed. Its scores are preparation signals, not admissions predictions or external endorsements.
+            </p>
           </div>
         </section>
 
@@ -127,6 +212,7 @@ export default async function RootPage() {
         </section>
 
         <section id="features" className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+          <h2 className="sr-only">AQUA application infrastructure features</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['Commitment Conservation', 'Every answer maps back to a canonical commitment, so variants stay useful without losing the original proof.'],
@@ -149,6 +235,18 @@ export default async function RootPage() {
           <Link href="/login" className="btn-primary mt-8 px-6 py-3">Start Free</Link>
         </section>
       </main>
+
+      <footer className="border-t border-neutral-900 px-4 py-8 text-sm text-neutral-500 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p>AQUA Application Hub · Ello Cello LLC</p>
+          <nav className="flex flex-wrap gap-5" aria-label="Trust and agent resources">
+            <Link className="hover:text-neutral-300" href="/about">About</Link>
+            <Link className="hover:text-neutral-300" href="/contact">Contact</Link>
+            <Link className="hover:text-neutral-300" href="/privacy">Privacy</Link>
+            <a className="hover:text-neutral-300" href="/llms.txt">Agent guidance</a>
+          </nav>
+        </div>
+      </footer>
     </div>
   )
 }
