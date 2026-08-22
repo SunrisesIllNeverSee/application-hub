@@ -11,6 +11,13 @@ const nextConfig = {
       },
     ],
   },
+  async headers() {
+    const vary = 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch'
+    return ['/', '/about', '/about/scoring', '/contact', '/privacy'].map((source) => ({
+      source,
+      headers: [{ key: 'Vary', value: vary }],
+    }))
+  },
   async redirects() {
     return [
       { source: '/today',             destination: '/dash',                   permanent: true },
