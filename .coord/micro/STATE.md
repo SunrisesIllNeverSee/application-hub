@@ -3,7 +3,7 @@ type: State
 title: Micro Session State
 description: Save/resume slot for the current repository build state.
 tags: [repo-standard, coordination, state]
-timestamp: 2026-08-21
+timestamp: 2026-08-22
 ---
 
 # Micro Session State
@@ -11,9 +11,11 @@ timestamp: 2026-08-21
 ## Current
 
 - Status: active
-- In progress: Ora Is Agentic remediation for mos2es.xyz on branch `agent-readiness-2026-08-21`
-- Next: implement agent-facing HTTP/content surfaces, tests, CI verification, then hand off/merge
-- Blockers: organization phone number is not published or verified; do not invent one for schema
+- In progress: portable Domain-Native Contribution Exchange gateway v0.1 on branch `contribution-exchange-gateway-v0-1`
+- Next: implement portable core, mos2es.xyz reference install, tests, CI verification, then hand off/merge
+- Scope: domain-native unsolicited contribution exchange first; reciprocal request path represented in schema/API; company participation required for settlement; agent registration optional
+- Economic model: configurable transaction fee on successful settlement; referral/commission rates represented but not hard-wired
+- Constraint: preserve AQUA application behavior; keep exchange code isolated and movable
 
 ## Resume order
 
