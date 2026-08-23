@@ -14,6 +14,7 @@ const LIMITS = {
   exchange_agent_signup: { windowMs: 60 * 60 * 1000, max: 10 },
   exchange_proposal: { windowMs: 60 * 60 * 1000, max: 20 },
   exchange_request: { windowMs: 60 * 60 * 1000, max: 20 },
+  exchange_message: { windowMs: 60 * 60 * 1000, max: 120 },
 } satisfies Record<string, LimitConfig>
 
 export type RateLimitAction = keyof typeof LIMITS
