@@ -66,6 +66,7 @@ create table if not exists public.exchange_records (
 
 create index if not exists exchange_records_target_domain_state_idx on public.exchange_records(target_domain, state, created_at desc);
 create index if not exists exchange_records_agent_idx on public.exchange_records(initiator_agent_id, created_at desc);
+create index if not exists exchange_records_company_idx on public.exchange_records(company_id, created_at desc);
 
 create table if not exists public.exchange_events (
   id uuid primary key default gen_random_uuid(),
