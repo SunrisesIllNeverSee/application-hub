@@ -8,7 +8,7 @@ const read=(p)=>fs.readFileSync(path.join(root,p),'utf8')
 
 test('portable package contains the state-bearing commitment fields',()=>{const types=read('exchange-gateway/src/types.ts'); for(const token of ['contribution_id','consideration','rights','vesting','authorization','verification','settlement','revocation','provenance']) assert.match(types,new RegExp(token))})
 
-test('state machine separates agreement, authorization, delivery, verification and settlement',()=>{const sm=read('exchange-gateway/src/state-machine.ts'); for(const state of ['committed','authorized','delivering','delivered','verified','settled']) assert.match(sm,new RegExp(state)); assert.match(sm,/to === 'settled'.*system/s)})
+test('state machine separates agreement authorization delivery verification settlement and closure',()=>{const sm=read('exchange-gateway/src/state-machine.ts'); for(const state of ['committed','authorized','delivering','delivered','verified','settled']) assert.match(sm,new RegExp(state)); assert.match(sm,/to === 'settled'.*system/s); assert.match(sm,/verified: \['settled', 'disputed'\]/); assert.match(sm,/settled: \['closed', 'disputed'\]/)})
 
 test('example commitment preserves cash royalty reciprocal access and pre/post vesting rights',()=>{const example=JSON.parse(read('exchange-gateway/examples/contribution-commitment.json')); assert.equal(example.origin.type,'ambient_observation'); assert.ok(example.consideration.some(x=>x.type==='cash')); assert.ok(example.consideration.some(x=>x.type==='royalty')); assert.ok(example.consideration.some(x=>x.type==='reciprocal_access')); assert.equal(example.rights.pre_vesting.deploy,'prohibited'); assert.equal(example.rights.post_vesting.deploy,'permitted')})
 
