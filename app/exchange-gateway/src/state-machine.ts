@@ -9,7 +9,7 @@ export const EXCHANGE_TRANSITIONS: Record<ExchangeState, readonly ExchangeState[
   authorized: ['delivering', 'disputed', 'revoked'],
   delivering: ['delivered', 'disputed', 'revoked'],
   delivered: ['verified', 'disputed'],
-  verified: ['settled', 'closed', 'disputed'],
+  verified: ['settled', 'disputed'],
   settled: ['closed', 'disputed'],
   disputed: ['negotiating', 'closed', 'revoked'],
   closed: [],
