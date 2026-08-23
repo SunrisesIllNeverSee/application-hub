@@ -1,34 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: false,
-  },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-  },
+  experimental: { typedRoutes: false },
+  images: { remotePatterns: [{ protocol: 'https', hostname: '**' }] },
   async headers() {
     const vary = 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch'
-    return ['/', '/about', '/about/scoring', '/contact', '/privacy'].map((source) => ({
-      source,
-      headers: [{ key: 'Vary', value: vary }],
-    }))
+    return ['/', '/about', '/about/scoring', '/contact', '/privacy', '/exchange', '/exchange/company', '/exchange/agent', '/exchange/propose', '/agents'].map((source) => ({ source, headers: [{ key: 'Vary', value: vary }] }))
   },
   async redirects() {
     return [
-      { source: '/today',             destination: '/dash',                   permanent: true },
-      { source: '/hub',               destination: '/applications',           permanent: true },
-      { source: '/hub/:path*',        destination: '/applications/:path*',    permanent: true },
-      { source: '/bank',              destination: '/questions',              permanent: true },
-      { source: '/bank/:path*',       destination: '/questions/:path*',       permanent: true },
+      { source: '/today', destination: '/dash', permanent: true },
+      { source: '/hub', destination: '/applications', permanent: true },
+      { source: '/hub/:path*', destination: '/applications/:path*', permanent: true },
+      { source: '/bank', destination: '/questions', permanent: true },
+      { source: '/bank/:path*', destination: '/questions/:path*', permanent: true },
       { source: '/archive/questions', destination: '/questions?view=archive', permanent: true },
-      { source: '/funders',           destination: '/applications?view=funders', permanent: true },
+      { source: '/funders', destination: '/applications?view=funders', permanent: true },
     ]
   },
 }
-
 export default nextConfig
