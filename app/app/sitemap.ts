@@ -8,18 +8,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: programs } = await supabase.from('programs').select('slug, updated_at').order('heat_score', { ascending: false }).limit(500)
   const programUrls: MetadataRoute.Sitemap = (programs ?? []).map((p) => ({ url: `${BASE_URL}/hub/${p.slug}`, lastModified: p.updated_at ? new Date(p.updated_at) : new Date(), changeFrequency: 'weekly', priority: 0.7 }))
   const trustLastModified = new Date('2026-08-21T00:00:00Z')
-  const exchangeLastModified = new Date('2026-08-22T00:00:00Z')
   return [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE_URL}/about`, lastModified: trustLastModified, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/about/scoring`, lastModified: trustLastModified, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/contact`, lastModified: trustLastModified, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/privacy`, lastModified: trustLastModified, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/exchange`, lastModified: exchangeLastModified, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${BASE_URL}/exchange/company`, lastModified: exchangeLastModified, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${BASE_URL}/exchange/agent`, lastModified: exchangeLastModified, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${BASE_URL}/exchange/propose`, lastModified: exchangeLastModified, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${BASE_URL}/agents`, lastModified: exchangeLastModified, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/agents`, lastModified: trustLastModified, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/hub`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE_URL}/hub/timeline`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     ...programUrls,

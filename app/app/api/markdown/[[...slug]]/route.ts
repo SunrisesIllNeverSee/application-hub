@@ -1,5 +1,4 @@
 import { MARKDOWN_PAGES, NOT_FOUND_MARKDOWN } from '@/lib/agent-content.mjs'
-import { EXCHANGE_MARKDOWN_PAGES } from '@/lib/exchange-markdown.mjs'
 
 interface RouteContext { params: Promise<{ slug?: string[] }> }
 function pathnameFromSlug(slug: string[] | undefined) { return slug?.length ? `/${slug.join('/')}` : '/' }
@@ -12,7 +11,7 @@ function markdownResponse(body: string, status = 200, includeBody = true) {
 async function resolveMarkdown(context: RouteContext, includeBody: boolean) {
   const { slug } = await context.params
   const pathname = pathnameFromSlug(slug)
-  const body = EXCHANGE_MARKDOWN_PAGES[pathname] ?? MARKDOWN_PAGES[pathname]
+  const body = MARKDOWN_PAGES[pathname]
   if (!body) return markdownResponse(NOT_FOUND_MARKDOWN, 404, includeBody)
   return markdownResponse(body, 200, includeBody)
 }

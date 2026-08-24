@@ -1,5 +1,0 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { ExchangeControlClient } from '@/components/exchange/ExchangeControlClient'
-export const metadata:Metadata={title:'Exchange Control — policy, escalations and economics',description:'Govern a domain Exchange Agent: delegation policy, principal escalations, activity and settled economics.',alternates:{canonical:'/exchange/control'}}
-export default function ExchangeControlPage(){return <main className="min-h-screen bg-neutral-950 px-5 py-12 text-neutral-100"><div className="mx-auto max-w-6xl"><Link href="/exchange" className="text-sm text-neutral-500">← Exchange</Link><p className="mt-8 text-xs uppercase tracking-[0.2em] text-emerald-400">Human supervisory surface</p><h1 className="mt-3 text-4xl font-semibold">Govern the agent. Do not operate the inbox.</h1><p className="mt-4 max-w-3xl text-lg leading-8 text-neutral-300">Set what the domain agent may engage, what requires a principal, and where execution authority stops. Routine agent-to-agent exchange should proceed without a human polling proposals.</p><div className="mt-10"><ExchangeControlClient/></div></div></main>}
