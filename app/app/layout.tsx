@@ -46,17 +46,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider>{children}</ThemeProvider>
-        {/* Google Analytics 4 (gtag.js) — measurement ID G-RMC1QHB72Q */}
+        {/* Google Analytics 4 (gtag.js) — measurement ID G-WEKMTD1CBL (mos2es.xyz stream) */}
         <Script
           id="ga4-gtag-src"
           strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtag/js?id=G-RMC1QHB72Q"
+          src="https://www.googletagmanager.com/gtag/js?id=G-WEKMTD1CBL"
         />
         <Script
           id="ga4-gtag-init"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
-            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RMC1QHB72Q');`,
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WEKMTD1CBL');`,
           }}
         />
       </body>
