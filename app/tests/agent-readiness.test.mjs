@@ -38,7 +38,10 @@ test('public HTML routes declare Accept in framework and Vercel Vary headers', a
 
   const expectedRoutes = ['/', '/about', '/about/scoring', '/contact', '/privacy']
   for (const pathname of expectedRoutes) {
-    assert.ok(vercel.headers.some((entry) => entry.source === pathname && entry.headers.some((header) => header.key === 'Vary' && header.value === expected)), `missing Vercel Vary route ${pathname}`)
+    const entry = vercel.headers.find((e) => e.source === pathname)
+    assert.ok(entry, `missing Vercel Vary route ${pathname}`)
+    assert.ok(entry.headers.some((h) => h.key === 'Vary' && h.value === expected), `Vercel Vary value mismatch for ${pathname}`)
+    assert.equal(entry.override, true, `Vercel Vary for ${pathname} must override Next.js internal Vary`)
   }
 })
 

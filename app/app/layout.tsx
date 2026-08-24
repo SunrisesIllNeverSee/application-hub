@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -45,6 +46,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider>{children}</ThemeProvider>
+        {/* Google Analytics 4 (gtag.js) — measurement ID G-RMC1QHB72Q */}
+        <Script
+          id="ga4-gtag-src"
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-RMC1QHB72Q"
+        />
+        <Script
+          id="ga4-gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RMC1QHB72Q');`,
+          }}
+        />
       </body>
     </html>
   )
