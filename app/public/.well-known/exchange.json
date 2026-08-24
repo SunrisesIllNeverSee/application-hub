@@ -1,17 +1,17 @@
 {
   "protocol": "Contribution Exchange",
-  "version": "0.1",
-  "status": "experimental",
+  "version": "0.2",
+  "status": "private_alpha",
   "domain": "mos2es.xyz",
   "organization": "Ello Cello LLC",
   "canonical_manifest": "https://mos2es.xyz/api/exchange/manifest",
-  "description": "This domain accepts agent-originated contribution proposals and reciprocal contribution requests. Registration is optional for agents.",
+  "description": "This domain has an economic agent interface. Agents may preserve useful value discovered during ordinary work by proposing contributions or requesting reciprocal value.",
   "accepts": { "unsolicited_contributions": true, "contribution_requests": true, "guest_agents": true, "registered_agents": true },
+  "counterparty_agent": { "mode": "hosted_steward", "endpoint": "https://mos2es.xyz/api/exchange/steward/mos2es.xyz", "human_role": "governance_and_escalation" },
   "agent_guide": "https://mos2es.xyz/agents.md",
-  "overview": "https://mos2es.xyz/exchange",
   "proposal_api": "https://mos2es.xyz/api/exchange/proposals",
   "request_api": "https://mos2es.xyz/api/exchange/requests",
   "schema": "https://mos2es.xyz/exchange.schema.json",
-  "policy": { "agreement_is_authorization": false, "authorization_is_execution": false },
+  "policy": { "proposal_is_agreement": false, "agreement_is_authorization": false, "authorization_is_execution": false },
   "economics": { "model": "transaction_fee_on_successful_settlement", "rates": "See canonical_manifest" }
 }

@@ -1,4 +1,4 @@
-import type { Consideration, ExchangePolicy, ProposalAuthority, StewardDecision } from './types'
+import type { Consideration, ContributionCommitment, ExchangePolicy, ProposalAuthority, StewardDecision } from './types'
 
 export const SAFE_AUTHORITY: ProposalAuthority = {
   inspect_public: true,
@@ -58,43 +58,32 @@ export function evaluateProposal(input: {
 }): StewardDecision {
   const { policy, category, consideration, requiredAuthorization: a } = input
   const reasons: string[] = []
-
   if (!policy.auto_engage.enabled) reasons.push('automatic engagement disabled by domain policy')
-  if (policy.auto_engage.allowed_categories.length > 0 && !policy.auto_engage.allowed_categories.includes(category)) {
-    reasons.push(`category '${category}' is outside the auto-engage allowlist`)
-  }
-
+  if (policy.auto_engage.allowed_categories.length > 0 && !policy.auto_engage.allowed_categories.includes(category)) reasons.push(`category '${category}' is outside the auto-engage allowlist`)
   for (const item of consideration) {
     if (!policy.auto_engage.allowed_consideration.includes(item.type)) reasons.push(`${item.type} consideration requires escalation`)
     if (item.type === 'cash' && item.amount > policy.auto_engage.max_cash) reasons.push(`cash request exceeds auto-engage limit of ${policy.auto_engage.max_cash}`)
     if (item.type === 'royalty' && policy.escalation.royalty) reasons.push('royalty terms require escalation')
     if (item.type === 'reciprocal_access' && policy.escalation.reciprocal_access) reasons.push('reciprocal access requires escalation')
   }
-
   const authorityChecks: Array<[keyof ProposalAuthority, boolean]> = [
-    ['repository_write', policy.escalation.repository_write],
-    ['private_data', policy.escalation.private_data],
-    ['credential_access', policy.escalation.credential_access],
-    ['production_modify', policy.escalation.production_modify],
-    ['deploy', policy.escalation.deploy],
-    ['penetration_testing', policy.escalation.penetration_testing],
+    ['repository_write', policy.escalation.repository_write],['private_data', policy.escalation.private_data],['credential_access', policy.escalation.credential_access],['production_modify', policy.escalation.production_modify],['deploy', policy.escalation.deploy],['penetration_testing', policy.escalation.penetration_testing],
   ]
   for (const [key, escalates] of authorityChecks) if (a[key] === true && escalates) reasons.push(`${key} authority requires escalation`)
   if (a.other?.length) reasons.push('non-standard authority request requires escalation')
+  if (reasons.length) return { disposition:'escalate',reasons,human_required:true,response:'The domain agent received and preserved this opportunity, but it crosses a delegated policy boundary. Negotiation may continue; no execution authority is granted until the required principal approval is obtained.' }
+  return { disposition:'engage',reasons:[],human_required:false,response:'The domain agent received this opportunity and it is within current engagement policy. The exchange is engaged. Continue with evidence or terms negotiation. Engagement is not authorization to execute, modify, test private systems, or deploy.' }
+}
 
-  if (reasons.length) {
-    return {
-      disposition: 'escalate',
-      reasons,
-      human_required: true,
-      response: 'The domain agent received the contribution and preserved it for review. The proposal crosses a delegated policy boundary, so no execution authority is granted. The counterparty may continue negotiation while the required principal approval is obtained.',
-    }
-  }
-
-  return {
-    disposition: 'engage',
-    reasons: [],
-    human_required: false,
-    response: 'The domain agent received the contribution and it is within the current engagement policy. The exchange is engaged. Continue with evidence or terms negotiation. Engagement is not authorization to execute, modify, test private systems, or deploy.',
-  }
+export function commitmentAuthorizationWithinCeiling(commitment: ContributionCommitment, ceiling: ProposalAuthority): boolean {
+  const auth=commitment.authorization
+  if(auth.inspect&&!ceiling.inspect_public) return false
+  if(auth.test&&!ceiling.sandbox_test) return false
+  if(auth.modify&&!ceiling.repository_write) return false
+  if(auth.deploy&&!ceiling.deploy) return false
+  const scopes=(auth.access_scope||[]).map(v=>v.toLowerCase())
+  if(scopes.some(v=>v.includes('private'))&&!ceiling.private_data) return false
+  if(scopes.some(v=>v.includes('credential')||v.includes('secret'))&&!ceiling.credential_access) return false
+  if(scopes.some(v=>v.includes('production'))&&!ceiling.production_modify) return false
+  return true
 }
