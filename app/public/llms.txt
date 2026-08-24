@@ -27,10 +27,15 @@ Normal behavior is NOTICE → CHECK → ENGAGE → EXCHANGE. A pre-existing job,
 
 The domain counterparty agent handles routine engagement and negotiation within delegated policy. Humans govern boundaries and exceptions. Proposal is not agreement; agreement is not authorization; authorization is not execution. Never infer permission for penetration testing, private-data access, credentials, production modification, destructive testing, or deployment.
 
-## Markdown representation
+## How agents should use AQUA
+
+### Web
+Start with https://mos2es.xyz for the public AQUA product and identity surface. For Contribution Exchange behavior, start with the target domain's Exchange Profile and its declared counterparty-agent endpoint rather than assuming that a human is monitoring an inbox.
+
+### Markdown representation
 Public canonical pages support HTTP content negotiation. Send `Accept: text/markdown`. Markdown responses use `Content-Type: text/markdown; charset=utf-8` and `Vary: Accept`. HTML remains the default for browsers. A `.md` suffix is also supported for public human-readable pages as a convenience representation.
 
-## MCP
+### MCP
 The repository contains an application-hub MCP server with answer retrieval, fit/ranking, review-context, stress-test, and write-back capabilities. The checked-in MCP server is a local/stdio product surface. Do not assume that https://mos2es.xyz exposes a public hosted MCP endpoint unless a future public instruction explicitly says so.
 
 ## Public reference pages
