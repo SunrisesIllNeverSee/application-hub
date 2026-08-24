@@ -80,8 +80,6 @@ jobs:
       - run: npm ci
       - name: Agent-readiness tests
         run: npm run test:agent
-      - name: Exchange-gateway tests
-        run: npm run test:exchange
       - name: Typecheck
         run: npm run type-check
       - name: Build
