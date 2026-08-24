@@ -29,3 +29,11 @@ timestamp: 2026-08-21
 - Economics: Model A transaction fee, configurable in basis points. Referral, originator, collaborator, and verifier attribution fields are included but rates remain configurable/TBD.
 - Required surfaces: exchange manifest, agent carry-with-it brochure, marketing page, company onboarding, optional agent signup, proposal/request APIs, commitment/rights/vesting object, verification/settlement hooks, install/migration documentation, competitive positioning, tests.
 - Constraint: do not modify AQUA application workflows except public discovery/content links needed for the reference install. Keep exchange implementation movable.
+
+### 2026-08-23 — exchange agent orchestration v0.2
+- Role: LEAD refactor + product architecture.
+- Correction: v0.1 overemphasized human-operated SaaS surfaces. Preserve its economic/state substrate, but make agent↔domain-agent orchestration the normal path.
+- Product unit: Exchange Profile + domain Exchange Agent/Steward + Contribution Proposal + Contribution Commitment + governed authorization + settlement.
+- Human role: policy, authority delegation, escalations, activity/audit, economics; not routine proposal polling or manual lifecycle operation.
+- Required additions: machine-evaluable proposal fields (impact/confidence/required authority/verification), domain-agent authority policy, hosted steward behavior, event subscriptions/delivery, machine-first negotiation/transition endpoints, human supervisory console, Exchange-specific metadata.
+- Safety invariant: ambient observation never implies permission; proposal ≠ agreement; agreement ≠ authorization; authorization ≠ execution.
