@@ -36,6 +36,6 @@ export async function POST(req:NextRequest){
 
   await appendExchangeEvent({exchangeId:data.id,eventType:'request_created',actor:initiator,fromState:null,toState:'proposed',payload:{title:p.title,category:p.category,proposal_detail:proposalDetail}})
   const counterparty=await dispatchToDomainAgent({company,exchange:data,triage:{category:p.category,consideration:p.consideration,requiredAuthorization:p.requiredAuthorization},eventType:'request_received'})
-  const finalState=counterparty.decision?.disposition==='engage'?'engaged':'proposed'
+  const finalState=counterparty.decision?.disposition==='engage'?'negotiating':'proposed'
   return NextResponse.json({exchange:{...data,state:finalState},counterparty,proposer_key:proposerKey,warning:'Save this request key. It authenticates the requesting agent to this exchange.'},{status:201})
 }
