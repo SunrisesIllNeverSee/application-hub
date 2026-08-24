@@ -51,6 +51,12 @@ export async function authenticateCompany(domain: string, key: string | null): P
   return !!company?.admin_key_hash && hashSecret(key) === company.admin_key_hash
 }
 
+export async function authenticateDomainAgent(domain: string, key: string | null): Promise<boolean> {
+  if (!key) return false
+  const company = await findCompany(domain)
+  return !!company?.domain_agent_key_hash && hashSecret(key) === company.domain_agent_key_hash
+}
+
 export function authenticateProposer(record: { proposer_key_hash?: string | null }, key: string | null): boolean {
   return !!key && !!record.proposer_key_hash && hashSecret(key) === record.proposer_key_hash
 }

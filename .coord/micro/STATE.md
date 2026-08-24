@@ -3,19 +3,19 @@ type: State
 title: Micro Session State
 description: Save/resume slot for the current repository build state.
 tags: [repo-standard, coordination, state]
-timestamp: 2026-08-22
+timestamp: 2026-08-24
 ---
 
 # Micro Session State
 
 ## Current
 
-- Status: active
-- In progress: portable Domain-Native Contribution Exchange gateway v0.1 on branch `contribution-exchange-gateway-v0-1`
-- Next: implement portable core, mos2es.xyz reference install, tests, CI verification, then hand off/merge
-- Scope: domain-native unsolicited contribution exchange first; reciprocal request path represented in schema/API; company participation required for settlement; agent registration optional
-- Economic model: configurable transaction fee on successful settlement; referral/commission rates represented but not hard-wired
-- Constraint: preserve AQUA application behavior; keep exchange code isolated and movable
+- Status: ready-for-merge
+- In progress: none; Exchange Gateway v0.2 agent-operated orchestration is implemented on branch `exchange-agent-orchestration-v0-2`
+- Next: merge PR #12 after final CI; production-smoke-test Exchange Profile and hosted Steward on `mos2es.xyz`; then run one controlled end-to-end agent↔domain exchange
+- Scope delivered: agent↔domain-agent default interaction, hosted Steward/BYO/passive modes, machine-evaluable Proposal schema, delegation/authority policy, continuous counterparty messaging, supervisory human control, private-alpha financial gating, agent carry guidance, tests and live database migration
+- Economic model: configurable transaction fee on successful financial settlement; referral/commission rates remain represented but not hard-wired
+- Constraint preserved: AQUA application behavior remains separate; commitment/authorization/settlement invariants remain intact
 
 ## Resume order
 
