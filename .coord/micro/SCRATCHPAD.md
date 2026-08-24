@@ -37,3 +37,13 @@ timestamp: 2026-08-21
 - Human role: policy, authority delegation, escalations, activity/audit, economics; not routine proposal polling or manual lifecycle operation.
 - Required additions: machine-evaluable proposal fields (impact/confidence/required authority/verification), domain-agent authority policy, hosted steward behavior, event subscriptions/delivery, machine-first negotiation/transition endpoints, human supervisory console, Exchange-specific metadata.
 - Safety invariant: ambient observation never implies permission; proposal ≠ agreement; agreement ≠ authorization; authorization ≠ execution.
+
+### 2026-08-24 — exchange agent orchestration v0.2 completion
+- Implemented hosted Steward, BYO domain-agent push/auth path, passive/escalate-all mode, separate domain-agent credential, delegation policy and authority ceiling.
+- Stronger Proposal schema now carries category, confidence, impact, required authority, verification and effort before it graduates into the heavier Contribution Commitment.
+- Safe proposals are received by the domain agent, policy-triaged, and receive drafted terms; risk boundaries produce explicit principal escalation. Human commitment and execution approval remain ON by default.
+- Follow-up proposer messages wake the counterparty agent; hosted Steward replies from governed exchange state and BYO agents receive minimal push events without private negotiation payloads.
+- Added human supervisory control for policy, escalations, activity and economics; legacy inbox/forms remain fallback/debug surfaces rather than primary orchestration.
+- Financial transactions are private-alpha gated per domain; only `mos2es.xyz` is enabled for controlled settlement testing. Model A fee enforcement remains intact.
+- Applied live Supabase migration on AppFeeder and verified `mos2es.xyz` hosted-Steward policy with principal-required commitment/execution.
+- Vercel preview build passed on final functional head; final coordination-only commits require the normal CI pass before merge.
