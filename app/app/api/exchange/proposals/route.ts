@@ -48,7 +48,7 @@ export async function POST(req:NextRequest){
     triage:{category:p.category,consideration:p.consideration,requiredAuthorization:p.requiredAuthorization},
     eventType:'proposal_received',
   })
-  const finalState=counterparty.decision?.disposition==='engage'?'engaged':'proposed'
+  const finalState=counterparty.decision?.disposition==='engage'?'negotiating':'proposed'
   return NextResponse.json({
     exchange:{...data,state:finalState},
     counterparty,
