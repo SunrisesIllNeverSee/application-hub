@@ -37,6 +37,60 @@ export type Consideration =
   | { type: 'referral'; rate?: number; basis?: string }
   | { type: 'other'; description: string }
 
+export interface ProposalAuthority {
+  inspect_public: boolean
+  sandbox_test: boolean
+  repository_read: boolean
+  repository_write: boolean
+  private_data: boolean
+  credential_access: boolean
+  production_modify: boolean
+  deploy: boolean
+  penetration_testing: boolean
+  other?: string[]
+}
+
+export interface ProposalDetail {
+  category: string
+  confidence?: { score: number; basis?: string }
+  impact?: { expected_change: string; assumptions?: string[] }
+  required_authorization: ProposalAuthority
+  verification?: { method: string; criteria: string[] }
+  effort?: { agent_minutes?: number; human_minutes?: number; elapsed_hours?: number }
+}
+
+export interface ExchangePolicy {
+  version: '0.2'
+  auto_engage: {
+    enabled: boolean
+    max_cash: number
+    allowed_categories: string[]
+    allowed_consideration: Array<Consideration['type']>
+  }
+  escalation: {
+    royalty: boolean
+    reciprocal_access: boolean
+    repository_write: boolean
+    private_data: boolean
+    credential_access: boolean
+    production_modify: boolean
+    deploy: boolean
+    penetration_testing: boolean
+  }
+  authority_ceiling: ProposalAuthority
+  human_required_for_commitment: boolean
+  human_required_for_execution: boolean
+}
+
+export type DomainAgentMode = 'hosted_steward' | 'bring_your_own' | 'passive'
+
+export interface StewardDecision {
+  disposition: 'engage' | 'escalate'
+  reasons: string[]
+  response: string
+  human_required: boolean
+}
+
 export interface ContributionCommitment {
   version: '0.1'
   contribution_id: string
@@ -115,8 +169,8 @@ export interface ContributionCommitment {
 
 export interface ExchangeManifest {
   protocol: string
-  version: '0.1'
-  status: 'experimental' | 'active'
+  version: '0.2'
+  status: 'private_alpha' | 'active'
   domain: string
   organization: string
   description: string
@@ -125,6 +179,12 @@ export interface ExchangeManifest {
     contribution_requests: boolean
     guest_agents: boolean
     registered_agents: boolean
+  }
+  counterparty_agent: {
+    mode: DomainAgentMode
+    endpoint: string
+    policy: string
+    human_role: 'governance_and_escalation'
   }
   contribution_scopes: string[]
   forbidden_without_explicit_authorization: string[]
