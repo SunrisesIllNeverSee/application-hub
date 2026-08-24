@@ -11,5 +11,12 @@
     { "source": "/exchange/agent", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/exchange/propose", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/agents", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] }
+  ],
+  "routes": [
+    { "src": "/", "headers": { "Vary": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }, "override": true, "continue": true },
+    { "src": "/about", "headers": { "Vary": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }, "override": true, "continue": true },
+    { "src": "/about/scoring", "headers": { "Vary": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }, "override": true, "continue": true },
+    { "src": "/contact", "headers": { "Vary": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }, "override": true, "continue": true },
+    { "src": "/privacy", "headers": { "Vary": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }, "override": true, "continue": true }
   ]
 }
