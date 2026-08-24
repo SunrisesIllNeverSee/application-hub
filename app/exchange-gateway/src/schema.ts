@@ -23,6 +23,18 @@ export const ConsiderationSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('other'), description: z.string().min(1).max(4000) }),
 ])
 
+const DEFAULT_PROPOSAL_AUTHORITY = {
+  inspect_public: true,
+  sandbox_test: false,
+  repository_read: false,
+  repository_write: false,
+  private_data: false,
+  credential_access: false,
+  production_modify: false,
+  deploy: false,
+  penetration_testing: false,
+}
+
 export const ProposalAuthoritySchema = z.object({
   inspect_public: z.boolean().default(true),
   sandbox_test: z.boolean().default(false),
@@ -40,7 +52,7 @@ const ProposalDetailFields = {
   category: z.string().trim().min(1).max(100).default('other'),
   confidence: z.object({ score: z.number().min(0).max(1), basis: z.string().trim().max(2000).optional() }).optional(),
   impact: z.object({ expectedChange: z.string().trim().min(1).max(4000), assumptions: z.array(z.string().trim().min(1).max(1000)).max(20).default([]) }).optional(),
-  requiredAuthorization: ProposalAuthoritySchema.default({ inspect_public: true }),
+  requiredAuthorization: ProposalAuthoritySchema.default(DEFAULT_PROPOSAL_AUTHORITY),
   verification: z.object({ method: z.string().trim().min(1).max(500), criteria: z.array(z.string().trim().min(1).max(1000)).min(1).max(50) }).optional(),
   effort: z.object({ agentMinutes: z.number().nonnegative().max(1_000_000).optional(), humanMinutes: z.number().nonnegative().max(1_000_000).optional(), elapsedHours: z.number().nonnegative().max(100_000).optional() }).optional(),
 }
@@ -143,7 +155,7 @@ export const ExchangePolicyUpdateSchema = z.object({
   autoEngageEnabled: z.boolean(),
   autoEngageMaxCash: z.number().nonnegative().max(10_000_000),
   allowedCategories: z.array(z.string().trim().min(1).max(100)).max(50),
-  humanRequiredForCommitment: z.boolean().default(false),
+  humanRequiredForCommitment: z.boolean().default(true),
   humanRequiredForExecution: z.boolean().default(true),
 })
 
