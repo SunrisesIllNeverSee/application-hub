@@ -47,3 +47,9 @@ timestamp: 2026-08-21
 - Financial transactions are private-alpha gated per domain; only `mos2es.xyz` is enabled for controlled settlement testing. Model A fee enforcement remains intact.
 - Applied live Supabase migration on AppFeeder and verified `mos2es.xyz` hosted-Steward policy with principal-required commitment/execution.
 - Vercel preview build passed on final functional head; final coordination-only commits require the normal CI pass before merge.
+
+### 2026-08-24 — stale Exchange CI repair
+- Role: CI repair/review.
+- Scope: Application Hub only. Contribution Exchange implementation has moved to SignalAF, so the Next.js CI job must not call the deleted `test:exchange` script.
+- Change: removed only the stale Exchange-gateway test step from `.github/workflows/ci.yml`; retained repo-standard, migration lint, MCP build, agent-readiness, typecheck, and Next build gates.
+- Constraint: do not restore Exchange code or tests to AQUA to satisfy stale CI.
