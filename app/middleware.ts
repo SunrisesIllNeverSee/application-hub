@@ -40,7 +40,7 @@ function markdownRewrite(request: NextRequest, pathname: string) {
   const canonicalPath = pathname.endsWith('.md') ? pathname.slice(0, -3) || '/' : pathname
   url.pathname = canonicalPath === '/' ? '/api/markdown' : `/api/markdown${canonicalPath}`
   const response = NextResponse.rewrite(url)
-  appendVaryAccept(response.headers)
+  response.headers.set('Vary', 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch')
   return response
 }
 
@@ -128,7 +128,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isNegotiable) appendVaryAccept(supabaseResponse.headers)
+  if (isNegotiable) {
+    const existingVary = supabaseResponse.headers.get('Vary') ?? ''
+    const fullVary = 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch'
+    if (!existingVary.toLowerCase().includes('accept')) {
+      supabaseResponse.headers.set('Vary', fullVary)
+    }
+  }
   return supabaseResponse
 }
 
