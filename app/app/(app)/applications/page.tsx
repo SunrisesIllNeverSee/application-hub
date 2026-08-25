@@ -19,6 +19,7 @@ import {
 } from '@/lib/applicantMode'
 import { formatDeadline, programTypeLabel, formatCheckSize, cn } from '@/lib/utils'
 import { FundersDirectory } from '@/components/FundersDirectory'
+import { itemList } from '@/lib/jsonld'
 
 export const metadata = {
   title: 'Applications',
@@ -253,8 +254,28 @@ export default async function HubPage({
     ? (applicationMap[resolvedSelectedId] ?? null)
     : null
 
+  // ItemList JSON-LD for the public program list (discover tab only).
+  // /hub is a permanent redirect to /applications, so the canonical list URL
+  // is /applications. Capped at 100 to keep the structured-data payload lean.
+  const hubItemList = tab === 'discover' && sorted.length > 0
+    ? itemList(
+        'AQUA Application Hub — Programs',
+        '/applications',
+        sorted.slice(0, 100).map((p) => ({
+          name: p.name,
+          url: `https://mos2es.xyz/applications/${p.slug}`,
+        })),
+      )
+    : null
+
   return (
     <div className="-mx-4 md:-mx-6 -my-4 md:-my-8 h-[calc(100vh-3.5rem)] md:h-screen flex flex-col">
+      {hubItemList && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(hubItemList).replace(/</g, '\\u003c') }}
+        />
+      )}
       {/* Slim header */}
       <div className="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 md:px-6 py-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">

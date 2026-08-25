@@ -220,6 +220,18 @@ test('scoring page includes DefinedTerm JSON-LD for 5 scoring concepts', async (
   assert.match(jsonld, /Program Value Score/)
 })
 
+test('hub page (/applications) includes ItemList JSON-LD for the program list', async () => {
+  // /hub is a permanent redirect to /applications (next.config.mjs), so the
+  // canonical program-list page is /applications. The ItemList is rendered
+  // in the discover tab where the public program list is shown.
+  const source = await read('app/(app)/applications/page.tsx')
+  assert.match(source, /import \{ itemList \} from '@\/lib\/jsonld'/, 'applications page should import itemList from lib/jsonld')
+  assert.match(source, /itemList\(/, 'applications page should call itemList()')
+  assert.match(source, /application\/ld\+json/, 'applications page should render a JSON-LD script tag for ItemList')
+  const jsonld = await read('lib/jsonld.ts')
+  assert.match(jsonld, /'@type': 'ItemList'/, 'lib/jsonld itemList builder should emit ItemList type')
+})
+
 test('FAQ markdown content exists for content negotiation', () => {
   const body = MARKDOWN_PAGES['/faq']
   assert.ok(body, 'missing Markdown for /faq')
