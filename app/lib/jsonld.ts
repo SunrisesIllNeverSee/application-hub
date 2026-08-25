@@ -102,6 +102,11 @@ export function comparisonArticle(headline: string, description: string, path: s
     headline,
     description,
     url: `${SITE_ORIGIN}${path}`,
+    author: {
+      '@type': 'Organization',
+      name: 'AQUA Application Hub',
+      url: SITE_ORIGIN,
+    },
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': SITE_ID },
   }

@@ -462,3 +462,12 @@ test('llms.txt includes guides and vs index pages', async () => {
   assert.match(llms, /\/guides/, 'llms.txt should include /guides')
   assert.match(llms, /\/vs/, 'llms.txt should include /vs')
 })
+
+// ─── Schema.org validation fixes ───────────────────────────────────────────
+
+test('comparisonArticle schema includes author field (Schema.org Article requires it)', async () => {
+  const source = await read('lib/jsonld.ts')
+  assert.match(source, /export function comparisonArticle/, 'comparisonArticle builder should exist')
+  assert.match(source, /author:/, 'comparisonArticle should include author field')
+  assert.match(source, /'@type': 'Organization'/, 'author should be typed as Organization')
+})
