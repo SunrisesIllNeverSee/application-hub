@@ -169,6 +169,71 @@ The Appfeeder Chrome extension captures answers from application form fields usi
 
 For agent guidance see https://mos2es.xyz/llms.txt. For Contribution Exchange behavior see https://mos2es.xyz/agents. The MCP manifest at https://mos2es.xyz/.well-known/mcp describes the tool surface in machine-readable form.
 `,
+
+  '/faq': `# AQUA Application Hub — Frequently Asked Questions
+
+AQUA Application Hub is a platform for reusable application infrastructure at https://mos2es.xyz. These answers cover what AQUA is, how answer reuse works, what the scores mean, and how to get started.
+
+## What is AQUA Application Hub?
+
+AQUA Application Hub is a platform for reusable application infrastructure. It turns recurring application questions, reusable answers, opportunity-fit signals, and review history into a portable application graph. The current public wedge is founder and startup opportunity applications — accelerators, fellowships, grants, and jobs.
+
+## Is AQUA an admissions oracle?
+
+No. AQUA does not decide who is admitted, funded, hired, or selected. Its scores are decision-support and preparation signals, not acceptance probabilities, external rankings, or endorsements from any organization represented in the archive. AQUA helps you prepare; it does not predict outcomes.
+
+## How does answer reuse work?
+
+Many accelerators, fellowships, grants, jobs, and schools ask different versions of the same underlying questions. AQUA treats questions and answers as reusable assets. You write a strong answer once, improve it over time, create variants for different destinations, and keep those variants connected to the source material. When a new application asks a similar question, AQUA surfaces the best existing answer instead of making you start from scratch.
+
+## What is Smart Matcher?
+
+Smart Matcher compares your current profile against a program question surface and identifies how well your existing answers align. It measures coverage, theme alignment, criteria match, and answer completeness. Smart Matcher helps you prioritize programs where you are already strong and identify gaps before you start drafting.
+
+## What is fit score?
+
+Fit score measures how well your current profile aligns to a specific program. It combines four dimensions: coverage of the program question surface (40%), theme alignment (35%), criteria match (15%), and a quality signal from answer completeness (10%). A fit score is not a prediction of acceptance — it tells you where you are prepared relative to what the program measures.
+
+## What is significance score?
+
+Significance score measures how important a question is across the universe of programs. A high significance score means the question appears frequently, commands longer answers, and aligns with high-prestige themes. It does not grade the quality of your answer — it measures the question structural importance in the ecosystem.
+
+## What is the application graph?
+
+The application graph is the data structure that connects your questions, answers, applications, fit signals, review loops, and reusable identity material. Instead of treating each application as an isolated document, the graph links related questions and answers across programs so that improving one answer benefits all applications that touch the same underlying question.
+
+## What is answer lineage?
+
+Answer lineage is the connection between an answer variant and its source material. When you create a variant of an answer for a different program, AQUA tracks the relationship back to the original answer and its supporting evidence. This means you can trace why an answer says what it says, update the source, and see which variants are affected.
+
+## Is AQUA free?
+
+AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at mos2es.xyz is the canonical public product surface. The local MCP server and developer resources are publicly accessible.
+
+## How does the MCP server work?
+
+AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx application-hub-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.
+
+## What is the Appfeeder extension?
+
+Appfeeder is a browser extension that lets you capture application questions and draft answers directly from program websites. It feeds captured content into your AQUA answer bank so you can refine and reuse it across applications.
+
+## Does AQUA rank applicants?
+
+No. AQUA does not rank founders against each other. Scores are personal — your composite score tells you how you fit a program, not how you compare to other people applying to that program. AQUA never exposes inter-founder comparisons. The Hub ranks programs for you, not you against other applicants.
+
+## Does AQUA influence admissions decisions?
+
+No. AQUA has no relationship with any program admissions process. No score AQUA surfaces influences any decision made by YC, Techstars, NSF, or any other program. AQUA surfaces signal that helps you prepare. What programs do with what you submit is entirely outside the AQUA scope.
+
+## What is the Contribution Exchange?
+
+The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to signalaf.com — see signalaf.com/agents.md for the full agent carry guide.
+
+## How do I get started with AQUA?
+
+Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx application-hub-mcp-server for agent-based workflows.
+`,
 }
 
 export const NOT_FOUND_MARKDOWN = `# 404 — Not found

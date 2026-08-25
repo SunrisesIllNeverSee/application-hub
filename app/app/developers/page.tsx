@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { BREADCRUMBS } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'AQUA Application Hub Developer Portal — API, MCP, OpenAPI',
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
 export default function DevelopersPage() {
   return (
     <div className="min-h-screen bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMBS.developers).replace(/</g, '\\u003c') }}
+      />
       <nav className="sticky top-0 z-30 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80">
         <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-6">
           <Link href="/" className="text-sm text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white">AQUA</Link>

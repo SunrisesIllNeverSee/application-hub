@@ -166,3 +166,74 @@ test('homepage JSON-LD includes WebSite entity and npm sameAs for brand discover
   assert.match(source, /npmjs\.com/)
   assert.match(source, /alternateName.*mos2es\.xyz/)
 })
+
+test('lib/jsonld.ts exports reusable JSON-LD builders', async () => {
+  const source = await read('lib/jsonld.ts')
+  assert.match(source, /export function breadcrumbList/)
+  assert.match(source, /export function faqPage/)
+  assert.match(source, /export function definedTerm/)
+  assert.match(source, /export function itemList/)
+  assert.match(source, /BreadcrumbList/)
+  assert.match(source, /FAQPage/)
+  assert.match(source, /DefinedTerm/)
+  assert.match(source, /ItemList/)
+})
+
+test('sub-pages include BreadcrumbList JSON-LD', async () => {
+  const jsonld = await read('lib/jsonld.ts')
+  assert.match(jsonld, /BreadcrumbList/, 'lib/jsonld should export breadcrumbList builder')
+  for (const pathname of ['app/about/page.tsx', 'app/about/scoring/page.tsx', 'app/contact/page.tsx', 'app/privacy/page.tsx', 'app/developers/page.tsx', 'app/agents/page.tsx']) {
+    const source = await read(pathname)
+    assert.match(source, /BREADCRUMBS/, `${pathname} should import BREADCRUMBS from lib/jsonld`)
+    assert.match(source, /application\/ld\+json/, `${pathname} should render JSON-LD script tag`)
+  }
+})
+
+test('FAQ page exists with FAQPage schema and 15 Q&A pairs', async () => {
+  const source = await read('app/faq/page.tsx')
+  assert.match(source, /faqPage/)
+  assert.match(source, /FAQPage/)
+  assert.match(source, /alternates:\s*\{ canonical: '\/faq' \}/)
+  assert.match(source, /What is AQUA Application Hub/)
+  assert.match(source, /Is AQUA an admissions oracle/)
+  assert.match(source, /How does answer reuse work/)
+  assert.match(source, /What is Smart Matcher/)
+  assert.match(source, /What is fit score/)
+  assert.match(source, /What is significance score/)
+  assert.match(source, /What is the application graph/)
+  assert.match(source, /What is answer lineage/)
+  assert.match(source, /How does the MCP server work/)
+  assert.match(source, /Does AQUA rank applicants/)
+  assert.match(source, /Does AQUA influence admissions decisions/)
+  assert.match(source, /How do I get started/)
+})
+
+test('scoring page includes DefinedTerm JSON-LD for 5 scoring concepts', async () => {
+  const source = await read('app/about/scoring/page.tsx')
+  assert.match(source, /SCORING_TERMS/, 'scoring page should import SCORING_TERMS')
+  const jsonld = await read('lib/jsonld.ts')
+  assert.match(jsonld, /DefinedTerm/, 'lib/jsonld should export definedTerm builder')
+  assert.match(jsonld, /Significance Score/)
+  assert.match(jsonld, /Fit Score/)
+  assert.match(jsonld, /Composite Score/)
+  assert.match(jsonld, /Heat Score/)
+  assert.match(jsonld, /Program Value Score/)
+})
+
+test('FAQ markdown content exists for content negotiation', () => {
+  const body = MARKDOWN_PAGES['/faq']
+  assert.ok(body, 'missing Markdown for /faq')
+  assert.match(body, /^# /)
+  assert.ok(body.length > 500, '/faq Markdown is too thin')
+  assert.match(body, /What is AQUA Application Hub/)
+})
+
+test('sitemap includes /faq', async () => {
+  const sitemap = await read('app/sitemap.ts')
+  assert.match(sitemap, /\/faq/)
+})
+
+test('llms.txt includes /faq', async () => {
+  const llms = await read('public/llms.txt')
+  assert.match(llms, /\/faq/)
+})

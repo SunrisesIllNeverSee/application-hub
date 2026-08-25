@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { BREADCRUMBS, SCORING_TERMS } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'Scoring & Intelligence',
@@ -136,6 +137,17 @@ function SectionLabel({ label, title }: { label: string; title: string }) {
 export default function ScoringPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMBS.scoring).replace(/</g, '\\u003c') }}
+      />
+      {SCORING_TERMS.map((term, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(term).replace(/</g, '\\u003c') }}
+        />
+      ))}
       <nav className="border-b border-neutral-200 dark:border-neutral-800 sticky top-0 z-30 bg-white/80 dark:bg-neutral-950/80 backdrop-blur">
         <div className="max-w-4xl mx-auto px-6 h-14 flex items-center gap-3">
           <Link

@@ -49,6 +49,7 @@ AQUA exposes an authenticated REST API at https://mos2es.xyz/api. All routes req
 - OpenAPI spec: https://mos2es.xyz/openapi.json
 - MCP manifest: https://mos2es.xyz/.well-known/mcp
 - About: https://mos2es.xyz/about
+- FAQ: https://mos2es.xyz/faq
 - Contact: https://mos2es.xyz/contact
 - Privacy: https://mos2es.xyz/privacy
 - Scoring methodology: https://mos2es.xyz/about/scoring
