@@ -241,8 +241,10 @@ export default async function RootPage() {
           <p>AQUA Application Hub · Ello Cello LLC</p>
           <nav className="flex flex-wrap gap-5" aria-label="Trust and agent resources">
             <Link className="hover:text-neutral-300" href="/about">About</Link>
+            <Link className="hover:text-neutral-300" href="/developers">Developers</Link>
             <Link className="hover:text-neutral-300" href="/contact">Contact</Link>
             <Link className="hover:text-neutral-300" href="/privacy">Privacy</Link>
+            <a className="hover:text-neutral-300" href="/openapi.json">API spec</a>
             <a className="hover:text-neutral-300" href="/llms.txt">Agent guidance</a>
           </nav>
         </div>

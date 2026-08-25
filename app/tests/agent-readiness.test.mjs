@@ -98,7 +98,53 @@ test('custom 404 and sitemap expose recovery and trust endpoints', async () => {
   assert.match(notFound, /\/sitemap\.xml/)
   assert.match(notFound, /\/about/)
 
-  for (const pathname of ['/about', '/about/scoring', '/contact', '/privacy']) {
+  for (const pathname of ['/about', '/about/scoring', '/contact', '/privacy', '/developers']) {
     assert.ok(sitemap.includes(pathname), `sitemap missing ${pathname}`)
   }
+})
+
+test('OpenAPI spec is published with typed operations and ProblemDetails', async () => {
+  const source = await read('app/openapi.json/route.ts')
+  assert.match(source, /openapi:\s*'3\.0\.3'/)
+  assert.match(source, /operationId/)
+  assert.match(source, /ProblemDetails/)
+  assert.match(source, /matchQuestion/)
+  assert.match(source, /intakeApplication/)
+  assert.match(source, /captureAnswer/)
+  assert.match(source, /smartMatcher/)
+  assert.match(source, /stressTestAnswer/)
+})
+
+test('MCP manifest is published at /.well-known/mcp', async () => {
+  const source = await read('app/.well-known/mcp/route.ts')
+  assert.match(source, /application-hub-mcp-server/)
+  assert.match(source, /stdio/)
+  assert.match(source, /toolCount/)
+  assert.match(source, /toolCategories/)
+})
+
+test('developer portal documents API, MCP, and auth', async () => {
+  const source = await read('app/developers/page.tsx')
+  assert.match(source, /OpenAPI/)
+  assert.match(source, /MCP/)
+  assert.match(source, /Authentication/i)
+  assert.match(source, /Bearer JWT/)
+  assert.match(source, /ProblemDetails/)
+  assert.match(source, /Appfeeder/)
+  assert.match(source, /alternates:\s*\{ canonical: '\/developers' \}/)
+})
+
+test('homepage links to developer resources and API spec', async () => {
+  const source = await read('app/page.tsx')
+  assert.match(source, /href="\/developers"/)
+  assert.match(source, /href="\/openapi\.json"/)
+})
+
+test('llms.txt references developer portal, OpenAPI, and MCP manifest', async () => {
+  const llms = await read('public/llms.txt')
+  assert.match(llms, /\/developers/)
+  assert.match(llms, /\/openapi\.json/)
+  assert.match(llms, /\.well-known\/mcp/)
+  assert.match(llms, /OpenAPI 3\.0\.3/)
+  assert.match(llms, /27 tools/)
 })

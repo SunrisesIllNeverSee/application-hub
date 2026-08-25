@@ -111,6 +111,60 @@ Composite scoring combines personal fit with an estimated program-value signal t
 
 AQUA does not decide who gets into a program, does not expose a leaderboard ranking founders against one another, and does not represent any accelerator, grantmaker, employer, school, or fellowship listed in the archive. The detailed human-readable methodology is available at https://mos2es.xyz/about/scoring.
 `,
+  '/developers': `# AQUA Application Hub Developer Portal
+
+AQUA Application Hub exposes an authenticated REST API, a local MCP server with 27 tools, and the Appfeeder browser extension. This document is the Markdown representation of the developer portal at https://mos2es.xyz/developers.
+
+## Quickstart
+
+AQUA is an authenticated product. Sign in at https://mos2es.xyz/login to get a session cookie, or retrieve a Bearer JWT from GET /api/auth/token for extension or agent use.
+
+\`\`\`bash
+# Get your auth token (requires active session)
+curl https://mos2es.xyz/api/auth/token
+
+# Match a question against your answer bank
+curl -X POST https://mos2es.xyz/api/match-question \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer <JWT>" \\
+  -d '{"text": "Tell us what you have built", "limit": 5}'
+\`\`\`
+
+## OpenAPI specification
+
+The full OpenAPI 3.0.3 document is published at https://mos2es.xyz/openapi.json. It documents 10 operations with unique operationIds, typed request/response schemas, and ProblemDetails error models (RFC 9457). Operations include matchQuestion, intakeApplication, captureAnswer, smartMatcher, checkAutofillEligibility, stressTestAnswer, generateDraft, and getAuthToken.
+
+## Authentication
+
+AQUA uses Supabase Auth. Two credential types are accepted:
+
+- Session cookie (browser): After login, Supabase sets an sb-access-token cookie. The web app and browser extension use this automatically.
+- Bearer JWT (extension/agent): Send Authorization: Bearer <JWT> with API requests. Get the JWT from GET /api/auth/token while logged in.
+
+## MCP server
+
+The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at mos2es.xyz. The MCP manifest is at https://mos2es.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server.
+
+### Public tools (11, no auth required)
+
+hub_search_programs, hub_get_program_detail, hub_get_program_by_slug, hub_get_program_rankings, hub_get_heat_scores, hub_get_program_questions, hub_find_similar_questions, hub_get_universal_questions, hub_get_program_dna, hub_get_question_significance, hub_get_acceptance_stats.
+
+### Authenticated tools (16, require Supabase JWT)
+
+hub_get_profile_answers, hub_get_application_readiness, hub_get_fit_score, hub_find_best_programs, hub_rank_my_answers, hub_log_draft_run, hub_save_answer, hub_get_answer_review_context, hub_save_answer_review, hub_stress_test_answer, hub_intake_application, hub_fill_application, hub_set_borrow_threshold, hub_search_answer_bank.
+
+## Error handling
+
+All API error responses use a ProblemDetails shape (RFC 9457) with machine-readable error codes, human-readable title and detail, and a resolution hint.
+
+## Appfeeder browser extension
+
+The Appfeeder Chrome extension captures answers from application form fields using /api/answers/capture and /api/match-question with a Bearer JWT. Source is in the repository under appfeeder/.
+
+## Agent integration
+
+For agent guidance see https://mos2es.xyz/llms.txt. For Contribution Exchange behavior see https://mos2es.xyz/agents. The MCP manifest at https://mos2es.xyz/.well-known/mcp describes the tool surface in machine-readable form.
+`,
 }
 
 export const NOT_FOUND_MARKDOWN = `# 404 — Not found
