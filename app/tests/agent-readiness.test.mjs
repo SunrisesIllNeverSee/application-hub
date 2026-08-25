@@ -471,3 +471,30 @@ test('comparisonArticle schema includes author field (Schema.org Article require
   assert.match(source, /author:/, 'comparisonArticle should include author field')
   assert.match(source, /'@type': 'Organization'/, 'author should be typed as Organization')
 })
+
+// ─── GSC crawl fixes: canonical/noindex/sitemap ────────────────────────────
+
+test('sitemap excludes auth-protected /hub/* and /applications/* URLs', async () => {
+  const sitemap = await read('app/sitemap.ts')
+  // Must NOT generate /hub/ URLs from Supabase (they redirect to /login)
+  assert.doesNotMatch(sitemap, /\/hub\/`/, 'sitemap must not include /hub/ URL entries')
+  assert.doesNotMatch(sitemap, /programUrls/, 'sitemap must not generate program URLs from Supabase')
+  assert.doesNotMatch(sitemap, /from\('programs'\)/, 'sitemap must not query programs table for sitemap URLs')
+  // Must still contain public content pages
+  assert.match(sitemap, /\/faq/, 'sitemap should still include /faq')
+  assert.match(sitemap, /\/concepts\/answer-reuse/, 'sitemap should still include concept pages')
+})
+
+test('robots.ts disallows auth-protected routes including /hub/ and /login', async () => {
+  const robots = await read('app/robots.ts')
+  assert.match(robots, /\/hub\//, 'robots should disallow /hub/')
+  assert.match(robots, /\/applications\//, 'robots should disallow /applications/')
+  assert.match(robots, /\/login/, 'robots should disallow /login')
+  assert.match(robots, /\/dash/, 'robots should disallow /dash')
+})
+
+test('auth layout adds noindex and canonical to /login', async () => {
+  const layout = await read('app/(auth)/layout.tsx')
+  assert.match(layout, /robots.*index.*false/, 'auth layout should set noindex')
+  assert.match(layout, /canonical.*\/login/, 'auth layout should set canonical to /login')
+})
