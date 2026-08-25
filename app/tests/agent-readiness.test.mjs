@@ -383,3 +383,44 @@ test('Markdown content exists for all Phase 3 pages', () => {
     assert.ok(body.length > 200, `${p} Markdown is too thin (${body?.length ?? 0} chars)`)
   }
 })
+
+// ─── Phase 4c + 5b: IndexNow + Security headers ────────────────────────────
+
+test('IndexNow API route exists with POST handler and domain validation', async () => {
+  const source = await read('app/api/indexnow/route.ts')
+  assert.match(source, /export async function POST/, 'indexnow route should export POST handler')
+  assert.match(source, /export async function GET/, 'indexnow route should export GET handler for status')
+  assert.match(source, /mos2es\.xyz/, 'indexnow route should validate mos2es.xyz URLs only')
+  assert.match(source, /INDEXNOW_KEY/, 'indexnow route should reference the key')
+  assert.match(source, /api\.indexnow\.org/, 'indexnow route should forward to IndexNow API')
+  assert.match(source, /rejected/, 'indexnow route should track rejected URLs')
+})
+
+test('IndexNow key file exists in public directory', async () => {
+  const fs = await import('node:fs/promises')
+  const keyPath = new URL('../public/f1f880e1830342be8c1180ee9a7cfb41.txt', import.meta.url)
+  const key = (await fs.readFile(keyPath, 'utf-8')).trim()
+  assert.equal(key, 'f1f880e1830342be8c1180ee9a7cfb41', 'IndexNow key file should contain the key')
+})
+
+test('IndexNow push script exists', async () => {
+  const fs = await import('node:fs/promises')
+  const scriptPath = new URL('../../scripts/indexnow-push.mjs', import.meta.url)
+  const source = await fs.readFile(scriptPath, 'utf-8')
+  assert.match(source, /mos2es\.xyz/, 'push script should target mos2es.xyz')
+  assert.match(source, /api\/indexnow/, 'push script should call the API route')
+  assert.match(source, /sitemap\.xml/, 'push script should fetch sitemap URLs')
+  assert.match(source, /dry-run/, 'push script should support --dry-run flag')
+})
+
+test('next.config.mjs includes security headers', async () => {
+  const source = await read('next.config.mjs')
+  assert.match(source, /X-Content-Type-Options/, 'should set X-Content-Type-Options: nosniff')
+  assert.match(source, /X-Frame-Options/, 'should set X-Frame-Options: DENY')
+  assert.match(source, /Referrer-Policy/, 'should set Referrer-Policy')
+  assert.match(source, /Permissions-Policy/, 'should set Permissions-Policy')
+  assert.match(source, /Strict-Transport-Security/, 'should set HSTS')
+  assert.match(source, /Content-Security-Policy/, 'should set CSP')
+  assert.match(source, /object-src 'none'/, 'CSP should block object-src')
+  assert.match(source, /frame-src/, 'CSP should allow frame-src for Stripe')
+})
