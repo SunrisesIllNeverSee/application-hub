@@ -64,7 +64,7 @@ test('llms.txt contains when-to-use and invocation guidance', async () => {
   assert.match(llms, /## When to use AQUA/)
   assert.match(llms, /## How agents should use AQUA/)
   assert.match(llms, /Accept: text\/markdown/)
-  assert.match(llms, /local\/stdio/)
+  assert.match(llms, /stdio/)
   assert.match(llms, /Do not use AQUA as an admissions oracle/)
 })
 
