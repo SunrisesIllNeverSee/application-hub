@@ -55,6 +55,8 @@ AQUA exposes an authenticated REST API at https://mos2es.xyz/api. All routes req
 - Scoring methodology: https://mos2es.xyz/about/scoring
 - Agent guide: https://mos2es.xyz/agents
 - Application infrastructure hub: https://mos2es.xyz/application-infrastructure
+- Guides index: https://mos2es.xyz/guides
+- Comparisons index: https://mos2es.xyz/vs
 - Concept: Answer reuse: https://mos2es.xyz/concepts/answer-reuse
 - Concept: Fit score: https://mos2es.xyz/concepts/fit-score
 - Concept: Application graph: https://mos2es.xyz/concepts/application-graph

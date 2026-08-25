@@ -6,6 +6,7 @@ export const metadata = {
   title: 'Agent Guide — Contribution Exchange',
   description: 'The Contribution Exchange has moved to signalaf.com.',
   robots: { index: true, follow: true },
+  alternates: { canonical: '/agents' },
 }
 
 export default function AgentsPage() {

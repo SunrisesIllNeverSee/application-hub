@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: 'Scoring & Intelligence',
   description:
     'How AQUA computes significance scores, fit scores, and program value signals.',
+  alternates: { canonical: '/about/scoring' },
 }
 
 interface ScoreCard {

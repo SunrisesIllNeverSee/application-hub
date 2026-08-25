@@ -424,3 +424,41 @@ test('next.config.mjs includes security headers', async () => {
   assert.match(source, /object-src 'none'/, 'CSP should block object-src')
   assert.match(source, /frame-src/, 'CSP should allow frame-src for Stripe')
 })
+
+// ─── Phase 5b: Crawl fixes ─────────────────────────────────────────────────
+
+test('guides index page exists with canonical and breadcrumb', async () => {
+  const source = await read('app/guides/page.tsx')
+  assert.match(source, /alternates:\s*\{ canonical: '\/guides' \}/, 'guides index should have canonical')
+  assert.match(source, /BREADCRUMBS/, 'guides index should render breadcrumb JSON-LD')
+  assert.match(source, /how-to-reuse-application-answers/, 'guides index should link to guide pages')
+})
+
+test('vs index page exists with canonical and breadcrumb', async () => {
+  const source = await read('app/vs/page.tsx')
+  assert.match(source, /alternates:\s*\{ canonical: '\/vs' \}/, 'vs index should have canonical')
+  assert.match(source, /BREADCRUMBS/, 'vs index should render breadcrumb JSON-LD')
+  assert.match(source, /founderapp/, 'vs index should link to comparison pages')
+})
+
+test('about/scoring has canonical metadata', async () => {
+  const source = await read('app/about/scoring/page.tsx')
+  assert.match(source, /alternates:\s*\{ canonical: '\/about\/scoring' \}/, 'about/scoring should have canonical')
+})
+
+test('agents page has canonical metadata', async () => {
+  const source = await read('app/agents/page.tsx')
+  assert.match(source, /alternates:\s*\{ canonical: '\/agents' \}/, 'agents should have canonical')
+})
+
+test('sitemap includes guides and vs index pages', async () => {
+  const sitemap = await read('app/sitemap.ts')
+  assert.match(sitemap, /\/guides/, 'sitemap should include /guides')
+  assert.match(sitemap, /\/vs`/, 'sitemap should include /vs')
+})
+
+test('llms.txt includes guides and vs index pages', async () => {
+  const llms = await read('public/llms.txt')
+  assert.match(llms, /\/guides/, 'llms.txt should include /guides')
+  assert.match(llms, /\/vs/, 'llms.txt should include /vs')
+})
