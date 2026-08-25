@@ -1,7 +1,7 @@
 export const MARKDOWN_PAGES = {
   '/': `# AQUA Application Hub
 
-AQUA is founder-first application infrastructure operated by Ello Cello LLC. It turns recurring application questions, reusable answers, opportunity fit signals, and review history into a portable application graph. The public product is available at https://mos2es.xyz.
+Application answer reuse lets you write strong answers to common application questions once and adapt them across multiple programs. AQUA is founder-first application infrastructure operated by Ello Cello LLC that turns recurring application questions, reusable answers, opportunity fit signals, and review history into a portable application graph. The public product is available at https://mos2es.xyz.
 
 ## What AQUA does
 
@@ -26,7 +26,7 @@ Agents should read https://mos2es.xyz/llms.txt for when-to-use guidance. The rep
 `,
   '/about': `# About AQUA Application Hub
 
-AQUA is application infrastructure built around a simple observation: many applications ask different versions of the same underlying questions. Rewriting those answers from scratch loses time, evidence, and consistency. AQUA stores questions and answers as reusable assets, keeps variants connected to their sources, and helps a user see which opportunities can already be answered from material they have developed.
+Application answer reuse is the practice of writing strong answers to common application questions once and adapting them across multiple programs — accelerators, fellowships, grants, jobs, and schools. AQUA Application Hub is a platform for reusable application infrastructure built around a simple observation: many applications ask different versions of the same underlying questions. Rewriting those answers from scratch loses time, evidence, and consistency. AQUA stores questions and answers as reusable assets, keeps variants connected to their sources, and helps a user see which opportunities can already be answered from material they have developed.
 
 ## Product scope
 
@@ -93,7 +93,7 @@ For privacy, access, correction, or deletion questions, contact burnmydays@proto
 `,
   '/about/scoring': `# AQUA Scoring & Intelligence
 
-AQUA uses defined internal signals to help users understand preparation and opportunity fit. The system measures structured data consistently; it does not claim that an internal score is objective truth or an admissions prediction.
+Opportunity fit scoring measures how well your existing application answers align with what a specific program asks for. AQUA computes significance scores, fit scores, composite scores, and program value signals using defined internal formulas applied consistently to structured data. These are preparation signals, not admissions predictions or objective truth.
 
 ## Significance Score
 
@@ -113,7 +113,7 @@ AQUA does not decide who gets into a program, does not expose a leaderboard rank
 `,
   '/developers': `# AQUA Application Hub Developer Portal
 
-AQUA Application Hub exposes an authenticated REST API, a local MCP server with 27 tools, and the Appfeeder browser extension. This document is the Markdown representation of the developer portal at https://mos2es.xyz/developers.
+An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub exposes an authenticated REST API with typed operations, a local MCP server with 27 tools for agent environments, and the Appfeeder browser extension for capturing answers from program websites. This document is the Markdown representation of the developer portal at https://mos2es.xyz/developers.
 
 ## Quickstart
 

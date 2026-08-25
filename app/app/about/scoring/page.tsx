@@ -180,10 +180,10 @@ export default function ScoringPage() {
             Scoring &amp; Intelligence
           </h1>
           <p className="text-xl text-neutral-600 dark:text-neutral-300 leading-relaxed max-w-2xl mb-5">
-            We measure signal, not truth.
+            Opportunity fit scoring measures how well your existing application answers align with what a specific program asks for. AQUA computes significance scores, fit scores, composite scores, and program value signals — all preparation signals, not admissions predictions.
           </p>
           <p className="text-base text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-2xl">
-            Every number on this platform is derived from a defined formula applied
+            We measure signal, not truth. Every number on this platform is derived from a defined formula applied
             consistently to structured data. Scores are mathematically formulated
             internally — not editorial opinions, not committee judgments, not external
             rankings. The math is the same for everyone. What changes is the input.

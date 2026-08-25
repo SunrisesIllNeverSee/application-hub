@@ -28,7 +28,7 @@ export default function AboutPage() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Application infrastructure</p>
           <h1 className="mb-6 text-4xl font-semibold tracking-tight md:text-5xl">About AQUA Application Hub</h1>
           <p className="max-w-3xl text-xl leading-relaxed text-neutral-600 dark:text-neutral-300">
-            AQUA turns recurring application questions, reusable answers, opportunity-fit signals, and review history into a portable application graph.
+            Application answer reuse is the practice of writing strong answers to common application questions once and adapting them across multiple programs — accelerators, fellowships, grants, jobs, and schools. AQUA Application Hub is a platform for reusable application infrastructure that turns recurring application questions, reusable answers, opportunity-fit signals, and review history into a portable application graph.
           </p>
         </section>
 

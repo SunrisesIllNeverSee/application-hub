@@ -29,9 +29,7 @@ export default function DevelopersPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">AQUA Application Hub Developers</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">AQUA developer portal</h1>
           <p className="max-w-3xl text-xl leading-relaxed text-neutral-600 dark:text-neutral-300">
-            Build against the AQUA Application Hub REST API, run the local MCP server
-            with 27 tools, or integrate the Appfeeder browser extension. All REST
-            routes require a Supabase session cookie or Bearer JWT.
+            An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub REST API exposes these capabilities with typed operations, a local MCP server with 27 tools for agent environments, and an Appfeeder browser extension for capturing answers from program websites. All REST routes require a Supabase session cookie or Bearer JWT.
           </p>
         </header>
 

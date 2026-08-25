@@ -8,7 +8,7 @@ const logos = ['Y Combinator', 'Techstars', 'a16z', '500 Global', 'Stanford', 'N
 export const metadata: Metadata = {
   title: 'AQUA Application Hub',
   description:
-    'AQUA Application Hub turns recurring application questions, reusable answers, fit signals, and review history into a portable application graph.',
+    'Reuse application answers across accelerators, grants, fellowships, and jobs. AQUA Application Hub turns recurring application questions, reusable answers, fit signals, and review history into a portable application graph.',
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
@@ -122,7 +122,7 @@ export default async function RootPage() {
               AQUA
             </p>
             <p className="mt-7 max-w-xl text-xl leading-8 text-neutral-300">
-              One answer bank — for every application you&apos;ll ever write.
+              Reuse application answers across accelerators, grants, fellowships, and jobs. One answer bank for every application you&apos;ll ever write.
             </p>
             <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-neutral-300">
               {['Commitment Engine', 'Multi-Mode', 'Governed Answers'].map((item) => (

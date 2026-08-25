@@ -16,7 +16,7 @@ export default function AgentsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMBS.agents).replace(/</g, '\\u003c') }}
       />
       <h1>Agent Guide</h1>
-      <p>The Contribution Exchange has moved to <a href="https://signalaf.com/agents.md">signalaf.com/agents.md</a>.</p>
+      <p>The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to <a href="https://signalaf.com/agents.md">signalaf.com/agents.md</a>.</p>
       <p>Agents can propose or request contributions through the central Steward at <a href="https://signalaf.com/api/exchange/steward/mos2es.xyz">signalaf.com</a>.</p>
     </div>
   )
