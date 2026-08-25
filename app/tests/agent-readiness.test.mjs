@@ -249,3 +249,137 @@ test('llms.txt includes /faq', async () => {
   const llms = await read('public/llms.txt')
   assert.match(llms, /\/faq/)
 })
+
+// ─── Phase 3: Content layer tests ──────────────────────────────────────────
+
+test('lib/jsonld.ts exports HowTo and comparisonArticle builders', async () => {
+  const source = await read('lib/jsonld.ts')
+  assert.match(source, /export function howTo/, 'lib/jsonld should export howTo builder')
+  assert.match(source, /export function comparisonArticle/, 'lib/jsonld should export comparisonArticle builder')
+  assert.match(source, /HowTo/, 'lib/jsonld should reference HowTo type')
+  assert.match(source, /Article/, 'lib/jsonld should reference Article type')
+})
+
+test('5 concept pages exist with DefinedTerm + BreadcrumbList JSON-LD', async () => {
+  const concepts = [
+    { path: 'app/concepts/answer-reuse/page.tsx', term: 'Answer Reuse', crumb: 'conceptAnswerReuse' },
+    { path: 'app/concepts/fit-score/page.tsx', term: 'Opportunity Fit Score', crumb: 'conceptFitScore' },
+    { path: 'app/concepts/application-graph/page.tsx', term: 'Application Graph', crumb: 'conceptApplicationGraph' },
+    { path: 'app/concepts/answer-lineage/page.tsx', term: 'Answer Lineage', crumb: 'conceptAnswerLineage' },
+    { path: 'app/concepts/smart-matcher/page.tsx', term: 'Smart Matcher', crumb: 'conceptSmartMatcher' },
+  ]
+  for (const c of concepts) {
+    const source = await read(c.path)
+    assert.match(source, /import \{ BREADCRUMBS, definedTerm \} from '@\/lib\/jsonld'/, `${c.path} should import BREADCRUMBS + definedTerm`)
+    assert.match(source, new RegExp(`BREADCRUMBS\\.${c.crumb}`), `${c.path} should use BREADCRUMBS.${c.crumb}`)
+    assert.match(source, /definedTerm\(/, `${c.path} should call definedTerm()`)
+    assert.match(source, /application\/ld\+json/, `${c.path} should render JSON-LD script tags`)
+    assert.match(source, /alternates:\s*\{ canonical:/, `${c.path} should have canonical metadata`)
+  }
+})
+
+test('3 guide pages exist with HowTo + BreadcrumbList JSON-LD', async () => {
+  const guides = [
+    { path: 'app/guides/how-to-reuse-application-answers/page.tsx', crumb: 'guideReuseAnswers' },
+    { path: 'app/guides/how-to-compare-accelerator-fit/page.tsx', crumb: 'guideCompareFit' },
+    { path: 'app/guides/how-to-build-an-answer-bank/page.tsx', crumb: 'guideBuildAnswerBank' },
+  ]
+  for (const g of guides) {
+    const source = await read(g.path)
+    assert.match(source, /import \{ BREADCRUMBS, howTo \} from '@\/lib\/jsonld'/, `${g.path} should import BREADCRUMBS + howTo`)
+    assert.match(source, new RegExp(`BREADCRUMBS\\.${g.crumb}`), `${g.path} should use BREADCRUMBS.${g.crumb}`)
+    assert.match(source, /howTo\(/, `${g.path} should call howTo()`)
+    assert.match(source, /application\/ld\+json/, `${g.path} should render JSON-LD script tags`)
+    assert.match(source, /alternates:\s*\{ canonical:/, `${g.path} should have canonical metadata`)
+  }
+})
+
+test('3 comparison pages exist with Article + BreadcrumbList JSON-LD', async () => {
+  const comparisons = [
+    { path: 'app/vs/founderapp/page.tsx', crumb: 'vsFounderApp' },
+    { path: 'app/vs/manual-application-tracking/page.tsx', crumb: 'vsManualTracking' },
+    { path: 'app/vs/spreadsheets-for-applications/page.tsx', crumb: 'vsSpreadsheets' },
+  ]
+  for (const c of comparisons) {
+    const source = await read(c.path)
+    assert.match(source, /import \{ BREADCRUMBS, comparisonArticle \} from '@\/lib\/jsonld'/, `${c.path} should import BREADCRUMBS + comparisonArticle`)
+    assert.match(source, new RegExp(`BREADCRUMBS\\.${c.crumb}`), `${c.path} should use BREADCRUMBS.${c.crumb}`)
+    assert.match(source, /comparisonArticle\(/, `${c.path} should call comparisonArticle()`)
+    assert.match(source, /application\/ld\+json/, `${c.path} should render JSON-LD script tags`)
+    assert.match(source, /alternates:\s*\{ canonical:/, `${c.path} should have canonical metadata`)
+  }
+})
+
+test('application-infrastructure topic hub exists with ItemList + BreadcrumbList', async () => {
+  const source = await read('app/application-infrastructure/page.tsx')
+  assert.match(source, /import \{ BREADCRUMBS, itemList \} from '@\/lib\/jsonld'/, 'hub should import BREADCRUMBS + itemList')
+  assert.match(source, /BREADCRUMBS\.applicationInfrastructure/, 'hub should use BREADCRUMBS.applicationInfrastructure')
+  assert.match(source, /itemList\(/, 'hub should call itemList()')
+  assert.match(source, /application\/ld\+json/, 'hub should render JSON-LD script tags')
+  assert.match(source, /alternates:\s*\{ canonical:/, 'hub should have canonical metadata')
+})
+
+test('sitemap includes all Phase 3 content pages', async () => {
+  const sitemap = await read('app/sitemap.ts')
+  const paths = [
+    '/application-infrastructure',
+    '/concepts/answer-reuse',
+    '/concepts/fit-score',
+    '/concepts/application-graph',
+    '/concepts/answer-lineage',
+    '/concepts/smart-matcher',
+    '/guides/how-to-reuse-application-answers',
+    '/guides/how-to-compare-accelerator-fit',
+    '/guides/how-to-build-an-answer-bank',
+    '/vs/founderapp',
+    '/vs/manual-application-tracking',
+    '/vs/spreadsheets-for-applications',
+  ]
+  for (const p of paths) {
+    assert.match(sitemap, new RegExp(p.replace(/\//g, '\\/')), `sitemap should include ${p}`)
+  }
+})
+
+test('llms.txt includes all Phase 3 content pages', async () => {
+  const llms = await read('public/llms.txt')
+  const paths = [
+    '/application-infrastructure',
+    '/concepts/answer-reuse',
+    '/concepts/fit-score',
+    '/concepts/application-graph',
+    '/concepts/answer-lineage',
+    '/concepts/smart-matcher',
+    '/guides/how-to-reuse-application-answers',
+    '/guides/how-to-compare-accelerator-fit',
+    '/guides/how-to-build-an-answer-bank',
+    '/vs/founderapp',
+    '/vs/manual-application-tracking',
+    '/vs/spreadsheets-for-applications',
+  ]
+  for (const p of paths) {
+    assert.match(llms, new RegExp(p.replace(/\//g, '\\/')), `llms.txt should include ${p}`)
+  }
+})
+
+test('Markdown content exists for all Phase 3 pages', () => {
+  const paths = [
+    '/application-infrastructure',
+    '/concepts/answer-reuse',
+    '/concepts/fit-score',
+    '/concepts/application-graph',
+    '/concepts/answer-lineage',
+    '/concepts/smart-matcher',
+    '/guides/how-to-reuse-application-answers',
+    '/guides/how-to-compare-accelerator-fit',
+    '/guides/how-to-build-an-answer-bank',
+    '/vs/founderapp',
+    '/vs/manual-application-tracking',
+    '/vs/spreadsheets-for-applications',
+  ]
+  for (const p of paths) {
+    const body = MARKDOWN_PAGES[p]
+    assert.ok(body, `missing Markdown for ${p}`)
+    assert.match(body, /^# /, `${p} Markdown should start with H1`)
+    assert.ok(body.length > 200, `${p} Markdown is too thin (${body?.length ?? 0} chars)`)
+  }
+})

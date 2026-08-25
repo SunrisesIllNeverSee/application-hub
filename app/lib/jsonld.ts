@@ -77,6 +77,36 @@ export function itemList(name: string, path: string, items: { name: string; url?
   }
 }
 
+/** HowTo — for guide pages. AI engines cite step-by-step instructions. */
+export function howTo(name: string, description: string, path: string, steps: { name: string; text: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    url: `${SITE_ORIGIN}${path}`,
+    step: steps.map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+    })),
+  }
+}
+
+/** Article — for comparison pages. */
+export function comparisonArticle(headline: string, description: string, path: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline,
+    description,
+    url: `${SITE_ORIGIN}${path}`,
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': SITE_ID },
+  }
+}
+
 /** Common breadcrumb trails for AQUA pages. */
 export const BREADCRUMBS = {
   about: breadcrumbList([
@@ -107,6 +137,69 @@ export const BREADCRUMBS = {
   faq: breadcrumbList([
     { name: 'Home', path: '/' },
     { name: 'FAQ', path: '/faq' },
+  ]),
+  // Concept pages
+  conceptAnswerReuse: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Application Infrastructure', path: '/application-infrastructure' },
+    { name: 'Answer Reuse', path: '/concepts/answer-reuse' },
+  ]),
+  conceptFitScore: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Application Infrastructure', path: '/application-infrastructure' },
+    { name: 'Fit Score', path: '/concepts/fit-score' },
+  ]),
+  conceptApplicationGraph: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Application Infrastructure', path: '/application-infrastructure' },
+    { name: 'Application Graph', path: '/concepts/application-graph' },
+  ]),
+  conceptAnswerLineage: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Application Infrastructure', path: '/application-infrastructure' },
+    { name: 'Answer Lineage', path: '/concepts/answer-lineage' },
+  ]),
+  conceptSmartMatcher: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Application Infrastructure', path: '/application-infrastructure' },
+    { name: 'Smart Matcher', path: '/concepts/smart-matcher' },
+  ]),
+  // Guide pages
+  guideReuseAnswers: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+    { name: 'Reuse Application Answers', path: '/guides/how-to-reuse-application-answers' },
+  ]),
+  guideCompareFit: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+    { name: 'Compare Accelerator Fit', path: '/guides/how-to-compare-accelerator-fit' },
+  ]),
+  guideBuildAnswerBank: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+    { name: 'Build an Answer Bank', path: '/guides/how-to-build-an-answer-bank' },
+  ]),
+  // Comparison pages
+  vsFounderApp: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Comparisons', path: '/vs' },
+    { name: 'AQUA vs FounderApp', path: '/vs/founderapp' },
+  ]),
+  vsManualTracking: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Comparisons', path: '/vs' },
+    { name: 'AQUA vs Manual Tracking', path: '/vs/manual-application-tracking' },
+  ]),
+  vsSpreadsheets: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Comparisons', path: '/vs' },
+    { name: 'AQUA vs Spreadsheets', path: '/vs/spreadsheets-for-applications' },
+  ]),
+  // Topic hub
+  applicationInfrastructure: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Application Infrastructure', path: '/application-infrastructure' },
   ]),
 }
 

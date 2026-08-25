@@ -54,6 +54,18 @@ AQUA exposes an authenticated REST API at https://mos2es.xyz/api. All routes req
 - Privacy: https://mos2es.xyz/privacy
 - Scoring methodology: https://mos2es.xyz/about/scoring
 - Agent guide: https://mos2es.xyz/agents
+- Application infrastructure hub: https://mos2es.xyz/application-infrastructure
+- Concept: Answer reuse: https://mos2es.xyz/concepts/answer-reuse
+- Concept: Fit score: https://mos2es.xyz/concepts/fit-score
+- Concept: Application graph: https://mos2es.xyz/concepts/application-graph
+- Concept: Answer lineage: https://mos2es.xyz/concepts/answer-lineage
+- Concept: Smart Matcher: https://mos2es.xyz/concepts/smart-matcher
+- Guide: How to reuse application answers: https://mos2es.xyz/guides/how-to-reuse-application-answers
+- Guide: How to compare accelerator fit: https://mos2es.xyz/guides/how-to-compare-accelerator-fit
+- Guide: How to build an answer bank: https://mos2es.xyz/guides/how-to-build-an-answer-bank
+- Comparison: AQUA vs FounderApp: https://mos2es.xyz/vs/founderapp
+- Comparison: AQUA vs manual tracking: https://mos2es.xyz/vs/manual-application-tracking
+- Comparison: AQUA vs spreadsheets: https://mos2es.xyz/vs/spreadsheets-for-applications
 - Exchange (hosted on signalaf.com): https://signalaf.com/exchange
 - Sitemap: https://mos2es.xyz/sitemap.xml
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub
