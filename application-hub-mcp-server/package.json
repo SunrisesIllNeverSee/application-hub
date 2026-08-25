@@ -1,9 +1,37 @@
 {
   "name": "application-hub-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server for the Application Hub — programs, questions, rankings, and applicant intelligence",
+  "description": "MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence. 27 tools for agent environments.",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "application-hub-mcp-server": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "aqua",
+    "application-hub",
+    "mos2es",
+    "agent",
+    "claude",
+    "cursor",
+    "windsurf"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SunrisesIllNeverSee/application-hub.git",
+    "directory": "application-hub-mcp-server"
+  },
+  "homepage": "https://mos2es.xyz/developers#mcp",
+  "bugs": {
+    "url": "https://github.com/SunrisesIllNeverSee/application-hub/issues"
+  },
+  "license": "MIT",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",

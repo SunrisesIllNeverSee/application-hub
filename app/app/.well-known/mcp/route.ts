@@ -21,7 +21,7 @@ export async function GET() {
     transport: {
       stdio: {
         command: 'npx',
-        args: ['application-hub-mcp-server'],
+        args: ['-y', 'application-hub-mcp-server'],
         env: {
           SUPABASE_URL: '${NEXT_PUBLIC_SUPABASE_URL}',
           SUPABASE_ANON_KEY: '${NEXT_PUBLIC_SUPABASE_ANON_KEY}',
@@ -33,6 +33,8 @@ export async function GET() {
         note: 'Self-hosted Streamable HTTP transport. Set TRANSPORT=http and PORT. Not hosted publicly by mos2es.xyz.',
       },
     },
+    npm: 'https://www.npmjs.com/package/application-hub-mcp-server',
+    install: 'npx -y application-hub-mcp-server',
     capabilities: {
       tools: true,
       resources: true,

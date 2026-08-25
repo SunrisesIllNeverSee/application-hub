@@ -27,6 +27,7 @@ const jsonLd = {
       '@type': 'Organization',
       '@id': 'https://mos2es.xyz/#organization',
       name: 'Ello Cello LLC',
+      alternateName: 'AQUA Application Hub',
       url: 'https://mos2es.xyz',
       email: 'burnmydays@proton.me',
       address: {
@@ -47,13 +48,22 @@ const jsonLd = {
       sameAs: [
         'https://mos2es.com',
         'https://github.com/SunrisesIllNeverSee/application-hub',
+        'https://www.npmjs.com/package/application-hub-mcp-server',
       ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://mos2es.xyz/#website',
+      name: 'AQUA Application Hub',
+      alternateName: ['AQUA', 'mos2es.xyz'],
+      url: 'https://mos2es.xyz',
+      publisher: { '@id': 'https://mos2es.xyz/#organization' },
     },
     {
       '@type': 'SoftwareApplication',
       '@id': 'https://mos2es.xyz/#aqua',
       name: 'AQUA Application Hub',
-      alternateName: 'AQUA',
+      alternateName: ['AQUA', 'mos2es.xyz'],
       url: 'https://mos2es.xyz',
       description:
         'Founder-first application infrastructure for reusable questions, answers, opportunity fit, review history, and source lineage.',
@@ -66,7 +76,7 @@ const jsonLd = {
         'Opportunity fit and readiness signals',
         'Answer lineage and variants',
         'Persisted reviews and stress tests',
-        'Local MCP agent tools',
+        'Local MCP agent tools (npm: application-hub-mcp-server)',
       ],
     },
   ],

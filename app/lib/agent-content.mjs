@@ -143,7 +143,11 @@ AQUA uses Supabase Auth. Two credential types are accepted:
 
 ## MCP server
 
-The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at mos2es.xyz. The MCP manifest is at https://mos2es.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server.
+The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It is published on npm as application-hub-mcp-server and can be run with npx -y application-hub-mcp-server. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at mos2es.xyz. The MCP manifest is at https://mos2es.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server.
+
+## CLI
+
+The AQUA MCP server is published on npm at https://www.npmjs.com/package/application-hub-mcp-server. Install globally with npm install -g application-hub-mcp-server or run directly with npx -y application-hub-mcp-server.
 
 ### Public tools (11, no auth required)
 

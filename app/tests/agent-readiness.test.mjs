@@ -147,4 +147,22 @@ test('llms.txt references developer portal, OpenAPI, and MCP manifest', async ()
   assert.match(llms, /\.well-known\/mcp/)
   assert.match(llms, /OpenAPI 3\.0\.3/)
   assert.match(llms, /27 tools/)
+  assert.match(llms, /npx -y application-hub-mcp-server/)
+  assert.match(llms, /npmjs\.com/)
+})
+
+test('MCP server is published on npm with bin entry', async () => {
+  const pkg = JSON.parse(await read('../application-hub-mcp-server/package.json'))
+  assert.equal(pkg.name, 'application-hub-mcp-server')
+  assert.ok(pkg.bin, 'package.json must have a bin field for CLI use')
+  assert.ok(pkg.bin['application-hub-mcp-server'], 'bin must map to dist/index.js')
+  assert.match(pkg.description, /AQUA Application Hub/)
+  assert.equal(pkg.license, 'MIT')
+})
+
+test('homepage JSON-LD includes WebSite entity and npm sameAs for brand discoverability', async () => {
+  const source = await read('app/page.tsx')
+  assert.match(source, /'@type': 'WebSite'/)
+  assert.match(source, /npmjs\.com/)
+  assert.match(source, /alternateName.*mos2es\.xyz/)
 })
