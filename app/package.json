@@ -18,6 +18,7 @@
     "fundscore": "^0.2.0",
     "jose": "^6.2.8",
     "next": "^15.3.4",
+    "posthog-js": "^1.420.0",
     "react": "^18",
     "react-dom": "^18",
     "stripe": "^22.1.1",

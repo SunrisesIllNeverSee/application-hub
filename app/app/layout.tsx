@@ -3,6 +3,7 @@ import Script from 'next/script'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { PostHogProvider } from '@/components/PostHogProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -45,7 +46,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <PostHogProvider>{children}</PostHogProvider>
+        </ThemeProvider>
         {/* Google Analytics 4 (gtag.js) — measurement ID G-WEKMTD1CBL (mos2es.xyz stream) */}
         <Script
           id="ga4-gtag-src"
