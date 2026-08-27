@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { elloCelloLLC } from '@/lib/canon-entities'
 
 const logos = ['Y Combinator', 'Techstars', 'a16z', '500 Global', 'Stanford', 'NSF', 'Stripe', 'Google']
 
@@ -26,10 +27,15 @@ const jsonLd = {
     {
       '@type': 'Organization',
       '@id': 'https://mos2es.xyz/#organization',
-      name: 'Ello Cello LLC',
+      name: elloCelloLLC.name,
       alternateName: 'AQUA Application Hub',
       url: 'https://mos2es.xyz',
       email: 'burnmydays@proton.me',
+      description: elloCelloLLC.description,
+      sourceSystem: elloCelloLLC.sourceSystem,
+      canonBacked: elloCelloLLC.canonBacked,
+      authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
+      associatedWith: elloCelloLLC.associatedWith,
       address: {
         '@type': 'PostalAddress',
         streetAddress: '84 W Utica St',
