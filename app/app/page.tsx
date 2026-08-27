@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { elloCelloLLC, CANON_LD_CONTEXT } from '@/lib/canon-entities'
+import { elloCelloLLC, CANON_LD_CONTEXT, CANON_ENTITY_IDS } from '@/lib/canon-entities'
 
 const logos = ['Y Combinator', 'Techstars', 'a16z', '500 Global', 'Stanford', 'NSF', 'Stripe', 'Google']
 
@@ -83,6 +83,9 @@ const jsonLd = {
         'Answer lineage and variants',
         'Persisted reviews and stress tests',
         'Local MCP agent tools (npm: application-hub-mcp-server)',
+      ],
+      about: [
+        { '@id': CANON_ENTITY_IDS.moses },
       ],
     },
   ],
