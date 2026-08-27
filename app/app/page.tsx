@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { elloCelloLLC } from '@/lib/canon-entities'
+import { elloCelloLLC, CANON_LD_CONTEXT } from '@/lib/canon-entities'
 
 const logos = ['Y Combinator', 'Techstars', 'a16z', '500 Global', 'Stanford', 'NSF', 'Stripe', 'Google']
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 }
 
 const jsonLd = {
-  '@context': 'https://schema.org',
+  '@context': CANON_LD_CONTEXT,
   '@graph': [
     {
       '@type': 'Organization',
