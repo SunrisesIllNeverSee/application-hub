@@ -17,6 +17,10 @@ export const CANON_ENTITY_IDS = {
   ello_cello_llc: "https://mos2es.com/ontology/0.1/entity/ello_cello_llc",
   moses: "https://mos2es.com/ontology/0.1/entity/moses",
   deric_j_mchenry: "https://mos2es.com/ontology/0.1/entity/deric_j_mchenry",
+  upsilon: "https://mos2es.com/ontology/0.1/entity/upsilon",
+  sigrank: "https://mos2es.com/ontology/0.1/entity/sigrank",
+  signalaf: "https://mos2es.com/ontology/0.1/entity/signalaf",
+  yield_metric: "https://mos2es.com/ontology/0.1/entity/yield_metric",
 } as const;
 
 // ─── JSON-LD @context for canon-backed blocks ───────────────────────────────
@@ -46,7 +50,7 @@ export const elloCelloLLC = {
   name: "Ello Cello LLC",
   description:
     "Organization associated with the owner's published works and products, " +
-    "including SigRank and MO\u00A7ES\u2122.",
+    "including Upsilon, SigRank, and MO\u00A7ES\u2122.",
   authorityApprovalRef: "APPROVAL-2026-08-14-001 (ID-ELLO-001)",
   associatedWith: { "@id": CANON_ENTITY_IDS.moses },
 } as const;
