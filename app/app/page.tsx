@@ -64,6 +64,13 @@ const jsonLd = {
       alternateName: ['AQUA', 'mos2es.xyz'],
       url: 'https://mos2es.xyz',
       publisher: { '@id': 'https://mos2es.xyz/#organization' },
+      sourceSystem: elloCelloLLC.sourceSystem,
+      canonBacked: elloCelloLLC.canonBacked,
+      authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
+      associatedWith: [
+        { '@id': 'https://mos2es.xyz/#organization' },
+        { '@id': CANON_ENTITY_IDS.moses },
+      ],
     },
     {
       '@type': 'SoftwareApplication',
