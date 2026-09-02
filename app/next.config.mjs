@@ -46,13 +46,38 @@ const nextConfig = {
       headers: [{ key: 'Vary', value: vary }, ...securityHeaders],
     }))
 
+    // Link headers for AI agent discovery on /.well-known/* routes
+    const wellKnownLinkHeaders = [
+      {
+        source: '/.well-known/agent.json',
+        headers: [
+          ...securityHeaders,
+          { key: 'Link', value: '<https://mos2es.xyz/.well-known/agent.json>; rel="agent"' },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [
+          ...securityHeaders,
+          { key: 'Link', value: '<https://mos2es.xyz/.well-known/api-catalog>; rel="service-desc"; type="application/linkset+json"' },
+        ],
+      },
+      {
+        source: '/.well-known/http-message-signatures-directory',
+        headers: [
+          ...securityHeaders,
+          { key: 'Content-Type', value: 'application/jwk-set+json' },
+        ],
+      },
+    ]
+
     // Catch-all for security headers on all other routes
     const catchAll = [{
       source: '/(.*)',
       headers: securityHeaders,
     }]
 
-    return [...varyHeaders, ...catchAll]
+    return [...varyHeaders, ...wellKnownLinkHeaders, ...catchAll]
   },
   async redirects() {
     return [

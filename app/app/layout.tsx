@@ -40,6 +40,9 @@ export const metadata: Metadata = {
     description:
       'Build a reusable answer bank, preserve source lineage, and understand opportunity fit across applications.',
   },
+  other: {
+    'ai-catalog': '/.well-known/agent.json',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

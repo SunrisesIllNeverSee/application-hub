@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+Sitemap: https://mos2es.xyz/sitemap.xml
+Host: https://mos2es.xyz
+
+Content-Signal: search=yes
+Content-Signal: ai-input=yes
+Content-Signal: ai-train=yes
+
+Agentmap: /.well-known/agent.json
