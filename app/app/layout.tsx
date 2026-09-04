@@ -65,6 +65,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WEKMTD1CBL');`,
           }}
         />
+        {/* WebMCP bridge — exposes browser-native tools for AI agents */}
+        <Script
+          id="webmcp-bridge"
+          strategy="afterInteractive"
+          src="/webmcp.js"
+        />
       </body>
     </html>
   )
