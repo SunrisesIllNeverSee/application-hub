@@ -107,3 +107,25 @@ consider using:
 - `read_multiple_files` — batch file reads
 
 Allowed paths: ~/Developer, ~/.config/devin, ~/.config/sigrank, ~/Desktop
+
+
+## MCP Server Recommendations for This Repo
+
+Full index: `Moses_Enterprise_B2BPilot_/_workspace/MCP_INDEX.md`
+
+**Primary (use regularly):**
+- `gsc-seo-mos2es-xyz` — Google Search Console for mos2es.xyz SEO data
+- `moses-search` — AI Search for mos2es.org content (AQUA proxies to it)
+- `web-scrape` — extract content from mos2es.xyz live pages, check structured data
+- `indexnow` — submit new/changed URLs to Bing/Yandex after deploys
+
+**Secondary (use as needed):**
+- `context7` — verify Next.js / React / Tailwind patterns before writing
+- `playwright` / `chrome-devtools` — visual verification of mos2es.xyz pages
+- `no-slop` / `ai-slop-checker` — check UI copy for AI writing tells
+- `repomix` — pack codebase for handoffs
+
+**Not needed here:**
+- `supabase` / `vercel` — those are for the sigrank-app repo
+- `posthog` / `ds-server` / `sigadmin` — those are for the b2bpilot workers repo
+- `blender` / `worldmonitor` — unrelated
