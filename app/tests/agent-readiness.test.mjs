@@ -485,8 +485,8 @@ test('sitemap excludes auth-protected /hub/* and /applications/* URLs', async ()
   assert.match(sitemap, /\/concepts\/answer-reuse/, 'sitemap should still include concept pages')
 })
 
-test('robots.ts disallows auth-protected routes including /hub/ and /login', async () => {
-  const robots = await read('app/robots.ts')
+test('robots.txt disallows auth-protected routes including /hub/ and /login', async () => {
+  const robots = await read('public/robots.txt')
   assert.match(robots, /\/hub\//, 'robots should disallow /hub/')
   assert.match(robots, /\/applications\//, 'robots should disallow /applications/')
   assert.match(robots, /\/login/, 'robots should disallow /login')
