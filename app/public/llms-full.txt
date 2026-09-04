@@ -1,0 +1,89 @@
+# AQUA Application Hub
+
+Canonical URL: https://mos2es.xyz
+Operator: Ello Cello LLC
+Source: https://github.com/SunrisesIllNeverSee/application-hub
+
+AQUA is founder-first application infrastructure for application answer reuse — the practice of writing strong answers to common application questions once and adapting them across multiple programs. AQUA turns recurring application questions, reusable answers, opportunity fit signals, and review history into a portable application graph.
+
+## Architecture
+
+AQUA is part of the MO§ES™ ecosystem:
+- **MO§ES™**: governance framework / methodology — https://mos2es.org
+- **Upsilon**: enterprise measurement engine — https://mos2es.org
+- **SigRank**: public leaderboard / benchmark — https://signalaf.com
+- **SignalAF**: public distribution brand — https://signalaf.com
+- **Signomy**: governed AI agent city-state — https://signomy.xyz
+- **AQUA**: applications, questions, answers — https://mos2es.xyz (this site)
+
+## When to use AQUA
+Use AQUA when a user needs to:
+1. Reuse strong answers across applications
+2. Organize recurring application questions
+3. Compare opportunity fit across programs
+4. Identify readiness gaps before submission
+5. Preserve answer lineage and version history
+6. Review and stress-test answers
+7. Work with AQUA's local MCP tooling
+
+## When NOT to use AQUA
+- Do not use as an admissions oracle or acceptance-probability service
+- Do not use as an external ranking of applicants
+- AQUA's fit and readiness scores are internal preparation signals, not predictions
+
+## Pages
+- [Home](https://mos2es.xyz/): AQUA application infrastructure
+- [About](https://mos2es.xyz/about): what AQUA is and how it works
+- [About / Scoring](https://mos2es.xyz/about/scoring): how fit and readiness scores work
+- [FAQ](https://mos2es.xyz/faq): frequently asked questions
+- [Developers](https://mos2es.xyz/developers): developer documentation and MCP tools
+- [Contact](https://mos2es.xyz/contact): contact information
+- [Privacy](https://mos2es.xyz/privacy): privacy policy
+- [Agents](https://mos2es.xyz/agents): agent discovery and exchange information
+- [Application Infrastructure](https://mos2es.xyz/application-infrastructure): technical overview
+- [Guides](https://mos2es.xyz/guides): how-to guides
+- [Comparisons](https://mos2es.xyz/vs): comparison pages
+
+## Concepts
+- [Answer Reuse](https://mos2es.xyz/concepts/answer-reuse): writing strong answers once and adapting them
+- [Fit Score](https://mos2es.xyz/concepts/fit-score): internal opportunity fit signal
+- [Application Graph](https://mos2es.xyz/concepts/application-graph): portable graph of questions, answers, and opportunities
+- [Answer Lineage](https://mos2es.xyz/concepts/answer-lineage): version history and provenance tracking
+- [Smart Matcher](https://mos2es.xyz/concepts/smart-matcher): opportunity matching algorithm
+
+## Guides
+- [How to Reuse Application Answers](https://mos2es.xyz/guides/how-to-reuse-application-answers)
+- [How to Compare Accelerator Fit](https://mos2es.xyz/guides/how-to-compare-accelerator-fit)
+- [How to Build an Answer Bank](https://mos2es.xyz/guides/how-to-build-an-answer-bank)
+
+## Comparisons
+- [AQUA vs FounderApp](https://mos2es.xyz/vs/founderapp)
+- [AQUA vs Manual Application Tracking](https://mos2es.xyz/vs/manual-application-tracking)
+- [AQUA vs Spreadsheets for Applications](https://mos2es.xyz/vs/spreadsheets-for-applications)
+
+## Key concepts
+- Answer Reuse: writing strong answers to common application questions once and adapting them across programs
+- Application Graph: a portable graph connecting questions, answers, opportunities, and review history
+- Fit Score: internal signal measuring how well an opportunity matches an applicant's profile
+- Readiness Score: internal signal measuring how prepared an applicant is for a specific opportunity
+- Answer Lineage: version history and provenance tracking for adapted answers
+- Smart Matcher: algorithm that matches applicant answers to opportunity questions
+
+## Contribution Exchange — moved to signalaf.com
+The Contribution Exchange has moved from mos2es.xyz to signalaf.com (SigRank). AQUA is now pure application infrastructure. The exchange is hosted on signalaf.com's control plane.
+
+- Exchange Profile: https://mos2es.xyz/.well-known/exchange.json (points to signalaf.com)
+- Domain counterparty agent: https://signalaf.com/api/exchange/steward/mos2es.xyz
+- Full carry guide: https://signalaf.com/agents.md
+- Contribution Exchange MCP: https://signalaf.com/api/exchange/mcp
+- Proposal API: POST https://signalaf.com/api/exchange/proposals
+- Reciprocal request API: POST https://signalaf.com/api/exchange/requests
+- Contribution Commitment schema: https://signalaf.com/exchange.schema.json
+
+## Ecosystem
+- MO§ES™: governance framework — https://mos2es.org
+- Upsilon: measurement engine — https://mos2es.org
+- SigRank: public leaderboard — https://signalaf.com
+- SignalAF: public distribution — https://signalaf.com
+- Signomy: governed marketplace — https://signomy.xyz
+- GitHub org: https://github.com/SunrisesIllNeverSee
