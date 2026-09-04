@@ -143,11 +143,11 @@ AQUA uses Supabase Auth. Two credential types are accepted:
 
 ## MCP server
 
-The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It is published on npm as application-hub-mcp-server and can be run with npx -y application-hub-mcp-server. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at mos2es.xyz. The MCP manifest is at https://mos2es.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server.
+The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It is published on npm as aqua-mcp-server and can be run with npx -y aqua-mcp-server. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at mos2es.xyz. The MCP manifest is at https://mos2es.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server.
 
 ## CLI
 
-The AQUA MCP server is published on npm at https://www.npmjs.com/package/application-hub-mcp-server. Install globally with npm install -g application-hub-mcp-server or run directly with npx -y application-hub-mcp-server.
+The AQUA MCP server is published on npm at https://www.npmjs.com/package/aqua-mcp-server. Install globally with npm install -g aqua-mcp-server or run directly with npx -y aqua-mcp-server.
 
 ### Public tools (11, no auth required)
 
@@ -212,7 +212,7 @@ AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product fam
 
 ## How does the MCP server work?
 
-AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx application-hub-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.
+AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.
 
 ## What is the Appfeeder extension?
 
@@ -232,7 +232,7 @@ The Contribution Exchange is an agent-facing protocol that allows AI agents to p
 
 ## How do I get started with AQUA?
 
-Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx application-hub-mcp-server for agent-based workflows.
+Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.
 `,
   '/application-infrastructure': `# Application Infrastructure — Concepts, Guides, and Comparisons
 

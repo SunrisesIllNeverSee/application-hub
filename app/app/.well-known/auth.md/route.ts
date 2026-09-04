@@ -52,7 +52,7 @@ Authorization: Bearer <jwt>
 \`\`\`
 
 ### MCP server
-The local MCP server (npx application-hub-mcp-server) accepts a Supabase
+The local MCP server (npx aqua-mcp-server) accepts a Supabase
 access token via the SUPABASE_ACCESS_TOKEN environment variable.
 
 ## OAuth discovery

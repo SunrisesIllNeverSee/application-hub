@@ -1,11 +1,11 @@
 {
-  "name": "application-hub-mcp-server",
+  "name": "aqua-mcp-server",
   "version": "1.0.0",
   "description": "MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence. 27 tools for agent environments.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "application-hub-mcp-server": "dist/index.js"
+    "aqua-mcp-server": "dist/index.js"
   },
   "files": [
     "dist",

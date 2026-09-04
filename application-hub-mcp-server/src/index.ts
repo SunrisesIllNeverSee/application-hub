@@ -53,7 +53,7 @@ import { registerProgramComparison } from "./prompts/program_comparison.js";
 
 async function main() {
   const server = new McpServer({
-    name: "application-hub-mcp-server",
+    name: "aqua-mcp-server",
     version: "1.0.0"
   });
 
@@ -117,7 +117,7 @@ async function main() {
 
     // Health check
     app.get("/health", (_req, res) => {
-      res.json({ status: "ok", server: "application-hub-mcp-server", version: "1.0.0" });
+      res.json({ status: "ok", server: "aqua-mcp-server", version: "1.0.0" });
     });
 
     const port = parseInt(process.env.PORT ?? "3000");

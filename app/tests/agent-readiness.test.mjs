@@ -117,7 +117,7 @@ test('OpenAPI spec is published with typed operations and ProblemDetails', async
 
 test('MCP manifest is published at /.well-known/mcp', async () => {
   const source = await read('app/.well-known/mcp/route.ts')
-  assert.match(source, /application-hub-mcp-server/)
+  assert.match(source, /aqua-mcp-server/)
   assert.match(source, /stdio/)
   assert.match(source, /toolCount/)
   assert.match(source, /toolCategories/)
@@ -147,15 +147,15 @@ test('llms.txt references developer portal, OpenAPI, and MCP manifest', async ()
   assert.match(llms, /\.well-known\/mcp/)
   assert.match(llms, /OpenAPI 3\.0\.3/)
   assert.match(llms, /27 tools/)
-  assert.match(llms, /npx -y application-hub-mcp-server/)
+  assert.match(llms, /npx -y aqua-mcp-server/)
   assert.match(llms, /npmjs\.com/)
 })
 
 test('MCP server is published on npm with bin entry', async () => {
-  const pkg = JSON.parse(await read('../application-hub-mcp-server/package.json'))
-  assert.equal(pkg.name, 'application-hub-mcp-server')
+  const pkg = JSON.parse(await read('../aqua-mcp-server/package.json'))
+  assert.equal(pkg.name, 'aqua-mcp-server')
   assert.ok(pkg.bin, 'package.json must have a bin field for CLI use')
-  assert.ok(pkg.bin['application-hub-mcp-server'], 'bin must map to dist/index.js')
+  assert.ok(pkg.bin['aqua-mcp-server'], 'bin must map to dist/index.js')
   assert.match(pkg.description, /AQUA Application Hub/)
   assert.equal(pkg.license, 'MIT')
 })

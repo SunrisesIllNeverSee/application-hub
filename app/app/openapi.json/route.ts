@@ -33,10 +33,10 @@ export async function GET() {
         docs: 'https://mos2es.xyz/developers#authentication',
       },
       'x-mcp-server': {
-        name: 'application-hub-mcp-server',
+        name: 'aqua-mcp-server',
         transport: 'stdio (local) or Streamable HTTP (self-hosted)',
         tools: 27,
-        repo: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server',
+        repo: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
         docs: 'https://mos2es.xyz/developers#mcp',
       },
     },

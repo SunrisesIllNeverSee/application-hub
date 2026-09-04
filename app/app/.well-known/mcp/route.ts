@@ -15,13 +15,13 @@ export const revalidate = 3600
 export async function GET() {
   const manifest = {
     schemaVersion: '1.0',
-    name: 'application-hub-mcp-server',
+    name: 'aqua-mcp-server',
     version: '1.0.0',
     description: 'MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence',
     transport: {
       stdio: {
         command: 'npx',
-        args: ['-y', 'application-hub-mcp-server'],
+        args: ['-y', 'aqua-mcp-server'],
         env: {
           SUPABASE_URL: '${NEXT_PUBLIC_SUPABASE_URL}',
           SUPABASE_ANON_KEY: '${NEXT_PUBLIC_SUPABASE_ANON_KEY}',
@@ -33,8 +33,8 @@ export async function GET() {
         note: 'Self-hosted Streamable HTTP transport. Set TRANSPORT=http and PORT. Not hosted publicly by mos2es.xyz.',
       },
     },
-    npm: 'https://www.npmjs.com/package/application-hub-mcp-server',
-    install: 'npx -y application-hub-mcp-server',
+    npm: 'https://www.npmjs.com/package/aqua-mcp-server',
+    install: 'npx -y aqua-mcp-server',
     capabilities: {
       tools: true,
       resources: true,
@@ -47,7 +47,7 @@ export async function GET() {
     },
     resourceCategories: ['programs', 'questions', 'rankings'],
     promptTemplates: ['opportunity_scout', 'draft_answer', 'program_comparison'],
-    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server',
+    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
     docs: 'https://mos2es.xyz/developers#mcp',
     auth: {
       type: 'Supabase JWT',
