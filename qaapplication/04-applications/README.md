@@ -3,26 +3,30 @@
 ## Funnel stages
 
 ```
+06-workshop/          ← workstation: active drafting
+  <program>.md        ← form structure + notes
+  draft/              ← rough draft answers (prefilled, iterating)
+
 04-applications/      ← applying: bare form templates + submitted record
   <program>.md        ← bare form template (unfilled, reusable)
-07-apply/             ← active drafting / workshop lane
-  <program>.md        ← working application packet
+  submitted/          ← submitted: final record by entity + batch
+    <program>-<batch>/
+      draft.md        ← the rough draft that was used
+      final.md        ← clean copy of what was actually submitted
 
-06-answers/index/     ← answer bank: reusable answers by theme/question
-08-submitted/         ← immutable submitted record
-  archive/            ← paired Q+A per submitted program
-  archived_applications/ ← fuller filled application records
+07-answers/archive/   ← answer bank: paste-ready answers by program
 ```
 
 ## Status convention
 
 | Stage | Location | Meaning |
 |---|---|---|
-| Drafting | `07-apply/` | Active, iterating |
+| Drafting | `06-workshop/draft/` | Active, iterating |
 | Applying | `04-applications/<program>.md` | Bare template ready |
-| Submitted | `08-submitted/` | Filed, immutable record |
+| Submitted | `04-applications/submitted/<program>-<batch>/` | Filed, immutable record |
 
 ## Submitted applications
 
-See `../08-submitted/archived_applications/` and `../08-submitted/archive/`
-for the current immutable submission records.
+| Program | Batch | Date | Folder |
+|---|---|---|---|
+| Y Combinator | Summer 2026 | 2026-05-26 | `submitted/yc-summer-2026/` |
