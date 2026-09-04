@@ -58,7 +58,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: 'How does the MCP server work?',
     answer:
-      'AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx application-hub-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.',
+      'AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.',
   },
   {
     question: 'What is the Appfeeder extension?',
@@ -83,7 +83,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: 'How do I get started with AQUA?',
     answer:
-      'Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx application-hub-mcp-server for agent-based workflows.',
+      'Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.',
   },
 ]
 

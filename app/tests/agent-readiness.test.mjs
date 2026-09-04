@@ -152,7 +152,7 @@ test('llms.txt references developer portal, OpenAPI, and MCP manifest', async ()
 })
 
 test('MCP server is published on npm with bin entry', async () => {
-  const pkg = JSON.parse(await read('../aqua-mcp-server/package.json'))
+  const pkg = JSON.parse(await read('../application-hub-mcp-server/package.json'))
   assert.equal(pkg.name, 'aqua-mcp-server')
   assert.ok(pkg.bin, 'package.json must have a bin field for CLI use')
   assert.ok(pkg.bin['aqua-mcp-server'], 'bin must map to dist/index.js')

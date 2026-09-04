@@ -115,10 +115,10 @@ curl https://mos2es.xyz/openapi.json | jq .info`}</code></pre>
             <a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server" className="text-brand-600 hover:underline dark:text-brand-400">application-hub-mcp-server/</a>.
           </p>
           <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Install via npm (published)
-npm install -g application-hub-mcp-server
+npm install -g aqua-mcp-server
 
 # Or run directly without installing
-npx -y application-hub-mcp-server
+npx -y aqua-mcp-server
 
 # Or clone and build from source
 git clone https://github.com/SunrisesIllNeverSee/application-hub

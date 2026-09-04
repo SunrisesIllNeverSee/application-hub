@@ -54,7 +54,7 @@ const jsonLd = {
       sameAs: [
         'https://mos2es.com',
         'https://github.com/SunrisesIllNeverSee/application-hub',
-        'https://www.npmjs.com/package/application-hub-mcp-server',
+        'https://www.npmjs.com/package/aqua-mcp-server',
       ],
     },
     {
@@ -89,7 +89,7 @@ const jsonLd = {
         'Opportunity fit and readiness signals',
         'Answer lineage and variants',
         'Persisted reviews and stress tests',
-        'Local MCP agent tools (npm: application-hub-mcp-server)',
+        'Local MCP agent tools (npm: aqua-mcp-server)',
       ],
       about: [
         { '@id': CANON_ENTITY_IDS.moses },
