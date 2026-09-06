@@ -6,20 +6,32 @@ on:
       - main
   pull_request:
 
+permissions: {}
+
 jobs:
   repo-standard:
     name: repo-standard
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Validate repository structure
         run: python3 .repo/scripts/repo_check.py --ci
 
   migrations:
     name: Migration lint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: supabase/setup-cli@v1
         with:
           version: latest
@@ -48,17 +60,22 @@ jobs:
   mcp-server:
     name: MCP server
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: application-hub-mcp-server
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: application-hub-mcp-server/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Typecheck
         run: npm run typecheck
       - name: Build
@@ -67,17 +84,22 @@ jobs:
   next-app:
     name: Next.js app
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: app
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: app/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Agent-readiness tests
         run: npm run test:agent
       - name: Typecheck
