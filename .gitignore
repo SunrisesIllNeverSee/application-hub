@@ -47,3 +47,7 @@ application-hub-mcp-server/.plugin-eval/
 # Repository Standard — coordination should not be in product repos
 .coord/
 .repo/.cache/
+
+# Skylos scan output
+skylos-sec.json
+.skylos/
