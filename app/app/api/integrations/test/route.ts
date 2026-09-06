@@ -70,7 +70,31 @@ export async function POST(req: NextRequest) {
 }
 
 function isPrivateUrl(url: string): boolean {
-  return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|::1|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.)/i.test(url)
+  try {
+    const parsed = new URL(url)
+    const h = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, '')
+    if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '::1') return true
+    if (h.endsWith('.localhost')) return true
+    if (h.startsWith('169.254.')) return true
+    if (h === 'metadata.google.internal') return true
+    if (h.startsWith('10.')) return true
+    if (h.startsWith('192.168.')) return true
+    if (h.startsWith('172.')) {
+      const parts = h.split('.')
+      const second = parseInt(parts[1], 10)
+      if (second >= 16 && second <= 31) return true
+    }
+    if (h.startsWith('100.')) {
+      const parts = h.split('.')
+      const second = parseInt(parts[1], 10)
+      if (second >= 64 && second <= 127) return true
+    }
+    if (h.startsWith('fc') || h.startsWith('fd')) return true
+    if (h.startsWith('fe80:')) return true
+    return false
+  } catch {
+    return true
+  }
 }
 
 async function pingOllama(baseUrl: string): Promise<{ ok: boolean; info?: string; error?: string }> {
@@ -119,6 +143,7 @@ async function pingOllama(baseUrl: string): Promise<{ ok: boolean; info?: string
 }
 
 async function pingBearer(url: string, apiKey: string): Promise<{ ok: boolean; info?: string; error?: string }> {
+  if (isPrivateUrl(url)) return { ok: false, error: 'URL must not point to a private/internal host.' }
   try {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), 8000)
@@ -174,6 +199,7 @@ async function pingAnthropic(apiKey: string, model: string): Promise<{ ok: boole
 }
 
 async function pingGoogle(url: string): Promise<{ ok: boolean; info?: string; error?: string }> {
+  if (isPrivateUrl(url)) return { ok: false, error: 'URL must not point to a private/internal host.' }
   try {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), 8000)

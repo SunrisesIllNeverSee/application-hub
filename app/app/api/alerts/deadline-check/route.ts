@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { timingSafeEqual } from 'node:crypto'
 
 // ============================================================
 // POST /api/alerts/deadline-check
@@ -141,7 +142,10 @@ function isAuthorized(req: NextRequest): boolean {
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
 
   if (!token || !cronSecret) return false
-  return token === cronSecret
+  const a = Buffer.from(token)
+  const b = Buffer.from(cronSecret)
+  if (a.length !== b.length) return false
+  return timingSafeEqual(a, b)
 }
 
 // ------------------------------------------------------------

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { timingSafeEqual } from 'node:crypto'
 
 // ============================================================
 // POST /api/cron/recruiter
@@ -50,11 +51,18 @@ function createAdminClient() {
   return createSupabaseClient(url, key)
 }
 
+function safeCronEqual(token: string, secret: string): boolean {
+  const a = Buffer.from(token)
+  const b = Buffer.from(secret)
+  if (a.length !== b.length) return false
+  return timingSafeEqual(a, b)
+}
+
 function verifyCron(req: NextRequest): boolean {
   const auth = req.headers.get('authorization') ?? ''
   const token = auth.replace(/^Bearer\s+/i, '')
   const secret = process.env.CRON_SECRET ?? ''
-  return secret.length > 0 && token === secret
+  return secret.length > 0 && safeCronEqual(token, secret)
 }
 
 function deadlineLabel(deadline_at: string | null, is_rolling: boolean): string {

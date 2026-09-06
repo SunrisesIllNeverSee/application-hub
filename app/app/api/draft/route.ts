@@ -3,6 +3,29 @@ import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
 
+function isProhibitedHost(hostname: string): boolean {
+  const h = hostname.toLowerCase().replace(/^\[|\]$/g, '')
+  if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '::1') return true
+  if (h.endsWith('.localhost')) return true
+  if (h.startsWith('169.254.')) return true
+  if (h === 'metadata.google.internal') return true
+  if (h.startsWith('10.')) return true
+  if (h.startsWith('192.168.')) return true
+  if (h.startsWith('172.')) {
+    const parts = h.split('.')
+    const second = parseInt(parts[1], 10)
+    if (second >= 16 && second <= 31) return true
+  }
+  if (h.startsWith('100.')) {
+    const parts = h.split('.')
+    const second = parseInt(parts[1], 10)
+    if (second >= 64 && second <= 127) return true
+  }
+  if (h.startsWith('fc') || h.startsWith('fd')) return true
+  if (h.startsWith('fe80:')) return true
+  return false
+}
+
 const MODEL = 'claude-haiku-4-5-20251001'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
 const PLATFORM_PROVIDER = 'platform_anthropic'
@@ -361,6 +384,14 @@ Write the draft answer only — no preamble, no explanation, no word count at th
         ? (resolvedBaseUrl ?? resolvedApiKey ?? 'http://localhost:11434').replace(/\/$/, '') + '/v1'
         : 'https://api.openai.com/v1'
       const apiKey = resolvedProvider === 'ollama' ? 'ollama' : resolvedApiKey!
+      if (resolvedProvider === 'ollama') {
+        try {
+          const parsed = new URL(baseUrl)
+          if (isProhibitedHost(parsed.hostname)) {
+            return NextResponse.json({ error: 'Ollama URL must not point to a private/internal host.' }, { status: 400 })
+          }
+        } catch { /* invalid URL — fetch will fail with a clear error */ }
+      }
       // Respect the user's saved model_preference; fall back to a sensible default per provider.
       // For Ollama, the default 'llama3.2' will fail if that model isn't pulled — savvy users
       // should save their pulled model name (e.g. 'llama3.1:8b', 'qwen2.5:3b') as model_preference.
