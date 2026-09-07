@@ -5571,13 +5571,13 @@ Good news — `mos2es.xyz` is already added to the Vercel project. Let me check 
 ---
 
 **[2026-05-11 12:30:13] Claude:**
-- **Value:** `570721c116f0b990b1956a6d31240c4e7e151ad9997a16edbfa02e6147d1deb2`
+- **Value:** `<CRON_SECRET>` (redacted — rotate this value, it was exposed in git history)
    - **Environment:** Production + Preview + Development
 3. Hit Save, then redeploy
 
 Then in **Supabase dashboard → project `betcyfbzsgusaghriptz` → Edge Functions** — deploy the deadline alerts function and set it to run daily at 8am UTC.
 
-Or simpler: skip the Edge Function entirely and just hit the API route directly from a free cron service like [cron-job.org](https://cron-job.org) — point it at `https://mos2es.xyz/api/alerts/deadline-check` with the `Authorization: Bearer 570721c116f0b990b1956a6d31240c4e7e151ad9997a16edbfa02e6147d1deb2` header, daily at 8am.
+Or simpler: skip the Edge Function entirely and just hit the API route directly from a free cron service like [cron-job.org](https://cron-job.org) — point it at `https://mos2es.xyz/api/alerts/deadline-check` with the `Authorization: Bearer <CRON_SECRET>` header, daily at 8am.
 
 ---
 
@@ -5615,7 +5615,7 @@ Scheduled. Let me verify it's registered:
 **[2026-05-11 13:41:48] Claude:**
 Everything wired end-to-end. Here's the full picture:
 
-**`CRON_SECRET`** — set as a Supabase secret (same value needs to go in Vercel env vars — add `CRON_SECRET=570721c116f0b990b1956a6d31240c4e7e151ad9997a16edbfa02e6147d1deb2` to Vercel so the `/api/alerts/deadline-check` route accepts the call)
+**`CRON_SECRET`** — set as a Supabase secret (same value needs to go in Vercel env vars — add `CRON_SECRET=<CRON_SECRET>` to Vercel so the `/api/alerts/deadline-check` route accepts the call)
 
 **Edge function** — `deadline-alerts` deployed and ACTIVE
 
@@ -5630,11 +5630,7 @@ Can't read Vercel env vars through the MCP or CLI — Vercel intentionally doesn
 
 **[vercel.com/sunrisesillneversees-projects/application-hub/settings/environment-variables](https://vercel.com/sunrisesillneversees-projects/application-hub/settings/environment-variables)**
 
-Look for `CRON_SECRET` — if it's there, you're done. If not, add it with this value:
-
-```
-570721c116f0b990b1956a6d31240c4e7e151ad9997a16edbfa02e6147d1deb2
-```
+Look for `CRON_SECRET` — if it's there, you're done. If not, add it with the value from your Vercel environment variables (do not hardcode it here).
 
 That's the same value already set as a Supabase secret, so both ends match.
 
@@ -5811,7 +5807,7 @@ Good session. Here's where you landed:
 **One thing still on you:**
 Add these 5 env vars to Vercel → application-hub → Settings → Environment Variables:
 ```
-CRON_SECRET = 570721c116f0b990b1956a6d31240c4e7e151ad9997a16edbfa02e6147d1deb2
+CRON_SECRET = <CRON_SECRET>
 STRIPE_PRO_MONTHLY_PRICE_ID = price_...
 STRIPE_PRO_ANNUAL_PRICE_ID = price_...
 STRIPE_TEAM_MONTHLY_PRICE_ID = price_...
