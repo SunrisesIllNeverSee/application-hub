@@ -4,5 +4,18 @@
     "deploymentEnabled": {
       "main": true
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.mos2es.xyz"
+        }
+      ],
+      "destination": "https://mos2es.xyz/:path*",
+      "permanent": true
+    }
+  ]
 }
