@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Application Canon — Process Map</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #1a1a1a;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #fafafa;
+  }
+  h1 {
+    font-size: 1.8rem;
+    border-bottom: 3px solid #333;
+    padding-bottom: 0.5rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 2.5rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.3rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    background: white;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f0f0f0;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  code {
+    background: #e8e8e8;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
+  }
+  pre {
+    background: #1a1a1a;
+    color: #e0e0e0;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .status-working { background: #d4edda; color: #155724; }
+  .status-partial { background: #fff3cd; color: #856404; }
+  .status-gap { background: #f8d7da; color: #721c24; }
+  .status-none { background: #e2e3e5; color: #383d41; }
+  .meta {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    border: 1px solid #ddd;
+  }
+  .meta p { margin: 0.3rem 0; }
+  .meta strong { display: inline-block; width: 120px; }
+  .gap-row td { background: #fff5f5; }
+  .open-question {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 0.8rem 1rem;
+    margin: 0.5rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .open-question::before {
+    content: "OPEN QUESTION: ";
+    font-weight: 700;
+    color: #f57f17;
+  }
+  .process-flow {
+    background: #1a1a1a;
+    color: #00e676;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.95rem;
+    margin: 1rem 0;
+    letter-spacing: 0.05em;
+  }
+  .edit-hint {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    color: #1565c0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Application Canon — Process Map</h1>
+
+<div class="meta">
+  <p><strong>Status:</strong> Planning document, open for edits</p>
+  <p><strong>Created:</strong> 2026-09-06</p>
+  <p><strong>Owner:</strong> Deric / Ello Cello</p>
+  <p><strong>Purpose:</strong> Map the full application process, the AQUA product turns, internal archiving, and gaps before designing the SKU system.</p>
+</div>
+
+<div class="edit-hint">
+  This is an editable planning document. Modify the tables, add rows, mark decisions, and resolve open questions directly in this file.
+</div>
+
+<!-- ============================================================ -->
+<h2>1. The User Process</h2>
+
+<p>The full flow a user (or Deric) takes to fill out an application, regardless of domain (jobs, funding, college).</p>
+
+<div class="process-flow">
+DISCOVER → INDEX → CAPTURE → CATEGORIZE → MATCH → DRAFT → FILL → STRESS TEST → SUBMIT → ARCHIVE OUTCOME
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>What the user does</th>
+      <th>What they need</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Discover</strong></td><td>Find an opportunity (job posting, accelerator, college, grant)</td><td>A URL, a PDF, or pasted text</td></tr>
+    <tr><td><strong>Index</strong></td><td>The system records who is asking (company/funder/school)</td><td>A company profile gets created or matched</td></tr>
+    <tr><td><strong>Capture</strong></td><td>The system pulls questions out of the posting/application</td><td>Questions extracted from the source</td></tr>
+    <tr><td><strong>Categorize</strong></td><td>Each question gets tagged by domain + universal theme</td><td>Domain (jobs/funding/college), theme (background, competency, etc.)</td></tr>
+    <tr><td><strong>Match</strong></td><td>The system finds existing answers that already fit this question</td><td>Answer bank search by theme + significance</td></tr>
+    <tr><td><strong>Draft</strong></td><td>User writes or refines an answer for this specific target</td><td>A variant of an existing answer, or a new one</td></tr>
+    <tr><td><strong>Fill</strong></td><td>The answer goes into the actual application form</td><td>Browser extension or manual paste</td></tr>
+    <tr><td><strong>Stress test</strong></td><td>The answer gets probed for weak spots</td><td>RNS/MO§ES review layer</td></tr>
+    <tr><td><strong>Submit</strong></td><td>The application goes out</td><td>Status logged</td></tr>
+    <tr><td><strong>Archive outcome</strong></td><td>Accepted / rejected / waitlisted gets recorded</td><td>Outcome feeds back into fit scoring</td></tr>
+  </tbody>
+</table>
+
+<h3>Notes</h3>
+<ul>
+  <li>This process is the same whether the user is applying to YC, a job at Google, or Harvard MBA.</li>
+  <li>The domain changes the surface (what the application looks like) but not the steps.</li>
+  <li>Steps 1-4 are ingestion. Steps 5-6 are reuse. Steps 7-9 are execution. Step 10 is feedback.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>2. The Three Application Domains</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Domain</th>
+      <th>What it covers</th>
+      <th>Example entities</th>
+      <th>Example questions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Jobs</strong></td>
+      <td>Job applications, cover letters, role-specific prompts</td>
+      <td>Google, Stripe, a startup, Ello Cello (when hiring)</td>
+      <td>"Tell me about yourself", "Why this role?", "Describe a challenge you overcame"</td>
+    </tr>
+    <tr>
+      <td><strong>Funding</strong></td>
+      <td>Accelerators, VC, grants, fellowships for startups/projects</td>
+      <td>Y Combinator, Techstars, NSF SBIR, Echoing Green</td>
+      <td>"What's your traction?", "What problem are you solving?", "Why this program?"</td>
+    </tr>
+    <tr>
+      <td><strong>College</strong></td>
+      <td>College, grad school, MBA, scholarship applications</td>
+      <td>Harvard, Stanford, Columbia MBA, Rhodes Scholarship</td>
+      <td>"Personal statement", "Why this school?", "Describe your research interests"</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Universal themes (cross-domain)</h3>
+<p>These normalize questions across domains so the same concept links even when the wording differs:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Universal theme</th>
+      <th>Jobs</th>
+      <th>Funding</th>
+      <th>College</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>background</code></td><td>experience</td><td>team</td><td>academic_background</td></tr>
+    <tr><td><code>competency</code></td><td>skills</td><td>traction</td><td>activities</td></tr>
+    <tr><td><code>problem</code></td><td>challenge</td><td>problem</td><td>research_gap</td></tr>
+    <tr><td><code>approach</code></td><td>methodology</td><td>solution</td><td>research_plan</td></tr>
+    <tr><td><code>impact</code></td><td>scope</td><td>market</td><td>contribution</td></tr>
+    <tr><td><code>motivation</code></td><td>culture_fit</td><td>vision</td><td>goals</td></tr>
+    <tr><td><code>personal</code></td><td>personal</td><td>personal</td><td>personal_statement</td></tr>
+    <tr><td><code>fit</code></td><td>role_fit</td><td>program_fit</td><td>program_fit</td></tr>
+    <tr><td><code>general</code></td><td>(other)</td><td>(other)</td><td>(other)</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>3. AQUA Product Turns (Current State)</h2>
+
+<p>What the AQUA app and MCP server can actually do today, mapped to the user process.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Process step</th>
+      <th>MCP tool / API route</th>
+      <th>App surface</th>
+      <th>What it does</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Discover</strong></td>
+      <td><code>hub_search_programs</code>, <code>hub_get_program_rankings</code>, <code>hub_find_best_programs</code>, <code>hub_get_heat_scores</code></td>
+      <td>/hub, /today, /funders</td>
+      <td>Search and rank 842 programs</td>
+      <td><span class="status-badge status-working">Working (founder only)</span></td>
+    </tr>
+    <tr>
+      <td><strong>Index</strong></td>
+      <td><code>hub_get_program_by_slug</code>, <code>hub_get_program_detail</code></td>
+      <td>/funders (partial)</td>
+      <td>Look up a program by slug</td>
+      <td><span class="status-badge status-partial">Partial — no create, no funders table</span></td>
+    </tr>
+    <tr>
+      <td><strong>Capture</strong></td>
+      <td><code>hub_intake_application</code></td>
+      <td>/api/import</td>
+      <td>Ingest pasted application text, extract questions</td>
+      <td><span class="status-badge status-partial">Pasted text only — no PDF, no URL</span></td>
+    </tr>
+    <tr>
+      <td><strong>Categorize</strong></td>
+      <td><code>hub_get_program_dna</code>, <code>hub_get_program_questions</code>, <code>hub_find_similar_questions</code>, <code>hub_get_universal_questions</code>, <code>hub_get_question_significance</code></td>
+      <td>/questions, /archive</td>
+      <td>Tag questions by theme, score significance, find duplicates</td>
+      <td><span class="status-badge status-partial">Founder only. Jobs/college not populated</span></td>
+    </tr>
+    <tr>
+      <td><strong>Match</strong></td>
+      <td><code>hub_search_answer_bank</code>, <code>hub_get_profile_answers</code>, <code>hub_rank_my_answers</code>, <code>hub_get_fit_score</code>, <code>hub_get_application_readiness</code></td>
+      <td>/answers, /smart-matcher</td>
+      <td>Find existing answers, compute fit, rank by coverage</td>
+      <td><span class="status-badge status-partial">Single domain. Cross-domain not surfaced</span></td>
+    </tr>
+    <tr>
+      <td><strong>Draft</strong></td>
+      <td><code>hub_save_answer</code>, <code>hub_log_draft_run</code></td>
+      <td>/workspace, /api/draft</td>
+      <td>Save answer, track AI draft usage</td>
+      <td><span class="status-badge status-partial">No variant tracking — one answer per question</span></td>
+    </tr>
+    <tr>
+      <td><strong>Fill</strong></td>
+      <td><code>hub_fill_application</code></td>
+      <td>Browser extension</td>
+      <td>Fill application fields from answer bank</td>
+      <td><span class="status-badge status-partial">Manual assist only. No auto-fill</span></td>
+    </tr>
+    <tr>
+      <td><strong>Stress test</strong></td>
+      <td><code>hub_stress_test_answer</code>, <code>hub_get_answer_review_context</code>, <code>hub_save_answer_review</code>, <code>hub_set_borrow_threshold</code></td>
+      <td>/api/stress-test</td>
+      <td>Probe answers, persist reviews</td>
+      <td><span class="status-badge status-working">Working</span></td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>Submit</strong></td>
+      <td>(none)</td>
+      <td>(none)</td>
+      <td>No submit tracking</td>
+      <td><span class="status-badge status-gap">GAP — no tool, no table, no UI</span></td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>Archive outcome</strong></td>
+      <td><code>hub_get_acceptance_stats</code></td>
+      <td>(none in UI)</td>
+      <td>Aggregate stats only</td>
+      <td><span class="status-badge status-gap">GAP — no per-application outcome log</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>MCP tool inventory (21 tools)</h3>
+
+<p><strong>Programs (5):</strong></p>
+<ul>
+  <li><code>hub_search_programs</code></li>
+  <li><code>hub_get_program_by_slug</code></li>
+  <li><code>hub_get_program_detail</code></li>
+  <li><code>hub_get_program_rankings</code></li>
+  <li><code>hub_get_heat_scores</code></li>
+</ul>
+
+<p><strong>Questions (4):</strong></p>
+<ul>
+  <li><code>hub_get_program_questions</code></li>
+  <li><code>hub_get_program_dna</code></li>
+  <li><code>hub_find_similar_questions</code></li>
+  <li><code>hub_get_universal_questions</code></li>
+</ul>
+
+<p><strong>Intelligence (2):</strong></p>
+<ul>
+  <li><code>hub_get_question_significance</code></li>
+  <li><code>hub_get_acceptance_stats</code></li>
+</ul>
+
+<p><strong>User (10):</strong></p>
+<ul>
+  <li><code>hub_find_best_programs</code></li>
+  <li><code>hub_get_fit_score</code></li>
+  <li><code>hub_get_application_readiness</code></li>
+  <li><code>hub_get_profile_answers</code></li>
+  <li><code>hub_search_answer_bank</code></li>
+  <li><code>hub_rank_my_answers</code></li>
+  <li><code>hub_save_answer</code></li>
+  <li><code>hub_log_draft_run</code></li>
+  <li><code>hub_fill_application</code></li>
+  <li><code>hub_intake_application</code></li>
+  <li><code>hub_stress_test_answer</code></li>
+  <li><code>hub_get_answer_review_context</code></li>
+  <li><code>hub_save_answer_review</code></li>
+  <li><code>hub_set_borrow_threshold</code></li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>4. Internal Archiving (What the Database Holds)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Table</th>
+      <th>What it holds</th>
+      <th>Archiving behavior</th>
+      <th>Gaps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>programs</code></td>
+      <td>842 opportunities</td>
+      <td>Company + program in one row</td>
+      <td>No separate funders/companies table. Company data embedded in program row.</td>
+    </tr>
+    <tr>
+      <td><code>archived_questions</code></td>
+      <td>225 deduplicated questions</td>
+      <td>Significance scored, universal flagged, theme tagged</td>
+      <td>Only founder domain populated. Jobs and college questions not archived.</td>
+    </tr>
+    <tr>
+      <td><code>program_questions</code></td>
+      <td>Per-program phrasing/limits</td>
+      <td>Links questions to programs with word limits</td>
+      <td>Works. No cross-domain question linking.</td>
+    </tr>
+    <tr>
+      <td><code>program_dna</code></td>
+      <td>Theme weight breakdown per program</td>
+      <td>Computed from questions via cron</td>
+      <td>Works for founder. No DNA for jobs or college.</td>
+    </tr>
+    <tr>
+      <td><code>profile_answers</code></td>
+      <td>User's answer bank</td>
+      <td>Per-user, per-question</td>
+      <td>No variant tracking. One answer per question. No "this is the YC version."</td>
+    </tr>
+    <tr>
+      <td><code>user_program_fit</code></td>
+      <td>Fit scores</td>
+      <td>Per user × program</td>
+      <td>Works for founder. No fit scoring for jobs or college.</td>
+    </tr>
+    <tr>
+      <td><code>answer_reviews</code></td>
+      <td>Persisted review output</td>
+      <td>Per answer</td>
+      <td>Works.</td>
+    </tr>
+    <tr>
+      <td><code>answer_stress_tests</code></td>
+      <td>Stress test runs</td>
+      <td>Per answer</td>
+      <td>Works.</td>
+    </tr>
+    <tr>
+      <td><code>ai_draft_runs</code> / <code>ai_usage</code></td>
+      <td>Draft tracking</td>
+      <td>Per user</td>
+      <td>Works.</td>
+    </tr>
+    <tr>
+      <td><code>user_integrations</code></td>
+      <td>BYOK metadata</td>
+      <td>Per user</td>
+      <td>Works.</td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>(missing)</strong></td>
+      <td><strong>Application submissions</strong></td>
+      <td>—</td>
+      <td><strong>No table. No way to log "I submitted this application on this date."</strong></td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>(missing)</strong></td>
+      <td><strong>Application outcomes</strong></td>
+      <td>—</td>
+      <td><strong>No table. No way to log "YC W26: rejected" or "Google SWE: accepted."</strong></td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>(missing)</strong></td>
+      <td><strong>Answer variants</strong></td>
+      <td>—</td>
+      <td><strong>No table. No way to store multiple versions of an answer for different targets.</strong></td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>(missing)</strong></td>
+      <td><strong>Companies/funders</strong></td>
+      <td>—</td>
+      <td><strong>No table. Company data trapped inside program rows. VISION doc calls for this but not built.</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>5. Gap Analysis</h2>
+
+<h3>By process step</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Gap</th>
+      <th>Impact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Discover</strong></td><td>Only founder domain has programs. No job board integration, no college program catalog.</td><td><span class="status-badge status-gap">High</span> — blocks jobs and college entirely</td></tr>
+    <tr><td><strong>Index</strong></td><td>No separate company/funder entity. Company data embedded in programs.</td><td><span class="status-badge status-gap">High</span> — can't profile a company independently</td></tr>
+    <tr><td><strong>Capture</strong></td><td>Only pasted text. No PDF parsing, no URL scraping, no bulk import.</td><td><span class="status-badge status-partial">Medium</span> — manual paste works but doesn't scale</td></tr>
+    <tr><td><strong>Categorize</strong></td><td>Jobs and college domains in taxonomy but not populated.</td><td><span class="status-badge status-gap">High</span> — blocks cross-domain answer reuse</td></tr>
+    <tr><td><strong>Match</strong></td><td>Cross-domain matching designed but not surfaced.</td><td><span class="status-badge status-partial">Medium</span> — blocks the portability moat</td></tr>
+    <tr><td><strong>Draft</strong></td><td>No variant tracking. One answer per question.</td><td><span class="status-badge status-gap">High</span> — user re-writes for every target</td></tr>
+    <tr><td><strong>Fill</strong></td><td>Extension exists but only manual assist.</td><td><span class="status-badge status-partial">Medium</span> — manual works but slow</td></tr>
+    <tr><td><strong>Stress test</strong></td><td>Works.</td><td><span class="status-badge status-working">None</span></td></tr>
+    <tr class="gap-row"><td><strong>Submit</strong></td><td>No tracking at all.</td><td><span class="status-badge status-gap">High</span> — can't track submissions</td></tr>
+    <tr class="gap-row"><td><strong>Archive outcome</strong></td><td>Only aggregate stats. No per-application outcome log.</td><td><span class="status-badge status-gap">High</span> — can't close feedback loop</td></tr>
+  </tbody>
+</table>
+
+<h3>By domain</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Domain</th>
+      <th>Current state</th>
+      <th>What's missing</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Funding</strong></td>
+      <td>Working. 842 programs, 225 questions, fit scoring, stress testing.</td>
+      <td>Variant tracking, submit logging, outcome logging, separate funders table</td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>Jobs</strong></td>
+      <td>Taxonomy exists. Nothing populated.</td>
+      <td>Everything — programs, questions, answers, fit scoring, capture, fill</td>
+    </tr>
+    <tr class="gap-row">
+      <td><strong>College</strong></td>
+      <td>Taxonomy exists. Nothing populated.</td>
+      <td>Everything — programs, questions, answers, fit scoring, capture, fill</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>6. SKU Design Questions (To Resolve Before Formatting)</h2>
+
+<h3>Q1: What entity types need SKUs?</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Entity</th>
+      <th>Description</th>
+      <th>Needs SKU?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Domain</td><td>jobs / funding / college</td><td>Maybe — could be a prefix rather than a standalone SKU</td></tr>
+    <tr><td>Company</td><td>The entity creating the application (YC, Google, Harvard)</td><td>Yes</td></tr>
+    <tr><td>Application</td><td>A specific cycle or posting (YC W26, Google SWE, Harvard MBA 2026)</td><td>Yes</td></tr>
+    <tr><td>Question</td><td>An archived question ("Tell me about yourself")</td><td>Yes</td></tr>
+    <tr><td>Answer</td><td>A user's answer to a question</td><td>Yes</td></tr>
+    <tr><td>Answer Variant</td><td>A target-specific version of an answer</td><td>Yes</td></tr>
+    <tr><td>Outcome</td><td>The result of a submitted application</td><td>Maybe — could be a status field on Application</td></tr>
+    <tr><td>Review</td><td>A stress test or review of an answer</td><td>Maybe — could be a child of Answer</td></tr>
+  </tbody>
+</table>
+
+<div class="open-question">Should Domain, Outcome, and Review get their own SKUs, or are they attributes of other entities?</div>
+
+<h3>Q2: What does each SKU reference?</h3>
+
+<p>The traceability chain:</p>
+<pre>Domain → Company → Application → Question → Answer → Answer Variant
+                                                    → Review
+                                                    → Stress Test</pre>
+
+<ul>
+  <li>An Answer Variant references its Question</li>
+  <li>A Question references its Application (or multiple applications)</li>
+  <li>An Application references its Company</li>
+  <li>A Company references its Domain</li>
+</ul>
+
+<div class="open-question">Should a Question reference an Application, or should the Application reference Questions? Currently <code>program_questions</code> is a join table — the link goes both ways. Which direction is canonical for the SKU?</div>
+
+<h3>Q3: Where does the SKU live?</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Source of truth</th>
+      <th>Sync target</th>
+      <th>Tradeoff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>A</td><td>Database (Supabase column)</td><td>Canon files (frontmatter)</td><td>DB is authoritative, canon is projection. Matches current architecture.</td></tr>
+    <tr><td>B</td><td>Canon files (frontmatter)</td><td>Database (Supabase column)</td><td>Canon is authoritative, DB is projection. Matches social profile canon pattern.</td></tr>
+    <tr><td>C</td><td>Both (bidirectional sync)</td><td>Either can initiate</td><td>Most flexible but most complex. Risk of conflicts.</td></tr>
+  </tbody>
+</table>
+
+<div class="open-question">The social profile canon uses Option B (canon is source of truth). AQUA's architecture doc says "database remains the source of truth." Which wins for the application canon?</div>
+
+<h3>Q4: Does a SKU survive across domains?</h3>
+
+<p>"Tell me about yourself" appears in jobs, funding, and college. Options:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Behavior</th>
+      <th>Tradeoff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>A</td><td>One Question, one SKU, tagged with <code>domain: general</code></td><td>Simple. But can't track domain-specific phrasing or word limits.</td></tr>
+    <tr><td>B</td><td>Three Questions, three SKUs, linked by <code>universal_theme: background</code></td><td>Preserves domain-specific metadata. But the same question exists 3 times.</td></tr>
+    <tr><td>C</td><td>One Question SKU + per-domain "phrasing" records</td><td>Question is universal, phrasing is per-domain. Matches <code>program_questions</code> pattern.</td></tr>
+  </tbody>
+</table>
+
+<div class="open-question">Option C matches the existing <code>archived_questions</code> + <code>program_questions</code> pattern. Should the SKU follow that, or simplify?</div>
+
+<h3>Q5: What about the user's identity?</h3>
+
+<p>The social profile canon holds Deric's identity — name, title, bio, links. The SEO profile holds business context. Where does the resume/cover letter identity live?</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Location</th>
+      <th>Tradeoff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>A</td><td>In the application canon (new file)</td><td>Self-contained. But duplicates identity from social profile canon.</td></tr>
+    <tr><td>B</td><td>Reference the social profile canon</td><td>No duplication. But the application canon depends on another canon.</td></tr>
+    <tr><td>C</td><td>A shared "identity canon" that both reference</td><td>Cleanest separation. But adds another layer.</td></tr>
+  </tbody>
+</table>
+
+<div class="open-question">The resume is identity material. The social profile is identity material. Are they the same canon or different canons that share a root?</div>
+
+<!-- ============================================================ -->
+<h2>7. Next Steps</h2>
+
+<ol>
+  <li><strong>Resolve SKU questions</strong> (Section 6) — these block the SKU format design</li>
+  <li><strong>Decide canon location</strong> — AQUA docs/ (current) vs. neutral Codex location vs. both</li>
+  <li><strong>Design SKU format</strong> — after Q1-Q5 are answered</li>
+  <li><strong>Build the gap features</strong> — submit tracking, outcome logging, answer variants, separate companies table</li>
+  <li><strong>Populate jobs and college domains</strong> — archive questions, seed programs, compute DNA</li>
+  <li><strong>Wire the canon to the database</strong> — sync layer between files and Supabase</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2>Changelog</h2>
+
+<ul>
+  <li>2026-09-06: Initial process map created. Covers user process, AQUA turns, internal archiving, gap analysis, and SKU design questions.</li>
+</ul>
+
+</body>
+</html>
