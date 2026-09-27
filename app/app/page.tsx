@@ -25,6 +25,7 @@ const jsonLd = {
   '@context': CANON_LD_CONTEXT,
   '@graph': [
     {
+      '@context': CANON_LD_CONTEXT,
       '@type': 'Organization',
       '@id': 'https://mos2es.xyz/#organization',
       name: elloCelloLLC.name,
@@ -32,10 +33,11 @@ const jsonLd = {
       url: 'https://mos2es.xyz',
       email: 'burnmydays@proton.me',
       description: elloCelloLLC.description,
-      sourceSystem: elloCelloLLC.sourceSystem,
-      canonBacked: elloCelloLLC.canonBacked,
-      authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
-      associatedWith: elloCelloLLC.associatedWith,
+      logo: 'https://mos2es.xyz/opengraph-image',
+      'moses:sourceSystem': elloCelloLLC.sourceSystem,
+      'moses:canonBacked': elloCelloLLC.canonBacked,
+      'moses:authorityApprovalRef': elloCelloLLC.authorityApprovalRef,
+      'moses:associatedWith': elloCelloLLC.associatedWith,
       address: {
         '@type': 'PostalAddress',
         streetAddress: '84 W Utica St',
@@ -58,21 +60,23 @@ const jsonLd = {
       ],
     },
     {
+      '@context': CANON_LD_CONTEXT,
       '@type': 'WebSite',
       '@id': 'https://mos2es.xyz/#website',
       name: 'AQUA Application Hub',
       alternateName: ['AQUA', 'mos2es.xyz'],
       url: 'https://mos2es.xyz',
       publisher: { '@id': 'https://mos2es.xyz/#organization' },
-      sourceSystem: elloCelloLLC.sourceSystem,
-      canonBacked: elloCelloLLC.canonBacked,
-      authorityApprovalRef: elloCelloLLC.authorityApprovalRef,
-      associatedWith: [
+      'moses:sourceSystem': elloCelloLLC.sourceSystem,
+      'moses:canonBacked': elloCelloLLC.canonBacked,
+      'moses:authorityApprovalRef': elloCelloLLC.authorityApprovalRef,
+      'moses:associatedWith': [
         { '@id': 'https://mos2es.xyz/#organization' },
         { '@id': CANON_ENTITY_IDS.moses },
       ],
     },
     {
+      '@context': CANON_LD_CONTEXT,
       '@type': 'SoftwareApplication',
       '@id': 'https://mos2es.xyz/#aqua',
       name: 'AQUA Application Hub',
@@ -82,6 +86,11 @@ const jsonLd = {
         'Founder-first application infrastructure for reusable questions, answers, opportunity fit, review history, and source lineage.',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        description: 'Free tier available.',
+        url: 'https://mos2es.xyz/login',
+      },
       provider: { '@id': 'https://mos2es.xyz/#organization' },
       featureList: [
         'Reusable application answer bank',

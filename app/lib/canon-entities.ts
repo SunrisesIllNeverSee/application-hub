@@ -30,14 +30,11 @@ export const CANON_ENTITY_IDS = {
 // moses namespace so the JSON-LD is semantically valid. This context is
 // shared with mos2es-site and sigrank-app — same namespace, same field
 // mappings.
-export const CANON_LD_CONTEXT = {
-  "@vocab": "https://schema.org/",
-  moses: "https://mos2es.com/ontology/0.1/",
-  sourceSystem: "moses:sourceSystem",
-  canonBacked: "moses:canonBacked",
-  authorityApprovalRef: "moses:authorityApprovalRef",
-  associatedWith: "moses:associatedWith",
-} as const;
+// Validators (and Google's parser) expect the literal string form. The moses:
+// namespace is preserved by prefixing the custom field names directly —
+// "moses:" is a valid IRI scheme, so the keys stay namespaced without a
+// context-object mapping.
+export const CANON_LD_CONTEXT = "https://schema.org";
 
 const CANON_PROVENANCE = {
   sourceSystem: "search-authority",
