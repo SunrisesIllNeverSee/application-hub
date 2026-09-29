@@ -18,3 +18,80 @@ Content-Signal: ai-input=yes
 Content-Signal: ai-train=yes
 
 Agentmap: /.well-known/agent.json
+
+# Explicitly allow AI answer-engine crawlers on public content (AEO/GEO).
+# App/authenticated paths stay disallowed for all bots.
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /profile/
+Disallow: /workspace/
+Disallow: /questions
+Disallow: /applications/
+Disallow: /hub/
+Disallow: /dash
+Disallow: /onboarding
+Disallow: /login
+
+User-agent: Bytespider
+Disallow: /
