@@ -6,6 +6,7 @@
     { "source": "/about/scoring", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/contact", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/privacy", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
+    { "source": "/support", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/exchange", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/exchange/company", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },
     { "source": "/exchange/agent", "headers": [{ "key": "Vary", "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch" }] },

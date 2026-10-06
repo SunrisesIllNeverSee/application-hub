@@ -19,6 +19,7 @@ Agents should read https://mos2es.xyz/llms.txt for when-to-use guidance. The rep
 
 - About: https://mos2es.xyz/about
 - Contact: https://mos2es.xyz/contact
+- AQUA IDP support: https://mos2es.xyz/support
 - Privacy: https://mos2es.xyz/privacy
 - Scoring methodology: https://mos2es.xyz/about/scoring
 - Sitemap: https://mos2es.xyz/sitemap.xml
@@ -66,12 +67,36 @@ This is the business mailing address associated with Ello Cello LLC's public rec
 - Product: https://mos2es.xyz
 - About: https://mos2es.xyz/about
 - Privacy: https://mos2es.xyz/privacy
+- AQUA IDP support: https://mos2es.xyz/support
 - Scoring methodology: https://mos2es.xyz/about/scoring
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub
 `,
+  '/support': `# AQUA IDP Support
+
+AQUA IDP is the local-folder plugin for preserving applications, organizing questions, reviewing answers, and preparing Markdown drafts. It does not create a website account. The original application stays available so the user can check every interpretation and reuse decision against the source.
+
+## Find the next action
+
+Open PROGRESS.md in the AQUA folder, then Run-Status.csv. A ready means the source has been archived and its questions indexed. QU review_needed means the questions still need interpretation. waiting_for_QU and waiting_for_answers describe phase order; they do not mean those capabilities are missing. Keep or export the entire folder to carry the bank into another session.
+
+## Common questions
+
+- Missing application field: compare the archived source with the question index and record the gap. Do not invent an answer.
+- Wrong question match: preserve the original wording and correct the interpretation or grouping.
+- Old submitted answer: treat it as historical evidence until its facts and wording have been reviewed and the applicant explicitly approves a reusable version.
+- Markdown draft: it is a prepared document, not evidence that an outside form was filled, submitted, or accepted.
+
+## Contact support
+
+Email burnmydays@proton.me with the plugin version, current phase, expected result, observed result, and a beta report ID when available. Do not email application answers, source documents, credentials, government IDs, or other sensitive records. A redacted example may be requested separately. For a suspected security issue, describe the affected surface and steps to reproduce without sending live secrets. The publisher will assess confirmed issues and determine appropriate containment and notification.
+
+## Privacy and beta reports
+
+Issue details and technical tracebacks stay in the local Beta Reports folder by default. Optional automatic delivery sends limited technical metadata after opt-in; beta-reporting --disable stops future delivery. Users can delete their local reports and workspace files themselves. See https://mos2es.xyz/privacy for the plugin's full data-handling explanation, and https://mos2es.xyz/contact for website-account or business questions.
+`,
   '/privacy': `# AQUA Privacy
 
-Last updated: 2026-08-21
+Last updated: 2026-10-02
 
 AQUA Application Hub is operated by Ello Cello LLC. This page describes the main categories of information the product handles and the controls reflected in the current application architecture. It is intended to make the public data posture legible; it does not replace any additional terms presented during a specific paid service or integration flow.
 
@@ -87,9 +112,18 @@ User answers and answer history are treated as sensitive application data. The a
 
 AQUA can support BYOK model providers, so a user who enables a provider may send selected drafting or review material to that provider under the provider's own terms. Billing flows may use Stripe. Hosting, authentication, database, and delivery infrastructure may process information necessary to provide those services. Users should avoid placing credentials or secrets inside application-answer text.
 
+## AQUA IDP plugin
+
+AQUA IDP is a separate local-folder workflow. It uses only applications, URLs, and professional context supplied or authorized by the user through their host. It writes source copies, question indexes, historical answer candidates, approved answer versions, drafts, and progress records to a folder the user chooses. The publisher does not receive application content through the plugin's normal file workflow. Files remain until the user or their host deletes them. The host may process conversation and file data under its own terms and privacy policy.
+
+Local beta reports can contain issue details and technical tracebacks. Automatic delivery is off by default. After opt-in, the plugin sends only a random report ID, time, version, command, issue type, error class, grouping fingerprint, Python version, and operating-system name over HTTPS. It does not send application questions, answers, source files, file paths, local issue descriptions, or tracebacks. The Cloudflare-hosted receiver uses the request IP for rate limiting but does not save it in the report record. Received report records expire after 30 days; infrastructure logs may have separate retention. beta-reporting --disable stops future delivery. Users can delete local reports from their workspace.
+
+Users choose sources and can inspect, edit, export, or delete their local files. An old submitted answer is not automatically approved for future reuse. AQUA IDP is not designed for payment-card data, protected health information, government identifiers, passwords, API keys, or one-time codes; redact those before providing an application.
+
 ## Requests and contact
 
 For privacy, access, correction, or deletion questions, contact burnmydays@proton.me. Include the account email or other identifier necessary to locate the relevant account, but do not send passwords, private API keys, or authentication tokens. Business contact information and the mailing address are published at https://mos2es.xyz/contact.
+For plugin help or a privacy request concerning a beta report, see https://mos2es.xyz/support and include the report ID when available.
 `,
   '/about/scoring': `# AQUA Scoring & Intelligence
 

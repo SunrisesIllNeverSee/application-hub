@@ -127,6 +127,10 @@ export const BREADCRUMBS = {
     { name: 'Home', path: '/' },
     { name: 'Contact', path: '/contact' },
   ]),
+  support: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'AQUA IDP Support', path: '/support' },
+  ]),
   privacy: breadcrumbList([
     { name: 'Home', path: '/' },
     { name: 'Privacy', path: '/privacy' },

@@ -32,7 +32,7 @@ const nextConfig = {
 
     // Pages that support Markdown content negotiation (Accept: text/markdown)
     const varyPages = [
-      '/', '/about', '/about/scoring', '/contact', '/privacy', '/agents',
+      '/', '/about', '/about/scoring', '/contact', '/privacy', '/support', '/agents',
       '/faq', '/developers', '/application-infrastructure',
       '/concepts/answer-reuse', '/concepts/fit-score', '/concepts/application-graph',
       '/concepts/answer-lineage', '/concepts/smart-matcher',

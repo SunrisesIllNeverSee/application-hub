@@ -36,14 +36,14 @@ test('public HTML routes declare Accept in framework and Vercel Vary headers', a
   const expected = 'Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch'
   assert.ok(config.includes(expected))
 
-  const expectedRoutes = ['/', '/about', '/about/scoring', '/contact', '/privacy']
+  const expectedRoutes = ['/', '/about', '/about/scoring', '/contact', '/privacy', '/support']
   for (const pathname of expectedRoutes) {
     assert.ok(vercel.headers.some((entry) => entry.source === pathname && entry.headers.some((header) => header.key === 'Vary' && header.value === expected)), `missing Vercel Vary route ${pathname}`)
   }
 })
 
 test('canonical Markdown pages are substantial and semantically structured', () => {
-  for (const pathname of ['/', '/about', '/contact', '/privacy', '/about/scoring']) {
+  for (const pathname of ['/', '/about', '/contact', '/privacy', '/support', '/about/scoring']) {
     const body = MARKDOWN_PAGES[pathname]
     assert.ok(body, `missing Markdown for ${pathname}`)
     assert.match(body, /^# /)
@@ -81,7 +81,7 @@ test('homepage source contains canonical metadata and required JSON-LD identitie
 })
 
 test('trust anchor pages are substantial, canonical, and have heading hierarchy', async () => {
-  for (const pathname of ['app/about/page.tsx', 'app/contact/page.tsx', 'app/privacy/page.tsx']) {
+  for (const pathname of ['app/about/page.tsx', 'app/contact/page.tsx', 'app/privacy/page.tsx', 'app/support/page.tsx']) {
     const source = await read(pathname)
     assert.ok(source.length > 2500, `${pathname} is too thin`)
     assert.match(source, /alternates:\s*\{ canonical:/)
@@ -98,7 +98,7 @@ test('custom 404 and sitemap expose recovery and trust endpoints', async () => {
   assert.match(notFound, /\/sitemap\.xml/)
   assert.match(notFound, /\/about/)
 
-  for (const pathname of ['/about', '/about/scoring', '/contact', '/privacy', '/developers']) {
+  for (const pathname of ['/about', '/about/scoring', '/contact', '/privacy', '/support', '/developers']) {
     assert.ok(sitemap.includes(pathname), `sitemap missing ${pathname}`)
   }
 })
