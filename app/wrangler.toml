@@ -1,0 +1,29 @@
+name = "application-hub"
+main = ".open-next/worker.js"
+compatibility_date = "2025-10-01"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "application-hub"
+
+[images]
+binding = "IMAGES"
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1
+
+# Server-side secrets go via `wrangler secret put` (never here):
+#   SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY,
+#   GROQ_API_KEY, RESEND_API_KEY, STRIPE_SECRET_KEY, CRON_SECRET,
+#   INTEGRATION_ENCRYPTION_KEY, ICEBERG_TOKEN
+
+[vars]
+CF_WORKER = "1"
+NEXT_PUBLIC_APP_URL = "https://aquaidp.xyz"
+APP_URL = "https://aquaidp.xyz"

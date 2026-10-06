@@ -6,9 +6,10 @@ import { join } from 'path'
 import { tmpdir } from 'os'
 
 // fundscore is a CJS module — use dynamic import to avoid ESM issues
+// Not available on Cloudflare Workers (needs fs/subprocess for git clone + score)
 let fundscore: any
 try {
-  fundscore = require('fundscore')
+  fundscore = process.env.CF_WORKER === '1' ? null : require('fundscore')
 } catch {
   fundscore = null
 }

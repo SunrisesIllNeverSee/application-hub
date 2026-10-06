@@ -51,3 +51,4 @@ application-hub-mcp-server/.plugin-eval/
 # Skylos scan output
 skylos-sec.json
 .skylos/
+.vercel
