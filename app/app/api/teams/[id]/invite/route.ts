@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 const APP_URL = 'https://application-hub-chi.vercel.app'
-const FROM_EMAIL = 'noreply@mos2es.xyz'
+const FROM_EMAIL = 'noreply@aquaidp.xyz'
 
 interface InviteBody {
   email?: unknown

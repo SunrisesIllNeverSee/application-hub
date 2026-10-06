@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
 
   const appUrl = (process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://aquaidp.xyz').replace(/\/$/, '')
   const resendKey = process.env.RESEND_API_KEY ?? ''
-  const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@mos2es.xyz'
+  const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@aquaidp.xyz'
 
   if (!resendKey) {
     return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 })
