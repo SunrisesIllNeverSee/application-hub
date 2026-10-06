@@ -15,7 +15,7 @@ export async function GET() {
       {
         kty: 'OKP',
         crv: 'Ed25519',
-        kid: 'mos2es-xyz-bot-1',
+        kid: 'aquaidp-xyz-bot-1',
         use: 'sig',
         alg: 'EdDSA',
         x: 'GCJc4y2SKFAS_icpaChff43m-zqawFVCfbrgsytKjI0',

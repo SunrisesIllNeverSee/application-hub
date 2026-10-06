@@ -62,12 +62,12 @@ export default function LoginPage() {
     }
   }
 
-  async function handleGitHub() {
+  async function handleOAuth(provider: 'github' | 'google' | 'linkedin_oidc') {
     setLoading(true)
     setError(null)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
+      provider,
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     })
     if (error) {
@@ -171,12 +171,12 @@ export default function LoginPage() {
                 </p>
               )}
 
-              {/* GitHub OAuth */}
+              {/* OAuth providers */}
               {isPasswordMode && (
-                <div className="mb-5">
+                <div className="mb-5 space-y-2.5">
                   <button
                     type="button"
-                    onClick={handleGitHub}
+                    onClick={() => handleOAuth('github')}
                     disabled={loading}
                     className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg border border-neutral-700 bg-neutral-800 text-white text-sm font-medium hover:bg-neutral-700 transition-colors disabled:opacity-50"
                   >
@@ -184,6 +184,31 @@ export default function LoginPage() {
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                     Continue with GitHub
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOAuth('google')}
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg border border-neutral-700 bg-neutral-800 text-white text-sm font-medium hover:bg-neutral-700 transition-colors disabled:opacity-50"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                      <path fill="#EA4335" d="M12 5.04c1.62 0 3.06.56 4.2 1.64l3.12-3.12C17.46 1.8 14.96.72 12 .72 7.44.72 3.56 3.36 1.72 7.28l3.64 2.82C6.24 7.04 8.88 5.04 12 5.04z"/>
+                      <path fill="#4285F4" d="M23.28 12.26c0-.8-.08-1.56-.2-2.3H12v4.34h6.44c-.28 1.48-1.12 2.74-2.4 3.58l3.7 2.86c2.16-2 3.54-4.94 3.54-8.48z"/>
+                      <path fill="#FBBC05" d="M5.36 14.26c-.28-.84-.44-1.74-.44-2.66s.16-1.82.44-2.66L1.72 6.12C.98 7.68.6 9.4.6 11.2s.38 3.52 1.12 5.08l3.64-2.82z"/>
+                      <path fill="#34A853" d="M12 23.28c2.96 0 5.46-.98 7.28-2.66l-3.7-2.86c-1 .68-2.28 1.08-3.58 1.08-3.12 0-5.76-2-6.64-4.82l-3.64 2.82c1.84 3.68 5.72 6.44 10.28 6.44z"/>
+                    </svg>
+                    Continue with Google
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOAuth('linkedin_oidc')}
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg border border-neutral-700 bg-neutral-800 text-white text-sm font-medium hover:bg-neutral-700 transition-colors disabled:opacity-50"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#0A66C2" aria-hidden="true">
+                      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z"/>
+                    </svg>
+                    Continue with LinkedIn
                   </button>
                   <div className="flex items-center gap-3 mt-4">
                     <div className="flex-1 h-px bg-neutral-800" />

@@ -115,7 +115,7 @@ async function sendDeadlineEmail(
       Authorization: `Bearer ${resendApiKey}`,
     },
     body: JSON.stringify({
-      from: 'alerts@mos2es.xyz',
+      from: 'alerts@aquaidp.xyz',
       to,
       subject,
       html,
