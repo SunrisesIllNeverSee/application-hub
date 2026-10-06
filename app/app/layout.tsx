@@ -12,7 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://mos2es.xyz'),
+  metadataBase: new URL('https://aquaidp.xyz'),
   title: {
     default: 'AQUA Application Hub',
     template: '%s — AQUA',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Ello Cello LLC' }],
   openGraph: {
     type: 'website',
-    url: 'https://mos2es.xyz',
+    url: 'https://aquaidp.xyz',
     siteName: 'AQUA Application Hub',
     title: 'AQUA Application Hub — Applications. Questions. Answers.',
     description:
@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <PostHogProvider>{children}</PostHogProvider>
         </ThemeProvider>
-        {/* Google Analytics 4 (gtag.js) — measurement ID G-WEKMTD1CBL (mos2es.xyz stream) */}
+        {/* Google Analytics 4 (gtag.js) — measurement ID G-WEKMTD1CBL (aquaidp.xyz stream) */}
         <Script
           id="ga4-gtag-src"
           strategy="afterInteractive"

@@ -53,12 +53,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: 'Is AQUA free?',
     answer:
-      'AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at mos2es.xyz is the canonical public product surface. Pricing details are available on the platform. The local MCP server and developer resources are publicly accessible.',
+      'AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at aquaidp.xyz is the canonical public product surface. Pricing details are available on the platform. The local MCP server and developer resources are publicly accessible.',
   },
   {
     question: 'How does the MCP server work?',
     answer:
-      'AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.',
+      'AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at aquaidp.xyz; the server is designed for local use alongside your agent client.',
   },
   {
     question: 'What is the Appfeeder extension?',
@@ -78,12 +78,12 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: 'What is the Contribution Exchange?',
     answer:
-      'The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to signalaf.com — see signalaf.com/agents.md for the full agent carry guide. Agents interact with the Steward at signalaf.com/api/exchange/steward/mos2es.xyz.',
+      'The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to signalaf.com — see signalaf.com/agents.md for the full agent carry guide. Agents interact with the Steward at signalaf.com/api/exchange/steward/aquaidp.xyz.',
   },
   {
     question: 'How do I get started with AQUA?',
     answer:
-      'Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.',
+      'Visit aquaidp.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.',
   },
 ]
 

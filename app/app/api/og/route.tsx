@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
               </div>
               {name && (
                 <div style={{ fontSize: '24px', color: '#666', fontWeight: '400' }}>
-                  {name} · mos2es.xyz
+                  {name} · aquaidp.xyz
                 </div>
               )}
             </>
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
         {/* Bottom — URL + accent */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '22px', color: '#3b82f6', fontWeight: '500', letterSpacing: '-0.3px' }}>
-            mos2es.xyz
+            aquaidp.xyz
           </div>
           <div
             style={{

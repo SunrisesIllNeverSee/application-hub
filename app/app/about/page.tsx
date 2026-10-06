@@ -45,7 +45,7 @@ export default function AboutPage() {
         <section className="mb-14 space-y-5">
           <h2 className="text-2xl font-semibold tracking-tight">What is in the system</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            AQUA includes an answer bank, an application workspace, opportunity fit and readiness signals, imports, bring-your-own-key drafting, persisted reviews, and stress tests. A local MCP server exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The web application at mos2es.xyz remains the canonical public product surface; agents should not assume that a hosted public MCP endpoint exists.
+            AQUA includes an answer bank, an application workspace, opportunity fit and readiness signals, imports, bring-your-own-key drafting, persisted reviews, and stress tests. A local MCP server exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The web application at aquaidp.xyz remains the canonical public product surface; agents should not assume that a hosted public MCP endpoint exists.
           </p>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
             AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. This site is specifically focused on application infrastructure. Its public source repository is available on GitHub so technical users and agents can inspect the shipped architecture rather than relying only on marketing claims.

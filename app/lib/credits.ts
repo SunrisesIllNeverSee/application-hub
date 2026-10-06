@@ -204,13 +204,13 @@ export function resolveDedupKey(eventType: CreditEventType, actionId?: string): 
 
 export const SHARE_CONTENT = {
   twitter: {
-    text: `I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere — the question archive is genuinely useful. mos2es.xyz #founders #startups`,
+    text: `I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere — the question archive is genuinely useful. aquaidp.xyz #founders #startups`,
     eventType: 'social_share' as CreditEventType,
     platformLabel: 'X / Twitter',
   },
   linkedin: {
     text: `Discovered a tool that changed how I approach accelerator applications. Application Hub archives every question across YC, Techstars, NSF, and 800+ programs — so you build one reusable answer bank instead of starting from scratch every time. Worth a look.`,
-    url: 'https://mos2es.xyz',
+    url: 'https://aquaidp.xyz',
     eventType: 'social_repost' as CreditEventType,
     platformLabel: 'LinkedIn',
   },

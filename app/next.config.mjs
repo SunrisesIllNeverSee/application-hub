@@ -52,14 +52,14 @@ const nextConfig = {
         source: '/.well-known/agent.json',
         headers: [
           ...securityHeaders,
-          { key: 'Link', value: '<https://mos2es.xyz/.well-known/agent.json>; rel="agent"' },
+          { key: 'Link', value: '<https://aquaidp.xyz/.well-known/agent.json>; rel="agent"' },
         ],
       },
       {
         source: '/.well-known/api-catalog',
         headers: [
           ...securityHeaders,
-          { key: 'Link', value: '<https://mos2es.xyz/.well-known/api-catalog>; rel="service-desc"; type="application/linkset+json"' },
+          { key: 'Link', value: '<https://aquaidp.xyz/.well-known/api-catalog>; rel="service-desc"; type="application/linkset+json"' },
         ],
       },
       {

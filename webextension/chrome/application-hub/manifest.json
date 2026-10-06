@@ -12,7 +12,7 @@
     "https://*.acceleratorapp.co/*",
     "https://*.commonapp.org/*",
     "https://*.grants.gov/*",
-    "https://mos2es.xyz/*"
+    "https://aquaidp.xyz/*"
   ],
   "background": {
     "service_worker": "background.js",

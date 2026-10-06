@@ -55,7 +55,7 @@ Meaning Preservation at Execution, similar to TCP/IP
 ---
 
 ### Answer
-mos2es.com / mos2es.xyz / signomy.xyz
+mos2es.com / aquaidp.xyz / signomy.xyz
 
 — from: 3xcapital · 2026-05-13 · Q: "Websites"
 

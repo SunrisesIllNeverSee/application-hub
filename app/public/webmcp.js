@@ -75,7 +75,7 @@
       if (matches.length === 0) {
         return { content: [{ type: 'text', text: 'No results found for: ' + query + '. Try: answer bank, fit score, smart matcher, guides, lineage.' }] };
       }
-      const results = matches.map(p => '- [' + p.title + '](https://mos2es.xyz' + p.url + ')').join('\n');
+      const results = matches.map(p => '- [' + p.title + '](https://aquaidp.xyz' + p.url + ')').join('\n');
       return { content: [{ type: 'text', text: 'Results for "' + query + '":\n' + results }] };
     }
   });
@@ -98,11 +98,11 @@
     annotations: { readOnlyHint: true },
     async execute({ concept }) {
       const concepts = {
-        'answer-lineage': 'Answer Lineage: every answer traces its origin and variants, enabling provenance tracking and reuse without losing source context. See: https://mos2es.xyz/concepts/answer-lineage',
-        'answer-reuse': 'Answer Reuse: reuse application answers across accelerators, grants, fellowships, and jobs. One answer bank for every application. See: https://mos2es.xyz/concepts/answer-reuse',
-        'application-graph': 'Application Graph: a portable network of questions, answers, fit signals, and review history that spans all your applications. See: https://mos2es.xyz/concepts/application-graph',
-        'fit-score': 'Fit Score: opportunity fit and readiness signals that help you understand which programs match your profile. See: https://mos2es.xyz/concepts/fit-score',
-        'smart-matcher': 'Smart Matcher: recommends opportunities based on your answer bank and fit signals. See: https://mos2es.xyz/concepts/smart-matcher'
+        'answer-lineage': 'Answer Lineage: every answer traces its origin and variants, enabling provenance tracking and reuse without losing source context. See: https://aquaidp.xyz/concepts/answer-lineage',
+        'answer-reuse': 'Answer Reuse: reuse application answers across accelerators, grants, fellowships, and jobs. One answer bank for every application. See: https://aquaidp.xyz/concepts/answer-reuse',
+        'application-graph': 'Application Graph: a portable network of questions, answers, fit signals, and review history that spans all your applications. See: https://aquaidp.xyz/concepts/application-graph',
+        'fit-score': 'Fit Score: opportunity fit and readiness signals that help you understand which programs match your profile. See: https://aquaidp.xyz/concepts/fit-score',
+        'smart-matcher': 'Smart Matcher: recommends opportunities based on your answer bank and fit signals. See: https://aquaidp.xyz/concepts/smart-matcher'
       };
       const result = concepts[concept] || 'Unknown concept: ' + concept;
       return { content: [{ type: 'text', text: result }] };
@@ -156,7 +156,7 @@
     annotations: { readOnlyHint: true },
     async execute() {
       const ecosystem = [
-        'AQUA Application Hub (mos2es.xyz): Founder-first application infrastructure',
+        'AQUA Application Hub (aquaidp.xyz): Founder-first application infrastructure',
         'MO§ES™ (mos2es.com): Sovereign signal governance framework',
         'SigRank (signalaf.com): Public leaderboard and benchmark for AI operator evaluation',
         'Upsilon: Enterprise measurement engine for AI operations',

@@ -31,7 +31,7 @@ MO§ES™
 Meaning Preservation at Execution, similar to TCP/IP
 
 ### Q: Websites
-mos2es.com / mos2es.xyz / signomy.xyz
+mos2es.com / aquaidp.xyz / signomy.xyz
 
 ### Q: Architecture link
 https://mos2es.com/architecture

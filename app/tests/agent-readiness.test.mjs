@@ -164,7 +164,7 @@ test('homepage JSON-LD includes WebSite entity and npm sameAs for brand discover
   const source = await read('app/page.tsx')
   assert.match(source, /'@type': 'WebSite'/)
   assert.match(source, /npmjs\.com/)
-  assert.match(source, /alternateName.*mos2es\.xyz/)
+  assert.match(source, /alternateName.*aquaidp\.xyz/)
 })
 
 test('lib/jsonld.ts exports reusable JSON-LD builders', async () => {
@@ -390,7 +390,7 @@ test('IndexNow API route exists with POST handler and domain validation', async 
   const source = await read('app/api/indexnow/route.ts')
   assert.match(source, /export async function POST/, 'indexnow route should export POST handler')
   assert.match(source, /export async function GET/, 'indexnow route should export GET handler for status')
-  assert.match(source, /mos2es\.xyz/, 'indexnow route should validate mos2es.xyz URLs only')
+  assert.match(source, /aquaidp\.xyz/, 'indexnow route should validate aquaidp.xyz URLs only')
   assert.match(source, /INDEXNOW_KEY/, 'indexnow route should reference the key')
   assert.match(source, /api\.indexnow\.org/, 'indexnow route should forward to IndexNow API')
   assert.match(source, /rejected/, 'indexnow route should track rejected URLs')
@@ -407,7 +407,7 @@ test('IndexNow push script exists', async () => {
   const fs = await import('node:fs/promises')
   const scriptPath = new URL('../../scripts/indexnow-push.mjs', import.meta.url)
   const source = await fs.readFile(scriptPath, 'utf-8')
-  assert.match(source, /mos2es\.xyz/, 'push script should target mos2es.xyz')
+  assert.match(source, /aquaidp\.xyz/, 'push script should target aquaidp.xyz')
   assert.match(source, /api\/indexnow/, 'push script should call the API route')
   assert.match(source, /sitemap\.xml/, 'push script should fetch sitemap URLs')
   assert.match(source, /dry-run/, 'push script should support --dry-run flag')

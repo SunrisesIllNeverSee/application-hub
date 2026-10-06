@@ -1,4 +1,4 @@
-const DEFAULT_HUB_URL = 'https://mos2es.xyz'
+const DEFAULT_HUB_URL = 'https://aquaidp.xyz'
 
 async function getSettings() {
   const settings = await chrome.storage.local.get(['hubUrl', 'jwt'])

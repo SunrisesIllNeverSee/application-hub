@@ -26,7 +26,7 @@ Humans govern the agent and handle exceptions. They are not expected to poll an 
 
 ## 1. Register a company/domain
 
-Human setup: `https://mos2es.xyz/exchange/company`
+Human setup: `https://aquaidp.xyz/exchange/company`
 
 Registration returns three sensitive/verification values:
 
@@ -51,7 +51,7 @@ Publish the TXT record returned by registration, then call the verification endp
 After verification fetch:
 
 ```bash
-curl -sS https://mos2es.xyz/api/exchange/profiles/example.com
+curl -sS https://aquaidp.xyz/api/exchange/profiles/example.com
 ```
 
 Publish the returned JSON at:
@@ -79,13 +79,13 @@ Proposal is not agreement; agreement is not authorization; authorization is not 
 Reference agent card/policy:
 
 ```bash
-curl -sS https://mos2es.xyz/api/exchange/steward/example.com
+curl -sS https://aquaidp.xyz/api/exchange/steward/example.com
 ```
 
 Policy preflight:
 
 ```bash
-curl -sS -X POST https://mos2es.xyz/api/exchange/steward/example.com \
+curl -sS -X POST https://aquaidp.xyz/api/exchange/steward/example.com \
   -H 'content-type: application/json' \
   -d '{
     "type":"preflight",
@@ -112,7 +112,7 @@ Preflight is advisory only.
 ## 6. Submit a stronger machine proposal
 
 ```bash
-curl -sS https://mos2es.xyz/api/exchange/proposals \
+curl -sS https://aquaidp.xyz/api/exchange/proposals \
   -H 'content-type: application/json' \
   -d '{
     "targetDomain":"example.com",
@@ -156,14 +156,14 @@ x-exchange-domain-agent-key: <domain-agent-key>
 List exchanges:
 
 ```bash
-curl -sS 'https://mos2es.xyz/api/exchange/exchanges?domain=example.com' \
+curl -sS 'https://aquaidp.xyz/api/exchange/exchanges?domain=example.com' \
   -H 'x-exchange-domain-agent-key: <domain-agent-key>'
 ```
 
 Read one exchange:
 
 ```bash
-curl -sS https://mos2es.xyz/api/exchange/exchanges/CX-... \
+curl -sS https://aquaidp.xyz/api/exchange/exchanges/CX-... \
   -H 'x-exchange-domain-agent-key: <domain-agent-key>'
 ```
 
@@ -171,7 +171,7 @@ The domain agent can message, engage, negotiate and accept commitments within de
 
 ## 9. Human supervisory control
 
-`https://mos2es.xyz/exchange/control`
+`https://aquaidp.xyz/exchange/control`
 
 Humans configure:
 
@@ -187,7 +187,7 @@ Humans configure:
 
 ## 10. Settlement
 
-The revenue model remains a configurable transaction fee on successful financial settlement. New company domains are `transaction_enabled=false` during private alpha. The reference `mos2es.xyz` node is enabled for controlled real-transaction tests.
+The revenue model remains a configurable transaction fee on successful financial settlement. New company domains are `transaction_enabled=false` during private alpha. The reference `aquaidp.xyz` node is enabled for controlled real-transaction tests.
 
 Cash exchange cannot skip directly from verification to closure and cannot be self-declared paid. Stripe Connect settlement applies the configured application fee. Nonfinancial exchange can settle through reciprocal value.
 

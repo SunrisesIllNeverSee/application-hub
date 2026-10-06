@@ -52,7 +52,7 @@ const ROWS: { dimension: string; aqua: string; founderApp: string }[] = [
   },
   {
     dimension: 'Pricing model',
-    aqua: 'Operated by Ello Cello LLC; web app at mos2es.xyz is the canonical surface, local MCP server and developer resources are publicly accessible.',
+    aqua: 'Operated by Ello Cello LLC; web app at aquaidp.xyz is the canonical surface, local MCP server and developer resources are publicly accessible.',
     founderApp: 'Commercial SaaS pricing on its own surface.',
   },
 ]

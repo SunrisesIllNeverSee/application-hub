@@ -375,7 +375,7 @@ academic-geo Devin session as the next task. Summary of what it covers:
 - **Live GSC findings** (pulled 2026-06-30) for all 4 properties:
   - `signalaf.com` — root indexed, `/methodology` + `/research/q1-2026` unknown to Google (discovery gap)
   - `mos2es.com` — healthiest, 226 impressions but concentrated on `poster.html`
-  - `mos2es.xyz` — root crawled 7 weeks ago, 148 `/hub` URLs pushed but crawl-budget starved
+  - `aquaidp.xyz` — root crawled 7 weeks ago, 148 `/hub` URLs pushed but crawl-budget starved
   - `signomy.xyz` — mid, 51 URLs pushed, crawl ~2 wks old
 - **Render is NOT the blocker** (verified via curl — all server-rendered)
 - **Per-site fix punch-list** using `scripts/gsc/gsc.mjs` toolkit

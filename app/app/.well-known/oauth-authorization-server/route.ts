@@ -1,9 +1,9 @@
 /**
  * app/.well-known/oauth-authorization-server/route.ts
  *
- * OAuth Authorization Server Metadata (RFC 8414) for mos2es.xyz.
+ * OAuth Authorization Server Metadata (RFC 8414) for aquaidp.xyz.
  *
- * mos2es.xyz uses Supabase for auth. This metadata bridges Supabase's
+ * aquaidp.xyz uses Supabase for auth. This metadata bridges Supabase's
  * OIDC discovery to the OAuth standard path so scanners can verify the
  * issuer chain.
  */
@@ -29,22 +29,22 @@ export async function GET() {
     id_token_signing_alg_values_supported: ['RS256', 'HS256', 'ES256'],
     code_challenge_methods_supported: ['S256', 'plain'],
     require_pushed_authorization_requests: false,
-    auth_md: 'https://mos2es.xyz/.well-known/auth.md',
-    registration_endpoint: 'https://mos2es.xyz/login',
+    auth_md: 'https://aquaidp.xyz/.well-known/auth.md',
+    registration_endpoint: 'https://aquaidp.xyz/login',
     agent_auth: {
       skill:
         'Public tools (programs, questions, rankings) work without auth. Authenticated tools (answer bank, fit scores, application intake) require a Supabase session JWT.',
-      register_uri: 'https://mos2es.xyz/login',
+      register_uri: 'https://aquaidp.xyz/login',
       methods: [
         {
           type: 'oauth_2.0',
           flow: 'authorization_code',
           authorization_endpoint: `${supabaseUrl}/auth/v1/oauth/authorize`,
           token_endpoint: `${supabaseUrl}/auth/v1/oauth/token`,
-          callback: 'https://mos2es.xyz/auth/callback',
+          callback: 'https://aquaidp.xyz/auth/callback',
           providers: ['github', 'twitter', 'email_magic_link'],
           scopes: ['openid', 'profile', 'email', 'offline_access'],
-          session_check: 'GET https://mos2es.xyz/api/auth/session',
+          session_check: 'GET https://aquaidp.xyz/api/auth/session',
         },
       ],
     },

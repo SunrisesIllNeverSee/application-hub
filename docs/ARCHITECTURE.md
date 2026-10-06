@@ -32,7 +32,7 @@ BYOK providers   Stripe           scheduled jobs / alerts
 ```
 
 Today that means:
-- public web app at `mos2es.xyz`
+- public web app at `aquaidp.xyz`
 - MCP server for Claude/Cursor/Windsurf/Codex
 - Supabase as the single source of truth
 - BYOK providers including Anthropic, OpenAI, Ollama, and Google

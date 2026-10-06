@@ -70,7 +70,7 @@ Three enforcement primitives, already architecturally complete:
 - **SIGSYSTEM** — measurement instrument (v1.1, ~1,500 lines of Python) that quantifies commitment-kernel preservation across transformations. Already processed 1.123 billion tokens across 21 production sessions.
 - **Vault Artifacts** — self-authenticating, cryptographically lineage-bound digital artifacts produced by every verified transformation. Provenance is not logged after the fact — it is structurally embedded.
 
-Live today: KASSA voice-AI commitment-kernel demo (cached mode, no auth), Signomy governed-agent marketplace (270 API endpoints, Stripe Connect, signomy.xyz), AQUA application OS (mos2es.xyz), COMMAND (mos2es.io).
+Live today: KASSA voice-AI commitment-kernel demo (cached mode, no auth), Signomy governed-agent marketplace (270 API endpoints, Stripe Connect, signomy.xyz), AQUA application OS (aquaidp.xyz), COMMAND (mos2es.io).
 
 The first monetizable wedge is the measurement instrument sold to Forward Deployed Engineering teams at AI labs — where pipelines pass tests, hit SLA, and still get reported as broken two weeks later because commitment kernels drift silently. MO§ES™ quantifies that drift.
 
@@ -92,7 +92,7 @@ The first monetizable wedge is the measurement instrument sold to Forward Deploy
 
 ### Q10. Please provide a link to the product, if any.
 
-https://mos2es.com | https://mos2es.xyz | https://signomy.xyz | https://zenodo.org/records/20029607
+https://mos2es.com | https://aquaidp.xyz | https://signomy.xyz | https://zenodo.org/records/20029607
 
 ---
 
@@ -133,7 +133,7 @@ Multi-stage shipping — live substrate, live products, empirically proven gover
 - Signal Army v1.4 — 1,252 lines, 76,313 words processed across 6 production runs
 - KASSA v7 — live voice-AI commitment-kernel demo, cached mode, no auth
 - Signomy — 270 API endpoints, Stripe Connect, governed-agent marketplace live at signomy.xyz
-- AQUA / Application Hub — founder-first application OS at mos2es.xyz (this YC application is being drafted through it)
+- AQUA / Application Hub — founder-first application OS at aquaidp.xyz (this YC application is being drafted through it)
 - COMMAND — live at mos2es.io with wave-cascade pricing
 
 **IP and research:**

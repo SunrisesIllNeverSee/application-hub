@@ -19,7 +19,7 @@ _Status: Mapped. Currency naming TBD (days vs credits). Build when confirmed._
 |---|---|---|
 | Currency name | **Days** (days of Pro access) · Credits · Points | "Days" is most tangible — earning 5 days means 5 extra days on your Pro clock |
 | Redemption mechanic | Pro days · Question unlocks · Priority features | Need to pick one primary before UI makes sense |
-| OG share image | Static (mos2es.xyz OG tags) · Dynamic card (user stats) | Dynamic is more shareable — "I've answered 25 questions" |
+| OG share image | Static (aquaidp.xyz OG tags) · Dynamic card (user stats) | Dynamic is more shareable — "I've answered 25 questions" |
 | Leaderboard | Yes (eventually) · No (privacy concern) · Opt-in | Deferred until enough users |
 
 ---
@@ -73,7 +73,7 @@ Every earning action should map to something real:
 ## Share post with image — design
 
 ### Static OG image (already partially done)
-mos2es.xyz has `metadataBase` set. Adding a proper `openGraph.images` entry to the root layout creates the card that appears when any URL is shared. This is the minimum — one branded card, always shows.
+aquaidp.xyz has `metadataBase` set. Adding a proper `openGraph.images` entry to the root layout creates the card that appears when any URL is shared. This is the minimum — one branded card, always shows.
 
 ### Dynamic OG image (richer)
 `/api/og?user=<id>` generates a personalized card:
@@ -84,16 +84,16 @@ mos2es.xyz has `metadataBase` set. Adding a proper `openGraph.images` entry to t
 │  Building my answer bank.                   │
 │  25 questions answered · 3 programs tracked  │
 │                                              │
-│  mos2es.xyz                                  │
+│  aquaidp.xyz                                  │
 └─────────────────────────────────────────────┘
 ```
 Uses Vercel's `@vercel/og` — no image server needed, runs as an Edge Function.
-The share URL becomes `https://mos2es.xyz?ref=<user_slug>` so referral attribution is baked in.
+The share URL becomes `https://aquaidp.xyz?ref=<user_slug>` so referral attribution is baked in.
 
 ### Share flow with image
 1. User opens CreditsPanel → Share section
 2. Sees post preview with image thumbnail
-3. Clicks "Share on X" → opens `twitter.com/intent/tweet?text=...&url=mos2es.xyz?ref=<slug>`
+3. Clicks "Share on X" → opens `twitter.com/intent/tweet?text=...&url=aquaidp.xyz?ref=<slug>`
 4. Twitter scrapes the URL → OG image appears in the tweet
 5. User posts → returns to app → "Mark as shared" → claim reward
 

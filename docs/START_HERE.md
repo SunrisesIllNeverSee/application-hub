@@ -14,7 +14,7 @@ timestamp: 2026-08-19
 
 ## What this project is
 
-**Application Hub** (`mos2es.xyz`) — a platform that helps founders (and eventually job seekers, students, researchers) apply to accelerators, grants, fellowships, and programs.
+**Application Hub** (`aquaidp.xyz`) — a platform that helps founders (and eventually job seekers, students, researchers) apply to accelerators, grants, fellowships, and programs.
 
 Core asset: a **question archive** + reusable **answer bank**. Answer once, apply everywhere.
 

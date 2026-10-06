@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# IndexNow ping script for mos2es.xyz
+# IndexNow ping script for aquaidp.xyz
 # Notifies Bing, DuckDuckGo, Yandex, and Seznam about page updates.
 #
 # Usage:
@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-HOST="mos2es.xyz"
+HOST="aquaidp.xyz"
 KEY="f1f880e1830342be8c1180ee9a7cfb41"
 KEY_LOCATION="https://${HOST}/${KEY}.txt"
 SITEMAP_URL="https://${HOST}/sitemap.xml"

@@ -30,7 +30,7 @@ Browser Extension (Chrome MV3)
   ├── Side Panel / Overlay  — shows matched answers in Suggest mode
   └── Popup                 — settings: mode toggle, auth, portal status
 
-        ↕  (HTTPS calls to mos2es.xyz)
+        ↕  (HTTPS calls to aquaidp.xyz)
 
 Next.js API
   └── POST /api/match-question
@@ -150,8 +150,8 @@ overrides live in `extension/portals/*.ts` (one file per portal).
 The extension needs a user session to call `/api/match-question`.
 
 **V1 approach (simplest):** User opens Application Hub in the same browser, logs in.
-The extension reads the Supabase session from `localStorage` on the `mos2es.xyz` origin
-via a content script injected on `mos2es.xyz/*`. This is same-origin, no special
+The extension reads the Supabase session from `localStorage` on the `aquaidp.xyz` origin
+via a content script injected on `aquaidp.xyz/*`. This is same-origin, no special
 permissions needed.
 
 **V1+ approach (more robust):** Generate an extension API token in `/profile/settings`

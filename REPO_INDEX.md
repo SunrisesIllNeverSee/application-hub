@@ -7,12 +7,12 @@
 
 ## Quick orientation
 
-**What this is:** Application Hub (`mos2es.xyz`) — founder-first application infrastructure. Question archive + reusable answer bank + fit/review spine. Built on Supabase + Next.js + MCP server.
+**What this is:** Application Hub (`aquaidp.xyz`) — founder-first application infrastructure. Question archive + reusable answer bank + fit/review spine. Built on Supabase + Next.js + MCP server.
 
 **Company:** Ello Cello LLC — Deric McHenry
 
 **Live surfaces:**
-- Web app: `mos2es.xyz` (Vercel)
+- Web app: `aquaidp.xyz` (Vercel)
 - MCP server: 21 tools, stdio, local
 - Supabase project: `betcyfbzsgusaghriptz`
 

@@ -43,6 +43,13 @@ export default function ContactPage() {
         </section>
 
         <section className="mb-14 space-y-5">
+          <h2 className="text-2xl font-semibold tracking-tight">AQUA IDP plugin help</h2>
+          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
+            For help with the local-folder plugin, its application archive, question review, answer bank, or beta reports, start at the <Link className="underline decoration-neutral-400 underline-offset-4" href="/support">AQUA IDP support page</Link>. It explains where to find the next action and what to include in a report without sending private application content by email.
+          </p>
+        </section>
+
+        <section className="mb-14 space-y-5">
           <h2 className="text-2xl font-semibold tracking-tight">Business mailing address</h2>
           <address className="not-italic leading-7 text-neutral-600 dark:text-neutral-300">
             Ello Cello LLC<br />
@@ -58,13 +65,14 @@ export default function ContactPage() {
         <section className="mb-14 space-y-5">
           <h2 className="text-2xl font-semibold tracking-tight">Canonical public resources</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The canonical product is https://mos2es.xyz. Product identity and scope are described on the About page, data handling is summarized on the Privacy page, and the public source repository is https://github.com/SunrisesIllNeverSee/application-hub. Agents can use /llms.txt for machine-oriented guidance and /sitemap.xml to discover public pages.
+            The canonical product is https://aquaidp.xyz. Product identity and scope are described on the About page, data handling is summarized on the Privacy page, and the public source repository is https://github.com/SunrisesIllNeverSee/application-hub. Agents can use /llms.txt for machine-oriented guidance and /sitemap.xml to discover public pages.
           </p>
         </section>
 
         <div className="flex flex-wrap gap-4 border-t border-neutral-200 pt-8 text-sm dark:border-neutral-800">
           <Link href="/about" className="btn-secondary">About</Link>
           <Link href="/privacy" className="btn-secondary">Privacy</Link>
+          <Link href="/support" className="btn-secondary">IDP Support</Link>
           <a href="/llms.txt" className="btn-secondary">Agent guidance</a>
         </div>
       </main>

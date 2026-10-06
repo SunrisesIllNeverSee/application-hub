@@ -185,7 +185,7 @@ export function CreditsPanel({
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => {
-                  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${statText} with @ApplicationHub — answer once, apply everywhere. mos2es.xyz`)}`
+                  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${statText} with @ApplicationHub — answer once, apply everywhere. aquaidp.xyz`)}`
                   window.open(twitterUrl, '_blank', 'noopener,noreferrer')
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-700 dark:hover:bg-neutral-100 transition-colors"

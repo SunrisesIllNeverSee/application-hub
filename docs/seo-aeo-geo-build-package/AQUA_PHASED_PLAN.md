@@ -1,13 +1,13 @@
 # AQUA Application Hub — SEO/GEO/AEO Phased Implementation Plan
 
-> **Target site:** mos2es.xyz (Next.js 15, Vercel, `app/` root)
+> **Target site:** aquaidp.xyz (Next.js 15, Vercel, `app/` root)
 > **Repo:** `/Users/dericmchenry/Developer/built/application-hub`
 > **Reference:** signalaf.com playbook (7 phases shipped, B- → A-)
 > **Adapted from:** `docs/seo-aeo-geo-build-package/playbook/SEO_GEO_AEO_PLAYBOOK.md`
 >
 > This plan adapts the signalaf.com playbook for AQUA. The signalaf playbook
 > was written for mos2es.com (static HTML, 11 pages) but AQUA is now a
-> Next.js 15 app at mos2es.xyz with ~7 public pages, 40+ API routes, an MCP
+> Next.js 15 app at aquaidp.xyz with ~7 public pages, 40+ API routes, an MCP
 > server, and an OpenAPI spec. The principles are the same; the implementation
 > uses Next.js App Router conventions.
 
@@ -36,10 +36,10 @@
 | 2 | No FAQPage schema anywhere | High (AI citation) | 1 |
 | 3 | No DefinedTerm schema for AQUA concepts | High (AI citation) | 1 |
 | 4 | No per-page OG images for key routes | Low (polish) | 1 |
-| 5 | No AEO audit run for mos2es.xyz | Critical (baseline) | 2 |
+| 5 | No AEO audit run for aquaidp.xyz | Critical (baseline) | 2 |
 | 6 | Opening paragraphs use proprietary vocabulary | High (AEO) | 2 |
 | 7 | No content pages (vs/, guides, metrics, faq) | High (long-tail) | 3 |
-| 8 | No GSC setup for mos2es.xyz | Critical (indexing) | 4 |
+| 8 | No GSC setup for aquaidp.xyz | Critical (indexing) | 4 |
 | 9 | No IndexNow integration | Medium (Bing speed) | 4 |
 | 10 | No Screaming Frog baseline crawl | High (site health) | 5 |
 | 11 | No weekly citation tracking process | Medium (ongoing) | 6 |
@@ -83,13 +83,13 @@
 - `npm run test:agent` — all pass
 - validator.schema.org — 0 errors on each page type
 - search.google.com/test/rich-results — FAQPage eligible
-- Live: `curl -s https://mos2es.xyz/faq | grep FAQPage`
+- Live: `curl -s https://aquaidp.xyz/faq | grep FAQPage`
 
 ---
 
 ## Phase 2 — AEO Audit + Opening Paragraph Rewrites (code + content)
 
-**Goal:** Run the 46-prompt test panel across 7 engines for mos2es.xyz, then fix the query association gap.
+**Goal:** Run the 46-prompt test panel across 7 engines for aquaidp.xyz, then fix the query association gap.
 
 **Step 2a — Run the audit (manual, ~2 hours):**
 1. Adapt the 46-prompt panel from `aeo-audit/PERPLEXITY_PROMPTS.md` for AQUA
@@ -175,17 +175,17 @@ For each page that fails broad prompt retrieval, rewrite the opening paragraph t
 
 ## Phase 4 — Google Search Console + IndexNow (setup + code)
 
-**Goal:** Get mos2es.xyz into Google Search Console and set up programmatic indexing.
+**Goal:** Get aquaidp.xyz into Google Search Console and set up programmatic indexing.
 
 **Step 4a — GSC setup (owner action, ~15 min):**
 1. Go to https://search.google.com/search-console
-2. Add property: `sc-domain:mos2es.xyz` (Domain property, requires DNS verification)
+2. Add property: `sc-domain:aquaidp.xyz` (Domain property, requires DNS verification)
 3. Verify via DNS TXT record (Vercel DNS or Porkbun)
-4. Submit sitemap: `https://mos2es.xyz/sitemap.xml`
+4. Submit sitemap: `https://aquaidp.xyz/sitemap.xml`
 
 **Step 4b — GSC API toolkit (code):**
 1. Copy `gsc-toolkit/gsc.mjs` to `scripts/gsc/gsc.mjs`
-2. Update defaults: `GSC_SITE=sc-domain:mos2es.xyz`
+2. Update defaults: `GSC_SITE=sc-domain:aquaidp.xyz`
 3. Set up service account + key at `~/.config/aqua/gsc-sa.json`
 4. Add `scripts/gsc/README.md` with AQUA-specific instructions
 5. Add `AGENTS.md` section with GSC commands
@@ -198,7 +198,7 @@ For each page that fails broad prompt retrieval, rewrite the opening paragraph t
 5. Push all sitemap URLs after deployment
 
 **Deliverables:**
-- GSC property verified for mos2es.xyz
+- GSC property verified for aquaidp.xyz
 - `scripts/gsc/gsc.mjs` adapted for AQUA
 - `app/api/indexnow/route.ts`
 - `scripts/indexnow-push.mjs`
@@ -217,7 +217,7 @@ For each page that fails broad prompt retrieval, rewrite the opening paragraph t
 
 **Step 5a — Baseline crawl (manual, ~30 min):**
 1. Download Screaming Frog SEO Spider (free, 500 URLs)
-2. Crawl `https://mos2es.xyz`
+2. Crawl `https://aquaidp.xyz`
 3. Export: All Internal Links, All External Links, Orphan Pages, Redirects, Issues
 4. Save exports to `docs/seo-aeo-geo-build-package/screaming-frog/`
 
@@ -265,7 +265,7 @@ Prioritize:
 **Monthly (30 min):**
 - Full AEO citation audit (46-prompt panel across 7 engines)
 - IndexNow push for any changed URLs
-- AI crawler access check (`curl https://mos2es.xyz/robots.txt`)
+- AI crawler access check (`curl https://aquaidp.xyz/robots.txt`)
 
 **Quarterly (2 hours):**
 - Screaming Frog crawl + compare

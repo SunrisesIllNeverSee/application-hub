@@ -6,9 +6,9 @@
 //   node scripts/indexnow-push.mjs /faq /about        # push specific paths
 //   node scripts/indexnow-push.mjs --dry-run          # print URLs without submitting
 //
-// Requires the deployed site to be live (calls https://mos2es.xyz/api/indexnow).
+// Requires the deployed site to be live (calls https://aquaidp.xyz/api/indexnow).
 
-const HOST = 'mos2es.xyz'
+const HOST = 'aquaidp.xyz'
 const BASE = `https://${HOST}`
 const API = `${BASE}/api/indexnow`
 const SITEMAP = `${BASE}/sitemap.xml`

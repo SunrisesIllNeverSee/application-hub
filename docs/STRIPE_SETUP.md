@@ -25,7 +25,7 @@ This Stripe account is shared with another app. The integration is isolated by:
 |---|---|---|
 | **Product IDs** | This app | Application Hub products only |
 | **Price IDs** | This app | The 4 IDs listed in Part 1.1 below |
-| **Webhook endpoint** | This app | `https://mos2es.xyz/api/stripe/webhook` — only Application Hub events route here |
+| **Webhook endpoint** | This app | `https://aquaidp.xyz/api/stripe/webhook` — only Application Hub events route here |
 | **Webhook handler price filter** | This app | `webhook/route.ts` filters every `customer.subscription.*` and `invoice.*` event by Application Hub price ID before mutating `user_subscriptions`. Events from the other app's subscriptions are skipped with a `[webhook] skip ... shared-account isolation` log line. |
 | **API keys** | **SHARED** | Same `sk_live_…` / `pk_live_…` powers both apps. Restricted keys can isolate later if needed. |
 | **Customer Portal config** | **SHARED account-wide policy** | See Part 1.3 — do not blindly toggle, inspect what the other app depends on first. |
@@ -99,11 +99,11 @@ Copy these:
 
 ### 2.1 Add the endpoint in Stripe
 
-> ✅ **Safe to add alongside the other app.** Webhook endpoints are per-URL — adding `mos2es.xyz/api/stripe/webhook` does not affect the other app's endpoint. The Application Hub handler also filters every subscription/invoice event by Application Hub price ID, so even if a shared Stripe customer's event is delivered, the handler will skip events whose price ID doesn't belong to this app.
+> ✅ **Safe to add alongside the other app.** Webhook endpoints are per-URL — adding `aquaidp.xyz/api/stripe/webhook` does not affect the other app's endpoint. The Application Hub handler also filters every subscription/invoice event by Application Hub price ID, so even if a shared Stripe customer's event is delivered, the handler will skip events whose price ID doesn't belong to this app.
 
 Stripe Dashboard → **Developers** → **Webhooks** → **+ Add endpoint**.
 
-- **Endpoint URL**: `https://mos2es.xyz/api/stripe/webhook`
+- **Endpoint URL**: `https://aquaidp.xyz/api/stripe/webhook`
 - **Events to send** — select these 7:
   - `checkout.session.completed`
   - `customer.subscription.created`
@@ -167,7 +167,7 @@ vercel --prod
 
 ### 4.1 Trigger a test checkout
 
-1. Visit https://mos2es.xyz → sign in → /profile/settings (or wherever PricingCards is rendered)
+1. Visit https://aquaidp.xyz → sign in → /profile/settings (or wherever PricingCards is rendered)
 2. Click "Upgrade to Pro Monthly"
 3. Should redirect to Stripe Checkout
 4. Use Stripe test card: `4242 4242 4242 4242`, any future expiry, any CVC, any ZIP

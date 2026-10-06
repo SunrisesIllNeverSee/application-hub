@@ -1,7 +1,7 @@
 export const MARKDOWN_PAGES = {
   '/': `# AQUA Application Hub
 
-Application answer reuse lets you write strong answers to common application questions once and adapt them across multiple programs. AQUA is founder-first application infrastructure operated by Ello Cello LLC that turns recurring application questions, reusable answers, opportunity fit signals, and review history into a portable application graph. The public product is available at https://mos2es.xyz.
+Application answer reuse lets you write strong answers to common application questions once and adapt them across multiple programs. AQUA is founder-first application infrastructure operated by Ello Cello LLC that turns recurring application questions, reusable answers, opportunity fit signals, and review history into a portable application graph. The public product is available at https://aquaidp.xyz.
 
 ## What AQUA does
 
@@ -13,16 +13,16 @@ Smart Matcher compares the material already present in an answer bank with the q
 
 ## Agent access
 
-Agents should read https://mos2es.xyz/llms.txt for when-to-use guidance. The repository includes a local/stdio MCP server for answer retrieval, fit and ranking tools, review context, persisted stress tests, and write-back. Do not assume a hosted public MCP endpoint. Web users can start at https://mos2es.xyz/login.
+Agents should read https://aquaidp.xyz/llms.txt for when-to-use guidance. The repository includes a local/stdio MCP server for answer retrieval, fit and ranking tools, review context, persisted stress tests, and write-back. Do not assume a hosted public MCP endpoint. Web users can start at https://aquaidp.xyz/login.
 
 ## Trust and identity
 
-- About: https://mos2es.xyz/about
-- Contact: https://mos2es.xyz/contact
-- AQUA IDP support: https://mos2es.xyz/support
-- Privacy: https://mos2es.xyz/privacy
-- Scoring methodology: https://mos2es.xyz/about/scoring
-- Sitemap: https://mos2es.xyz/sitemap.xml
+- About: https://aquaidp.xyz/about
+- Contact: https://aquaidp.xyz/contact
+- AQUA IDP support: https://aquaidp.xyz/support
+- Privacy: https://aquaidp.xyz/privacy
+- Scoring methodology: https://aquaidp.xyz/about/scoring
+- Sitemap: https://aquaidp.xyz/sitemap.xml
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub
 `,
   '/about': `# About AQUA Application Hub
@@ -37,7 +37,7 @@ AQUA includes an answer bank, application workspace, opportunity fit and readine
 
 ## Operator and ownership
 
-AQUA is operated by Ello Cello LLC, a New York limited liability company. The canonical public product URL is https://mos2es.xyz. The public source repository is https://github.com/SunrisesIllNeverSee/application-hub. AQUA is part of the broader MO§ES product family, while this site remains specifically focused on application infrastructure.
+AQUA is operated by Ello Cello LLC, a New York limited liability company. The canonical public product URL is https://aquaidp.xyz. The public source repository is https://github.com/SunrisesIllNeverSee/application-hub. AQUA is part of the broader MO§ES product family, while this site remains specifically focused on application infrastructure.
 
 ## Boundaries
 
@@ -45,7 +45,7 @@ AQUA can organize source material, calculate internal preparation and fit signal
 `,
   '/contact': `# Contact AQUA
 
-AQUA Application Hub is operated by Ello Cello LLC. Use the contact information below for product questions, business inquiries, account or data requests, and responsible security disclosures related to https://mos2es.xyz.
+AQUA Application Hub is operated by Ello Cello LLC. Use the contact information below for product questions, business inquiries, account or data requests, and responsible security disclosures related to https://aquaidp.xyz.
 
 ## Email
 
@@ -64,11 +64,11 @@ This is the business mailing address associated with Ello Cello LLC's public rec
 
 ## Useful links
 
-- Product: https://mos2es.xyz
-- About: https://mos2es.xyz/about
-- Privacy: https://mos2es.xyz/privacy
-- AQUA IDP support: https://mos2es.xyz/support
-- Scoring methodology: https://mos2es.xyz/about/scoring
+- Product: https://aquaidp.xyz
+- About: https://aquaidp.xyz/about
+- Privacy: https://aquaidp.xyz/privacy
+- AQUA IDP support: https://aquaidp.xyz/support
+- Scoring methodology: https://aquaidp.xyz/about/scoring
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub
 `,
   '/support': `# AQUA IDP Support
@@ -92,7 +92,7 @@ Email burnmydays@proton.me with the plugin version, current phase, expected resu
 
 ## Privacy and beta reports
 
-Issue details and technical tracebacks stay in the local Beta Reports folder by default. Optional automatic delivery sends limited technical metadata after opt-in; beta-reporting --disable stops future delivery. Users can delete their local reports and workspace files themselves. See https://mos2es.xyz/privacy for the plugin's full data-handling explanation, and https://mos2es.xyz/contact for website-account or business questions.
+Issue details and technical tracebacks stay in the local Beta Reports folder by default. Optional automatic delivery sends limited technical metadata after opt-in; beta-reporting --disable stops future delivery. Users can delete their local reports and workspace files themselves. See https://aquaidp.xyz/privacy for the plugin's full data-handling explanation, and https://aquaidp.xyz/contact for website-account or business questions.
 `,
   '/privacy': `# AQUA Privacy
 
@@ -122,8 +122,8 @@ Users choose sources and can inspect, edit, export, or delete their local files.
 
 ## Requests and contact
 
-For privacy, access, correction, or deletion questions, contact burnmydays@proton.me. Include the account email or other identifier necessary to locate the relevant account, but do not send passwords, private API keys, or authentication tokens. Business contact information and the mailing address are published at https://mos2es.xyz/contact.
-For plugin help or a privacy request concerning a beta report, see https://mos2es.xyz/support and include the report ID when available.
+For privacy, access, correction, or deletion questions, contact burnmydays@proton.me. Include the account email or other identifier necessary to locate the relevant account, but do not send passwords, private API keys, or authentication tokens. Business contact information and the mailing address are published at https://aquaidp.xyz/contact.
+For plugin help or a privacy request concerning a beta report, see https://aquaidp.xyz/support and include the report ID when available.
 `,
   '/about/scoring': `# AQUA Scoring & Intelligence
 
@@ -143,22 +143,22 @@ Composite scoring combines personal fit with an estimated program-value signal t
 
 ## Boundaries
 
-AQUA does not decide who gets into a program, does not expose a leaderboard ranking founders against one another, and does not represent any accelerator, grantmaker, employer, school, or fellowship listed in the archive. The detailed human-readable methodology is available at https://mos2es.xyz/about/scoring.
+AQUA does not decide who gets into a program, does not expose a leaderboard ranking founders against one another, and does not represent any accelerator, grantmaker, employer, school, or fellowship listed in the archive. The detailed human-readable methodology is available at https://aquaidp.xyz/about/scoring.
 `,
   '/developers': `# AQUA Application Hub Developer Portal
 
-An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub exposes an authenticated REST API with typed operations, a local MCP server with 27 tools for agent environments, and the Appfeeder browser extension for capturing answers from program websites. This document is the Markdown representation of the developer portal at https://mos2es.xyz/developers.
+An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub exposes an authenticated REST API with typed operations, a local MCP server with 27 tools for agent environments, and the Appfeeder browser extension for capturing answers from program websites. This document is the Markdown representation of the developer portal at https://aquaidp.xyz/developers.
 
 ## Quickstart
 
-AQUA is an authenticated product. Sign in at https://mos2es.xyz/login to get a session cookie, or retrieve a Bearer JWT from GET /api/auth/token for extension or agent use.
+AQUA is an authenticated product. Sign in at https://aquaidp.xyz/login to get a session cookie, or retrieve a Bearer JWT from GET /api/auth/token for extension or agent use.
 
 \`\`\`bash
 # Get your auth token (requires active session)
-curl https://mos2es.xyz/api/auth/token
+curl https://aquaidp.xyz/api/auth/token
 
 # Match a question against your answer bank
-curl -X POST https://mos2es.xyz/api/match-question \\
+curl -X POST https://aquaidp.xyz/api/match-question \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer <JWT>" \\
   -d '{"text": "Tell us what you have built", "limit": 5}'
@@ -166,7 +166,7 @@ curl -X POST https://mos2es.xyz/api/match-question \\
 
 ## OpenAPI specification
 
-The full OpenAPI 3.0.3 document is published at https://mos2es.xyz/openapi.json. It documents 10 operations with unique operationIds, typed request/response schemas, and ProblemDetails error models (RFC 9457). Operations include matchQuestion, intakeApplication, captureAnswer, smartMatcher, checkAutofillEligibility, stressTestAnswer, generateDraft, and getAuthToken.
+The full OpenAPI 3.0.3 document is published at https://aquaidp.xyz/openapi.json. It documents 10 operations with unique operationIds, typed request/response schemas, and ProblemDetails error models (RFC 9457). Operations include matchQuestion, intakeApplication, captureAnswer, smartMatcher, checkAutofillEligibility, stressTestAnswer, generateDraft, and getAuthToken.
 
 ## Authentication
 
@@ -177,7 +177,7 @@ AQUA uses Supabase Auth. Two credential types are accepted:
 
 ## MCP server
 
-The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It is published on npm as aqua-mcp-server and can be run with npx -y aqua-mcp-server. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at mos2es.xyz. The MCP manifest is at https://mos2es.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server.
+The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It is published on npm as aqua-mcp-server and can be run with npx -y aqua-mcp-server. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at aquaidp.xyz. The MCP manifest is at https://aquaidp.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server.
 
 ## CLI
 
@@ -201,12 +201,12 @@ The Appfeeder Chrome extension captures answers from application form fields usi
 
 ## Agent integration
 
-For agent guidance see https://mos2es.xyz/llms.txt. For Contribution Exchange behavior see https://mos2es.xyz/agents. The MCP manifest at https://mos2es.xyz/.well-known/mcp describes the tool surface in machine-readable form.
+For agent guidance see https://aquaidp.xyz/llms.txt. For Contribution Exchange behavior see https://aquaidp.xyz/agents. The MCP manifest at https://aquaidp.xyz/.well-known/mcp describes the tool surface in machine-readable form.
 `,
 
   '/faq': `# AQUA Application Hub — Frequently Asked Questions
 
-AQUA Application Hub is a platform for reusable application infrastructure at https://mos2es.xyz. These answers cover what AQUA is, how answer reuse works, what the scores mean, and how to get started.
+AQUA Application Hub is a platform for reusable application infrastructure at https://aquaidp.xyz. These answers cover what AQUA is, how answer reuse works, what the scores mean, and how to get started.
 
 ## What is AQUA Application Hub?
 
@@ -242,11 +242,11 @@ Answer lineage is the connection between an answer variant and its source materi
 
 ## Is AQUA free?
 
-AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at mos2es.xyz is the canonical public product surface. The local MCP server and developer resources are publicly accessible.
+AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at aquaidp.xyz is the canonical public product surface. The local MCP server and developer resources are publicly accessible.
 
 ## How does the MCP server work?
 
-AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at mos2es.xyz; the server is designed for local use alongside your agent client.
+AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at aquaidp.xyz; the server is designed for local use alongside your agent client.
 
 ## What is the Appfeeder extension?
 
@@ -266,7 +266,7 @@ The Contribution Exchange is an agent-facing protocol that allows AI agents to p
 
 ## How do I get started with AQUA?
 
-Visit mos2es.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.
+Visit aquaidp.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.
 `,
   '/application-infrastructure': `# Application Infrastructure — Concepts, Guides, and Comparisons
 
@@ -274,29 +274,29 @@ Application infrastructure is the layer that connects reusable answers, source l
 
 ## Concepts
 
-- **Answer Reuse** — Treating questions and answers as reusable assets with variants kept connected to source material. https://mos2es.xyz/concepts/answer-reuse
-- **Fit Score** — How well your current profile aligns to a specific program across coverage, themes, criteria, and completeness. https://mos2es.xyz/concepts/fit-score
-- **Application Graph** — The data structure connecting questions, answers, applications, fit signals, and review loops. https://mos2es.xyz/concepts/application-graph
-- **Answer Lineage** — The connection between an answer variant and its source material, so updates propagate to affected variants. https://mos2es.xyz/concepts/answer-lineage
-- **Smart Matcher** — Compares your profile against a program question surface and identifies coverage gaps before drafting. https://mos2es.xyz/concepts/smart-matcher
+- **Answer Reuse** — Treating questions and answers as reusable assets with variants kept connected to source material. https://aquaidp.xyz/concepts/answer-reuse
+- **Fit Score** — How well your current profile aligns to a specific program across coverage, themes, criteria, and completeness. https://aquaidp.xyz/concepts/fit-score
+- **Application Graph** — The data structure connecting questions, answers, applications, fit signals, and review loops. https://aquaidp.xyz/concepts/application-graph
+- **Answer Lineage** — The connection between an answer variant and its source material, so updates propagate to affected variants. https://aquaidp.xyz/concepts/answer-lineage
+- **Smart Matcher** — Compares your profile against a program question surface and identifies coverage gaps before drafting. https://aquaidp.xyz/concepts/smart-matcher
 
 ## Guides
 
-- **Build an Answer Bank** — How to import or capture answers and structure them for reuse across programs. https://mos2es.xyz/guides/how-to-build-an-answer-bank
-- **Reuse Application Answers** — How to adapt existing answers for a new program while preserving lineage. https://mos2es.xyz/guides/how-to-reuse-application-answers
-- **Compare Accelerator Fit** — How to use fit score and Smart Matcher to prioritize programs where you are already strong. https://mos2es.xyz/guides/how-to-compare-accelerator-fit
+- **Build an Answer Bank** — How to import or capture answers and structure them for reuse across programs. https://aquaidp.xyz/guides/how-to-build-an-answer-bank
+- **Reuse Application Answers** — How to adapt existing answers for a new program while preserving lineage. https://aquaidp.xyz/guides/how-to-reuse-application-answers
+- **Compare Accelerator Fit** — How to use fit score and Smart Matcher to prioritize programs where you are already strong. https://aquaidp.xyz/guides/how-to-compare-accelerator-fit
 
 ## Comparisons
 
-- **AQUA vs FounderApp** — Application graph and fit scoring versus universal profile autofill. https://mos2es.xyz/vs/founderapp
-- **AQUA vs Manual Tracking** — Structured answer bank and lineage versus spreadsheets, docs, and copy-paste. https://mos2es.xyz/vs/manual-application-tracking
-- **AQUA vs Spreadsheets** — Graph structure and fit signals versus flat, manual application tracking. https://mos2es.xyz/vs/spreadsheets-for-applications
+- **AQUA vs FounderApp** — Application graph and fit scoring versus universal profile autofill. https://aquaidp.xyz/vs/founderapp
+- **AQUA vs Manual Tracking** — Structured answer bank and lineage versus spreadsheets, docs, and copy-paste. https://aquaidp.xyz/vs/manual-application-tracking
+- **AQUA vs Spreadsheets** — Graph structure and fit signals versus flat, manual application tracking. https://aquaidp.xyz/vs/spreadsheets-for-applications
 
 ## Related pages
 
-- About AQUA: https://mos2es.xyz/about
-- Scoring methodology: https://mos2es.xyz/about/scoring
-- FAQ: https://mos2es.xyz/faq
+- About AQUA: https://aquaidp.xyz/about
+- Scoring methodology: https://aquaidp.xyz/about/scoring
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/concepts/answer-reuse': `# What is answer reuse in applications?
 
@@ -320,10 +320,10 @@ Answer reuse is not plagiarism. You are reusing your own answers to your own que
 
 ## Related pages
 
-- Answer Lineage: https://mos2es.xyz/concepts/answer-lineage
-- Smart Matcher: https://mos2es.xyz/concepts/smart-matcher
-- Guide: Reuse Answers: https://mos2es.xyz/guides/how-to-reuse-application-answers
-- FAQ: https://mos2es.xyz/faq
+- Answer Lineage: https://aquaidp.xyz/concepts/answer-lineage
+- Smart Matcher: https://aquaidp.xyz/concepts/smart-matcher
+- Guide: Reuse Answers: https://aquaidp.xyz/guides/how-to-reuse-application-answers
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/concepts/fit-score': `# What is opportunity fit scoring?
 
@@ -348,10 +348,10 @@ AQUA computes fit scores by comparing your answer bank and profile against a pro
 
 ## Related pages
 
-- Scoring methodology: https://mos2es.xyz/about/scoring
-- Smart Matcher: https://mos2es.xyz/concepts/smart-matcher
-- Guide: Compare Fit: https://mos2es.xyz/guides/how-to-compare-accelerator-fit
-- FAQ: https://mos2es.xyz/faq
+- Scoring methodology: https://aquaidp.xyz/about/scoring
+- Smart Matcher: https://aquaidp.xyz/concepts/smart-matcher
+- Guide: Compare Fit: https://aquaidp.xyz/guides/how-to-compare-accelerator-fit
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/concepts/application-graph': `# What is a portable application graph?
 
@@ -385,10 +385,10 @@ AQUA stores the application graph as the core data model behind its answer bank,
 
 ## Related pages
 
-- Answer Reuse: https://mos2es.xyz/concepts/answer-reuse
-- Answer Lineage: https://mos2es.xyz/concepts/answer-lineage
-- About AQUA: https://mos2es.xyz/about
-- FAQ: https://mos2es.xyz/faq
+- Answer Reuse: https://aquaidp.xyz/concepts/answer-reuse
+- Answer Lineage: https://aquaidp.xyz/concepts/answer-lineage
+- About AQUA: https://aquaidp.xyz/about
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/concepts/answer-lineage': `# What is answer lineage?
 
@@ -412,10 +412,10 @@ AQUA stores lineage as typed edges in the application graph. When you create a v
 
 ## Related pages
 
-- Answer Reuse: https://mos2es.xyz/concepts/answer-reuse
-- Application Graph: https://mos2es.xyz/concepts/application-graph
-- About AQUA: https://mos2es.xyz/about
-- FAQ: https://mos2es.xyz/faq
+- Answer Reuse: https://aquaidp.xyz/concepts/answer-reuse
+- Application Graph: https://aquaidp.xyz/concepts/application-graph
+- About AQUA: https://aquaidp.xyz/about
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/concepts/smart-matcher': `# What is Smart Matcher for applications?
 
@@ -440,10 +440,10 @@ Smart Matcher does not predict whether you will be admitted, funded, or hired. I
 
 ## Related pages
 
-- Fit Score: https://mos2es.xyz/concepts/fit-score
-- Scoring methodology: https://mos2es.xyz/about/scoring
-- Guide: Compare Fit: https://mos2es.xyz/guides/how-to-compare-accelerator-fit
-- FAQ: https://mos2es.xyz/faq
+- Fit Score: https://aquaidp.xyz/concepts/fit-score
+- Scoring methodology: https://aquaidp.xyz/about/scoring
+- Guide: Compare Fit: https://aquaidp.xyz/guides/how-to-compare-accelerator-fit
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/guides/how-to-reuse-application-answers': `# How to reuse application answers
 
@@ -475,10 +475,10 @@ Before you submit any application, review the variants you are using against the
 
 ## Related pages
 
-- Answer reuse concept: https://mos2es.xyz/concepts/answer-reuse
-- Answer lineage concept: https://mos2es.xyz/concepts/answer-lineage
-- Smart Matcher concept: https://mos2es.xyz/concepts/smart-matcher
-- FAQ: https://mos2es.xyz/faq
+- Answer reuse concept: https://aquaidp.xyz/concepts/answer-reuse
+- Answer lineage concept: https://aquaidp.xyz/concepts/answer-lineage
+- Smart Matcher concept: https://aquaidp.xyz/concepts/smart-matcher
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/guides/how-to-compare-accelerator-fit': `# How to compare accelerator fit
 
@@ -510,10 +510,10 @@ Rank your shortlist by fit score and focus your drafting effort on the programs 
 
 ## Related pages
 
-- Fit score concept: https://mos2es.xyz/concepts/fit-score
-- Smart Matcher concept: https://mos2es.xyz/concepts/smart-matcher
-- Scoring methodology: https://mos2es.xyz/about/scoring
-- FAQ: https://mos2es.xyz/faq
+- Fit score concept: https://aquaidp.xyz/concepts/fit-score
+- Smart Matcher concept: https://aquaidp.xyz/concepts/smart-matcher
+- Scoring methodology: https://aquaidp.xyz/about/scoring
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/guides/how-to-build-an-answer-bank': `# How to build an answer bank for applications
 
@@ -545,10 +545,10 @@ Your answer bank is a living asset, not a one-time import. After each applicatio
 
 ## Related pages
 
-- Answer reuse concept: https://mos2es.xyz/concepts/answer-reuse
-- Application graph concept: https://mos2es.xyz/concepts/application-graph
-- Developer portal: https://mos2es.xyz/developers
-- FAQ: https://mos2es.xyz/faq
+- Answer reuse concept: https://aquaidp.xyz/concepts/answer-reuse
+- Application graph concept: https://aquaidp.xyz/concepts/application-graph
+- Developer portal: https://aquaidp.xyz/developers
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/vs/founderapp': `# AQUA Application Hub vs FounderApp
 
@@ -576,7 +576,7 @@ AQUA also adds fit scoring and Smart Matcher — signals that tell you how well 
 | MCP / agent integration | Ships a local MCP server exposing answer retrieval, ranking, review-context, stress-test, and write-back for agent environments. | No MCP server. Browser-based autofill is the primary interaction model. |
 | Cross-program coverage | Accelerators, fellowships, grants, and jobs share one question surface and answer graph. | Broad form coverage, but treated as independent autofill targets rather than a connected graph. |
 | Open source | Public source repository available on GitHub so technical users and agents can inspect the shipped architecture. | Closed source product. |
-| Pricing model | Operated by Ello Cello LLC; web app at mos2es.xyz is the canonical surface, local MCP server and developer resources are publicly accessible. | Commercial SaaS pricing on its own surface. |
+| Pricing model | Operated by Ello Cello LLC; web app at aquaidp.xyz is the canonical surface, local MCP server and developer resources are publicly accessible. | Commercial SaaS pricing on its own surface. |
 
 ## When to pick which
 
@@ -584,10 +584,10 @@ Choose FounderApp if your primary need is fast, universal profile autofill acros
 
 ## Related pages
 
-- Answer reuse: https://mos2es.xyz/concepts/answer-reuse
-- Answer lineage: https://mos2es.xyz/concepts/answer-lineage
-- Smart Matcher: https://mos2es.xyz/concepts/smart-matcher
-- FAQ: https://mos2es.xyz/faq
+- Answer reuse: https://aquaidp.xyz/concepts/answer-reuse
+- Answer lineage: https://aquaidp.xyz/concepts/answer-lineage
+- Smart Matcher: https://aquaidp.xyz/concepts/smart-matcher
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/vs/manual-application-tracking': `# AQUA Application Hub vs Manual Application Tracking
 
@@ -622,9 +622,9 @@ If you apply to one or two programs once, manual tracking is fine. If you apply 
 
 ## Related pages
 
-- Answer reuse: https://mos2es.xyz/concepts/answer-reuse
-- Build an answer bank: https://mos2es.xyz/guides/how-to-build-an-answer-bank
-- FAQ: https://mos2es.xyz/faq
+- Answer reuse: https://aquaidp.xyz/concepts/answer-reuse
+- Build an answer bank: https://aquaidp.xyz/guides/how-to-build-an-answer-bank
+- FAQ: https://aquaidp.xyz/faq
 `,
   '/vs/spreadsheets-for-applications': `# AQUA Application Hub vs Spreadsheets for Applications
 
@@ -657,10 +657,10 @@ A spreadsheet is enough for a single application with no reuse. Once you apply t
 
 ## Related pages
 
-- Application graph: https://mos2es.xyz/concepts/application-graph
-- Answer lineage: https://mos2es.xyz/concepts/answer-lineage
-- Build an answer bank: https://mos2es.xyz/guides/how-to-build-an-answer-bank
-- FAQ: https://mos2es.xyz/faq
+- Application graph: https://aquaidp.xyz/concepts/application-graph
+- Answer lineage: https://aquaidp.xyz/concepts/answer-lineage
+- Build an answer bank: https://aquaidp.xyz/guides/how-to-build-an-answer-bank
+- FAQ: https://aquaidp.xyz/faq
 `,
 }
 
@@ -670,11 +670,11 @@ The requested AQUA resource does not exist at this path.
 
 ## Where to look next
 
-- Home: https://mos2es.xyz/
-- Agent guidance: https://mos2es.xyz/llms.txt
-- Sitemap: https://mos2es.xyz/sitemap.xml
-- About AQUA: https://mos2es.xyz/about
-- Contact: https://mos2es.xyz/contact
-- Privacy: https://mos2es.xyz/privacy
-- Scoring methodology: https://mos2es.xyz/about/scoring
+- Home: https://aquaidp.xyz/
+- Agent guidance: https://aquaidp.xyz/llms.txt
+- Sitemap: https://aquaidp.xyz/sitemap.xml
+- About AQUA: https://aquaidp.xyz/about
+- Contact: https://aquaidp.xyz/contact
+- Privacy: https://aquaidp.xyz/privacy
+- Scoring methodology: https://aquaidp.xyz/about/scoring
 `

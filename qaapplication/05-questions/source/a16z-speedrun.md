@@ -66,7 +66,7 @@ https://github.com/SunrisesIllNeverSee
 https://x.com/burnmydays
 
 ### Q: Portfolio URL
-mos2es.com, signomy.xyz, mos2es.xyz, https://zenodo.org/records/20029607
+mos2es.com, signomy.xyz, aquaidp.xyz, https://zenodo.org/records/20029607
 
 ### Q: Tell us more about the team — Team description (100-word limit; submitted at 55/100)
 MO§ES™ was team-agnostic by design, do not be confused with team avoidant. The protocol doesn't require a specific implementation team, more so it requires the right team for each deployment. That's intentional. A protocol that only works with one team isn't infrastructure, it's a service. I look forward to working and building with many teams.
@@ -99,7 +99,7 @@ United States — New York, Buffalo
 September 2025
 
 ### Q: Company Website
-http://mos2es.com https://mos2es.xyz https://signomy.xyz
+http://mos2es.com https://aquaidp.xyz https://signomy.xyz
 
 ### Q: Anything else we should know? (optional, 100-word limit)
 *Submitted at 0/100 — left blank*

@@ -78,7 +78,7 @@ MCP (Model Context Protocol) plugin layer: custom MCP servers wired into Claude 
 
 ## Q10. Please provide a link to the product, if any.
 
-mos2es.com / signomy.xyz / mos2es.xyz
+mos2es.com / signomy.xyz / aquaidp.xyz
 
 ---
 

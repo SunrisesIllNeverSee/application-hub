@@ -16,36 +16,36 @@ export async function GET() {
       title: 'AQUA Application Hub API',
       version: '1.0.0',
       description:
-        'AQUA Application Hub is founder-first application infrastructure built around a portable application graph: applications, recurring questions, reusable answers, answer variants, fit signals, reviews, and lineage. This document describes the authenticated REST API exposed at mos2es.xyz/api. All routes require a Supabase session cookie (browser) or Bearer JWT (extension/agent). A local MCP server exposes 27 tools for agent environments. See /developers for quickstart guides and integration details.',
+        'AQUA Application Hub is founder-first application infrastructure built around a portable application graph: applications, recurring questions, reusable answers, answer variants, fit signals, reviews, and lineage. This document describes the authenticated REST API exposed at aquaidp.xyz/api. All routes require a Supabase session cookie (browser) or Bearer JWT (extension/agent). A local MCP server exposes 27 tools for agent environments. See /developers for quickstart guides and integration details.',
       contact: {
         name: 'AQUA Application Hub',
         email: 'burnmydays@proton.me',
-        url: 'https://mos2es.xyz/contact',
+        url: 'https://aquaidp.xyz/contact',
       },
       'x-service-info': {
         categories: ['application-infrastructure', 'answer-reuse', 'opportunity-fit'],
         provider: 'Ello Cello LLC',
-        website: 'https://mos2es.xyz',
+        website: 'https://aquaidp.xyz',
         product: 'AQUA Application Hub',
       },
       'x-auth-model': {
         type: 'Supabase session cookie or Bearer JWT',
-        docs: 'https://mos2es.xyz/developers#authentication',
+        docs: 'https://aquaidp.xyz/developers#authentication',
       },
       'x-mcp-server': {
         name: 'aqua-mcp-server',
         transport: 'stdio (local) or Streamable HTTP (self-hosted)',
         tools: 27,
         repo: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
-        docs: 'https://mos2es.xyz/developers#mcp',
+        docs: 'https://aquaidp.xyz/developers#mcp',
       },
     },
     externalDocs: {
       description: 'AQUA Application Hub developer portal',
-      url: 'https://mos2es.xyz/developers',
+      url: 'https://aquaidp.xyz/developers',
     },
     servers: [
-      { url: 'https://mos2es.xyz/api', description: 'Production' },
+      { url: 'https://aquaidp.xyz/api', description: 'Production' },
     ],
     components: {
       securitySchemes: {

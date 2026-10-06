@@ -4,7 +4,7 @@
  * The AQUA MCP server is a local/stdio product surface — it runs inside the
  * user agent environment (Claude Desktop, Cursor, Windsurf) and connects to
  * the user Supabase session. There is no public hosted MCP endpoint at
- * mos2es.xyz. This manifest tells agents where to find the server source,
+ * aquaidp.xyz. This manifest tells agents where to find the server source,
  * how to install it, and what transport it supports.
  */
 
@@ -30,7 +30,7 @@ export async function GET() {
       },
       http: {
         url: 'http://localhost:3000/mcp',
-        note: 'Self-hosted Streamable HTTP transport. Set TRANSPORT=http and PORT. Not hosted publicly by mos2es.xyz.',
+        note: 'Self-hosted Streamable HTTP transport. Set TRANSPORT=http and PORT. Not hosted publicly by aquaidp.xyz.',
       },
     },
     npm: 'https://www.npmjs.com/package/aqua-mcp-server',
@@ -48,7 +48,7 @@ export async function GET() {
     resourceCategories: ['programs', 'questions', 'rankings'],
     promptTemplates: ['opportunity_scout', 'draft_answer', 'program_comparison'],
     repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
-    docs: 'https://mos2es.xyz/developers#mcp',
+    docs: 'https://aquaidp.xyz/developers#mcp',
     auth: {
       type: 'Supabase JWT',
       description: 'Authenticated tools require a Supabase access token from the user session. Public tools (programs, questions, rankings) work without auth.',

@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // POST /api/indexnow
 // Forwards URL submission to IndexNow API for Bing, DuckDuckGo, Yandex, Seznam.
-// Accepts a JSON body: { urls: ["https://mos2es.xyz/faq", ...] }
-// Or a single URL string: "https://mos2es.xyz/faq"
-// Only mos2es.xyz URLs are accepted — this endpoint is not a proxy for arbitrary domains.
+// Accepts a JSON body: { urls: ["https://aquaidp.xyz/faq", ...] }
+// Or a single URL string: "https://aquaidp.xyz/faq"
+// Only aquaidp.xyz URLs are accepted — this endpoint is not a proxy for arbitrary domains.
 
 const INDEXNOW_KEY = 'f1f880e1830342be8c1180ee9a7cfb41'
-const HOST = 'mos2es.xyz'
+const HOST = 'aquaidp.xyz'
 const KEY_LOCATION = `https://${HOST}/${INDEXNOW_KEY}.txt`
 const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow'
 const MAX_URLS = 10000
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No URLs provided' }, { status: 400 })
   }
 
-  // Validate: only mos2es.xyz URLs, reject anything else
+  // Validate: only aquaidp.xyz URLs, reject anything else
   const validUrls: string[] = []
   const rejected: string[] = []
   for (const u of urls) {

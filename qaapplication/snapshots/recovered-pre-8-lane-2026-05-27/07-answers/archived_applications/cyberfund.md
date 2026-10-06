@@ -67,7 +67,7 @@ Same way most of the industry measures the wrong substrate — volume instead of
 - Four U.S. patent filings + the MO§ES™ trademark, filed across the last eight months — covering the compression substrate, the signal compression engine, civic infrastructure, and the conservation law itself.
 - An empirical preprint that's openly falsifiable. Conservation Law of Commitment — five versioned releases on Zenodo (V.05 = DOI 10.5281/zenodo.20029607). Public test harness, pinned oracle, refutation conditions explicit.
 - Benchmarks at #1 across all five measured kernels against the Artificial Analysis Coding Agent Index over a seven-day window.
-- Live product surfaces. KASSA voice-AI commitment-kernel demo. Grok demo — 339 timestamped public exchanges across 13 days. Signomy at signomy.xyz — 270 API endpoints, Stripe Connect. AQUA at mos2es.xyz — founder-first application OS (this cyber•Fund interview was filled through it).
+- Live product surfaces. KASSA voice-AI commitment-kernel demo. Grok demo — 339 timestamped public exchanges across 13 days. Signomy at signomy.xyz — 270 API endpoints, Stripe Connect. AQUA at aquaidp.xyz — founder-first application OS (this cyber•Fund interview was filled through it).
 - Beachhead currently shipping: SigRank.
 
 Volume traction comes after the beachhead lands. Substrate traction came first.

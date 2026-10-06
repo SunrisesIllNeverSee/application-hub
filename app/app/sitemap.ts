@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-const BASE_URL = 'https://mos2es.xyz'
+const BASE_URL = 'https://aquaidp.xyz'
 export const dynamic = 'force-dynamic'
 
 // Public, indexable pages only. Auth-protected routes (/applications/*, /hub/*,

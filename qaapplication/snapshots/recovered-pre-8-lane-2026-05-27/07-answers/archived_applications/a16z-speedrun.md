@@ -46,7 +46,7 @@ application_type: accelerator
 | LinkedIn | https://www.linkedin.com/in/dericmchenry |
 | GitHub | https://github.com/SunrisesIllNeverSee |
 | X / Twitter | https://x.com/burnmydays |
-| Portfolio URLs | mos2es.com, signomy.xyz, mos2es.xyz, https://zenodo.org/records/20029607 |
+| Portfolio URLs | mos2es.com, signomy.xyz, aquaidp.xyz, https://zenodo.org/records/20029607 |
 
 **Founder experience (100-word limit, submitted 99/100):**
 July 2025 was my first AI session, since then I have designed over a dozen products, numerous demos/artifacts, and built four e2e. Established Conservation Law of Commitment Preprint, empirical testing, with a falsifiability harness. That has evolved into my Commitment Theory Prospectus aka Preservation of Meaning via the combination of thermodynamic's, physic's, and language. Currently, have a registered trademark for MO§ES™ system and four provisional patents covering its expansive lattice structure backend, frontend, hardware, and multiple products. Current projects: Redefining Voice AI infra, new Turing Test, and AQUA. Q/A Bank. Received first validation when attending Pitch x Deel NYC.
@@ -61,7 +61,7 @@ MO§ES™ was team-agnostic by design, do not be confused with team avoidant. Th
 | Startup name | MO§ES™ |
 | Build location | United States — New York, Buffalo |
 | Founded | September 2025 |
-| Company website | http://mos2es.com https://mos2es.xyz https://signomy.xyz |
+| Company website | http://mos2es.com https://aquaidp.xyz https://signomy.xyz |
 
 **Pitch in one sentence (10-word limit, submitted 10/10):**
 Constitutional enforcement at the execution level. AAI, Agents, and BI

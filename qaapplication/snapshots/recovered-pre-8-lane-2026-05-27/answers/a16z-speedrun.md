@@ -139,7 +139,7 @@ https://x.com/burnmydays
 ---
 
 ### Answer
-mos2es.com, signomy.xyz, mos2es.xyz, https://zenodo.org/records/20029607
+mos2es.com, signomy.xyz, aquaidp.xyz, https://zenodo.org/records/20029607
 
 — from: a16z-speedrun · 2026-05 · Q: "Portfolio URL"
 
@@ -192,7 +192,7 @@ September 2025
 ---
 
 ### Answer
-http://mos2es.com https://mos2es.xyz https://signomy.xyz
+http://mos2es.com https://aquaidp.xyz https://signomy.xyz
 
 — from: a16z-speedrun · 2026-05 · Q: "Company Website"
 

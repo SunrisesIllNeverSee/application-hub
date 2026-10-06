@@ -61,7 +61,7 @@ is testable locally without a Supabase Edge Function runtime.
 | `CRON_SECRET` | Vercel env + Supabase Edge Function env | Shared secret authorizing cron calls. Must match on both sides. |
 | `RESEND_API_KEY` | Vercel env | Resend API key for sending emails. Already used by deadline-alerts. |
 | `RESEND_FROM_EMAIL` | Vercel env | From address, e.g. `noreply@mos2es.xyz`. Already used by deadline-alerts. |
-| `APP_URL` | Vercel env + Supabase Edge Function env | Base URL for deep links in emails, e.g. `https://mos2es.xyz`. |
+| `APP_URL` | Vercel env + Supabase Edge Function env | Base URL for deep links in emails, e.g. `https://aquaidp.xyz`. |
 
 `CRON_SECRET`, `RESEND_API_KEY`, and `RESEND_FROM_EMAIL` are already in use by the
 deadline-alerts agent. If those are set, confirm `APP_URL` is present and add
@@ -90,7 +90,7 @@ supabase functions deploy recruiter-agent
 In the Supabase dashboard, go to Edge Functions -> recruiter-agent -> Environment variables:
 
 ```
-APP_URL=https://mos2es.xyz
+APP_URL=https://aquaidp.xyz
 CRON_SECRET=<same value as Vercel CRON_SECRET>
 ```
 

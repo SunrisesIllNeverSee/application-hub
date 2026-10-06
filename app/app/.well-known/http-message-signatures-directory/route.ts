@@ -2,7 +2,7 @@
  * app/.well-known/http-message-signatures-directory/route.ts
  *
  * Web Bot Auth — serves a JWKS so other sites can verify requests
- * signed by mos2es.xyz's bot/agent.
+ * signed by aquaidp.xyz's bot/agent.
  */
 
 import { NextResponse } from 'next/server'

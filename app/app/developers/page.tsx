@@ -5,7 +5,7 @@ import { BREADCRUMBS } from '@/lib/jsonld'
 export const metadata: Metadata = {
   title: 'AQUA Application Hub Developer Portal — API, MCP, OpenAPI',
   description:
-    'Developer resources for AQUA Application Hub at mos2es.xyz: OpenAPI spec, REST API, MCP server with 27 tools, authentication, Appfeeder extension, and agent integration guidance.',
+    'Developer resources for AQUA Application Hub at aquaidp.xyz: OpenAPI spec, REST API, MCP server with 27 tools, authentication, Appfeeder extension, and agent integration guidance.',
   alternates: { canonical: '/developers' },
 }
 
@@ -42,16 +42,16 @@ export default function DevelopersPage() {
             extension or agent use. Start with the OpenAPI document for typed operations and error models.
           </p>
           <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Get your auth token (requires active session)
-curl https://mos2es.xyz/api/auth/token
+curl https://aquaidp.xyz/api/auth/token
 
 # Match a question against your answer bank
-curl -X POST https://mos2es.xyz/api/match-question \\
+curl -X POST https://aquaidp.xyz/api/match-question \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer <JWT>" \\
   -d '{"text": "Tell us what you have built", "limit": 5}'
 
 # Read the OpenAPI spec
-curl https://mos2es.xyz/openapi.json | jq .info`}</code></pre>
+curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
         </section>
 
         <section className="space-y-4">
@@ -105,7 +105,7 @@ curl https://mos2es.xyz/openapi.json | jq .info`}</code></pre>
             rankings, intelligence, and user-authenticated operations. It runs
             locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted
             via Streamable HTTP transport. There is no public hosted MCP endpoint
-            at mos2es.xyz — the server runs in the user agent environment and
+            at aquaidp.xyz — the server runs in the user agent environment and
             connects to the user Supabase session.
           </p>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">

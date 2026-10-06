@@ -47,7 +47,7 @@ name it. Read those first.
    — strong reference for tone, founder background, MO§ES™ pitch). The
    May 2026 snapshot; outranked by live sources where they diverge.
 3. **Live sources** — GitHub `SunrisesIllNeverSee`, `mos2es.com`,
-   `mos2es.xyz`, `signomy.xyz` — see [sources.md](sources.md) for the
+   `aquaidp.xyz`, `signomy.xyz` — see [sources.md](sources.md) for the
    full fetch protocol.
 4. **The target program's DNA** — inferred from the questions themselves.
 

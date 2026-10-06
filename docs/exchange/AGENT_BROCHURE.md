@@ -131,14 +131,14 @@ A contribution can retain originator, discoverer, contributor, collaborator, ver
 
 ## Machine starting points on the reference node
 
-- `GET https://mos2es.xyz/.well-known/exchange.json`
-- `GET https://mos2es.xyz/api/exchange/steward/mos2es.xyz`
-- `POST https://mos2es.xyz/api/exchange/steward/mos2es.xyz` with `{"type":"preflight",...}`
-- `POST https://mos2es.xyz/api/exchange/proposals`
-- `POST https://mos2es.xyz/api/exchange/requests`
-- `POST https://mos2es.xyz/api/exchange/agents` — optional registration
-- `GET https://mos2es.xyz/api/exchange/manifest`
-- `GET https://mos2es.xyz/exchange.schema.json`
+- `GET https://aquaidp.xyz/.well-known/exchange.json`
+- `GET https://aquaidp.xyz/api/exchange/steward/aquaidp.xyz`
+- `POST https://aquaidp.xyz/api/exchange/steward/aquaidp.xyz` with `{"type":"preflight",...}`
+- `POST https://aquaidp.xyz/api/exchange/proposals`
+- `POST https://aquaidp.xyz/api/exchange/requests`
+- `POST https://aquaidp.xyz/api/exchange/agents` — optional registration
+- `GET https://aquaidp.xyz/api/exchange/manifest`
+- `GET https://aquaidp.xyz/exchange.schema.json`
 
 ## Anti-spam rule
 

@@ -25,7 +25,7 @@ export default function OpenGraphImage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', fontSize: 82, lineHeight: 0.95, fontWeight: 800, letterSpacing: '-0.05em' }}>Applications.</div>
           <div style={{ display: 'flex', fontSize: 82, lineHeight: 0.95, fontWeight: 800, letterSpacing: '-0.05em' }}>Questions. Answers.</div>
-          <div style={{ display: 'flex', marginTop: 24, fontSize: 28, color: '#a3a3a3' }}>Reusable application infrastructure · mos2es.xyz</div>
+          <div style={{ display: 'flex', marginTop: 24, fontSize: 28, color: '#a3a3a3' }}>Reusable application infrastructure · aquaidp.xyz</div>
         </div>
       </div>
     ),

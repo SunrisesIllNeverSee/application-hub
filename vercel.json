@@ -11,10 +11,32 @@
       "has": [
         {
           "type": "host",
+          "value": "www.aquaidp.xyz"
+        }
+      ],
+      "destination": "https://aquaidp.xyz/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "mos2es.xyz"
+        }
+      ],
+      "destination": "https://aquaidp.xyz/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
           "value": "www.mos2es.xyz"
         }
       ],
-      "destination": "https://mos2es.xyz/:path*",
+      "destination": "https://aquaidp.xyz/:path*",
       "permanent": true
     }
   ]

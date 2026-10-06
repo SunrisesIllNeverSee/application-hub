@@ -65,7 +65,7 @@ export async function GET(req: Request) {
   const provenance = {
     exported_at: new Date().toISOString(),
     source: 'AQUA Application Hub',
-    source_url: 'https://mos2es.xyz',
+    source_url: 'https://aquaidp.xyz',
     user_id: user.id,
     commitment_hash: profile?.commitment_hash ?? null,
   }
@@ -190,7 +190,7 @@ function buildLERExport(
     id: `urn:aqua:persona:${user.id}`,
     issuedOn: new Date().toISOString(),
     issuer: {
-      id: 'https://mos2es.xyz',
+      id: 'https://aquaidp.xyz',
       name: 'AQUA Application Hub',
       type: 'Profile',
     },
@@ -233,7 +233,7 @@ function buildVCExport(
     type: ['VerifiableCredential', 'PersonaProfileCredential'],
     id: `urn:aqua:vc:${user.id}:${Date.now()}`,
     issuer: {
-      id: 'did:web:mos2es.xyz',
+      id: 'did:web:aquaidp.xyz',
       name: 'AQUA Application Hub',
     },
     issuanceDate: new Date().toISOString(),
@@ -254,7 +254,7 @@ function buildVCExport(
       type: 'CommitmentHashProof2024',
       created: new Date().toISOString(),
       proofPurpose: 'assertionMethod',
-      verificationMethod: 'did:web:mos2es.xyz#commitment-verifier',
+      verificationMethod: 'did:web:aquaidp.xyz#commitment-verifier',
       commitment_hash: (profile?.commitment_hash as string) ?? null,
       provenance_chain: (profile?.provenance_chain as unknown[]) ?? [],
     },

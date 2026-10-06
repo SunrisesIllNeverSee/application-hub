@@ -176,7 +176,7 @@ Other coordination docs should point here rather than restating these facts unle
 - Root `.gitignore` is present and excludes dependency folders, build output, `.next`, local env files, and editor artifacts.
 
 ### Deployment
-- App is deployed live at `https://mos2es.xyz`
+- App is deployed live at `https://aquaidp.xyz`
 - Auth (magic link + password escape hatch) confirmed working on live site.
 - Smoke test completed 2026-05-10. All core routes load against live Supabase.
 

@@ -1,5 +1,5 @@
 const DEFAULT_SETTINGS = {
-  hubUrl: 'https://mos2es.xyz',
+  hubUrl: 'https://aquaidp.xyz',
   agentUrl: 'http://127.0.0.1:4317',
   jwt: '',
   mode: 'manual',

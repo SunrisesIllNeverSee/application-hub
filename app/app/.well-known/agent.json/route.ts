@@ -9,16 +9,16 @@ export async function GET() {
     version: '1.0.0',
     description:
       'Founder-first application infrastructure — portable application graph of recurring questions, reusable answers, fit signals, and review history. Local MCP server with 27 tools for agent environments.',
-    url: 'https://mos2es.xyz',
+    url: 'https://aquaidp.xyz',
     protocolVersion: '0.3.0',
     supportedInterfaces: [
       {
-        url: 'https://mos2es.xyz/api',
+        url: 'https://aquaidp.xyz/api',
         protocolBinding: 'HTTP+JSON',
         protocolVersion: '0.3.0',
       },
       {
-        url: 'https://mos2es.xyz/.well-known/mcp',
+        url: 'https://aquaidp.xyz/.well-known/mcp',
         protocolBinding: 'MCP',
         protocolVersion: '1.0',
       },
@@ -57,7 +57,7 @@ export async function GET() {
     ],
     provider: {
       organization: 'Ello Cello LLC',
-      url: 'https://mos2es.xyz',
+      url: 'https://aquaidp.xyz',
     },
     authentication: {
       schemes: ['oauth2'],

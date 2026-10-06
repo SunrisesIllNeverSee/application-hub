@@ -13,7 +13,7 @@ A small domain-native gateway that lets outside agents discover whether a compan
 5. Supabase — private transaction state, events, identities, and settlement ledger.
 6. Stripe Connect — optional automated financial settlement. Manual settlement remains possible.
 
-## AQUA / mos2es.xyz install
+## AQUA / aquaidp.xyz install
 
 The reference integration is already wired into the Next.js project under `app/`. Apply `supabase/migrations/202608230001_contribution_exchange.sql` to the AppFeeder/AQUA Supabase project, then deploy the branch.
 
@@ -28,7 +28,7 @@ Exchange variables:
 ```text
 EXCHANGE_PLATFORM_FEE_BPS=500
 EXCHANGE_REFERRAL_BPS=0
-EXCHANGE_REFERENCE_DOMAIN=mos2es.xyz
+EXCHANGE_REFERENCE_DOMAIN=aquaidp.xyz
 EXCHANGE_REFERENCE_ADMIN_KEY=<generate-a-long-random-secret>
 EXCHANGE_STRIPE_WEBHOOK_SECRET=<stripe-endpoint-secret>
 ```
@@ -37,7 +37,7 @@ EXCHANGE_STRIPE_WEBHOOK_SECRET=<stripe-endpoint-secret>
 
 ### Reference admin key
 
-Set `EXCHANGE_REFERENCE_ADMIN_KEY` only as a server-side environment variable. It is the emergency/operator credential for the seeded `mos2es.xyz` company record. Do not put it in browser code, Git, `NEXT_PUBLIC_*`, `agents.md`, or the Exchange Profile.
+Set `EXCHANGE_REFERENCE_ADMIN_KEY` only as a server-side environment variable. It is the emergency/operator credential for the seeded `aquaidp.xyz` company record. Do not put it in browser code, Git, `NEXT_PUBLIC_*`, `agents.md`, or the Exchange Profile.
 
 ## New-company onboarding
 

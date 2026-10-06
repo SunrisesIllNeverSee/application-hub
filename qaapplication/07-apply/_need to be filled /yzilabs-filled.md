@@ -40,7 +40,7 @@ https://mos2es.com
 @burnmydays *(MO§ES™ tweets from founder account currently)*
 
 ## 9. Product Demo
-https://mos2es.xyz *(AQUA — live) · KASSA voice-AI demo available at mos2es.com*
+https://aquaidp.xyz *(AQUA — live) · KASSA voice-AI demo available at mos2es.com*
 *(TODO: add Loom demo link if recorded)*
 
 ## 10. Intro Deck / Pitch Presentation

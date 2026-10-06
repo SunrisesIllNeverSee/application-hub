@@ -8,7 +8,7 @@ timestamp: 2026-08-19
 
 # BYOK Ollama setup — local model on production
 
-> Verified working on 2026-05-11. End-to-end: `mos2es.xyz` → Cloudflare tunnel → laptop Ollama → llama3.1:8b → draft text streamed back into the workspace UI.
+> Verified working on 2026-05-11. End-to-end: `aquaidp.xyz` → Cloudflare tunnel → laptop Ollama → llama3.1:8b → draft text streamed back into the workspace UI.
 
 This is the setup that lets your **deployed Vercel app** call **the Ollama server running on your laptop** — without exposing your home IP, paying for an OpenAI key, or maintaining a server.
 
@@ -18,7 +18,7 @@ This is the setup that lets your **deployed Vercel app** call **the Ollama serve
 
 - **Provider**: Ollama running locally (your laptop)
 - **Models pulled**: `llama3.1:8b` (4.7GB), `qwen2.5:3b` (1.8GB)
-- **Reachable from**: both `localhost:3000` dev server AND `mos2es.xyz` production
+- **Reachable from**: both `localhost:3000` dev server AND `aquaidp.xyz` production
 - **Cost**: $0 — no API charges, just your laptop's CPU/GPU and electricity
 
 ---
@@ -66,7 +66,7 @@ The tunnel URL looks like `https://titled-promotions-related-wing.trycloudflare.
 
 ## Saving the BYOK integration
 
-Visit **mos2es.xyz/profile/integrations** → sign in → save:
+Visit **aquaidp.xyz/profile/integrations** → sign in → save:
 
 | Field | Value |
 |---|---|
@@ -82,7 +82,7 @@ The integration row lives in `public.user_integrations`. The `base_url` and `mod
 
 ## How a draft request flows
 
-1. User clicks **"Draft with AI"** on a workspace question (mos2es.xyz/workspace/[program_id])
+1. User clicks **"Draft with AI"** on a workspace question (aquaidp.xyz/workspace/[program_id])
 2. Browser POSTs to `/api/draft` with `archived_question_id` and the program metadata
 3. Server reads `user_integrations` filtered by `user_id`, sorted by `PROVIDER_PRIORITY` (anthropic → openai → ollama → google)
 4. Picks the highest-priority active integration (your Ollama row)
@@ -117,7 +117,7 @@ SET base_url = 'https://NEW_TUNNEL_URL.trycloudflare.com',
 WHERE provider = 'ollama';
 ```
 
-Or just visit `mos2es.xyz/profile/integrations` and update the Base URL via the UI.
+Or just visit `aquaidp.xyz/profile/integrations` and update the Base URL via the UI.
 
 ---
 
@@ -178,6 +178,6 @@ For now (you + 5 power users testing), the laptop + tunnel setup is perfect.
 
 ## What worked first time on 2026-05-11
 
-The full chain — `mos2es.xyz` workspace UI → POST `/api/draft` → Vercel cloud function → `https://titled-promotions-related-wing.trycloudflare.com` → my MacBook's Ollama → `llama3.1:8b` running on local CPU → response streamed back → rendered in the editor — returned a 127-word draft for the question *"Why is now the right time to build this?"* in ~7 seconds. Free, private, no API key, no rate limits.
+The full chain — `aquaidp.xyz` workspace UI → POST `/api/draft` → Vercel cloud function → `https://titled-promotions-related-wing.trycloudflare.com` → my MacBook's Ollama → `llama3.1:8b` running on local CPU → response streamed back → rendered in the editor — returned a 127-word draft for the question *"Why is now the right time to build this?"* in ~7 seconds. Free, private, no API key, no rate limits.
 
 That's the entire AI feature working on production infrastructure with $0 of cloud GPU spend.

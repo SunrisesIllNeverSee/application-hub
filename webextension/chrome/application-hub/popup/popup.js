@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Open app button
   btnOpenApp.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'https://mos2es.xyz/dash' })
+    chrome.tabs.create({ url: 'https://aquaidp.xyz/dash' })
     window.close()
   })
 })

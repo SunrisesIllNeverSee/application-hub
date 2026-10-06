@@ -7,55 +7,55 @@ export async function GET() {
   const catalog = {
     linkset: [
       {
-        anchor: 'https://mos2es.xyz/api',
+        anchor: 'https://aquaidp.xyz/api',
         'service-desc': [
           {
-            href: 'https://mos2es.xyz/openapi.json',
+            href: 'https://aquaidp.xyz/openapi.json',
             type: 'application/json',
             title: 'AQUA Application Hub OpenAPI',
           },
         ],
         'service-doc': [
           {
-            href: 'https://mos2es.xyz/developers',
+            href: 'https://aquaidp.xyz/developers',
             type: 'text/html',
             title: 'AQUA Application Hub Developer Portal',
           },
           {
-            href: 'https://mos2es.xyz/.well-known/auth.md',
+            href: 'https://aquaidp.xyz/.well-known/auth.md',
             type: 'text/markdown',
             title: 'AQUA Application Hub Authentication',
           },
         ],
         status: [
           {
-            href: 'https://mos2es.xyz/api/health',
+            href: 'https://aquaidp.xyz/api/health',
             type: 'application/json',
           },
         ],
       },
       {
-        anchor: 'https://mos2es.xyz',
+        anchor: 'https://aquaidp.xyz',
         'service-desc': [
           {
-            href: 'https://mos2es.xyz/openapi.json',
+            href: 'https://aquaidp.xyz/openapi.json',
             type: 'application/json',
             title: 'AQUA Application Hub OpenAPI',
           },
           {
-            href: 'https://mos2es.xyz/.well-known/mcp',
+            href: 'https://aquaidp.xyz/.well-known/mcp',
             type: 'application/json',
             title: 'AQUA Application Hub MCP Server Manifest',
           },
         ],
         'service-doc': [
           {
-            href: 'https://mos2es.xyz/developers',
+            href: 'https://aquaidp.xyz/developers',
             type: 'text/html',
             title: 'AQUA Application Hub Developer Portal',
           },
           {
-            href: 'https://mos2es.xyz/llms.txt',
+            href: 'https://aquaidp.xyz/llms.txt',
             type: 'text/plain',
             title: 'AQUA Application Hub llms.txt',
           },

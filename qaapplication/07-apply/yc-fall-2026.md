@@ -74,7 +74,7 @@ Paid operator profiles and performance features for AI-native users; team and en
 
 ### Other ideas
 
-Signomy, an agentic-economy marketplace with dual governance (signomy.xyz); AQUA (mos2es.xyz), an application operating system that turns recurring questions and answers into a reusable bank; SigRank; and the Post-Turing Test, a measurement standard for human-AI collaboration depth.
+Signomy, an agentic-economy marketplace with dual governance (signomy.xyz); AQUA (aquaidp.xyz), an application operating system that turns recurring questions and answers into a reusable bank; SigRank; and the Post-Turing Test, a measurement standard for human-AI collaboration depth.
 
 ## Equity and fundraising
 

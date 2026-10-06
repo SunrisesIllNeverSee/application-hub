@@ -10,7 +10,7 @@
  * structured data per the Schema.org spec.
  */
 
-const SITE_ORIGIN = 'https://mos2es.xyz'
+const SITE_ORIGIN = 'https://aquaidp.xyz'
 const ORG_ID = `${SITE_ORIGIN}/#organization`
 const SITE_ID = `${SITE_ORIGIN}/#website`
 

@@ -9,7 +9,7 @@ export async function GET() {
 
 ## Overview
 
-AQUA Application Hub (mos2es.xyz) uses Supabase for authentication. Public
+AQUA Application Hub (aquaidp.xyz) uses Supabase for authentication. Public
 tools (programs, questions, rankings) work without auth. Authenticated tools
 (answer bank, fit scores, application intake) require a Supabase session JWT.
 
@@ -40,7 +40,7 @@ tools (programs, questions, rankings) work without auth. Authenticated tools
 ## Authentication methods
 
 ### Browser (cookie-based)
-Users sign in via the web UI at https://mos2es.xyz/login. Supabase sets a
+Users sign in via the web UI at https://aquaidp.xyz/login. Supabase sets a
 session cookie that authenticates subsequent requests.
 
 ### Agent / extension (Bearer JWT)
@@ -60,11 +60,11 @@ access token via the SUPABASE_ACCESS_TOKEN environment variable.
 - Authorization server metadata: /.well-known/oauth-authorization-server
 - Protected resource metadata: /.well-known/oauth-protected-resource
 - Issuer: ${supabaseUrl}/auth/v1
-- Registration: https://mos2es.xyz/login
+- Registration: https://aquaidp.xyz/login
 
 ## Web Bot Auth
 
-mos2es.xyz signs outgoing bot/agent requests using Ed25519. Verification keys
+aquaidp.xyz signs outgoing bot/agent requests using Ed25519. Verification keys
 are published at /.well-known/http-message-signatures-directory.
 `
 

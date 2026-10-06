@@ -7,7 +7,7 @@ Pre-fill accelerator and grant applications from your answer bank.
 1. `chrome://extensions` → Enable Developer Mode
 2. Click **Load unpacked** → select this `appfeeder/` folder
 3. Open the extension popup → paste your credentials:
-   - **Session token** — copy from [mos2es.xyz/profile/settings](https://mos2es.xyz/profile/settings)
+   - **Session token** — copy from [aquaidp.xyz/profile/settings](https://aquaidp.xyz/profile/settings)
    - **Supabase anon key** — copy from your Supabase project settings (it's the public key)
 
 ## Supported portals (V1)

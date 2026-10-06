@@ -52,8 +52,8 @@ export async function POST(req: Request) {
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
       type: 'account_onboarding',
-      return_url: body.return_url ?? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://mos2es.xyz'}/profile/settings`,
-      refresh_url: body.refresh_url ?? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://mos2es.xyz'}/profile/settings`,
+      return_url: body.return_url ?? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://aquaidp.xyz'}/profile/settings`,
+      refresh_url: body.refresh_url ?? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://aquaidp.xyz'}/profile/settings`,
     })
 
     return NextResponse.json({ url: accountLink.url, stripe_account_id: accountId })

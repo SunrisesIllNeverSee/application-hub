@@ -14,13 +14,13 @@ timestamp: 2026-08-19
 
 | Layer | State | Verified |
 |---|---|---|
-| Marketing landing (`mos2es.xyz`) | ✅ 100/100 Lighthouse | screenshots in `.claude/` |
+| Marketing landing (`aquaidp.xyz`) | ✅ 100/100 Lighthouse | screenshots in `.claude/` |
 | Auth (magic link + password) | ✅ both flows work | tested 2026-05-11 |
 | Cross-theme schema (jobs / school / grants) | ✅ migration 018 applied | enum `opportunity_kind` populated |
 | Programs archive | ✅ **30 → 842** | migrations 019 applied, 812 Fundingcake imports |
 | Question archive | ✅ 225 questions seeded | significance-scored |
 | Answer Bank + Drip mechanic | ✅ table + RPCs | migration 014 applied |
-| Workspace + Profile + Hub UIs | ✅ all routes render | tested on localhost + mos2es.xyz |
+| Workspace + Profile + Hub UIs | ✅ all routes render | tested on localhost + aquaidp.xyz |
 | **BYOK Ollama** (local + tunnel) | ✅ **just shipped** | drafted 93 words via `llama3.1:8b` |
 | AI Draft (kind-aware coach) | ✅ working | 11 coach personas wired |
 | Paste import (`/profile/import`) | ✅ route + UI | migration 020 applied |

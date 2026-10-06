@@ -45,7 +45,7 @@ timestamp: 2026-08-19
 
 | Surface | URL | Status |
 |---|---|---|
-| Marketing landing | https://mos2es.xyz | ✅ 100/100 Lighthouse |
+| Marketing landing | https://aquaidp.xyz | ✅ 100/100 Lighthouse |
 | Dev server | http://localhost:3000 | ✅ Tailwind serves cleanly after `.next/` clean |
 | Hub directory | /hub | ✅ 842 programs |
 | Workspace | /workspace/[program_id] | ✅ Draft with AI generates real output |
@@ -107,6 +107,6 @@ a111dc9  feat: cross-theme expansion + community flywheel + Fundingcake archive
 2. Same terminal: `cloudflared tunnel --url http://localhost:11434 &`
 3. Grab the new tunnel URL: `grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' /tmp/cf-tunnel.log | head -1`
 4. Update `user_integrations.base_url` to the new tunnel URL (via UI at `/profile/integrations` or SQL)
-5. Test "Draft with AI" on `mos2es.xyz` — confirm 200 response
+5. Test "Draft with AI" on `aquaidp.xyz` — confirm 200 response
 
 If you only test locally, you can skip steps 2–4 and use `base_url = http://localhost:11434` directly.

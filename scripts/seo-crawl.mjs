@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // scripts/seo-crawl.mjs — Lightweight SEO crawler (Screaming Frog alternative).
 //
-// Crawls mos2es.xyz from the sitemap + homepage, following internal links.
+// Crawls aquaidp.xyz from the sitemap + homepage, following internal links.
 // Reports:
 //   - Broken links (4xx/5xx)
 //   - Redirect chains
@@ -21,7 +21,7 @@
 //
 // No external dependencies — uses built-in fetch + URL parsing.
 
-const BASE = 'https://mos2es.xyz'
+const BASE = 'https://aquaidp.xyz'
 const SITEMAP = `${BASE}/sitemap.xml`
 const TIMEOUT_MS = 10000
 
@@ -367,7 +367,7 @@ async function main() {
   }
 
   console.log('\n' + '='.repeat(70))
-  console.log('SEO CRAWL REPORT — mos2es.xyz')
+  console.log('SEO CRAWL REPORT — aquaidp.xyz')
   console.log('='.repeat(70))
   console.log(`Pages crawled: ${results.filter((r) => r.status === 200).length}`)
   console.log(`Redirects: ${results.filter((r) => r.redirected).length}`)

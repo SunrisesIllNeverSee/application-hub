@@ -3780,7 +3780,7 @@ So the real question is — are you going with **App Feeder**, something else, o
 ---
 
 **[2026-05-10 18:23:41] Claude:**
-That works — `mos2es.xyz` is yours, it's clean, and MO§ES governs the platform anyway so the connection isn't a stretch.
+That works — `aquaidp.xyz` is yours, it's clean, and MO§ES governs the platform anyway so the connection isn't a stretch.
 
 Sending address would be something like `noreply@mos2es.xyz` or `hub@mos2es.xyz`.
 
@@ -3788,9 +3788,9 @@ Here's the sequence:
 
 **Step 1 — Resend (10 min)**
 1. Go to [resend.com](https://resend.com) → sign in
-2. **Domains** → Add Domain → enter `mos2es.xyz`
+2. **Domains** → Add Domain → enter `aquaidp.xyz`
 3. Resend gives you 3 DNS records (MX, SPF, DKIM)
-4. Go to wherever `mos2es.xyz` DNS is managed (looks like Namecheap or similar from that list) → add the 3 records
+4. Go to wherever `aquaidp.xyz` DNS is managed (looks like Namecheap or similar from that list) → add the 3 records
 5. Back in Resend → **Verify** → wait 5–30 min for DNS propagation
 6. Once verified → **API Keys** → Create API Key → copy it
 
@@ -3864,7 +3864,7 @@ The test email button is specifically inside the SMTP settings panel, only appea
 
 **Two questions before we go further:**
 
-1. Did you actually set up Resend yet (created account, verified `mos2es.xyz` domain, got the API key)? Or are we still on Supabase's default email?
+1. Did you actually set up Resend yet (created account, verified `aquaidp.xyz` domain, got the API key)? Or are we still on Supabase's default email?
 
 2. On that page you're on right now — is **"Confirm email"** toggled on or off? That matters for whether magic links work on the live app.
 
@@ -4084,9 +4084,9 @@ That last step works because your middleware already redirects logged-in users a
 ---
 
 **[2026-05-10 19:19:41] Claude:**
-Before you wire that DNS — quick check: do you actually want Application Hub living at `mos2es.xyz`? That's your MO§ES domain. It works, but it's worth a 5-second decision before you commit the DNS.
+Before you wire that DNS — quick check: do you actually want Application Hub living at `aquaidp.xyz`? That's your MO§ES domain. It works, but it's worth a 5-second decision before you commit the DNS.
 
-If yes — add these at your DNS provider (wherever `mos2es.xyz` is registered):
+If yes — add these at your DNS provider (wherever `aquaidp.xyz` is registered):
 
 | Type | Name | Value |
 |---|---|---|
@@ -4096,19 +4096,19 @@ If yes — add these at your DNS provider (wherever `mos2es.xyz` is registered):
 Vercel's dashboard will show you the exact records — click **"Learn more"** or the arrow next to "DNS Change Recommended" and it'll show the exact values to copy.
 
 Once DNS propagates (5–30 min), update two things in Supabase:
-- **Site URL** → `https://mos2es.xyz`
-- **Redirect URLs** → add `https://mos2es.xyz/auth/callback`
+- **Site URL** → `https://aquaidp.xyz`
+- **Redirect URLs** → add `https://aquaidp.xyz/auth/callback`
 
 And the Resend SMTP sender can stay `noreply@mos2es.xyz` — it's already verified there, no conflict.
 
 ---
 
 **[2026-05-10 19:41:05] Claude:**
-Good — you already have `https://mos2es.xyz/auth/callback` in there. Now two more things:
+Good — you already have `https://aquaidp.xyz/auth/callback` in there. Now two more things:
 
 **1. Set the Site URL** — that field is blank or wrong. Set it to:
 ```
-https://mos2es.xyz
+https://aquaidp.xyz
 ```
 Save.
 
@@ -4117,14 +4117,14 @@ Save.
 https://application-hub-chi.vercel.app/auth/callback
 ```
 
-Then once DNS propagates and `mos2es.xyz` points to Vercel, the Site URL will be correct and magic links will land at the right place.
+Then once DNS propagates and `aquaidp.xyz` points to Vercel, the Site URL will be correct and magic links will land at the right place.
 
-You can also clean up the dead URLs in that list (`application-hub-snowy` etc.) once `mos2es.xyz` is the permanent home — keeps it tidy.
+You can also clean up the dead URLs in that list (`application-hub-snowy` etc.) once `aquaidp.xyz` is the permanent home — keeps it tidy.
 
 ---
 
 **[2026-05-10 19:42:56] Claude:**
-You're right, my bad — I can see it in the list. If Site URL is already set to `https://mos2es.xyz` then you're good on that front.
+You're right, my bad — I can see it in the list. If Site URL is already set to `https://aquaidp.xyz` then you're good on that front.
 
 Just add the missing chi URL:
 ```
@@ -4309,7 +4309,7 @@ Two agents running in parallel. While they work, here's your honest milestone pi
 | Real deadlines + urgency sort | ✅ Done |
 | Program TL;DR / pros / cons / best-for | ✅ Done |
 | User profile split (answers/about/settings) | ✅ Done |
-| Custom SMTP (Resend + mos2es.xyz) | ✅ Done |
+| Custom SMTP (Resend + aquaidp.xyz) | ✅ Done |
 | Live deployment (Vercel) | ✅ Done |
 | Migrations 010/011/012 applied | ✅ Done |
 | Auth working on live site | ✅ Done |
@@ -4690,7 +4690,7 @@ So 015 got applied (you did do that one), but 013 and 014 haven't been run in th
 cd app && vercel env ls
 ```
 
-**One other thing** — the Vercel project domains show the auto-generated URLs but not `mos2es.xyz`. Was that domain added to this specific project in Vercel, or is it pointing somewhere else? Worth confirming it's wired correctly.
+**One other thing** — the Vercel project domains show the auto-generated URLs but not `aquaidp.xyz`. Was that domain added to this specific project in Vercel, or is it pointing somewhere else? Worth confirming it's wired correctly.
 
 The two things that definitely still need doing are applying **migrations 013 and 014** in the Supabase SQL editor — want to do those now?
 
@@ -5507,7 +5507,7 @@ Build is in progress right now (`BUILDING`). Here's the clean state of everythin
 **What still needs you to flip a switch:**
 1. Stripe — create prices in dashboard, add 4 env vars to Vercel
 2. Deadline alerts — add `CRON_SECRET` to Vercel, schedule in Supabase dashboard
-3. Custom domain `mos2es.xyz` — verify it's pointed at Vercel correctly
+3. Custom domain `aquaidp.xyz` — verify it's pointed at Vercel correctly
 
 What's on your mind?
 
@@ -5549,17 +5549,17 @@ Two separate dev server instances. One was probably intentional at some point (P
 **[2026-05-11 12:28:03] Claude:**
 Both gone. The remaining shells are just Claude Code's own session shells — those are normal and expected, one per active Claude Code window. The MCP stacking is a Claude Desktop thing and doesn't really cause problems, just uses a bit of memory.
 
-For the two items you flagged — `CRON_SECRET` and `mos2es.xyz` — both are Vercel dashboard moves. Want to handle those now?
+For the two items you flagged — `CRON_SECRET` and `aquaidp.xyz` — both are Vercel dashboard moves. Want to handle those now?
 
 ---
 
 **[2026-05-11 12:29:18] Claude:**
-Good news — `mos2es.xyz` is already added to the Vercel project. Let me check if it's actually resolving:
+Good news — `aquaidp.xyz` is already added to the Vercel project. Let me check if it's actually resolving:
 
 ---
 
 **[2026-05-11 12:29:57] Claude:**
-`mos2es.xyz` is live and serving Application Hub. DNS is working correctly — no action needed there.
+`aquaidp.xyz` is live and serving Application Hub. DNS is working correctly — no action needed there.
 
 **For `CRON_SECRET`** — this one needs to be set manually in Vercel since I can't write env vars through the API. Here's exactly what to do:
 
@@ -5577,7 +5577,7 @@ Good news — `mos2es.xyz` is already added to the Vercel project. Let me check 
 
 Then in **Supabase dashboard → project `betcyfbzsgusaghriptz` → Edge Functions** — deploy the deadline alerts function and set it to run daily at 8am UTC.
 
-Or simpler: skip the Edge Function entirely and just hit the API route directly from a free cron service like [cron-job.org](https://cron-job.org) — point it at `https://mos2es.xyz/api/alerts/deadline-check` with the `Authorization: Bearer <CRON_SECRET>` header, daily at 8am.
+Or simpler: skip the Edge Function entirely and just hit the API route directly from a free cron service like [cron-job.org](https://cron-job.org) — point it at `https://aquaidp.xyz/api/alerts/deadline-check` with the `Authorization: Bearer <CRON_SECRET>` header, daily at 8am.
 
 ---
 
@@ -5729,7 +5729,7 @@ Running both at the same time — Lighthouse audit + SEO check:
 ---
 
 **[2026-05-11 16:01:17] Claude:**
-Found the problem immediately — `metadataBase` is missing from the layout. That's why Vercel URLs are being indexed instead of `mos2es.xyz`. Let me run Lighthouse and fix SEO in parallel:
+Found the problem immediately — `metadataBase` is missing from the layout. That's why Vercel URLs are being indexed instead of `aquaidp.xyz`. Let me run Lighthouse and fix SEO in parallel:
 
 ---
 
@@ -5746,7 +5746,7 @@ Now create robots.ts and sitemap.ts:
 **[2026-05-11 16:02:57] Claude:**
 Pushed. Here are the results:
 
-**Lighthouse scores (mos2es.xyz landing page):**
+**Lighthouse scores (aquaidp.xyz landing page):**
 | Category | Score |
 |---|---|
 | Performance | **97/100** |
@@ -5757,11 +5757,11 @@ Pushed. Here are the results:
 Zero issues flagged. That's a clean bill of health.
 
 **SEO indexing fix:**
-- `metadataBase: new URL('https://mos2es.xyz')` — this is the key one. Without it, Next.js has no idea what the canonical domain is, so it leaves OG and canonical tags pointing at whatever URL the request came from — which is often the `.vercel.app` preview URL
+- `metadataBase: new URL('https://aquaidp.xyz')` — this is the key one. Without it, Next.js has no idea what the canonical domain is, so it leaves OG and canonical tags pointing at whatever URL the request came from — which is often the `.vercel.app` preview URL
 - `robots.ts` — tells crawlers what to index (public pages) and what to skip (`/api/`, `/profile/`, `/workspace/`)
 - `sitemap.ts` — dynamic sitemap with the landing page, hub directory, and all 200 top programs by heat score
 
-Once Vercel deploys this (a few minutes), the Vercel URLs should stop appearing and `mos2es.xyz` should be the canonical reference everywhere. You may also want to submit `https://mos2es.xyz/sitemap.xml` to Google Search Console if you haven't already — speeds up the re-indexing significantly.
+Once Vercel deploys this (a few minutes), the Vercel URLs should stop appearing and `aquaidp.xyz` should be the canonical reference everywhere. You may also want to submit `https://aquaidp.xyz/sitemap.xml` to Google Search Console if you haven't already — speeds up the re-indexing significantly.
 
 ---
 
@@ -5797,7 +5797,7 @@ Good session. Here's where you landed:
 - Multi-provider draft (Anthropic, OpenAI, Ollama)
 - Application import + program submission UI
 - Portable taxonomy (jobs/school/grants foundation)
-- SEO fixed — `mos2es.xyz` is now the canonical URL, sitemap + robots live
+- SEO fixed — `aquaidp.xyz` is now the canonical URL, sitemap + robots live
 - Migration 026 applied (answer reviews)
 - pg_cron + edge function wired for deadline alerts
 - Supabase CLI linked, secrets set
@@ -6553,7 +6553,7 @@ Everything documented and pushed. Here's what was written:
 
 **`STATUS.md`** — Migration chain updated to 027, `/today` added to confirmed surfaces, stress-test UI marked live, product status table completed for all P1 items, new "What landed 2026-05-11" section listing all 16 new/modified files.
 
-**`TASKS.md`** — Live State updated to mos2es.xyz + migrations 027. Five items marked `[x]` done (home dashboard, stress-test UI, significance stars, DNA visualization, recruiter agent). MoatScore/FundScore and internal applicant ranking added as P2 items with clear dependency notes.
+**`TASKS.md`** — Live State updated to aquaidp.xyz + migrations 027. Five items marked `[x]` done (home dashboard, stress-test UI, significance stars, DNA visualization, recruiter agent). MoatScore/FundScore and internal applicant ranking added as P2 items with clear dependency notes.
 
 **`ROADMAP.md`** — Current Truth updated with 027 and all new routes. Next Product Layer P1 items all checked off. Two new P2 items added.
 
@@ -6909,7 +6909,7 @@ supabase functions deploy recruiter-agent --project-ref betcyfbzsgusaghriptz
 
 **Step 2 — Set env vars on the function** (Supabase dashboard → Edge Functions → recruiter-agent → Secrets):
 ```
-APP_URL = https://mos2es.xyz
+APP_URL = https://aquaidp.xyz
 CRON_SECRET = <same value as your Vercel CRON_SECRET>
 ```
 
@@ -7279,7 +7279,7 @@ Add Credits to the profile sidebar nav:
 Done. Here's the flow now:
 
 **Share on X:** User hits "Share" → Twitter compose opens pre-filled with:
-> *"I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere. The question archive is genuinely useful → mos2es.xyz #founders #startups"*
+> *"I've been building my answer bank for YC, Techstars, and 30+ programs with @ApplicationHub. Answer once, apply everywhere. The question archive is genuinely useful → aquaidp.xyz #founders #startups"*
 
 They post it, come back, hit "Mark as shared → claim" — 25 credits. Weekly reset.
 
@@ -7294,7 +7294,7 @@ The "Share" button and the claim button are intentionally separate — the share
 **[2026-05-12 00:10:37] Claude:**
 Two things to address before building more — the image and whether to commit to the currency naming. Let me map the whole thing out first.
 
-**On the image:** the share URL (mos2es.xyz) needs a proper OG image so when the post is scraped by Twitter/LinkedIn, a card appears. The right approach is a dynamic `/api/og` endpoint — Vercel's built-in OG image generator. It can produce a branded card, optionally showing the user's stats ("25 questions answered"). That's a separate small build.
+**On the image:** the share URL (aquaidp.xyz) needs a proper OG image so when the post is scraped by Twitter/LinkedIn, a card appears. The right approach is a dynamic `/api/og` endpoint — Vercel's built-in OG image generator. It can produce a branded card, optionally showing the user's stats ("25 questions answered"). That's a separate small build.
 
 **On days vs credits:** worth clarifying before naming is baked in everywhere. Two reads:
 - "Days" as in days of Pro access earned → very tangible, easy to understand, directly tied to subscription value
@@ -7897,7 +7897,7 @@ None of those were executed. I confirmed the code that should make them work exi
 
 To actually close these out you need to either:
 
-1. **Log into mos2es.xyz** and click through them yourself (fastest, since the migration is applied to prod)
+1. **Log into aquaidp.xyz** and click through them yourself (fastest, since the migration is applied to prod)
 2. **Hand to Codex with browser access** — it can run them against the live site if given a session or magic link
 3. **Hand to Devin** with the auth preconditions met — that's exactly what the handoff doc was written for
 
@@ -9619,7 +9619,7 @@ Here's where everything stands:
 
 ---
 
-## App — mos2es.xyz
+## App — aquaidp.xyz
 
 **AQUA phase fully shipped.** All 8 features live:
 - Split-screen workspace editor
@@ -11185,7 +11185,7 @@ Your import error (`/api/import/paste` → 503) requires `ANTHROPIC_API_KEY` on 
 
 ## The Ollama gotcha you'll hit when you try to actually use it
 
-If you typed `http://localhost:11434` (or no URL — that's the default), the **production site on mos2es.xyz cannot reach your local Ollama**. Vercel serverless functions run in the cloud and have no path to your laptop's localhost.
+If you typed `http://localhost:11434` (or no URL — that's the default), the **production site on aquaidp.xyz cannot reach your local Ollama**. Vercel serverless functions run in the cloud and have no path to your laptop's localhost.
 
 For Ollama to work against the live site, you need one of:
 - **Ngrok tunnel**: `ngrok http 11434` → save the public `https://xxx.ngrok-free.app` URL as base_url
@@ -11293,7 +11293,7 @@ The detection combines `isPrivateUrl()` (regex matching RFC 1918 ranges + loopba
 
 You're hitting two separate things that look like one problem:
 
-**1. Your test result is correct.** Ollama on your laptop literally cannot be reached from mos2es.xyz (which runs on Vercel's servers). This isn't a bug — it's how localhost works.
+**1. Your test result is correct.** Ollama on your laptop literally cannot be reached from aquaidp.xyz (which runs on Vercel's servers). This isn't a bug — it's how localhost works.
 
 **2. Three paths forward for Ollama**, pick one:
 
@@ -11901,7 +11901,7 @@ Everything before 5/10 was your prior 3-4 products. The "$10 → $68 → $608 �
 
 ## What's in that $592
 
-- Next.js app live at mos2es.xyz
+- Next.js app live at aquaidp.xyz
 - 41 Supabase migrations (RLS, RPCs, triggers, pgvector embeddings, enums)
 - TypeScript MCP server: 21 tools, 7 resources, 3 prompts, 69 tests passing, plugin-eval 100/100 Grade A
 - Stripe live (real checkout)
@@ -14865,7 +14865,7 @@ MO§ES™ is not a product. It's infrastructure — the signal governance layer 
 
 → mos2es.com
 → mos2es.com/benchmarks
-→ mos2es.xyz
+→ aquaidp.xyz
 ```
 
 ---
@@ -14919,7 +14919,7 @@ Independently verified Transmitter-Class VI (Singular) operator classification b
 |---|-------------|-----|
 | 1 | **Sovereign Signal Benchmark** — the five-category field comparison | `mos2es.com/benchmarks` |
 | 2 | **Commitment Conservation Preprint** — Zenodo DOI | *(your Zenodo DOI)* |
-| 3 | **AQUA — Application Hub** — live product | `mos2es.xyz` |
+| 3 | **AQUA — Application Hub** — live product | `aquaidp.xyz` |
 
 Add a custom image for #1 — use the dark/gold benchmark poster if you have it from the canvas session.
 
@@ -15004,7 +15004,7 @@ McHenry's First Law: commitment is conserved across interaction chains (it doesn
 |---------|-------------|
 | **SigRank™** | Operator classification leaderboard — ranks human-AI signal quality. First of its kind. |
 | **COMMAND** | Live governance console — constitutional multi-agent orchestration in production at mos2es.com |
-| **AQUA** (Application Hub) | Full-stack SaaS — accelerator/grant/fellowship application infrastructure. mos2es.xyz |
+| **AQUA** (Application Hub) | Full-stack SaaS — accelerator/grant/fellowship application infrastructure. aquaidp.xyz |
 | **Commitment Conservation Harness v2** | Research instrument — the measurement layer that validated the laws. Published Zenodo. |
 
 ---

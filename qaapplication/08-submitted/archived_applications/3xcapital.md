@@ -25,7 +25,7 @@
 | --- | --- |
 | Startup name | MO§ES™ |
 | One-line description | Meaning Preservation at Execution, similar to TCP/IP |
-| Websites | mos2es.com / mos2es.xyz / signomy.xyz |
+| Websites | mos2es.com / aquaidp.xyz / signomy.xyz |
 | Architecture link | https://mos2es.com/architecture |
 | Legal entity | Ello Cello LLC |
 | Sector | *not selected* (sector options were DeFi / Infrastructure / Web2-to-Web3 / Metaverse / GameFi / L1 / L2 / NFT / Other — MO§ES™ doesn't fit cleanly into the Web3-default sector taxonomy) |

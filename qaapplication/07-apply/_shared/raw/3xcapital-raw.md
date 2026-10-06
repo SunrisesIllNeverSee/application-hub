@@ -59,7 +59,7 @@ MO§ES™
 *
 Meaning Preservation at Execution, similiar to TCP/IP
 *
-mos2es.com/mos2es.xyz/signomy.xyz
+mos2es.com/aquaidp.xyz/signomy.xyz
 *
 https://mos2es.com/architecture
 *

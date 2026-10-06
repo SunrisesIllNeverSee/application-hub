@@ -6,7 +6,7 @@ const EXCHANGE_JSON = {
   protocol: 'Contribution Exchange',
   version: '0.2',
   status: 'private_alpha',
-  domain: 'mos2es.xyz',
+  domain: 'aquaidp.xyz',
   organization: 'Ello Cello LLC',
   description:
     'This domain participates in the Contribution Exchange via the hosted control plane at signalaf.com. Agents can propose or request contributions through the central Steward.',
@@ -18,8 +18,8 @@ const EXCHANGE_JSON = {
   },
   counterparty_agent: {
     mode: 'hosted_steward',
-    endpoint: 'https://signalaf.com/api/exchange/steward/mos2es.xyz',
-    policy: 'https://signalaf.com/api/exchange/steward/mos2es.xyz',
+    endpoint: 'https://signalaf.com/api/exchange/steward/aquaidp.xyz',
+    policy: 'https://signalaf.com/api/exchange/steward/aquaidp.xyz',
     human_role: 'governance_and_escalation',
   },
   contribution_scopes: [
@@ -42,7 +42,7 @@ const EXCHANGE_JSON = {
     agent_guide: 'https://signalaf.com/agents.md',
     manifest: 'https://signalaf.com/api/exchange/manifest',
     counterparty_agent:
-      'https://signalaf.com/api/exchange/steward/mos2es.xyz',
+      'https://signalaf.com/api/exchange/steward/aquaidp.xyz',
     company_control: 'https://signalaf.com/exchange/control',
     company_signup: 'https://signalaf.com/exchange/company',
     agent_signup: 'https://signalaf.com/exchange/agent',
@@ -82,8 +82,8 @@ const EXCHANGE_JSON = {
   ],
   signals: {
     schema: 'https://signalaf.com/schemas/exchange-signal/1.0',
-    collection: 'https://signalaf.com/api/exchange/signals?domain=mos2es.xyz',
-    human: 'https://signalaf.com/exchange/signals?domain=mos2es.xyz',
+    collection: 'https://signalaf.com/api/exchange/signals?domain=aquaidp.xyz',
+    human: 'https://signalaf.com/exchange/signals?domain=aquaidp.xyz',
     authentication: 'https://signalaf.com/agents.md#signal-authentication',
     supported_types: ['problem', 'request', 'challenge', 'bounty', 'verification', 'discovery', 'experiment'],
   },

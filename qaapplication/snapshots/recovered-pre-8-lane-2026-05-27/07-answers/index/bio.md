@@ -132,7 +132,7 @@ Yes
 ---
 
 ## QU-0016 · AP-a16z-speedrun · 2026-05
-mos2es.com, signomy.xyz, mos2es.xyz, https://zenodo.org/records/20029607
+mos2es.com, signomy.xyz, aquaidp.xyz, https://zenodo.org/records/20029607
 
 ---
 

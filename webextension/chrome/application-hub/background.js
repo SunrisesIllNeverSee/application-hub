@@ -5,7 +5,7 @@
 // Manifest V3 service worker — stateless between wake-ups.
 // ============================================================
 
-const API_BASE = 'https://mos2es.xyz'
+const API_BASE = 'https://aquaidp.xyz'
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 // ─── In-memory cache (cleared on service worker restart) ──────────────────────

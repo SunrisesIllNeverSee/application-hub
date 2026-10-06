@@ -14,7 +14,7 @@ Firecrawl for HTML→markdown; WebFetch as fallback.
 | --- | --- | --- |
 | Personal GitHub profile | <https://github.com/SunrisesIllNeverSee> | Repo list, pinned repos, recent activity, README snippets from active projects |
 | MO§ES™ — primary landing | <https://mos2es.com> | Current product description, pitch language, calls to action, latest claims |
-| MO§ES™ — secondary | <https://mos2es.xyz> | Anything that differs from `.com` — separate product surface, demos, technical detail |
+| MO§ES™ — secondary | <https://aquaidp.xyz> | Anything that differs from `.com` — separate product surface, demos, technical detail |
 | Signomy | <https://signomy.xyz> | Product surface, stated capabilities ("270 API endpoints, Stripe Connect" per a16z app — verify still current), positioning |
 
 I treat the live site as ground truth over the a16z application when they
@@ -68,7 +68,7 @@ If I do fetch live content, it lands here for reference within this draft sessio
 applications/_drafting/sources/
 ├── github-profile.md         ← snapshot of github.com/SunrisesIllNeverSee
 ├── mos2es-com.md             ← snapshot of mos2es.com
-├── mos2es-xyz.md             ← snapshot of mos2es.xyz
+├── mos2es-xyz.md             ← snapshot of aquaidp.xyz
 ├── signomy-xyz.md            ← snapshot of signomy.xyz
 └── <repo-name>.md            ← any specific repo I fetch
 ```

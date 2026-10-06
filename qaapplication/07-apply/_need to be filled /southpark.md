@@ -90,7 +90,7 @@ Share links to any artifacts you've built or published related to this idea.
 This can be a demo, live prototype, memo, or any artifact.
 1. Signomy — 270-endpoint API platform with Stripe Connect, fully live. Built end-to-end in under six months with no prior software background. signomy.xyz
 
-2. AQUA (Application Hub) — founder-first application OS that indexes every essay answer by canonical question and pre-fills across future applications. AI-native, live, compounding. This SPC application is literally being filled through it. mos2es.xyz
+2. AQUA (Application Hub) — founder-first application OS that indexes every essay answer by canonical question and pre-fills across future applications. AI-native, live, compounding. This SPC application is literally being filled through it. aquaidp.xyz
 
 3. Conservation Law of Commitment preprint — five versioned releases on Zenodo, publicly falsifiable, empirically testable. The framework has survived four months of open scrutiny. The academic artifact demonstrates the same thing the product benchmarks demonstrate: the ability to do rigorous, verifiable work independently. zenodo.org/records/20029607
 Who are the next 2-3 people you'd want to and could recruit to your team and why?

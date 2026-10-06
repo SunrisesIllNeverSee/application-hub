@@ -106,7 +106,7 @@ https://signomy.xyz
 
 **2. AQUA**
 Founder-first application OS. Every essay answer indexed by canonical question, pre-filled across future applications. AI-native and compounding. This SPC application is being filled through it.
-https://mos2es.xyz
+https://aquaidp.xyz
 
 **3. Commitment Theory Preprint**
 Full academic record of the Conservation Law with version history, citations, and the falsifiability harness.

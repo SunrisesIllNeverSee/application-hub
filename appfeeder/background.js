@@ -1,13 +1,13 @@
 /**
  * background.js — Service worker
  *
- * Calls mos2es.xyz/api/match-question with the user's JWT.
+ * Calls aquaidp.xyz/api/match-question with the user's JWT.
  * The API handles embedding generation + pgvector semantic search
  * against the archived_questions table, then joins with the user's
  * saved answers. Extension only stores credentials — no local matching logic.
  */
 
-const APP_URL = 'https://mos2es.xyz'
+const APP_URL = 'https://aquaidp.xyz'
 
 async function getAuth() {
   return new Promise(resolve => {

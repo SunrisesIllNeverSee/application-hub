@@ -6,9 +6,9 @@ export const revalidate = 3600
 export async function GET() {
   // Agent Skills Discovery RFC v0.2.0
   // https://github.com/cloudflare/agent-skills-discovery-rfc
-  const llmsTxtUrl = 'https://mos2es.xyz/llms.txt'
+  const llmsTxtUrl = 'https://aquaidp.xyz/llms.txt'
 
-  const llmsTxtContent = `# AQUA Application Hub\n\nCanonical URL: https://mos2es.xyz\nOperator: Ello Cello LLC\nSource: https://github.com/SunrisesIllNeverSee/application-hub\n\nAQUA is founder-first application infrastructure for application answer reuse — the practice of writing strong answers to common application questions once and adapting them across multiple programs.`
+  const llmsTxtContent = `# AQUA Application Hub\n\nCanonical URL: https://aquaidp.xyz\nOperator: Ello Cello LLC\nSource: https://github.com/SunrisesIllNeverSee/application-hub\n\nAQUA is founder-first application infrastructure for application answer reuse — the practice of writing strong answers to common application questions once and adapting them across multiple programs.`
 
   const llmsTxtDigest =
     'sha256:' + createHash('sha256').update(llmsTxtContent).digest('hex')

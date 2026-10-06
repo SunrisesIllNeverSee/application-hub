@@ -263,7 +263,7 @@ export default async function HubPage({
         '/applications',
         sorted.slice(0, 100).map((p) => ({
           name: p.name,
-          url: `https://mos2es.xyz/applications/${p.slug}`,
+          url: `https://aquaidp.xyz/applications/${p.slug}`,
         })),
       )
     : null

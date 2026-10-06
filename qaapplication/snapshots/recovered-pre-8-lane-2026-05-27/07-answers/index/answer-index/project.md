@@ -66,10 +66,10 @@ MVP
 ---
 
 ## QU-0026 · AP-3xcapital · 2026-05-13
-mos2es.com / mos2es.xyz / signomy.xyz
+mos2es.com / aquaidp.xyz / signomy.xyz
 
 ## QU-0026 · AP-a16z-speedrun · 2026-05
-http://mos2es.com https://mos2es.xyz https://signomy.xyz
+http://mos2es.com https://aquaidp.xyz https://signomy.xyz
 
 ---
 

@@ -30,7 +30,7 @@ The public wedge is startup opportunities. The underlying spine is broad enough 
 
 | Surface | State |
 |---|---|
-| Live app | `https://mos2es.xyz` |
+| Live app | `https://aquaidp.xyz` |
 | Archive + migration counts | See `docs/STATUS.md` (registry archived to `docs/archive/build-era/agents/`) |
 | MCP server | 21 tools, 7 resources, 3 prompts |
 | Web product | Hub, Bank, workspace, profile split, imports, BYOK |

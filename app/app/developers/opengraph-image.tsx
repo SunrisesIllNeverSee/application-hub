@@ -24,7 +24,7 @@ export default function DevelopersOG() {
         <div style={{ display: 'flex', fontSize: 34, fontWeight: 700, letterSpacing: '-0.03em' }}>AQUA Application Hub</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', fontSize: 72, lineHeight: 0.95, fontWeight: 800, letterSpacing: '-0.05em' }}>Developers</div>
-          <div style={{ display: 'flex', marginTop: 24, fontSize: 28, color: '#a3a3a3' }}>OpenAPI · MCP server · REST API · mos2es.xyz/developers</div>
+          <div style={{ display: 'flex', marginTop: 24, fontSize: 28, color: '#a3a3a3' }}>OpenAPI · MCP server · REST API · aquaidp.xyz/developers</div>
         </div>
       </div>
     ),

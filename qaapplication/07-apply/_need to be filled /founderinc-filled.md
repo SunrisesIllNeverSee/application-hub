@@ -38,7 +38,7 @@ Constitutional AI Governance — the execution-layer framework that turns fronti
 ### What is the coolest thing you have ever built or created?
 Commitment Theory. I applied thermodynamics, laws of nature, and physics to language and derived a conservation law for meaning. The Conservation Law of Commitment has been live on Zenodo (DOI 10.5281/zenodo.20029607) with a public falsifiability harness for four months — anyone can break it, nobody has. From that substrate I built MO§ES™: a constitutional governance framework for AI systems that benchmarks at #1 against the Artificial Analysis Coding Agent Index across all five measured kernels — 97.23% cache hit, 35,242 lines of real code, $0.0007/line — while running a governed two-engine loop (Claude + Codex) on a live production build. Four U.S. patent filings. One registered trademark. The benchmark is the receipt.
 
-Links: mos2es.com · zenodo.org/records/20029607 · signomy.xyz · mos2es.xyz
+Links: mos2es.com · zenodo.org/records/20029607 · signomy.xyz · aquaidp.xyz
 
 ### Any other ideas?
 AQUA (Applications · Questions · Answers) — a founder-first application OS that turns recurring essay-writing labor into a compounding data asset. Every answer a founder writes gets indexed by canonical question, scored for reuse, and pre-filled across future applications. AI-native. This application is literally being filled through it.
@@ -62,7 +62,7 @@ No
 **LinkedIn:** https://www.linkedin.com/in/dericmchenry/
 **Github:** https://github.com/SunrisesIllNeverSee
 **Twitter/X:** https://x.com/burnmydays
-**Website/portfolio:** mos2es.com · mos2es.xyz · signomy.xyz · zenodo.org/records/20029607
+**Website/portfolio:** mos2es.com · aquaidp.xyz · signomy.xyz · zenodo.org/records/20029607
 
 ---
 
@@ -72,7 +72,7 @@ No
 AI Infrastructure / Developer Tools
 
 ### Link to your project (if it's live)
-https://mos2es.com · https://mos2es.xyz · https://signomy.xyz
+https://mos2es.com · https://aquaidp.xyz · https://signomy.xyz
 
 ### Do you have users?
 No *(pre-beachhead — substrate traction first)*

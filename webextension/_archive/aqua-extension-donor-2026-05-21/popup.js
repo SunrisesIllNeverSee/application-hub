@@ -1,4 +1,4 @@
-const DEFAULT_HUB_URL = 'https://mos2es.xyz'
+const DEFAULT_HUB_URL = 'https://aquaidp.xyz'
 
 const hubUrlInput = document.getElementById('hubUrl')
 const jwtInput = document.getElementById('jwt')

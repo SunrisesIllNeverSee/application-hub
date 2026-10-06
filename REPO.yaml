@@ -9,7 +9,7 @@ repo:
   lifecycle: active
   repo_id: application_hub
   family: moses
-  purpose: Application Hub — founder-first application infrastructure, live at mos2es.xyz. Next.js app, browser extension, MCP server, Supabase backend, QA pipeline.
+  purpose: Application Hub — founder-first application infrastructure, live at aquaidp.xyz. Next.js app, browser extension, MCP server, Supabase backend, QA pipeline.
 
 structure:
   profile: platform

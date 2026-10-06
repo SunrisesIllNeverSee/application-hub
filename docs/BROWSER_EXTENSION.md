@@ -83,8 +83,8 @@ popup.html → user pastes Supabase anon key + user JWT
 background.js reads from chrome.storage.local for each API call
 ```
 
-The JWT comes from the user's session on mos2es.xyz. In the popup,
-show a "Get your token" link → `https://mos2es.xyz/profile/settings`
+The JWT comes from the user's session on aquaidp.xyz. In the popup,
+show a "Get your token" link → `https://aquaidp.xyz/profile/settings`
 (where we'll add a "copy session token" button in a follow-up).
 
 No server-side auth relay. Direct Supabase REST only.
@@ -175,7 +175,7 @@ appfeeder/
 1. `chrome://extensions` → Enable Developer Mode
 2. Load unpacked → select `appfeeder/`
 3. Navigate to one of the V1 portals
-4. Open popup → paste JWT from mos2es.xyz/profile/settings
+4. Open popup → paste JWT from aquaidp.xyz/profile/settings
 
 ---
 
