@@ -50,11 +50,18 @@ COMMENT ON TABLE reward_credit_receipts IS
    credited exactly once; status churn on contribution_rewards cannot remint.';
 
 ALTER TABLE reward_credit_receipts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "rcr_owner_select" ON reward_credit_receipts;
 CREATE POLICY "rcr_owner_select" ON reward_credit_receipts
   FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "rcr_service_all" ON reward_credit_receipts
-  FOR ALL USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
+DROP POLICY IF EXISTS "rcr_service_select" ON reward_credit_receipts;
+DROP POLICY IF EXISTS "rcr_service_all" ON reward_credit_receipts;
+CREATE POLICY "rcr_service_select" ON reward_credit_receipts
+  FOR SELECT USING (auth.role() = 'service_role');
+
+-- V14-05: receipts are owner-only writes — minted solely by the SECURITY
+-- DEFINER process_reward trigger. A pre-inserted receipt would squat-block a
+-- legitimate mint, so INSERT is revoked from everyone below the owner.
+REVOKE INSERT, UPDATE, DELETE ON reward_credit_receipts FROM PUBLIC;
 
 -- Append-only: receipts are evidence of minting, never edited.
 CREATE OR REPLACE FUNCTION deny_receipt_mutation() RETURNS trigger
@@ -114,6 +121,26 @@ DROP TRIGGER IF EXISTS trg_process_reward ON contribution_rewards;
 CREATE TRIGGER trg_process_reward
   BEFORE INSERT OR UPDATE ON contribution_rewards
   FOR EACH ROW EXECUTE FUNCTION process_reward();
+
+-- V14-02: pool-exhausted accept must not abort. credit_amount CHECK was >0;
+-- 0 is the honest value for "accepted, nothing left to unlock".
+ALTER TABLE user_contributions DROP CONSTRAINT IF EXISTS user_contributions_credit_amount_check;
+ALTER TABLE user_contributions ADD CONSTRAINT user_contributions_credit_amount_check
+  CHECK (credit_amount >= 0);
+
+-- V14-04: contribution_rewards.id is the mint-once dedup key — reassigning it
+-- would mint again under a fresh receipt. PK must be immutable.
+CREATE OR REPLACE FUNCTION deny_reward_id_change() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+  IF OLD.id IS DISTINCT FROM NEW.id THEN
+    RAISE EXCEPTION 'contribution_rewards.id is immutable (mint-once key)';
+  END IF;
+  RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS trg_reward_id_immutable ON contribution_rewards;
+CREATE TRIGGER trg_reward_id_immutable BEFORE UPDATE ON contribution_rewards
+  FOR EACH ROW EXECUTE FUNCTION deny_reward_id_change();
 
 -- 4. award_* functions: honor migration mode so bulk import/replay cannot
 --    mint historical rewards (M05-F-IQ-MINT). Unchanged semantics otherwise.
