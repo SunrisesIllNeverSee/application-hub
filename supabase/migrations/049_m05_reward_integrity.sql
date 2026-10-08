@@ -21,6 +21,13 @@
 -- Migration safety: all award paths honor the session flag
 --   SET app.migration_mode = 'on'
 -- which suppresses every reward side-effect during bulk import/replay.
+--
+-- THREAT NOTE: app.migration_mode is a self-settable session GUC — a
+-- discipline gate, not a privilege boundary (same class as the M05 anchor
+-- finding). Any role with SQL access can suppress rewards for its own writes.
+-- Mitigation at deploy time: ensure untrusted roles reach the DB only through
+-- RPC/PostgREST surfaces where arbitrary SET is not possible; direct SQL
+-- sessions are already trusted-context.
 -- ============================================================
 
 -- 1. Restore 'contribution' to the unlock-source CHECK (030's intent,
@@ -70,6 +77,7 @@ DECLARE
 BEGIN
   -- migration/replay safety: no reward side-effects in migration mode
   IF current_setting('app.migration_mode', true) = 'on' THEN
+    NEW.updated_at = NOW();  -- suppress reward side-effects, still stamp row metadata
     RETURN NEW;
   END IF;
 
