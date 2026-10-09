@@ -32,6 +32,7 @@ export async function verifySupabaseJWT(token: string): Promise<VerifiedUser> {
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: `${SUPABASE_URL}/auth/v1`,
     audience: 'authenticated',
+    algorithms: ['ES256'],
   })
   return {
     id: payload.sub as string,

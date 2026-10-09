@@ -39,6 +39,7 @@ export async function validateUserToken(token: string): Promise<string> {
     const { payload } = await jwtVerify(token, JWKS, {
       issuer: `${SUPABASE_URL}/auth/v1`,
       audience: "authenticated",
+      algorithms: ["ES256"],
     });
     if (payload.sub) return payload.sub;
   } catch {
