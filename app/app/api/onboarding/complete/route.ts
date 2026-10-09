@@ -110,13 +110,19 @@ export async function POST(req: NextRequest) {
     identity = 'job_seeker'
   }
 
-  await supabase
+  const { data: updatedProfile, error: profileErr } = await supabase
     .from('user_profiles')
     .update({
       onboarding_completed_at: new Date().toISOString(),
       active_identity: identity,
     })
     .eq('user_id', user.id)
+    .select('user_id')
+
+  if (profileErr)
+    return NextResponse.json({ error: `Could not persist onboarding: ${profileErr.message}` }, { status: 500 })
+  if (!updatedProfile?.length)
+    return NextResponse.json({ error: 'Profile row missing — onboarding could not be recorded.' }, { status: 500 })
 
   const { data: starterCount } = await supabase.rpc('claim_starter_package', { p_user_id: user.id })
 
