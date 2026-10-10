@@ -78,7 +78,7 @@ export function hubSyncOptedIn(settings) {
 export function stripCaptureAnswerBodies(capture) {
   if (!capture || typeof capture !== 'object') return capture
   const questions = Array.isArray(capture.questions)
-    ? capture.questions.map((q) => ({
+    ? capture.questions.filter(Boolean).map((q) => ({
         fieldId: q.fieldId ?? null,
         label: q.label ?? '',
         value: '',
