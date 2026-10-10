@@ -41,8 +41,11 @@ const CONFIDENCE_OPTIONS: { value: AnswerConfidence; label: string }[] = [
 // The editor still works as a local drafting surface, but the direct
 // client→Supabase profile_answers upsert is skipped — never fake-saved.
 const LOCAL_FIRST =
-  process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST === '1' ||
-  process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST === 'true'
+  // NOTE: local-first deployment must set BOTH AQUA_LOCAL_FIRST (server
+  // routes) and NEXT_PUBLIC_AQUA_LOCAL_FIRST (this direct client→Supabase
+  // write). Setting only the server flag leaves this path ungated.
+  ['1', 'true'].includes(
+    (process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '').trim().toLowerCase())
 
 export function AnswerEditor({
   archivedQuestionId,

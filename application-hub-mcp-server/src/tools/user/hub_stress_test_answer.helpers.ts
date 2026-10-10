@@ -124,6 +124,8 @@ export async function fetchProgramScope(
   return { programQuestions, programDna };
 }
 
+import { privateWriteRefusalResult } from "../../services/local_first.js";
+
 export async function persistStressTestRun(
   client: any,
   user_id: string,
@@ -134,6 +136,10 @@ export async function persistStressTestRun(
   followUps: any,
   checklist: any
 ): Promise<{ run: { id: string; created_at: string } | null; error: string | null }> {
+  const lfRefusal = privateWriteRefusalResult("answer-derived stress-test content");
+  if (lfRefusal) {
+    return { run: null, error: lfRefusal.content?.[0]?.text ?? "local-first refusal" };
+  }
   const { data, error } = await client
     .from("answer_stress_tests")
     .insert({

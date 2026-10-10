@@ -8,6 +8,13 @@
 // Authority: aquarnd/aqua-canon/Planning/Execution/m06/local-first/
 //   LF-Architecture-Contract.md + LF-Private-Data-Flow-Inventory.csv
 //
+// FLAG PAIRING (required): server routes gate on AQUA_LOCAL_FIRST; direct
+// client→Supabase writes (e.g. AnswerEditor upserts) gate on
+// NEXT_PUBLIC_AQUA_LOCAL_FIRST. A deployment enabling local-first MUST set
+// both — route guards cannot intercept direct client writes. Durable
+// backstop = a server-side RLS policy decision; tracked as an owner item in
+// the M06 authorization package (Out-of-code boundary).
+//
 // Deliberately dependency-free (no next/server import) so this module can be
 // unit-tested directly with `node --test` (type stripping) and reused by any
 // route handler. `Response.json` is the standard Web API and is fully
@@ -21,7 +28,7 @@ export const LOCAL_FIRST_REFUSAL_MESSAGE =
  * Server-side flag: AQUA_LOCAL_FIRST=1 (also accepts 'true').
  */
 export function isLocalFirst(): boolean {
-  const v = process.env.AQUA_LOCAL_FIRST
+  const v = process.env.AQUA_LOCAL_FIRST?.trim().toLowerCase()
   return v === '1' || v === 'true'
 }
 

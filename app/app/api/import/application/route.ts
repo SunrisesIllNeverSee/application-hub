@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 const MODEL = 'claude-3-5-haiku-20241022'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
@@ -13,6 +14,9 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const refused = refusePrivateWrite()
+    if (refused) return refused
 
     const body = await req.json()
     const { text, program_name } = body as { text?: string; program_name?: string }

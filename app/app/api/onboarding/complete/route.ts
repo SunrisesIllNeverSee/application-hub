@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       // The uploaded free text is private content — do not persist it into
       // applicant_context. Onboarding metadata still completes below.
       answersCount = 0
-      themeCount.other = 1
+      themeCount.other = 0
     } else {
       const { data: prof } = await supabase
         .from('user_profiles')
