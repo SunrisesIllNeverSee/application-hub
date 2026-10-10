@@ -24,11 +24,22 @@ const DEFAULT_SETTINGS = {
 }
 
 function normalizeHubUrl(hubUrl) {
-  return (hubUrl || DEFAULT_SETTINGS.hubUrl).replace(/\/$/, '')
+  const v = (hubUrl || DEFAULT_SETTINGS.hubUrl).replace(/\/$/, '')
+  // F-B1: hub URL is a Bearer-JWT sink — only the allowlist may receive it.
+  // Arbitrary values silently revert to the default rather than exfiltrate.
+  if (typeof isAllowedHubUrl === 'function' && !isAllowedHubUrl(v)) {
+    return DEFAULT_SETTINGS.hubUrl
+  }
+  return v
 }
 
 function normalizeAgentUrl(agentUrl) {
-  return (agentUrl || DEFAULT_SETTINGS.agentUrl).replace(/\/$/, '')
+  const v = (agentUrl || DEFAULT_SETTINGS.agentUrl).replace(/\/$/, '')
+  // agentUrl receives full captures — localhost only.
+  if (typeof isLocalhostUrl === 'function' && !isLocalhostUrl(v)) {
+    return DEFAULT_SETTINGS.agentUrl
+  }
+  return v
 }
 
 async function getSettings() {

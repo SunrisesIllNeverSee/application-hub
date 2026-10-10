@@ -44,9 +44,24 @@ export interface BankEntry {
 
 let storagePromise: Promise<VaultStorage> | null = null
 
-/** Open the IndexedDB vault (memoized per page session). */
-export function getStorage(): Promise<VaultStorage> {
-  if (!storagePromise) storagePromise = openVaultStorage()
+/**
+ * Open the IndexedDB vault (memoized per page session). F-UI1: the DB name is
+ * keyed to the authenticated user id so two accounts sharing a browser
+ * profile get isolated vaults; anonymous fallback keeps a shared vault.
+ */
+export async function getStorage(): Promise<VaultStorage> {
+  if (!storagePromise) {
+    storagePromise = (async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const { data } = await createClient().auth.getUser()
+        const uid = data.user?.id
+        return openVaultStorage(uid ? `aqua-local-${uid}` : 'aqua-local')
+      } catch {
+        return openVaultStorage('aqua-local')
+      }
+    })()
+  }
   return storagePromise
 }
 
@@ -85,9 +100,12 @@ export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
 
   const byAnswer = new Map<string, BankVersion[]>()
   for (const v of versions) {
+    // F-UI2: an approval only displays when its pinned sha matches the stored
+    // version — a swapped version row must not still look "Approved".
+    const ap = approvalByVersion.get(v.id)
     const bv: BankVersion = {
       record: v,
-      approval: approvalByVersion.get(v.id)?.decision ?? null,
+      approval: ap && ap.version_sha256 === v.sha256 ? ap.decision : null,
       provenance: provenanceByVersion.get(v.id) ?? null,
     }
     const list = byAnswer.get(v.answer_id) ?? []
