@@ -84,9 +84,13 @@ await t('packet freeze + signoff (single sign per packet)', async () => {
   const s = createMemoryStorage()
   const p = await freezePacket(s, { application_id: 'app1', manifest: { files: ['a.pdf'], n: 1 } })
   assert.equal(p.manifest_sha256, await sha256Hex(canonicalJson({ files: ['a.pdf'], n: 1 })))
-  const so = await signPacket(s, { packet_id: p.id, signer_class: 'human' })
+  await assert.rejects(() => signPacket(s, { packet_id: p.id, signer_class: 'human' }), /user acknowledgement/)
+  const so = await signPacket(s, { packet_id: p.id, signer_class: 'human', user_ack: true })
   assert.equal(so.signature_b64, null)
-  await assert.rejects(() => signPacket(s, { packet_id: p.id, signer_class: 'human' }), VaultImmutableError)
+  await assert.rejects(
+    () => signPacket(s, { packet_id: p.id, signer_class: 'human', user_ack: true }),
+    VaultImmutableError,
+  )
 })
 
 // --- catalog: TTL + offline ---

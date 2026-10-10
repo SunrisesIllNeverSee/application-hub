@@ -74,7 +74,9 @@ export async function deriveKey(
   const subtle = getCrypto().subtle
   const base = await subtle.importKey('raw', te.encode(secret), 'PBKDF2', false, ['deriveKey'])
   return subtle.deriveKey(
-    { name: 'PBKDF2', salt: salt as BufferSource, iterations: iters, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt: salt as BufferSource,
+      // iters is attacker-controlled in stored blobs — clamp against DoS (F-V2)
+      iterations: Math.min(Math.max(1, iters | 0), 2_000_000), hash: 'SHA-256' },
     base,
     { name: 'AES-GCM', length: 256 },
     false,

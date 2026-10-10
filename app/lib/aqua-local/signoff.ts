@@ -142,6 +142,7 @@ export async function attestPacket(
     signer_class: input.signer_class,
     signature_b64: signatureB64,
     pubkey_b64: pubkeyB64,
+    user_ack: input.user_ack,
   })
   await advancePacketState(storage, input.packet_id, 'signed')
   return record
