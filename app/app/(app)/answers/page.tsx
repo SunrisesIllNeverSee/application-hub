@@ -3,6 +3,8 @@ import type { ProfileAnswerWithQuestion, QuestionTheme } from '@/lib/database.ty
 import { ThemeTag } from '@/components/ThemeTag'
 import { AnswerEditor } from '@/components/AnswerEditor'
 import { AnswerFileTree } from '@/components/AnswerFileTree'
+import { LocalFirstBankSection } from '@/components/aqua-local/LocalFirstBankSection'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -51,6 +53,28 @@ export default async function AnswersPage({ searchParams }: Props) {
   // Default = most recently updated (first in list).
   const resolvedId = selectedId || allAnswers[0]?.id || null
   const selected = resolvedId ? allAnswers.find((a) => a.id === resolvedId) ?? null : null
+
+  // IN-01: local-first — the answer bank lives in the on-device vault.
+  // Hosted profile_answers (if any) render in the legacy section with an
+  // explicit user-initiated import; nothing hosted is shown as the bank.
+  if (LOCAL_FIRST) {
+    return (
+      <div>
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Answers</h1>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Your reusable answers — stored encrypted on this device.
+            </p>
+          </div>
+          <Link href="/questions" className="flex-shrink-0 text-sm text-brand-600 dark:text-brand-400 hover:underline">
+            Question Bank →
+          </Link>
+        </div>
+        <LocalFirstBankSection hosted={allAnswers} />
+      </div>
+    )
+  }
 
   if (total === 0) {
     return (

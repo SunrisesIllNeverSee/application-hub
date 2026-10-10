@@ -1,11 +1,20 @@
 'use client'
 
-import { useState, useTransition, useCallback } from 'react'
+import { useState, useTransition, useCallback, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { ProfileAnswer, AnswerConfidence } from '@/lib/database.types'
 import { WordCount } from './WordCount'
 import { StressTestPanel } from './StressTestPanel'
 import { countWords, cn } from '@/lib/utils'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
+import { useVault } from '@/lib/aqua-local-client/VaultProvider'
+import {
+  scopeForQuestion,
+  loadScopeEntry,
+  saveScopedVersion,
+} from '@/lib/aqua-local-client/session'
+import type { BankVersion } from '@/lib/aqua-local-client/session'
 
 interface DraftResponse {
   draft: string
@@ -37,15 +46,11 @@ const CONFIDENCE_OPTIONS: { value: AnswerConfidence; label: string }[] = [
   { value: 'locked', label: 'Locked' },
 ]
 
-// Local-first mode (LF-25): private answer content stays on the device.
-// The editor still works as a local drafting surface, but the direct
-// client→Supabase profile_answers upsert is skipped — never fake-saved.
-const LOCAL_FIRST =
-  // NOTE: local-first deployment must set BOTH AQUA_LOCAL_FIRST (server
-  // routes) and NEXT_PUBLIC_AQUA_LOCAL_FIRST (this direct client→Supabase
-  // write). Setting only the server flag leaves this path ungated.
-  ['1', 'true'].includes(
-    (process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '').trim().toLowerCase())
+// Local-first mode (LF-25, IN-01): private answer content stays on the
+// device. Saves write NEW immutable versions into the IndexedDB vault via
+// repo.createVersion — never Supabase, never fake-saved. When the vault is
+// locked the editor says so honestly instead of silently keeping text in
+// component state.
 
 export function AnswerEditor({
   archivedQuestionId,
@@ -61,12 +66,52 @@ export function AnswerEditor({
   )
   const [isEditing, setIsEditing] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error' | 'local-only'>('idle')
+  const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error' | 'local-only' | 'locked'>('idle')
   const [isDrafting, setIsDrafting] = useState(false)
   const [draftFeedback, setDraftFeedback] = useState<DraftFeedback | null>(null)
   const [copied, setCopied] = useState(false)
+  // IN-01: latest vault version for this question scope (+ its approval).
+  const [localVersion, setLocalVersion] = useState<BankVersion | null>(null)
 
   const supabase = createClient()
+  const vault = useVault()
+  const storageRef = useRef<import('@/lib/aqua-local-client/session').VaultStorage | null>(null)
+  const questionText = initialAnswer?.question_text ?? ''
+
+  // IN-01 load path: under local-first, open the vault lazily and — when
+  // already unlocked — read the latest version for this question scope.
+  // When the scope has no vault versions yet, fall back to prefilling from
+  // the hosted legacy row (never written back server-side).
+  useEffect(() => {
+    if (!LOCAL_FIRST || !vault.enabled) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const storage = await vault.ensureStorage()
+        if (cancelled) return
+        storageRef.current = storage
+        const secret = vault.getSecret()
+        if (!secret) return // locked — honest inline state shows below
+        const scoped = await loadScopeEntry(
+          storage,
+          secret,
+          scopeForQuestion(archivedQuestionId, programId),
+        )
+        if (cancelled) return
+        if (scoped.latest) {
+          setLocalVersion(scoped.latest.version)
+          setContent(scoped.latest.body)
+        }
+      } catch {
+        // Vault open/decrypt failures leave the editor in its prefilled
+        // state — the save path reports honestly rather than fake-saving.
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [archivedQuestionId, programId, vault.enabled, vault.status])
 
   const wordCount = countWords(content)
   const charCount = content.length
@@ -155,12 +200,44 @@ export function AnswerEditor({
   const handleSave = useCallback(async () => {
     if (!content.trim()) return
 
-    // Local-first: do NOT write answer bodies to Supabase. The text remains
-    // in local component state only — report honestly instead of fake-saving.
+    // Local-first (IN-01): the answer body NEVER goes to Supabase. Save =
+    // a new immutable vault version (parent-linked to the shown version),
+    // written through repo.createVersion inside the question's exact
+    // occurrence scope. A locked vault gets an honest 'locked' state —
+    // no silent in-memory-only keep, no fake-save.
     if (LOCAL_FIRST) {
-      setSaveState('local-only')
-      setIsEditing(false)
-      setTimeout(() => setSaveState('idle'), 4000)
+      const secret = vault.getSecret()
+      const storage = storageRef.current
+      if (!secret || !storage) {
+        setSaveState('locked')
+        setTimeout(() => setSaveState('idle'), 5000)
+        return
+      }
+      startTransition(async () => {
+        try {
+          const record = await saveScopedVersion(
+            storage,
+            secret,
+            scopeForQuestion(archivedQuestionId, programId),
+            {
+              title: questionText || `Answer — ${archivedQuestionId}`,
+              body: content,
+              method: 'manual',
+            },
+          )
+          setLocalVersion({
+            record,
+            approval: null,
+            provenance: null,
+          })
+          setSaveState('saved')
+          setIsEditing(false)
+          setTimeout(() => setSaveState('idle'), 2000)
+        } catch {
+          setSaveState('error')
+          setTimeout(() => setSaveState('idle'), 3000)
+        }
+      })
       return
     }
 
@@ -200,7 +277,7 @@ export function AnswerEditor({
         setTimeout(() => setSaveState('idle'), 2000)
       }
     })
-  }, [content, confidence, wordCount, archivedQuestionId, initialAnswer, supabase])
+  }, [content, confidence, wordCount, archivedQuestionId, programId, initialAnswer, supabase, vault, questionText])
 
   if (!isEditing && !compact) {
     return (
@@ -251,7 +328,19 @@ export function AnswerEditor({
               {content}
             </p>
             <div className="mt-2 flex items-center justify-between">
-              <WordCount current={wordCount} limit={wordLimit} charCurrent={charCount} charLimit={charLimit} />
+              <div className="flex items-center gap-2">
+                <WordCount current={wordCount} limit={wordLimit} charCurrent={charCount} charLimit={charLimit} />
+                {LOCAL_FIRST && localVersion?.approval === 'approved' && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400">
+                    Approved
+                  </span>
+                )}
+                {LOCAL_FIRST && localVersion && localVersion.approval !== 'approved' && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">
+                    Vault v{localVersion.record.id.slice(0, 8)}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={() => setIsEditing(true)}
                 className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
@@ -285,9 +374,18 @@ export function AnswerEditor({
 
   return (
     <div className="space-y-3">
-      {LOCAL_FIRST && (
+      {LOCAL_FIRST && vault.status !== 'unlocked' && (
+        <div className="rounded-lg border border-warning-500/30 bg-warning-50/40 dark:bg-warning-950/20 px-3 py-2 text-xs text-warning-700 dark:text-warning-300">
+          Vault locked —{' '}
+          <Link href="/aqua-local" className="font-medium underline underline-offset-2">
+            unlock to save on device
+          </Link>
+          . Your edits are held in this editor only until the vault is unlocked.
+        </div>
+      )}
+      {LOCAL_FIRST && vault.status === 'unlocked' && (
         <div className="rounded-lg border border-brand-500/20 bg-brand-50/40 dark:bg-brand-950/20 px-3 py-2 text-xs text-brand-700 dark:text-brand-300">
-          Local-first mode: your answer stays on this device and is not sent to the server.
+          Local-first mode: saving writes a new encrypted version to your device vault — never to the server.
         </div>
       )}
       <textarea
@@ -440,6 +538,15 @@ export function AnswerEditor({
         {saveState === 'local-only' && (
           <span className="text-xs text-brand-600 dark:text-brand-400">Kept on device — not saved to server</span>
         )}
+        {saveState === 'locked' && (
+          <span className="text-xs text-warning-600 dark:text-warning-400">
+            Vault locked — unlock at{' '}
+            <Link href="/aqua-local" className="font-medium underline underline-offset-2">
+              Local vault
+            </Link>{' '}
+            to save on device
+          </span>
+        )}
 
         {(isEditing || compact) && (
           <button
@@ -457,7 +564,7 @@ export function AnswerEditor({
           disabled={isPending || !content.trim()}
           className="btn-primary text-xs py-1.5 px-3"
         >
-          {isPending ? 'Saving…' : LOCAL_FIRST ? 'Keep on device' : 'Save answer'}
+          {isPending ? 'Saving…' : LOCAL_FIRST ? 'Save to vault' : 'Save answer'}
         </button>
       </div>
       {/* Stress test — only when a saved answer exists */}

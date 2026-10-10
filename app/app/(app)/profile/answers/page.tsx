@@ -3,6 +3,8 @@ import type { ProfileAnswerWithQuestion, QuestionTheme } from '@/lib/database.ty
 import { themeLabel } from '@/lib/utils'
 import { ThemeTag } from '@/components/ThemeTag'
 import { AnswerEditor } from '@/components/AnswerEditor'
+import { LocalFirstBankSection } from '@/components/aqua-local/LocalFirstBankSection'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 const THEME_ORDER: QuestionTheme[] = [
   'problem',
@@ -51,6 +53,12 @@ export default async function ProfileAnswersPage() {
   const lockedCount = allAnswers.filter((a) => a.confidence === 'locked').length
   const solidCount = allAnswers.filter((a) => a.confidence === 'solid').length
   const draftCount = allAnswers.filter((a) => a.confidence === 'draft').length
+
+  // IN-01: local-first — the answer bank reads from the on-device vault;
+  // hosted rows render only in the legacy import section.
+  if (LOCAL_FIRST) {
+    return <LocalFirstBankSection hosted={allAnswers} />
+  }
 
   return (
     <div>
