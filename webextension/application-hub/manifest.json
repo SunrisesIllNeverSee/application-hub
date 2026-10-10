@@ -11,6 +11,13 @@
     "sidePanel"
   ],
   "host_permissions": ["<all_urls>"],
+  "externally_connectable": {
+    "matches": [
+      "*://*.aquaidp.xyz/*",
+      "http://localhost/*",
+      "http://127.0.0.1/*"
+    ]
+  },
   "background": {
     "service_worker": "background.js",
     "type": "module"

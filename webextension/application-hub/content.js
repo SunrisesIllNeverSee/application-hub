@@ -327,11 +327,17 @@ function queueScan() {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  // LF-13: fills write answer bodies OUT to third-party funder forms — that is
+  // product-intended egress and must only run on explicit user action. The
+  // background/sidepanel set userInitiated only inside a click handler; a
+  // message without it is refused (no auto-fill-on-load, ever).
   if (message.type === 'FILL_FIELD_REQUEST') {
+    if (message.userInitiated !== true) return false
     fillFieldById(message.fieldId, message.text)
   }
 
   if (message.type === 'FILL_BULK_REQUEST') {
+    if (message.userInitiated !== true) return false
     ;(message.fills || []).forEach(({ fieldId, text }) => fillFieldById(fieldId, text))
   }
 

@@ -1,3 +1,14 @@
+import {
+  BYOK_EGRESS,
+  buildConsentRecord,
+  evaluateGenerateConsent,
+  hubSyncOptedIn,
+  isAllowedSenderOrigin,
+  localFirstEnabled,
+  senderOrigin,
+  stripCaptureAnswerBodies,
+} from './local-first.js'
+
 const DEFAULT_SETTINGS = {
   hubUrl: 'https://aquaidp.xyz',
   agentUrl: 'http://127.0.0.1:4317',
@@ -5,6 +16,11 @@ const DEFAULT_SETTINGS = {
   mode: 'manual',
   automationEnabled: false,
   lastActiveTab: null,
+  // LF-13: local-first capture boundary. Default ON per mission privacy
+  // posture — answer bodies never leave the device implicitly.
+  localFirst: true,
+  // Explicit opt-in: sync the local answer bank up to the hosted hub.
+  syncToHub: false,
 }
 
 function normalizeHubUrl(hubUrl) {
@@ -24,6 +40,8 @@ async function getSettings() {
     agentUrl: normalizeAgentUrl(raw.agentUrl),
     mode: raw.mode === 'automation' ? 'automation' : 'manual',
     automationEnabled: Boolean(raw.automationEnabled),
+    localFirst: raw.localFirst !== false,
+    syncToHub: raw.syncToHub === true,
   }
 }
 
@@ -33,6 +51,8 @@ async function saveSettings(partial) {
   if (partial.agentUrl !== undefined) next.agentUrl = normalizeAgentUrl(partial.agentUrl)
   if (partial.mode !== undefined) next.mode = partial.mode === 'automation' ? 'automation' : 'manual'
   if (partial.automationEnabled !== undefined) next.automationEnabled = Boolean(partial.automationEnabled)
+  if (partial.localFirst !== undefined) next.localFirst = partial.localFirst !== false
+  if (partial.syncToHub !== undefined) next.syncToHub = partial.syncToHub === true
   await chrome.storage.local.set(next)
   return next
 }
@@ -188,7 +208,7 @@ async function callAnthropic(apiKey, system, prompt) {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: BYOK_EGRESS.anthropic.model,
       max_tokens: 1024,
       system,
       messages: [{ role: 'user', content: prompt }],
@@ -207,7 +227,7 @@ async function callOpenAI(apiKey, system, prompt) {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: BYOK_EGRESS.openai.model,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: prompt },
@@ -219,12 +239,38 @@ async function callOpenAI(apiKey, system, prompt) {
   return data.choices?.[0]?.message?.content ?? null
 }
 
-async function generateAnswer(question, matchedAnswer) {
-  const { hubUrl, jwt } = await getSettings()
-  if (!jwt) return null
+async function recordConsent(record) {
+  const { consentLog = [] } = await chrome.storage.local.get('consentLog')
+  consentLog.push(record)
+  // Bound the log so storage stays small; receipts are also exportable later.
+  await chrome.storage.local.set({ consentLog: consentLog.slice(-500) })
+}
+
+// LF-13: per-call user confirmation is required before any answer content
+// egresses to a BYOK provider. The sidepanel must pass confirmEgress: true
+// only after the user approves a dialog naming provider + model.
+async function generateAnswer(question, matchedAnswer, confirmEgress) {
+  const settings = await getSettings()
+  const { hubUrl, jwt } = settings
+  if (!jwt) return { answer: null, error: 'unauthorized' }
 
   const byok = await fetchByokKey(jwt, hubUrl)
-  if (!byok?.key) return null
+  if (!byok?.key) return { answer: null, error: 'no_byok_key' }
+
+  const egress = BYOK_EGRESS[byok.provider] || { model: 'unknown' }
+
+  // Consent is evaluated after the BYOK lookup so a refusal can honestly name
+  // the provider + model the call would have egressed to.
+  const consent = evaluateGenerateConsent({ settings, confirmEgress })
+  if (!consent.allowed) {
+    return {
+      answer: null,
+      error: 'consent_required',
+      provider: byok.provider,
+      model: egress.model,
+      consent,
+    }
+  }
 
   const system = `You are AQUA, an AI assistant that helps people write compelling application answers.
 You have access to the user's existing answer bank. When given a question and an existing answer,
@@ -236,17 +282,51 @@ Be concise, authentic, and specific. Never generic. Max 300 words unless the que
     : `Question: ${question}\n\nWrite a strong, authentic answer for this application question.`
 
   try {
-    if (byok.provider === 'anthropic') return await callAnthropic(byok.key, system, prompt)
-    if (byok.provider === 'openai') return await callOpenAI(byok.key, system, prompt)
-    return null
+    let answer = null
+    if (byok.provider === 'anthropic') answer = await callAnthropic(byok.key, system, prompt)
+    if (byok.provider === 'openai') answer = await callOpenAI(byok.key, system, prompt)
+    if (!answer) return { answer: null, error: 'provider_failed' }
+
+    // Honest egress receipt: provider + model recorded at send time.
+    await recordConsent(buildConsentRecord({
+      provider: byok.provider,
+      model: egress.model,
+      kind: 'generate',
+      questionText: question,
+    }))
+
+    return { answer, egress: { provider: byok.provider, model: egress.model } }
   } catch {
-    return null
+    return { answer: null, error: 'provider_error' }
   }
 }
 
+// LF-13: captures always land in the browser-local answer bank first. Hub
+// sync happens only behind the explicit `syncToHub` opt-in.
+async function saveToLocalBank(questionText, answerText, provenance) {
+  const { localAnswerBank = [] } = await chrome.storage.local.get('localAnswerBank')
+  localAnswerBank.push({
+    id: `ans-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    questionText,
+    answerText,
+    method: provenance || 'manual',
+    savedAt: new Date().toISOString(),
+    syncedToHub: false,
+  })
+  await chrome.storage.local.set({ localAnswerBank })
+  return { saved: true, where: 'local' }
+}
+
 async function captureAnswer(questionText, answerText) {
-  const { hubUrl, jwt } = await getSettings()
-  if (!jwt) return { saved: false, reason: 'unauthorized' }
+  const settings = await getSettings()
+  const { hubUrl, jwt } = settings
+
+  const local = await saveToLocalBank(questionText, answerText, 'manual')
+
+  if (!hubSyncOptedIn(settings)) {
+    return { ...local, syncedToHub: false, reason: 'local_first' }
+  }
+  if (!jwt) return { ...local, syncedToHub: false, reason: 'unauthorized' }
 
   try {
     const res = await fetch(`${hubUrl}/api/answers/capture`, {
@@ -258,9 +338,10 @@ async function captureAnswer(questionText, answerText) {
       body: JSON.stringify({ questionText, answerText }),
     })
 
-    return await res.json().catch(() => ({ saved: false, reason: 'invalid_response' }))
+    const payload = await res.json().catch(() => ({ saved: false, reason: 'invalid_response' }))
+    return { ...local, syncedToHub: Boolean(payload?.saved), hub: payload }
   } catch {
-    return { saved: false, reason: 'network_error' }
+    return { ...local, syncedToHub: false, reason: 'network_error' }
   }
 }
 
@@ -294,6 +375,18 @@ async function routeFieldsToConsumers(tabId, pageTitle, rawFields) {
 
   return matched
 }
+
+// LF-13: origin gate — only aquaidp.xyz (+ subdomains) and localhost dev
+// origins may pass messages to this extension. Everything else is rejected.
+chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+  const origin = senderOrigin(sender)
+  if (!isAllowedSenderOrigin(origin)) {
+    sendResponse({ ok: false, error: 'origin_rejected' })
+    return false
+  }
+  sendResponse({ ok: false, error: `Unknown external message type: ${message?.type}` })
+  return false
+})
 
 chrome.runtime.onInstalled.addListener(() => {
   if (chrome.sidePanel?.setPanelBehavior) {
@@ -343,25 +436,41 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === 'GENERATE_REQUEST') {
-      return generateAnswer(message.question, message.matchedAnswer)
+      return generateAnswer(message.question, message.matchedAnswer, message.confirmEgress === true)
     }
 
     if (message.type === 'GENERATE_BULK_REQUEST') {
       return Promise.all(
-        (message.fields || []).map(async (field) => ({
-          fieldId: field.fieldId,
-          answer: await generateAnswer(field.questionText, field.matchedAnswer || null),
-        }))
+        (message.fields || []).map(async (field) => {
+          const result = await generateAnswer(
+            field.questionText,
+            field.matchedAnswer || null,
+            field.confirmEgress === true
+          )
+          return {
+            fieldId: field.fieldId,
+            answer: result.answer,
+            error: result.error || null,
+            provider: result.provider || null,
+            model: result.model || null,
+          }
+        })
       )
     }
 
     if (message.type === 'FILL_FIELD_REQUEST') {
       const tabId = message.tabId || (await getSettings()).lastActiveTab
       if (!tabId) return { ok: false, error: 'No active application tab.' }
+      // LF-13: require the caller to attest user initiation; FILL_* is an
+      // egress write to a third-party form and must never be implicit.
+      if (message.userInitiated !== true) {
+        return { ok: false, error: 'user_action_required' }
+      }
       await chrome.tabs.sendMessage(tabId, {
         type: 'FILL_FIELD_REQUEST',
         fieldId: message.fieldId,
         text: message.text,
+        userInitiated: true,
       })
       return { ok: true }
     }
@@ -369,15 +478,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'FILL_BULK_REQUEST') {
       const tabId = message.tabId || (await getSettings()).lastActiveTab
       if (!tabId) return { ok: false, error: 'No active application tab.' }
+      if (message.userInitiated !== true) {
+        return { ok: false, error: 'user_action_required' }
+      }
       await chrome.tabs.sendMessage(tabId, {
         type: 'FILL_BULK_REQUEST',
         fills: message.fills || [],
+        userInitiated: true,
       })
       return { ok: true }
     }
 
     if (message.type === 'CAPTURE_SAVE_ANSWER') {
       return captureAnswer(message.questionText, message.answerText)
+    }
+
+    if (message.type === 'BANK_LOCAL_LIST') {
+      const { localAnswerBank = [] } = await chrome.storage.local.get('localAnswerBank')
+      return { entries: localAnswerBank }
     }
 
     if (message.type === 'EXPORT_MARKDOWN_REQUEST') {
@@ -391,7 +509,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const tabId = message.tabId || (await getSettings()).lastActiveTab
       if (!tabId) throw new Error('No active application tab.')
 
-      const capture = await requestPageCapture(tabId)
+      const settings = await getSettings()
+      let capture = await requestPageCapture(tabId)
+
+      // LF-13: under local-first, typed answer bodies in the page capture are
+      // stripped before hub ingest. Labels/selectors still travel so the
+      // canonical record stays useful; bodies stay on-device.
+      if (localFirstEnabled(settings) && capture) {
+        capture = stripCaptureAnswerBodies(capture)
+      }
+
       return hubFetch('/api/hub/ingest', {
         vertical: message.vertical || 'founder',
         entity: capture?.entity || message.entity || 'Captured application',
@@ -401,7 +528,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           url: capture?.url || null,
           title: capture?.title || null,
           questions: capture?.questions || [],
-          mode: (await getSettings()).mode,
+          mode: settings.mode,
+          localFirst: localFirstEnabled(settings),
+          redactedAnswers: capture?.redactedAnswers || 0,
         },
       })
     }

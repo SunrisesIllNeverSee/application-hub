@@ -4,6 +4,8 @@ const DEFAULT_SETTINGS = {
   jwt: '',
   mode: 'manual',
   automationEnabled: false,
+  localFirst: true,
+  syncToHub: false,
 }
 
 let settings = { ...DEFAULT_SETTINGS }
@@ -160,23 +162,44 @@ function renderFields(fields) {
   fields.forEach((field) => container.appendChild(buildFieldCard(field)))
 }
 
+// LF-13: per-call consent handshake. First request goes without confirm so
+// the background can honestly name the BYOK provider + model; if consent is
+// required we ask the user, then resend exactly once with confirmEgress.
+async function requestGeneration(payload) {
+  const first = await chrome.runtime.sendMessage({ type: 'GENERATE_REQUEST', ...payload })
+
+  if (first?.error === 'consent_required') {
+    const who = first.provider
+      ? `${first.provider} (${first.model || 'unknown model'})`
+      : 'your configured AI provider'
+    const ok = window.confirm(
+      `Local-first mode: send this question${payload.matchedAnswer ? ' and your bank answer' : ''} to ${who}?\n\n` +
+      'The content leaves this device once for this call. A consent receipt is stored locally.'
+    )
+    if (!ok) return { answer: null, declined: true }
+    return chrome.runtime.sendMessage({ type: 'GENERATE_REQUEST', ...payload, confirmEgress: true })
+  }
+  return first
+}
+
 async function generateOne(field, textarea, button) {
   const original = button.textContent
   button.textContent = 'Working…'
   button.disabled = true
 
-  const answer = await chrome.runtime.sendMessage({
-    type: 'GENERATE_REQUEST',
+  const result = await requestGeneration({
     question: field.questionText,
     matchedAnswer: field.matchedAnswer || null,
   })
 
-  if (answer) {
-    textarea.value = answer
-    generatedAnswers[field.fieldId] = answer
+  if (result?.answer) {
+    textarea.value = result.answer
+    generatedAnswers[field.fieldId] = result.answer
     textarea.closest('.field-card')?.classList.add('has-generated')
   } else {
-    textarea.placeholder = 'Generation failed. Check your saved token and BYOK integration.'
+    textarea.placeholder = result?.declined
+      ? 'Generation declined — nothing was sent.'
+      : 'Generation failed. Check your saved token and BYOK integration.'
   }
 
   button.textContent = original
@@ -187,14 +210,36 @@ async function generateAll() {
   $('generating-label').textContent = 'AQUA is drafting…'
   showSection('generating')
 
-  const results = await chrome.runtime.sendMessage({
+  const fields = detectedFields.map((field) => ({
+    fieldId: field.fieldId,
+    questionText: field.questionText,
+    matchedAnswer: generatedAnswers[field.fieldId] || field.matchedAnswer || null,
+  }))
+
+  let results = await chrome.runtime.sendMessage({
     type: 'GENERATE_BULK_REQUEST',
-    fields: detectedFields.map((field) => ({
-      fieldId: field.fieldId,
-      questionText: field.questionText,
-      matchedAnswer: generatedAnswers[field.fieldId] || field.matchedAnswer || null,
-    })),
+    fields,
   })
+
+  // LF-13: bulk generation needs the same explicit confirm. One user approval
+  // covers this batch only; each call still records its own consent receipt.
+  const needsConsent = (results || []).some((r) => r?.error === 'consent_required')
+  if (needsConsent) {
+    const provider = (results || []).find((r) => r?.provider)
+    const who = provider ? `${provider.provider} (${provider.model})` : 'your configured AI provider'
+    const ok = window.confirm(
+      `Local-first mode: send ${fields.length} question(s) and matched bank answers to ${who}?\n\n` +
+      'Content leaves this device once per field. Consent receipts are stored locally.'
+    )
+    if (!ok) {
+      showSection('main')
+      return
+    }
+    results = await chrome.runtime.sendMessage({
+      type: 'GENERATE_BULK_REQUEST',
+      fields: fields.map((f) => ({ ...f, confirmEgress: true })),
+    })
+  }
 
   ;(results || []).forEach(({ fieldId, answer }) => {
     if (answer) generatedAnswers[fieldId] = answer
@@ -211,6 +256,7 @@ async function fillOne(fieldId, text) {
     tabId: activeTabId,
     fieldId,
     text,
+    userInitiated: true,
   })
 }
 
@@ -228,6 +274,7 @@ async function fillAllMatched() {
     type: 'FILL_BULK_REQUEST',
     tabId: activeTabId,
     fills,
+    userInitiated: true,
   })
 }
 
@@ -240,9 +287,10 @@ async function saveToBank(questionText, answerText) {
   })
 
   if (settings.mode === 'automation') {
+    const where = response?.syncedToHub ? 'local bank + hub' : 'local bank (on-device only)'
     setAutomationFeedback(
       response?.saved
-        ? 'Saved this answer back to your bank.'
+        ? `Saved this answer to your ${where}.`
         : `Save skipped: ${response?.reason || 'unknown result'}.`,
       response?.saved ? 'success' : 'muted'
     )
