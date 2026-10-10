@@ -49,10 +49,22 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
     setError(null)
     startTransition(async () => {
       try {
+        // Local-first: private answer bodies never transit the server. The
+        // endpoint only needs question ids (theme lookup) and length metadata
+        // for validation — bodies go to the device vault below instead.
+        const payload = LOCAL_FIRST
+          ? {
+              mode,
+              answer_lengths: Object.fromEntries(
+                Object.entries(answers).map(([id, t]) => [id, t.trim().length]),
+              ),
+              upload_len: upload.trim().length,
+            }
+          : { mode, answers, upload }
         const res = await fetch('/api/onboarding/complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode, answers, upload }),
+          body: JSON.stringify(payload),
         })
         if (!res.ok) {
           const body = await res.json().catch(() => ({}))
@@ -75,7 +87,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
             // secret unlocks the vault before any write.
             await tryUnlock(storage, vaultSecret)
             if (mode === 'starter') {
-              const entries = Object.entries(answers).filter(([, t]) => t.trim().length > 0)
+              const entries = Object.entries(answers).filter(([, t]) => t.trim().length > 30)
               for (const [qid, text] of entries) {
                 const q = questions.find((qq) => qq.id === qid)
                 await saveScopedVersion(storage, vaultSecret, scopeForQuestion(qid, null), {
@@ -93,7 +105,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
               )
             }
             setVaultNote(
-              `Saved ${mode === 'starter' ? Object.values(answers).filter((t) => t.trim().length > 0).length : 1} answer(s) encrypted on this device.`,
+              `Saved ${mode === 'starter' ? Object.values(answers).filter((t) => t.trim().length > 30).length : 1} answer(s) encrypted on this device.`,
             )
           } catch (e) {
             // Honest surface: onboarding metadata succeeded but the local
@@ -301,6 +313,9 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
               <label htmlFor="vault-secret-starter" className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                 Vault secret — encrypts your answers on this device
               </label>
+              <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mb-1">
+                This secret stays in memory only — you'll re-enter it once to unlock your vault inside the app.
+              </p>
               <input
                 id="vault-secret-starter"
                 type="password"
@@ -368,6 +383,9 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
             <label htmlFor="vault-secret-upload" className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
               Vault secret — encrypts your answers on this device
             </label>
+            <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mb-1">
+              This secret stays in memory only — you'll re-enter it once to unlock your vault inside the app.
+            </p>
             <input
               id="vault-secret-upload"
               type="password"

@@ -206,15 +206,17 @@ export function AnswerEditor({
     // occurrence scope. A locked vault gets an honest 'locked' state —
     // no silent in-memory-only keep, no fake-save.
     if (LOCAL_FIRST) {
+      startTransition(async () => {
+      // ensureStorage() re-resolves the uid-keyed DB — a mid-session account
+      // switch drops the prior user's handle AND secret (review fix).
+      const storage = await vault.ensureStorage().catch(() => null)
       const secret = vault.getSecret()
-      const storage = storageRef.current
       if (!secret || !storage) {
         setSaveState('locked')
         setTimeout(() => setSaveState('idle'), 5000)
         return
       }
-      startTransition(async () => {
-        try {
+      try {
           const record = await saveScopedVersion(
             storage,
             secret,
@@ -537,9 +539,6 @@ export function AnswerEditor({
         )}
         {saveState === 'error' && (
           <span className="text-xs text-danger-600 dark:text-danger-500">Save failed — check console</span>
-        )}
-        {saveState === 'local-only' && (
-          <span className="text-xs text-brand-600 dark:text-brand-400">Kept on device — not saved to server</span>
         )}
         {saveState === 'locked' && (
           <span className="text-xs text-warning-600 dark:text-warning-400">

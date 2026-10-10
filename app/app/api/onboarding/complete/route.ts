@@ -9,6 +9,9 @@ interface CompletePayload {
   mode: 'starter' | 'upload'
   answers?: Record<string, string>
   upload?: string
+  // Local-first privacy path: client sends only lengths/ids, never bodies.
+  answer_lengths?: Record<string, number>
+  upload_len?: number
 }
 
 export async function POST(req: NextRequest) {
@@ -28,12 +31,14 @@ export async function POST(req: NextRequest) {
   const themeCount: Record<string, number> = {}
 
   if (body.mode === 'starter') {
-    const answers = body.answers ?? {}
-    const entries = Object.entries(answers).filter(([, text]) => text.trim().length > 30)
+    // Under local-first the client sends answer_lengths (id→char count), not
+    // bodies. Validation and theme lookup need ids + counts only.
+    const entries = localFirst
+      ? Object.entries(body.answer_lengths ?? {}).filter(([, len]) => len > 30)
+      : Object.entries(body.answers ?? {}).filter(([, text]) => (text as string).trim().length > 30)
     if (entries.length < 5) {
       return NextResponse.json({ error: 'At least 5 answers required.' }, { status: 400 })
     }
-
     const ids = entries.map(([id]) => id)
     const { data: questions } = await supabase
       .from('archived_questions')
@@ -44,27 +49,30 @@ export async function POST(req: NextRequest) {
       (questions ?? []).map((q) => [q.id, q as { id: string; text: string; theme: string }])
     )
 
-    const rows = entries.map(([archived_question_id, text]) => {
-      const q = questionLookup[archived_question_id]
+    // Theme counting needs only ids — works for both body and length entries.
+    for (const [qid] of entries) {
+      const q = questionLookup[qid]
       if (q?.theme) themeCount[q.theme] = (themeCount[q.theme] ?? 0) + 1
-      const wc = text.trim().split(/\s+/).length
-      return {
-        user_id: user.id,
-        archived_question_id,
-        question_text: q?.text ?? '',
-        content: text.trim(),
-        answer_content: text.trim(),
-        word_count: wc,
-        confidence: 'draft' as const,
-      }
-    })
+    }
 
     if (localFirst) {
-      // Do NOT write rows to profile_answers. Answers were accepted in the
-      // payload for compatibility but are deliberately dropped server-side —
-      // the client keeps them on device. Reported honestly below.
+      // No bodies were sent and none are written — reported honestly below.
       answersCount = 0
     } else {
+      const rows = entries.map(([archived_question_id, text]) => {
+        const q = questionLookup[archived_question_id]
+        const body = (text as string).trim()
+        const wc = body.split(/\s+/).length
+        return {
+          user_id: user.id,
+          archived_question_id,
+          question_text: q?.text ?? '',
+          content: body,
+          answer_content: body,
+          word_count: wc,
+          confidence: 'draft' as const,
+        }
+      })
       const { error: insertErr } = await supabase
         .from('profile_answers')
         .upsert(rows, { onConflict: 'user_id,archived_question_id', ignoreDuplicates: false })
@@ -75,8 +83,10 @@ export async function POST(req: NextRequest) {
       answersCount = rows.length
     }
   } else if (body.mode === 'upload') {
+    // Local-first sends upload_len only — the body never transits.
     const raw = (body.upload ?? '').trim()
-    if (raw.length < 100) {
+    const uploadLen = localFirst ? (body.upload_len ?? 0) : raw.length
+    if (uploadLen < 100) {
       return NextResponse.json({ error: 'Add at least a paragraph.' }, { status: 400 })
     }
 
