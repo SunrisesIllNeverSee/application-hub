@@ -222,6 +222,11 @@ export async function approveVersion(
  */
 export function compareApprovals(a: ApprovalRecord, b: ApprovalRecord): number {
   if (a.seq != null && b.seq != null) return a.seq - b.seq
+  // Mixed pairs: seq-bearing rows post-date legacy rows by construction —
+  // a legacy approval's wall-clock at can be skewed and must not outrank a
+  // seq'd revocation (LF-APPROVAL-01).
+  if (a.seq != null) return 1
+  if (b.seq != null) return -1
   return a.at.localeCompare(b.at) || a.id.localeCompare(b.id)
 }
 
