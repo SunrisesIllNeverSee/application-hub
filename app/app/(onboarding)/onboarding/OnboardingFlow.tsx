@@ -10,6 +10,7 @@ import {
   getStorage,
   saveScopedVersion,
   scopeForQuestion,
+  tryUnlock,
   ONBOARDING_APPLICATION_ID,
 } from '@/lib/aqua-local-client/session'
 
@@ -68,6 +69,11 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
           try {
             if (!vaultSecret) throw new Error('A vault secret is required in local-first mode.')
             const storage = await getStorage()
+            // A vault may already exist with a different secret — writing
+            // without unlocking first would encrypt this version under a key
+            // the user's real secret can't open (mixed-key vault). Verify the
+            // secret unlocks the vault before any write.
+            await tryUnlock(storage, vaultSecret)
             if (mode === 'starter') {
               const entries = Object.entries(answers).filter(([, t]) => t.trim().length > 0)
               for (const [qid, text] of entries) {

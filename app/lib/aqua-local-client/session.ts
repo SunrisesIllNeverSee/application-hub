@@ -33,7 +33,8 @@ import type {
 export { VaultDecryptError, VaultBlankBodyError, VaultScopeError, VaultNotFoundError }
 export type { VaultStorage, VersionMethod }
 
-/** Reserved scope for LF-12 local onboarding answers. */
+/** Scope for the onboarding upload path only; starter answers are scoped to
+ *  the 'answer-bank' application so they show in the normal bank. */
 export const ONBOARDING_APPLICATION_ID = 'local-onboarding'
 
 /** A version row enriched with its latest approval + provenance receipt. */
@@ -48,27 +49,34 @@ export interface BankEntry {
   versions: BankVersion[] // ascending by created_at — last is newest
 }
 
-let storagePromise: Promise<VaultStorage> | null = null
+// Keyed by the resolved uid (or 'anon') — an account switch mid-session must
+// re-resolve, never hand a different user the previous user's vault handle.
+const storagePromises = new Map<string, Promise<VaultStorage>>()
+
+export async function resolveVaultDbName(): Promise<string> {
+  try {
+    const { createClient } = await import('@/lib/supabase/client')
+    const { data } = await createClient().auth.getUser()
+    return data.user?.id ? `aqua-local-${data.user.id}` : 'aqua-local'
+  } catch {
+    return 'aqua-local'
+  }
+}
 
 /**
- * Open the IndexedDB vault (memoized per page session). F-UI1: the DB name is
- * keyed to the authenticated user id so two accounts sharing a browser
- * profile get isolated vaults; anonymous fallback keeps a shared vault.
+ * Open the IndexedDB vault (memoized per authenticated user). F-UI1 + IN-01
+ * review fix: the cache key is the user id, so signing out and in as a
+ * different account inside one SPA session opens that user's vault — never
+ * the previous user's.
  */
 export async function getStorage(): Promise<VaultStorage> {
-  if (!storagePromise) {
-    storagePromise = (async () => {
-      try {
-        const { createClient } = await import('@/lib/supabase/client')
-        const { data } = await createClient().auth.getUser()
-        const uid = data.user?.id
-        return openVaultStorage(uid ? `aqua-local-${uid}` : 'aqua-local')
-      } catch {
-        return openVaultStorage('aqua-local')
-      }
-    })()
+  const dbName = await resolveVaultDbName()
+  let p = storagePromises.get(dbName)
+  if (!p) {
+    p = openVaultStorage(dbName)
+    storagePromises.set(dbName, p)
   }
-  return storagePromise
+  return p
 }
 
 /**

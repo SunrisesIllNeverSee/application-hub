@@ -23,6 +23,7 @@ import {
 } from 'react'
 import {
   getStorage,
+  resolveVaultDbName,
   tryUnlock,
   VaultDecryptError,
 } from './session'
@@ -78,6 +79,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<VaultStatus>(LOCAL_FIRST ? 'idle' : 'off')
   const [vaultHasData, setVaultHasData] = useState<boolean | null>(null)
   const storageRef = useRef<VaultStorage | null>(null)
+  const storageUidRef = useRef<string | null>(null)
   const secretRef = useRef<string | null>(null)
 
   const ensureStorage = useCallback(async (): Promise<VaultStorage> => {
@@ -85,7 +87,17 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       setStatus('unsupported')
       throw new Error('IndexedDB is not available in this browser')
     }
-    const s = storageRef.current ?? (await getStorage())
+    // Account switch mid-session: getStorage resolves the current user's DB;
+    // if it changed, drop the prior user's handle AND their secret.
+    const currentDb = await resolveVaultDbName()
+    const s = storageRef.current && storageUidRef.current === currentDb
+      ? storageRef.current
+      : await getStorage()
+    if (storageUidRef.current !== currentDb) {
+      secretRef.current = null
+      setStatus('locked')
+    }
+    storageUidRef.current = currentDb
     storageRef.current = s
     if (secretRef.current) {
       setStatus('unlocked')

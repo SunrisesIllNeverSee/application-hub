@@ -74,11 +74,14 @@ export function LocalFirstBankSection({
       // account's payload is refused by importLegacyAnswers.
       const { createClient } = await import('@/lib/supabase/client')
       const { data: { user } } = await createClient().auth.getUser()
+      // Bug-2 fix (review): hard-fail if the session can't be resolved —
+      // passing undefined would silently skip the cross-account check.
+      if (!user?.id) throw new Error('Import requires an authenticated session')
       const result = await runLegacyImport(storage, secret, async () => {
         const res = await fetch('/api/answers/export', { credentials: 'include' })
         if (!res.ok) throw new Error(`Export failed (${res.status})`)
         return res.json()
-      }, { expectedUserId: user?.id })
+      }, { expectedUserId: user.id })
       setImportResult(result)
       await refresh()
     } catch (e) {

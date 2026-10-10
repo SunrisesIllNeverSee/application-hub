@@ -412,7 +412,9 @@ export function AnswerEditor({
 
       {/* Controls row */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Confidence toggle */}
+        {/* Confidence toggle — hidden under local-first: vault versions
+            carry no confidence field (approval is the lifecycle marker). */}
+        {!LOCAL_FIRST && (
         <div className="flex items-center gap-1.5">
           <span className="text-xs text-neutral-500 dark:text-neutral-400">Confidence</span>
           <div className="flex rounded-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
@@ -432,6 +434,7 @@ export function AnswerEditor({
             ))}
           </div>
         </div>
+        )}
 
         {/* AI draft button */}
         <button
