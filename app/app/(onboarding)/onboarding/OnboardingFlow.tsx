@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation'
 import type { ArchivedQuestion } from '@/lib/database.types'
 import { ThemeTag } from '@/components/ThemeTag'
 import { cn } from '@/lib/utils'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
+import {
+  getStorage,
+  saveScopedVersion,
+  scopeForQuestion,
+  ONBOARDING_APPLICATION_ID,
+} from '@/lib/aqua-local-client/session'
 
 type StarterQuestion = Pick<
   ArchivedQuestion,
@@ -23,6 +30,10 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [upload, setUpload] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [vaultNote, setVaultNote] = useState<string | null>(null)
+  // IN-01: local-first — onboarding answers are written to the device vault.
+  // The secret is typed by the user, held in state only, never persisted.
+  const [vaultSecret, setVaultSecret] = useState('')
   const [reviewSummary, setReviewSummary] = useState<{ identity: string; themesCovered: number; topThemes: string[]; answersCount: number } | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -48,6 +59,45 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
           return
         }
         const body = await res.json()
+
+        // IN-01: local-first — the server accepted the payload but dropped
+        // the private content (see /api/onboarding/complete). Persist the
+        // answers into the on-device vault now, scoped to the question
+        // occurrence so the rest of the app finds them consistently.
+        if (LOCAL_FIRST) {
+          try {
+            if (!vaultSecret) throw new Error('A vault secret is required in local-first mode.')
+            const storage = await getStorage()
+            if (mode === 'starter') {
+              const entries = Object.entries(answers).filter(([, t]) => t.trim().length > 0)
+              for (const [qid, text] of entries) {
+                const q = questions.find((qq) => qq.id === qid)
+                await saveScopedVersion(storage, vaultSecret, scopeForQuestion(qid, null), {
+                  title: q?.text ?? `Onboarding answer — ${qid}`,
+                  body: text.trim(),
+                  method: 'manual',
+                })
+              }
+            } else {
+              await saveScopedVersion(
+                storage,
+                vaultSecret,
+                { application_id: ONBOARDING_APPLICATION_ID, question_occurrence_id: 'onboarding:upload' },
+                { title: 'Onboarding upload', body: upload.trim(), method: 'manual' },
+              )
+            }
+            setVaultNote(
+              `Saved ${mode === 'starter' ? Object.values(answers).filter((t) => t.trim().length > 0).length : 1} answer(s) encrypted on this device.`,
+            )
+          } catch (e) {
+            // Honest surface: onboarding metadata succeeded but the local
+            // save did not — say so instead of implying the bank was seeded.
+            setVaultNote(
+              `Onboarding completed, but answers could not be written to the device vault: ${e instanceof Error ? e.message : 'unknown error'}`,
+            )
+          }
+        }
+
         setReviewSummary(body.summary)
         setStep('review')
       } catch (e) {
@@ -71,6 +121,12 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
               Your AQUAscore baseline is in. The product is yours from here.
             </p>
           </div>
+
+          {vaultNote && (
+            <p className="mb-4 rounded-lg border border-brand-500/20 bg-brand-50/40 dark:bg-brand-950/20 px-4 py-3 text-sm text-brand-700 dark:text-brand-300">
+              {vaultNote}
+            </p>
+          )}
 
           <div className="card p-6 mb-6 space-y-4">
             <Row label="Detected identity" value={reviewSummary.identity} />
@@ -234,12 +290,31 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
           </div>
 
           {/* Submit */}
+          {LOCAL_FIRST && (
+            <div className="mt-6 card p-4">
+              <label htmlFor="vault-secret-starter" className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                Vault secret — encrypts your answers on this device
+              </label>
+              <input
+                id="vault-secret-starter"
+                type="password"
+                value={vaultSecret}
+                onChange={(e) => setVaultSecret(e.target.value)}
+                placeholder="Choose a vault secret (never stored, never sent)"
+                className="w-full px-3 py-2 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                autoComplete="new-password"
+              />
+              <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-600">
+                Local-first mode: answers are written to your device vault, not the server. If you lose this secret the answers cannot be recovered.
+              </p>
+            </div>
+          )}
           {error && (
             <p className="mt-6 text-sm text-danger-600 dark:text-danger-500 text-center">{error}</p>
           )}
           <button
             onClick={() => submit('starter')}
-            disabled={completedStarter < minRequired || isPending}
+            disabled={completedStarter < minRequired || isPending || (LOCAL_FIRST && !vaultSecret)}
             className="mt-8 w-full px-6 py-3 rounded-lg bg-brand-600 hover:bg-brand-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
           >
             {isPending ? 'Saving...' : completedStarter >= minRequired ? 'Finish — open AQUA' : `Answer ${minRequired - completedStarter} more to continue`}
@@ -282,12 +357,32 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
           {upload.trim().length} characters · stored as a timestamped captured moment in your Answers
         </p>
 
+        {LOCAL_FIRST && (
+          <div className="mt-6 card p-4">
+            <label htmlFor="vault-secret-upload" className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+              Vault secret — encrypts your answers on this device
+            </label>
+            <input
+              id="vault-secret-upload"
+              type="password"
+              value={vaultSecret}
+              onChange={(e) => setVaultSecret(e.target.value)}
+              placeholder="Choose a vault secret (never stored, never sent)"
+              className="w-full px-3 py-2 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              autoComplete="new-password"
+            />
+            <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-600">
+              Local-first mode: the pasted text is written to your device vault, not the server.
+            </p>
+          </div>
+        )}
+
         {error && (
           <p className="mt-6 text-sm text-danger-600 dark:text-danger-500 text-center">{error}</p>
         )}
         <button
           onClick={() => submit('upload')}
-          disabled={upload.trim().length < 100 || isPending}
+          disabled={upload.trim().length < 100 || isPending || (LOCAL_FIRST && !vaultSecret)}
           className="mt-6 w-full px-6 py-3 rounded-lg bg-brand-600 hover:bg-brand-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
         >
           {isPending ? 'Saving...' : upload.trim().length < 100 ? 'Add at least a paragraph to continue' : 'Finish — open AQUA'}

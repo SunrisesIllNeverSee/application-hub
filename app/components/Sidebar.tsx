@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useTheme } from '@/components/ThemeProvider'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 interface Application {
   id: string
@@ -28,6 +29,11 @@ const NAV = [
   { href: '/questions', label: 'Questions', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
   { href: '/answers', label: 'Answers', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V7M4 7l8-4 8 4M4 7l8 4 8-4m-8 4v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
   { href: '/workstation', label: 'Workstation', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 17v-2m3 2v-4m3 4v-6M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
+  // IN-01: vault link visible only under the local-first flag — one bank,
+  // no duplication (the vault surface is the answer bank).
+  ...(LOCAL_FIRST
+    ? [{ href: '/aqua-local', label: 'Local vault', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>) }]
+    : []),
 ]
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
