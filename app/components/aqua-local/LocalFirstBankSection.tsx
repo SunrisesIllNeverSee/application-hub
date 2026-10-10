@@ -70,11 +70,15 @@ export function LocalFirstBankSection({
     setImportResult(null)
     try {
       const storage = await vault.ensureStorage()
+      // F-B8: bind the export payload to the session user — a foreign
+      // account's payload is refused by importLegacyAnswers.
+      const { createClient } = await import('@/lib/supabase/client')
+      const { data: { user } } = await createClient().auth.getUser()
       const result = await runLegacyImport(storage, secret, async () => {
         const res = await fetch('/api/answers/export', { credentials: 'include' })
         if (!res.ok) throw new Error(`Export failed (${res.status})`)
         return res.json()
-      })
+      }, { expectedUserId: user?.id })
       setImportResult(result)
       await refresh()
     } catch (e) {
