@@ -1,14 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { UnlockPanel } from '@/components/aqua-local/UnlockPanel'
 import { VaultStatusBanner } from '@/components/aqua-local/VaultStatusBanner'
 import { AnswerBankList } from '@/components/aqua-local/AnswerBankList'
 import { LocalAnswerEditor, type EditTarget } from '@/components/aqua-local/LocalAnswerEditor'
 import { OnboardingLocalCard } from '@/components/aqua-local/OnboardingLocalCard'
 import {
-  getStorage,
-  tryUnlock,
   loadBank,
   saveVersion,
   readBody,
@@ -19,19 +17,19 @@ import {
   ONBOARDING_APPLICATION_ID,
   VaultBlankBodyError,
   VaultDecryptError,
-} from './vault-session'
-import type { BankEntry, BankVersion, VaultStorage } from './vault-session'
+} from '@/lib/aqua-local-client/session'
+import type { BankEntry, BankVersion } from '@/lib/aqua-local-client/session'
+import { useVault } from '@/lib/aqua-local-client/VaultProvider'
 import type { VersionRecord } from '@/lib/aqua-local'
 
 // LF-10/11/12/15 — local-first surface. All private content lives in the
-// browser IndexedDB vault (`aqua-local`). The vault secret is kept in a ref —
-// memory only, never persisted, never sent anywhere.
-
-type Phase = 'init' | 'unsupported' | 'locked' | 'unlocked'
+// browser IndexedDB vault (`aqua-local`). IN-01: storage + secret now come
+// from the shared VaultProvider mounted at the (app) layout, so unlocking
+// here unlocks every other surface (and vice versa) for the session. The
+// secret is still memory-only — never persisted, never sent anywhere.
 
 export default function AquaLocal() {
-  const [phase, setPhase] = useState<Phase>('init')
-  const [vaultHasData, setVaultHasData] = useState<boolean | null>(null)
+  const vault = useVault()
   const [bank, setBank] = useState<BankEntry[]>([])
   const [offline, setOffline] = useState(false)
   const [backupDue, setBackupDue] = useState(false)
@@ -44,32 +42,39 @@ export default function AquaLocal() {
   const [lastSaved, setLastSaved] = useState<VersionRecord | null>(null)
   const [approvingId, setApprovingId] = useState<string | null>(null)
 
-  const storageRef = useRef<VaultStorage | null>(null)
-  const secretRef = useRef<string | null>(null)
+  const phase = vault.status // 'idle' | 'unsupported' | 'locked' | 'unlocked'
 
   const refreshBank = useCallback(async () => {
-    const s = storageRef.current
-    if (!s) return
-    const entries = await loadBank(s)
-    setBank(entries)
-    const hasVersions = entries.some((e) => e.versions.length > 0)
-    const last = lastBackupAt()
-    setBackupDue(hasVersions && (last === null || Date.now() - last > BACKUP_REMINDER_MS))
-  }, [])
-
-  useEffect(() => {
-    if (typeof indexedDB === 'undefined') {
-      setPhase('unsupported')
-      return
+    const secret = vault.getSecret()
+    if (!secret) return
+    try {
+      const storage = await vault.ensureStorage()
+      const entries = await loadBank(storage)
+      setBank(entries)
+      const hasVersions = entries.some((e) => e.versions.length > 0)
+      const last = lastBackupAt()
+      setBackupDue(hasVersions && (last === null || Date.now() - last > BACKUP_REMINDER_MS))
+    } catch {
+      setBanner('Could not read the vault')
     }
-    getStorage()
-      .then(async (s) => {
-        storageRef.current = s
-        const versions = await s.getAll('versions')
-        setVaultHasData(versions.length > 0)
-        setPhase('locked')
-      })
-      .catch(() => setPhase('unsupported'))
+  }, [vault])
+
+  // Lazy open: first visit to this surface opens the DB (locked state).
+  // If another surface already unlocked the vault, status is already
+  // 'unlocked' and this is a no-op probe.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        await vault.ensureStorage()
+      } catch {
+        if (!cancelled) setBanner('This browser does not support IndexedDB — the local vault cannot run here.')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -83,35 +88,32 @@ export default function AquaLocal() {
     }
   }, [])
 
-  const handleUnlock = async (secret: string) => {
-    const s = storageRef.current ?? (await getStorage())
-    storageRef.current = s
-    await tryUnlock(s, secret) // throws VaultDecryptError on wrong secret
-    secretRef.current = secret
-    setPhase('unlocked')
-    await refreshBank()
-  }
+  useEffect(() => {
+    if (phase === 'unlocked') void refreshBank()
+    if (phase === 'locked') setBank([])
+  }, [phase, refreshBank])
 
   const lock = () => {
-    secretRef.current = null
+    vault.lock()
     setTarget(null)
     setBank([])
-    setPhase('locked')
-    setVaultHasData(true) // a locked vault that exists still prompts for the secret
   }
 
   const requireSecret = (): string => {
-    const secret = secretRef.current
+    const secret = vault.getSecret()
     if (!secret) {
-      setPhase('locked')
+      vault.lock()
       throw new VaultDecryptError('vault is locked — unlock to continue')
     }
     return secret
   }
 
+  const requireStorage = async () => vault.ensureStorage()
+
   const handleEdit = async (entry: BankEntry, version: BankVersion) => {
     try {
-      const { title, body } = await readBody(storageRef.current!, requireSecret(), version.record.id)
+      const storage = await requireStorage()
+      const { title, body } = await readBody(storage, requireSecret(), version.record.id)
       setSaveError('')
       setLastSaved(null)
       setTarget({
@@ -131,7 +133,8 @@ export default function AquaLocal() {
     setSaving(true)
     setSaveError('')
     try {
-      const record = await saveVersion(storageRef.current!, requireSecret(), input)
+      const storage = await requireStorage()
+      const record = await saveVersion(storage, requireSecret(), input)
       setLastSaved(record)
       await refreshBank()
     } catch (e) {
@@ -170,7 +173,8 @@ export default function AquaLocal() {
   const handleApprove = async (versionId: string, decision: 'approved' | 'rejected') => {
     setApprovingId(versionId)
     try {
-      await approve(storageRef.current!, versionId, decision)
+      const storage = await requireStorage()
+      await approve(storage, versionId, decision)
       await refreshBank()
     } catch (e) {
       setBanner(e instanceof Error ? e.message : 'Approval failed')
@@ -182,7 +186,8 @@ export default function AquaLocal() {
   const handleBackup = async () => {
     setBackupBusy(true)
     try {
-      const name = await downloadBackup(storageRef.current!, requireSecret())
+      const storage = await requireStorage()
+      const name = await downloadBackup(storage, requireSecret())
       setBanner(`Encrypted backup downloaded: ${name}`)
       setBackupDue(false)
     } catch (e) {
@@ -219,7 +224,7 @@ export default function AquaLocal() {
         </p>
       )}
 
-      {phase === 'init' && (
+      {phase === 'idle' && (
         <p className="mt-6 text-sm text-neutral-400">Opening vault…</p>
       )}
 
@@ -231,7 +236,7 @@ export default function AquaLocal() {
       )}
 
       {phase === 'locked' && (
-        <UnlockPanel vaultHasData={vaultHasData} onUnlock={handleUnlock} />
+        <UnlockPanel vaultHasData={vault.vaultHasData} onUnlock={vault.unlock} />
       )}
 
       {unlocked && (

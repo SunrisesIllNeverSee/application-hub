@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import type { BankEntry, BankVersion } from '@/app/(app)/aqua-local/vault-session'
+import type { BankEntry, BankVersion } from '@/lib/aqua-local-client/session'
 import type { VersionMethod } from '@/lib/aqua-local'
 
 // LF-10 Answer Bank: local answers with immutable versions, approval state,

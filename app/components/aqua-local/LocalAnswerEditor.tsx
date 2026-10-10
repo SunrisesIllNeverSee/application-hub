@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { countWords } from '@/lib/utils'
 import { WordCount } from '../WordCount'
-import type { SaveVersionInput } from '@/app/(app)/aqua-local/vault-session'
+import type { SaveVersionInput } from '@/lib/aqua-local-client/session'
 import type { VersionRecord } from '@/lib/aqua-local'
 
 // LF-11 local answer editor. Every save writes a NEW immutable version into

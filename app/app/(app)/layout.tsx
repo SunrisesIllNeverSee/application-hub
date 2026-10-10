@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/Sidebar'
 import { CreditToast } from '@/components/CreditToast'
 import { BetaEndBanner } from '@/components/BetaEndBanner'
+import { VaultProvider } from '@/lib/aqua-local-client/VaultProvider'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 export default async function AppLayout({
   children,
@@ -62,7 +64,12 @@ export default async function AppLayout({
       <Sidebar user={user} applications={applications} creditBalance={creditBalance} />
       <main className="flex-1 min-w-0 overflow-y-auto pt-14 md:pt-0">
         <BetaEndBanner />
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">{children}</div>
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">
+          {/* IN-01: shared vault session — unlock survives in-app navigation.
+              Lazy: no IndexedDB open until a surface actually uses it.
+              Flag-off renders children unwrapped (legacy path unchanged). */}
+          {LOCAL_FIRST ? <VaultProvider>{children}</VaultProvider> : children}
+        </div>
       </main>
       <CreditToast userId={user.id} />
     </div>

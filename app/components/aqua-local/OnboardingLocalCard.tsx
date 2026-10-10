@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { ONBOARDING_APPLICATION_ID } from '@/app/(app)/aqua-local/vault-session'
-import type { BankEntry } from '@/app/(app)/aqua-local/vault-session'
+import { ONBOARDING_APPLICATION_ID } from '@/lib/aqua-local-client/session'
+import type { BankEntry } from '@/lib/aqua-local-client/session'
 
 // LF-12 local onboarding. In local-first mode there is no server
 // profile_answers row — onboarding answers are written straight into the

@@ -1,7 +1,13 @@
-// Thin page-level adapter over app/lib/aqua-local (LF-10/11/15).
+// Thin client adapter over app/lib/aqua-local (LF-10/11/15, IN-01).
 // UI code calls ONLY this adapter + repo functions re-exported here; it owns
 // no domain logic of its own. The vault lib is the authority — do not patch
 // around it. The user secret is held in React state only (never persisted).
+//
+// Lives in lib/ (not the page dir) so every (app) surface shares one adapter.
+// Imports are RELATIVE (../aqua-local) so the pure functions can be exercised
+// under `node` type-stripping without the @/ alias — see run-session-tests.mjs.
+// The only @/-aliased import is the lazy dynamic import inside getStorage(),
+// which never fires in tests (storage is injected directly).
 
 import {
   openVaultStorage,
@@ -14,7 +20,7 @@ import {
   VaultBlankBodyError,
   VaultScopeError,
   VaultNotFoundError,
-} from '@/lib/aqua-local'
+} from '../aqua-local/index.ts'
 import type {
   VaultStorage,
   AnswerRecord,
@@ -22,7 +28,7 @@ import type {
   ProvenanceRecord,
   VersionRecord,
   VersionMethod,
-} from '@/lib/aqua-local'
+} from '../aqua-local/index.ts'
 
 export { VaultDecryptError, VaultBlankBodyError, VaultScopeError, VaultNotFoundError }
 export type { VaultStorage, VersionMethod }
@@ -195,6 +201,108 @@ export function lastBackupAt(): number | null {
   const v = localStorage.getItem(LAST_BACKUP_KEY)
   const t = v ? Date.parse(v) : NaN
   return Number.isFinite(t) ? t : null
+}
+
+/**
+ * IN-01 — scope conventions for the normal (app) surfaces.
+ *
+ * `question_occurrence_id` is always the `archived_question_id` — one
+ * occurrence per catalog question, consistent with the local surface's
+ * string occurrences ('onboarding:*', legacy source_ids).
+ *
+ * `application_id`:
+ *   - a `programId` when the edit happens inside an application workspace
+ *     (binds the answer to that application's exact question occurrence);
+ *   - PROFILE_BANK_APPLICATION_ID otherwise (answer bank / profile pages).
+ */
+export const PROFILE_BANK_APPLICATION_ID = 'answer-bank'
+
+export function scopeForQuestion(
+  archivedQuestionId: string,
+  programId?: string | null,
+): { application_id: string; question_occurrence_id: string } {
+  return {
+    application_id: programId ?? PROFILE_BANK_APPLICATION_ID,
+    question_occurrence_id: archivedQuestionId,
+  }
+}
+
+/** All answers recorded for a question occurrence, across applications. */
+export async function findAnswersForOccurrence(
+  storage: VaultStorage,
+  questionOccurrenceId: string,
+): Promise<AnswerRecord[]> {
+  const answers = await storage.getAll<AnswerRecord>('answers')
+  return answers.filter((a) => a.scope?.question_occurrence_id === questionOccurrenceId)
+}
+
+export interface ScopedAnswer {
+  entry: BankEntry | null
+  /** Latest version + decrypted body, or null when no versions exist. */
+  latest: { version: BankVersion; title: string; body: string } | null
+}
+
+/**
+ * Load the bank entry for a question scope. Exact application_id match wins;
+ * otherwise the occurrence's most-recently-versioned answer is used (one
+ * logical answer per question across contexts). Requires an UNLOCKED vault —
+ * the latest body is decrypted with `secret`.
+ */
+export async function loadScopeEntry(
+  storage: VaultStorage,
+  secret: string,
+  scope: { application_id: string; question_occurrence_id: string },
+): Promise<ScopedAnswer> {
+  const bank = await loadBank(storage)
+  const matches = bank.filter(
+    (e) => e.answer.scope.question_occurrence_id === scope.question_occurrence_id,
+  )
+  const entry =
+    matches.find((e) => e.answer.scope.application_id === scope.application_id) ??
+    matches[0] ??
+    null
+  if (!entry) return { entry: null, latest: null }
+  const latest = entry.versions.at(-1) ?? null
+  if (!latest) return { entry, latest: null }
+  const { title, body } = await readBody(storage, secret, latest.record.id)
+  return { entry, latest: { version: latest, title, body } }
+}
+
+/**
+ * Save an edit for a question scope as a new immutable child version.
+ * Reuses an existing answer for the occurrence (exact application scope
+ * preferred) so one question maps to one bank entry; creates a new scoped
+ * answer only when none exists. Returns the created version.
+ */
+export async function saveScopedVersion(
+  storage: VaultStorage,
+  secret: string,
+  scope: { application_id: string; question_occurrence_id: string },
+  input: { title: string; body: string; method?: VersionMethod; provenance?: string | null },
+): Promise<VersionRecord> {
+  const candidates = await findAnswersForOccurrence(storage, scope.question_occurrence_id)
+  const exact = candidates.find((a) => a.scope.application_id === scope.application_id) ?? null
+  const answer = exact ?? candidates[0] ?? null
+
+  let parentVersionId: string | null = null
+  if (answer) {
+    const versions = await storage.getAll<VersionRecord>('versions')
+    const latest = versions
+      .filter((v) => v.answer_id === answer!.id)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
+      .at(-1)
+    parentVersionId = latest?.id ?? null
+  }
+
+  return saveVersion(storage, secret, {
+    answer_id: answer?.id ?? null,
+    scope,
+    parent_version_id: parentVersionId,
+    title: input.title,
+    body: input.body,
+    method: input.method ?? 'manual',
+    provenance: input.provenance ?? null,
+  })
 }
 
 /** Export an encrypted backup and trigger a user-initiated file download. */
