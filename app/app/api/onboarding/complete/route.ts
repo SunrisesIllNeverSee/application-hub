@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isLocalFirst, LOCAL_FIRST_REFUSAL_MESSAGE } from '@/lib/local-first-guard'
 
 const APPLICANT_MODES = ['founder', 'student', 'researcher', 'job_seeker'] as const
 type ApplicantMode = typeof APPLICANT_MODES[number]
@@ -14,6 +15,11 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Local-first: answer bodies and free-text uploads must not be persisted
+  // server-side. The non-private profile metadata update below
+  // (onboarding_completed_at, active_identity) still succeeds.
+  const localFirst = isLocalFirst()
 
   const body = (await req.json().catch(() => null)) as CompletePayload | null
   if (!body) return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
@@ -53,42 +59,56 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    const { error: insertErr } = await supabase
-      .from('profile_answers')
-      .upsert(rows, { onConflict: 'user_id,archived_question_id', ignoreDuplicates: false })
+    if (localFirst) {
+      // Do NOT write rows to profile_answers. Answers were accepted in the
+      // payload for compatibility but are deliberately dropped server-side —
+      // the client keeps them on device. Reported honestly below.
+      answersCount = 0
+    } else {
+      const { error: insertErr } = await supabase
+        .from('profile_answers')
+        .upsert(rows, { onConflict: 'user_id,archived_question_id', ignoreDuplicates: false })
 
-    if (insertErr) {
-      return NextResponse.json({ error: `Could not save answers: ${insertErr.message}` }, { status: 500 })
+      if (insertErr) {
+        return NextResponse.json({ error: `Could not save answers: ${insertErr.message}` }, { status: 500 })
+      }
+      answersCount = rows.length
     }
-    answersCount = rows.length
   } else if (body.mode === 'upload') {
     const raw = (body.upload ?? '').trim()
     if (raw.length < 100) {
       return NextResponse.json({ error: 'Add at least a paragraph.' }, { status: 400 })
     }
 
-    const { data: prof } = await supabase
-      .from('user_profiles')
-      .select('applicant_context')
-      .eq('user_id', user.id)
-      .maybeSingle<{ applicant_context: Record<string, unknown> | null }>()
+    if (localFirst) {
+      // The uploaded free text is private content — do not persist it into
+      // applicant_context. Onboarding metadata still completes below.
+      answersCount = 0
+      themeCount.other = 1
+    } else {
+      const { data: prof } = await supabase
+        .from('user_profiles')
+        .select('applicant_context')
+        .eq('user_id', user.id)
+        .maybeSingle<{ applicant_context: Record<string, unknown> | null }>()
 
-    const newContext = {
-      ...(prof?.applicant_context ?? {}),
-      onboarding_upload: raw,
-      onboarding_upload_at: new Date().toISOString(),
+      const newContext = {
+        ...(prof?.applicant_context ?? {}),
+        onboarding_upload: raw,
+        onboarding_upload_at: new Date().toISOString(),
+      }
+
+      const { error: upErr } = await supabase
+        .from('user_profiles')
+        .update({ applicant_context: newContext })
+        .eq('user_id', user.id)
+
+      if (upErr) {
+        return NextResponse.json({ error: `Could not save upload: ${upErr.message}` }, { status: 500 })
+      }
+      answersCount = 1
+      themeCount.other = 1
     }
-
-    const { error: upErr } = await supabase
-      .from('user_profiles')
-      .update({ applicant_context: newContext })
-      .eq('user_id', user.id)
-
-    if (upErr) {
-      return NextResponse.json({ error: `Could not save upload: ${upErr.message}` }, { status: 500 })
-    }
-    answersCount = 1
-    themeCount.other = 1
   } else {
     return NextResponse.json({ error: 'Unknown mode.' }, { status: 400 })
   }
@@ -133,6 +153,10 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    // Truthful local-first reporting: private answer/upload content was NOT
+    // stored server-side. Only onboarding metadata was persisted.
+    answers_stored_server_side: !localFirst,
+    ...(localFirst ? { local_first: true, note: LOCAL_FIRST_REFUSAL_MESSAGE } : {}),
     summary: {
       identity: identity.replace(/_/g, ' '),
       answersCount,

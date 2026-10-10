@@ -3,6 +3,7 @@ import { z } from "zod";
 import { userClient } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { ANSWER_CONFIDENCES, CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../../services/local_first.js";
 
 const SAVE_ANSWER_FIELDS =
   "id, user_id, archived_question_id, question_text, theme, answer_content," +
@@ -40,6 +41,7 @@ The database trigger keeps content/answer_content, question_text, theme, word_co
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ user_token, archived_question_id, answer_content, confidence, response_format }) => {
+    if (isLocalFirst()) return privateWriteRefusalResult();
     const user_id = await validateUserToken(user_token);
     const client = userClient(user_token);
 

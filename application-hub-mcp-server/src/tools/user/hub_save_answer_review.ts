@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 import { validateUserToken } from "../../services/auth.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../../services/local_first.js";
 import { userClient } from "../../services/supabase.js";
 
 const ANSWER_FIELDS =
@@ -158,6 +159,7 @@ drafting separate from review comments, scores, and certification metadata.`,
     certification,
     response_format
   }) => {
+    if (isLocalFirst()) return privateWriteRefusalResult();
     const user_id = await validateUserToken(user_token);
     const client = userClient(user_token);
 

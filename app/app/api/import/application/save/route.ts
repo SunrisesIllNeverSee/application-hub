@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 interface SavePair {
   archived_question_id: string
@@ -9,6 +10,11 @@ interface SavePair {
 
 export async function POST(req: NextRequest) {
   try {
+    // Local-first: this route writes answer bodies into profile_answers.
+    // Refuse honestly.
+    const lfRefusal = refusePrivateWrite()
+    if (lfRefusal) return lfRefusal
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {

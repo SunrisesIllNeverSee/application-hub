@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { loadEmbeddingIntegrations } from '@/lib/intake-extract'
 import { embedQuestionText } from '@/lib/embed'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // ============================================================
 // POST /api/applications/[id]/fill
@@ -63,6 +64,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { borrow_threshold = DEFAULT_BORROW_THRESHOLD, dry_run = false } = body as {
       borrow_threshold?: number
       dry_run?: boolean
+    }
+
+    // Local-first: a real fill copies answer bodies into new profile_answers
+    // rows server-side. Refuse the write honestly. dry_run is read-only for
+    // the caller's own data and stays available.
+    if (!dry_run) {
+      const lfRefusal = refusePrivateWrite({
+        detail: 'Run with dry_run:true to preview without server writes.',
+      })
+      if (lfRefusal) return lfRefusal
     }
 
     // ── 1. Load the application (must be yours) ─────────────────────────────

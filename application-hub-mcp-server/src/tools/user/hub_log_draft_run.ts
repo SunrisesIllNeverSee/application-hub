@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { checkRateLimit } from "../../services/rate_limit.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../../services/local_first.js";
 
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT"),
@@ -32,6 +33,7 @@ Requires valid user_token.`,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
   }, async ({ user_token, program_id, archived_question_id, integration_type,
               model_used, prompt_tokens, completion_tokens }) => {
+    if (isLocalFirst()) return privateWriteRefusalResult("draft-run payloads can carry private content");
     const user_id = await validateUserToken(user_token);
     await checkRateLimit(user_id);
 

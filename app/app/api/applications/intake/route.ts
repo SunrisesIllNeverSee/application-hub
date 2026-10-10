@@ -16,6 +16,7 @@ import {
   type SourceKind,
   type ExtractedQuestion,
 } from '@/lib/intake-extract'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // ============================================================
 // POST /api/applications/intake
@@ -44,6 +45,11 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    // Local-first: intake persists the raw pasted application text (private
+    // content, may include answer bodies) in app_import_sessions. Refuse honestly.
+    const lfRefusal = refusePrivateWrite()
+    if (lfRefusal) return lfRefusal
+
     // Auth: session cookie (browser) OR Authorization: Bearer <jwt> (extension/MCP)
     const authHeader = req.headers.get('authorization')
     let supabase = await createClient()

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { loadEmbeddingIntegrations } from '@/lib/intake-extract'
 import { embedQuestionText } from '@/lib/embed'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // POST /api/answers/capture
 // Called by the Appfeeder extension when a user finishes typing in a form field.
@@ -15,6 +16,10 @@ import { embedQuestionText } from '@/lib/embed'
 const MATCH_THRESHOLD = 0.72
 
 export async function POST(req: Request) {
+  // Local-first: this route persists answer bodies server-side. Refuse honestly.
+  const lfRefusal = refusePrivateWrite()
+  if (lfRefusal) return lfRefusal
+
   // Auth: session cookie OR Bearer JWT (extension)
   const authHeader = req.headers.get('authorization')
   let supabase = await createClient()

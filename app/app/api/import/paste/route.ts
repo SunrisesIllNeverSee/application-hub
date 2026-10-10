@@ -18,6 +18,7 @@ import {
   type ExtractedPair,
   type ExtractedQuestion,
 } from '@/lib/intake-extract'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // ─── Input validation (hand-rolled, zod isn't installed) ──────────────────────
 
@@ -81,6 +82,12 @@ function validateInput(raw: unknown): ParsedInput | { error: string } {
 
 export async function POST(req: NextRequest) {
   try {
+    // Local-first: this route persists pasted Q&A text (app_import_sessions)
+    // and answer bodies (profile_answers), and ships the text to an LLM for
+    // extraction. Refuse honestly.
+    const lfRefusal = refusePrivateWrite()
+    if (lfRefusal) return lfRefusal
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {

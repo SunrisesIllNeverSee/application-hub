@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { embedAndStoreQuestion } from "../../services/embed.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../../services/local_first.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
 
 // The pound-out loop, step 1 (MCP surface): grab an application.
@@ -231,6 +232,7 @@ Question extraction: AI when ANTHROPIC_API_KEY or GROQ_API_KEY is set in the ser
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
   }, async ({ user_token, program_name, program_url, application_text, source_kind, response_format }) => {
+    if (isLocalFirst()) return privateWriteRefusalResult("pasted application text stays on device");
     const user_id = await validateUserToken(user_token);
 
     // 1. Extract questions

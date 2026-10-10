@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 function isProhibitedHost(hostname: string): boolean {
   const h = hostname.toLowerCase().replace(/^\[|\]$/g, '')
@@ -131,6 +132,13 @@ function countWords(text: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Local-first: drafting sends the user's answer bodies to an external LLM
+    // provider and persists prompt + output in ai_draft_runs. Refuse honestly.
+    const lfRefusal = refusePrivateWrite({
+      detail: 'Drafting runs on your device in local-first mode.',
+    })
+    if (lfRefusal) return lfRefusal
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 

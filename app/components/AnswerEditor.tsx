@@ -37,6 +37,13 @@ const CONFIDENCE_OPTIONS: { value: AnswerConfidence; label: string }[] = [
   { value: 'locked', label: 'Locked' },
 ]
 
+// Local-first mode (LF-25): private answer content stays on the device.
+// The editor still works as a local drafting surface, but the direct
+// client→Supabase profile_answers upsert is skipped — never fake-saved.
+const LOCAL_FIRST =
+  process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST === '1' ||
+  process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST === 'true'
+
 export function AnswerEditor({
   archivedQuestionId,
   programId,
@@ -51,7 +58,7 @@ export function AnswerEditor({
   )
   const [isEditing, setIsEditing] = useState(false)
   const [isPending, startTransition] = useTransition()
-  const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error'>('idle')
+  const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error' | 'local-only'>('idle')
   const [isDrafting, setIsDrafting] = useState(false)
   const [draftFeedback, setDraftFeedback] = useState<DraftFeedback | null>(null)
   const [copied, setCopied] = useState(false)
@@ -144,6 +151,15 @@ export function AnswerEditor({
 
   const handleSave = useCallback(async () => {
     if (!content.trim()) return
+
+    // Local-first: do NOT write answer bodies to Supabase. The text remains
+    // in local component state only — report honestly instead of fake-saving.
+    if (LOCAL_FIRST) {
+      setSaveState('local-only')
+      setIsEditing(false)
+      setTimeout(() => setSaveState('idle'), 4000)
+      return
+    }
 
     startTransition(async () => {
       const {
@@ -266,6 +282,11 @@ export function AnswerEditor({
 
   return (
     <div className="space-y-3">
+      {LOCAL_FIRST && (
+        <div className="rounded-lg border border-brand-500/20 bg-brand-50/40 dark:bg-brand-950/20 px-3 py-2 text-xs text-brand-700 dark:text-brand-300">
+          Local-first mode: your answer stays on this device and is not sent to the server.
+        </div>
+      )}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -413,6 +434,9 @@ export function AnswerEditor({
         {saveState === 'error' && (
           <span className="text-xs text-danger-600 dark:text-danger-500">Save failed — check console</span>
         )}
+        {saveState === 'local-only' && (
+          <span className="text-xs text-brand-600 dark:text-brand-400">Kept on device — not saved to server</span>
+        )}
 
         {(isEditing || compact) && (
           <button
@@ -430,7 +454,7 @@ export function AnswerEditor({
           disabled={isPending || !content.trim()}
           className="btn-primary text-xs py-1.5 px-3"
         >
-          {isPending ? 'Saving…' : 'Save answer'}
+          {isPending ? 'Saving…' : LOCAL_FIRST ? 'Keep on device' : 'Save answer'}
         </button>
       </div>
       {/* Stress test — only when a saved answer exists */}

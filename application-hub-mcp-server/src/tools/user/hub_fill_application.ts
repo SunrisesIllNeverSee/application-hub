@@ -4,6 +4,7 @@ import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { embedText } from "../../services/embed.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../../services/local_first.js";
 
 // The pound-out loop, step 2 (MCP surface): fill an application from the
 // answer bank. Direct answers where they exist; vector-borrowed drafts for
@@ -171,6 +172,7 @@ Deterministic: no AI-generated text is written. Review happens in the workspace 
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ user_token, application_id, borrow_threshold, dual_pass, dry_run, response_format }) => {
+    if (isLocalFirst() && !dry_run) return privateWriteRefusalResult("fill writes borrowed answer bodies server-side; dry_run stays available");
     const user_id = await validateUserToken(user_token);
 
     // 0. Resolve borrow threshold: explicit arg > saved preference > default

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabase } from "../../services/supabase.js";
 import { validateUserToken } from "../../services/auth.js";
 import { CHARACTER_LIMIT, ResponseFormat } from "../../constants.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../../services/local_first.js";
 
 const Schema = z.object({
   user_token: z.string().describe("Supabase JWT from client auth"),
@@ -22,6 +23,7 @@ Once set, every future hub_fill_application call uses your saved value automatic
     inputSchema: Schema,
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, async ({ user_token, borrow_threshold, response_format }) => {
+    if (isLocalFirst()) return privateWriteRefusalResult("preference writes to your server profile are disabled");
     const user_id = await validateUserToken(user_token);
 
     // Read current applicant_context so we merge rather than overwrite
