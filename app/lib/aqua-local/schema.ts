@@ -5,7 +5,7 @@
 // packets, provenance, and signoffs live ONLY here. Never egress.
 
 export const DB_NAME = 'aqua-local'
-export const DB_VERSION = 1
+export const DB_VERSION = 2
 
 export const STORE_NAMES = [
   'answers',
@@ -16,6 +16,9 @@ export const STORE_NAMES = [
   'catalog_cache',
   'imports',
   'signoffs',
+  'provider_keys',
+  'provider_consents',
+  'packet_states',
 ] as const
 
 export type StoreName = (typeof STORE_NAMES)[number]
@@ -91,11 +94,68 @@ export interface ImportRecord {
   at: string
 }
 
+/**
+ * LF-21 signer identity class. `authenticated-account` = backed by a real
+ * signed-in account identity; `local-only` = a vault-local signer with no
+ * external identity attestation. ActorClass values remain accepted for
+ * pre-LF-21 callers.
+ */
+export type SignerClass = 'authenticated-account' | 'local-only'
+
 export interface SignoffRecord {
   packet_id: string // primary key — one signoff per packet
-  signer_class: ActorClass
+  signer_class: ActorClass | SignerClass
   timestamp: string
   signature_b64: string | null
+  /** Base64 SPKI public key that produced signature_b64 (ECDSA P-256). Null when unsigned. */
+  pubkey_b64?: string | null
+}
+
+/**
+ * LF-16 — BYOK key material. The API key is stored ONLY in the local vault
+ * (encrypted like version bodies). It is never sent to the application
+ * server; the only egress is the provider call itself.
+ */
+export interface ProviderKeyRecord {
+  provider_id: string // primary key
+  key_blob: string // serialized EncryptedBlob
+  stored_at: string
+}
+
+/** LF-16 — one consent receipt per generation call. Written before egress. */
+export interface ProviderConsentRecord {
+  id: string // primary key
+  provider_id: string
+  adapter_id: string
+  purpose: 'generation'
+  granted_by: 'user' // consent is only ever user-granted
+  request_sha256: string // sha256 of canonical request that consent covered
+  at: string
+}
+
+/**
+ * LF-23 — packet lifecycle state. `submitted_external_observed` is a
+ * DECLARED-but-UNREACHABLE member: it exists so exports/state reports can
+ * honestly name the state, but no code path may set it (no transport exists).
+ */
+export type PacketState =
+  | 'prepared'
+  | 'signed'
+  | 'exported'
+  | 'submitted_external_observed'
+
+export const PACKET_STATES: readonly PacketState[] = [
+  'prepared',
+  'signed',
+  'exported',
+  'submitted_external_observed',
+]
+
+export interface PacketStateRecord {
+  packet_id: string // primary key
+  state: PacketState
+  history: Array<{ state: PacketState; at: string }>
+  updated_at: string
 }
 
 export interface StoreSpec {
@@ -137,6 +197,13 @@ export const STORE_SPECS: StoreSpec[] = [
   { name: 'catalog_cache', keyPath: 'key', indexes: [] },
   { name: 'imports', keyPath: 'batch_id', indexes: [] },
   { name: 'signoffs', keyPath: 'packet_id', indexes: [] },
+  { name: 'provider_keys', keyPath: 'provider_id', indexes: [] },
+  {
+    name: 'provider_consents',
+    keyPath: 'id',
+    indexes: [{ name: 'by_provider', keyPath: 'provider_id' }],
+  },
+  { name: 'packet_states', keyPath: 'packet_id', indexes: [] },
 ]
 
 /**
@@ -147,6 +214,16 @@ export const STORE_SPECS: StoreSpec[] = [
  */
 export const MIGRATIONS: Array<(db: IDBDatabase) => void> = [
   // v0 → v1: create all stores
+  (db) => {
+    for (const spec of STORE_SPECS) {
+      if (db.objectStoreNames.contains(spec.name)) continue
+      const store = db.createObjectStore(spec.name, { keyPath: spec.keyPath })
+      for (const idx of spec.indexes) {
+        store.createIndex(idx.name, idx.keyPath, { unique: false })
+      }
+    }
+  },
+  // v1 → v2: LF-16/LF-23 stores (idempotent — guarded like v1)
   (db) => {
     for (const spec of STORE_SPECS) {
       if (db.objectStoreNames.contains(spec.name)) continue

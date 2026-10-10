@@ -25,6 +25,7 @@ import type {
   ApprovalRecord,
   PacketRecord,
   ProvenanceRecord,
+  SignerClass,
   SignoffRecord,
   VersionMethod,
   VersionRecord,
@@ -203,7 +204,12 @@ export async function freezePacket(
 /** Sign a frozen packet. One signoff per packet; signature is optional (declared sign-off allowed). */
 export async function signPacket(
   storage: VaultStorage,
-  input: { packet_id: string; signer_class: ActorClass; signature_b64?: string | null },
+  input: {
+    packet_id: string
+    signer_class: ActorClass | SignerClass
+    signature_b64?: string | null
+    pubkey_b64?: string | null
+  },
 ): Promise<SignoffRecord> {
   const packet = await storage.get<PacketRecord>('packets', input.packet_id)
   if (!packet) throw new VaultNotFoundError(`packet not found: ${input.packet_id}`)
@@ -212,6 +218,7 @@ export async function signPacket(
     signer_class: input.signer_class,
     timestamp: nowIso(),
     signature_b64: input.signature_b64 ?? null,
+    pubkey_b64: input.pubkey_b64 ?? null,
   }
   const inserted = await storage.putIfAbsent('signoffs', record.packet_id, record)
   if (!inserted) throw new VaultImmutableError(`packet already signed: ${input.packet_id}`)
