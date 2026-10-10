@@ -17,3 +17,24 @@ This branch's verification evidence lives in the **aquarnd** repository
 Branch state at evidence cut: `m06-release-candidate` =
 site main + `m05-reward-integrity` (049/050) + `m04-aqua-staging` (/aqua
 surface) + flag-guard/onboarding/ES256-pin corrections.
+
+## lf-local-first evidence (LF-27)
+
+The `lf-local-first` branch (HEAD `929dd83`) carries the M06 local-first
+build: `/aqua-local` vault surface, server write boundary
+(`lib/local-first-guard.ts`), aqua-local domain lib (`lib/aqua-local/`),
+extension capture boundary, and MCP local-first service.
+
+| Deliverable | Location in aquarnd |
+|---|---|
+| Integrated RC report (LF-27) | `aqua-canon/Planning/Execution/m06/local-first/LF-Integrated-RC-Report.md` |
+| LF-27 attestation | `aqua-canon/Planning/Execution/m04/reviews/lf-27-attestation.json` |
+| Earlier LF task reports | `aqua-canon/Planning/Execution/m04/reviews/lf-*` |
+
+Verification highlights (full matrix in the report): `tsc --noEmit` clean,
+`next build` clean, authenticated `/aqua-local` renders 200 under
+`AQUA_LOCAL_FIRST=1`/`NEXT_PUBLIC_AQUA_LOCAL_FIRST=1` and 404s flag-off;
+7 private-write API routes return honest 403 `{local_first:true}` under the
+flag and original behavior flag-off; vault is client-side IndexedDB only —
+zero local-first DB migrations (049/050 are unrelated m05 reward-integrity);
+181 tests pass across the 5 node suites + MCP vitest.
