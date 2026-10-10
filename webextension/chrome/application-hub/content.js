@@ -108,8 +108,9 @@
 
   // ─── Match + prefill orchestration ──────────────────────────────────────────
 
-  async function processField(field) {
-    if (field.getAttribute(AQUA_ATTR)) return
+  async function processField(field, fillAllowed = false) {
+    // 'available' fields may be re-processed when the user clicks fill
+    if (field.getAttribute(AQUA_ATTR) && !(fillAllowed && field.getAttribute(AQUA_ATTR) === 'available')) return
 
     const label = getFieldLabel(field)
     if (!label || label.length < MIN_LABEL_LENGTH) {
@@ -127,7 +128,10 @@
 
       if (response?.matches?.length > 0) {
         const topMatch = response.matches[0]
-        if (topMatch.auto_fill_safe && topMatch.user_answer) {
+        // Local-first: writing answer content into a funder form is
+        // user-initiated egress only — auto-scan marks availability and
+        // never fills (see webextension/application-hub/LOCAL-FIRST.md).
+        if (fillAllowed && topMatch.auto_fill_safe && topMatch.user_answer) {
           await prefillField(field, topMatch)
         } else {
           // Mark as available but don't auto-fill
@@ -160,13 +164,9 @@
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.type === 'TRIGGER_PREFILL') {
-      // Reset all fields and rescan
-      document.querySelectorAll(`[${AQUA_ATTR}]`).forEach(el => {
-        el.removeAttribute(AQUA_ATTR)
-        delete el.dataset.aquaMatchId
-        delete el.dataset.aquaScore
-      })
-      scanPage()
+      // Explicit user click — fill fields already matched as 'available'
+      const fields = findFormFields()
+      fields.forEach((f) => processField(f, true))
       sendResponse({ ok: true })
     }
     return true
