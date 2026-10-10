@@ -22,6 +22,7 @@ import type {
   AnswerRecord,
   ApprovalRecord,
   CatalogCacheRecord,
+  EventRecord,
   ImportRecord,
   PacketRecord,
   ProvenanceRecord,
@@ -56,6 +57,8 @@ interface BackupPayload {
   imports: ImportRecord[]
   signoffs: SignoffRecord[]
   catalog_cache: CatalogCacheRecord[]
+  /** LF-18 audit ledger — portable so a restored vault keeps its receipts. */
+  events?: EventRecord[]
 }
 
 /** Export the full vault to a portable, encrypted JSON string. Requires the secret to decrypt bodies. */
@@ -78,6 +81,7 @@ export async function exportVault(storage: VaultStorage, secret: string): Promis
     imports: await storage.getAll<ImportRecord>('imports'),
     signoffs: await storage.getAll<SignoffRecord>('signoffs'),
     catalog_cache: await storage.getAll<CatalogCacheRecord>('catalog_cache'),
+    events: await storage.getAll<EventRecord>('events'),
   }
   const blob = await encryptText(secret, canonicalJson(payload))
   return JSON.stringify({ format: 'aqua-local-backup', ...blob }, null, 2)
@@ -144,7 +148,8 @@ export async function importVault(
       | 'provenance'
       | 'imports'
       | 'signoffs'
-      | 'catalog_cache',
+      | 'catalog_cache'
+      | 'events',
     key: string,
     value: unknown,
   ) => {
@@ -187,6 +192,12 @@ export async function importVault(
   }
   for (const c of payload.catalog_cache ?? []) {
     await dedupePut('catalog_cache', c.key, c)
+  }
+  // LF-18: imported events keep their original seq — they are historical
+  // receipts, and new local events allocate above max(existing seq), so a
+  // restore can never collide with or overwrite the ledger.
+  for (const e of payload.events ?? []) {
+    await dedupePut('events', e.id, e)
   }
 
   const batch: ImportRecord = {

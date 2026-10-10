@@ -171,9 +171,32 @@ export function createMemoryStorage(): VaultStorage {
     async keys(store: StoreName): Promise<string[]> {
       return [...table(store).keys()]
     }
+    /**
+     * Serialize top-level transactions on a promise chain — this models
+     * what IndexedDB actually guarantees (readwrite txs over the same
+     * stores cannot interleave), which LF-18's seq allocation relies on.
+     * Nested tx calls reuse the same transaction context (like
+     * IdbStoreTx) rather than queueing, which would deadlock.
+     */
     tx<R>(_stores: StoreName[], fn: (s: VaultStorage) => Promise<R>): Promise<R> {
-      return fn(this)
+      const self = this
+      const child: VaultStorage = {
+        get: (s, k) => self.get(s, k),
+        put: (s, v) => self.put(s, v),
+        putIfAbsent: (s, k, v) => self.putIfAbsent(s, k, v),
+        getAll: (s) => self.getAll(s),
+        delete: (s, k) => self.delete(s, k),
+        keys: (s) => self.keys(s),
+        tx: (_s, f) => f(child), // nested → same context
+      }
+      const run = this.txChain.then(() => fn(child))
+      this.txChain = run.then(
+        () => undefined,
+        () => undefined,
+      )
+      return run
     }
+    private txChain: Promise<unknown> = Promise.resolve()
   }
   return new MemoryStorage()
 }

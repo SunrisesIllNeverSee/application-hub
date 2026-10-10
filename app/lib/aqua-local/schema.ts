@@ -5,7 +5,7 @@
 // packets, provenance, and signoffs live ONLY here. Never egress.
 
 export const DB_NAME = 'aqua-local'
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 
 export const STORE_NAMES = [
   'answers',
@@ -19,6 +19,7 @@ export const STORE_NAMES = [
   'provider_keys',
   'provider_consents',
   'packet_states',
+  'events',
 ] as const
 
 export type StoreName = (typeof STORE_NAMES)[number]
@@ -59,8 +60,35 @@ export interface VersionRecord {
 export interface ApprovalRecord {
   id: string
   version_id: string
+  version_sha256: string // approval binds the exact content hash (F-V1)
   decision: 'approved' | 'rejected'
   actor_class: ActorClass
+  at: string
+  /**
+   * LF-18 — storage-side monotonic sequence mirrored from the `events`
+   * ledger entry written in the same transaction. This is the authoritative
+   * order for "latest decision": wall-clock `at` can collide across tabs
+   * (ms granularity, independent clocks). Absent on pre-LF-18 rows; those
+   * order by (at, id) as before.
+   */
+  seq?: number
+}
+
+/**
+ * LF-18 — append-only audit event ledger. Every governed mutation that
+ * needs a receipt appends exactly one event; `seq` is assigned inside the
+ * same transaction as the mutation by taking max(existing seq)+1, so two
+ * tabs cannot interleave the read-modify-write (IndexedDB serializes
+ * readwrite transactions over the same stores). The ledger is never
+ * updated or deleted — a revocation is a NEW event, not an edit.
+ */
+export interface EventRecord {
+  id: string
+  seq: number // authoritative total order, starts at 1
+  kind: string // e.g. 'approval_decision'
+  entity: string // e.g. 'version'
+  entity_id: string
+  payload: Record<string, unknown>
   at: string
 }
 
@@ -204,6 +232,14 @@ export const STORE_SPECS: StoreSpec[] = [
     indexes: [{ name: 'by_provider', keyPath: 'provider_id' }],
   },
   { name: 'packet_states', keyPath: 'packet_id', indexes: [] },
+  {
+    name: 'events',
+    keyPath: 'id',
+    indexes: [
+      { name: 'by_seq', keyPath: 'seq' },
+      { name: 'by_entity', keyPath: 'entity_id' },
+    ],
+  },
 ]
 
 /**
@@ -224,6 +260,16 @@ export const MIGRATIONS: Array<(db: IDBDatabase) => void> = [
     }
   },
   // v1 → v2: LF-16/LF-23 stores (idempotent — guarded like v1)
+  (db) => {
+    for (const spec of STORE_SPECS) {
+      if (db.objectStoreNames.contains(spec.name)) continue
+      const store = db.createObjectStore(spec.name, { keyPath: spec.keyPath })
+      for (const idx of spec.indexes) {
+        store.createIndex(idx.name, idx.keyPath, { unique: false })
+      }
+    }
+  },
+  // v2 → v3: LF-18 events ledger (idempotent — guarded like v1)
   (db) => {
     for (const spec of STORE_SPECS) {
       if (db.objectStoreNames.contains(spec.name)) continue

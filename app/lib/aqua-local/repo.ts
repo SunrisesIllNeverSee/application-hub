@@ -23,6 +23,7 @@ import type {
   ActorClass,
   AnswerRecord,
   ApprovalRecord,
+  EventRecord,
   PacketRecord,
   ProvenanceRecord,
   SignerClass,
@@ -165,21 +166,81 @@ export async function listVersions(storage: VaultStorage, answerId: string): Pro
     .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
 }
 
+/**
+ * LF-18 — record an approval decision AND its audit receipt atomically.
+ * The `seq` is allocated from the events ledger inside the same
+ * transaction (max(existing)+1), so two tabs racing on the same vault get
+ * a strict total order instead of a wall-clock tie: IndexedDB serializes
+ * readwrite transactions over the same object stores, and the in-memory
+ * adapter is single-threaded. A revocation is a NEW decision row + NEW
+ * event — never an update of the prior approval.
+ */
 export async function approveVersion(
   storage: VaultStorage,
   input: { version_id: string; decision: 'approved' | 'rejected'; actor_class: ActorClass },
 ): Promise<ApprovalRecord> {
   const version = await storage.get<VersionRecord>('versions', input.version_id)
   if (!version) throw new VaultNotFoundError(`version not found: ${input.version_id}`)
-  const record: ApprovalRecord = {
-    id: newId(),
-    version_id: input.version_id,
-    decision: input.decision,
-    actor_class: input.actor_class,
-    at: nowIso(),
-  }
-  await storage.put('approvals', record)
-  return record
+  return storage.tx(['approvals', 'events'], async (s) => {
+    const events = await s.getAll<EventRecord>('events')
+    const seq = events.reduce((max, e) => Math.max(max, e.seq), 0) + 1
+    const record: ApprovalRecord = {
+      id: newId(),
+      version_id: input.version_id,
+      version_sha256: version.sha256,
+      decision: input.decision,
+      actor_class: input.actor_class,
+      at: nowIso(),
+      seq,
+    }
+    await s.put('approvals', record)
+    const event: EventRecord = {
+      id: newId(),
+      seq,
+      kind: 'approval_decision',
+      entity: 'version',
+      entity_id: input.version_id,
+      payload: {
+        approval_id: record.id,
+        version_sha256: record.version_sha256,
+        decision: record.decision,
+        actor_class: record.actor_class,
+      },
+      at: record.at,
+    }
+    await s.put('events', event)
+    return record
+  })
+}
+
+/**
+ * LF-18 authoritative ordering for approval records: `seq` (storage-side
+ * total order) when both records carry it; otherwise the legacy (at, id)
+ * wall-clock order for pre-LF-18 rows. Mixed pairs also fall back to
+ * (at, id) — there is no meaningful way to compare a ledger sequence
+ * against a timestamp.
+ */
+export function compareApprovals(a: ApprovalRecord, b: ApprovalRecord): number {
+  if (a.seq != null && b.seq != null) return a.seq - b.seq
+  return a.at.localeCompare(b.at) || a.id.localeCompare(b.id)
+}
+
+/** All decisions for one version (or every version), oldest → newest. */
+export async function listApprovals(
+  storage: VaultStorage,
+  versionId?: string,
+): Promise<ApprovalRecord[]> {
+  const all = await storage.getAll<ApprovalRecord>('approvals')
+  return all.filter((a) => !versionId || a.version_id === versionId).sort(compareApprovals)
+}
+
+/** Audit ledger, oldest → newest. Optionally filter by event kind. */
+export async function listEvents(
+  storage: VaultStorage,
+  kind?: string,
+): Promise<EventRecord[]> {
+  const all = await storage.getAll<EventRecord>('events')
+  return all.filter((e) => !kind || e.kind === kind).sort((a, b) => a.seq - b.seq)
 }
 
 /** Freeze a packet: canonical manifest + digest. Frozen packets are immutable. */
@@ -209,8 +270,13 @@ export async function signPacket(
     signer_class: ActorClass | SignerClass
     signature_b64?: string | null
     pubkey_b64?: string | null
+    // LF-PACKET-02: the primitive is public but still requires the explicit
+    // ack — the governed wrapper (signoff.ts attestPacket) adds state checks.
+    user_ack?: boolean
   },
 ): Promise<SignoffRecord> {
+  if (input.user_ack !== true)
+    throw new Error('packet sign-off requires explicit user acknowledgement')
   const packet = await storage.get<PacketRecord>('packets', input.packet_id)
   if (!packet) throw new VaultNotFoundError(`packet not found: ${input.packet_id}`)
   const record: SignoffRecord = {

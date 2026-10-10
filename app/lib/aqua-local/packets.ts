@@ -44,7 +44,7 @@ import type {
   SignoffRecord,
   VersionRecord,
 } from './schema.ts'
-import { isBlankBody, VaultNotFoundError } from './repo.ts'
+import { compareApprovals, isBlankBody, VaultNotFoundError } from './repo.ts'
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -181,8 +181,15 @@ async function latestApproval(
   const all = await storage.getAll<ApprovalRecord>('approvals')
   const forVersion = all
     .filter((a) => a.version_id === versionId)
-    .sort((a, b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id))
-  return forVersion.length ? forVersion[forVersion.length - 1] : null
+    .sort(compareApprovals) // LF-18: seq when present, (at, id) for legacy rows
+  const latest = forVersion.length ? forVersion[forVersion.length - 1] : null
+  if (!latest) return null
+  // F-V1: the approval pins the version's sha256 at approval time. If the
+  // stored version row was swapped, the hashes diverge — treat as no valid
+  // approval (fail closed).
+  const v = await storage.get<VersionRecord>('versions', versionId)
+  if (!v || v.sha256 !== latest.version_sha256) return null
+  return latest
 }
 
 /**
