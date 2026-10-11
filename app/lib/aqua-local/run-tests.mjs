@@ -9,7 +9,7 @@ import {
 } from './repo.ts'
 import { VaultDecryptError, canonicalJson, sha256Hex } from './crypto.ts'
 import { putCatalog, getCatalog, getCatalogOffline } from './catalog.ts'
-import { exportVault, importVault, VaultTamperError } from './backup.ts'
+import { exportVault, importVault, previewVaultImport, VaultTamperError } from './backup.ts'
 
 const SECRET = 'correct-horse-battery-staple'
 let passed = 0
@@ -154,6 +154,43 @@ await t('backup inner sha tamper → VaultTamperError', async () => {
   payload.versions[0].sha256 = '0'.repeat(64)
   const forged = JSON.stringify({ format: 'aqua-local-backup', ...(await encryptText(SECRET, canonicalJson(payload))) })
   await assert.rejects(() => importVault(createMemoryStorage(), SECRET, forged), VaultTamperError)
+})
+
+await t('preview: counts insert vs skip, writes nothing', async () => {
+  const s1 = createMemoryStorage()
+  const a = await createAnswer(s1, { application_id: 'app1', question_occurrence_id: 'q1' })
+  await createVersion(s1, SECRET, { answer_id: a.id, title: 't-one', body: 'b1', method: 'manual' })
+  const dump = await exportVault(s1, SECRET)
+
+  // fresh vault: everything would insert
+  const s2 = createMemoryStorage()
+  const p1 = await previewVaultImport(s2, SECRET, dump)
+  assert.equal(p1.stores.versions.insert, 1)
+  assert.equal(p1.stores.versions.skip, 0)
+  assert.equal(p1.stores.answers.insert, 1)
+  assert.ok(p1.total_insert >= 2) // answer + version (+ receipts)
+  assert.deepEqual(p1.version_titles, ['t-one'])
+  // dry-run wrote nothing
+  assert.equal((await s2.getAll('versions')).length, 0)
+  assert.equal((await s2.getAll('imports')).length, 0)
+
+  // after a real restore, a second preview reports all-skip
+  await importVault(s2, SECRET, dump)
+  const p2 = await previewVaultImport(s2, SECRET, dump)
+  assert.equal(p2.stores.versions.insert, 0)
+  assert.equal(p2.stores.versions.skip, 1)
+  assert.equal(p2.total_insert, 0)
+})
+
+await t('preview: same refusals as import (wrong secret + tamper)', async () => {
+  const s1 = createMemoryStorage()
+  const a = await createAnswer(s1, { application_id: 'app1', question_occurrence_id: 'q1' })
+  await createVersion(s1, SECRET, { answer_id: a.id, title: 't', body: 'x', method: 'manual' })
+  const dump = await exportVault(s1, SECRET)
+  const s2 = createMemoryStorage()
+  await assert.rejects(() => previewVaultImport(s2, 'nope', dump), VaultDecryptError)
+  await assert.rejects(() => previewVaultImport(s2, SECRET, '{"format":"other"}'), VaultTamperError)
+  assert.equal((await s2.getAll('versions')).length, 0)
 })
 
 await t('approval records decision', async () => {

@@ -6,6 +6,7 @@ import { VaultStatusBanner } from '@/components/aqua-local/VaultStatusBanner'
 import { AnswerBankList } from '@/components/aqua-local/AnswerBankList'
 import { LocalAnswerEditor, type EditTarget } from '@/components/aqua-local/LocalAnswerEditor'
 import { OnboardingLocalCard } from '@/components/aqua-local/OnboardingLocalCard'
+import { RestoreBackupPanel } from '@/components/aqua-local/RestoreBackupPanel'
 import {
   loadBank,
   saveVersion,
@@ -290,6 +291,13 @@ export default function AquaLocal() {
             )}
           </section>
         </>
+      )}
+
+      {/* Restore is reachable while locked (fresh-browser recovery) AND
+          while unlocked — it verifies the backup secret against the vault
+          before writing anything. */}
+      {(phase === 'locked' || unlocked) && (
+        <RestoreBackupPanel onRestored={() => void refreshBank()} />
       )}
 
       {/* LF-12: onboarding card is part of the surface even while locked —

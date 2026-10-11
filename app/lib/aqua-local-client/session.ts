@@ -16,10 +16,14 @@ import {
   readVersion,
   approveVersion,
   exportVault,
+  importVault,
+  previewVaultImport,
   VaultDecryptError,
   VaultBlankBodyError,
   VaultScopeError,
   VaultNotFoundError,
+  VaultTamperError,
+  VaultBackupVersionError,
 } from '../aqua-local/index.ts'
 import type {
   VaultStorage,
@@ -30,8 +34,16 @@ import type {
   VersionMethod,
 } from '../aqua-local/index.ts'
 
-export { VaultDecryptError, VaultBlankBodyError, VaultScopeError, VaultNotFoundError }
+export {
+  VaultDecryptError,
+  VaultBlankBodyError,
+  VaultScopeError,
+  VaultNotFoundError,
+  VaultTamperError,
+  VaultBackupVersionError,
+}
 export type { VaultStorage, VersionMethod }
+export type { BackupPreview, ImportResult } from '../aqua-local/index.ts'
 
 /** Scope for the onboarding upload path only; starter answers are scoped to
  *  the 'answer-bank' application so they show in the normal bank. */
@@ -311,6 +323,29 @@ export async function saveScopedVersion(
     method: input.method ?? 'manual',
     provenance: input.provenance ?? null,
   })
+}
+
+/** Dry-run a backup restore against the current vault — decrypts + verifies, writes nothing. */
+export function previewBackup(
+  storage: VaultStorage,
+  secret: string,
+  exportedJson: string,
+) {
+  return previewVaultImport(storage, secret, exportedJson)
+}
+
+/**
+ * Restore an encrypted backup into the vault. `secret` must be BOTH the
+ * backup's secret and (when the vault is non-empty) the vault's secret —
+ * the import re-encrypts version bodies under it. Callers enforce that
+ * compatibility via tryUnlock before invoking this.
+ */
+export function restoreBackup(
+  storage: VaultStorage,
+  secret: string,
+  exportedJson: string,
+) {
+  return importVault(storage, secret, exportedJson)
 }
 
 /** Export an encrypted backup and trigger a user-initiated file download. */

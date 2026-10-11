@@ -27,6 +27,7 @@ import type {
   PacketRecord,
   ProvenanceRecord,
   SignoffRecord,
+  StoreName,
   VersionRecord,
 } from './schema.ts'
 
@@ -93,12 +94,12 @@ export interface ImportResult {
   skipped_duplicates: number
 }
 
-/** Import an encrypted backup. Refuses wrong secret, wrong format version, and tampered data. */
-export async function importVault(
-  storage: VaultStorage,
-  secret: string,
-  exportedJson: string,
-): Promise<ImportResult> {
+/**
+ * Shared parse/decrypt/verify for import + preview. Every refusal happens
+ * here, before any storage write: wrong secret, non-backup JSON, format
+ * version, and per-version sha256 integrity.
+ */
+async function decryptBackupPayload(secret: string, exportedJson: string): Promise<BackupPayload> {
   let envelope: { format?: string; format_version?: number } & Record<string, unknown>
   try {
     envelope = JSON.parse(exportedJson)
@@ -134,6 +135,76 @@ export async function importVault(
       throw new VaultTamperError(`version ${v.id} sha256 mismatch — refusing tampered backup`)
     }
   }
+  return payload
+}
+
+/** Per-store preview line: what a restore would insert vs skip as duplicates. */
+export interface BackupPreviewStore {
+  total: number
+  insert: number
+  skip: number
+}
+
+export interface BackupPreview {
+  format_version: number
+  exported_at: string
+  /** Per-store insert/skip counts keyed by store name. */
+  stores: Record<string, BackupPreviewStore>
+  total_insert: number
+  total_skip: number
+  /** Answer titles from the backup (decrypted) for user-facing preview. */
+  version_titles: string[]
+}
+
+/**
+ * Dry-run of importVault: decrypts + verifies the backup with `secret` and
+ * computes what would be inserted vs skipped against the CURRENT vault —
+ * without writing anything. Same refusals as importVault.
+ */
+export async function previewVaultImport(
+  storage: VaultStorage,
+  secret: string,
+  exportedJson: string,
+): Promise<BackupPreview> {
+  const payload = await decryptBackupPayload(secret, exportedJson)
+
+  const stores: Record<string, BackupPreviewStore> = {}
+  const track = async (store: StoreName, key: string) => {
+    const s = (stores[store] ??= { total: 0, insert: 0, skip: 0 })
+    s.total++
+    const existing = await storage.get(store, key)
+    if (existing === undefined) s.insert++
+    else s.skip++
+  }
+
+  for (const a of payload.answers ?? []) await track('answers', a.id)
+  for (const v of payload.versions ?? []) await track('versions', v.id)
+  for (const a of payload.approvals ?? []) await track('approvals', a.id)
+  for (const p of payload.packets ?? []) await track('packets', p.id)
+  for (const p of payload.provenance ?? []) await track('provenance', p.version_id)
+  for (const i of payload.imports ?? []) await track('imports', i.batch_id)
+  for (const s of payload.signoffs ?? []) await track('signoffs', s.packet_id)
+  for (const c of payload.catalog_cache ?? []) await track('catalog_cache', c.key)
+  for (const e of payload.events ?? []) await track('events', e.id)
+
+  const all = Object.values(stores)
+  return {
+    format_version: payload.format_version,
+    exported_at: payload.exported_at,
+    stores,
+    total_insert: all.reduce((n, s) => n + s.insert, 0),
+    total_skip: all.reduce((n, s) => n + s.skip, 0),
+    version_titles: (payload.versions ?? []).map((v) => v.title),
+  }
+}
+
+/** Import an encrypted backup. Refuses wrong secret, wrong format version, and tampered data. */
+export async function importVault(
+  storage: VaultStorage,
+  secret: string,
+  exportedJson: string,
+): Promise<ImportResult> {
+  const payload = await decryptBackupPayload(secret, exportedJson)
 
   const counts: Record<string, number> = {}
   let skipped = 0
