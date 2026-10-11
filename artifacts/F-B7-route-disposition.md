@@ -54,11 +54,35 @@ the M06 authorization package.
 | Extension capture | Out of v1 scope; `/api/hub/ingest` capture path now refuses under flag regardless. |
 | Status update with private notes attached | `PATCH …/outcome` `{status:'accepted', outcome_notes:'…'}` → 403 naming `refused_fields:['outcome_notes']`; `{status:'accepted'}` alone → 200. |
 
+## Round 2 — falsifier corrections (`7fe2247`, re-verifier PASS)
+
+Independent falsification (`m04/reviews/FB7-Restore-*`) returned
+CONDITIONAL; bounded corrections applied and re-verified:
+
+| Route | Correction |
+|---|---|
+| `POST /api/import/program`, `POST /api/import/submit-url` | The URL field itself was a covert text channel (`?essay=<private>` persisted into `import_queue.raw_text`/`url`/`metadata.original_url`). Under flag the stored/dedupe URL is now scheme+host+path only (`publicUrlForLocalFirstStorage`); userinfo URLs refuse 403. Flag-off stores the full URL as before. |
+| `POST /api/hub/intake/review` (adjacent sink, advisory FB7R-03) | `notes` + `edited_payload` refuse field-level; decision/checkpoint writes still work. |
+| `POST /api/match-question` (advisory FB7R-04) | Whole-route refusal — deferred extension match path; sends question text to embedding APIs and returns hosted answer bodies; no v1 UI consumer. |
+| `POST /api/onboarding/complete` (advisory FB7R-05) | `answers`/`upload` bodies refuse under flag — the local-first client sends `answer_lengths`/`upload_len` metadata only; bodies must not even transit. |
+| `OutcomeTracker` client | Debounced payload omits the two free-text keys under flag — legacy hosted notes seeded into state can't echo back and 403 permitted edits. |
+| `RestoreBackupPanel` | `assertVaultSecretCompatible` (versions + provider_keys) re-verified at confirm time — mixed-key vaults not producible through the UI. |
+| `lib/aqua-local/backup.ts` | Structural validation in `decryptBackupPayload` — malformed stores refuse wholesale before any write; preview counts in-file duplicate ids as skips. |
+
+Documented residual (accepted): the URL *path* still carries text by
+necessity — public-URL ingestion requires it; query-param leakage (the
+implicit channel) is closed.
+
 ## Negative-test evidence
 
-- `node --test app/tests/local-first-guard.test.mjs` — 12/12 (5 new
-  field-level cases: inert-off, refuse-under-flag, metadata-passes,
-  non-string refuse, multi-field naming).
-- Live refusal evidence: see `lf-restore-and-boundary` browser/route run in
-  `aquarnd/…/m06/local-first/` (flagged prod build on :3144) — each gated
-  route exercised end-to-end with HTTP status + payload recorded.
+- `node --test app/tests/local-first-guard.test.mjs` — 16/16 (field-level
+  cases + URL sanitize).
+- `node app/lib/aqua-local/run-tests.mjs` — 16/16 (preview + structural
+  validation).
+- Live refusal evidence: `lf-restore-and-boundary.mjs` → 34/34 at
+  `7fe2247` in `aquarnd/…/m06/local-first/restore-boundary-artifacts/` —
+  every gated route exercised end-to-end with HTTP status + payload
+  recorded, covert-URL persistence verified absent via REST read-back.
+- Independent falsification + re-verification:
+  `aquarnd/…/m04/reviews/FB7-Restore-Findings.csv` +
+  `FB7-Restore-Review.md` — verdict PASS at `7fe2247`.
