@@ -88,3 +88,41 @@ export function refusePrivateTextFields(
     { status: 403 },
   )
 }
+
+/**
+ * F-B7/FB7R-01 — public-program URL sanitized for hosted storage under
+ * local-first. The url/program_url field is itself a free-text channel
+ * (`?essay=<private text>` would persist verbatim into import_queue), so
+ * under the flag the stored/dedupe URL keeps only scheme+host+path:
+ * query and fragment are stripped, and URLs carrying embedded credentials
+ * (userinfo) refuse outright — they are private content by definition.
+ *
+ * Flag-off callers keep the legacy full-URL behavior — this helper is only
+ * invoked on the local-first path.
+ *
+ * Returns { url } on success, or { refuse: Response } for userinfo URLs.
+ */
+export function publicUrlForLocalFirstStorage(
+  raw: string,
+): { url: string; refuse?: never } | { url?: never; refuse: Response } {
+  let parsed: URL
+  try {
+    parsed = new URL(raw)
+  } catch {
+    return { refuse: Response.json({ error: 'invalid URL' }, { status: 400 }) }
+  }
+  if (parsed.username !== '' || parsed.password !== '') {
+    return {
+      refuse: Response.json(
+        privateWriteRefusal({
+          detail: 'URLs with embedded credentials are not accepted in local-first mode',
+          refused_fields: ['url'],
+        }),
+        { status: 403 },
+      ),
+    }
+  }
+  parsed.search = ''
+  parsed.hash = ''
+  return { url: parsed.toString() }
+}

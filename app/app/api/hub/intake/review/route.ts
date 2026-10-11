@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestUser } from '@/lib/supabase/request-auth'
+import { refusePrivateTextFields } from '@/lib/local-first-guard'
 import {
   nextCheckpoint,
   type IntakeCheckpoint,
@@ -116,6 +117,15 @@ export async function POST(req: Request) {
   if (!submissionId || !isCheckpoint(checkpoint) || !isDecision(decision)) {
     return NextResponse.json({ error: 'submission_id, checkpoint, and decision are required' }, { status: 400 })
   }
+
+  // F-B7/FB7R-03: notes and edited_payload persist user text into
+  // intake_gate_reviews/intake_events and the staged tables — they refuse
+  // under local-first. Approve/reject decisions still work without them.
+  const refused = refusePrivateTextFields(
+    body as Record<string, unknown>,
+    ['notes', 'edited_payload'],
+  )
+  if (refused) return refused
 
   const { data: submission, error: submissionError } = await supabase
     .from('intake_submissions')

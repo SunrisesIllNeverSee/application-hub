@@ -182,6 +182,36 @@ await t('preview: counts insert vs skip, writes nothing', async () => {
   assert.equal(p2.total_insert, 0)
 })
 
+await t('malformed backup → wholesale refusal, zero partial writes (FB7R-07)', async () => {
+  const s1 = createMemoryStorage()
+  const a = await createAnswer(s1, { application_id: 'app1', question_occurrence_id: 'q1' })
+  await createVersion(s1, SECRET, { answer_id: a.id, title: 't', body: 'real', method: 'manual' })
+  const dump = await exportVault(s1, SECRET)
+  const { decryptText, encryptText } = await import('./crypto.ts')
+  const env = JSON.parse(dump)
+  const payload = JSON.parse(await decryptText(SECRET, env))
+
+  // object body_plaintext (was: "[object Object]" sha garbage)
+  const bad1 = { ...payload, versions: [{ ...payload.versions[0], body_plaintext: { x: 1 } }] }
+  const s2 = createMemoryStorage()
+  const forged1 = JSON.stringify({ format: 'aqua-local-backup', ...(await encryptText(SECRET, canonicalJson(bad1))) })
+  await assert.rejects(() => importVault(s2, SECRET, forged1), VaultTamperError)
+  await assert.rejects(() => previewVaultImport(s2, SECRET, forged1), VaultTamperError)
+  assert.equal((await s2.getAll('versions')).length, 0)
+
+  // version missing dedupe id — previously a mid-loop partial import
+  const bad2 = { ...payload, versions: [{ ...payload.versions[0], id: undefined }] }
+  const forged2 = JSON.stringify({ format: 'aqua-local-backup', ...(await encryptText(SECRET, canonicalJson(bad2))) })
+  await assert.rejects(() => importVault(s2, SECRET, forged2), VaultTamperError)
+  assert.equal((await s2.getAll('versions')).length, 0)
+  assert.equal((await s2.getAll('imports')).length, 0)
+
+  // non-array store
+  const bad3 = { ...payload, answers: { id: a.id } }
+  const forged3 = JSON.stringify({ format: 'aqua-local-backup', ...(await encryptText(SECRET, canonicalJson(bad3))) })
+  await assert.rejects(() => importVault(s2, SECRET, forged3), VaultTamperError)
+})
+
 await t('preview: same refusals as import (wrong secret + tamper)', async () => {
   const s1 = createMemoryStorage()
   const a = await createAnswer(s1, { application_id: 'app1', question_occurrence_id: 'q1' })

@@ -2,9 +2,9 @@
 
 import { useRef, useState } from 'react'
 import {
+  assertVaultSecretCompatible,
   previewBackup,
   restoreBackup,
-  tryUnlock,
   VaultBackupVersionError,
   VaultDecryptError,
   VaultTamperError,
@@ -74,20 +74,17 @@ export function RestoreBackupPanel({ onRestored }: { onRestored?: () => void }) 
       fileTextRef.current = text
       const storage = await vault.ensureStorage()
 
-      // Account compatibility: when this vault already holds versions, the
-      // backup secret must be the vault's secret — imported bodies are
-      // re-encrypted under it, so a mismatch would make the vault's own
-      // records unreadable under one secret or the other.
-      const existing = await storage.getAll('versions')
-      if (existing.length > 0) {
-        try {
-          await tryUnlock(storage, secret)
-        } catch {
-          setError(
-            "This backup's secret does not match this vault's secret. A backup restores only into a vault that shares its secret.",
-          )
-          return
-        }
+      // Account compatibility: when this vault already holds secret-bearing
+      // records, the backup secret must be the vault's secret — imported
+      // bodies are re-encrypted under it, so a mismatch would make the
+      // vault's own records unreadable under one secret or the other.
+      try {
+        await assertVaultSecretCompatible(storage, secret)
+      } catch {
+        setError(
+          "This backup's secret does not match this vault's secret. A backup restores only into a vault that shares its secret.",
+        )
+        return
       }
 
       const p = await previewBackup(storage, secret, text)
@@ -106,6 +103,9 @@ export function RestoreBackupPanel({ onRestored }: { onRestored?: () => void }) 
     setError('')
     try {
       const storage = await vault.ensureStorage()
+      // FB7R-06: re-verify at write time — records may have been added under
+      // the session secret between Check and Confirm.
+      await assertVaultSecretCompatible(storage, secret)
       const r = await restoreBackup(storage, secret, fileTextRef.current)
       setResult(r)
       setState('done')

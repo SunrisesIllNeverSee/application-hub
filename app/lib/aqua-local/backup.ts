@@ -128,6 +128,51 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
     throw new VaultBackupVersionError(`backup format_version ${payload.format_version} unsupported`)
   }
 
+  // Structural validation (FB7R-07): every store must be an array of objects
+  // carrying its dedupe key field with the right types — before ANY write.
+  // A malformed backup refuses wholesale instead of partially importing.
+  const requireList = (
+    store: string,
+    list: unknown,
+    keyField: string,
+    extraFields: string[] = [],
+    stringOnlyFields: string[] = [],
+  ) => {
+    if (list === undefined || list === null) return
+    if (!Array.isArray(list)) {
+      throw new VaultTamperError(`backup ${store} is not an array`)
+    }
+    for (const [i, rec] of list.entries()) {
+      if (!rec || typeof rec !== 'object' || Array.isArray(rec)) {
+        throw new VaultTamperError(`backup ${store}[${i}] is not an object`)
+      }
+      const r = rec as Record<string, unknown>
+      for (const f of [keyField, ...extraFields]) {
+        if (typeof r[f] !== 'string' || (r[f] as string).length === 0) {
+          throw new VaultTamperError(`backup ${store}[${i}] missing/invalid field: ${f}`)
+        }
+      }
+      for (const f of stringOnlyFields) {
+        if (typeof r[f] !== 'string') {
+          throw new VaultTamperError(`backup ${store}[${i}] field must be a string: ${f}`)
+        }
+      }
+    }
+  }
+  requireList('answers', payload.answers, 'id')
+  requireList('versions', payload.versions, 'id', [
+    'answer_id',
+    'sha256',
+    'body_plaintext',
+  ], ['title'])
+  requireList('approvals', payload.approvals, 'id', ['version_id'])
+  requireList('packets', payload.packets, 'id')
+  requireList('provenance', payload.provenance, 'version_id')
+  requireList('imports', payload.imports, 'batch_id')
+  requireList('signoffs', payload.signoffs, 'packet_id')
+  requireList('catalog_cache', payload.catalog_cache, 'key')
+  requireList('events', payload.events, 'id')
+
   // Integrity: recompute each version sha256 over canonical plaintext before writing anything.
   for (const v of payload.versions ?? []) {
     const digest = await sha256Hex(canonicalJson({ title: v.title, body: v.body_plaintext }))
@@ -169,9 +214,18 @@ export async function previewVaultImport(
   const payload = await decryptBackupPayload(secret, exportedJson)
 
   const stores: Record<string, BackupPreviewStore> = {}
+  const seenInFile = new Set<string>()
   const track = async (store: StoreName, key: string) => {
     const s = (stores[store] ??= { total: 0, insert: 0, skip: 0 })
     s.total++
+    // In-file duplicates are skips — import's putIfAbsent writes the first
+    // occurrence and skips the rest; preview reports the same outcome.
+    const dedupeKey = `${store}:${key}`
+    if (seenInFile.has(dedupeKey)) {
+      s.skip++
+      return
+    }
+    seenInFile.add(dedupeKey)
     const existing = await storage.get(store, key)
     if (existing === undefined) s.insert++
     else s.skip++

@@ -18,6 +18,7 @@ import {
   exportVault,
   importVault,
   previewVaultImport,
+  decryptText,
   VaultDecryptError,
   VaultBlankBodyError,
   VaultScopeError,
@@ -323,6 +324,28 @@ export async function saveScopedVersion(
     method: input.method ?? 'manual',
     provenance: input.provenance ?? null,
   })
+}
+
+/**
+ * Assert `secret` can read every secret-bearing store already in the vault —
+ * required before restoring a backup into a NON-EMPTY vault, since imported
+ * bodies are re-encrypted under it. An empty vault accepts any secret (it
+ * becomes the vault secret). Covers versions AND provider keys — the two
+ * stores that carry EncryptedBlobs. Throws VaultDecryptError on mismatch.
+ */
+export async function assertVaultSecretCompatible(
+  storage: VaultStorage,
+  secret: string,
+): Promise<void> {
+  const versions = await storage.getAll<VersionRecord>('versions')
+  if (versions.length > 0) {
+    await tryUnlock(storage, secret) // decrypts oldest version
+    return
+  }
+  const keys = await storage.getAll<{ key_blob: string }>('provider_keys')
+  if (keys.length > 0) {
+    await decryptText(secret, JSON.parse(keys[0].key_blob))
+  }
 }
 
 /** Dry-run a backup restore against the current vault — decrypts + verifies, writes nothing. */

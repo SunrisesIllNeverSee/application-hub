@@ -8,6 +8,7 @@ import {
   isLocalFirst,
   refusePrivateWrite,
   refusePrivateTextFields,
+  publicUrlForLocalFirstStorage,
   privateWriteRefusal,
   LOCAL_FIRST_REFUSAL_MESSAGE,
 } from '../lib/local-first-guard.ts'
@@ -119,4 +120,30 @@ test('refusePrivateTextFields lists every refused field', async () => {
   )
   const body = await res.json()
   assert.deepEqual(body.refused_fields, ['outcome_notes', 'program_feedback'])
+})
+
+// --- FB7R-01 URL sanitize (called only under flag) ---
+
+test('publicUrlForLocalFirstStorage strips query + fragment from stored URL', () => {
+  const r = publicUrlForLocalFirstStorage('https://example.com/grant?utm=x&essay=PRIVATE#frag')
+  assert.equal(r.url, 'https://example.com/grant')
+  assert.equal(r.refuse, undefined)
+})
+
+test('publicUrlForLocalFirstStorage preserves path + port', () => {
+  const r = publicUrlForLocalFirstStorage('https://example.com:8443/a/b/c?x=1')
+  assert.equal(r.url, 'https://example.com:8443/a/b/c')
+})
+
+test('publicUrlForLocalFirstStorage refuses userinfo URLs with honest 403', async () => {
+  const r = publicUrlForLocalFirstStorage('https://user:secret@example.com/grant')
+  assert.equal(r.url, undefined)
+  assert.equal(r.refuse.status, 403)
+  const body = await r.refuse.json()
+  assert.equal(body.local_first, true)
+})
+
+test('publicUrlForLocalFirstStorage 400s on unparseable URL', async () => {
+  const r = publicUrlForLocalFirstStorage('not a url')
+  assert.equal(r.refuse.status, 400)
 })

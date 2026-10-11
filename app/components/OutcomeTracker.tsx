@@ -115,12 +115,20 @@ export function OutcomeTracker({
     }
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
     debounceTimer.current = setTimeout(() => {
-      const payload: Record<string, unknown> = {
-        outcome_notes: notes.length > 0 ? notes : null,
-        program_feedback: feedback.length > 0 ? feedback : null,
-        interview_date: showInterviewDate && interviewDate.length > 0 ? interviewDate : null,
-        would_recommend: showRecommend ? recommend : null,
-      }
+      // Under local-first the server refuses the free-text fields — omit
+      // them entirely so permitted metadata edits still save (and legacy
+      // hosted values seeded into state are never echoed back).
+      const payload: Record<string, unknown> = LOCAL_FIRST
+        ? {
+            interview_date: showInterviewDate && interviewDate.length > 0 ? interviewDate : null,
+            would_recommend: showRecommend ? recommend : null,
+          }
+        : {
+            outcome_notes: notes.length > 0 ? notes : null,
+            program_feedback: feedback.length > 0 ? feedback : null,
+            interview_date: showInterviewDate && interviewDate.length > 0 ? interviewDate : null,
+            would_recommend: showRecommend ? recommend : null,
+          }
       void patchOutcome(payload)
     }, 300)
     return () => {

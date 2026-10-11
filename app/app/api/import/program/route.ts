@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { refusePrivateTextFields } from '@/lib/local-first-guard'
+import {
+  isLocalFirst,
+  publicUrlForLocalFirstStorage,
+  refusePrivateTextFields,
+} from '@/lib/local-first-guard'
 
 function isValidUrl(str: string): boolean {
   try {
@@ -38,7 +42,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'url must be a valid http or https URL' }, { status: 400 })
     }
 
-    const rawText = questions_text?.trim() || url
+    // FB7R-01: under local-first the stored URL keeps scheme+host+path only —
+    // query/fragment/userinfo would otherwise persist user-supplied text into
+    // import_queue.raw_text through the one field meant to carry it.
+    let storedUrl = url
+    if (isLocalFirst()) {
+      const sanitized = publicUrlForLocalFirstStorage(url)
+      if (sanitized.refuse) return sanitized.refuse
+      storedUrl = sanitized.url
+    }
+
+    const rawText = questions_text?.trim() || storedUrl
 
     const { data: queued, error: insertError } = await supabase
       .from('import_queue')

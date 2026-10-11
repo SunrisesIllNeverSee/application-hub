@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isLocalFirst, LOCAL_FIRST_REFUSAL_MESSAGE } from '@/lib/local-first-guard'
+import {
+  isLocalFirst,
+  LOCAL_FIRST_REFUSAL_MESSAGE,
+  refusePrivateTextFields,
+} from '@/lib/local-first-guard'
 
 const APPLICANT_MODES = ['founder', 'student', 'researcher', 'job_seeker'] as const
 type ApplicantMode = typeof APPLICANT_MODES[number]
@@ -26,6 +30,16 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => null)) as CompletePayload | null
   if (!body) return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+
+  // F-B7/FB7R-05: under local-first the client sends answer_lengths/
+  // upload_len metadata only. A caller that still posts bodies gets an
+  // honest refusal — answer text must not even transit the server.
+  const refused = refusePrivateTextFields(
+    body as unknown as Record<string, unknown>,
+    ['answers', 'upload'],
+    { detail: 'send answer_lengths/upload_len metadata, not answer bodies' },
+  )
+  if (refused) return refused
 
   let answersCount = 0
   const themeCount: Record<string, number> = {}

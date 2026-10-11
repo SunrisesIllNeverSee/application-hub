@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { refusePrivateTextFields } from '@/lib/local-first-guard'
+import {
+  isLocalFirst,
+  publicUrlForLocalFirstStorage,
+  refusePrivateTextFields,
+} from '@/lib/local-first-guard'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -146,7 +150,16 @@ export async function POST(req: NextRequest) {
     if (refused) return refused
 
     const { program_url, kind, notes } = parsed.value
-    const normalizedUrl = normalizeUrl(program_url)
+    let normalizedUrl = normalizeUrl(program_url)
+
+    // FB7R-01: under local-first the stored URL keeps scheme+host+path only —
+    // query/fragment/userinfo would otherwise persist user-supplied text into
+    // import_queue.raw_text/url/metadata.original_url.
+    if (isLocalFirst()) {
+      const sanitized = publicUrlForLocalFirstStorage(normalizedUrl)
+      if (sanitized.refuse) return sanitized.refuse
+      normalizedUrl = sanitized.url
+    }
 
     // 1. Rate limit — max 10 submissions per user per rolling 24h
     const windowStart = new Date(
@@ -208,7 +221,10 @@ export async function POST(req: NextRequest) {
 
     // 4. Insert the submission. raw_text is kept populated for backwards
     //    compatibility with the MCP server / reviewer tooling that reads it.
-    const rawText = notes ? `${program_url}\n\n${notes}` : program_url
+    //    Under local-first normalizedUrl is the sanitized (query/fragment/
+    //    userinfo-stripped) value — never persist the raw submission string.
+    const storedUrl = isLocalFirst() ? normalizedUrl : program_url
+    const rawText = notes ? `${storedUrl}\n\n${notes}` : storedUrl
 
     type ImportQueueInsert = {
       raw_text: string
@@ -230,7 +246,7 @@ export async function POST(req: NextRequest) {
       notes: notes ?? null,
       metadata: {
         source: 'hub_submit_form',
-        original_url: program_url,
+        original_url: storedUrl,
       },
       submitted_at: new Date().toISOString(),
     }

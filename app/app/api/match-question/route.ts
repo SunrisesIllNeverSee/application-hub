@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { decryptKey } from '@/lib/encryption'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // ============================================================
 // POST /api/match-question
@@ -118,6 +119,14 @@ async function fulltextSearch(text: string, limit: number, url: string, key: str
 }
 
 export async function POST(req: Request) {
+  // F-B7/FB7R-04: this route sends question text to embedding APIs and
+  // returns hosted answer bodies over the wire — the deferred extension's
+  // match path. Under local-first it refuses; no v1 web surface calls it.
+  const refused = refusePrivateWrite({
+    detail: 'Answer matching runs on your device in local-first mode.',
+  })
+  if (refused) return refused
+
   // Auth: session cookie (browser) OR Authorization: Bearer <jwt> (extension)
   const authHeader = req.headers.get('authorization')
   let supabase = await createClient()
