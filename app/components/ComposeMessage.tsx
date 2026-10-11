@@ -2,6 +2,7 @@
 
 import { useState, useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 interface ComposeMessageProps {
   toUserId?: string
@@ -149,6 +150,13 @@ export function ComposeMessage({
                 <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">
                   Message
                 </label>
+                {LOCAL_FIRST && (
+                  <p className="mb-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Messages are hosted on the AQUA server and delivered to the
+                    recipient — your private application answers stay in your
+                    local vault; don&apos;t paste them here.
+                  </p>
+                )}
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}

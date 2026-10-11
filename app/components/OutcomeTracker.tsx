@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 type OutcomeStatus = 'accepted' | 'waitlisted' | 'rejected' | 'submitted'
 
@@ -205,17 +206,26 @@ export function OutcomeTracker({
             <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">
               Outcome notes
             </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value.slice(0, 2000))}
-              maxLength={2000}
-              placeholder="What happened? Any context worth saving?"
-              rows={3}
-              className="w-full text-xs px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
-            />
-            <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 text-right tabular-nums">
-              {notes.length}/2000
-            </p>
+            {LOCAL_FIRST ? (
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 italic">
+                Free-text notes stay on your device in local-first mode — keep them in
+                your vault instead. Status, dates, and ratings still save.
+              </p>
+            ) : (
+              <>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value.slice(0, 2000))}
+                  maxLength={2000}
+                  placeholder="What happened? Any context worth saving?"
+                  rows={3}
+                  className="w-full text-xs px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+                <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 text-right tabular-nums">
+                  {notes.length}/2000
+                </p>
+              </>
+            )}
           </div>
 
           {showInterviewDate && (
@@ -236,17 +246,25 @@ export function OutcomeTracker({
             <label className="block text-[11px] font-medium text-neutral-600 dark:text-neutral-400 mb-1">
               Program feedback
             </label>
-            <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value.slice(0, 2000))}
-              maxLength={2000}
-              placeholder="Did the program share any feedback?"
-              rows={3}
-              className="w-full text-xs px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
-            />
-            <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 text-right tabular-nums">
-              {feedback.length}/2000
-            </p>
+            {LOCAL_FIRST ? (
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 italic">
+                Free-text feedback stays on your device in local-first mode.
+              </p>
+            ) : (
+              <>
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value.slice(0, 2000))}
+                  maxLength={2000}
+                  placeholder="Did the program share any feedback?"
+                  rows={3}
+                  className="w-full text-xs px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+                <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 text-right tabular-nums">
+                  {feedback.length}/2000
+                </p>
+              </>
+            )}
           </div>
 
           {showRecommend && (

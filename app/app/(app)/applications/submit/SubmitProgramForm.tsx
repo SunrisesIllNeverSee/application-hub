@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 const KIND_OPTIONS = [
   { value: 'accelerator', label: 'Accelerator' },
@@ -208,6 +209,12 @@ export function SubmitProgramForm({ defaultKind }: SubmitProgramFormProps = {}) 
           Notes{' '}
           <span className="font-normal text-neutral-400">(optional)</span>
         </label>
+        {LOCAL_FIRST && (
+          <p className="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
+            In local-first mode free-text notes stay on your device — submit the
+            public program URL only. The server refuses note text.
+          </p>
+        )}
         <textarea
           id="notes"
           name="notes"
@@ -215,8 +222,8 @@ export function SubmitProgramForm({ defaultKind }: SubmitProgramFormProps = {}) 
           onChange={(e) => setNotes(e.target.value)}
           rows={6}
           className="input resize-none"
-          placeholder="What questions did they ask? Anything we should know?"
-          disabled={isSubmitting}
+          placeholder={LOCAL_FIRST ? 'Disabled in local-first mode' : 'What questions did they ask? Anything we should know?'}
+          disabled={isSubmitting || LOCAL_FIRST}
           maxLength={NOTES_MAX}
         />
         <p

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { refusePrivateTextFields } from '@/lib/local-first-guard'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -134,6 +135,16 @@ export async function POST(req: NextRequest) {
     if (!parsed.ok) {
       return NextResponse.json(parsed.error, { status: 400 })
     }
+
+    // F-B7: program_url + kind are public-program catalog metadata;
+    // notes is a free-text channel into import_queue.raw_text and refuses
+    // under local-first.
+    const refused = refusePrivateTextFields(
+      parsed.value as unknown as Record<string, unknown>,
+      ['notes'],
+    )
+    if (refused) return refused
+
     const { program_url, kind, notes } = parsed.value
     const normalizedUrl = normalizeUrl(program_url)
 

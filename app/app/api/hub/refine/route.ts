@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 function refineSelectedText(selectedText: string, context: string) {
   const trimmed = selectedText.trim()
@@ -17,6 +18,14 @@ function refineSelectedText(selectedText: string, context: string) {
 }
 
 export async function POST(req: Request) {
+  // F-B7: selectedText + editor context cross the device boundary even
+  // though nothing is persisted — user answer text must not transit the
+  // server under local-first.
+  const refused = refusePrivateWrite({
+    detail: 'Text refinement does not transit the server in local-first mode.',
+  })
+  if (refused) return refused
+
   const supabase = await createClient()
   const {
     data: { user },

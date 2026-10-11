@@ -50,3 +50,41 @@ export function refusePrivateWrite(extra?: Record<string, unknown>): Response | 
   if (!isLocalFirst()) return null
   return Response.json(privateWriteRefusal(extra), { status: 403 })
 }
+
+/**
+ * F-B7 field-level gate for mixed routes: structured/account metadata writes
+ * stay permitted under local-first, but named free-text fields that carry
+ * user-private content refuse honestly. Field-level (not keyword) — the
+ * check is on the payload SHAPE, never the text content.
+ *
+ * A field "carries text" when present with a non-null value; an empty
+ * string and an explicit null (clearing a stored value) are allowed.
+ *
+ * Returns null when the flag is off or none of the fields carry text, so
+ * callers can do:
+ *
+ *   const refusal = refusePrivateTextFields(body, ['outcome_notes'])
+ *   if (refusal) return refusal
+ */
+export function refusePrivateTextFields(
+  body: Record<string, unknown>,
+  fields: string[],
+  extra?: Record<string, unknown>,
+): Response | null {
+  if (!isLocalFirst()) return null
+  const refused = fields.filter((f) => {
+    const v = body[f]
+    if (v == null) return false
+    if (typeof v === 'string') return v.trim().length > 0
+    return true
+  })
+  if (refused.length === 0) return null
+  return Response.json(
+    privateWriteRefusal({
+      detail: `free-text field(s) stay on your device in local-first mode: ${refused.join(', ')}`,
+      refused_fields: refused,
+      ...extra,
+    }),
+    { status: 403 },
+  )
+}

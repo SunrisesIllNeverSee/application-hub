@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { refusePrivateTextFields } from '@/lib/local-first-guard'
 
 function isValidUrl(str: string): boolean {
   try {
@@ -19,6 +20,11 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
+    // F-B7: url + program_name are public-program catalog metadata;
+    // questions_text is a free-text channel into import_queue.raw_text and
+    // refuses under local-first.
+    const refused = refusePrivateTextFields(body as Record<string, unknown>, ['questions_text'])
+    if (refused) return refused
     const { url, program_name, questions_text } = body as {
       url?: string
       program_name?: string

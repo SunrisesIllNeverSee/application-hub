@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestUser } from '@/lib/supabase/request-auth'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 import {
   buildIntakeMeta,
   extractManualIntake,
@@ -294,6 +295,15 @@ async function createManualSubmission(req: Request, body: Record<string, unknown
 }
 
 export async function POST(req: Request) {
+  // F-B7: under local-first this route persists arbitrary pasted text
+  // (manual path → intake_submissions.raw_input; capture path → canonical
+  // hub forward). Both are private-content-egress-class writes; public
+  // program ingestion continues via /api/import/submit-url + /api/import/program.
+  const refused = refusePrivateWrite({
+    detail: 'Pasted application/page text stays on your device in local-first mode. Submit public programs by URL instead.',
+  })
+  if (refused) return refused
+
   const body = await req.json().catch(() => ({}))
   if (body && typeof body === 'object' && isManualPayload(body as Record<string, unknown>)) {
     return createManualSubmission(req, body as Record<string, unknown>)

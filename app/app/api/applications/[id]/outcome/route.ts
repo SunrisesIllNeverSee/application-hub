@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sanitizeText } from '@/lib/sanitize'
+import { refusePrivateTextFields } from '@/lib/local-first-guard'
 
 type OutcomeStatus = 'accepted' | 'rejected' | 'waitlisted' | 'submitted' | 'withdrawn'
 
@@ -36,6 +37,15 @@ export async function PATCH(
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
+
+  // F-B7: status / dates / rating / public-flag are operational metadata and
+  // stay writable; free-text notes + feedback are user-private content and
+  // refuse under local-first. Explicit null (clearing) is allowed.
+  const refused = refusePrivateTextFields(
+    body as unknown as Record<string, unknown>,
+    ['outcome_notes', 'program_feedback'],
+  )
+  if (refused) return refused
 
   const ALLOWED_STATUSES: OutcomeStatus[] = [
     'accepted',

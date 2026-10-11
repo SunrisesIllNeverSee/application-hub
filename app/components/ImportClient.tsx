@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ThemeTag } from '@/components/ThemeTag'
 import { truncate } from '@/lib/utils'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 import type { QuestionTheme } from '@/lib/database.types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -503,15 +504,22 @@ function SubmitProgramTab() {
             Paste the questions directly{' '}
             <span className="font-normal text-neutral-400">(optional — helps if the page requires login)</span>
           </label>
-          <textarea
-            id="questions-text"
-            value={questionsText}
-            onChange={(e) => setQuestionsText(e.target.value)}
-            rows={6}
-            className="input resize-none"
-            placeholder="Paste the application questions here if the page is behind a login…"
-            disabled={loading}
-          />
+          {LOCAL_FIRST ? (
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              In local-first mode pasted text stays on your device — submit the
+              public program URL only. The server refuses pasted text.
+            </p>
+          ) : (
+            <textarea
+              id="questions-text"
+              value={questionsText}
+              onChange={(e) => setQuestionsText(e.target.value)}
+              rows={6}
+              className="input resize-none"
+              placeholder="Paste the application questions here if the page is behind a login…"
+              disabled={loading}
+            />
+          )}
         </div>
 
         <div>
