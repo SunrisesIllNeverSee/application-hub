@@ -314,7 +314,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
                 Vault secret — encrypts your answers on this device
               </label>
               <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mb-1">
-                This secret stays in memory only — you'll re-enter it once to unlock your vault inside the app.
+                This secret stays in memory only — you&apos;ll re-enter it once to unlock your vault inside the app.
               </p>
               <input
                 id="vault-secret-starter"
@@ -384,7 +384,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
               Vault secret — encrypts your answers on this device
             </label>
             <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mb-1">
-              This secret stays in memory only — you'll re-enter it once to unlock your vault inside the app.
+              This secret stays in memory only — you&apos;ll re-enter it once to unlock your vault inside the app.
             </p>
             <input
               id="vault-secret-upload"
