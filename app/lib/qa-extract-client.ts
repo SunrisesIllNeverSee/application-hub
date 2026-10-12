@@ -1,7 +1,8 @@
 // Client-safe extraction helpers for local-first import.
 // Pure functions only — the server module lib/intake-extract.ts carries the
-// AI-provider call path; this file re-exports the shared pure pieces (the
-// prompt builder + JSON parsers are identical to intake-extract's contract)
+// hosted AI-provider call path and cannot be imported client-side (it pulls
+// @anthropic-ai/sdk + server crypto). This file DUPLICATES the prompt builder
+// + JSON parsers with identical contract (keep in sync with intake-extract.ts)
 // and adds a deterministic Q/A pair parser for no-provider extraction.
 
 export type SourceKind =

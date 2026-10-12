@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { IngestionUploader } from '@/components/ingestion/IngestionUploader'
+import { isLocalFirst } from '@/lib/local-first-guard'
 import { createClient } from '@/lib/supabase/server'
 
 export const metadata = { title: 'Manual intake — Profile' }
@@ -20,9 +21,9 @@ export default async function ProfileImportPage() {
           Manual intake
         </h2>
         <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          Stage application material into AQUA&apos;s 7-layer Supabase intake workflow.
-          Nothing moves forward without explicit checkpoint approval, and every
-          transition is written to the audit trail.
+          {isLocalFirst()
+            ? 'Import application material on this device — extraction runs locally and results land encrypted in your vault. Nothing is sent to AQUA.'
+            : "Stage application material into AQUA's 7-layer Supabase intake workflow. Nothing moves forward without explicit checkpoint approval, and every transition is written to the audit trail."}
         </p>
       </div>
 

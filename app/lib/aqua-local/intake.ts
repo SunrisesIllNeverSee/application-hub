@@ -21,12 +21,15 @@
 // /api/import/submit-url + /api/import/program unchanged.
 
 import { newId, nowIso, sha256Hex } from './crypto.ts'
-import { createAnswer } from './repo.ts'
+import { buildVersionPayload, createAnswer, VaultImmutableError } from './repo.ts'
+
 import type { VaultStorage } from './vault.ts'
 import type {
   AnswerRecord,
   CatalogCacheRecord,
   EventRecord,
+  ProvenanceRecord,
+  VersionRecord,
 } from './schema.ts'
 
 export interface LocalIntakeInput {
@@ -236,15 +239,10 @@ export async function importLegacyQAPairs(
   pairs: ImportedPairLike[],
   source: { label: string; source_url?: string | null },
 ): Promise<LegacyImportResult> {
-  const { createVersion } = await import('./repo.ts')
   const batchId = newId()
-  const answers = await storage.getAll<AnswerRecord>('answers')
-  const byOccurrence = new Map(
-    answers.map((a) => [`${a.scope.application_id}::${a.scope.question_occurrence_id}`, a]),
-  )
 
-  let created = 0
-  let versions = 0
+  // Phase 1 — validate + hash outside any transaction.
+  const prepared: Array<{ occ: string; title: string; body: string }> = []
   let skipped = 0
   for (let idx = 0; idx < pairs.length; idx++) {
     const p = pairs[idx]
@@ -252,30 +250,64 @@ export async function importLegacyQAPairs(
     // IR-031b: a pair with no real question binds the answer to nothing —
     // skip rather than collapse every such pair into one slot.
     if (p.question_text.trim().length < 8) { skipped++; continue }
-    const occ = await importOccurrenceId(p.question_text, idx)
-    const key = `answer-bank::${occ}`
-    let answer = byOccurrence.get(key)
-    if (!answer) {
-      answer = await createAnswer(storage, {
-        application_id: 'answer-bank',
-        question_occurrence_id: occ,
-      })
-      byOccurrence.set(key, answer)
-      created++
-    }
-    await createVersion(storage, secret, {
-      answer_id: answer.id,
+    prepared.push({
+      occ: await importOccurrenceId(p.question_text, idx),
       title: p.question_text.slice(0, 80),
       body: p.answer_text,
-      method: 'imported',
-      provenance: `imported:${source.label}`,
-      observed_flags: { deterministic_parse: true },
     })
-    versions++
   }
 
-  await storage.tx(['events'], async (tx) => {
-    const events = await tx.getAll<EventRecord>('events')
+  // Phase 2 — answers tx (IDB-only): dedup read + creates are atomic, so
+  // two interleaved imports cannot double-create a slot (TOCTOU closed).
+  let created = 0
+  const occToAnswerId = await storage.tx(['answers'], async (s) => {
+    const answers = await s.getAll<AnswerRecord>('answers')
+    const byOccurrence = new Map(
+      answers.map((a) => [`${a.scope.application_id}::${a.scope.question_occurrence_id}`, a]),
+    )
+    const map = new Map<string, string>()
+    for (const entry of prepared) {
+      const key = `answer-bank::${entry.occ}`
+      let answer = byOccurrence.get(key)
+      if (!answer) {
+        answer = await createAnswer(s, {
+          application_id: 'answer-bank',
+          question_occurrence_id: entry.occ,
+        })
+        byOccurrence.set(key, answer)
+        created++
+      }
+      map.set(entry.occ, answer.id)
+    }
+    return map
+  })
+
+  // Phase 3 — version crypto outside the tx (WebCrypto inside an IDB
+  // transaction risks auto-commit in real browsers).
+  const payloads = await Promise.all(
+    prepared.map((entry) =>
+      buildVersionPayload(secret, {
+        answer_id: occToAnswerId.get(entry.occ)!,
+        title: entry.title,
+        body: entry.body,
+        method: 'imported',
+        provenance: `imported:${source.label}`,
+        observed_flags: { deterministic_parse: true },
+      }),
+    ),
+  )
+
+  // Phase 4 — versions + audit event tx (IDB-only): one atomic write, so a
+  // mid-loop throw cannot leave orphaned answers + no versions + no event.
+  let versions = 0
+  await storage.tx(['versions', 'provenance', 'events'], async (s) => {
+    for (const { record, receipt } of payloads) {
+      const inserted = await s.putIfAbsent('versions', record.id, record)
+      if (!inserted) throw new VaultImmutableError(`version id collision refused: ${record.id}`)
+      await s.put('provenance', receipt)
+      versions++
+    }
+    const events = await s.getAll<EventRecord>('events')
     const seq = events.reduce((m, e) => Math.max(m, e.seq), 0) + 1
     const ev: EventRecord = {
       id: newId(),
@@ -292,7 +324,7 @@ export async function importLegacyQAPairs(
       },
       at: nowIso(),
     }
-    await tx.put('events', ev)
+    await s.put('events', ev)
   })
   return { batch_id: batchId, created_answers: created, added_versions: versions, skipped_short: skipped }
 }

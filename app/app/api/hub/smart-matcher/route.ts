@@ -15,7 +15,8 @@ import { getRequestUser } from '@/lib/supabase/request-auth'
 function isPersonaValue(v: unknown): boolean {
   if (v == null) return true
   const t = typeof v
-  if (t === 'number' || t === 'boolean') return Number.isFinite(v as number)
+  if (t === 'boolean') return true
+  if (t === 'number') return Number.isFinite(v as number)
   if (t === 'string') return (v as string).length <= 500
   if (Array.isArray(v)) {
     return v.length <= 50 && v.every((x) => typeof x === 'string' && x.length <= 200)

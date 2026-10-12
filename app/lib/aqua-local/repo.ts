@@ -116,13 +116,26 @@ export async function createVersion(
     }
   }
 
+  const { record, receipt } = await buildVersionPayload(secret, input, parent?.id ?? null)
+  await insertVersion(storage, record, receipt)
+  return record
+}
+
+/** Crypto + record assembly for a version — pure (no store access), so it is
+    safe to call OUTSIDE a transaction. Do the puts via insertVersion (or a
+    caller-managed tx) — WebCrypto awaits inside an IDB transaction risk
+    auto-commit in real browsers. */
+export async function buildVersionPayload(
+  secret: string,
+  input: Pick<CreateVersionInput, 'answer_id' | 'title' | 'body' | 'method' | 'provenance' | 'provider' | 'model' | 'observed_flags'>,
+  parentVersionId: string | null = null,
+): Promise<{ record: VersionRecord; receipt: ProvenanceRecord }> {
   const sha256 = await sha256Hex(canonicalJson({ title: input.title, body: input.body }))
   const blob = await encryptText(secret, input.body)
-
   const record: VersionRecord = {
     id: newId(),
     answer_id: input.answer_id,
-    parent_version_id: parent?.id ?? null,
+    parent_version_id: parentVersionId,
     title: input.title,
     body: JSON.stringify(blob),
     sha256,
@@ -131,20 +144,28 @@ export async function createVersion(
     created_at: nowIso(),
     immutable: true,
   }
+  const receipt: ProvenanceRecord = {
+    version_id: record.id,
+    method: input.method,
+    provider: input.provider ?? null,
+    model: input.model ?? null,
+    observed_flags: input.observed_flags ?? {},
+  }
+  return { record, receipt }
+}
 
+/** Put a pre-built version record + provenance receipt. Inside a caller tx
+    the same puts may be issued directly on the tx-scoped storage. */
+export async function insertVersion(
+  storage: VaultStorage,
+  record: VersionRecord,
+  receipt: ProvenanceRecord,
+): Promise<void> {
   await storage.tx(['versions', 'provenance'], async (s) => {
     const inserted = await s.putIfAbsent('versions', record.id, record)
     if (!inserted) throw new VaultImmutableError(`version id collision refused: ${record.id}`)
-    const receipt: ProvenanceRecord = {
-      version_id: record.id,
-      method: input.method,
-      provider: input.provider ?? null,
-      model: input.model ?? null,
-      observed_flags: input.observed_flags ?? {},
-    }
     await s.put('provenance', receipt)
   })
-  return record
 }
 
 /** Decrypt a stored version. Throws VaultDecryptError on wrong secret. */

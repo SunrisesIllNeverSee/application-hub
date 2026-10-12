@@ -140,11 +140,18 @@ export async function GET() {
         },
         SmartMatcherRequest: {
           type: 'object',
-          description: 'Compute fit scores for the user answer bank against a target program.',
+          description:
+            'Fit-score request matching the smart-matcher edge contract. user_persona values are shape-bounded (scalars or short string arrays); unknown fields are rejected.',
           properties: {
-            program_id: { type: 'string', format: 'uuid' },
-            application_id: { type: 'string', format: 'uuid' },
+            user_persona: {
+              type: 'object',
+              additionalProperties: true,
+              description: 'Persona descriptors for matching (≤50 keys; scalar or ≤50×≤200-char string-array values).',
+            },
+            vertical_filter: { type: 'string', description: "Persona vertical (default 'founder')." },
+            match_limit: { type: 'integer', minimum: 1, maximum: 50, default: 10 },
           },
+          additionalProperties: false,
         },
         AutofillEligibilityRequest: {
           type: 'object',
