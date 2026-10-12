@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useVault } from '@/lib/aqua-local-client/VaultProvider'
 import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
+import { compareApprovals } from '@/lib/aqua-local'
 import type { AnswerRecord, VersionRecord, ApprovalRecord } from '@/lib/aqua-local/schema'
 
 interface BankCounts {
@@ -36,9 +37,21 @@ export function VaultShellNote({ className }: { className?: string }) {
           storage.getAll<VersionRecord>('versions'),
           storage.getAll<ApprovalRecord>('approvals'),
         ])
+        // Same strict semantics as the freeze gate / vault score:
+        // latest decision per version wins, must be human + not restored +
+        // sha-pinned to the stored version.
+        const latestByVersion = new Map<string, (typeof approvals)[number]>()
+        for (const a of [...approvals].sort(compareApprovals)) latestByVersion.set(a.version_id, a)
+        const shaByVersion = new Map(versions.map((v) => [v.id, v.sha256]))
         const approved = new Set(
-          approvals
-            .filter((a) => a.decision === 'approved')
+          [...latestByVersion.values()]
+            .filter(
+              (a) =>
+                a.decision === 'approved' &&
+                a.actor_class === 'human' &&
+                !a.restored_from_backup &&
+                a.version_sha256 === shaByVersion.get(a.version_id),
+            )
             .map((a) => a.version_id),
         ).size
         if (!cancelled) {

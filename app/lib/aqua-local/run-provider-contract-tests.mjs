@@ -71,7 +71,7 @@ await t('openai: error body surfaces honestly', async () => {
   )
 })
 
-await t('google: key in query param, canonical path, consent records endpoint', async () => {
+await t('google: key in x-goog-api-key header, canonical path, consent records endpoint', async () => {
   const s = createMemoryStorage()
   await storeProviderKey(s, SECRET, 'google', 'goog-key')
   const { calls, f } = captureFetch({ candidates: [{ content: { parts: [{ text: 'gemini out' }] } }], modelVersion: 'gemini-2.0-flash' })

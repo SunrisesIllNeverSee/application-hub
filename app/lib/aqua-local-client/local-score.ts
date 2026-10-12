@@ -96,8 +96,16 @@ export async function computeVaultScore(
   for (const ap of [...approvals].sort(compareApprovals)) {
     latestByVersion.set(ap.version_id, ap)
   }
+  const shaByVersion = new Map(versions.map((v) => [v.id, v.sha256]))
+  // F-V1 sha-pin — identical to packets.ts latestApproval: a decision only
+  // counts when it was recorded against the version's stored sha; a swapped
+  // version row must not look approved to the score either.
   const approvedCount = [...latestByVersion.values()].filter(
-    (a) => a.decision === 'approved' && a.actor_class === 'human' && !a.restored_from_backup,
+    (a) =>
+      a.decision === 'approved' &&
+      a.actor_class === 'human' &&
+      !a.restored_from_backup &&
+      a.version_sha256 === shaByVersion.get(a.version_id),
   ).length
 
   const intakeApps = cache.filter((r) => r.key.startsWith('intake:')).length

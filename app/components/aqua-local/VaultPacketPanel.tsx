@@ -194,11 +194,17 @@ export function VaultPacketPanel({
       // vault must not claim authenticated-account backing.
       const { createClient } = await import('@/lib/supabase/client')
       // getUser() validates server-side — getSession() can return a
-      // cached-but-revoked session claiming 'authenticated-account'.
-      const { data: { user } } = await createClient().auth.getUser()
+      // cached-but-revoked session claiming 'authenticated-account'. On a
+      // lookup FAILURE the signature still lands as 'local-only' — a
+      // network blip must not block a fundamentally local operation.
+      let authed = false
+      try {
+        const { data: { user } } = await createClient().auth.getUser()
+        authed = Boolean(user)
+      } catch { authed = false }
       await attestPacket(storage, {
         packet_id: frozenId,
-        signer_class: user ? 'authenticated-account' : 'local-only',
+        signer_class: authed ? 'authenticated-account' : 'local-only',
         user_ack: ack === true,
         privateKey: kp.privateKey,
         pubkey_b64: kp.pubkey_b64,
@@ -325,7 +331,7 @@ export function VaultPacketPanel({
                       }
                       className="w-full rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-900"
                     >
-                      <option value="" disabled>— choose a version —</option>
+                      <option value="">— choose a version / skip —</option>
                       {r.versions.map((v) => (
                         <option key={v.id} value={v.id}>
                           {v.title || 'untitled'} · {v.method} ·{' '}

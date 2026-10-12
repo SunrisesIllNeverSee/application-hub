@@ -299,7 +299,7 @@ export async function importLegacyQAPairs(
         title: entry.title,
         body: entry.body,
         method: 'imported',
-        provenance: `imported:${source.label}`,
+        provenance: `imported:${source.label}${source.source_url ? ` (${source.source_url})` : ''}`,
         provider: extraction?.provider ?? null,
         model: extraction?.model ?? null,
         observed_flags: { deterministic_parse: extraction?.deterministic_parse === true },
