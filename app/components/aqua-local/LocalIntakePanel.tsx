@@ -58,6 +58,7 @@ export function LocalIntakePanel() {
   // vault versions, not just question slots.
   const [mode, setMode] = useState<'questions' | 'qa'>('questions')
   const [pairs, setPairs] = useState<ExtractedPair[] | null>(null)
+  const [pairProvenance, setPairProvenance] = useState<{ deterministic_parse: boolean; provider?: string; model?: string }>({ deterministic_parse: true })
   const [qaResult, setQaResult] = useState<LegacyImportResult | null>(null)
   const [providers, setProviders] = useState<{ provider_id: string; base_url?: string; model_preference?: string }[]>([])
   const [providerId, setProviderId] = useState('')
@@ -89,6 +90,7 @@ export function LocalIntakePanel() {
     setPairs(null)
     if (mode === 'qa') {
       setPairs(extractQAPairsDeterministic(content))
+      setPairProvenance({ deterministic_parse: true })
       return
     }
     try {
@@ -130,13 +132,14 @@ export function LocalIntakePanel() {
       // re-fetched cfg that could differ from what the user was shown.
       const chosen = providers.find((p) => p.provider_id === providerId) ?? providers[0]
       if (!chosen) throw new Error('No provider configured — set one up in the vault panel')
-      const { text } = await generateDraft(storage, secret, true, {
+      const { text, provider, model } = await generateDraft(storage, secret, true, {
         provider_id: chosen.provider_id,
         prompt: buildQAPairsPrompt(content, 'other'),
         system: SYSTEM_PROMPT,
         model: chosen.model_preference,
       })
       setPairs(parsePairs(text))
+      setPairProvenance({ deterministic_parse: false, provider: provider ?? undefined, model: model ?? undefined })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Provider extraction failed')
     } finally {
@@ -152,10 +155,12 @@ export function LocalIntakePanel() {
       const storage = await vault.ensureStorage()
       const secret = vault.getSecret()
       if (!secret) throw new Error('Vault locked')
+      // Provenance mirrors the extraction path — deterministic flag only
+      // for the local parser; provider pairs carry provider+model instead.
       const res = await importLegacyQAPairs(storage, secret, pairs, {
         label: sourceTitle.trim() || 'manual paste',
         source_url: sourceUrl.trim() || null,
-      })
+      }, pairProvenance)
       setQaResult(res)
       setPairs(null)
       setContent('')
@@ -181,6 +186,7 @@ export function LocalIntakePanel() {
       setResult(res)
       setExtraction(null)
       setContent('')
+      setIntakes(await listLocalIntakes(storage))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Vault import failed')
     } finally {
@@ -348,7 +354,7 @@ export function LocalIntakePanel() {
           <p className="font-medium text-success-200">
             Imported {qaResult.added_versions} answer version{qaResult.added_versions === 1 ? '' : 's'}
             {qaResult.created_answers > 0 ? ` across ${qaResult.created_answers} new bank entr${qaResult.created_answers === 1 ? 'y' : 'ies'}` : ' into existing bank entries'}
-            {qaResult.skipped_short > 0 ? ` — ${qaResult.skipped_short} skipped (under 10 chars)` : ''}
+            {qaResult.skipped_short > 0 ? ` — ${qaResult.skipped_short} skipped (blank or too short)` : ''}
           </p>
           <p className="mt-1 text-neutral-400">
             Bodies are encrypted in your{' '}

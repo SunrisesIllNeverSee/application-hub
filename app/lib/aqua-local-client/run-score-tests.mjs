@@ -1,5 +1,7 @@
 // Vault score gate-parity tests — uses the @/ alias shim from governance.
-// Run: node --import file:///$AQUARND/.../ir-node-alias.mjs lib/aqua-local-client/run-score-tests.mjs
+// Run: node --import "$AQUARND/aqua-canon/Planning/Execution/m06/integration-recovery/reviews/ir-node-alias.mjs" lib/aqua-local-client/run-score-tests.mjs
+//   AQUARND = governance repo root (default: ~/Developer/_7_labs/aquarnd).
+//   The shim resolves '@/' imports; app-root override: AQUA_APP_FS.
 import assert from 'node:assert/strict'
 import { createMemoryStorage } from '../aqua-local/vault.ts'
 import { createAnswer, createVersion, approveVersion } from '../aqua-local/repo.ts'

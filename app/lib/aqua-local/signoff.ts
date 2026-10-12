@@ -168,24 +168,30 @@ export async function attestPacket(
   // IR-003: a signoff restored from a backup is a file claim, not a fresh
   // attestation — a real sign-off may overwrite it (putIfAbsent would
   // otherwise block re-signing a restored packet forever).
-  if (priorSignoff?.restored_from_backup) {
-    await storage.delete('signoffs', input.packet_id)
-  }
-  const record = await recordSignoff(storage, {
-    packet_id: input.packet_id,
-    signer_class: input.signer_class,
-    signature_b64: signatureB64,
-    pubkey_b64: pubkeyB64,
-    user_ack: input.user_ack,
+  // Signoff + state advance commit in ONE tx — a crash between them would
+  // otherwise leave 'prepared' + a live signoff, which wedges the packet
+  // permanently (next attest hits putIfAbsent with no restored escape).
+  const record = await storage.tx(['signoffs', 'packet_states', 'packets'], async (s) => {
+    if (priorSignoff?.restored_from_backup) {
+      await s.delete('signoffs', input.packet_id)
+    }
+    const rec = await recordSignoff(s, {
+      packet_id: input.packet_id,
+      signer_class: input.signer_class,
+      signature_b64: signatureB64,
+      pubkey_b64: pubkeyB64,
+      user_ack: input.user_ack,
+    })
+    // IR-020/IR-029b: a re-attestation of a restored signoff replaces the
+    // record — but the state transition is skipped ONLY when the packet is
+    // already 'signed'. A backup carrying state 'prepared' PLUS a restored
+    // signoff row is an inconsistent claim: writing the fresh signoff while
+    // leaving 'prepared' would make the packet permanently un-signable
+    // (next attest hits putIfAbsent). Advance prepared→signed in that edge.
+    if (!isReattest || state.state !== 'signed') {
+      await advancePacketState(s, input.packet_id, 'signed')
+    }
+    return rec
   })
-  // IR-020/IR-029b: a re-attestation of a restored signoff replaces the
-  // record — but the state transition is skipped ONLY when the packet is
-  // already 'signed'. A backup carrying state 'prepared' PLUS a restored
-  // signoff row is an inconsistent claim: writing the fresh signoff while
-  // leaving 'prepared' would make the packet permanently un-signable (next
-  // attest hits putIfAbsent). Advance prepared→signed in that edge.
-  if (!isReattest || state.state !== 'signed') {
-    await advancePacketState(storage, input.packet_id, 'signed')
-  }
   return record
 }

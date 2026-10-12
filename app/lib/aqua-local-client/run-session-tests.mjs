@@ -1,5 +1,6 @@
 // Self-contained aqua-local-client session adapter tests (no test runner).
-// Run: node lib/aqua-local-client/run-session-tests.mjs
+// Run: node --import "$AQUARND/aqua-canon/Planning/Execution/m06/integration-recovery/reviews/ir-node-alias.mjs" lib/aqua-local-client/run-session-tests.mjs
+//   (AQUARND = governance repo root; the shim resolves '@/lib' imports.)
 // (Node >=22.6 type-strips .ts imports; storage is injected memory —
 //  getStorage()/IndexedDB is never touched here.)
 import assert from 'node:assert/strict'

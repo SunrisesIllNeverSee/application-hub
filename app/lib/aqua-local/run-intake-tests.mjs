@@ -127,10 +127,10 @@ await t('deterministic Q/A parser extracts pairs', async () => {
 await t('legacy import lands versions in the bank — re-import extends not duplicates', async () => {
   const s = createMemoryStorage()
   const pairs = extractQAPairsDeterministic(QA_SAMPLE)
-  const r1 = await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc-w26' })
+  const r1 = await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc-w26' }, { deterministic_parse: true })
   assert.equal(r1.created_answers, 3)
   assert.equal(r1.added_versions, 3)
-  const r2 = await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc-w26-reimport' })
+  const r2 = await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc-w26-reimport' }, { deterministic_parse: true })
   assert.equal(r2.created_answers, 0, 'same pairs dedupe onto existing slots')
   assert.equal(r2.added_versions, 3, 're-import adds versions, not answers')
   const answers = await s.getAll('answers')
@@ -142,7 +142,7 @@ await t('legacy import lands versions in the bank — re-import extends not dupl
 await t('imported bodies stay encrypted + raw paste never stored', async () => {
   const s = createMemoryStorage()
   const pairs = extractQAPairsDeterministic(QA_SAMPLE)
-  await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc' })
+  await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc' }, { deterministic_parse: true })
   const versions = await s.getAll('versions')
   assert.ok(!versions[0].body.includes('120 beta users'), 'ciphertext at rest')
   const catalog = await s.getAll('catalog_cache')
@@ -166,7 +166,7 @@ await t('IR-031: distinct questions sharing a 280-char prefix get separate slots
     { question_text: shared + 'B', answer_text: 'Second distinct answer here.', theme: 'other', confidence: 'draft' },
     { question_text: '', answer_text: 'An answer with no question at all.', theme: 'other', confidence: 'draft' },
   ]
-  const res = await importLegacyQAPairs(s, SECRET, pairs, { label: 'test' })
+  const res = await importLegacyQAPairs(s, SECRET, pairs, { label: 'test' }, { deterministic_parse: true })
   assert.equal(res.created_answers, 2, 'two distinct questions = two slots')
   assert.equal(res.skipped_short, 1, 'empty question skipped')
 })
@@ -188,8 +188,23 @@ await t('blank-guard: Cf-only body skipped (canon invariant parity with createVe
     { question_text: 'A real question here?', answer_text: zwsp, theme: 'other', confidence: 'draft' },
     { question_text: 'A real question here?', answer_text: 'A real substantive answer body.', theme: 'other', confidence: 'draft' },
   ]
-  const res = await importLegacyQAPairs(s, SECRET, pairs, { label: 'cf' })
+  const res = await importLegacyQAPairs(s, SECRET, pairs, { label: 'cf' }, { deterministic_parse: true })
   assert.equal(res.added_versions, 1, 'Cf-only body refused — only the real answer lands')
+})
+
+
+await t('W2: provider-extracted pairs carry provider/model, never claim deterministic parse', async () => {
+  const s = createMemoryStorage()
+  const pairs = [
+    { question_text: 'Team background?', answer_text: 'Three cofounders, prior exits.', theme: 'team', confidence: 'solid' },
+  ]
+  await importLegacyQAPairs(s, SECRET, pairs, { label: 'llm-extract' }, {
+    deterministic_parse: false, provider: 'ollama', model: 'qwen3:0.6b',
+  })
+  const provenance = await s.getAll('provenance')
+  assert.equal(provenance[0].provider, 'ollama')
+  assert.equal(provenance[0].model, 'qwen3:0.6b')
+  assert.equal(provenance[0].observed_flags.deterministic_parse, false)
 })
 
 

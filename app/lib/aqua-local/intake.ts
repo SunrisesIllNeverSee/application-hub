@@ -238,6 +238,11 @@ export async function importLegacyQAPairs(
   secret: string,
   pairs: ImportedPairLike[],
   source: { label: string; source_url?: string | null },
+  /** Provenance of the PAIRS — deterministic_parse must ONLY be set for
+      local rule-based extraction; provider extraction carries the
+      disclosed provider/model instead (falsifier-class honesty issue:
+      never claim a deterministic parse for LLM output). */
+  extraction?: { deterministic_parse?: boolean; provider?: string | null; model?: string | null },
 ): Promise<LegacyImportResult> {
   const batchId = newId()
 
@@ -295,7 +300,9 @@ export async function importLegacyQAPairs(
         body: entry.body,
         method: 'imported',
         provenance: `imported:${source.label}`,
-        observed_flags: { deterministic_parse: true },
+        provider: extraction?.provider ?? null,
+        model: extraction?.model ?? null,
+        observed_flags: { deterministic_parse: extraction?.deterministic_parse === true },
       }),
     ),
   )
