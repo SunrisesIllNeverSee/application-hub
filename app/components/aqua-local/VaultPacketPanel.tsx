@@ -323,6 +323,7 @@ export function VaultPacketPanel({
                       }
                       className="w-full rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-900"
                     >
+                      <option value="" disabled>— choose a version —</option>
                       {r.versions.map((v) => (
                         <option key={v.id} value={v.id}>
                           {v.title || 'untitled'} · {v.method} ·{' '}

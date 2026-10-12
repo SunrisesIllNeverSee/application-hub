@@ -850,4 +850,26 @@ await t('IR-029: unreachable-state packet refuses signoff pre-write', async () =
 })
 
 
+await t('IR-029b: prepared + restored signoff → attestation advances to signed', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet, record } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  // simulate a restored backup: state 'prepared' + restored signoff row
+  await s.put('signoffs', {
+    packet_id: packet.packet_id, signer_class: 'restored', signature_b64: null,
+    pubkey_b64: null, user_ack: true, at: new Date().toISOString(),
+    restored_from_backup: true,
+  })
+  await attestPacket(s, {
+    packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+    manifest_sha256: record.manifest_sha256,
+  })
+  const st = await getPacketState(s, packet.packet_id)
+  assert.equal(st.state, 'signed', 'inconsistent prepared+signoff must advance, not wedge')
+})
+
+
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

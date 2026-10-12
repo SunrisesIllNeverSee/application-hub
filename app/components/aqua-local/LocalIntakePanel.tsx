@@ -12,6 +12,7 @@ import {
 import {
   importLocalIntake,
   importLegacyQAPairs,
+  listLocalIntakes,
   type LocalIntakeResult,
   type LegacyImportResult,
 } from '@/lib/aqua-local/intake'
@@ -60,17 +61,20 @@ export function LocalIntakePanel() {
   const [qaResult, setQaResult] = useState<LegacyImportResult | null>(null)
   const [providers, setProviders] = useState<{ provider_id: string; base_url?: string; model_preference?: string }[]>([])
   const [providerId, setProviderId] = useState('')
+  const [intakes, setIntakes] = useState<Array<Record<string, unknown>>>([])
 
   useEffect(() => {
     if (vault.status !== 'unlocked') return
     let cancelled = false
     void vault.ensureStorage()
       .then((s) => listProviders(s))
-      .then((ps) => {
+      .then(async (ps) => {
         if (cancelled) return
         const list = ps.map((p) => ({ provider_id: p.provider_id, base_url: p.base_url, model_preference: p.model_preference }))
         setProviders(list)
         setProviderId((cur) => cur || list[0]?.provider_id || '')
+        const storage = await vault.ensureStorage()
+        setIntakes(await listLocalIntakes(storage))
       })
       .catch(() => undefined)
     return () => { cancelled = true }
@@ -155,6 +159,7 @@ export function LocalIntakePanel() {
       setQaResult(res)
       setPairs(null)
       setContent('')
+      setIntakes(await listLocalIntakes(storage))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Vault import failed')
     } finally {
@@ -275,7 +280,9 @@ export function LocalIntakePanel() {
             )}
             {(() => {
               const sel = providers.find((p) => p.provider_id === providerId) ?? providers[0]
-              const endpoint = sel.base_url ?? PROVIDER_ENDPOINTS[sel.provider_id] ?? sel.provider_id
+              const endpoint = sel.base_url
+                ? `${sel.base_url.replace(/\/+$/, '')}${sel.provider_id === 'ollama' ? '/api/chat' : ''}`
+                : PROVIDER_ENDPOINTS[sel.provider_id] ?? sel.provider_id
               return (
                 <>
                   <button className="btn-secondary" disabled={!canExtract || busy} onClick={() => void extractWithProvider()}>
@@ -348,6 +355,25 @@ export function LocalIntakePanel() {
             <a href="/aqua-local" className="text-brand-400 underline underline-offset-2">vault answer bank</a>
             {' '}— reusing them in applications keeps the normal approval gates.
           </p>
+        </div>
+      )}
+
+      {intakes.length > 0 && (
+        <div className="space-y-2 rounded-md border border-neutral-800/60 p-4">
+          <p className="text-xs font-semibold text-neutral-300">Recent intakes on this device</p>
+          <ul className="space-y-1 text-xs text-neutral-400">
+            {intakes.slice(0, 8).map((r, i) => (
+              <li key={String(r.intake_id ?? i)} className="flex items-baseline justify-between gap-3">
+                <span className="truncate font-medium text-neutral-300">
+                  {String((r.entity as Record<string, unknown>)?.name ?? r.application_id ?? 'intake')}
+                </span>
+                <span className="shrink-0 text-neutral-500">
+                  {Array.isArray(r.questions) ? r.questions.length : 0} questions ·{' '}
+                  {String(r.imported_at ?? '').slice(0, 10)}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

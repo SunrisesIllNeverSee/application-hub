@@ -178,9 +178,13 @@ export async function attestPacket(
     pubkey_b64: pubkeyB64,
     user_ack: input.user_ack,
   })
-  // IR-020: a re-attestation of a restored signoff replaces the record but
-  // does NOT re-transition state — the packet is already 'signed'.
-  if (!isReattest) {
+  // IR-020/IR-029b: a re-attestation of a restored signoff replaces the
+  // record — but the state transition is skipped ONLY when the packet is
+  // already 'signed'. A backup carrying state 'prepared' PLUS a restored
+  // signoff row is an inconsistent claim: writing the fresh signoff while
+  // leaving 'prepared' would make the packet permanently un-signable (next
+  // attest hits putIfAbsent). Advance prepared→signed in that edge.
+  if (!isReattest || state.state !== 'signed') {
     await advancePacketState(storage, input.packet_id, 'signed')
   }
   return record

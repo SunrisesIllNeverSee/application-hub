@@ -70,21 +70,22 @@ export async function computeVaultScore(
   let wordCountN = 0
   for (const a of answers) {
     const vs = versionsByAnswer.get(a.id) ?? []
-    let answered = false
-    for (const v of vs) {
-      try {
-        const body = await decryptText(secret, JSON.parse(v.body))
-        const words = body.trim().split(/\s+/).filter(Boolean).length
-        if (words > 0) {
-          answered = true
-          totalWords += words
-          wordCountN++
-        }
-      } catch {
-        /* undecryptable — skip */
+    // Hosted semantics: averageWordCount is per-ANSWER (latest body), not
+    // per-version — dividing by version count would over-weight heavily
+    // edited answers vs the hosted formula.
+    const latest = [...vs].sort((x, y) => x.created_at.localeCompare(y.created_at)).at(-1)
+    if (!latest) continue
+    try {
+      const body = await decryptText(secret, JSON.parse(latest.body))
+      const words = body.trim().split(/\s+/).filter(Boolean).length
+      if (words > 0) {
+        answeredCount++
+        totalWords += words
+        wordCountN++
       }
+    } catch {
+      /* undecryptable — skip */
     }
-    if (answered) answeredCount++
   }
 
   // Latest decision wins, then exclude — mirror the freeze gate semantics

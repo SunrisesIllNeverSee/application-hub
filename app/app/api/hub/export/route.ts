@@ -21,7 +21,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Supabase environment is not configured' }, { status: 500 })
   }
 
-  const body = await req.json().catch(() => ({}))
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+    return NextResponse.json({ error: 'JSON object body required' }, { status: 400 })
+  }
   // AM-0057: the canonical export contract (handleExport in
   // supabase/functions/canonical-hub) permits {canonical_id | package_id,
   // export_format ∈ json|markdown|pdf}. Arbitrary caller fields are

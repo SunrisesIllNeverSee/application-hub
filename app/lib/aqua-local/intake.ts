@@ -97,9 +97,12 @@ export async function importLocalIntake(
   // intake materialization (slots + catalog record + event) commits as one
   // transaction — a mid-import failure must not leave orphan slots without
   // the catalog record that names them.
-  const existingAnswers = await storage.getAll<AnswerRecord>('answers')
   const occurrenceIds: string[] = []
   await storage.tx(['answers', 'catalog_cache', 'events'], async (s) => {
+    // Dedup read INSIDE the tx — reading outside then writing inside is a
+    // TOCTOU hole: two interleaved imports would each see 'no existing' and
+    // double-create slots for the same occurrence.
+    const existingAnswers = await s.getAll<AnswerRecord>('answers')
     for (const q of extraction.questions) {
       const occ = `${applicationId}-q${q.order_index}`
       occurrenceIds.push(occ)
@@ -107,10 +110,12 @@ export async function importLocalIntake(
         (a) => a.scope.application_id === applicationId && a.scope.question_occurrence_id === occ,
       )
       if (!exists) {
-        await createAnswer(s, {
+        // push the created record so a duplicated question within the same
+        // extraction doesn't get a second slot either.
+        existingAnswers.push(await createAnswer(s, {
           application_id: applicationId,
           question_occurrence_id: occ,
-        })
+        }))
       }
     }
 

@@ -33,8 +33,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Supabase environment is not configured' }, { status: 500 })
   }
 
-  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
   const bad = (why: string) => NextResponse.json({ error: `invalid field: ${why}` }, { status: 400 })
+
+  const raw = await req.json().catch(() => null)
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
+    return bad('JSON object body required')
+  }
+  const body = raw as Record<string, unknown>
 
   const { user_persona, vertical_filter, match_limit } = body
   const forwarded: Record<string, unknown> = { user_id: user.id }
