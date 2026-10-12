@@ -106,6 +106,9 @@ export interface PacketSignoff {
   timestamp: string | null
   signature_b64: string | null
   pubkey_b64: string | null
+  /** IR-023: true when the signoff came from a backup file — provenance is
+      disclosed in exports rather than dropped at materialization. */
+  restored_from_backup?: boolean
 }
 
 export interface FrozenPacket {
@@ -450,7 +453,9 @@ export async function advancePacketState(
 // ---------------------------------------------------------------------------
 
 /** Read a packet's manifest — encrypted records require the vault secret;
-    legacy plaintext manifests (pre-IR-002) still read. */
+    legacy plaintext manifests (pre-IR-002) still read, and are re-encrypted
+    in place on first read with a secret (IR-018: forward-only is not enough —
+    a legacy plaintext record would sit readable on disk forever). */
 async function readManifestJson(
   storage: VaultStorage,
   record: PacketRecord,
@@ -462,7 +467,14 @@ async function readManifestJson(
     }
     return decryptText(secret, JSON.parse(record.manifest_enc))
   }
-  if (record.manifest_json) return record.manifest_json
+  if (record.manifest_json) {
+    // Lazy self-heal: encrypt under the caller's secret and drop plaintext.
+    if (secret) {
+      const enc = JSON.stringify(await encryptText(secret, record.manifest_json))
+      await storage.put('packets', { ...record, manifest_enc: enc, manifest_json: undefined })
+    }
+    return record.manifest_json
+  }
   throw new VaultNotFoundError(`packet has no manifest: ${record.id}`)
 }
 
@@ -486,6 +498,7 @@ export async function loadPacket(
           timestamp: signoff.timestamp,
           signature_b64: signoff.signature_b64,
           pubkey_b64: signoff.pubkey_b64 ?? null,
+          ...(signoff.restored_from_backup ? { restored_from_backup: true } : {}),
         }
       : { signer_class: null, timestamp: null, signature_b64: null, pubkey_b64: null },
   }

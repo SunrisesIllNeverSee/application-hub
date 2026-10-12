@@ -347,13 +347,14 @@ await t('signoff: signed state + pubkey + timestamp in record', async () => {
   assert.equal(
     await verifyManifestSignature(kp.pubkey_b64, record.manifest_sha256, so.signature_b64), true,
   )
-  // one signoff per packet
+  // one signoff per packet — second attempt refused (state gate fires first
+  // under IR-020; only restored signoffs may be re-attested)
   await assert.rejects(
     () => attestPacket(s, {
       packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
       manifest_sha256: record.manifest_sha256,
     }),
-    VaultImmutableError,
+    /already signed/,
   )
 })
 
@@ -693,6 +694,82 @@ await t('IR-011: discard does not advance to exported', async () => {
   assert.equal(st.state, 'discarded')
   // discarded is terminal
   await assert.rejects(() => advancePacketState(s, packet.packet_id, 'exported'), /illegal packet transition/)
+})
+
+
+// ---------------- round-2 seam probes ----------------
+
+await t('IR-018: legacy plaintext manifest re-encrypts on first read', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet, record } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  // downgrade the record to the legacy plaintext shape
+  const plain = await decryptText(SECRET, JSON.parse(record.manifest_enc))
+  await s.put('packets', { ...record, manifest_enc: undefined, manifest_json: plain })
+  // read with secret → self-heals to ciphertext
+  await loadPacket(s, packet.packet_id, SECRET)
+  const after = await s.get('packets', packet.packet_id)
+  assert.ok(after.manifest_enc, 're-encrypted on read')
+  assert.equal(after.manifest_json, undefined, 'plaintext dropped')
+})
+
+await t('IR-020: restored signoff can be re-attested without state churn', async () => {
+  const { exportVault, importVault } = await import('./backup.ts')
+  const s1 = createMemoryStorage()
+  const { version } = await seedApproved(s1)
+  const { packet, record } = await freezeApplicationPacket(s1, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  const kp = await generateSignerKeyPair()
+  await attestPacket(s1, {
+    packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+    privateKey: kp.privateKey, pubkey_b64: kp.pubkey_b64,
+    manifest_sha256: record.manifest_sha256,
+  })
+  const dump = await exportVault(s1, SECRET)
+  const s2 = createMemoryStorage()
+  await importVault(s2, SECRET, dump)
+  // restored signoff marked
+  const imported = await s2.get('signoffs', packet.packet_id)
+  assert.equal(imported.restored_from_backup, true)
+  // re-attestation replaces it without signed→signed throw
+  const so = await attestPacket(s2, {
+    packet_id: packet.packet_id, signer_class: 'authenticated-account', user_ack: true,
+    manifest_sha256: record.manifest_sha256,
+  })
+  assert.equal(so.restored_from_backup, undefined)
+  assert.equal((await getPacketState(s2, packet.packet_id)).state, 'signed')
+})
+
+await t('IR-021: every adapter declares an egress endpoint for the consent receipt', async () => {
+  const { adapterForProvider } = await import('./providers.ts')
+  for (const pid of ['anthropic', 'openai', 'google', 'ollama']) {
+    const adapter = adapterForProvider(pid, pid === 'ollama' ? { base_url: 'http://localhost:11434' } : {})
+    assert.ok(adapter.endpoint?.startsWith('http'), `${pid} missing endpoint`)
+  }
+})
+
+await t('IR-023: exported signoff discloses restored provenance', async () => {
+  const { exportVault, importVault } = await import('./backup.ts')
+  const s1 = createMemoryStorage()
+  const { version } = await seedApproved(s1)
+  const { packet, record } = await freezeApplicationPacket(s1, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  await attestPacket(s1, {
+    packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+    manifest_sha256: record.manifest_sha256,
+  })
+  const dump = await exportVault(s1, SECRET)
+  const s2 = createMemoryStorage()
+  await importVault(s2, SECRET, dump)
+  const doc = JSON.parse(await exportPacket(s2, packet.packet_id, SECRET))
+  assert.equal(doc.packet.signoff.restored_from_backup, true)
 })
 
 

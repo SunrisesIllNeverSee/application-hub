@@ -185,11 +185,13 @@ await t('full approve→freeze→sign→export flow performs ZERO network fetche
       application_id: 'app1',
       selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
     })
+    // IR-005/027: attest the packet's stored manifest digest, not an answer sha.
+    const record = await s.get('packets', packet.packet_id)
     await attestPacket(s, {
       packet_id: packet.packet_id, signer_class: 'local-only',
-      user_ack: true, manifest_sha256: packet.questions[0].answer_sha256,
+      user_ack: true, manifest_sha256: record.manifest_sha256,
     })
-    const doc = await exportPacket(s, packet.packet_id)
+    const doc = await exportPacket(s, packet.packet_id, SECRET)
     assert.ok(doc.includes('aqua-local-packet'))
     assert.equal((await getPacketState(s, packet.packet_id)).state, 'exported')
   } finally {

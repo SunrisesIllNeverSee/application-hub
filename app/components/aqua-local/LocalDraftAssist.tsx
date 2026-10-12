@@ -17,6 +17,14 @@ import { buildDraftPrompt, resolveKind } from '@/lib/draft-prompts'
 // receipt BEFORE egress; the result is a proposal the user reviews and only
 // then saves as a version.
 
+// IR-022: canonical egress URLs shown in the consent disclosure —
+// endpoint-configured providers (ollama) show their stored base_url instead.
+const PROVIDER_ENDPOINTS: Record<string, string> = {
+  anthropic: 'https://api.anthropic.com/v1/messages',
+  openai: 'https://api.openai.com/v1/chat/completions',
+  google: 'https://generativelanguage.googleapis.com/v1beta/models',
+}
+
 export interface DraftAssistResult {
   text: string
   provider: string
@@ -190,6 +198,19 @@ export function LocalDraftAssist({
               Sends directly from this browser to {providerName}
               {model.trim() ? ` (model ${model.trim()})` : ''}:
             </p>
+            {/* IR-022: name the concrete endpoint — for endpoint-configured
+                providers (e.g. Ollama) the user must see where text is going. */}
+            {(() => {
+              const cfg = providers.find((p) => p.provider_id === providerId)
+              const ep = cfg?.base_url
+                ? `${cfg.base_url.replace(/\/+$/, '')}/api/chat`
+                : PROVIDER_ENDPOINTS[providerId]
+              return ep ? (
+                <p className="mt-1 font-mono text-[10px] text-neutral-400 dark:text-neutral-500">
+                  egress: {ep}
+                </p>
+              ) : null
+            })()}
             <ul className="mt-1 list-inside list-disc">
               <li>The question text + theme + word limit (~{targetWords} target)</li>
               <li>An application-coach system instruction</li>

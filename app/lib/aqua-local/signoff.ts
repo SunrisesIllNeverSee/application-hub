@@ -124,6 +124,16 @@ export async function attestPacket(
     throw new PacketStateError('cannot sign an already-exported packet — freeze a new packet instead')
   }
 
+  // IR-020: check the EXISTING signoff before writing — when it is a
+  // backup-restored claim, a fresh attestation overwrites it WITHOUT a
+  // state transition (state is already 'signed'). Only when the stored
+  // signoff is live does signed→signed remain illegal.
+  const priorSignoff = await storage.get<SignoffRecord>('signoffs', input.packet_id)
+  const isReattest = Boolean(priorSignoff?.restored_from_backup)
+  if (state.state === 'signed' && !isReattest) {
+    throw new PacketStateError('packet already signed — freeze a new packet for corrections')
+  }
+
   // IR-005: sign the STORED packet's manifest digest — never trust the
   // caller's manifest_sha256. A foreign digest would produce a 'signed'
   // packet whose signature cannot verify against the real manifest.
@@ -152,8 +162,7 @@ export async function attestPacket(
   // IR-003: a signoff restored from a backup is a file claim, not a fresh
   // attestation — a real sign-off may overwrite it (putIfAbsent would
   // otherwise block re-signing a restored packet forever).
-  const existing = await storage.get<SignoffRecord>('signoffs', input.packet_id)
-  if (existing?.restored_from_backup) {
+  if (priorSignoff?.restored_from_backup) {
     await storage.delete('signoffs', input.packet_id)
   }
   const record = await recordSignoff(storage, {
@@ -163,6 +172,10 @@ export async function attestPacket(
     pubkey_b64: pubkeyB64,
     user_ack: input.user_ack,
   })
-  await advancePacketState(storage, input.packet_id, 'signed')
+  // IR-020: a re-attestation of a restored signoff replaces the record but
+  // does NOT re-transition state — the packet is already 'signed'.
+  if (!isReattest) {
+    await advancePacketState(storage, input.packet_id, 'signed')
+  }
   return record
 }

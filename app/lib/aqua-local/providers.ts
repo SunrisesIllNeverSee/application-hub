@@ -433,6 +433,7 @@ export function createAnthropicAdapter(opts?: { model?: string }): ProviderAdapt
     id: 'anthropic-byok',
     mode: 'byok',
     provider: 'anthropic',
+    endpoint: 'https://api.anthropic.com/v1/messages',
     async generate(req, ctx) {
       if (!ctx.apiKey) throw new ProviderKeyError('anthropic adapter called without a key')
       // EGRESS-DECLARED: user-consented BYOK generation.
@@ -523,6 +524,7 @@ export function createGoogleAdapter(opts?: { model?: string }): ProviderAdapter 
     id: 'google-byok',
     mode: 'byok',
     provider: 'google',
+    endpoint: 'https://generativelanguage.googleapis.com/v1beta/models',
     async generate(req, ctx) {
       if (!ctx.apiKey) throw new ProviderKeyError('google adapter called without a key')
       // EGRESS-DECLARED: user-consented BYOK generation.

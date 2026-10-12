@@ -70,6 +70,10 @@ export const ONBOARDING_APPLICATION_ID = 'local-onboarding'
 export interface BankVersion {
   record: VersionRecord
   approval: 'approved' | 'rejected' | null
+  /** IR-019: the displayed decision came from a backup file — it is shown
+      but does NOT qualify the version for packets until a fresh local
+      decision is recorded. */
+  restored?: boolean
   provenance: ProvenanceRecord | null
 }
 
@@ -161,6 +165,7 @@ export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
     const bv: BankVersion = {
       record: v,
       approval: ap && ap.version_sha256 === v.sha256 ? ap.decision : null,
+      restored: ap?.restored_from_backup === true && ap.version_sha256 === v.sha256,
       provenance: provenanceByVersion.get(v.id) ?? null,
     }
     const list = byAnswer.get(v.answer_id) ?? []

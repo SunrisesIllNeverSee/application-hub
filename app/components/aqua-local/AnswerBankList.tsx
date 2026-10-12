@@ -28,7 +28,16 @@ function MethodBadge({ method, provider, model }: { method: VersionMethod; provi
   )
 }
 
-function ApprovalBadge({ approval }: { approval: BankVersion['approval'] }) {
+function ApprovalBadge({ approval, restored }: { approval: BankVersion['approval']; restored?: boolean }) {
+  // IR-019: a backup-restored decision is honest provenance — it displays
+  // but never reads as a live approval; packets require a fresh decision.
+  if (restored) {
+    return (
+      <span className="inline-block rounded-full border border-amber-300 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:border-amber-700 dark:text-amber-400" title="Restored from a backup — requires a fresh local decision before packet use">
+        Restored
+      </span>
+    )
+  }
   if (approval === 'approved') {
     return (
       <span className="inline-block rounded-full border border-success-300 px-2 py-0.5 text-[10px] font-medium text-success-700 dark:border-success-800 dark:text-success-400">
@@ -102,7 +111,7 @@ export function AnswerBankList({
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
-                {latest && <ApprovalBadge approval={latest.approval} />}
+                {latest && <ApprovalBadge approval={latest.approval} restored={latest.restored} />}
                 {latest && (
                   <MethodBadge
                     method={latest.record.method}
@@ -136,7 +145,7 @@ export function AnswerBankList({
                             latest
                           </span>
                         )}
-                        <ApprovalBadge approval={bv.approval} />
+                        <ApprovalBadge approval={bv.approval} restored={bv.restored} />
                         <MethodBadge
                           method={v.method}
                           provider={bv.provenance?.provider}
@@ -157,7 +166,7 @@ export function AnswerBankList({
                         >
                           {bv.approval === 'approved' ? 'Edit (new child version)' : 'Edit'}
                         </button>
-                        {bv.approval !== 'approved' && (
+                        {(bv.approval !== 'approved' || bv.restored) && (
                           <button
                             onClick={() => onApprove(v.id, 'approved')}
                             disabled={approvingId === v.id}
