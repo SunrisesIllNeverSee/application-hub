@@ -21,7 +21,7 @@
 // /api/import/submit-url + /api/import/program unchanged.
 
 import { newId, nowIso, sha256Hex } from './crypto.ts'
-import { createAnswer, listEvents } from './repo.ts'
+import { createAnswer } from './repo.ts'
 import type { VaultStorage } from './vault.ts'
 import type {
   AnswerRecord,
@@ -141,23 +141,27 @@ export async function importLocalIntake(
   }
   await storage.put('catalog_cache', record)
 
-  const events = await listEvents(storage)
-  const seq = events.reduce((m, e) => Math.max(m, e.seq), 0) + 1
-  const ev: EventRecord = {
-    id: newId(),
-    seq,
-    kind: 'local_intake_import',
-    entity: 'application',
-    entity_id: applicationId,
-    payload: {
-      intake_id: intakeId,
-      question_count: extraction.questions.length,
-      vertical: extraction.entity.vertical,
-      source_type: input.source_type,
-    },
-    at: now,
-  }
-  await storage.put('events', ev)
+  // Event seq allocated inside a tx over ['events'] — same monotonicity
+  // contract as approveVersion; concurrent imports must not duplicate seq.
+  await storage.tx(['events'], async (tx) => {
+    const events = await tx.getAll<EventRecord>('events')
+    const seq = events.reduce((m, e) => Math.max(m, e.seq), 0) + 1
+    const ev: EventRecord = {
+      id: newId(),
+      seq,
+      kind: 'local_intake_import',
+      entity: 'application',
+      entity_id: applicationId,
+      payload: {
+        intake_id: intakeId,
+        question_count: extraction.questions.length,
+        vertical: extraction.entity.vertical,
+        source_type: input.source_type,
+      },
+      at: now,
+    }
+    await tx.put('events', ev)
+  })
 
   return {
     intake_id: intakeId,
@@ -262,23 +266,25 @@ export async function importLegacyQAPairs(
     versions++
   }
 
-  const events = await listEvents(storage)
-  const seq = events.reduce((m, e) => Math.max(m, e.seq), 0) + 1
-  const ev: EventRecord = {
-    id: newId(),
-    seq,
-    kind: 'legacy_qa_import',
-    entity: 'batch',
-    entity_id: batchId,
-    payload: {
-      source: source.label,
-      pairs_in: pairs.length,
-      created_answers: created,
-      added_versions: versions,
-      skipped_short: skipped,
-    },
-    at: nowIso(),
-  }
-  await storage.put('events', ev)
+  await storage.tx(['events'], async (tx) => {
+    const events = await tx.getAll<EventRecord>('events')
+    const seq = events.reduce((m, e) => Math.max(m, e.seq), 0) + 1
+    const ev: EventRecord = {
+      id: newId(),
+      seq,
+      kind: 'legacy_qa_import',
+      entity: 'batch',
+      entity_id: batchId,
+      payload: {
+        source: source.label,
+        pairs_in: pairs.length,
+        created_answers: created,
+        added_versions: versions,
+        skipped_short: skipped,
+      },
+      at: nowIso(),
+    }
+    await tx.put('events', ev)
+  })
   return { batch_id: batchId, created_answers: created, added_versions: versions, skipped_short: skipped }
 }
