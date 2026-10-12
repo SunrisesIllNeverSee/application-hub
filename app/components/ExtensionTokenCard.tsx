@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 export function ExtensionTokenCard() {
   const [token, setToken] = useState<string | null>(null)
@@ -36,13 +37,21 @@ export function ExtensionTokenCard() {
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
           Appfeeder Extension
         </h3>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-          Pre-fill accelerator applications from your answer bank.
-          Paste this token into the extension popup.
-        </p>
+        {LOCAL_FIRST ? (
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+            Unavailable in local-first mode — the extension&apos;s capture and
+            match endpoints write answer text to the server, which this build
+            refuses. Vault answers stay on-device; nothing here changes that.
+          </p>
+        ) : (
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+            Pre-fill accelerator applications from your answer bank.
+            Paste this token into the extension popup.
+          </p>
+        )}
       </div>
 
-      {!token ? (
+      {LOCAL_FIRST ? null : !token ? (
         <button
           onClick={fetchToken}
           disabled={loading}
