@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import { SubmissionExport } from '@/components/SubmissionExport'
+import { LocalIntakePanel } from '@/components/aqua-local/LocalIntakePanel'
+import { isLocalFirst } from '@/lib/local-first-guard'
 import { ProgramSelect } from '@/components/ProgramSelect'
 import { cn } from '@/lib/utils'
 import type {
@@ -222,7 +224,17 @@ export default async function WorkstationPage({ searchParams }: Props) {
         <TabLink href="/workstation?tab=export" active={tab === 'export'}>Export</TabLink>
       </div>
 
-      {tab === 'import' && (
+      {tab === 'import' && isLocalFirst() && (
+        <div className="space-y-6">
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            Import runs on this device in local-first mode — parsed Q&amp;A
+            pairs land in your encrypted vault bank; nothing is posted to the
+            server.
+          </p>
+          <LocalIntakePanel />
+        </div>
+      )}
+      {tab === 'import' && !isLocalFirst() && (
         <div className="space-y-6">
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
             Paste any application you&apos;ve already submitted and we&apos;ll pull the Q&amp;A pairs into your answer bank.

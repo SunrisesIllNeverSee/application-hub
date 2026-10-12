@@ -191,6 +191,9 @@ async function latestApproval(
   // evidence — freeze requires a fresh local decision.
   if (latest?.restored_from_backup) return null
   if (!latest) return null
+  // IR-017: an agent-classed decision is advisory review, not user approval.
+  // The packet gate requires the latest decision to come from 'human'.
+  if (latest.actor_class !== 'human') return null
   // F-V1: the approval pins the version's sha256 at approval time. If the
   // stored version row was swapped, the hashes diverge — treat as no valid
   // approval (fail closed).

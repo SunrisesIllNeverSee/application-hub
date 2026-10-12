@@ -5,6 +5,7 @@ import type { UserProgramFit } from '@/lib/database.types'
 import { computeAquaScore, nextTierDelta, aquaScoreTier, type AquaScoreInputs } from '@/lib/aquascore'
 import WeeklyPoll from '@/components/WeeklyPoll'
 import { VaultShellNote } from '@/components/aqua-local/VaultShellNote'
+import { VaultScoreCard } from '@/components/aqua-local/VaultScoreCard'
 
 export const metadata = { title: 'Dash' }
 
@@ -299,6 +300,7 @@ export default async function DashPage() {
         />
       </div>
       <VaultShellNote />
+      <VaultScoreCard className="mt-3 rounded-lg border border-brand-200/60 bg-brand-50/50 px-4 py-3 text-xs text-brand-900 dark:border-brand-800/50 dark:bg-brand-950/30 dark:text-brand-200" />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">

@@ -90,16 +90,16 @@ export function IntakeForm() {
             + New application
           </span>
           <span className="ml-2 text-sm text-neutral-500 dark:text-neutral-400">
-            Form paste is disabled in local-first mode (no pasted text is sent to the
-            server). Open an opportunity from{' '}
+            No pasted text is sent to the server in local-first mode. Open an opportunity
+            from{' '}
             <Link href="/applications" className="text-brand-600 underline underline-offset-2 dark:text-brand-400">
               Applications
             </Link>
-            {' '}and answer its questions in the{' '}
-            <Link href="/aqua-local" className="text-brand-600 underline underline-offset-2 dark:text-brand-400">
-              local vault
+            {' '}or{' '}
+            <Link href="/profile/import" className="text-brand-600 underline underline-offset-2 dark:text-brand-400">
+              import the application on this device
             </Link>
-            .
+            {' '}— extraction runs locally into your vault.
           </span>
         </div>
       )

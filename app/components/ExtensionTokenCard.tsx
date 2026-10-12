@@ -39,9 +39,11 @@ export function ExtensionTokenCard() {
         </h3>
         {LOCAL_FIRST ? (
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Unavailable in local-first mode — the extension&apos;s capture and
-            match endpoints write answer text to the server, which this build
-            refuses. Vault answers stay on-device; nothing here changes that.
+            Extension capture/match is unavailable under local-first — those
+            endpoints write answer text server-side. Your session token still
+            authenticates the functioning MCP/API read tools (they enforce
+            the same local-first refusals server-side), so it remains
+            available below — clearly labeled for that use only.
           </p>
         ) : (
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -51,7 +53,15 @@ export function ExtensionTokenCard() {
         )}
       </div>
 
-      {LOCAL_FIRST ? null : !token ? (
+      {LOCAL_FIRST && !token ? (
+        <button
+          onClick={fetchToken}
+          disabled={loading}
+          className="btn-secondary text-sm"
+        >
+          {loading ? 'Loading…' : 'Show token (for MCP/API tools)'}
+        </button>
+      ) : !token ? (
         <button
           onClick={fetchToken}
           disabled={loading}
@@ -71,6 +81,7 @@ export function ExtensionTokenCard() {
           </div>
           <p className="text-xs text-neutral-400">
             Token expires with your session. Refresh this page to get a new one.
+            {LOCAL_FIRST ? ' Extension capture is deferred — this token is for MCP/API clients.' : ''}
           </p>
         </div>
       )}

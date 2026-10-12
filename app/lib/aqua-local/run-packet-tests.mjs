@@ -793,4 +793,37 @@ await t('IR-028: discarded packet refuses signoff before any write', async () =>
 })
 
 
+await t('IR-017: agent-classed approval does not satisfy the packet gate', async () => {
+  const s = createMemoryStorage()
+  const a = await createAnswer(s, { application_id: 'app1', question_occurrence_id: 'q1' })
+  const v = await createVersion(s, SECRET, { answer_id: a.id, title: 'v', body: 'b', method: 'manual' })
+  await approveVersion(s, { version_id: v.id, decision: 'approved', actor_class: 'agent' })
+  await assert.rejects(
+    () => freezeApplicationPacket(s, SECRET, {
+      application_id: 'app1',
+      selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+    }),
+    /unapproved selection/,
+  )
+  // a later human decision re-qualifies it
+  await approveVersion(s, { version_id: v.id, decision: 'approved', actor_class: 'human' })
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+  })
+  assert.ok(packet.packet_id)
+  // a later AGENT review cannot downgrade/undo the human gate either — the
+  // latest decision is what counts and an agent rejection is still valid
+  // review, but it no longer reads as 'approved' for packets.
+  await approveVersion(s, { version_id: v.id, decision: 'rejected', actor_class: 'agent' })
+  await assert.rejects(
+    () => freezeApplicationPacket(s, SECRET, {
+      application_id: 'app1',
+      selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+    }),
+    /unapproved selection/,
+  )
+})
+
+
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

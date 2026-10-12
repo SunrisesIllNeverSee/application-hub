@@ -55,7 +55,19 @@ Requires valid user_token.`,
       })
       .sort((a, b) => b.asked_by_count - a.asked_by_count);
 
-    const output = { count: answers.length, answers };
+    // AM-0032: under local-first, vault answers are not in hosted tables —
+    // this ranking is LEGACY-HOSTED data only and must say so, not present
+    // as the user's complete picture.
+    const lf = process.env.AQUA_LOCAL_FIRST === "1" || process.env.AQUA_LOCAL_FIRST === "true";
+    const output = {
+      count: answers.length,
+      answers,
+      ...(lf ? {
+        local_first: true,
+        coverage_scope: "hosted_answers_only",
+        notice: "Local-first mode: answers stored in the encrypted local vault are not in hosted tables and are excluded from this ranking. This is legacy-hosted data, not your complete bank.",
+      } : {}),
+    };
 
     if (response_format === ResponseFormat.JSON) {
       return {
@@ -68,7 +80,8 @@ Requires valid user_token.`,
 
     const lines: string[] = [
       `# Your Answers Ranked by Coverage`,
-      `_Answers that unlock the most programs_\n`
+      `_Answers that unlock the most programs_\n`,
+      ...(lf ? [`> Local-first: hosted answers only — vault-stored answers are excluded (they never leave your device).\n`] : []),
     ];
 
     answers.forEach((a, i) => {

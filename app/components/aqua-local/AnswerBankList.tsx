@@ -28,7 +28,7 @@ function MethodBadge({ method, provider, model }: { method: VersionMethod; provi
   )
 }
 
-function ApprovalBadge({ approval, restored }: { approval: BankVersion['approval']; restored?: boolean }) {
+function ApprovalBadge({ approval, restored, actorClass }: { approval: BankVersion['approval']; restored?: boolean; actorClass?: string }) {
   // IR-019: a backup-restored decision is honest provenance — it displays
   // but never reads as a live approval; packets require a fresh decision.
   if (restored) {
@@ -39,9 +39,14 @@ function ApprovalBadge({ approval, restored }: { approval: BankVersion['approval
     )
   }
   if (approval === 'approved') {
-    return (
+    // IR-017: agent-classed decisions are review, not human approval.
+    return actorClass === 'human' ? (
       <span className="inline-block rounded-full border border-success-300 px-2 py-0.5 text-[10px] font-medium text-success-700 dark:border-success-800 dark:text-success-400">
         Approved
+      </span>
+    ) : (
+      <span className="inline-block rounded-full border border-neutral-300 px-2 py-0.5 text-[10px] font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400" title="Agent-reviewed — a human approval is required before this version can enter a packet">
+        Agent-reviewed
       </span>
     )
   }
@@ -111,7 +116,7 @@ export function AnswerBankList({
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
-                {latest && <ApprovalBadge approval={latest.approval} restored={latest.restored} />}
+                {latest && <ApprovalBadge approval={latest.approval} restored={latest.restored} actorClass={latest.actor_class} />}
                 {latest && (
                   <MethodBadge
                     method={latest.record.method}
@@ -145,7 +150,7 @@ export function AnswerBankList({
                             latest
                           </span>
                         )}
-                        <ApprovalBadge approval={bv.approval} restored={bv.restored} />
+                        <ApprovalBadge approval={bv.approval} restored={bv.restored} actorClass={bv.actor_class} />
                         <MethodBadge
                           method={v.method}
                           provider={bv.provenance?.provider}

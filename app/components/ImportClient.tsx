@@ -506,8 +506,12 @@ function SubmitProgramTab() {
           </label>
           {LOCAL_FIRST ? (
             <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              In local-first mode pasted text stays on your device — submit the
-              public program URL only. The server refuses pasted text.
+              Pasted text stays on your device in local-first mode — submit the
+              public program URL here, or{' '}
+              <a href="/profile/import" className="text-brand-600 underline underline-offset-2 dark:text-brand-400">
+                extract the application on-device
+              </a>{' '}
+              into your vault.
             </p>
           ) : (
             <textarea

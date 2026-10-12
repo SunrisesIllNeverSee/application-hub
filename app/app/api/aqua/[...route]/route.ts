@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isLocalFirst } from '@/lib/local-first-guard'
 
 // POST /api/aqua/<bridge-route> — AQUA staging proxy (AP-M04-SITE).
 //
@@ -23,6 +24,16 @@ export async function POST(
 ) {
   if (process.env.AQUA_STAGING !== '1')
     return NextResponse.json({ error: 'not found' }, { status: 404 })
+
+  // IR-010: a staging proxy must not silently become a private-data bypass —
+  // under local-first this surface refuses entirely (the bridge path can
+  // carry draft/approve/packet payloads with private text). Legitimate
+  // isolated staging keeps working when only AQUA_STAGING is set.
+  if (isLocalFirst())
+    return NextResponse.json(
+      { error: 'staging proxy unavailable under local-first', local_first: true },
+      { status: 403 },
+    )
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

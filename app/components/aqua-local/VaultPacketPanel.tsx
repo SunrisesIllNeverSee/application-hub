@@ -182,9 +182,13 @@ export function VaultPacketPanel({
     try {
       const storage = await vault.ensureStorage()
       const kp = await generateSignerKeyPair()
+      // IR-016: signer class reflects the ACTUAL session — an anonymous
+      // vault must not claim authenticated-account backing.
+      const { createClient } = await import('@/lib/supabase/client')
+      const { data: { session } } = await createClient().auth.getSession()
       await attestPacket(storage, {
         packet_id: frozenId,
-        signer_class: 'authenticated-account',
+        signer_class: session?.user ? 'authenticated-account' : 'local-only',
         user_ack: ack === true,
         privateKey: kp.privateKey,
         pubkey_b64: kp.pubkey_b64,

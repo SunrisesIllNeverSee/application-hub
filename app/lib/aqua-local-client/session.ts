@@ -70,6 +70,10 @@ export const ONBOARDING_APPLICATION_ID = 'local-onboarding'
 export interface BankVersion {
   record: VersionRecord
   approval: 'approved' | 'rejected' | null
+  /** IR-017: class of the latest decision actor — agent decisions are
+      advisory review, shown distinctly; only 'human' qualifies a version
+      for packets. */
+  actor_class?: string
   /** IR-019: the displayed decision came from a backup file — it is shown
       but does NOT qualify the version for packets until a fresh local
       decision is recorded. */
@@ -165,6 +169,7 @@ export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
     const bv: BankVersion = {
       record: v,
       approval: ap && ap.version_sha256 === v.sha256 ? ap.decision : null,
+      actor_class: ap?.actor_class,
       restored: ap?.restored_from_backup === true && ap.version_sha256 === v.sha256,
       provenance: provenanceByVersion.get(v.id) ?? null,
     }
