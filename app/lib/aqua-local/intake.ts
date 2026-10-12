@@ -199,12 +199,16 @@ export interface LegacyImportResult {
 }
 
 /** Deterministic occurrence id for an imported pair — stable so a re-import
-    of the same Q&A adds a version rather than a duplicate answer. */
-function importOccurrenceId(questionText: string): string {
+    of the same Q&A adds a version rather than a duplicate answer.
+    IR-031: hash the FULL normalized text (never a truncated prefix — two
+    distinct questions sharing a 280-char head must not collapse), and
+    mix in the pair's batch position so a literal-duplicate question in the
+    same import still gets its own slot. */
+function importOccurrenceId(questionText: string, batchIndex: number): string {
   const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
   let h = 0
   for (let i = 0; i < norm.length; i++) h = (Math.imul(h, 31) + norm.charCodeAt(i)) | 0
-  return `import-${(h >>> 0).toString(36)}`
+  return `import-${(h >>> 0).toString(36)}-${batchIndex}`
 }
 
 /**
@@ -229,9 +233,13 @@ export async function importLegacyQAPairs(
   let created = 0
   let versions = 0
   let skipped = 0
-  for (const p of pairs) {
+  for (let idx = 0; idx < pairs.length; idx++) {
+    const p = pairs[idx]
     if (p.answer_text.trim().length < 10) { skipped++; continue }
-    const occ = importOccurrenceId(p.question_text)
+    // IR-031b: a pair with no real question binds the answer to nothing —
+    // skip rather than collapse every such pair into one slot.
+    if (p.question_text.trim().length < 8) { skipped++; continue }
+    const occ = importOccurrenceId(p.question_text, idx)
     const key = `answer-bank::${occ}`
     let answer = byOccurrence.get(key)
     if (!answer) {

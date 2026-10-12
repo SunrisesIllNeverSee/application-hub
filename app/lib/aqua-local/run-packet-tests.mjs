@@ -826,4 +826,28 @@ await t('IR-017: agent-classed approval does not satisfy the packet gate', async
 })
 
 
+await t('IR-029: unreachable-state packet refuses signoff pre-write', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet, record } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  // simulate a restored unreachable state — storage accepts it; attest must not
+  await s.put('packet_states', {
+    packet_id: packet.packet_id, state: 'submitted_external_observed',
+    history: [{ state: 'submitted_external_observed', at: new Date().toISOString() }],
+    updated_at: new Date().toISOString(),
+  })
+  await assert.rejects(
+    () => attestPacket(s, {
+      packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+      manifest_sha256: record.manifest_sha256,
+    }),
+    /cannot sign a packet in state/,
+  )
+  assert.equal(await s.get('signoffs', packet.packet_id), undefined)
+})
+
+
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

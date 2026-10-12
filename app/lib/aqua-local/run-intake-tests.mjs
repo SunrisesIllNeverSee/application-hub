@@ -157,4 +157,28 @@ await t('provider-shaped JSON output parses via parsePairs', async () => {
 })
 
 
+
+await t('IR-031: distinct questions sharing a 280-char prefix get separate slots', async () => {
+  const s = createMemoryStorage()
+  const shared = 'Shared prefix question '.padEnd(280, 'x')
+  const pairs = [
+    { question_text: shared + 'A', answer_text: 'First distinct answer here.', theme: 'other', confidence: 'draft' },
+    { question_text: shared + 'B', answer_text: 'Second distinct answer here.', theme: 'other', confidence: 'draft' },
+    { question_text: '', answer_text: 'An answer with no question at all.', theme: 'other', confidence: 'draft' },
+  ]
+  const res = await importLegacyQAPairs(s, SECRET, pairs, { label: 'test' })
+  assert.equal(res.created_answers, 2, 'two distinct questions = two slots')
+  assert.equal(res.skipped_short, 1, 'empty question skipped')
+})
+
+await t('IR-032: bare ?-line inside an answer stays answer text', async () => {
+  const pairs = extractQAPairsDeterministic(
+    'Q: Tell us about the team?\nA: We wondered — is this really the right path? Yes it is.\nA question inside?'
+  )
+  assert.equal(pairs.length, 1, 'mid-answer ?-line must not split the pair')
+  assert.ok(pairs[0].answer_text.includes('right path?'))
+  assert.ok(pairs[0].answer_text.includes('A question inside?'))
+})
+
+
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

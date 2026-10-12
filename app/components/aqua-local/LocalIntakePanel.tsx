@@ -50,14 +50,14 @@ export function LocalIntakePanel() {
   const [mode, setMode] = useState<'questions' | 'qa'>('questions')
   const [pairs, setPairs] = useState<ExtractedPair[] | null>(null)
   const [qaResult, setQaResult] = useState<LegacyImportResult | null>(null)
-  const [hasProvider, setHasProvider] = useState(false)
+  const [providers, setProviders] = useState<{ provider_id: string; base_url?: string; model_preference?: string }[]>([])
 
   useEffect(() => {
     if (vault.status !== 'unlocked') return
     let cancelled = false
     void vault.ensureStorage()
       .then((s) => listProviders(s))
-      .then((ps) => { if (!cancelled) setHasProvider(ps.length > 0) })
+      .then((ps) => { if (!cancelled) setProviders(ps.map((p) => ({ provider_id: p.provider_id, base_url: p.base_url, model_preference: p.model_preference }))) })
       .catch(() => undefined)
     return () => { cancelled = true }
   }, [vault, vault.status])
@@ -108,13 +108,14 @@ export function LocalIntakePanel() {
       const storage = await vault.ensureStorage()
       const secret = vault.getSecret()
       if (!secret) throw new Error('Vault locked')
-      const providers = await listProviders(storage)
-      if (providers.length === 0) throw new Error('No provider configured — set one up in the vault panel')
+      const cfgs = await listProviders(storage)
+      const chosen = providers[0] ?? cfgs[0]
+      if (!chosen) throw new Error('No provider configured — set one up in the vault panel')
       const { text } = await generateDraft(storage, secret, true, {
-        provider_id: providers[0].provider_id,
+        provider_id: chosen.provider_id,
         prompt: buildQAPairsPrompt(content, 'other'),
         system: SYSTEM_PROMPT,
-        model: providers[0].model_preference,
+        model: chosen.model_preference,
       })
       setPairs(parsePairs(text))
     } catch (e) {
@@ -244,10 +245,19 @@ export function LocalIntakePanel() {
         <button className="btn-primary" disabled={!canExtract || busy} onClick={extract}>
           Extract on this device
         </button>
-        {mode === 'qa' && hasProvider && (
-          <button className="btn-secondary" disabled={!canExtract || busy} onClick={() => void extractWithProvider()}>
-            {busy ? 'Extracting…' : 'Extract with my provider (consent shown)'}
-          </button>
+        {mode === 'qa' && providers.length > 0 && (
+          <>
+            <button className="btn-secondary" disabled={!canExtract || busy} onClick={() => void extractWithProvider()}>
+              {busy ? 'Extracting…' : `Extract with ${providers[0].provider_id}`}
+            </button>
+            {/* IR-033: disclose the actual egress — same standard as the
+                drafting consent disclosure. The paste goes ONLY to the
+                configured endpoint; the AQUA server never sees it. */}
+            <p className="basis-full font-mono text-[10px] text-neutral-400 dark:text-neutral-500">
+              sends your paste directly to {providers[0].provider_id}
+              {providers[0].base_url ? ` @ ${providers[0].base_url}` : ''} — a consent receipt is stored first
+            </p>
+          </>
         )}
         <p className="text-xs text-neutral-500">
           {canExtract

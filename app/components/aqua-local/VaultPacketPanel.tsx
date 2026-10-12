@@ -37,7 +37,9 @@ interface VersionChoice {
   id: string
   title: string
   created_at: string
-  decision: 'approved' | 'rejected' | null
+  /** 'agent'/'restored' are honest labels for decisions that cannot satisfy
+      the freeze gate — they display but never qualify. */
+  decision: 'approved' | 'rejected' | 'agent' | 'restored' | null
   method: string
 }
 
@@ -78,13 +80,17 @@ export function VaultPacketPanel({
       storage.getAll<ApprovalRecord>('approvals'),
     ])
     const appAnswers = answers.filter((a) => a.scope.application_id === programId)
-    const latestDecision = new Map<string, 'approved' | 'rejected'>()
+    // IR-030: mirror the freeze gate — 'approved' only counts when the
+    // latest decision is human and not backup-restored; everything else
+    // keeps its real decision so the UI can label it.
+    const latestDecision = new Map<string, 'approved' | 'rejected' | 'agent' | 'restored' | null>()
     // IR-007: LF-18 authoritative ordering — seq beats legacy timestamps.
     const sorted = [...approvals].sort(compareApprovals)
     for (const ap of sorted) {
-      if (ap.decision === 'approved' || ap.decision === 'rejected') {
-        latestDecision.set(ap.version_id, ap.decision)
-      }
+      if (ap.decision !== 'approved' && ap.decision !== 'rejected') continue
+      if (ap.restored_from_backup) latestDecision.set(ap.version_id, 'restored')
+      else if (ap.actor_class !== 'human') latestDecision.set(ap.version_id, 'agent')
+      else latestDecision.set(ap.version_id, ap.decision)
     }
     const next: RowState[] = questions.map((q) => {
       const occ = q.archived_question_id
@@ -103,8 +109,10 @@ export function VaultPacketPanel({
           decision: latestDecision.get(v.id) ?? null,
           method: v.method,
         }))
+      // IR-030: never auto-prefer a version that can't freeze — only
+      // human-approved, non-restored versions qualify.
       const preferred =
-        [...vs].reverse().find((v) => v.decision === 'approved') ?? vs.at(-1)
+        [...vs].reverse().find((v) => v.decision === 'approved') ?? null
       return {
         occurrenceId: occ,
         text: q.asked_as ?? occ,
@@ -318,7 +326,7 @@ export function VaultPacketPanel({
                       {r.versions.map((v) => (
                         <option key={v.id} value={v.id}>
                           {v.title || 'untitled'} · {v.method} ·{' '}
-                          {v.decision ?? 'unapproved'} · {v.created_at.slice(0, 10)}
+                          {v.decision === 'agent' ? 'agent-reviewed' : v.decision === 'restored' ? 'restored' : (v.decision ?? 'unapproved')} · {v.created_at.slice(0, 10)}
                         </option>
                       ))}
                     </select>

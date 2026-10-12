@@ -120,14 +120,14 @@ export async function attestPacket(
 
   const state = await getPacketState(storage, input.packet_id)
   if (!state) throw new VaultNotFoundError(`packet not found: ${input.packet_id}`)
-  // IR-028: refuse BEFORE any write when the packet is in a terminal state —
-  // never write a signoff record for a dead packet then throw on the
-  // transition (thrown-after-write leaves a phantom signoff row).
-  if (state.state === 'exported') {
-    throw new PacketStateError('cannot sign an already-exported packet — freeze a new packet instead')
-  }
-  if (state.state === 'discarded') {
-    throw new PacketStateError('cannot sign a discarded packet — freeze a new packet instead')
+  // IR-028/IR-029: allowlist the writeable states BEFORE any write — a
+  // packet in ANY terminal or unreachable state (exported, discarded,
+  // submitted_external_observed — e.g. arriving via a restored backup)
+  // must refuse before a signoff row can be written, never after.
+  if (state.state !== 'prepared' && state.state !== 'signed') {
+    throw new PacketStateError(
+      `cannot sign a packet in state '${state.state}' — freeze a new packet instead`,
+    )
   }
 
   // IR-020: check the EXISTING signoff before writing — when it is a

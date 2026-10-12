@@ -130,7 +130,12 @@ export function extractQAPairsDeterministic(text: string): ExtractedPair[] {
       if (aMatch[1]) answerBuf.push(aMatch[1])
       continue
     }
-    if (qMatch && !aMatch) {
+    // IR-032: once an answer is being collected, a bare '?'-terminated line
+    // is answer TEXT, not a new question — real questions inside answers
+    // carry explicit markers (Q:/Question:/###/numbered/bullet).
+    const explicitMarker = /^\s*(?:q\s*[:.)]|question\s*[:.)]|#{1,4}\s*|\d+[\).]\s+|[-*•]\s*\S)/i.test(line)
+    const isQuestion = qMatch && !aMatch && (answerBuf.length === 0 || explicitMarker)
+    if (isQuestion) {
       flush()
       const m = line.match(Q_RE)
       const qText = (m?.[1] ?? line.replace(/^\s*(?:q\s*[:.)]|question\s*[:.)]|#{1,4}\s*|\d+[\).]\s+|[-*•]\s*)\s*/i, '')).trim()
