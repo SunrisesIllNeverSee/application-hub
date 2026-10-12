@@ -548,10 +548,20 @@ export function createGoogleAdapter(opts?: { model?: string }): ProviderAdapter 
   }
 }
 
-/** Ollama (self-hosted) — direct browser call to the user's own endpoint. */
+/** Ollama (self-hosted) — direct browser call to the user's own endpoint.
+    The ngrok bypass header is sent ONLY for remote tunnels — localhost Ollama
+    rejects the CORS preflight when that header is present (it is not in the
+    daemon's Access-Control-Allow-Headers list). */
+function isLocalEndpoint(base: string): boolean {
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(base)
+}
+
 export function createOllamaAdapter(opts: { base_url: string; model?: string }): ProviderAdapter {
   const model = opts.model ?? DEFAULT_MODELS.ollama
   const base = opts.base_url.replace(/\/+$/, '')
+  const remoteHeaders: Record<string, string> = isLocalEndpoint(base)
+    ? {}
+    : { 'ngrok-skip-browser-warning': 'true' }
   return {
     id: 'ollama-byok',
     mode: 'byok',
@@ -564,7 +574,7 @@ export function createOllamaAdapter(opts: { base_url: string; model?: string }):
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
+          ...remoteHeaders,
         },
         body: JSON.stringify({
           model: req.model ?? model,
@@ -687,9 +697,10 @@ export async function testProviderConnection(
   if (providerId === 'ollama') {
     const base = (ctx.base_url ?? '').replace(/\/+$/, '')
     if (!base) throw new ProviderKeyError('Ollama base URL required')
-    const res = await withTimeout(`${base}/api/tags`, {
-      headers: { 'ngrok-skip-browser-warning': 'true' },
-    }, 6000)
+    const headers: Record<string, string> = isLocalEndpoint(base)
+      ? {}
+      : { 'ngrok-skip-browser-warning': 'true' }
+    const res = await withTimeout(`${base}/api/tags`, { headers }, 6000)
     if (!res.ok) throw new ProviderEgressError(`Ollama returned HTTP ${res.status}`)
     const data = (await res.json()) as { models?: { name: string }[] }
     const names = (data.models ?? []).map((m) => m.name)

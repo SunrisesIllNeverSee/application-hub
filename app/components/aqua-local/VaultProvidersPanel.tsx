@@ -141,6 +141,13 @@ export function VaultProvidersPanel() {
                           (cfg.last_tested_at ? ' · tested' : ' · not tested')
                         : 'Not configured'}
                     </p>
+                    {/* Test outcome must be visible even with the card collapsed. */}
+                    {error[def.id] && !expanded && (
+                      <p className="truncate text-xs text-danger-600 dark:text-danger-400">{error[def.id]}</p>
+                    )}
+                    {notice[def.id] && !expanded && (
+                      <p className="truncate text-xs text-success-700 dark:text-success-400">{notice[def.id]}</p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

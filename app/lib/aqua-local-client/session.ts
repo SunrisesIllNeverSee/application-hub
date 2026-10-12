@@ -81,13 +81,23 @@ export interface BankEntry {
 // re-resolve, never hand a different user the previous user's vault handle.
 const storagePromises = new Map<string, Promise<VaultStorage>>()
 
+let lastResolvedDbName: string | null = null
+
 export async function resolveVaultDbName(): Promise<string> {
+  // Read the LOCAL session (no network): getUser() validates against the
+  // server, and a transient failure (429, offline) would silently flip the
+  // vault to the shared 'aqua-local' DB — dropping the unlocked secret and
+  // potentially writing another user's data into the anon vault. Account
+  // switches still register because logout clears the local session.
   try {
     const { createClient } = await import('@/lib/supabase/client')
-    const { data } = await createClient().auth.getUser()
-    return data.user?.id ? `aqua-local-${data.user.id}` : 'aqua-local'
+    const { data } = await createClient().auth.getSession()
+    const uid = data.session?.user?.id
+    const name = uid ? `aqua-local-${uid}` : (lastResolvedDbName ?? 'aqua-local')
+    lastResolvedDbName = name
+    return name
   } catch {
-    return 'aqua-local'
+    return lastResolvedDbName ?? 'aqua-local'
   }
 }
 

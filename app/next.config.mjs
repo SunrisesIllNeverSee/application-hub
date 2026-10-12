@@ -21,7 +21,11 @@ const nextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data: https:",
           "font-src 'self' data:",
-          "connect-src 'self' https://*.supabase.co https://api.stripe.com",
+          // Local-first BYOK egress: the browser calls provider APIs directly
+          // with the user's vault-held key — these origins must be reachable.
+          // Ollama covers the default localhost port only; custom HTTPS
+          // endpoints need an owner-approved CSP addition.
+          "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com http://localhost:11434 http://127.0.0.1:11434",
           "frame-src 'self' https://js.stripe.com",
           "form-action 'self'",
           "base-uri 'self'",
