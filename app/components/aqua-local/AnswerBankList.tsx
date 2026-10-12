@@ -52,8 +52,11 @@ function ApprovalBadge({ approval, restored, actorClass }: { approval: BankVersi
   }
   if (approval === 'rejected') {
     return (
-      <span className="inline-block rounded-full border border-danger-500/30 px-2 py-0.5 text-[10px] font-medium text-danger-600 dark:text-danger-400">
-        Rejected
+      <span
+        className="inline-block rounded-full border border-danger-500/30 px-2 py-0.5 text-[10px] font-medium text-danger-600 dark:text-danger-400"
+        title={actorClass === 'agent' ? 'Agent-rejected — automated review, not a human decision' : undefined}
+      >
+        {actorClass === 'agent' ? 'Agent-rejected' : 'Rejected'}
       </span>
     )
   }

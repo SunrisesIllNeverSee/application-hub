@@ -73,7 +73,7 @@ export async function computeVaultScore(
     // Hosted semantics: averageWordCount is per-ANSWER (latest body), not
     // per-version — dividing by version count would over-weight heavily
     // edited answers vs the hosted formula.
-    const latest = [...vs].sort((x, y) => x.created_at.localeCompare(y.created_at)).at(-1)
+    const latest = [...vs].sort((x, y) => x.created_at.localeCompare(y.created_at) || x.id.localeCompare(y.id)).at(-1)
     if (!latest) continue
     try {
       const body = await decryptText(secret, JSON.parse(latest.body))

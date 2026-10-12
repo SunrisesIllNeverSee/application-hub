@@ -31,6 +31,7 @@ const PROVIDER_ENDPOINTS: Record<string, string> = {
   anthropic: 'https://api.anthropic.com/v1/messages',
   openai: 'https://api.openai.com/v1/chat/completions',
   google: 'https://generativelanguage.googleapis.com/v1beta/models',
+  ollama: 'http://localhost:11434/api/chat',
 }
 
 // AM-0017 — local-first intake. The hosted pipeline persists pasted
@@ -132,11 +133,14 @@ export function LocalIntakePanel() {
       // re-fetched cfg that could differ from what the user was shown.
       const chosen = providers.find((p) => p.provider_id === providerId) ?? providers[0]
       if (!chosen) throw new Error('No provider configured — set one up in the vault panel')
+      // disclosed_config pins the adapter to what the user was SHOWN —
+      // egress cannot diverge from the disclosure mid-session.
       const { text, provider, model } = await generateDraft(storage, secret, true, {
         provider_id: chosen.provider_id,
         prompt: buildQAPairsPrompt(content, 'other'),
         system: SYSTEM_PROMPT,
         model: chosen.model_preference,
+        disclosed_config: { base_url: chosen.base_url, model_preference: chosen.model_preference },
       })
       setPairs(parsePairs(text))
       setPairProvenance({ deterministic_parse: false, provider: provider ?? undefined, model: model ?? undefined })

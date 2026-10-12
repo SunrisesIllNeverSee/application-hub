@@ -574,6 +574,10 @@ export interface GenerateDraftInput {
   prompt: string
   system?: string
   model?: string
+  /** Pinned config from the UI disclosure — when set, the adapter is built
+      from THESE values so actual egress cannot diverge from what the user
+      was shown mid-session (stored config may have been edited). */
+  disclosed_config?: { base_url?: string; model_preference?: string }
 }
 
 export interface GenerateDraftResult {
@@ -595,8 +599,18 @@ export async function generateDraft(
   userConsent: boolean,
   input: GenerateDraftInput,
 ): Promise<GenerateDraftResult> {
-  const cfg = await loadProviderConfig(storage, input.provider_id)
-  if (!cfg) throw new ProviderKeyError(`provider '${input.provider_id}' is not configured in this vault`)
+  const stored = await loadProviderConfig(storage, input.provider_id)
+  if (!stored) throw new ProviderKeyError(`provider '${input.provider_id}' is not configured in this vault`)
+  // Only DEFINED disclosed fields pin the adapter — an absent key must not
+  // erase a stored value.
+  const cfg = input.disclosed_config
+    ? {
+        ...stored,
+        ...Object.fromEntries(
+          Object.entries(input.disclosed_config).filter(([, v]) => v !== undefined),
+        ),
+      }
+    : stored
   const adapter = adapterForProvider(input.provider_id, cfg)
   const { result, consent } = await generateWithConsent(
     storage,

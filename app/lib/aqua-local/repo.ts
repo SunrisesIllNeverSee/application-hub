@@ -130,6 +130,10 @@ export async function buildVersionPayload(
   input: Pick<CreateVersionInput, 'answer_id' | 'title' | 'body' | 'method' | 'provenance' | 'provider' | 'model' | 'observed_flags'>,
   parentVersionId: string | null = null,
 ): Promise<{ record: VersionRecord; receipt: ProvenanceRecord }> {
+  // The canon blank-guard applies to EVERY version writer, not only the
+  // createVersion path — a Cf-only body must never become an encrypted
+  // version that could be approved + packet-bound.
+  if (isBlankBody(input.body)) throw new VaultBlankBodyError()
   const sha256 = await sha256Hex(canonicalJson({ title: input.title, body: input.body }))
   const blob = await encryptText(secret, input.body)
   const record: VersionRecord = {
@@ -156,7 +160,7 @@ export async function buildVersionPayload(
 
 /** Put a pre-built version record + provenance receipt. Inside a caller tx
     the same puts may be issued directly on the tx-scoped storage. */
-export async function insertVersion(
+async function insertVersion(
   storage: VaultStorage,
   record: VersionRecord,
   receipt: ProvenanceRecord,
