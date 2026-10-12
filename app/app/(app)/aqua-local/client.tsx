@@ -7,6 +7,7 @@ import { AnswerBankList } from '@/components/aqua-local/AnswerBankList'
 import { LocalAnswerEditor, type EditTarget } from '@/components/aqua-local/LocalAnswerEditor'
 import { OnboardingLocalCard } from '@/components/aqua-local/OnboardingLocalCard'
 import { RestoreBackupPanel } from '@/components/aqua-local/RestoreBackupPanel'
+import { VaultProvidersPanel } from '@/components/aqua-local/VaultProvidersPanel'
 import {
   loadBank,
   saveVersion,
@@ -290,6 +291,10 @@ export default function AquaLocal() {
               </div>
             )}
           </section>
+
+          {/* SP021/LF-16 — local-first BYOK provider configuration. Keys live
+              in the vault only; generation egress is browser→provider. */}
+          <VaultProvidersPanel />
         </>
       )}
 

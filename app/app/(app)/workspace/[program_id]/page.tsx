@@ -18,6 +18,13 @@ import { QuestionTree } from '@/components/QuestionTree'
 import { CompiledOutput } from '@/components/CompiledOutput'
 import { SubmissionExport } from '@/components/SubmissionExport'
 import { formatDeadline, formatProgramStartDate, cn } from '@/lib/utils'
+import { isLocalFirst } from '@/lib/local-first-guard'
+import {
+  VaultAwareQuestionTree,
+  VaultReadiness,
+  VaultCompiledOutput,
+} from '@/components/aqua-local/VaultWorkspaceOverlay'
+import { VaultPacketPanel } from '@/components/aqua-local/VaultPacketPanel'
 
 interface Props {
   params: Promise<{ program_id: string }>
@@ -154,22 +161,28 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
             </div>
           </div>
           <div className="flex-shrink-0 flex items-center gap-3">
-            <div className="hidden md:block min-w-[160px]">
-              <div className="flex items-center justify-between text-[10px] text-neutral-500 dark:text-neutral-500 mb-1">
-                <span>Readiness</span>
-                <span className="tabular-nums">
-                  {answeredRequired}/{requiredCount} required
-                </span>
-              </div>
-              <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-1.5">
-                <div
-                  className={cn(
-                    'h-1.5 rounded-full transition-all',
-                    progressPct >= 80 ? 'bg-success-500' : progressPct >= 50 ? 'bg-brand-500' : 'bg-warning-500'
-                  )}
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
+            <div className="hidden md:block">
+              {isLocalFirst() ? (
+                <VaultReadiness programId={program.id} questions={questions} />
+              ) : (
+                <div className="min-w-[160px]">
+                  <div className="flex items-center justify-between text-[10px] text-neutral-500 dark:text-neutral-500 mb-1">
+                    <span>Readiness</span>
+                    <span className="tabular-nums">
+                      {answeredRequired}/{requiredCount} required
+                    </span>
+                  </div>
+                  <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-1.5">
+                    <div
+                      className={cn(
+                        'h-1.5 rounded-full transition-all',
+                        progressPct >= 80 ? 'bg-success-500' : progressPct >= 50 ? 'bg-brand-500' : 'bg-warning-500'
+                      )}
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <ApplicationStatusTracker
               programId={program.id}
@@ -189,13 +202,23 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
         <div className="flex-1 flex flex-col md:flex-row min-h-0">
           {/* Left: Question tree */}
           <aside className="md:w-80 md:flex-shrink-0 md:border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/40 md:h-full md:overflow-hidden">
-            <QuestionTree
-              programId={program.id}
-              questions={questions}
-              answerMap={answerMap}
-              selectedQuestionId={resolvedSelectedId}
-              currentTab={tab !== 'editor' ? tab : undefined}
-            />
+            {isLocalFirst() ? (
+              <VaultAwareQuestionTree
+                programId={program.id}
+                questions={questions}
+                answerMap={answerMap}
+                selectedQuestionId={resolvedSelectedId}
+                currentTab={tab !== 'editor' ? tab : undefined}
+              />
+            ) : (
+              <QuestionTree
+                programId={program.id}
+                questions={questions}
+                answerMap={answerMap}
+                selectedQuestionId={resolvedSelectedId}
+                currentTab={tab !== 'editor' ? tab : undefined}
+              />
+            )}
           </aside>
 
           {/* Right: Editor + Compiled tabs */}
@@ -242,35 +265,63 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
                 {/* Tab content */}
                 <div className="flex-1 overflow-y-auto min-h-0">
                   {tab === 'submit' ? (
-                    <SubmissionExport
-                      programName={program.name}
-                      programUrl={program.url}
-                      questions={questions.map((q) => ({
-                        archived_question_id: q.archived_question_id,
-                        item: {
-                          asked_as: q.asked_as,
-                          word_limit: q.word_limit,
-                          char_limit: q.char_limit,
-                          section: q.section,
-                          order_index: q.order_index,
-                          is_required: q.is_required,
-                          archived_question: q.archived_question ? { theme: q.archived_question.theme } : null,
-                        },
-                        answer: answerMap[q.archived_question_id]
-                          ? {
-                              answer_content: answerMap[q.archived_question_id].answer_content ?? '',
-                              word_count: answerMap[q.archived_question_id].word_count,
-                            }
-                          : null,
-                      }))}
-                    />
+                    isLocalFirst() ? (
+                      <div className="px-6 py-5">
+                        <div className="max-w-2xl">
+                          <VaultPacketPanel
+                            programId={program.id}
+                            programName={program.name}
+                            questions={questions.map((q) => ({
+                              archived_question_id: q.archived_question_id,
+                              asked_as: q.asked_as,
+                              is_required: q.is_required,
+                              order_index: q.order_index,
+                            }))}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <SubmissionExport
+                        programName={program.name}
+                        programUrl={program.url}
+                        questions={questions.map((q) => ({
+                          archived_question_id: q.archived_question_id,
+                          item: {
+                            asked_as: q.asked_as,
+                            word_limit: q.word_limit,
+                            char_limit: q.char_limit,
+                            section: q.section,
+                            order_index: q.order_index,
+                            is_required: q.is_required,
+                            archived_question: q.archived_question ? { theme: q.archived_question.theme } : null,
+                          },
+                          answer: answerMap[q.archived_question_id]
+                            ? {
+                                answer_content: answerMap[q.archived_question_id].answer_content ?? '',
+                                word_count: answerMap[q.archived_question_id].word_count,
+                              }
+                            : null,
+                        }))}
+                      />
+                    )
                   ) : tab === 'compiled' ? (
-                    <CompiledOutput
-                      question={selectedQuestion.asked_as}
-                      answer={selectedAnswer?.answer_content ?? ''}
-                      wordLimit={selectedQuestion.word_limit}
-                      charLimit={selectedQuestion.char_limit}
-                    />
+                    isLocalFirst() ? (
+                      <VaultCompiledOutput
+                        programId={program.id}
+                        question={selectedQuestion.asked_as}
+                        archivedQuestionId={selectedQuestion.archived_question_id}
+                        hostedAnswer={selectedAnswer?.answer_content ?? ''}
+                        wordLimit={selectedQuestion.word_limit ?? undefined}
+                        charLimit={selectedQuestion.char_limit ?? undefined}
+                      />
+                    ) : (
+                      <CompiledOutput
+                        question={selectedQuestion.asked_as}
+                        answer={selectedAnswer?.answer_content ?? ''}
+                        wordLimit={selectedQuestion.word_limit}
+                        charLimit={selectedQuestion.char_limit}
+                      />
+                    )
                   ) : (
                     <div className="px-6 py-5">
                       <div className="max-w-2xl">

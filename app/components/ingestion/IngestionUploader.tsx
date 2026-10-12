@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 type IntakeCheckpoint =
   | 'entity_checkpoint'
@@ -147,6 +148,23 @@ export function IngestionUploader() {
     } finally {
       setBusy(false)
     }
+  }
+
+  if (LOCAL_FIRST) {
+    // Local-first: pasted application text is private content and the hosted
+    // ingest/review routes refuse under the flag. Show the honest state
+    // instead of a uploader that can only 403.
+    return (
+      <div className="rounded-lg border border-neutral-800 bg-neutral-950 p-5">
+        <p className="text-sm font-medium text-neutral-100">Import unavailable in local-first mode</p>
+        <p className="mt-2 text-xs leading-6 text-neutral-400">
+          Pasted application text never leaves this device under the local-first boundary, so the
+          hosted ingestion pipeline is off. Author and review answers in the{' '}
+          <a href="/aqua-local" className="text-brand-400 underline underline-offset-2">local vault</a>;
+          public catalogs remain readable throughout the site.
+        </p>
+      </div>
+    )
   }
 
   return (

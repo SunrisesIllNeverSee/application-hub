@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 // The pound-out loop in one card:
 //   paste the application form → source archived, program indexed, questions
@@ -79,6 +80,30 @@ export function IntakeForm() {
   }
 
   if (!open) {
+    // Local-first: pasted application forms contain private text and the
+    // hosted intake/fill routes refuse under the flag (owner-approved
+    // boundary). Don't dead-end on a 403 — explain and point to the vault.
+    if (LOCAL_FIRST) {
+      return (
+        <div className="card w-full p-4 mb-6 text-left border-dashed">
+          <span className="text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+            + New application
+          </span>
+          <span className="ml-2 text-sm text-neutral-500 dark:text-neutral-400">
+            Form paste is disabled in local-first mode (no pasted text is sent to the
+            server). Open an opportunity from{' '}
+            <Link href="/applications" className="text-brand-600 underline underline-offset-2 dark:text-brand-400">
+              Applications
+            </Link>
+            {' '}and answer its questions in the{' '}
+            <Link href="/aqua-local" className="text-brand-600 underline underline-offset-2 dark:text-brand-400">
+              local vault
+            </Link>
+            .
+          </span>
+        </div>
+      )
+    }
     return (
       <button
         onClick={() => setOpen(true)}
