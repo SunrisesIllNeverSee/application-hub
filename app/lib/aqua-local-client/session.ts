@@ -19,6 +19,18 @@ import {
   importVault,
   previewVaultImport,
   decryptText,
+  storeProviderKey,
+  loadProviderKey,
+  loadProviderConfig,
+  deleteProviderKey,
+  listProviderConfigs,
+  markProviderTested,
+  generateWithConsent,
+  adapterForProvider,
+  testProviderConnection,
+  ProviderConsentError,
+  ProviderKeyError,
+  ProviderEgressError,
   VaultDecryptError,
   VaultBlankBodyError,
   VaultScopeError,
@@ -42,6 +54,9 @@ export {
   VaultNotFoundError,
   VaultTamperError,
   VaultBackupVersionError,
+  ProviderConsentError,
+  ProviderKeyError,
+  ProviderEgressError,
 }
 export type { VaultStorage, VersionMethod }
 export type { BackupPreview, ImportResult } from '../aqua-local/index.ts'
@@ -165,6 +180,9 @@ export interface SaveVersionInput {
   body: string
   method?: VersionMethod
   provenance?: string | null
+  provider?: string | null
+  model?: string | null
+  observed_flags?: Record<string, boolean>
 }
 
 /**
@@ -193,6 +211,9 @@ export async function saveVersion(
     body: input.body,
     method: input.method ?? 'manual',
     provenance: input.provenance ?? null,
+    provider: input.provider ?? null,
+    model: input.model ?? null,
+    observed_flags: input.observed_flags,
   })
 }
 
@@ -299,7 +320,15 @@ export async function saveScopedVersion(
   storage: VaultStorage,
   secret: string,
   scope: { application_id: string; question_occurrence_id: string },
-  input: { title: string; body: string; method?: VersionMethod; provenance?: string | null },
+  input: {
+    title: string
+    body: string
+    method?: VersionMethod
+    provenance?: string | null
+    provider?: string | null
+    model?: string | null
+    observed_flags?: Record<string, boolean>
+  },
 ): Promise<VersionRecord> {
   const candidates = await findAnswersForOccurrence(storage, scope.question_occurrence_id)
   const exact = candidates.find((a) => a.scope.application_id === scope.application_id) ?? null
@@ -323,6 +352,9 @@ export async function saveScopedVersion(
     body: input.body,
     method: input.method ?? 'manual',
     provenance: input.provenance ?? null,
+    provider: input.provider ?? null,
+    model: input.model ?? null,
+    observed_flags: input.observed_flags,
   })
 }
 
@@ -343,8 +375,9 @@ export async function assertVaultSecretCompatible(
     return
   }
   const keys = await storage.getAll<{ key_blob: string }>('provider_keys')
-  if (keys.length > 0) {
-    await decryptText(secret, JSON.parse(keys[0].key_blob))
+  const secretBearing = keys.find((k) => k.key_blob)
+  if (secretBearing) {
+    await decryptText(secret, JSON.parse(secretBearing.key_blob))
   }
 }
 
@@ -385,4 +418,176 @@ export async function downloadBackup(storage: VaultStorage, secret: string): Pro
   URL.revokeObjectURL(url)
   localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString())
   return filename
+}
+
+// ---------------------------------------------------------------------------
+// LF-16/SP021 — local-first BYOK provider configuration + consented generation.
+// Keys live ONLY in the vault (provider_keys store, encrypted under the user
+// secret). Generation egress goes browser→provider directly — the AQUA server
+// never sees the key or the content.
+// ---------------------------------------------------------------------------
+
+export const SUPPORTED_PROVIDERS: {
+  id: string
+  name: string
+  keyLabel: string
+  keyPlaceholder: string
+  baseUrlLabel?: string
+  modelPlaceholder: string
+  requiresKey: boolean
+  requiresBaseUrl: boolean
+}[] = [
+  {
+    id: 'anthropic',
+    name: 'Anthropic (Claude)',
+    keyLabel: 'API key',
+    keyPlaceholder: 'sk-ant-…',
+    modelPlaceholder: 'claude-haiku-4-5-20251001',
+    requiresKey: true,
+    requiresBaseUrl: false,
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI (GPT)',
+    keyLabel: 'API key',
+    keyPlaceholder: 'sk-…',
+    modelPlaceholder: 'gpt-4o-mini',
+    requiresKey: true,
+    requiresBaseUrl: false,
+  },
+  {
+    id: 'google',
+    name: 'Google (Gemini)',
+    keyLabel: 'API key',
+    keyPlaceholder: 'AIza…',
+    modelPlaceholder: 'gemini-2.0-flash',
+    requiresKey: true,
+    requiresBaseUrl: false,
+  },
+  {
+    id: 'ollama',
+    name: 'Ollama (self-hosted)',
+    keyLabel: 'API key (optional)',
+    keyPlaceholder: '(leave blank — Ollama usually needs none)',
+    baseUrlLabel: 'Ollama URL',
+    modelPlaceholder: 'llama3.2',
+    requiresKey: false,
+    requiresBaseUrl: true,
+  },
+]
+
+export interface ProviderConfigSummary {
+  provider_id: string
+  has_key: boolean
+  base_url?: string
+  model_preference?: string
+  last_tested_at?: string
+  stored_at: string
+}
+
+export async function listProviders(storage: VaultStorage): Promise<ProviderConfigSummary[]> {
+  const recs = await listProviderConfigs(storage)
+  return recs.map((r) => ({
+    provider_id: r.provider_id,
+    has_key: Boolean(r.key_blob),
+    base_url: r.base_url,
+    model_preference: r.model_preference,
+    last_tested_at: r.last_tested_at,
+    stored_at: r.stored_at,
+  }))
+}
+
+export async function saveProvider(
+  storage: VaultStorage,
+  secret: string,
+  input: { provider_id: string; api_key?: string; base_url?: string; model_preference?: string },
+): Promise<void> {
+  if (!SUPPORTED_PROVIDERS.some((p) => p.id === input.provider_id)) {
+    throw new ProviderKeyError(`unsupported provider '${input.provider_id}'`)
+  }
+  const def = SUPPORTED_PROVIDERS.find((p) => p.id === input.provider_id)!
+  if (def.requiresKey && !input.api_key?.trim() && !(await loadProviderKey(storage, secret, input.provider_id))) {
+    throw new ProviderKeyError(`${def.name} requires an API key`)
+  }
+  if (def.requiresBaseUrl && !input.base_url?.trim()) {
+    throw new ProviderKeyError(`${def.name} requires a base URL`)
+  }
+  await storeProviderKey(storage, secret, input.provider_id, input.api_key?.trim() ?? '', {
+    base_url: input.base_url?.trim() || undefined,
+    model_preference: input.model_preference?.trim() || undefined,
+  })
+}
+
+export async function removeProvider(storage: VaultStorage, providerId: string): Promise<void> {
+  await deleteProviderKey(storage, providerId)
+}
+
+/**
+ * Real connectivity probe — calls the provider with the stored key/config.
+ * Throws an honest error on failure; records last_tested_at on success.
+ */
+export async function testProvider(
+  storage: VaultStorage,
+  secret: string,
+  providerId: string,
+): Promise<string> {
+  const cfg = await loadProviderConfig(storage, providerId)
+  const apiKey = (await loadProviderKey(storage, secret, providerId)) ?? undefined
+  const detail = await testProviderConnection(providerId, {
+    apiKey,
+    base_url: cfg?.base_url,
+    model: cfg?.model_preference,
+    fetchImpl: globalThis.fetch.bind(globalThis),
+  })
+  await markProviderTested(storage, providerId)
+  return detail
+}
+
+export interface GenerateDraftInput {
+  provider_id: string
+  /** What the provider will receive — assembled by the caller, disclosed in UI. */
+  prompt: string
+  system?: string
+  model?: string
+}
+
+export interface GenerateDraftResult {
+  text: string
+  provider: string
+  model: string | null
+  consent_id: string
+  observed: string[]
+}
+
+/**
+ * Consent-gated generation. `userConsent` must be a real user grant — the UI
+ * collects it per request. A consent receipt is written BEFORE egress so every
+ * external call has an audit trail even when the provider call fails.
+ */
+export async function generateDraft(
+  storage: VaultStorage,
+  secret: string,
+  userConsent: boolean,
+  input: GenerateDraftInput,
+): Promise<GenerateDraftResult> {
+  const cfg = await loadProviderConfig(storage, input.provider_id)
+  if (!cfg) throw new ProviderKeyError(`provider '${input.provider_id}' is not configured in this vault`)
+  const adapter = adapterForProvider(input.provider_id, cfg)
+  const { result, consent } = await generateWithConsent(
+    storage,
+    adapter,
+    {
+      prompt: input.prompt,
+      system: input.system,
+      model: input.model ?? cfg.model_preference,
+    },
+    { userConsent, secret },
+  )
+  return {
+    text: result.text,
+    provider: result.provider,
+    model: result.model,
+    consent_id: consent.id,
+    observed: result.observed,
+  }
 }

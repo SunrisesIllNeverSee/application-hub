@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 
 type ProviderKey = 'anthropic' | 'openai' | 'google' | 'ollama'
 
@@ -168,6 +170,67 @@ export function IntegrationsForm({ integrations: initial }: Props) {
     }
     setRemoving(null)
     void provider
+  }
+
+  if (LOCAL_FIRST) {
+    // Local-first custody: keys live in the on-device vault. Legacy hosted
+    // integrations remain listed (and removable) but new keys are never
+    // stored server-side.
+    return (
+      <div className="space-y-6">
+        <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-4 dark:border-brand-800/60 dark:bg-brand-950/20">
+          <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
+            Provider keys are local-first now
+          </p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+            In local-first mode your AI provider keys are encrypted in your on-device vault and
+            are sent only to the provider you choose — never to this server. Configure and test
+            providers under{' '}
+            <Link href="/aqua-local" className="font-medium text-brand-600 underline underline-offset-2 dark:text-brand-400">
+              Local vault → AI providers
+            </Link>
+            .
+          </p>
+        </div>
+
+        {integrations.length > 0 && (
+          <div>
+            <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              Legacy hosted integrations
+            </h2>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-3">
+              These keys were saved server-side before local-first mode. They are not used by the
+              local vault. Re-enter any key under the vault provider you want to keep, then remove
+              the hosted copy if you wish.
+            </p>
+            <div className="space-y-3">
+              {integrations.map((i) => (
+                <div
+                  key={i.id}
+                  className="card px-5 py-4 flex items-center justify-between gap-4"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white capitalize">
+                      {i.provider} — legacy hosted
+                    </p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      key ending {i.key_fingerprint ?? '••••••'} · {i.status}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRemove(i.id, i.provider)}
+                    disabled={removing === i.id}
+                    className="text-xs text-neutral-400 hover:text-danger-600 dark:hover:text-danger-400 transition-colors flex-shrink-0"
+                  >
+                    {removing === i.id ? 'Removing…' : 'Remove'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (

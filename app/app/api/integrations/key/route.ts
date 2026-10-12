@@ -1,12 +1,21 @@
 import { NextResponse } from 'next/server'
 import { decryptKey } from '@/lib/encryption'
 import { getRequestUser } from '@/lib/supabase/request-auth'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // GET /api/integrations/key
 // Returns the decrypted API key for the user's default BYOK integration.
 // Used by the AQUA browser extension to call AI providers directly.
 // Requires a valid session cookie or bearer JWT — never returns keys unauthenticated.
 export async function GET(req: Request) {
+  // Local-first: server-stored keys are never exported to a client — that
+  // channel exists only for the deferred extension, and secrets must not
+  // transit this route without an explicit, owner-reviewed path.
+  const refused = refusePrivateWrite({
+    detail: 'Server-stored keys are not exported in local-first mode. Configure a provider in your on-device vault instead.',
+  })
+  if (refused) return refused
+
   const { supabase, user } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

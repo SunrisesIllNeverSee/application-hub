@@ -148,6 +148,12 @@ export interface ProviderKeyRecord {
   provider_id: string // primary key
   key_blob: string // serialized EncryptedBlob
   stored_at: string
+  /** Optional provider endpoint override (e.g. Ollama base URL). */
+  base_url?: string
+  /** Optional model preference for generation calls. */
+  model_preference?: string
+  /** Last successful connectivity probe timestamp (ISO-8601). */
+  last_tested_at?: string
 }
 
 /** LF-16 — one consent receipt per generation call. Written before egress. */

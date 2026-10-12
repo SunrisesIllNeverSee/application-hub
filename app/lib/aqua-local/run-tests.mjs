@@ -10,6 +10,12 @@ import {
 import { VaultDecryptError, canonicalJson, sha256Hex } from './crypto.ts'
 import { putCatalog, getCatalog, getCatalogOffline } from './catalog.ts'
 import { exportVault, importVault, previewVaultImport, VaultTamperError } from './backup.ts'
+import {
+  storeProviderKey, generateWithConsent,
+  createAnthropicAdapter, createOpenAiAdapter, createGoogleAdapter, createOllamaAdapter,
+  ProviderConsentError, ProviderKeyError, ProviderEgressError,
+} from './providers.ts'
+import { findRelatedVaultAnswers } from './match.ts'
 
 const SECRET = 'correct-horse-battery-staple'
 let passed = 0
@@ -229,6 +235,144 @@ await t('approval records decision', async () => {
   const v = await createVersion(s, SECRET, { answer_id: a.id, title: 'v1', body: 'x', method: 'imported' })
   const ap = await approveVersion(s, { version_id: v.id, decision: 'approved', actor_class: 'human' })
   assert.equal(ap.decision, 'approved')
+})
+
+// --- typed BYOK adapters (SP021): request shape + auth header per provider ---
+await t('anthropic adapter: native messages shape + browser-access header', async () => {
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'anthropic', 'sk-ant-test')
+  const adapter = createAnthropicAdapter({ model: 'claude-test' })
+  let seen = null
+  const fetchImpl = async (url, init) => {
+    seen = { url, init, body: JSON.parse(init.body) }
+    return new Response(JSON.stringify({
+      content: [{ type: 'text', text: 'draft text' }],
+      model: 'claude-test-1',
+    }), { status: 200, headers: { 'content-type': 'application/json' } })
+  }
+  const { result, consent } = await generateWithConsent(
+    s, adapter, { prompt: 'Q?', system: 'sys' }, { userConsent: true, secret: SECRET, fetchImpl })
+  assert.equal(result.text, 'draft text')
+  assert.equal(seen.url, 'https://api.anthropic.com/v1/messages')
+  assert.equal(seen.init.headers['x-api-key'], 'sk-ant-test')
+  assert.equal(seen.init.headers['anthropic-dangerous-direct-browser-access'], 'true')
+  assert.equal(seen.body.messages[0].content, 'Q?')
+  assert.equal(seen.body.system, 'sys')
+  assert.equal(result.provider, 'anthropic')
+  assert.ok(result.observed.includes('model_reported'))
+  assert.ok(consent.id)
+})
+
+await t('openai adapter: chat/completions shape + bearer', async () => {
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'openai', 'sk-test')
+  const adapter = createOpenAiAdapter({ model: 'gpt-x' })
+  let seen = null
+  const fetchImpl = async (url, init) => {
+    seen = { url, init, body: JSON.parse(init.body) }
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: 'hi' } }], model: 'gpt-x',
+    }), { status: 200 })
+  }
+  const { result } = await generateWithConsent(
+    s, adapter, { prompt: 'Q?', system: 'S' }, { userConsent: true, secret: SECRET, fetchImpl })
+  assert.equal(seen.url, 'https://api.openai.com/v1/chat/completions')
+  assert.equal(seen.init.headers.authorization, 'Bearer sk-test')
+  assert.equal(seen.body.messages.length, 2)
+  assert.equal(result.model, 'gpt-x')
+})
+
+await t('google adapter: generateContent + model echo', async () => {
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'google', 'gkey')
+  const adapter = createGoogleAdapter({ model: 'gemini-x' })
+  let seen = null
+  const fetchImpl = async (url, init) => {
+    seen = { url, init, body: JSON.parse(init.body) }
+    return new Response(JSON.stringify({
+      candidates: [{ content: { parts: [{ text: 'gemini out' }] } }],
+      modelVersion: 'gemini-x-001',
+    }), { status: 200 })
+  }
+  const { result } = await generateWithConsent(
+    s, adapter, { prompt: 'Q?' }, { userConsent: true, secret: SECRET, fetchImpl })
+  assert.ok(seen.url.includes(':generateContent'))
+  assert.equal(seen.init.headers['x-goog-api-key'], 'gkey')
+  assert.equal(result.text, 'gemini out')
+  assert.equal(result.model, 'gemini-x-001')
+})
+
+await t('ollama adapter: endpoint-only (no key required) + native /api/chat', async () => {
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'ollama', '', { base_url: 'http://localhost:11434' })
+  const adapter = createOllamaAdapter({ base_url: 'http://localhost:11434', model: 'llama3.2' })
+  let seen = null
+  const fetchImpl = async (url, init) => {
+    seen = { url, init, body: JSON.parse(init.body) }
+    return new Response(JSON.stringify({
+      message: { content: 'local out' }, model: 'llama3.2',
+    }), { status: 200 })
+  }
+  const { result } = await generateWithConsent(
+    s, adapter, { prompt: 'Q?' }, { userConsent: true, secret: SECRET, fetchImpl })
+  assert.equal(seen.url, 'http://localhost:11434/api/chat')
+  assert.equal(seen.body.stream, false)
+  assert.equal(result.text, 'local out')
+})
+
+await t('missing consent → ProviderConsentError, no egress', async () => {
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'anthropic', 'sk-ant-test')
+  let calls = 0
+  const fetchImpl = async () => { calls++; return new Response('{}') }
+  await assert.rejects(
+    () => generateWithConsent(
+      s, createAnthropicAdapter(), { prompt: 'x' },
+      { userConsent: false, secret: SECRET, fetchImpl }),
+    ProviderConsentError)
+  assert.equal(calls, 0)
+  assert.equal((await s.getAll('provider_consents')).length, 0)
+})
+
+await t('no stored key → ProviderKeyError, consent receipt still written first', async () => {
+  const s = createMemoryStorage()
+  const fetchImpl = async () => new Response('{}')
+  await assert.rejects(
+    () => generateWithConsent(
+      s, createAnthropicAdapter(), { prompt: 'x' },
+      { userConsent: true, secret: SECRET, fetchImpl }),
+    ProviderKeyError)
+  // Consent was recorded before the key check — the audit trail exists even
+  // though the call failed.
+  assert.equal((await s.getAll('provider_consents')).length, 1)
+})
+
+await t('provider error propagates honestly (401)', async () => {
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'openai', 'bad-key')
+  const fetchImpl = async () => new Response('{"error":"invalid"}', { status: 401 })
+  await assert.rejects(
+    () => generateWithConsent(
+      s, createOpenAiAdapter(), { prompt: 'x' },
+      { userConsent: true, secret: SECRET, fetchImpl }),
+    ProviderEgressError)
+})
+
+// --- SP024 local matcher ---
+await t('match: overlap score + related vault answers are local-only', async () => {
+  const s = createMemoryStorage()
+  const a = await createAnswer(s, { application_id: 'answer-bank', question_occurrence_id: 'qa' })
+  await createVersion(s, SECRET, {
+    answer_id: a.id, title: 'leadership',
+    body: 'I led a cross-functional team through a product launch.',
+    method: 'manual',
+  })
+  const hits = await findRelatedVaultAnswers(s, SECRET, 'Describe a time you led a team')
+  assert.equal(hits.length, 1)
+  assert.ok(hits[0].similarity > 0)
+  assert.equal(hits[0].preview.slice(0, 10), 'I led a cr')
+  const misses = await findRelatedVaultAnswers(s, SECRET, 'zzzzqqq unrelated tokens xyz')
+  assert.equal(misses.length, 0)
 })
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

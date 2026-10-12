@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { CHARACTER_LIMIT, ResponseFormat } from "../constants.js";
 import { validateUserToken } from "../services/auth.js";
+import { isLocalFirst, privateWriteRefusalResult } from "../services/local_first.js";
 
 const VerticalSchema = z.enum(["founder", "college", "grants", "jobs"]);
 
@@ -59,6 +60,11 @@ export function registerAquaHubTools(server: McpServer) {
     }).strict(),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true }
   }, async ({ user_token, response_format, ...params }) => {
+    // LF-25: raw application text is private content — refuse the hosted
+    // ingest write under local-first (vault intake is local-only).
+    if (isLocalFirst()) {
+      return privateWriteRefusalResult("ingest_application sends raw application text to the hosted canonical hub");
+    }
     const user_id = await validateUserToken(user_token);
     const payload = await callHub(user_token, { action: "ingest", user_id, ...params });
     return resultResponse(payload, response_format, "AQUA Ingestion Result");
@@ -112,6 +118,12 @@ export function registerAquaHubTools(server: McpServer) {
     }).strict(),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
   }, async ({ user_token, response_format, ...params }) => {
+    // LF-25: a posted `content` body is private answer text — refuse under
+    // local-first when content is supplied; metadata-only scoring on an
+    // existing variant stays available.
+    if (isLocalFirst() && typeof params.content === "string" && params.content.trim().length > 0) {
+      return privateWriteRefusalResult("qualify_answer would transmit answer content to the hosted canonical hub");
+    }
     const user_id = await validateUserToken(user_token);
     const payload = await callHub(user_token, { action: "qualify", user_id, ...params });
     return resultResponse(payload, response_format, "AQUA Qualification");

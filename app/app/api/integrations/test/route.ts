@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 /**
  * POST /api/integrations/test
@@ -19,6 +20,13 @@ import { createClient } from '@/lib/supabase/server'
  */
 export async function POST(req: NextRequest) {
   try {
+    // Local-first: keys are vault-stored and connectivity is tested
+    // browser→provider directly; key material must not transit this server.
+    const refused = refusePrivateWrite({
+      detail: 'Provider connectivity is tested from your device in local-first mode — keys never transit this server.',
+    })
+    if (refused) return refused
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

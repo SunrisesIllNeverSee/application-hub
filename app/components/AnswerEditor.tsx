@@ -15,6 +15,10 @@ import {
   saveScopedVersion,
 } from '@/lib/aqua-local-client/session'
 import type { BankVersion } from '@/lib/aqua-local-client/session'
+import {
+  LocalDraftAssist,
+  type DraftAssistResult,
+} from './aqua-local/LocalDraftAssist'
 
 interface DraftResponse {
   draft: string
@@ -69,6 +73,11 @@ export function AnswerEditor({
   const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error' | 'local-only' | 'locked'>('idle')
   const [isDrafting, setIsDrafting] = useState(false)
   const [draftFeedback, setDraftFeedback] = useState<DraftFeedback | null>(null)
+  // SP021/LF-16: under local-first the draft flow is consent-gated and
+  // browser-direct to the provider; a completed generation carries its
+  // consent receipt + provider/model provenance into the next save.
+  const [assistOpen, setAssistOpen] = useState(false)
+  const [draftProvenance, setDraftProvenance] = useState<DraftAssistResult | null>(null)
   const [copied, setCopied] = useState(false)
   // IN-01: latest vault version for this question scope (+ its approval).
   const [localVersion, setLocalVersion] = useState<BankVersion | null>(null)
@@ -127,6 +136,14 @@ export function AnswerEditor({
   }, [content])
 
   const handleDraft = useCallback(async () => {
+    // SP021/LF-16: under local-first the legacy /api/draft route refuses —
+    // drafting is a consent-gated browser→provider call using the user's
+    // vault-stored BYOK key. Open the disclosure instead of fetching.
+    if (LOCAL_FIRST) {
+      setDraftFeedback(null)
+      setAssistOpen(true)
+      return
+    }
     setIsDrafting(true)
     setDraftFeedback(null)
     try {
@@ -224,7 +241,16 @@ export function AnswerEditor({
             {
               title: questionText || `Answer — ${archivedQuestionId}`,
               body: content,
-              method: 'manual',
+              // Generated drafts carry their consent receipt + provider/model
+              // provenance; an AI proposal never auto-approves — the user
+              // reviewed the text in this editor and clicked Save.
+              method: draftProvenance ? 'byok' : 'manual',
+              provenance: draftProvenance ? `consent:${draftProvenance.consent_id}` : null,
+              provider: draftProvenance?.provider ?? null,
+              model: draftProvenance?.model ?? null,
+              observed_flags: draftProvenance
+                ? Object.fromEntries(draftProvenance.observed.map((f) => [f, true]))
+                : undefined,
             },
           )
           setLocalVersion({
@@ -232,6 +258,7 @@ export function AnswerEditor({
             approval: null,
             provenance: null,
           })
+          setDraftProvenance(null)
           setSaveState('saved')
           setIsEditing(false)
           setTimeout(() => setSaveState('idle'), 2000)
@@ -411,6 +438,27 @@ export function AnswerEditor({
         charCurrent={charCount}
         charLimit={charLimit}
       />
+
+      {LOCAL_FIRST && assistOpen && (
+        <LocalDraftAssist
+          archivedQuestionId={archivedQuestionId}
+          questionText={questionText}
+          wordLimit={wordLimit}
+          programId={programId}
+          currentDraft={content}
+          onResult={(r) => {
+            setContent(r.text)
+            setIsEditing(true)
+            setDraftProvenance(r)
+            setAssistOpen(false)
+            setDraftFeedback({
+              type: 'info',
+              message: `Drafted via ${r.provider}${r.model ? ` / ${r.model}` : ''} — review, edit, then save to your vault.`,
+            })
+          }}
+          onCancel={() => setAssistOpen(false)}
+        />
+      )}
 
       {/* Controls row */}
       <div className="flex items-center gap-3 flex-wrap">

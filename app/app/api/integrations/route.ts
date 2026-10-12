@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { encryptKey, keyFingerprint } from '@/lib/encryption'
+import { refusePrivateWrite } from '@/lib/local-first-guard'
 
 // POST /api/integrations — save a provider key
 export async function POST(req: NextRequest) {
   try {
+    // Local-first: key custody moves to the user's encrypted vault — the
+    // server must not receive or store new key material. Listing existing
+    // legacy integrations (GET) and removing them (DELETE) stay available.
+    const refused = refusePrivateWrite({
+      detail: 'Provider keys are stored in your on-device vault in local-first mode — open Local vault → AI providers.',
+    })
+    if (refused) return refused
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
