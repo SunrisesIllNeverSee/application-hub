@@ -773,4 +773,24 @@ await t('IR-023: exported signoff discloses restored provenance', async () => {
 })
 
 
+await t('IR-028: discarded packet refuses signoff before any write', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet, record } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  await advancePacketState(s, packet.packet_id, 'discarded')
+  await assert.rejects(
+    () => attestPacket(s, {
+      packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+      manifest_sha256: record.manifest_sha256,
+    }),
+    /discarded/,
+  )
+  // no phantom signoff row left behind
+  assert.equal(await s.get('signoffs', packet.packet_id), undefined)
+})
+
+
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)
