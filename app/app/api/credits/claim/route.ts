@@ -6,6 +6,7 @@ import {
   resolveDedupKey,
   type CreditEventType,
 } from '@/lib/credits'
+import { refusePrivateTextFields } from '@/lib/local-first-guard'
 
 // POST /api/credits/claim
 // Manual credit claims: social follows, shares, profile complete, first_draft.
@@ -23,6 +24,14 @@ export async function POST(req: Request) {
     action_id?: string
     metadata?: Record<string, unknown>
   }
+
+  // IR-008: free-form metadata is a covert channel for private text into
+  // credit_events — refuse it under local-first (claims still work without).
+  const lfRefusal = refusePrivateTextFields(
+    body as Record<string, unknown>,
+    ['metadata'],
+  )
+  if (lfRefusal) return lfRefusal
 
   if (!event_type) return NextResponse.json({ error: 'event_type required' }, { status: 400 })
 

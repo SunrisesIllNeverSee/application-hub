@@ -25,6 +25,7 @@ import type {
   EventRecord,
   ImportRecord,
   PacketRecord,
+  PacketStateRecord,
   ProvenanceRecord,
   SignoffRecord,
   StoreName,
@@ -57,6 +58,7 @@ interface BackupPayload {
   provenance: ProvenanceRecord[]
   imports: ImportRecord[]
   signoffs: SignoffRecord[]
+  packet_states?: PacketStateRecord[]
   catalog_cache: CatalogCacheRecord[]
   /** LF-18 audit ledger — portable so a restored vault keeps its receipts. */
   events?: EventRecord[]
@@ -81,6 +83,7 @@ export async function exportVault(storage: VaultStorage, secret: string): Promis
     provenance: await storage.getAll<ProvenanceRecord>('provenance'),
     imports: await storage.getAll<ImportRecord>('imports'),
     signoffs: await storage.getAll<SignoffRecord>('signoffs'),
+    packet_states: await storage.getAll<PacketStateRecord>('packet_states'),
     catalog_cache: await storage.getAll<CatalogCacheRecord>('catalog_cache'),
     events: await storage.getAll<EventRecord>('events'),
   }
@@ -170,6 +173,7 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
   requireList('provenance', payload.provenance, 'version_id')
   requireList('imports', payload.imports, 'batch_id')
   requireList('signoffs', payload.signoffs, 'packet_id')
+  requireList('packet_states', payload.packet_states, 'packet_id')
   requireList('catalog_cache', payload.catalog_cache, 'key')
   requireList('events', payload.events, 'id')
 
@@ -238,6 +242,7 @@ export async function previewVaultImport(
   for (const p of payload.provenance ?? []) await track('provenance', p.version_id)
   for (const i of payload.imports ?? []) await track('imports', i.batch_id)
   for (const s of payload.signoffs ?? []) await track('signoffs', s.packet_id)
+  for (const ps of payload.packet_states ?? []) await track('packet_states', ps.packet_id)
   for (const c of payload.catalog_cache ?? []) await track('catalog_cache', c.key)
   for (const e of payload.events ?? []) await track('events', e.id)
 
@@ -273,6 +278,7 @@ export async function importVault(
       | 'provenance'
       | 'imports'
       | 'signoffs'
+      | 'packet_states'
       | 'catalog_cache'
       | 'events',
     key: string,
@@ -295,9 +301,15 @@ export async function importVault(
     const record: VersionRecord = { ...rest, body: JSON.stringify(blob), immutable: true }
     await dedupePut('versions', v.id, record)
   }
+  // IR-003: imported approvals are claims, not fresh evidence. Strip the
+  // imported `seq` — a forged high seq would otherwise outrank a REAL local
+  // revocation (compareApprovals: seq'd rows always post-date seq-less
+  // ones, so stripping is ordering-safe: local decisions still win) — and
+  // mark them restored so freeze requires a fresh local decision.
   for (const a of payload.approvals ?? []) {
     sourceIds.push(a.id)
-    await dedupePut('approvals', a.id, a)
+    const { seq: _stripped, ...rest } = a
+    await dedupePut('approvals', a.id, { ...rest, restored_from_backup: true })
   }
   for (const p of payload.packets ?? []) {
     sourceIds.push(p.id)
@@ -313,7 +325,10 @@ export async function importVault(
   }
   for (const s of payload.signoffs ?? []) {
     sourceIds.push(s.packet_id)
-    await dedupePut('signoffs', s.packet_id, s)
+    await dedupePut('signoffs', s.packet_id, { ...s, restored_from_backup: true })
+  }
+  for (const ps of payload.packet_states ?? []) {
+    await dedupePut('packet_states', ps.packet_id, ps)
   }
   for (const c of payload.catalog_cache ?? []) {
     await dedupePut('catalog_cache', c.key, c)

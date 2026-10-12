@@ -12,6 +12,11 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json().catch(() => ({}))
+  // IR-009: never spread the raw caller body into an edge-function hop —
+  // forward an explicit allowlist of operational fields only, so private
+  // text can never ride along (applies unconditionally, not just flag-on).
+  const { program_id, submission_id, limit, min_score, modes, deadline_days } =
+    body as Record<string, unknown>
   const resp = await fetch(`${supabaseUrl}/functions/v1/smart-matcher`, {
     method: 'POST',
     headers: {
@@ -20,8 +25,13 @@ export async function POST(req: Request) {
       Authorization: accessToken ? `Bearer ${accessToken}` : `Bearer ${anonKey}`,
     },
     body: JSON.stringify({
-      ...body,
       user_id: user.id,
+      ...(program_id !== undefined ? { program_id } : {}),
+      ...(submission_id !== undefined ? { submission_id } : {}),
+      ...(limit !== undefined ? { limit } : {}),
+      ...(min_score !== undefined ? { min_score } : {}),
+      ...(modes !== undefined ? { modes } : {}),
+      ...(deadline_days !== undefined ? { deadline_days } : {}),
     }),
   })
 

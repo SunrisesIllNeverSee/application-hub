@@ -94,6 +94,12 @@ export interface ProviderAdapter {
    */
   requiresKey?: boolean
   /**
+   * IR-006: the exact URL generation egress targets. Recorded on the consent
+   * receipt so the audit trail names the host the request went to — a stored
+   * base_url must never silently redirect a provider's key to a foreign host.
+   */
+  endpoint?: string
+  /**
    * Perform the generation. `ctx.apiKey` is present only for `byok` mode.
    * `ctx.fetchImpl` is injectable for tests; adapters MUST use it rather
    * than a global fetch reference so the egress boundary stays auditable.
@@ -128,7 +134,11 @@ export async function storeProviderKey(
       ? JSON.stringify(await encryptText(secret, apiKey))
       : (existing?.key_blob ?? ''),
     stored_at: nowIso(),
-    ...(config?.base_url !== undefined ? { base_url: config.base_url } : {}),
+    // IR-006: base_url is persisted ONLY for endpoint-only providers
+    // (ollama) — a stored URL on a hosted provider would be an exfil path.
+    ...(config?.base_url !== undefined && providerId === 'ollama'
+      ? { base_url: config.base_url }
+      : {}),
     ...(config?.model_preference !== undefined
       ? { model_preference: config.model_preference }
       : {}),
@@ -210,7 +220,11 @@ export async function generateWithConsent(
   // Fail closed on anything other than an explicit `true`.
   if (input.userConsent !== true) throw new ProviderConsentError()
 
-  const requestSha = await sha256Hex(canonicalJson(request))
+  // IR-004: freeze the request BEFORE hashing — the caller holds a live
+  // reference and could mutate fields between the pin and egress. The consent
+  // receipt must attest exactly the bytes that leave the browser.
+  const snapshot = structuredClone(request)
+  const requestSha = await sha256Hex(canonicalJson(snapshot))
   const consent: ProviderConsentRecord = {
     id: newId(),
     provider_id: adapter.provider,
@@ -218,6 +232,7 @@ export async function generateWithConsent(
     purpose: 'generation',
     granted_by: 'user',
     request_sha256: requestSha,
+    ...(adapter.endpoint ? { endpoint: adapter.endpoint } : {}),
     at: nowIso(),
   }
   // Consent receipt is stored before egress: the audit trail exists even if
@@ -245,7 +260,7 @@ export async function generateWithConsent(
     throw new ProviderEgressError('no fetch implementation available in this environment')
   }
 
-  const result = await adapter.generate(request, { apiKey, fetchImpl })
+  const result = await adapter.generate(snapshot, { apiKey, fetchImpl })
   return { result, consent }
 }
 
@@ -456,13 +471,17 @@ export function createAnthropicAdapter(opts?: { model?: string }): ProviderAdapt
 }
 
 /** OpenAI Chat Completions API — direct from the browser (CORS: *). */
-export function createOpenAiAdapter(opts?: { model?: string; base_url?: string }): ProviderAdapter {
+export function createOpenAiAdapter(opts?: { model?: string }): ProviderAdapter {
   const model = opts?.model ?? DEFAULT_MODELS.openai
-  const base = (opts?.base_url ?? 'https://api.openai.com').replace(/\/+$/, '')
+  // IR-006: hard-pinned. The vault stores base_url for endpoint-only
+  // providers (Ollama); letting a stored URL redirect a hosted-provider
+  // adapter would smuggle the BYOK key + prompt to any CSP-allowed host.
+  const base = 'https://api.openai.com'
   return {
     id: 'openai-byok',
     mode: 'byok',
     provider: 'openai',
+    endpoint: `${base}/v1/chat/completions`,
     async generate(req, ctx) {
       if (!ctx.apiKey) throw new ProviderKeyError('openai adapter called without a key')
       // EGRESS-DECLARED: user-consented BYOK generation.
@@ -567,6 +586,7 @@ export function createOllamaAdapter(opts: { base_url: string; model?: string }):
     mode: 'byok',
     provider: 'ollama',
     requiresKey: false,
+    endpoint: `${base}/api/chat`,
     async generate(req, ctx) {
       if (!base) throw new ProviderKeyError('ollama adapter requires a base_url')
       // EGRESS-DECLARED: user-consented generation to the user's own endpoint.
@@ -615,7 +635,8 @@ export function adapterForProvider(
     case 'anthropic':
       return createAnthropicAdapter({ model })
     case 'openai':
-      return createOpenAiAdapter({ model, base_url: config.base_url })
+      // IR-006: caller-stored base_url is ignored for hosted providers.
+      return createOpenAiAdapter({ model })
     case 'google':
       return createGoogleAdapter({ model })
     case 'ollama':
@@ -671,7 +692,8 @@ export async function testProviderConnection(
   }
   if (providerId === 'openai') {
     if (!ctx.apiKey) throw new ProviderKeyError('API key required')
-    const base = (ctx.base_url ?? 'https://api.openai.com').replace(/\/+$/, '')
+    // IR-006: pinned canonical endpoint — never a caller-stored URL.
+    const base = 'https://api.openai.com'
     const res = await withTimeout(`${base}/v1/models`, {
       headers: { authorization: `Bearer ${ctx.apiKey}` },
     })

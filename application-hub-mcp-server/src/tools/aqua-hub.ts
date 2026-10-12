@@ -83,6 +83,11 @@ export function registerAquaHubTools(server: McpServer) {
     }).strict(),
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
   }, async ({ user_token, response_format, ...params }) => {
+    // IR-008: free-form metadata could carry private text into
+    // contribution_rewards — refuse it under local-first.
+    if (isLocalFirst() && params.metadata && Object.keys(params.metadata).length > 0) {
+      return privateWriteRefusalResult("process_reward metadata is a free-form channel that could carry private text");
+    }
     const user_id = await validateUserToken(user_token);
     const { supabase } = await import("../services/supabase.js");
     const { data, error } = await supabase
@@ -121,8 +126,13 @@ export function registerAquaHubTools(server: McpServer) {
     // LF-25: a posted `content` body is private answer text — refuse under
     // local-first when content is supplied; metadata-only scoring on an
     // existing variant stays available.
+    // IR-008: `metadata` is a free-form channel — a caller can smuggle answer
+    // text through metadata:{content:...} even when content is absent.
     if (isLocalFirst() && typeof params.content === "string" && params.content.trim().length > 0) {
       return privateWriteRefusalResult("qualify_answer would transmit answer content to the hosted canonical hub");
+    }
+    if (isLocalFirst() && params.metadata && Object.keys(params.metadata).length > 0) {
+      return privateWriteRefusalResult("qualify_answer metadata is a free-form channel that could carry private text to the hosted canonical hub");
     }
     const user_id = await validateUserToken(user_token);
     const payload = await callHub(user_token, { action: "qualify", user_id, ...params });

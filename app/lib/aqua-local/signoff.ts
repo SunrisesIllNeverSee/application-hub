@@ -124,11 +124,23 @@ export async function attestPacket(
     throw new PacketStateError('cannot sign an already-exported packet — freeze a new packet instead')
   }
 
+  // IR-005: sign the STORED packet's manifest digest — never trust the
+  // caller's manifest_sha256. A foreign digest would produce a 'signed'
+  // packet whose signature cannot verify against the real manifest.
+  const packet = await storage.get<{ manifest_sha256: string }>('packets', input.packet_id)
+  if (!packet) throw new VaultNotFoundError(`packet not found: ${input.packet_id}`)
+  if (input.manifest_sha256 !== packet.manifest_sha256) {
+    throw new SignoffAckError(
+      `manifest digest mismatch: caller claimed ${input.manifest_sha256}, stored packet has ${packet.manifest_sha256}`,
+    )
+  }
+  const manifestSha256 = packet.manifest_sha256
+
   let signatureB64: string | null = null
   let pubkeyB64: string | null = null
   if (input.privateKey && input.pubkey_b64) {
     try {
-      signatureB64 = await signManifestDigest(input.privateKey, input.manifest_sha256)
+      signatureB64 = await signManifestDigest(input.privateKey, manifestSha256)
       pubkeyB64 = input.pubkey_b64
     } catch {
       // PACKET-05 — unsupported/invalid key → truthful unsigned, never forged.
@@ -137,6 +149,13 @@ export async function attestPacket(
     }
   }
 
+  // IR-003: a signoff restored from a backup is a file claim, not a fresh
+  // attestation — a real sign-off may overwrite it (putIfAbsent would
+  // otherwise block re-signing a restored packet forever).
+  const existing = await storage.get<SignoffRecord>('signoffs', input.packet_id)
+  if (existing?.restored_from_backup) {
+    await storage.delete('signoffs', input.packet_id)
+  }
   const record = await recordSignoff(storage, {
     packet_id: input.packet_id,
     signer_class: input.signer_class,

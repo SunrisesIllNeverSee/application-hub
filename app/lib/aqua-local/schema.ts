@@ -72,6 +72,12 @@ export interface ApprovalRecord {
    * order by (at, id) as before.
    */
   seq?: number
+  /**
+   * IR-003: set by backup import — the decision came from a file, not this
+   * session's user. Freeze treats restored approvals as absent; the version
+   * needs a fresh local decision before a packet can select it.
+   */
+  restored_from_backup?: boolean
 }
 
 /**
@@ -95,7 +101,14 @@ export interface EventRecord {
 export interface PacketRecord {
   id: string
   application_id: string
-  manifest_json: string // canonical JSON manifest
+  /**
+   * Serialized EncryptedBlob of the canonical JSON manifest — the manifest
+   * embeds plaintext answer bodies/titles/skip reasons, so it is ciphertext
+   * at rest like version bodies (IR-002). `manifest_json` exists only on
+   * pre-encryption legacy records; readers fall back to it.
+   */
+  manifest_enc?: string
+  manifest_json?: string // legacy plaintext manifests (pre-IR-002)
   manifest_sha256: string
   frozen_at: string
 }
@@ -137,6 +150,12 @@ export interface SignoffRecord {
   signature_b64: string | null
   /** Base64 SPKI public key that produced signature_b64 (ECDSA P-256). Null when unsigned. */
   pubkey_b64?: string | null
+  /**
+   * IR-003: set by backup import — a restored signoff is a claim carried by
+   * the file, not a fresh attestation. attestPacket may overwrite it with a
+   * real sign-off.
+   */
+  restored_from_backup?: boolean
 }
 
 /**
@@ -164,6 +183,9 @@ export interface ProviderConsentRecord {
   purpose: 'generation'
   granted_by: 'user' // consent is only ever user-granted
   request_sha256: string // sha256 of canonical request that consent covered
+  /** IR-006: the exact egress URL the adapter declared — the consent record
+      names the host the key+prompt actually went to, not just the provider. */
+  endpoint?: string
   at: string
 }
 
@@ -176,6 +198,7 @@ export type PacketState =
   | 'prepared'
   | 'signed'
   | 'exported'
+  | 'discarded' // user closed without exporting — honest terminal state
   | 'submitted_external_observed'
 
 export const PACKET_STATES: readonly PacketState[] = [

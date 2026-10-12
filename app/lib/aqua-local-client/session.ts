@@ -15,6 +15,7 @@ import {
   createVersion,
   readVersion,
   approveVersion,
+  compareApprovals,
   exportVault,
   importVault,
   previewVaultImport,
@@ -143,8 +144,10 @@ export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
   ])
 
   // Latest approval wins per version (records are append-only).
+  // IR-007: single-sourced ordering — compareApprovals is the LF-18
+  // authoritative order (seq beats legacy timestamps); never re-roll.
   const approvalByVersion = new Map<string, ApprovalRecord>()
-  for (const a of approvals.sort((x, y) => x.at.localeCompare(y.at) || x.id.localeCompare(y.id))) {
+  for (const a of [...approvals].sort(compareApprovals)) {
     approvalByVersion.set(a.version_id, a)
   }
   const provenanceByVersion = new Map<string, ProvenanceRecord>()
@@ -322,9 +325,12 @@ export async function loadScopeEntry(
 
 /**
  * Save an edit for a question scope as a new immutable child version.
- * Reuses an existing answer for the occurrence (exact application scope
- * preferred) so one question maps to one bank entry; creates a new scoped
- * answer only when none exists. Returns the created version.
+ * Reuses an existing answer ONLY when its application scope matches the
+ * requested one — a bank-scoped answer must never silently absorb a
+ * program-context save (the version would be invisible to that program's
+ * readiness overlay and foreign-scoped to its packet freeze). One answer
+ * per (occurrence, application scope); a new scoped answer is created when
+ * none matches. Returns the created version.
  */
 export async function saveScopedVersion(
   storage: VaultStorage,
@@ -341,8 +347,7 @@ export async function saveScopedVersion(
   },
 ): Promise<VersionRecord> {
   const candidates = await findAnswersForOccurrence(storage, scope.question_occurrence_id)
-  const exact = candidates.find((a) => a.scope.application_id === scope.application_id) ?? null
-  const answer = exact ?? candidates[0] ?? null
+  const answer = candidates.find((a) => a.scope.application_id === scope.application_id) ?? null
 
   let parentVersionId: string | null = null
   if (answer) {

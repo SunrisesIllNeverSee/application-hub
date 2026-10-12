@@ -30,6 +30,7 @@
 import {
   canonicalJson,
   decryptText,
+  encryptText,
   nowIso,
   sha256Hex,
 } from './crypto.ts'
@@ -183,6 +184,9 @@ async function latestApproval(
     .filter((a) => a.version_id === versionId)
     .sort(compareApprovals) // LF-18: seq when present, (at, id) for legacy rows
   const latest = forVersion.length ? forVersion[forVersion.length - 1] : null
+  // IR-003: an imported 'restored' approval is a file claim, not session
+  // evidence — freeze requires a fresh local decision.
+  if (latest?.restored_from_backup) return null
   if (!latest) return null
   // F-V1: the approval pins the version's sha256 at approval time. If the
   // stored version row was swapped, the hashes diverge — treat as no valid
@@ -361,10 +365,12 @@ export async function freezeApplicationPacket(
   const manifestSha = await sha256Hex(manifestJson)
   const packet: FrozenPacket = { ...base, packet_id: `PK-${manifestSha.slice(0, 16)}` }
 
+  // IR-002: the manifest embeds private answer bodies — it is ciphertext at
+  // rest under the vault secret, exactly like version bodies.
   const record: PacketRecord = {
     id: packet.packet_id,
     application_id: input.application_id,
-    manifest_json: manifestJson,
+    manifest_enc: JSON.stringify(await encryptText(secret, manifestJson)),
     manifest_sha256: manifestSha,
     frozen_at: packet.created_at,
   }
@@ -398,9 +404,10 @@ export async function freezeApplicationPacket(
  * unconditionally as defence in depth.
  */
 const ALLOWED_TRANSITIONS: Readonly<Record<PacketState, readonly PacketState[]>> = {
-  prepared: ['signed', 'exported'], // exported-direct allowed: unsigned export stays truthful
-  signed: ['exported'],
+  prepared: ['signed', 'exported', 'discarded'], // exported-direct allowed: unsigned export stays truthful
+  signed: ['exported', 'discarded'],
   exported: [],
+  discarded: [],
   submitted_external_observed: [],
 }
 
@@ -442,10 +449,33 @@ export async function advancePacketState(
 // Packet materialization (record → full FrozenPacket incl. signoff)
 // ---------------------------------------------------------------------------
 
-export async function loadPacket(storage: VaultStorage, packetId: string): Promise<FrozenPacket> {
+/** Read a packet's manifest — encrypted records require the vault secret;
+    legacy plaintext manifests (pre-IR-002) still read. */
+async function readManifestJson(
+  storage: VaultStorage,
+  record: PacketRecord,
+  secret: string | null,
+): Promise<string> {
+  if (record.manifest_enc) {
+    if (!secret) {
+      throw new PacketFreezeError(['packet manifest is encrypted — vault secret required'])
+    }
+    return decryptText(secret, JSON.parse(record.manifest_enc))
+  }
+  if (record.manifest_json) return record.manifest_json
+  throw new VaultNotFoundError(`packet has no manifest: ${record.id}`)
+}
+
+export async function loadPacket(
+  storage: VaultStorage,
+  packetId: string,
+  secret: string | null = null,
+): Promise<FrozenPacket> {
   const record = await storage.get<PacketRecord>('packets', packetId)
   if (!record) throw new VaultNotFoundError(`packet not found: ${packetId}`)
-  const manifestContent = JSON.parse(record.manifest_json) as Record<string, unknown>
+  const manifestContent = JSON.parse(
+    await readManifestJson(storage, record, secret),
+  ) as Record<string, unknown>
   const signoff = await storage.get<SignoffRecord>('signoffs', packetId)
   const packet: FrozenPacket = {
     packet_id: record.id,
@@ -481,21 +511,26 @@ export async function listPackets(
  * string for the caller to save/share; nothing is transmitted anywhere.
  * Advances state prepared|signed → exported.
  */
-export async function exportPacket(storage: VaultStorage, packetId: string): Promise<string> {
+export async function exportPacket(
+  storage: VaultStorage,
+  packetId: string,
+  secret: string | null = null,
+): Promise<string> {
   const record = await storage.get<PacketRecord>('packets', packetId)
   if (!record) throw new VaultNotFoundError(`packet not found: ${packetId}`)
+  const manifestJson = await readManifestJson(storage, record, secret)
   const state = await getPacketState(storage, packetId)
   if (state && state.state === 'exported') {
     // Idempotent: re-export of the same packet returns an identical document.
   } else {
     await advancePacketState(storage, packetId, 'exported')
   }
-  const packet = await loadPacket(storage, packetId)
+  const packet = await loadPacket(storage, packetId, secret)
   const doc: PacketExport = {
     format: PACKET_EXPORT_FORMAT,
     spec_version: PACKET_SPEC_VERSION,
     packet,
-    manifest_json: record.manifest_json,
+    manifest_json: manifestJson,
     manifest_sha256: record.manifest_sha256,
   }
   return JSON.stringify(doc, null, 2)

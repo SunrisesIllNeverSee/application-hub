@@ -12,6 +12,7 @@ import {
   generateSignerKeyPair,
   verifyManifestSignature,
   PacketFreezeError,
+  compareApprovals,
   type AnswerRecord,
   type ApprovalRecord,
   type VersionRecord,
@@ -78,9 +79,8 @@ export function VaultPacketPanel({
     ])
     const appAnswers = answers.filter((a) => a.scope.application_id === programId)
     const latestDecision = new Map<string, 'approved' | 'rejected'>()
-    const sorted = [...approvals].sort(
-      (a, b) => (a.seq ?? 0) - (b.seq ?? 0) || a.at.localeCompare(b.at) || a.id.localeCompare(b.id),
-    )
+    // IR-007: LF-18 authoritative ordering — seq beats legacy timestamps.
+    const sorted = [...approvals].sort(compareApprovals)
     for (const ap of sorted) {
       if (ap.decision === 'approved' || ap.decision === 'rejected') {
         latestDecision.set(ap.version_id, ap.decision)
@@ -213,7 +213,8 @@ export function VaultPacketPanel({
     setBusy(true); setError('')
     try {
       const storage = await vault.ensureStorage()
-      const doc = await exportPacket(storage, frozenId)
+      const secret = vault.getSecret()
+      const doc = await exportPacket(storage, frozenId, secret)
       const blob = new Blob([doc], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -235,7 +236,8 @@ export function VaultPacketPanel({
     if (!frozenId) return
     try {
       const storage = await vault.ensureStorage()
-      await advancePacketState(storage, frozenId, 'exported')
+      // IR-011: discarding is NOT an export — never write a false export.
+      await advancePacketState(storage, frozenId, 'discarded')
     } catch { /* state-only best effort */ }
     setFrozenId(null); setManifestSha(null); setPacketState(null); setAck(false); setVerifyResult('')
   }

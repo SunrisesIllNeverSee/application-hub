@@ -16,6 +16,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -134,6 +135,26 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       return null
     }
     return secret
+  }, [])
+
+  // IR-012: signing out in ANY tab must drop the in-memory secret — an
+  // unlocked vault must not survive the account it was unlocked under.
+  useEffect(() => {
+    if (!LOCAL_FIRST) return
+    let unsub: (() => void) | undefined
+    void import('@/lib/supabase/client').then(({ createClient }) => {
+      const { data } = createClient().auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+          secretRef.current = null
+          storageRef.current = null
+          storageUidRef.current = null
+          setStatus('idle')
+          setVaultHasData(null)
+        }
+      })
+      unsub = data.subscription.unsubscribe
+    })
+    return () => unsub?.()
   }, [])
 
   const value = useMemo<VaultContextValue>(

@@ -12,7 +12,7 @@ import {
   createAnswer, createVersion, approveVersion, readVersion,
   VaultImmutableError,
 } from './repo.ts'
-import { canonicalJson, sha256Hex } from './crypto.ts'
+import { canonicalJson, decryptText, sha256Hex } from './crypto.ts'
 import {
   storeProviderKey, loadProviderKey, deleteProviderKey,
   generateWithConsent, generateVersion, createMockProvider,
@@ -76,7 +76,10 @@ await t('freeze: happy path binds approved version', async () => {
   assert.match(packet.packet_id, /^PK-[0-9a-f]{16}$/)
   assert.equal(packet.questions[0].approved, true)
   assert.equal(packet.questions[0].answer_sha256, version.sha256)
-  assert.equal(record.manifest_sha256, await sha256Hex(record.manifest_json))
+  // IR-002: manifest is ciphertext at rest — decrypt and verify the digest.
+  assert.equal(record.manifest_json, undefined)
+  const manifestPlain = await decryptText(SECRET, JSON.parse(record.manifest_enc))
+  assert.equal(record.manifest_sha256, await sha256Hex(manifestPlain))
   assert.equal((await getPacketState(s, packet.packet_id)).state, 'prepared')
 })
 
@@ -363,7 +366,8 @@ await t('signoff: no key → truthful unsigned record', async () => {
   })
   const so = await attestPacket(s, {
     packet_id: packet.packet_id, signer_class: 'authenticated-account',
-    user_ack: true, manifest_sha256: 'x',
+    user_ack: true,
+    manifest_sha256: (await s.get('packets', packet.packet_id)).manifest_sha256,
   })
   assert.equal(so.signature_b64, null)
   assert.equal(so.pubkey_b64, null)
@@ -382,10 +386,11 @@ await t('state machine: prepared→signed→exported; submitted_external_observe
   await assert.rejects(() => advancePacketState(s, pid, 'submitted_external_observed'), PacketStateError)
   await assert.rejects(() => advancePacketState(s, pid, 'bogus'), PacketStateError)
   await attestPacket(s, {
-    packet_id: pid, signer_class: 'local-only', user_ack: true, manifest_sha256: 'x',
+    packet_id: pid, signer_class: 'local-only', user_ack: true,
+    manifest_sha256: (await s.get('packets', pid)).manifest_sha256,
   })
   await assert.rejects(() => advancePacketState(s, pid, 'prepared'), PacketStateError)
-  await exportPacket(s, pid)
+  await exportPacket(s, pid, SECRET)
   const st = await getPacketState(s, pid)
   assert.equal(st.state, 'exported')
   assert.deepEqual(st.history.map((h) => h.state), ['prepared', 'signed', 'exported'])
@@ -427,7 +432,7 @@ await t('export: verifier PASS on clean packet (signed)', async () => {
     privateKey: kp.privateKey, pubkey_b64: kp.pubkey_b64,
     manifest_sha256: record.manifest_sha256,
   })
-  const out = verifyCli(await exportPacket(s, packet.packet_id))
+  const out = verifyCli(await exportPacket(s, packet.packet_id, SECRET))
   assert.match(out, /PASS — \d+\/\d+ checks passed/)
   assert.equal((await getPacketState(s, packet.packet_id)).state, 'exported')
 })
@@ -439,7 +444,7 @@ await t('export: verifier PASS on unsigned packet (truthful)', async () => {
     application_id: 'app1',
     selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
   })
-  const out = verifyCli(await exportPacket(s, packet.packet_id))
+  const out = verifyCli(await exportPacket(s, packet.packet_id, SECRET))
   assert.match(out, /unsigned packet/)
   assert.match(out, /PASS/)
 })
@@ -451,7 +456,7 @@ await t('export tamper: modified answer body → verifier FAIL', async () => {
     application_id: 'app1',
     selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
   })
-  const doc = JSON.parse(await exportPacket(s, packet.packet_id))
+  const doc = JSON.parse(await exportPacket(s, packet.packet_id, SECRET))
   doc.packet.questions[0].answer_body = 'MALLORY WAS HERE'
   verifyCli(JSON.stringify(doc), { expectFail: true })
 })
@@ -463,7 +468,7 @@ await t('export tamper: swapped version_id → verifier FAIL', async () => {
     application_id: 'app1',
     selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
   })
-  const doc = JSON.parse(await exportPacket(s, packet.packet_id))
+  const doc = JSON.parse(await exportPacket(s, packet.packet_id, SECRET))
   doc.packet.questions[0].version_id = 'a-different-version-id'
   verifyCli(JSON.stringify(doc), { expectFail: true })
 })
@@ -475,7 +480,7 @@ await t('export tamper: truncated file → verifier FAIL', async () => {
     application_id: 'app1',
     selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
   })
-  const json = await exportPacket(s, packet.packet_id)
+  const json = await exportPacket(s, packet.packet_id, SECRET)
   verifyCli(json.slice(0, Math.floor(json.length / 2)), { expectFail: true })
 })
 
@@ -492,7 +497,7 @@ await t('export tamper: foreign signature → verifier FAIL', async () => {
     privateKey: kp.privateKey, pubkey_b64: kp.pubkey_b64,
     manifest_sha256: record.manifest_sha256,
   })
-  const doc = JSON.parse(await exportPacket(s, packet.packet_id))
+  const doc = JSON.parse(await exportPacket(s, packet.packet_id, SECRET))
   // attacker re-signs a tampered manifest with THEIR key and swaps pubkey too —
   // manifest_sha256 embedded in doc no longer matches recomputed → FAIL.
   const evil = await generateSignerKeyPair()
@@ -511,9 +516,184 @@ await t('export tamper: packet claims submitted_external_observed → verifier F
     application_id: 'app1',
     selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
   })
-  const doc = JSON.parse(await exportPacket(s, packet.packet_id))
+  const doc = JSON.parse(await exportPacket(s, packet.packet_id, SECRET))
   doc.packet.state = 'submitted_external_observed'
   verifyCli(JSON.stringify(doc), { expectFail: true })
 })
+
+
+// ==================== IR-* falsifier-correction regressions ====================
+
+await t('IR-001: program-scoped save never rebinds onto a bank-scoped answer', async () => {
+  const { saveScopedVersion } = await import('../aqua-local-client/session.ts')
+  const s = createMemoryStorage()
+  // bank-scoped answer for the same occurrence exists first (dominant flow)
+  const bank = await createAnswer(s, { application_id: 'answer-bank', question_occurrence_id: 'q1' })
+  await createVersion(s, SECRET, { answer_id: bank.id, title: 'v-bank', body: 'bank copy', method: 'manual' })
+  // program-scoped save must create a NEW answer, not absorb into 'answer-bank'
+  const v = await saveScopedVersion(s, SECRET,
+    { application_id: 'app1', question_occurrence_id: 'q1' },
+    { title: 'v-app', body: 'app copy' })
+  const answers = await s.getAll('answers')
+  const bound = answers.filter((a) => a.scope.application_id === 'app1')
+  assert.equal(bound.length, 1)
+  const appAnswer = bound[0]
+  assert.equal(v.answer_id, appAnswer.id)
+  // and the packet path accepts it (foreign-scope refusal does not fire)
+  await approveVersion(s, { version_id: v.id, decision: 'approved', actor_class: 'human' })
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [
+      { question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' },
+    ],
+  })
+  assert.ok(packet.packet_id)
+})
+
+await t('IR-002: frozen manifest is ciphertext at rest — no plaintext bodies', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const canary = 'SECRET-BODY-DO-NOT-STORE-PLAINTEXT'
+  const s2 = createMemoryStorage()
+  const a2 = await createAnswer(s2, { application_id: 'app1', question_occurrence_id: 'q1' })
+  const v2 = await createVersion(s2, SECRET, { answer_id: a2.id, title: 'v', body: canary, method: 'manual' })
+  await approveVersion(s2, { version_id: v2.id, decision: 'approved', actor_class: 'human' })
+  const { packet, record } = await freezeApplicationPacket(s2, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: v2.id, question_text_snapshot: 'Q?' }],
+  })
+  const stored = await s2.get('packets', record.id)
+  assert.equal(stored.manifest_json, undefined, 'plaintext manifest_json must not be stored')
+  assert.ok(stored.manifest_enc, 'manifest_enc ciphertext present')
+  assert.ok(!stored.manifest_enc.includes(canary), 'canary must not appear in stored manifest ciphertext')
+  assert.ok(!JSON.stringify(stored).includes(canary))
+  // export still produces the plaintext manifest document
+  const doc = JSON.parse(await exportPacket(s2, packet.packet_id, SECRET))
+  assert.ok(doc.manifest_json.includes(canary))
+})
+
+await t('IR-004: consent sha pins the snapshot — post-call mutation cannot falsify receipt', async () => {
+  const s = createMemoryStorage()
+  const mock = createMockProvider({})
+  const req = { prompt: 'BENIGN' }
+  const orig = await sha256Hex(canonicalJson(req))
+  const { consent } = await generateWithConsent(s, mock, req, { userConsent: true })
+  // attacker mutates the live object after the call — consent must attest
+  // the bytes that were sent, not the mutated object
+  req.prompt = 'MUTATED'
+  assert.equal(consent.request_sha256, orig)
+  const consents = await listProviderConsents(s)
+  assert.equal(consents[0].request_sha256, orig)
+})
+
+await t('IR-005: attestPacket refuses a foreign manifest digest', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  const kp = await generateSignerKeyPair()
+  const foreign = await sha256Hex('not-the-real-manifest')
+  await assert.rejects(
+    () => attestPacket(s, {
+      packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+      privateKey: kp.privateKey, pubkey_b64: kp.pubkey_b64,
+      manifest_sha256: foreign,
+    }),
+    /manifest digest mismatch/,
+  )
+  // still signable with the correct digest afterwards
+  const so = await attestPacket(s, {
+    packet_id: packet.packet_id, signer_class: 'local-only', user_ack: true,
+    manifest_sha256: (await s.get('packets', packet.packet_id)).manifest_sha256,
+  })
+  assert.equal(so.packet_id, packet.packet_id)
+})
+
+await t('IR-006: openai adapter ignores caller-stored base_url (no key exfil)', async () => {
+  const { adapterForProvider, storeProviderKey } = await import('./providers.ts')
+  const s = createMemoryStorage()
+  await storeProviderKey(s, SECRET, 'openai', 'sk-test-123')
+  const calls = []
+  const evilFetch = async (url) => { calls.push(url); return new Response(JSON.stringify({ choices: [{ message: { content: 'ok' } }] })) }
+  const adapter = adapterForProvider('openai', { base_url: 'https://evil.example.com', model_preference: 'gpt-4o-mini' })
+  assert.equal(adapter.endpoint, 'https://api.openai.com/v1/chat/completions')
+  await generateWithConsent(
+    s, adapter, { prompt: 'p' },
+    { userConsent: true, secret: SECRET, fetchImpl: evilFetch },
+  )
+  assert.ok(calls[0].startsWith('https://api.openai.com'), `egress went to ${calls[0]}`)
+})
+
+await t('IR-003/013: backup approvals marked restored + seq stripped; packet_states carried', async () => {
+  const { exportVault, importVault } = await import('./backup.ts')
+  const s1 = createMemoryStorage()
+  const a = await createAnswer(s1, { application_id: 'app1', question_occurrence_id: 'q1' })
+  const v = await createVersion(s1, SECRET, { answer_id: a.id, title: 'v', body: 'b', method: 'manual' })
+  await approveVersion(s1, { version_id: v.id, decision: 'approved', actor_class: 'human' })
+  const { packet } = await freezeApplicationPacket(s1, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+  })
+  const dump = await exportVault(s1, SECRET)
+
+  const s2 = createMemoryStorage()
+  await importVault(s2, SECRET, dump)
+  const imported = (await s2.getAll('approvals')).find((x) => x.version_id === v.id)
+  assert.equal(imported.restored_from_backup, true)
+  assert.equal(imported.seq, undefined, 'imported seq stripped')
+  // packet state survives restore (IR-013)
+  const st = await getPacketState(s2, packet.packet_id)
+  assert.equal(st.state, 'prepared')
+  // restored approval does NOT satisfy freeze (IR-003)
+  await assert.rejects(
+    () => freezeApplicationPacket(s2, SECRET, {
+      application_id: 'app1',
+      selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+    }),
+    /unapproved selection/,
+  )
+  // fresh local decision re-qualifies it
+  await approveVersion(s2, { version_id: v.id, decision: 'approved', actor_class: 'human' })
+  const { packet: p2 } = await freezeApplicationPacket(s2, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+  })
+  assert.ok(p2.packet_id)
+})
+
+await t('IR-007: single-sourced approval ordering — seq beats legacy timestamps', async () => {
+  const s = createMemoryStorage()
+  const a = await createAnswer(s, { application_id: 'app1', question_occurrence_id: 'q1' })
+  const v = await createVersion(s, SECRET, { answer_id: a.id, title: 'v', body: 'b', method: 'manual' })
+  // legacy row (no seq) with a LATER timestamp, then a seq'd approval earlier in time
+  await s.put('approvals', {
+    id: 'legacy-rej', version_id: v.id, version_sha256: v.sha256,
+    decision: 'rejected', actor_class: 'human', at: '2999-01-01T00:00:00.000Z',
+  })
+  await approveVersion(s, { version_id: v.id, decision: 'approved', actor_class: 'human' })
+  // freeze must honor the seq'd approval (compareApprovals: seq > legacy)
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: v.id, question_text_snapshot: 'Q?' }],
+  })
+  assert.ok(packet.packet_id)
+})
+
+await t('IR-011: discard does not advance to exported', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  await advancePacketState(s, packet.packet_id, 'discarded')
+  const st = await getPacketState(s, packet.packet_id)
+  assert.equal(st.state, 'discarded')
+  // discarded is terminal
+  await assert.rejects(() => advancePacketState(s, packet.packet_id, 'exported'), /illegal packet transition/)
+})
+
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)
