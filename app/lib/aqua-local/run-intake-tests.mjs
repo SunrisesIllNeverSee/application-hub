@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict'
 import { createMemoryStorage } from './vault.ts'
 import { importLocalIntake, listLocalIntakes, intakeApplicationId, importLegacyQAPairs } from './intake.ts'
-import { extractQAPairsDeterministic, parsePairs } from '../qa-extract-client.ts'
+import { extractQAPairsDeterministic, parsePairs } from '../intake-extract-shared.ts'
 import { extractManualIntake, buildIntakeMeta } from '../intake/manual-intake.ts'
 import { createVersion, approveVersion } from './repo.ts'
 import { freezeApplicationPacket } from './packets.ts'
@@ -178,6 +178,18 @@ await t('IR-032: bare ?-line inside an answer stays answer text', async () => {
   assert.equal(pairs.length, 1, 'mid-answer ?-line must not split the pair')
   assert.ok(pairs[0].answer_text.includes('right path?'))
   assert.ok(pairs[0].answer_text.includes('A question inside?'))
+})
+
+
+await t('blank-guard: Cf-only body skipped (canon invariant parity with createVersion)', async () => {
+  const s = createMemoryStorage()
+  const zwsp = '\u200B'.repeat(20)
+  const pairs = [
+    { question_text: 'A real question here?', answer_text: zwsp, theme: 'other', confidence: 'draft' },
+    { question_text: 'A real question here?', answer_text: 'A real substantive answer body.', theme: 'other', confidence: 'draft' },
+  ]
+  const res = await importLegacyQAPairs(s, SECRET, pairs, { label: 'cf' })
+  assert.equal(res.added_versions, 1, 'Cf-only body refused — only the real answer lands')
 })
 
 

@@ -196,6 +196,12 @@ export async function listVersions(storage: VaultStorage, answerId: string): Pro
  * adapter is single-threaded. A revocation is a NEW decision row + NEW
  * event — never an update of the prior approval.
  */
+/** actor_class is caller-asserted, not proven — under the declared
+    threat model (single-user local vault) the only real producer is the
+    browser UI, which hardcodes 'human'; 'agent' exists for provider/agent
+    pipelines that may write advisory approvals. The packet freeze gate is
+    the enforcement point: only the LATEST decision being a non-restored
+    human 'approved' satisfies it (packets.ts latestApproval). */
 export async function approveVersion(
   storage: VaultStorage,
   input: { version_id: string; decision: 'approved' | 'rejected'; actor_class: ActorClass },

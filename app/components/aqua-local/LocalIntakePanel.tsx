@@ -22,7 +22,7 @@ import {
   buildQAPairsPrompt,
   SYSTEM_PROMPT,
   type ExtractedPair,
-} from '@/lib/qa-extract-client'
+} from '@/lib/intake-extract-shared'
 import { generateDraft, listProviders } from '@/lib/aqua-local-client/session'
 
 // IR-022/IR-033: canonical egress URLs for hosted providers — endpoint-

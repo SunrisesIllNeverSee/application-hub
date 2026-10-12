@@ -153,6 +153,16 @@ export async function GET() {
           },
           additionalProperties: false,
         },
+        HubExportRequest: {
+          type: 'object',
+          description: 'Canonical export request. Exactly matches the canonical-hub handleExport contract; unknown fields are rejected.',
+          properties: {
+            canonical_id: { type: 'string', format: 'uuid' },
+            package_id: { type: 'string', format: 'uuid', description: 'Alternative selector — resolves canonical ids from application_packages.commitments.' },
+            export_format: { type: 'string', enum: ['json', 'markdown', 'pdf'], default: 'json' },
+          },
+          additionalProperties: false,
+        },
         AutofillEligibilityRequest: {
           type: 'object',
           properties: {
@@ -300,9 +310,10 @@ export async function GET() {
           summary: 'Export application package data',
           description: 'Proxies to the canonical-hub Supabase function to produce an application package export.',
           tags: ['hub'],
-          requestBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } },
+          requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/HubExportRequest' } } } },
           responses: {
             '200': { description: 'Export produced', content: { 'application/json': { schema: { type: 'object' } } } },
+            '400': { description: 'Invalid field or missing id', content: { 'application/json': { schema: { $ref: '#/components/schemas/ProblemDetails' } } } },
             '401': { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/ProblemDetails' } } } },
           },
         },

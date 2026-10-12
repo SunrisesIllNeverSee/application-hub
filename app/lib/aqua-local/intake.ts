@@ -21,7 +21,7 @@
 // /api/import/submit-url + /api/import/program unchanged.
 
 import { newId, nowIso, sha256Hex } from './crypto.ts'
-import { buildVersionPayload, createAnswer, VaultImmutableError } from './repo.ts'
+import { buildVersionPayload, createAnswer, isBlankBody, VaultImmutableError } from './repo.ts'
 
 import type { VaultStorage } from './vault.ts'
 import type {
@@ -246,7 +246,10 @@ export async function importLegacyQAPairs(
   let skipped = 0
   for (let idx = 0; idx < pairs.length; idx++) {
     const p = pairs[idx]
-    if (p.answer_text.trim().length < 10) { skipped++; continue }
+    // length floor AND the canon blank-guard — trim() misses Unicode
+    // format chars (zero-width, bidi controls); a Cf-only body must not
+    // become an encrypted version that could be approved + packet-bound.
+    if (p.answer_text.trim().length < 10 || isBlankBody(p.answer_text)) { skipped++; continue }
     // IR-031b: a pair with no real question binds the answer to nothing —
     // skip rather than collapse every such pair into one slot.
     if (p.question_text.trim().length < 8) { skipped++; continue }
