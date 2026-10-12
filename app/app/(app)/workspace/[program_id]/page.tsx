@@ -356,6 +356,7 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
                         )}
                         <AnswerEditor
                           archivedQuestionId={selectedQuestion.archived_question_id}
+                          questionText={selectedQuestion.asked_as ?? undefined}
                           programId={program.id}
                           wordLimit={selectedQuestion.word_limit ?? undefined}
                           charLimit={selectedQuestion.char_limit ?? undefined}

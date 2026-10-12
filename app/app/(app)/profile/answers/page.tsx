@@ -179,6 +179,7 @@ function AnswerBankCard({ answer }: { answer: ProfileAnswerWithQuestion }) {
       <div className="p-5">
         <AnswerEditor
           archivedQuestionId={answer.archived_question_id}
+          questionText={question?.text ?? undefined}
           initialAnswer={answer}
           compact
         />

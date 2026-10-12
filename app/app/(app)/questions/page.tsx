@@ -282,6 +282,7 @@ function QuestionWorkspace({
           <div className="p-4">
             <AnswerEditor
               archivedQuestionId={q.id}
+              questionText={q.text}
               initialAnswer={existingAnswer}
               compact
             />

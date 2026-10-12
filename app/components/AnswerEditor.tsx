@@ -19,6 +19,7 @@ import {
   LocalDraftAssist,
   type DraftAssistResult,
 } from './aqua-local/LocalDraftAssist'
+import { RelatedVaultAnswers } from './aqua-local/VaultWorkspaceOverlay'
 
 interface DraftResponse {
   draft: string
@@ -37,6 +38,8 @@ interface DraftFeedback {
 
 interface AnswerEditorProps {
   archivedQuestionId: string
+  /** Question as presented — used for related-answer matching + AI prompts. */
+  questionText?: string
   programId?: string
   wordLimit?: number
   charLimit?: number
@@ -58,6 +61,7 @@ const CONFIDENCE_OPTIONS: { value: AnswerConfidence; label: string }[] = [
 
 export function AnswerEditor({
   archivedQuestionId,
+  questionText: questionTextProp,
   programId,
   wordLimit,
   charLimit,
@@ -85,7 +89,7 @@ export function AnswerEditor({
   const supabase = createClient()
   const vault = useVault()
   const storageRef = useRef<import('@/lib/aqua-local-client/session').VaultStorage | null>(null)
-  const questionText = initialAnswer?.question_text ?? ''
+  const questionText = initialAnswer?.question_text ?? questionTextProp ?? ''
 
   // IN-01 load path: under local-first, open the vault lazily and — when
   // already unlocked — read the latest version for this question scope.
@@ -438,6 +442,22 @@ export function AnswerEditor({
         charCurrent={charCount}
         charLimit={charLimit}
       />
+
+      {LOCAL_FIRST && !assistOpen && (
+        <RelatedVaultAnswers
+          programId={programId ?? null}
+          queryText={questionText || archivedQuestionId}
+          currentVersionId={localVersion?.record.id ?? null}
+          onPick={(body) => {
+            setContent(body)
+            setIsEditing(true)
+            setDraftFeedback({
+              type: 'info',
+              message: 'Inserted a related vault answer — review and edit before saving as a new version.',
+            })
+          }}
+        />
+      )}
 
       {LOCAL_FIRST && assistOpen && (
         <LocalDraftAssist

@@ -219,6 +219,7 @@ function AnswerDetail({ answer }: { answer: ProfileAnswerWithQuestion }) {
           <div className="p-4">
             <AnswerEditor
               archivedQuestionId={answer.archived_question_id}
+              questionText={q?.text ?? undefined}
               initialAnswer={answer}
               compact
             />

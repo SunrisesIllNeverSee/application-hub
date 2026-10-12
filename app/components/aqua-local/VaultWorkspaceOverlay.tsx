@@ -104,6 +104,88 @@ export function VaultAwareQuestionSidebar(props: {
   )
 }
 
+/**
+ * SP024 — related vault answers for a question (deterministic local text
+ * similarity; no embeddings egress). Surfaces reuse candidates in the editor;
+ * the user chooses to reuse — nothing auto-fills.
+ */
+export function RelatedVaultAnswers({
+  programId,
+  queryText,
+  currentVersionId,
+  onPick,
+}: {
+  programId: string | null
+  queryText: string
+  currentVersionId?: string | null
+  onPick: (body: string, title: string) => void
+}) {
+  const vault = useVault()
+  const [related, setRelated] = useState<import('@/lib/aqua-local').RelatedAnswer[]>([])
+
+  useEffect(() => {
+    if (vault.status !== 'unlocked' || !queryText.trim()) {
+      setRelated([])
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      try {
+        const storage = await vault.ensureStorage()
+        const secret = vault.getSecret()
+        if (!secret) return
+        const { findRelatedVaultAnswers } = await import('@/lib/aqua-local')
+        const hits = await findRelatedVaultAnswers(storage, secret, queryText, { limit: 4 })
+        if (!cancelled) setRelated(hits.filter((h) => h.version_id !== currentVersionId))
+      } catch {
+        if (!cancelled) setRelated([])
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [vault, queryText, currentVersionId])
+
+  if (vault.status !== 'unlocked' || related.length === 0) return null
+
+  return (
+    <div className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+      <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+        Related answers in your vault <span className="text-neutral-400">(local text match — not AI)</span>
+      </p>
+      <ul className="mt-2 space-y-2">
+        {related.map((r) => (
+          <li key={r.version_id} className="text-xs">
+            <button
+              onClick={() => {
+                const secret = vault.getSecret()
+                if (!secret) return
+                void (async () => {
+                  const storage = await vault.ensureStorage()
+                  const { body } = await readBody(storage, secret, r.version_id)
+                  onPick(body, r.title)
+                })()
+              }}
+              className="group block w-full text-left"
+            >
+              <span className="font-medium text-brand-600 group-hover:underline dark:text-brand-400">
+                {r.title || 'untitled'}
+              </span>
+              <span className="ml-2 text-neutral-400">{r.confidence} · {Math.round(r.similarity * 100)}%</span>
+              <span className="mt-0.5 block text-neutral-500 dark:text-neutral-400 line-clamp-2">
+                {r.preview}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-[10px] text-neutral-400 dark:text-neutral-500">
+        Click to insert the answer text into the editor — saving creates a new version under this question.
+      </p>
+    </div>
+  )
+}
+
 /** Readiness strip computed from the device vault (authoritative under flag). */
 export function VaultReadiness({
   programId,
