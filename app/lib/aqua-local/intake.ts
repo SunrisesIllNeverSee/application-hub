@@ -93,58 +93,61 @@ export async function importLocalIntake(
   const now = nowIso()
 
   // Answers are scoped slots — body written later by the user. Only create
-  // when absent (re-import must not clobber an answered slot).
+  // when absent (re-import must not clobber an answered slot). The whole
+  // intake materialization (slots + catalog record + event) commits as one
+  // transaction — a mid-import failure must not leave orphan slots without
+  // the catalog record that names them.
   const existingAnswers = await storage.getAll<AnswerRecord>('answers')
   const occurrenceIds: string[] = []
-  for (const q of extraction.questions) {
-    const occ = `${applicationId}-q${q.order_index}`
-    occurrenceIds.push(occ)
-    const exists = existingAnswers.some(
-      (a) => a.scope.application_id === applicationId && a.scope.question_occurrence_id === occ,
-    )
-    if (!exists) {
-      await createAnswer(storage, {
-        application_id: applicationId,
-        question_occurrence_id: occ,
-      })
+  await storage.tx(['answers', 'catalog_cache', 'events'], async (s) => {
+    for (const q of extraction.questions) {
+      const occ = `${applicationId}-q${q.order_index}`
+      occurrenceIds.push(occ)
+      const exists = existingAnswers.some(
+        (a) => a.scope.application_id === applicationId && a.scope.question_occurrence_id === occ,
+      )
+      if (!exists) {
+        await createAnswer(s, {
+          application_id: applicationId,
+          question_occurrence_id: occ,
+        })
+      }
     }
-  }
 
-  const record: CatalogCacheRecord = {
-    key: `intake:${applicationId}`,
-    blob: {
-      intake_id: intakeId,
-      application_id: applicationId,
-      imported_at: now,
-      source: {
-        type: input.source_type,
-        url: input.source_url ?? extraction.application.source_url ?? null,
-        title: input.source_title ?? extraction.application.title ?? null,
+    const record: CatalogCacheRecord = {
+      key: `intake:${applicationId}`,
+      blob: {
+        intake_id: intakeId,
+        application_id: applicationId,
+        imported_at: now,
+        source: {
+          type: input.source_type,
+          url: input.source_url ?? extraction.application.source_url ?? null,
+          title: input.source_title ?? extraction.application.title ?? null,
+        },
+        entity: extraction.entity,
+        application: {
+          title: extraction.application.title,
+          vertical: extraction.application.vertical,
+          deadline_at: extraction.application.deadline_at,
+        },
+        questions: extraction.questions.map((q, i) => ({
+          occurrence_id: occurrenceIds[i],
+          text: q.question_text,
+          order_index: q.order_index,
+          is_required: q.is_required,
+          word_limit: q.word_limit,
+          char_limit: q.char_limit,
+        })),
+        custody: 'vault-local — raw pasted text was never stored or transmitted',
       },
-      entity: extraction.entity,
-      application: {
-        title: extraction.application.title,
-        vertical: extraction.application.vertical,
-        deadline_at: extraction.application.deadline_at,
-      },
-      questions: extraction.questions.map((q, i) => ({
-        occurrence_id: occurrenceIds[i],
-        text: q.question_text,
-        order_index: q.order_index,
-        is_required: q.is_required,
-        word_limit: q.word_limit,
-        char_limit: q.char_limit,
-      })),
-      custody: 'vault-local — raw pasted text was never stored or transmitted',
-    },
-    fetched_at: now,
-  }
-  await storage.put('catalog_cache', record)
+      fetched_at: now,
+    }
+    await s.put('catalog_cache', record)
 
-  // Event seq allocated inside a tx over ['events'] — same monotonicity
-  // contract as approveVersion; concurrent imports must not duplicate seq.
-  await storage.tx(['events'], async (tx) => {
-    const events = await tx.getAll<EventRecord>('events')
+    // Event seq allocated inside the same tx — same monotonicity contract
+    // as approveVersion; concurrent imports must not duplicate seq.
+    const events = await s.getAll<EventRecord>('events')
     const seq = events.reduce((m, e) => Math.max(m, e.seq), 0) + 1
     const ev: EventRecord = {
       id: newId(),
@@ -160,7 +163,7 @@ export async function importLocalIntake(
       },
       at: now,
     }
-    await tx.put('events', ev)
+    await s.put('events', ev)
   })
 
   return {
@@ -204,10 +207,10 @@ export interface LegacyImportResult {
 
 /** Deterministic occurrence id for an imported pair — stable so a re-import
     of the same Q&A adds a version rather than a duplicate answer.
-    IR-031: hash the FULL normalized text (never a truncated prefix — two
-    distinct questions sharing a 280-char head must not collapse), and
-    mix in the pair's batch position so a literal-duplicate question in the
-    same import still gets its own slot. */
+    IR-031: sha256 over the normalized text (upstream parsers already
+    truncate to 280 chars — discrimination for prefix-twins comes from the
+    mixed-in batch position, not the hash width), plus batch index so a
+    literal-duplicate question in the same import still gets its own slot. */
 async function importOccurrenceId(questionText: string, batchIndex: number): Promise<string> {
   const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
   // truncated sha256 — the previous 32-bit JS hash had non-trivial

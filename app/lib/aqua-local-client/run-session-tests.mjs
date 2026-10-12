@@ -60,19 +60,26 @@ await t('re-save same scope → child version, dedup (one answer)', async () => 
   assert.equal(answers.length, 1) // no duplicate answer per occurrence
 })
 
-await t('same occurrence under a program scope reuses the bank answer', async () => {
+await t('IR-001 strict scope: program-scoped save NEVER rebinds the bank answer', async () => {
   const s = createMemoryStorage()
-  await saveScopedVersion(s, SECRET, scopeForQuestion('q-3'), {
+  const vBank = await saveScopedVersion(s, SECRET, scopeForQuestion('q-3'), {
     title: 'T', body: 'bank body',
   })
-  // Same question answered inside an application workspace: exact
-  // occurrence binding, one logical answer (no second answer row).
+  // Same question answered inside an application workspace gets its own
+  // scoped answer — silent reuse of the bank slot was revoked at 80e8336
+  // (a program save must not rewrite bank scope or block packet binding).
   const v2 = await saveScopedVersion(s, SECRET, scopeForQuestion('q-3', 'prog-7'), {
     title: 'T', body: 'workspace body',
   })
   const answers = await findAnswersForOccurrence(s, 'q-3')
-  assert.equal(answers.length, 1)
-  assert.equal(v2.answer_id, answers[0].id)
+  assert.equal(answers.length, 2)
+  assert.notEqual(v2.answer_id, vBank.answer_id)
+  const programAnswer = answers.find((a) => a.scope.application_id === 'prog-7')
+  assert.ok(programAnswer, 'program-scoped answer exists')
+  assert.equal(v2.answer_id, programAnswer.id)
+  // bank answer untouched — still holds exactly the bank version
+  const versions = (await s.getAll('versions')).filter((v) => v.answer_id === vBank.answer_id)
+  assert.equal(versions.length, 1)
 })
 
 await t('loadScopeEntry returns latest version + decrypted body', async () => {

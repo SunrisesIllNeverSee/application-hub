@@ -234,13 +234,13 @@ export function LocalIntakePanel() {
       <div className="flex gap-2 text-xs">
         <button
           className={mode === 'questions' ? 'btn-primary' : 'btn-secondary'}
-          onClick={() => { setMode('questions'); setPairs(null); setExtraction(null) }}
+          onClick={() => { setMode('questions'); setPairs(null); setExtraction(null); setResult(null); setQaResult(null) }}
         >
           New application — extract questions
         </button>
         <button
           className={mode === 'qa' ? 'btn-primary' : 'btn-secondary'}
-          onClick={() => { setMode('qa'); setPairs(null); setExtraction(null) }}
+          onClick={() => { setMode('qa'); setPairs(null); setExtraction(null); setResult(null); setQaResult(null) }}
         >
           Answered application — import Q&A
         </button>
