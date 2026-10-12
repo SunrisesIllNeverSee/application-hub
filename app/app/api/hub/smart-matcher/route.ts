@@ -1,6 +1,28 @@
 import { NextResponse } from 'next/server'
 import { getRequestUser } from '@/lib/supabase/request-auth'
 
+// The actual edge-function contract (supabase/functions/smart-matcher):
+//   user_persona:   record — persona descriptors for matching
+//   vertical_filter: string (default 'founder')
+//   match_limit:    integer 1-50 (default 10)
+//
+// IR-009/IR-025: forward an allowlist of the REAL contract fields with
+// validated shapes — never spread the raw caller body. user_persona is a
+// record, so it is shape-bounded (key count, scalar/short-array values,
+// string length) rather than open-ended: legitimate persona descriptors
+// are small scalars; a private answer body cannot fit the bound.
+
+function isPersonaValue(v: unknown): boolean {
+  if (v == null) return true
+  const t = typeof v
+  if (t === 'number' || t === 'boolean') return Number.isFinite(v as number)
+  if (t === 'string') return (v as string).length <= 500
+  if (Array.isArray(v)) {
+    return v.length <= 50 && v.every((x) => typeof x === 'string' && x.length <= 200)
+  }
+  return false
+}
+
 export async function POST(req: Request) {
   const { user, accessToken } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -11,45 +33,42 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Supabase environment is not configured' }, { status: 500 })
   }
 
-  const body = await req.json().catch(() => ({}))
-  // IR-009: never spread the raw caller body into an edge-function hop —
-  // forward an explicit allowlist of operational fields only, so private
-  // text can never ride along (applies unconditionally, not just flag-on).
-  // IR-025: allowlisted keys still carry untrusted values — validate shape
-  // per field contract so free text cannot transit through an allowed name.
-  const { program_id, submission_id, limit, min_score, modes, deadline_days } =
-    body as Record<string, unknown>
-  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  const MODE_ENUM = new Set(['deadline', 'fit', 'dna', 'new', 'high_score'])
-  const bad = (why: string) =>
-    NextResponse.json({ error: `invalid field: ${why}` }, { status: 400 })
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
+  const bad = (why: string) => NextResponse.json({ error: `invalid field: ${why}` }, { status: 400 })
+
+  const { user_persona, vertical_filter, match_limit } = body
   const forwarded: Record<string, unknown> = { user_id: user.id }
-  if (program_id !== undefined) {
-    if (typeof program_id !== 'string' || !UUID_RE.test(program_id)) return bad('program_id must be a uuid')
-    forwarded.program_id = program_id
-  }
-  if (submission_id !== undefined) {
-    if (typeof submission_id !== 'string' || !UUID_RE.test(submission_id)) return bad('submission_id must be a uuid')
-    forwarded.submission_id = submission_id
-  }
-  if (limit !== undefined) {
-    if (typeof limit !== 'number' || !Number.isInteger(limit) || limit < 1 || limit > 100) return bad('limit must be an integer 1-100')
-    forwarded.limit = limit
-  }
-  if (min_score !== undefined) {
-    if (typeof min_score !== 'number' || min_score < 0 || min_score > 1) return bad('min_score must be a number 0-1')
-    forwarded.min_score = min_score
-  }
-  if (modes !== undefined) {
-    if (!Array.isArray(modes) || modes.some((m) => typeof m !== 'string' || !MODE_ENUM.has(m))) {
-      return bad('modes must be an array of known mode names')
+
+  if (user_persona !== undefined) {
+    if (typeof user_persona !== 'object' || user_persona === null || Array.isArray(user_persona)) {
+      return bad('user_persona must be an object')
     }
-    forwarded.modes = modes
+    const entries = Object.entries(user_persona as Record<string, unknown>)
+    if (entries.length > 50) return bad('user_persona exceeds 50 keys')
+    if (entries.some(([k, v]) => typeof k !== 'string' || k.length > 80 || !isPersonaValue(v))) {
+      return bad('user_persona values must be scalars or short string arrays')
+    }
+    forwarded.user_persona = user_persona
   }
-  if (deadline_days !== undefined) {
-    if (typeof deadline_days !== 'number' || deadline_days < 0 || deadline_days > 3650) return bad('deadline_days must be a number 0-3650')
-    forwarded.deadline_days = deadline_days
+  if (vertical_filter !== undefined) {
+    if (typeof vertical_filter !== 'string' || vertical_filter.length > 64) {
+      return bad('vertical_filter must be a short string')
+    }
+    forwarded.vertical_filter = vertical_filter
   }
+  if (match_limit !== undefined) {
+    if (typeof match_limit !== 'number' || !Number.isInteger(match_limit) || match_limit < 1 || match_limit > 50) {
+      return bad('match_limit must be an integer 1-50')
+    }
+    forwarded.match_limit = match_limit
+  }
+  const extra = Object.keys(body).filter(
+    (k) => !['user_persona', 'vertical_filter', 'match_limit'].includes(k),
+  )
+  if (extra.length > 0) {
+    return NextResponse.json({ error: `unsupported field(s): ${extra.join(', ')}` }, { status: 400 })
+  }
+
   const resp = await fetch(`${supabaseUrl}/functions/v1/smart-matcher`, {
     method: 'POST',
     headers: {

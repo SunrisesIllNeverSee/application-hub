@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const EXPORT_FORMATS = new Set(['json', 'markdown'])
+const EXPORT_FORMATS = new Set(['json', 'markdown', 'pdf'])
 
 export async function POST(req: Request) {
   const supabase = await createClient()
@@ -22,14 +22,23 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json().catch(() => ({}))
-  // AM-0057: the canonical export contract is exactly {canonical_id,
-  // export_format}. Arbitrary caller fields are refused — not spread —
-  // so the hosted read path can never carry private text upstream under
-  // any flag state. (Applies unconditionally; local-first additionally
-  // never writes caller content to the hub.)
-  const { canonical_id, export_format } = body as Record<string, unknown>
-  if (typeof canonical_id !== 'string' || !UUID_RE.test(canonical_id)) {
+  // AM-0057: the canonical export contract (handleExport in
+  // supabase/functions/canonical-hub) permits {canonical_id | package_id,
+  // export_format ∈ json|markdown|pdf}. Arbitrary caller fields are
+  // refused — not spread — so the hosted read path can never carry
+  // private text upstream under any flag state.
+  const { canonical_id, package_id, export_format } = body as Record<string, unknown>
+  if (canonical_id !== undefined && (typeof canonical_id !== 'string' || !UUID_RE.test(canonical_id))) {
     return NextResponse.json({ error: 'canonical_id must be a uuid' }, { status: 400 })
+  }
+  if (package_id !== undefined && (typeof package_id !== 'string' || !UUID_RE.test(package_id))) {
+    return NextResponse.json({ error: 'package_id must be a uuid' }, { status: 400 })
+  }
+  if (canonical_id === undefined && package_id === undefined) {
+    return NextResponse.json(
+      { error: 'canonical_id or package_id required' },
+      { status: 400 },
+    )
   }
   const format = export_format === undefined ? 'json' : export_format
   if (typeof format !== 'string' || !EXPORT_FORMATS.has(format)) {
@@ -38,7 +47,7 @@ export async function POST(req: Request) {
       { status: 400 },
     )
   }
-  const allowedKeys = new Set(['canonical_id', 'export_format'])
+  const allowedKeys = new Set(['canonical_id', 'package_id', 'export_format'])
   const extra = Object.keys(body as Record<string, unknown>).filter((k) => !allowedKeys.has(k))
   if (extra.length > 0) {
     return NextResponse.json(
@@ -55,7 +64,8 @@ export async function POST(req: Request) {
       Authorization: session?.access_token ? `Bearer ${session.access_token}` : `Bearer ${anonKey}`,
     },
     body: JSON.stringify({
-      canonical_id,
+      ...(canonical_id !== undefined ? { canonical_id } : {}),
+      ...(package_id !== undefined ? { package_id } : {}),
       export_format: format,
       action: 'export',
       user_id: user.id,

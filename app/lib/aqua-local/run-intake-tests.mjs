@@ -94,11 +94,11 @@ await t('intake-scoped versions flow through the packet path', async () => {
 await t('scope ids are deterministic + collision-free across different pastes', async () => {
   const ex1 = extractionFor(SAMPLE)
   const ex2 = extractionFor(SAMPLE + '\nExtra question line?\n')
-  const id1 = intakeApplicationId(ex1.entity.slug, ex1.questions)
-  const id2 = intakeApplicationId(ex2.entity.slug, ex2.questions)
+  const id1 = await intakeApplicationId(ex1.entity.slug, ex1.questions)
+  const id2 = await intakeApplicationId(ex2.entity.slug, ex2.questions)
   assert.notEqual(id1, id2)
   // same paste → same id (idempotent re-import)
-  const id1b = intakeApplicationId(ex1.entity.slug, ex1.questions)
+  const id1b = await intakeApplicationId(ex1.entity.slug, ex1.questions)
   assert.equal(id1, id1b)
 })
 

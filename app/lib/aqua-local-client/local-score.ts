@@ -87,15 +87,16 @@ export async function computeVaultScore(
     if (answered) answeredCount++
   }
 
-  // Latest human decisions only — mirror the freeze gate semantics:
-  // LF-18 ordering, restored rows excluded, latest must be human+approved.
+  // Latest decision wins, then exclude — mirror the freeze gate semantics
+  // exactly (IR-034): LF-18 ordering, take the LATEST record, then require
+  // it to be human+approved and not restored. Filtering before the latest
+  // pick would let an older approval shadow a newer restored row.
   const latestByVersion = new Map<string, ApprovalRecord>()
   for (const ap of [...approvals].sort(compareApprovals)) {
-    if (ap.restored_from_backup) continue
     latestByVersion.set(ap.version_id, ap)
   }
   const approvedCount = [...latestByVersion.values()].filter(
-    (a) => a.decision === 'approved' && a.actor_class === 'human',
+    (a) => a.decision === 'approved' && a.actor_class === 'human' && !a.restored_from_backup,
   ).length
 
   const intakeApps = cache.filter((r) => r.key.startsWith('intake:')).length

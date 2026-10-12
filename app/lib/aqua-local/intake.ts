@@ -20,7 +20,7 @@
 // duplicated or impersonated. Public program ingestion continues via
 // /api/import/submit-url + /api/import/program unchanged.
 
-import { newId, nowIso } from './crypto.ts'
+import { newId, nowIso, sha256Hex } from './crypto.ts'
 import { createAnswer, listEvents } from './repo.ts'
 import type { VaultStorage } from './vault.ts'
 import type {
@@ -71,13 +71,13 @@ export interface IntakeExtractionLike {
  * and question_occurrence ids remain stable across a re-import of the same
  * extraction (idempotent re-run produces the same occurrences).
  */
-export function intakeApplicationId(entitySlug: string, questions: IntakeQuestionLike[]): string {
-  // Include a cheap content fingerprint so two different pastes with the
-  // same entity name still get distinct applications.
+export async function intakeApplicationId(entitySlug: string, questions: IntakeQuestionLike[]): Promise<string> {
+  // Content fingerprint via truncated sha256 — a 32-bit JS string hash has
+  // non-trivial collision probability; silently merging two distinct
+  // applications pastes under one id would lose data boundaries.
   const sig = questions.map((q) => q.normalized_text).join('|')
-  let h = 0
-  for (let i = 0; i < sig.length; i++) h = (Math.imul(h, 31) + sig.charCodeAt(i)) | 0
-  return `local-intake-${entitySlug}-${(h >>> 0).toString(36)}`
+  const h = await sha256Hex(sig)
+  return `local-intake-${entitySlug}-${h.slice(0, 16)}`
 }
 
 export async function importLocalIntake(
@@ -88,18 +88,18 @@ export async function importLocalIntake(
   if (!extraction.questions.length) {
     throw new Error('intake extraction produced no questions')
   }
-  const applicationId = intakeApplicationId(extraction.entity.slug, extraction.questions)
+  const applicationId = await intakeApplicationId(extraction.entity.slug, extraction.questions)
   const intakeId = `intake-${newId().slice(0, 12)}`
   const now = nowIso()
 
+  // Answers are scoped slots — body written later by the user. Only create
+  // when absent (re-import must not clobber an answered slot).
+  const existingAnswers = await storage.getAll<AnswerRecord>('answers')
   const occurrenceIds: string[] = []
   for (const q of extraction.questions) {
     const occ = `${applicationId}-q${q.order_index}`
     occurrenceIds.push(occ)
-    // Answers are scoped slots — body written later by the user. Only create
-    // when absent (re-import must not clobber an answered slot).
-    const answers = await storage.getAll<AnswerRecord>('answers')
-    const exists = answers.some(
+    const exists = existingAnswers.some(
       (a) => a.scope.application_id === applicationId && a.scope.question_occurrence_id === occ,
     )
     if (!exists) {
@@ -204,11 +204,12 @@ export interface LegacyImportResult {
     distinct questions sharing a 280-char head must not collapse), and
     mix in the pair's batch position so a literal-duplicate question in the
     same import still gets its own slot. */
-function importOccurrenceId(questionText: string, batchIndex: number): string {
+async function importOccurrenceId(questionText: string, batchIndex: number): Promise<string> {
   const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
-  let h = 0
-  for (let i = 0; i < norm.length; i++) h = (Math.imul(h, 31) + norm.charCodeAt(i)) | 0
-  return `import-${(h >>> 0).toString(36)}-${batchIndex}`
+  // truncated sha256 — the previous 32-bit JS hash had non-trivial
+  // collision probability; two distinct questions must never share a slot.
+  const h = await sha256Hex(`${norm}::${batchIndex}`)
+  return `import-${h.slice(0, 16)}`
 }
 
 /**
@@ -239,7 +240,7 @@ export async function importLegacyQAPairs(
     // IR-031b: a pair with no real question binds the answer to nothing —
     // skip rather than collapse every such pair into one slot.
     if (p.question_text.trim().length < 8) { skipped++; continue }
-    const occ = importOccurrenceId(p.question_text, idx)
+    const occ = await importOccurrenceId(p.question_text, idx)
     const key = `answer-bank::${occ}`
     let answer = byOccurrence.get(key)
     if (!answer) {

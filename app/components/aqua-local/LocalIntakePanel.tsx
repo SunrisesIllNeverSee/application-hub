@@ -24,6 +24,14 @@ import {
 } from '@/lib/qa-extract-client'
 import { generateDraft, listProviders } from '@/lib/aqua-local-client/session'
 
+// IR-022/IR-033: canonical egress URLs for hosted providers — endpoint-
+// configured providers (ollama) show their stored base_url instead.
+const PROVIDER_ENDPOINTS: Record<string, string> = {
+  anthropic: 'https://api.anthropic.com/v1/messages',
+  openai: 'https://api.openai.com/v1/chat/completions',
+  google: 'https://generativelanguage.googleapis.com/v1beta/models',
+}
+
 // AM-0017 — local-first intake. The hosted pipeline persists pasted
 // application text to Supabase — refused under the flag. This panel performs
 // the SAME deterministic extraction entirely on this device and writes the
@@ -51,13 +59,19 @@ export function LocalIntakePanel() {
   const [pairs, setPairs] = useState<ExtractedPair[] | null>(null)
   const [qaResult, setQaResult] = useState<LegacyImportResult | null>(null)
   const [providers, setProviders] = useState<{ provider_id: string; base_url?: string; model_preference?: string }[]>([])
+  const [providerId, setProviderId] = useState('')
 
   useEffect(() => {
     if (vault.status !== 'unlocked') return
     let cancelled = false
     void vault.ensureStorage()
       .then((s) => listProviders(s))
-      .then((ps) => { if (!cancelled) setProviders(ps.map((p) => ({ provider_id: p.provider_id, base_url: p.base_url, model_preference: p.model_preference }))) })
+      .then((ps) => {
+        if (cancelled) return
+        const list = ps.map((p) => ({ provider_id: p.provider_id, base_url: p.base_url, model_preference: p.model_preference }))
+        setProviders(list)
+        setProviderId((cur) => cur || list[0]?.provider_id || '')
+      })
       .catch(() => undefined)
     return () => { cancelled = true }
   }, [vault, vault.status])
@@ -108,8 +122,9 @@ export function LocalIntakePanel() {
       const storage = await vault.ensureStorage()
       const secret = vault.getSecret()
       if (!secret) throw new Error('Vault locked')
-      const cfgs = await listProviders(storage)
-      const chosen = providers[0] ?? cfgs[0]
+      // IR-033-fix: egress goes ONLY to the disclosed selection — never a
+      // re-fetched cfg that could differ from what the user was shown.
+      const chosen = providers.find((p) => p.provider_id === providerId) ?? providers[0]
       if (!chosen) throw new Error('No provider configured — set one up in the vault panel')
       const { text } = await generateDraft(storage, secret, true, {
         provider_id: chosen.provider_id,
@@ -247,16 +262,35 @@ export function LocalIntakePanel() {
         </button>
         {mode === 'qa' && providers.length > 0 && (
           <>
-            <button className="btn-secondary" disabled={!canExtract || busy} onClick={() => void extractWithProvider()}>
-              {busy ? 'Extracting…' : `Extract with ${providers[0].provider_id}`}
-            </button>
-            {/* IR-033: disclose the actual egress — same standard as the
-                drafting consent disclosure. The paste goes ONLY to the
-                configured endpoint; the AQUA server never sees it. */}
-            <p className="basis-full font-mono text-[10px] text-neutral-400 dark:text-neutral-500">
-              sends your paste directly to {providers[0].provider_id}
-              {providers[0].base_url ? ` @ ${providers[0].base_url}` : ''} — a consent receipt is stored first
-            </p>
+            {providers.length > 1 && (
+              <select
+                value={providerId}
+                onChange={(e) => setProviderId(e.target.value)}
+                className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+              >
+                {providers.map((p) => (
+                  <option key={p.provider_id} value={p.provider_id}>{p.provider_id}</option>
+                ))}
+              </select>
+            )}
+            {(() => {
+              const sel = providers.find((p) => p.provider_id === providerId) ?? providers[0]
+              const endpoint = sel.base_url ?? PROVIDER_ENDPOINTS[sel.provider_id] ?? sel.provider_id
+              return (
+                <>
+                  <button className="btn-secondary" disabled={!canExtract || busy} onClick={() => void extractWithProvider()}>
+                    {busy ? 'Extracting…' : `Extract with ${sel.provider_id}`}
+                  </button>
+                  {/* IR-022/IR-033: disclose the actual egress — same
+                      standard as the drafting consent disclosure. The paste
+                      goes ONLY to the disclosed endpoint; the AQUA server
+                      never sees it. */}
+                  <p className="basis-full font-mono text-[10px] text-neutral-400 dark:text-neutral-500">
+                    egress: {endpoint} — consent receipt stored before the call
+                  </p>
+                </>
+              )
+            })()}
           </>
         )}
         <p className="text-xs text-neutral-500">
