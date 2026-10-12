@@ -4,6 +4,7 @@ import { formatDeadline, cn } from '@/lib/utils'
 import type { UserProgramFit } from '@/lib/database.types'
 import { computeAquaScore, nextTierDelta, aquaScoreTier, type AquaScoreInputs } from '@/lib/aquascore'
 import WeeklyPoll from '@/components/WeeklyPoll'
+import { VaultShellNote } from '@/components/aqua-local/VaultShellNote'
 
 export const metadata = { title: 'Dash' }
 
@@ -297,6 +298,7 @@ export default async function DashPage() {
           accent="orange"
         />
       </div>
+      <VaultShellNote />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { formatDeadline, cn } from '@/lib/utils'
 import type { UserProgramFit } from '@/lib/database.types'
+import { VaultShellNote } from '@/components/aqua-local/VaultShellNote'
 
 export const metadata = { title: 'Today' }
 
@@ -135,6 +136,7 @@ type AppRow = typeof appRows extends (infer T)[] | null ? T : never
           Here&apos;s where things stand today.
         </p>
       </div>
+      <VaultShellNote />
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { formatDeadline, cn } from '@/lib/utils'
+import { VaultShellNote } from '@/components/aqua-local/VaultShellNote'
 
 export const metadata = { title: 'Smart Matcher — AQUA' }
 
@@ -113,6 +114,7 @@ export default async function SmartMatcherPage({
           Personalized recommendations based on your persona profile and answer bank.
         </p>
       </div>
+      <VaultShellNote />
 
       {/* Daily Digest */}
       <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5">

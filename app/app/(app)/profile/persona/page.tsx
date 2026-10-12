@@ -5,6 +5,7 @@ import { ThemeTag } from '@/components/ThemeTag'
 import { FmsQuickAssess } from '@/components/FmsQuickAssess'
 import { FundScoreScanButton } from '@/components/FundScoreScanButton'
 import { cn } from '@/lib/utils'
+import { VaultShellNote } from '@/components/aqua-local/VaultShellNote'
 
 export const metadata = { title: 'Persona' }
 
@@ -195,6 +196,7 @@ export default async function PersonaPage() {
           The system&apos;s read on you — distilled from your answers, applications, and craft.
         </p>
       </div>
+      <VaultShellNote className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-emerald-200/60 bg-emerald-50/50 px-3 py-2 text-xs text-emerald-800 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-300" />
 
       {/* AQUAscore headline */}
       <div className="card p-6 mb-6 bg-gradient-to-br from-brand-50 to-white dark:from-brand-950/30 dark:to-neutral-900">
