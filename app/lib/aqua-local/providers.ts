@@ -570,19 +570,14 @@ export function createGoogleAdapter(opts?: { model?: string }): ProviderAdapter 
 }
 
 /** Ollama (self-hosted) — direct browser call to the user's own endpoint.
-    The ngrok bypass header is sent ONLY for remote tunnels — localhost Ollama
-    rejects the CORS preflight when that header is present (it is not in the
-    daemon's Access-Control-Allow-Headers list). */
-function isLocalEndpoint(base: string): boolean {
-  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(base)
-}
-
+    Remote tunnels (ngrok et al.) do NOT get the ngrok-skip header: fetch()
+    sends `Accept: star-slash-star` — i.e. a non-HTML accept header, which
+    already passes ngrok's browser warning page,
+    while the extra header would FAIL the CORS preflight against Ollama's
+    fixed Access-Control-Allow-Headers list. */
 export function createOllamaAdapter(opts: { base_url: string; model?: string }): ProviderAdapter {
   const model = opts.model ?? DEFAULT_MODELS.ollama
   const base = opts.base_url.replace(/\/+$/, '')
-  const remoteHeaders: Record<string, string> = isLocalEndpoint(base)
-    ? {}
-    : { 'ngrok-skip-browser-warning': 'true' }
   return {
     id: 'ollama-byok',
     mode: 'byok',
@@ -596,7 +591,6 @@ export function createOllamaAdapter(opts: { base_url: string; model?: string }):
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...remoteHeaders,
         },
         body: JSON.stringify({
           model: req.model ?? model,
@@ -721,10 +715,7 @@ export async function testProviderConnection(
   if (providerId === 'ollama') {
     const base = (ctx.base_url ?? '').replace(/\/+$/, '')
     if (!base) throw new ProviderKeyError('Ollama base URL required')
-    const headers: Record<string, string> = isLocalEndpoint(base)
-      ? {}
-      : { 'ngrok-skip-browser-warning': 'true' }
-    const res = await withTimeout(`${base}/api/tags`, { headers }, 6000)
+    const res = await withTimeout(`${base}/api/tags`, {}, 6000)
     if (!res.ok) throw new ProviderEgressError(`Ollama returned HTTP ${res.status}`)
     const data = (await res.json()) as { models?: { name: string }[] }
     const names = (data.models ?? []).map((m) => m.name)
