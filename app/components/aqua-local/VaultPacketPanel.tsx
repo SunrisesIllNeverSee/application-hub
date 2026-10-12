@@ -193,10 +193,12 @@ export function VaultPacketPanel({
       // IR-016: signer class reflects the ACTUAL session — an anonymous
       // vault must not claim authenticated-account backing.
       const { createClient } = await import('@/lib/supabase/client')
-      const { data: { session } } = await createClient().auth.getSession()
+      // getUser() validates server-side — getSession() can return a
+      // cached-but-revoked session claiming 'authenticated-account'.
+      const { data: { user } } = await createClient().auth.getUser()
       await attestPacket(storage, {
         packet_id: frozenId,
-        signer_class: session?.user ? 'authenticated-account' : 'local-only',
+        signer_class: user ? 'authenticated-account' : 'local-only',
         user_ack: ack === true,
         privateKey: kp.privateKey,
         pubkey_b64: kp.pubkey_b64,
@@ -337,6 +339,22 @@ export function VaultPacketPanel({
                       </span>
                     )}
                   </div>
+                )}
+                {r.versions.length > 0 && r.selected === '' && (
+                  <input
+                    value={r.skipReason}
+                    onChange={(e) =>
+                      setRows((prev) =>
+                        prev.map((x) =>
+                          x.occurrenceId === r.occurrenceId
+                            ? { ...x, skipReason: e.target.value }
+                            : x,
+                        ),
+                      )
+                    }
+                    placeholder="Skipping this question — explain why (required if no version selected)"
+                    className="input mt-2 w-full text-xs"
+                  />
                 )}
               </div>
             ))}

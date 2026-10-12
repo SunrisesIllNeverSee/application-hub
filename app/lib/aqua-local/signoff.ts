@@ -197,11 +197,11 @@ export async function attestPacket(
     })
     // IR-020/IR-029b: a re-attestation of a restored signoff replaces the
     // record — but the state transition is skipped ONLY when the packet is
-    // already 'signed'. A backup carrying state 'prepared' PLUS a restored
-    // signoff row is an inconsistent claim: writing the fresh signoff while
-    // leaving 'prepared' would make the packet permanently un-signable
-    // (next attest hits putIfAbsent). Advance prepared→signed in that edge.
-    if (!isReattest || state.state !== 'signed') {
+    // already 'signed' AT TX TIME (txState, not the outer read — a racing
+    // restore could have regressed signed→prepared between them; skipping
+    // the advance on that stale read would wedge the packet as
+    // 'prepared' + live signoff). Advance prepared→signed in that edge.
+    if (!isReattest || txState.state !== 'signed') {
       await advancePacketState(s, input.packet_id, 'signed')
     }
     return rec
