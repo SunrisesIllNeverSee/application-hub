@@ -70,19 +70,28 @@ function ApprovalBadge({ approval, restored, actorClass }: { approval: BankVersi
 function scopeLabel(entry: BankEntry): string {
   const s = entry.answer.scope
   const app =
-    s.application_id === 'local-onboarding' ? 'Local onboarding' : s.application_id
-  return `${app} · ${s.question_occurrence_id}`
+    s.application_id === 'local-onboarding'
+      ? 'Local onboarding'
+      : (entry.intake_label ?? s.application_id)
+  // Intake-scoped entries carry the extracted question text — the opaque
+  // occurrence id alone can't tell the user which question a slot is for.
+  const q = entry.question_text
+  return q ? `${app} · ${q.length > 80 ? q.slice(0, 80) + '…' : q}` : `${app} · ${s.question_occurrence_id}`
 }
 
 export function AnswerBankList({
   bank,
   onEdit,
+  onNewVersion,
   onApprove,
   approvingId,
 }: {
   bank: BankEntry[]
   /** Decrypt + open editor parented at this version. */
   onEdit: (entry: BankEntry, version: BankVersion) => void
+  /** Write the FIRST version on a versionless slot (e.g. an intake
+      question waiting to be answered). */
+  onNewVersion?: (entry: BankEntry) => void
   onApprove: (versionId: string, decision: 'approved' | 'rejected') => void
   approvingId: string | null
 }) {
@@ -111,7 +120,10 @@ export function AnswerBankList({
             >
               <div>
                 <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  {latest?.record.title || 'Untitled answer'}
+                  {latest?.record.title ||
+                    (entry.question_text
+                      ? `Unwritten — ${entry.question_text.length > 70 ? entry.question_text.slice(0, 70) + '…' : entry.question_text}`
+                      : 'Unwritten answer')}
                 </p>
                 <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
                   {scopeLabel(entry)} · {entry.versions.length} version
@@ -134,7 +146,23 @@ export function AnswerBankList({
               </div>
             </button>
 
-            {open && (
+            {open && entry.versions.length === 0 && (
+              <div className="mt-3 rounded-lg border border-dashed border-neutral-300 p-3 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                {entry.question_text ? (
+                  <p className="mb-2 text-neutral-700 dark:text-neutral-300">{entry.question_text}</p>
+                ) : null}
+                No versions yet.
+                {onNewVersion && (
+                  <button
+                    onClick={() => onNewVersion(entry)}
+                    className="btn-secondary ml-2 px-3 py-1 text-xs"
+                  >
+                    Write answer
+                  </button>
+                )}
+              </div>
+            )}
+            {open && entry.versions.length > 0 && (
               <ul className="mt-3 space-y-2">
                 {[...entry.versions].reverse().map((bv, i) => {
                   const v = bv.record

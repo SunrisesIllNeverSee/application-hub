@@ -51,6 +51,9 @@ export async function POST(req: Request) {
     }
     const entries = Object.entries(user_persona as Record<string, unknown>)
     if (entries.length > 50) return bad('user_persona exceeds 50 keys')
+    // Total-size cap — shape bounds alone still permit ~25KB through an
+    // allowlisted field; bound the serialized persona.
+    if (JSON.stringify(user_persona).length > 8192) return bad('user_persona exceeds 8KB')
     if (entries.some(([k, v]) => typeof k !== 'string' || k.length > 80 || !isPersonaValue(v))) {
       return bad('user_persona values must be scalars or short string arrays')
     }

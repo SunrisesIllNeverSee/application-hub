@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { UnlockPanel } from '@/components/aqua-local/UnlockPanel'
 import { VaultStatusBanner } from '@/components/aqua-local/VaultStatusBanner'
 import { AnswerBankList } from '@/components/aqua-local/AnswerBankList'
+import { IntakePacketSection } from '@/components/aqua-local/IntakePacketSection'
 import { LocalAnswerEditor, type EditTarget } from '@/components/aqua-local/LocalAnswerEditor'
 import { OnboardingLocalCard } from '@/components/aqua-local/OnboardingLocalCard'
 import { RestoreBackupPanel } from '@/components/aqua-local/RestoreBackupPanel'
@@ -129,6 +130,21 @@ export default function AquaLocal() {
     } catch (e) {
       setBanner(e instanceof Error ? e.message : 'Could not decrypt this version')
     }
+  }
+
+  // First version on a versionless slot (e.g. an imported intake question
+  // waiting to be answered) — the slot already exists, just write v1.
+  const handleNewVersion = (entry: BankEntry) => {
+    setSaveError('')
+    setLastSaved(null)
+    setTarget({
+      answer_id: entry.answer.id,
+      parent_version_id: null,
+      parentWasApproved: false,
+      scope: entry.answer.scope,
+      title: entry.question_text?.slice(0, 60) ?? '',
+      body: '',
+    })
   }
 
   const handleSave = async (input: Parameters<typeof saveVersion>[2]) => {
@@ -274,6 +290,7 @@ export default function AquaLocal() {
             <AnswerBankList
               bank={bank}
               onEdit={handleEdit}
+              onNewVersion={handleNewVersion}
               onApprove={handleApprove}
               approvingId={approvingId}
             />
@@ -291,6 +308,10 @@ export default function AquaLocal() {
               </div>
             )}
           </section>
+
+          {/* Intake applications imported on this device get the same
+              packet lifecycle as hosted programs — select/freeze/sign/export. */}
+          <IntakePacketSection />
 
           {/* SP021/LF-16 — local-first BYOK provider configuration. Keys live
               in the vault only; generation egress is browser→provider. */}

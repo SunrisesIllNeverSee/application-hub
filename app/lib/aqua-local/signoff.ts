@@ -172,6 +172,15 @@ export async function attestPacket(
   // otherwise leave 'prepared' + a live signoff, which wedges the packet
   // permanently (next attest hits putIfAbsent with no restored escape).
   const record = await storage.tx(['signoffs', 'packet_states', 'packets'], async (s) => {
+    // Re-check STATE inside the tx — a concurrent discard between the
+    // outer read and this write must still refuse before any write, or a
+    // fresh signoff would land on a terminal packet.
+    const txState = await getPacketState(s, input.packet_id)
+    if (!txState || (txState.state !== 'prepared' && txState.state !== 'signed')) {
+      throw new PacketStateError(
+        `cannot sign a packet in state '${txState?.state ?? 'missing'}' — freeze a new packet instead`,
+      )
+    }
     // Re-read INSIDE the tx — a concurrent attest between the outer read
     // and this write could have landed a live signoff; deleting a live
     // signoff as if restored would silently erase a real attestation.

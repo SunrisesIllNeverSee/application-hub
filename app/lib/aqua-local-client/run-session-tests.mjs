@@ -5,6 +5,7 @@
 //  getStorage()/IndexedDB is never touched here.)
 import assert from 'node:assert/strict'
 import { createMemoryStorage } from '../aqua-local/vault.ts'
+import { createAnswer } from '../aqua-local/repo.ts'
 import { readVersion } from '../aqua-local/repo.ts'
 import { VaultDecryptError } from '../aqua-local/crypto.ts'
 import {
@@ -122,6 +123,25 @@ await t('tryUnlock: empty vault accepts any secret; wrong secret refused', async
   await saveScopedVersion(s, SECRET, scopeForQuestion('q-6'), { title: 'T', body: 'x' })
   assert.equal(await tryUnlock(s, SECRET), 'ok')
   await assert.rejects(() => tryUnlock(s, 'nope'), VaultDecryptError)
+})
+
+await t('loadBank: intake-scoped slots carry question text + entity label', async () => {
+  const s = createMemoryStorage()
+  const appId = 'local-intake-acme-abc123'
+  await s.put('catalog_cache', {
+    key: `intake:${appId}`,
+    fetched_at: new Date().toISOString(),
+    blob: {
+      application_id: appId,
+      entity: { name: 'Acme Incubator' },
+      questions: [{ occurrence_id: `${appId}-q1`, text: 'What is your unfair advantage?', order_index: 1 }],
+    },
+  })
+  await createAnswer(s, { application_id: appId, question_occurrence_id: `${appId}-q1` })
+  const bank = await loadBank(s)
+  const entry = bank.find((e) => e.answer.scope.application_id === appId)
+  assert.equal(entry?.question_text, 'What is your unfair advantage?')
+  assert.equal(entry?.intake_label, 'Acme Incubator')
 })
 
 console.log(`\n${passed} passed`)

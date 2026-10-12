@@ -42,6 +42,7 @@ import {
 import type {
   VaultStorage,
   AnswerRecord,
+  CatalogCacheRecord,
   ApprovalRecord,
   ProvenanceRecord,
   VersionRecord,
@@ -84,6 +85,11 @@ export interface BankVersion {
 export interface BankEntry {
   answer: AnswerRecord
   versions: BankVersion[] // ascending by created_at — last is newest
+  /** For intake-scoped answers: the extracted question text + entity label
+      from the `intake:<app>` catalog record (metadata-class — not
+      encrypted). Lets the bank show WHICH question a slot refers to. */
+  question_text?: string
+  intake_label?: string
 }
 
 // Keyed by the resolved uid (or 'anon') — an account switch mid-session must
@@ -144,12 +150,35 @@ export async function tryUnlock(storage: VaultStorage, secret: string): Promise<
 
 /** Load the whole Answer Bank: answers + versions + latest approval + provenance. */
 export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
-  const [answers, versions, approvals, provenance] = await Promise.all([
+  const [answers, versions, approvals, provenance, catalog] = await Promise.all([
     storage.getAll<AnswerRecord>('answers'),
     storage.getAll<VersionRecord>('versions'),
     storage.getAll<ApprovalRecord>('approvals'),
     storage.getAll<ProvenanceRecord>('provenance'),
+    storage.getAll<CatalogCacheRecord>('catalog_cache'),
   ])
+
+  // Intake-scoped answers join their extracted question text — a bank slot
+  // must be identifiable by WHAT was asked, not just opaque ids.
+  const intakeMeta = new Map<string, { label: string; byOcc: Map<string, string> }>()
+  for (const rec of catalog) {
+    if (!rec.key.startsWith('intake:')) continue
+    const blob = rec.blob as {
+      application_id?: string
+      entity?: { name?: string }
+      application?: { title?: string }
+      questions?: Array<{ occurrence_id?: string; text?: string }>
+    }
+    if (!blob?.application_id || !Array.isArray(blob.questions)) continue
+    intakeMeta.set(blob.application_id, {
+      label: blob.entity?.name ?? blob.application?.title ?? blob.application_id,
+      byOcc: new Map(
+        blob.questions
+          .filter((q) => typeof q?.occurrence_id === 'string')
+          .map((q) => [q.occurrence_id!, q.text ?? '']),
+      ),
+    })
+  }
 
   // Latest approval wins per version (records are append-only).
   // IR-007: single-sourced ordering — compareApprovals is the LF-18
@@ -181,6 +210,10 @@ export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
   return answers
     .map((answer) => ({
       answer,
+      question_text: intakeMeta
+        .get(answer.scope.application_id)
+        ?.byOcc.get(answer.scope.question_occurrence_id),
+      intake_label: intakeMeta.get(answer.scope.application_id)?.label,
       versions: (byAnswer.get(answer.id) ?? []).sort(
         (a, b) =>
           a.record.created_at.localeCompare(b.record.created_at) ||
