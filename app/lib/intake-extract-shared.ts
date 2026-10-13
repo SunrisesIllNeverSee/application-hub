@@ -280,9 +280,10 @@ export function extractQAPairsDeterministicReport(text: string): QAParseReport {
             : {}),
         })
       }
-    } else if (answer.length === 0) {
-      // a pending question that never collected an answer is dropped —
-      // surface it so the user knows a Q may have been mis-split
+    } else {
+      // a pending question whose "answer" never formed — empty OR too short
+      // to be a real answer — is dropped either way; surface it so the user
+      // knows a Q may have been mis-split (IR-037 review gap)
       droppedQuestions++
       uncertainBoundaries++
     }

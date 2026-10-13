@@ -35,7 +35,7 @@ export async function GET() {
       },
     },
     npm: 'https://www.npmjs.com/package/aqua-mcp-server',
-    npmStatus: 'The published npm entry currently registers the package name only — do not use npx until a dist-bearing release is published and verified.',
+    npmStatus: 'aqua-mcp-server@1.0.1 is published with a real dist/ (201 files, ~455KB unpacked) — npx aqua-mcp-server works. 1.0.0 was a metadata-only stub; use >=1.0.1.',
     install: 'git clone https://github.com/SunrisesIllNeverSee/application-hub.git && cd application-hub/application-hub-mcp-server && npm ci && npm run build && node dist/index.js',
     capabilities: {
       tools: true,
@@ -50,7 +50,7 @@ export async function GET() {
     },
     resourceCategories: ['programs', 'questions', 'rankings'],
     promptTemplates: ['opportunity_scout', 'draft_answer', 'program_comparison'],
-    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
+    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server',
     docs: 'https://aquaidp.xyz/mcp',
     auth: {
       type: 'Supabase JWT',

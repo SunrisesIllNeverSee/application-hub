@@ -110,9 +110,10 @@ export async function resolveVaultDbName(): Promise<string> {
   //
   // IR-M07: supabase-js getSession() queues behind an in-flight token
   // REFRESH — under auth rate-limiting (429/backoff) a local vault open
-  // can stall tens of seconds on a network it does not need. The uid is
-  // read synchronously from the persisted session first; the async path
-  // only runs as a bounded fallback.
+  // can stall tens of seconds on a network it does not need. The session
+  // is read synchronously from the auth cookies first (this app persists
+  // sessions via @supabase/ssr → document.cookie, not localStorage); the
+  // async path only runs as a bounded fallback.
   const fastUid = readLocalSessionUid()
   if (fastUid) {
     const name = `aqua-local-${fastUid}`
@@ -127,38 +128,70 @@ export async function resolveVaultDbName(): Promise<string> {
     )
     const { data } = await Promise.race([sessionPromise, timeout])
     const uid = data.session?.user?.id
-    const name = uid ? `aqua-local-${uid}` : (lastResolvedDbName ?? 'aqua-local')
+    if (!uid) {
+      // Session undetermined — NEVER fall to the shared 'aqua-local' DB
+      // once a uid-keyed DB has been resolved: a stalled session read on a
+      // logged-in user would silently write into the anonymous vault.
+      if (lastResolvedDbName) return lastResolvedDbName
+      return 'aqua-local'
+    }
+    const name = `aqua-local-${uid}`
     lastResolvedDbName = name
     return name
   } catch {
+    // Timeout/429-stall: sticky name if we have one, shared only as the
+    // never-resolved first-call fallback (anonymous surface).
     return lastResolvedDbName ?? 'aqua-local'
   }
 }
 
-/** Synchronous uid read from supabase-js's persisted session — the vault's
-    DB key must never wait on a token refresh. Scoped to THIS deployment's
-    project ref (from NEXT_PUBLIC_SUPABASE_URL) so a shared origin hosting
-    multiple Supabase projects never resolves the wrong uid. */
+/** Synchronous uid read from the persisted auth session. @supabase/ssr
+    (createBrowserClient) stores the session in document.cookie — chunked
+    as `sb-<ref>-auth-token`, `sb-<ref>-auth-token.0`, `.1`, … with each
+    chunk `base64-<base64url>` — never in localStorage. Scoped to THIS
+    deployment's project ref so multi-project origins can't cross-resolve. */
 function readLocalSessionUid(): string | null {
-  if (typeof localStorage === 'undefined') return null
+  if (typeof document === 'undefined' || !document.cookie) return null
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
     const ref = /^https:\/\/([a-z0-9-]+)\.supabase\.co/.exec(url)?.[1]
-    const wanted = ref ? `sb-${ref}-auth-token` : null
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i)
-      if (!k || !/^sb-[a-z0-9-]+-auth-token$/.test(k)) continue
-      if (wanted && k !== wanted) continue // wrong project on this origin
-      const raw = localStorage.getItem(k)
-      if (!raw) continue
-      const parsed = JSON.parse(raw) as { user?: { id?: string } }
-      const id = parsed?.user?.id
-      if (typeof id === 'string' && id.length > 0) return id
+    if (!ref) return null
+    const base = `sb-${ref}-auth-token`
+    // Collect the base key plus chunk keys in numeric order.
+    const chunks: Array<[number, string]> = []
+    for (const pair of document.cookie.split(';')) {
+      const eq = pair.indexOf('=')
+      if (eq === -1) continue
+      const k = pair.slice(0, eq).trim()
+      const v = pair.slice(eq + 1).trim()
+      if (k === base) chunks.push([0, v])
+      else {
+        const m = new RegExp(`^${base}\\.(\\d+)$`).exec(k)
+        if (m) chunks.push([Number(m[1]), v])
+      }
     }
+    if (chunks.length === 0) return null
+    chunks.sort((a, b) => a[0] - b[0])
+    // Base cookie stores the full value OR chunk .0 carries it — supabase-ssr
+    // either writes a single `base64-…` value or split chunks. Concatenate
+    // the chunk values (excluding the bare base key when chunks exist).
+    const chunkOnly = chunks.filter(([i]) => i > 0)
+    const joined = (chunkOnly.length > 0 ? chunkOnly : chunks).map(([, v]) => v).join('')
+    const raw = decodeURIComponent(joined)
+    // Cookie payload is either raw JSON or 'base64-<base64url>' (supabase-ssr).
+    const json = raw.startsWith('base64-')
+      ? (() => {
+          let b64 = raw.slice(7).replace(/-/g, '+').replace(/_/g, '/')
+          b64 += '='.repeat((4 - (b64.length % 4)) % 4)
+          return decodeURIComponent(escape(atob(b64)))
+        })()
+      : raw
+    const parsed = JSON.parse(json) as { user?: { id?: string } }
+    const id = parsed?.user?.id
+    return typeof id === 'string' && id.length > 0 ? id : null
   } catch {
-    /* malformed entry — fall through to the async path */
+    return null
   }
-  return null
 }
 
 /**
@@ -208,10 +241,13 @@ export async function loadBank(storage: VaultStorage, secret?: string | null): P
   if (secret) {
     // Per-record isolation: one corrupt title must not reject the whole
     // bank view (contrast VaultPacketPanel's .catch(() => v.title)).
-    await Promise.all(versions.map(async (v) => {
+    await Promise.all(versions.map(async (v, i) => {
       if (!v.title_enc) return
-      v.title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
-      delete v.title_enc
+      const title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
+      // Shallow copy — never mutate the stored shape in place: a caller
+      // re-putting this record would persist plaintext without the flag.
+      const { title_enc: _te, ...rest } = v
+      versions[i] = { ...rest, title } as VersionRecord
     }))
   }
 
@@ -220,9 +256,13 @@ export async function loadBank(storage: VaultStorage, secret?: string | null): P
   const intakeMeta = new Map<string, { label: string; byOcc: Map<string, string> }>()
   for (const rec of catalog) {
     if (!rec.key.startsWith('intake:')) continue
+    // Per-record isolation: one corrupt/foreign intake ciphertext must not
+    // reject the whole bank view (same contract as the title pass above).
     const blob = (rec.blob_enc
       ? (secret
-          ? JSON.parse(await decryptText(secret, JSON.parse(rec.blob_enc)))
+          ? JSON.parse(
+              await decryptText(secret, JSON.parse(rec.blob_enc)).catch(() => 'null'),
+            )
           : undefined) // encrypted intake record and no secret → skip
       : rec.blob) as {
       application_id?: string

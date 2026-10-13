@@ -78,9 +78,13 @@ export async function intakeApplicationId(entitySlug: string, questions: IntakeQ
   // Content fingerprint via truncated sha256 — a 32-bit JS string hash has
   // non-trivial collision probability; silently merging two distinct
   // applications pastes under one id would lose data boundaries.
+  // IR-014 residual: the entity slug is a name fragment — hash it too so
+  // scope ids + the intake:<id> catalog key leak only the hash, never the
+  // entity text. Determinism preserved (same slug → same segment).
   const sig = questions.map((q) => q.normalized_text).join('|')
+  const slugSeg = (await sha256Hex(`ent:${entitySlug}`)).slice(0, 8)
   const h = await sha256Hex(sig)
-  return `local-intake-${entitySlug}-${h.slice(0, 16)}`
+  return `local-intake-${slugSeg}-${h.slice(0, 16)}`
 }
 
 export async function importLocalIntake(
@@ -233,7 +237,10 @@ export interface LegacyImportResult {
     question inside one batch still gets its own slot via dupIndex. */
 async function importOccurrenceId(questionText: string, dupIndex: number): Promise<string> {
   const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
-  const h = await sha256Hex(dupIndex === 0 ? norm : `${norm}::dup${dupIndex}`)
+  // Length-prefixed structured input — a question literally ending in
+  // '::dup1' cannot collide with the second slot of its sibling text.
+  const payload = `q:${norm.length}:${norm}#dup:${dupIndex}`
+  const h = await sha256Hex(payload)
   return `import-${h.slice(0, 16)}`
 }
 

@@ -52,8 +52,13 @@ function useVaultOccurrences(programId: string) {
         // IR-014: titles are ciphertext at rest — decrypt for display.
         const secret = vault.getSecret()
         if (secret) {
-          for (const v of Object.values(map)) {
-            if (v.title_enc) { v.title = await decryptVersionTitle(secret, v).catch(() => v.title); delete v.title_enc }
+          for (const k of Object.keys(map)) {
+            const v = map[k]
+            if (v?.title_enc) {
+              const title = await decryptVersionTitle(secret, v).catch(() => v.title)
+              const { title_enc: _te, ...rest } = v // shallow copy — never write back plaintext
+              map[k] = { ...rest, title } as typeof v
+            }
           }
         }
         if (!cancelled) {

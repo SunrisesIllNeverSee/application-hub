@@ -17,8 +17,9 @@ import { signManifestDigest, verifyManifestSignature } from './crypto.ts'
 export { generateSignerKeyPair, signManifestDigest, verifyManifestSignature } from './crypto.ts'
 export type { SignerKeyPair } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
+import { nowIso } from './crypto.ts'
 import type { SignerClass, SignoffRecord } from './schema.ts'
-import { signPacket as recordSignoff, VaultNotFoundError } from './repo.ts'
+import { VaultNotFoundError, VaultImmutableError } from './repo.ts'
 import { advancePacketState, getPacketState, PacketStateError } from './packets.ts'
 
 export class SignoffAckError extends Error {
@@ -141,14 +142,20 @@ export async function attestPacket(
     if (txPrior?.restored_from_backup) {
       await s.delete('signoffs', input.packet_id)
     }
-    const rec = await recordSignoff(s, {
+    // The signoff row is written here (not via repo.signPacket) because the
+    // signature was already verified pre-tx — signPacket's crypto verify
+    // cannot run inside an IDB transaction. signature_verified is the value
+    // attestPacket itself computed against the stored manifest digest.
+    const rec: SignoffRecord = {
       packet_id: input.packet_id,
       signer_class: input.signer_class,
+      timestamp: nowIso(),
       signature_b64: signatureB64,
       pubkey_b64: pubkeyB64,
-      verified_with_manifest: verifiedManifest,
-      user_ack: input.user_ack,
-    })
+      signature_verified: verifiedManifest === manifestSha256,
+    }
+    const inserted = await s.putIfAbsent('signoffs', rec.packet_id, rec)
+    if (!inserted) throw new VaultImmutableError(`packet already signed: ${input.packet_id}`)
     // IR-020/IR-029b: a re-attestation of a restored signoff replaces the
     // record — but the state transition is skipped ONLY when the packet is
     // already 'signed' AT TX TIME (txState, not the outer read — a racing

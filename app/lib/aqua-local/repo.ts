@@ -353,6 +353,16 @@ export async function freezePacket(
     stored manifest digest AT THIS BOUNDARY — the lowest trust layer.
     A signature that fails verification is refused outright; an absent
     signature is a legitimate unsigned acknowledgement. */
+/** Sign a frozen packet. One signoff per packet; signature is optional
+    (declared sign-off allowed).
+    IR-024: a cryptographic signature is verified against the packet's
+    stored manifest digest AT THIS BOUNDARY — the primitive itself.
+    A signature that fails verification is refused outright; an absent
+    signature is a legitimate unsigned acknowledgement.
+    NOTE: this primitive awaits WebCrypto and therefore must NOT be called
+    inside an IDB transaction (the tx auto-commits mid-call and later writes
+    throw TransactionInactiveError). The governed path attestPacket writes
+    its signoff inside its own tx with a signature it verified pre-tx. */
 export async function signPacket(
   storage: VaultStorage,
   input: {
@@ -360,14 +370,6 @@ export async function signPacket(
     signer_class: ActorClass | SignerClass
     signature_b64?: string | null
     pubkey_b64?: string | null
-    /** When set, the caller asserts it already verified signature_b64
-        against THIS manifest digest (attestPacket does it pre-transaction —
-        WebCrypto inside an IDB tx would auto-commit the transaction and the
-        putIfAbsent below would throw TransactionInactiveError in real
-        browsers). The primitive still checks the packet's real digest
-        matches before storing verified status, so a forged claim must
-        carry the packet's own manifest digest. */
-    verified_with_manifest?: string
     // LF-PACKET-02: the primitive is public but still requires the explicit
     // ack — the governed wrapper (signoff.ts attestPacket) adds state checks.
     user_ack?: boolean
@@ -382,22 +384,14 @@ export async function signPacket(
   if (input.signature_b64) {
     if (!input.pubkey_b64)
       throw new Error('signature presented without its verification key')
-    if (input.verified_with_manifest) {
-      // Caller-pre-verified path — verify the claim binds THIS manifest.
-      if (input.verified_with_manifest !== packet.manifest_sha256)
-        throw new Error('signature verified against a different manifest — refused')
-      signatureVerified = true
-    } else {
-      // Direct-call path — verify here (no IDB tx in flight).
-      const ok = await verifyManifestSignature(
-        input.pubkey_b64,
-        packet.manifest_sha256,
-        input.signature_b64,
-      )
-      if (!ok)
-        throw new Error('signature verification failed — forged or mismatched signature refused')
-      signatureVerified = true
-    }
+    const ok = await verifyManifestSignature(
+      input.pubkey_b64,
+      packet.manifest_sha256,
+      input.signature_b64,
+    )
+    if (!ok)
+      throw new Error('signature verification failed — forged or mismatched signature refused')
+    signatureVerified = true
   }
 
   const record: SignoffRecord = {

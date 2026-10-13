@@ -60,6 +60,12 @@ export interface VersionRecord {
       from — set when text drafted/reused from ANOTHER scope becomes a new
       answer's root version. Separate from parent_version_id (same-answer
       lineage) — never implies approval transfer. */
+  /** Cross-scope (or same-scope) provenance: the draft this version STARTED
+      FROM — the bank answer it was picked/derived from. Means "started
+      from", not "still resembles" — the editor may diverge the body freely;
+      the link records the seed, never a content claim. parent_version_id
+      stays strict same-answer lineage; this field carries the cross-scope
+      trace (IR-026). */
   derived_from?: { version_id: string; version_sha256: string } | null
   body: string // serialized EncryptedBlob
   sha256: string // sha256 of canonicalJson({ title_plaintext, body_plaintext })

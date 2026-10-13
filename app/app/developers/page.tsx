@@ -113,8 +113,10 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
             Source code is in the repository under{' '}
             <a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server" className="text-brand-600 hover:underline dark:text-brand-400">application-hub-mcp-server/</a>.
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Current supported installation: clone and build from source.
-# Published npm 1.0.0 lacks the executable; npx is not yet functional.
+          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Published package (1.0.1+) — real dist/, runnable via npx:
+npx aqua-mcp-server
+
+# Or clone and build from source:
 git clone https://github.com/SunrisesIllNeverSee/application-hub
 cd application-hub/application-hub-mcp-server
 npm ci && npm run build

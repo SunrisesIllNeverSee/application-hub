@@ -91,8 +91,13 @@ export function VaultPacketPanel({
     // IR-014: titles are ciphertext at rest — decrypt for display.
     const secret = vault.getSecret()
     if (secret) {
-      for (const v of versions) {
-        if (v.title_enc) { v.title = await decryptVersionTitle(secret, v).catch(() => v.title); delete v.title_enc }
+      for (let i = 0; i < versions.length; i++) {
+        const v = versions[i]
+        if (v.title_enc) {
+          const title = await decryptVersionTitle(secret, v).catch(() => v.title)
+          const { title_enc: _te, ...rest } = v // shallow copy — never write back plaintext
+          versions[i] = { ...rest, title } as typeof v
+        }
       }
     }
     // IR-030: mirror the freeze gate — 'approved' only counts when the
