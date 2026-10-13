@@ -5,7 +5,7 @@ import { BREADCRUMBS } from '@/lib/jsonld'
 export const metadata: Metadata = {
   title: 'AQUA Application Hub Developer Portal — API, MCP, OpenAPI',
   description:
-    'Developer resources for AQUA Application Hub at aquaidp.xyz: OpenAPI spec, REST API, MCP server with 27 tools, authentication, Appfeeder extension, and agent integration guidance.',
+    'Developer resources for AQUA Application Hub at aquaidp.xyz: OpenAPI spec, REST API, MCP server with 31 registered tools, authentication, Appfeeder extension, and agent integration guidance.',
   alternates: { canonical: '/developers' },
 }
 
@@ -29,14 +29,14 @@ export default function DevelopersPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">AQUA Application Hub Developers</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">AQUA developer portal</h1>
           <p className="max-w-3xl text-xl leading-relaxed text-neutral-600 dark:text-neutral-300">
-            An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub REST API exposes these capabilities with typed operations, a local MCP server with 27 tools for agent environments, and an Appfeeder browser extension for capturing answers from program websites. All REST routes require a Supabase session cookie or Bearer JWT.
+            An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub REST API exposes these capabilities with typed operations, a local MCP server with 31 registered tools for agent environments, and a deferred Appfeeder capture integration. Public discovery routes are available without authentication; user-account endpoints require a Supabase session cookie or Bearer JWT.
           </p>
         </header>
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Quickstart</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            AQUA is an authenticated product — there is no unauthenticated public API.
+            Public discovery APIs are available without authentication; private account APIs require a session or Bearer JWT. Under local-first mode, legacy hosted private-answer write routes refuse requests (HTTP 403 with local_first:true).
             Sign in at <Link href="/login" className="text-brand-600 hover:underline dark:text-brand-400">/login</Link> to get
             a session cookie, or retrieve a Bearer JWT from <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-sm dark:bg-neutral-800">GET /api/auth/token</code> for
             extension or agent use. Start with the OpenAPI document for typed operations and error models.
@@ -44,11 +44,10 @@ export default function DevelopersPage() {
           <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Get your auth token (requires active session)
 curl https://aquaidp.xyz/api/auth/token
 
-# Match a question against your answer bank
-curl -X POST https://aquaidp.xyz/api/match-question \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer <JWT>" \\
-  -d '{"text": "Tell us what you have built", "limit": 5}'
+# Inspect the public MCP tool catalog
+curl https://aquaidp.xyz/.well-known/mcp
+
+# Private answer matching happens in the local vault, not /api/match-question (403).
 
 # Read the OpenAPI spec
 curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
@@ -61,8 +60,7 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
             <a href="/openapi.json" className="text-brand-600 hover:underline dark:text-brand-400">/openapi.json</a>.
             It documents 10 operations across matching, applications, answers, hub,
             review, drafting, and auth. Every operation has a unique operationId,
-            typed request/response schemas, and ProblemDetails error models
-            (RFC 9457).
+            typed request/response schemas, and documented error models. Some legacy private-write operations are listed for compatibility but refuse with HTTP 403 in local-first mode.
           </p>
           <ul className="list-disc space-y-1 pl-6 text-neutral-600 dark:text-neutral-300">
             <li><code className="rounded bg-neutral-100 px-1.5 py-0.5 text-sm dark:bg-neutral-800">matchQuestion</code> — match a question against the user answer bank</li>
@@ -101,7 +99,7 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
         <section className="space-y-4">
           <h2 id="mcp" className="text-2xl font-semibold tracking-tight">MCP server</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The AQUA MCP server exposes 27 tools across programs, questions,
+            The AQUA MCP source registers 31 tools across programs, questions,
             rankings, intelligence, and user-authenticated operations. It runs
             locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted
             via Streamable HTTP transport. There is no public hosted MCP endpoint
@@ -114,13 +112,8 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
             Source code is in the repository under{' '}
             <a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server" className="text-brand-600 hover:underline dark:text-brand-400">application-hub-mcp-server/</a>.
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Install via npm (published)
-npm install -g aqua-mcp-server
-
-# Or run directly without installing
-npx -y aqua-mcp-server
-
-# Or clone and build from source
+          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Current supported installation: clone and build from source.
+# Published npm 1.0.0 lacks the executable; npx is not yet functional.
 git clone https://github.com/SunrisesIllNeverSee/application-hub
 cd application-hub/application-hub-mcp-server
 npm install && npm run build
@@ -138,7 +131,7 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
               </p>
             </div>
             <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Authenticated tools (16)</h3>
+              <h3 className="font-semibold">Authenticated tools (14)</h3>
               <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                 Profile answers, application readiness, fit score, find best
                 programs, rank answers, log draft runs, save answers, review
@@ -147,14 +140,21 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
               </p>
             </div>
           </div>
+          <p className="text-sm text-neutral-600 dark:text-neutral-300">
+            Six additional canonical <code>aqua.*</code> tools cover ingest, qualification,
+            reward, variation and package operations. Private-content write tools refuse
+            in local-first mode; tool availability does not imply remote vault access.
+          </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Appfeeder browser extension</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The Appfeeder Chrome extension captures answers directly from
-            application form fields. It uses the <code className="text-xs">/api/answers/capture</code> and{' '}
-            <code className="text-xs">/api/match-question</code> endpoints with a Bearer JWT.
+            Appfeeder source is preserved, but its hosted capture and matching endpoints
+            refuse private-content operations while local-first is active. The extension
+            capture workflow is deferred; a JWT does not override those privacy guards.
+            Its legacy paths include <code className="text-xs">/api/answers/capture</code> and{' '}
+            <code className="text-xs">/api/match-question</code>.
             Source is in the repository under <code className="text-xs">appfeeder/</code>.
           </p>
         </section>
@@ -162,10 +162,11 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Error handling</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            All API error responses use a ProblemDetails shape (RFC 9457) with
+            Many API errors use a ProblemDetails shape (RFC 9457) with
             machine-readable <code className="text-xs">error</code> codes, human-readable{' '}
             <code className="text-xs">title</code> and <code className="text-xs">detail</code>, and a{' '}
             <code className="text-xs">resolution</code> hint suggesting the next step.
+            Local-first refusals may instead return a compact JSON response with <code className="text-xs">local_first: true</code>.
           </p>
           <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`{
   "error": "Unauthorized",

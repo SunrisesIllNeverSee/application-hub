@@ -20,9 +20,13 @@ export async function GET() {
     description: 'MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence',
     transport: {
       stdio: {
-        command: 'npx',
-        args: ['-y', 'aqua-mcp-server'],
+        // The currently published npm tarball is metadata-only (no dist/index.js).
+        // Until a runnable version is verified and published, install from source.
+        command: 'node',
+        args: ['<absolute-path-to-built-clone>/application-hub-mcp-server/dist/index.js'],
+        note: 'Run npm ci && npm run build in application-hub-mcp-server, then replace this placeholder with the absolute entrypoint path.',
         env: {
+          AQUA_LOCAL_FIRST: '1',
           SUPABASE_URL: '${NEXT_PUBLIC_SUPABASE_URL}',
           SUPABASE_ANON_KEY: '${NEXT_PUBLIC_SUPABASE_ANON_KEY}',
           SUPABASE_ACCESS_TOKEN: 'user session JWT',
@@ -34,24 +38,26 @@ export async function GET() {
       },
     },
     npm: 'https://www.npmjs.com/package/aqua-mcp-server',
-    install: 'npx -y aqua-mcp-server',
+    install: 'git clone https://github.com/SunrisesIllNeverSee/application-hub && cd application-hub/application-hub-mcp-server && npm ci && npm run build',
+    npmStatus: 'The published 1.0.0 package is metadata-only; do not use npx until a runnable package passes distribution acceptance and is published.',
     capabilities: {
       tools: true,
       resources: true,
       prompts: true,
     },
-    toolCount: 27,
+    toolCount: 31,
     toolCategories: {
       public: ['hub_search_programs', 'hub_get_program_detail', 'hub_get_program_by_slug', 'hub_get_program_rankings', 'hub_get_heat_scores', 'hub_get_program_questions', 'hub_find_similar_questions', 'hub_get_universal_questions', 'hub_get_program_dna', 'hub_get_question_significance', 'hub_get_acceptance_stats'],
       authenticated: ['hub_get_profile_answers', 'hub_get_application_readiness', 'hub_get_fit_score', 'hub_find_best_programs', 'hub_rank_my_answers', 'hub_log_draft_run', 'hub_save_answer', 'hub_get_answer_review_context', 'hub_save_answer_review', 'hub_stress_test_answer', 'hub_intake_application', 'hub_fill_application', 'hub_set_borrow_threshold', 'hub_search_answer_bank'],
+      canonical: ['aqua.ingest_application', 'aqua.process_reward', 'aqua.get_variations', 'aqua.qualify_answer', 'aqua.get_canonical_package', 'aqua.export_package'],
     },
     resourceCategories: ['programs', 'questions', 'rankings'],
     promptTemplates: ['opportunity_scout', 'draft_answer', 'program_comparison'],
-    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
+    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server',
     docs: 'https://aquaidp.xyz/developers#mcp',
     auth: {
       type: 'Supabase JWT',
-      description: 'Authenticated tools require a Supabase access token from the user session. Public tools (programs, questions, rankings) work without auth.',
+      description: 'User-account tools require a Supabase JWT; public discovery tools do not. Local-first mode refuses hosted private-content writes even with authentication.',
     },
   }
 
