@@ -24,7 +24,6 @@ import {
 } from 'react'
 import {
   getStorage,
-  resolveVaultDbName,
   tryUnlock,
   runVaultPrivacyMigration,
   invalidateVaultIdentity,
@@ -91,12 +90,11 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       setStatus('unsupported')
       throw new Error('IndexedDB is not available in this browser')
     }
-    // Account switch mid-session: getStorage resolves the current user's DB;
-    // if it changed, drop the prior user's handle AND their secret.
-    const currentDb = await resolveVaultDbName()
-    const s = storageRef.current && storageUidRef.current === currentDb
-      ? storageRef.current
-      : await getStorage()
+    // Account switch mid-session: getStorage resolves the current user's DB
+    // and returns the handle with its name — one atomic resolution, so the
+    // label can never diverge from the handle it describes. If it changed,
+    // drop the prior user's secret.
+    const { storage: s, dbName: currentDb } = await getStorage()
     if (storageUidRef.current !== currentDb) {
       secretRef.current = null
       setStatus('locked')

@@ -136,21 +136,29 @@ export function currentResolvedUid(): string | null {
  * Bounded async session read — queues behind supabase-js's in-flight token
  * refresh, so it races a timeout (a 429-stalled refresh must not block a
  * local vault open). Injectable in tests via __setSessionProbeForTests.
+ *
+ * IMPORTANT — real getSession() contract: on a retryable failure (429,
+ * network) it RESOLVES `{ data: { session: null }, error }` — it does not
+ * throw, and the session is NOT removed. `error` must stay observable so a
+ * retryable failure takes the stall path (sticky identity preserved) rather
+ * than being misread as a definitive sign-out.
  */
-type SessionProbe = () => Promise<{ uid: string | null }>
-async function defaultSessionProbe(): Promise<{ uid: string | null }> {
+type SessionProbe = () => Promise<{ uid: string | null; error?: unknown }>
+async function defaultSessionProbe(): Promise<{ uid: string | null; error?: unknown }> {
   const { createClient } = await import('@/lib/supabase/client')
   const sessionPromise = createClient().auth.getSession()
   const timeout = new Promise<never>((_, reject) =>
     setTimeout(() => reject(new Error('session read timeout')), 1500),
   )
-  const { data } = await Promise.race([sessionPromise, timeout])
-  return { uid: data.session?.user?.id ?? null }
+  const { data, error } = await Promise.race([sessionPromise, timeout])
+  return { uid: data.session?.user?.id ?? null, error: error ?? null }
 }
 let sessionProbe: SessionProbe = defaultSessionProbe
 
 /** TEST SEAM — never called by app code. Swap the async session read for a
-    controllable probe; pass null to restore the real implementation. */
+    controllable probe; pass null to restore the real implementation. The
+    probe returns the REAL getSession shape — resolve `{uid:null, error}` to
+    simulate a retryable failure, `{uid:null}` for a clean signed-out read. */
 export function __setSessionProbeForTests(probe: SessionProbe | null): void {
   sessionProbe = probe ?? defaultSessionProbe
 }
@@ -162,7 +170,41 @@ export function __wrapVaultHandleForTests(dbName: string, inner: VaultStorage): 
   return guardVaultHandle(dbName, resolutionEpoch, inner)
 }
 
-function rememberResolved(name: string, uid: string): string {
+/**
+ * Module-level auth listener — wired on first resolution so invalidation
+ * does not depend on VaultProvider being mounted (e.g. `(onboarding)`
+ * routes have none). No-ops outside a browser; fire-and-forget — the
+ * epoch/rememberResolved guards still catch races during the lazy import.
+ */
+let authListenerStarted = false
+function ensureAuthListener(): void {
+  if (authListenerStarted) return
+  authListenerStarted = true
+  void import('@/lib/supabase/client').then(({ createClient }) => {
+    createClient().auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        invalidateVaultIdentity()
+      } else if (
+        (event === 'SIGNED_IN' || event === 'USER_UPDATED') &&
+        session?.user?.id &&
+        lastResolvedUid &&
+        session.user.id !== lastResolvedUid
+      ) {
+        // Signed in as a different account under us — invalidate.
+        invalidateVaultIdentity()
+      }
+    })
+  }).catch(() => { authListenerStarted = false })
+}
+
+interface ResolvedVault {
+  name: string
+  /** Epoch captured at the atomic consistency point — binding a handle to
+      THIS epoch (not a later re-read) closes the resolve→bind race. */
+  epoch: number
+}
+
+function rememberResolved(name: string, uid: string): ResolvedVault {
   if (lastResolvedUid && lastResolvedUid !== uid) {
     // Account switched without an invalidation landing first (e.g. cookie
     // swap ahead of the auth listener) — kill every outstanding handle:
@@ -172,10 +214,22 @@ function rememberResolved(name: string, uid: string): string {
   }
   lastResolvedDbName = name
   lastResolvedUid = uid
-  return name
+  return { name, epoch: resolutionEpoch }
 }
 
-export async function resolveVaultDbName(): Promise<string> {
+/** Non-committing return: read the sticky name and epoch in the same
+    synchronous block — a queued invalidation cannot interleave, so the
+    pair is a consistent snapshot. */
+function currentSnapshot(): ResolvedVault {
+  return { name: lastResolvedDbName ?? 'aqua-local', epoch: resolutionEpoch }
+}
+
+/**
+ * Resolve the vault identity → `{ name, epoch }`. The epoch is bound at the
+ * atomic consistency point so a handle minted from this result dies the
+ * moment the next invalidation lands — never a live stale handle.
+ */
+export async function resolveVaultIdentity(): Promise<ResolvedVault> {
   // Read the LOCAL session (no network): getUser() validates against the
   // server, and a transient failure (429, offline) would silently flip the
   // vault to the shared 'aqua-local' DB — dropping the unlocked secret and
@@ -188,40 +242,63 @@ export async function resolveVaultDbName(): Promise<string> {
   // is read synchronously from the auth cookies first (this app persists
   // sessions via @supabase/ssr → document.cookie, not localStorage); the
   // async path only runs as a bounded fallback.
+  if (typeof window !== 'undefined') ensureAuthListener()
   const epoch = resolutionEpoch
-  const fastUid = readLocalSessionUid()
-  if (fastUid) return rememberResolved(`aqua-local-${fastUid}`, fastUid)
+  const local = readLocalSession()
+  if (local.uid) return rememberResolved(`aqua-local-${local.uid}`, local.uid)
   try {
-    const { uid } = await sessionProbe()
+    const { uid, error } = await sessionProbe()
     if (epoch !== resolutionEpoch) {
       // A sign-out/account-switch landed while the async read was in
       // flight — this result is stale; resolve against current state.
-      return resolveVaultDbName()
+      return resolveVaultIdentity()
     }
+    if (error) throw error // retryable refresh failure (429/network) → stall path
     // A session written mid-flight (cookie appeared after our first read)
     // beats a stale probe result.
-    const lateUid = readLocalSessionUid()
-    if (lateUid) return rememberResolved(`aqua-local-${lateUid}`, lateUid)
+    const late = readLocalSession()
+    if (late.uid) return rememberResolved(`aqua-local-${late.uid}`, late.uid)
     if (!uid) {
-      // Supabase definitively reports NO session — a sticky authenticated
-      // identity must not survive it (this is sign-out, not a stall).
-      lastResolvedDbName = null
-      lastResolvedUid = null
-      return 'aqua-local'
+      if (!local.material && !late.material) {
+        // NO auth-cookie material anywhere AND a clean null session —
+        // definitive sign-out (not a stall): release the authenticated
+        // identity AND every handle minted under it.
+        if (lastResolvedUid) invalidateVaultIdentity()
+        return currentSnapshot()
+      }
+      // Auth-cookie material exists but is unparseable/partial (e.g. a
+      // mid-rewrite chunk gap) — identity is INDETERMINATE, not absent:
+      // keep the established identity rather than substitute the shared
+      // anonymous vault for a possibly-authenticated user.
+      return currentSnapshot()
     }
     return rememberResolved(`aqua-local-${uid}`, uid)
   } catch {
-    if (epoch !== resolutionEpoch) return resolveVaultDbName()
-    // Timeout/429-stall: sticky name ONLY while the epoch is unchanged —
+    if (epoch !== resolutionEpoch) return resolveVaultIdentity()
+    // Timeout/error-stall: sticky name ONLY while the epoch is unchanged —
     // an invalidated identity can never be reused here. 'aqua-local' is
     // the never-resolved first-call fallback (anonymous surface) only.
-    return lastResolvedDbName ?? 'aqua-local'
+    return currentSnapshot()
   }
+}
+
+export async function resolveVaultDbName(): Promise<string> {
+  return (await resolveVaultIdentity()).name
+}
+
+/** Result of reading this deployment's auth cookie(s). */
+export interface AuthCookieRead {
+  /** Session uid when a complete, well-formed cookie was recovered. */
+  uid: string | null
+  /** true when ANY `sb-<ref>-auth-token*` material was present — including
+      partial/unparseable sets (mid-rewrite chunk gap). 'uid null + material
+      true' means INDETERMINATE, not signed-out. */
+  material: boolean
 }
 
 /**
  * Reassemble THIS project's supabase-ssr auth cookie(s) from a raw
- * `document.cookie` header string and extract the session uid — or null.
+ * `document.cookie` header string and extract the session uid.
  *
  * @supabase/ssr@0.4.x layout (mirrors its chunker/combineChunks exactly):
  *   - small session:   `sb-<ref>-auth-token`  = percent-encoded full value
@@ -230,52 +307,61 @@ export async function resolveVaultDbName(): Promise<string> {
  *   - payload:         raw JSON, or `base64-<base64url(JSON)>` (default
  *                      cookieEncoding 'base64url')
  *
- * Rules: a bare base cookie wins over chunks (library precedence); a
- * chunked set must be a contiguous 0..N run — a missing index means a
- * half-written/rotated set and the partial value is REFUSED, never decoded
- * into an authoritative identity. Other projects' `sb-*` cookies are
- * ignored via the <ref> scoping.
+ * Rules: a bare base cookie wins over chunks (library precedence — ssr's
+ * combineChunks checks the base key first); a chunked set must be a
+ * contiguous 0..N run — a missing index means a half-written/rotated set
+ * and the partial value is REFUSED, never decoded into an authoritative
+ * identity. Other projects' `sb-*` cookies are ignored via <ref> scoping.
+ * Strictness-side notes: `.01` collides with `.1` (refused as duplicate);
+ * duplicate bare-base keys last-win (document.cookie cannot actually carry
+ * duplicates); values are always decodeURIComponent'd because ssr writes
+ * them through `cookie.serialize`, which percent-encodes — the inverse is
+ * required for both raw and base64url payloads.
  */
-export function parseAuthCookieUid(cookieHeader: string, supabaseUrl: string): string | null {
-  if (!cookieHeader) return null
-  try {
-    const ref = /^https:\/\/([a-z0-9-]+)\.supabase\.co/.exec(supabaseUrl)?.[1]
-    if (!ref) return null
-    const base = `sb-${ref}-auth-token`
-    const chunkRe = new RegExp(`^${base}\\.(\\d+)$`)
-    let single: string | null = null
-    const chunks = new Map<number, string>()
-    for (const pair of cookieHeader.split(';')) {
-      const eq = pair.indexOf('=')
-      if (eq === -1) continue
-      const k = pair.slice(0, eq).trim()
-      const v = pair.slice(eq + 1).trim()
-      if (k === base) {
-        single = v
-        continue
-      }
+export function parseAuthCookie(cookieHeader: string, supabaseUrl: string): AuthCookieRead {
+  const none: AuthCookieRead = { uid: null, material: false }
+  if (!cookieHeader) return none
+  const ref = /^https:\/\/([a-z0-9-]+)\.supabase\.co/.exec(supabaseUrl)?.[1]
+  if (!ref) return none
+  const base = `sb-${ref}-auth-token`
+  const chunkRe = new RegExp(`^${base}\\.(\\d+)$`)
+  let single: string | null = null
+  let material = false
+  const chunks = new Map<number, string>()
+  for (const pair of cookieHeader.split(';')) {
+    const eq = pair.indexOf('=')
+    if (eq === -1) continue
+    const k = pair.slice(0, eq).trim()
+    const v = pair.slice(eq + 1).trim()
+    if (k === base) {
+      single = v
+      material = true
+      continue
+    }
+    if (k.startsWith(`${base}.`)) {
+      material = true // even a non-numeric suffix is auth material
       const m = chunkRe.exec(k)
       if (m) {
         const i = Number(m[1])
-        if (chunks.has(i)) return null // duplicate chunk index — corrupt
+        if (chunks.has(i)) return { uid: null, material: true } // duplicate index — corrupt
         chunks.set(i, v)
       }
     }
-    let joined: string
-    if (single !== null) {
-      joined = single
-    } else if (chunks.size > 0) {
-      const parts: string[] = []
-      for (let i = 0; i < chunks.size; i++) {
-        const v = chunks.get(i)
-        if (v === undefined) return null // gap in 0..N — refuse partial
-        parts.push(v)
-      }
-      joined = parts.join('')
-    } else {
-      return null
+  }
+  let joined: string | null = null
+  if (single !== null) {
+    joined = single
+  } else if (chunks.size > 0) {
+    const parts: string[] = []
+    for (let i = 0; i < chunks.size; i++) {
+      const v = chunks.get(i)
+      if (v === undefined) return { uid: null, material: true } // gap in 0..N — refuse partial
+      parts.push(v)
     }
-    if (!joined) return null
+    joined = parts.join('')
+  }
+  if (!joined) return { uid: null, material }
+  try {
     const raw = decodeURIComponent(joined)
     // Cookie payload is either raw JSON or 'base64-<base64url>' (supabase-ssr).
     const json = raw.startsWith('base64-')
@@ -288,18 +374,18 @@ export function parseAuthCookieUid(cookieHeader: string, supabaseUrl: string): s
       : raw
     const parsed = JSON.parse(json) as { user?: { id?: string } }
     const id = parsed?.user?.id
-    return typeof id === 'string' && id.length > 0 ? id : null
+    return { uid: typeof id === 'string' && id.length > 0 ? id : null, material: true }
   } catch {
-    return null
+    return { uid: null, material: true }
   }
 }
 
-/** Synchronous uid read from the persisted auth session — a vault-ROUTING
-    hint only. It never grants remote privileges: Supabase auth remains the
+/** Synchronous read of the persisted auth session — a vault-ROUTING hint
+    only. It never grants remote privileges: Supabase auth remains the
     authority for every privileged network operation. */
-function readLocalSessionUid(): string | null {
-  if (typeof document === 'undefined' || !document.cookie) return null
-  return parseAuthCookieUid(document.cookie, process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
+function readLocalSession(): AuthCookieRead {
+  if (typeof document === 'undefined' || !document.cookie) return { uid: null, material: false }
+  return parseAuthCookie(document.cookie, process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
 }
 
 /**
@@ -332,16 +418,22 @@ function guardVaultHandle(dbName: string, epoch: number, inner: VaultStorage): V
  * review fix: the cache key is the user id, so signing out and in as a
  * different account inside one SPA session opens that user's vault — never
  * the previous user's.
+ *
+ * Returns `{ storage, dbName }` from ONE atomic resolution — the handle is
+ * bound to the epoch captured at that resolution's consistency point, so an
+ * invalidation landing during the open leaves a dead handle (fails closed),
+ * never a live stale one. Callers must use the returned dbName rather than
+ * re-resolving, which would reintroduce a TOCTOU between the label and the
+ * handle.
  */
-export async function getStorage(): Promise<VaultStorage> {
-  const dbName = await resolveVaultDbName()
-  const epoch = resolutionEpoch
+export async function getStorage(): Promise<{ storage: VaultStorage; dbName: string }> {
+  const { name: dbName, epoch } = await resolveVaultIdentity()
   let p = storagePromises.get(dbName)
   if (!p) {
     p = openVaultStorage(dbName).then((s) => guardVaultHandle(dbName, epoch, s))
     storagePromises.set(dbName, p)
   }
-  return p
+  return { storage: await p, dbName }
 }
 
 /**

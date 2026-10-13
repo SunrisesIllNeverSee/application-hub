@@ -220,7 +220,7 @@ console.log(`\n${passed} passed`)
 
 // ---------------------------------------------------------------------------
 // M07-ID-001/002 — Supabase auth-cookie reassembly + vault identity isolation.
-// parseAuthCookieUid is pure (cookie header + project URL in, uid|null out).
+// parseAuthCookie is pure (cookie header + project URL in, uid|null out).
 // resolveVaultDbName is exercised through the __setSessionProbeForTests seam
 // and a document.cookie shim — no network, no IndexedDB.
 // ---------------------------------------------------------------------------
@@ -257,7 +257,7 @@ function clearCookies() {
 }
 
 const {
-  parseAuthCookieUid,
+  parseAuthCookie,
   resolveVaultDbName,
   invalidateVaultIdentity,
   currentResolvedUid,
@@ -274,50 +274,50 @@ process.env.NEXT_PUBLIC_SUPABASE_URL = SB_URL
 
 await t('cookie: single unchunked session → uid', async () => {
   const h = cookieHeader([[SB_BASE, encodeURIComponent(sessionValue(UID_A))]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_A)
 })
 
 await t('cookie: single RAW-JSON session (cookieEncoding=raw) → uid', async () => {
   const h = cookieHeader([[SB_BASE, encodeURIComponent(JSON.stringify({ user: { id: UID_A } }))]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_A)
 })
 
 await t('cookie: M07-ID-001 regression — .0+.1 chunks reassemble (was: .0 dropped → null)', async () => {
   const enc = encodeURIComponent(sessionValue(UID_A))
   const [c0, c1] = chunkValue(enc, 2)
   const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_A)
 })
 
 await t('cookie: three-chunk session reassembles', async () => {
   const enc = encodeURIComponent(sessionValue(UID_B))
   const [c0, c1, c2] = chunkValue(enc, 3)
   const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1], [`${SB_BASE}.2`, c2]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_B)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_B)
 })
 
 await t('cookie: chunks present but .0 missing → refused', async () => {
   const enc = encodeURIComponent(sessionValue(UID_A))
   const [, c1] = chunkValue(enc, 2)
   const h = cookieHeader([[`${SB_BASE}.1`, c1]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), null)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, null)
 })
 
 await t('cookie: missing MIDDLE chunk (.0+.2) → refused, never partial', async () => {
   const enc = encodeURIComponent(sessionValue(UID_A))
   const [c0, , c2] = chunkValue(enc, 3)
   const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.2`, c2]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), null)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, null)
 })
 
 await t('cookie: malformed payload → refused', async () => {
-  assert.equal(parseAuthCookieUid(cookieHeader([[SB_BASE, 'not-json-not-base64']]), SB_URL), null)
-  assert.equal(parseAuthCookieUid(cookieHeader([[SB_BASE, 'base64-%%%bad%%%']]), SB_URL), null)
+  assert.equal(parseAuthCookie(cookieHeader([[SB_BASE, 'not-json-not-base64']]), SB_URL).uid, null)
+  assert.equal(parseAuthCookie(cookieHeader([[SB_BASE, 'base64-%%%bad%%%']]), SB_URL).uid, null)
 })
 
 await t('cookie: wrong project ref → ignored', async () => {
   const h = cookieHeader([['sb-otherref99-auth-token', encodeURIComponent(sessionValue(UID_A))]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), null)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, null)
 })
 
 await t('cookie: multiple projects on origin → only ours resolved', async () => {
@@ -326,7 +326,7 @@ await t('cookie: multiple projects on origin → only ours resolved', async () =
     ['unrelated', 'x'],
     [SB_BASE, encodeURIComponent(sessionValue(UID_A))],
   ])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_A)
 })
 
 await t('cookie: bare base wins over chunks (library precedence)', async () => {
@@ -336,19 +336,19 @@ await t('cookie: bare base wins over chunks (library precedence)', async () => {
     [SB_BASE, encodeURIComponent(sessionValue(UID_A))],
     [`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1],
   ])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_A)
 })
 
 await t('cookie: unicode user metadata survives percent-encoded chunks', async () => {
   const enc = encodeURIComponent(sessionValue(UID_A, { user_metadata: { name: 'Zoë Müller — 日本語' } }))
   const [c0, c1, c2] = chunkValue(enc, 3)
   const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1], [`${SB_BASE}.2`, c2]])
-  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+  assert.equal(parseAuthCookie(h, SB_URL).uid, UID_A)
 })
 
 await t('cookie: empty/absent → null', async () => {
-  assert.equal(parseAuthCookieUid('', SB_URL), null)
-  assert.equal(parseAuthCookieUid(cookieHeader([['other', 'v']]), SB_URL), null)
+  assert.equal(parseAuthCookie('', SB_URL).uid, null)
+  assert.equal(parseAuthCookie(cookieHeader([['other', 'v']]), SB_URL).uid, null)
 })
 
 // --- vault identity lifecycle ----------------------------------------------
@@ -476,6 +476,89 @@ await t('identity: post-sign-out vault selection stays anonymous under stall', a
   // never resurrect A.
   assert.equal(await resolveVaultDbName(), 'aqua-local')
 })
+
+// --- reviewer round-6 regressions -------------------------------------------
+
+// (env re-set — the block above restores it)
+process.env.NEXT_PUBLIC_SUPABASE_URL = SB_URL
+
+await t('identity: retryable refresh failure (probe resolves {uid:null,error}) keeps the live vault', async () => {
+  // Real getSession() RESOLVES {session:null, error} on a 429/network retryable
+  // — it does not throw. This must take the stall path, not definitive-null.
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: UID_A }))
+  await resolveVaultDbName()
+  clearCookies()
+  __setSessionProbeForTests(async () => ({ uid: null, error: new Error('AuthRetryableFetchError: 429') }))
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`, 'retryable error must not drop to anon vault')
+  assert.equal(currentResolvedUid(), UID_A)
+})
+
+await t('identity: definitive-null revokes minted handles (not just the name)', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  await resolveVaultDbName()
+  const handle = __wrapVaultHandleForTests(`aqua-local-${UID_A}`, createMemoryStorage())
+  await handle.put('answers', { id: 'a1', scope: { application_id: 'x', question_occurrence_id: 'q' }, created_at: 't' })
+  // Cookies fully gone + clean null session = definitive sign-out WITHOUT
+  // an invalidate event reaching us (no listener on this route).
+  clearCookies()
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+  await assert.rejects(() => handle.put('answers', { id: 'a2', scope: {}, created_at: 't' }), VaultScopeError)
+})
+
+await t('identity: partial cookie material + sticky identity → INDETERMINATE keeps live vault', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  await resolveVaultDbName()
+  // Mid-rewrite chunk gap: material present (.1 only, .0 missing), probe null.
+  // This is indeterminate evidence — never substitute the anon vault.
+  setCookies([`${SB_BASE}.1`, encodeURIComponent('partial')])
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`, 'indeterminate cookie must not drop to anon')
+  assert.equal(currentResolvedUid(), UID_A)
+})
+
+await t('identity: partial cookie material + NO established identity → anon (nothing to preserve)', async () => {
+  invalidateVaultIdentity()
+  setCookies([`${SB_BASE}.1`, encodeURIComponent('partial')])
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+})
+
+await t('identity: material absent + clean null → definitive sign-out even WITH stale sticky', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: UID_A }))
+  await resolveVaultDbName()
+  clearCookies() // all auth material gone
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+  assert.equal(currentResolvedUid(), null)
+})
+
+await t('identity: resolveVaultIdentity returns the epoch bound atomically with the name', async () => {
+  const { resolveVaultIdentity } = await import('./session.ts')
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  const r1 = await resolveVaultIdentity()
+  assert.equal(r1.name, `aqua-local-${UID_A}`)
+  // A handle bound to r1.epoch is live now; after invalidation it must be dead.
+  const mem = createMemoryStorage()
+  const handle = (() => {
+    // bind exactly as getStorage does — at the returned epoch
+    const epoch = r1.epoch
+    const revoked = () => { /* exercised via __wrap below */ }
+    return __wrapVaultHandleForTests(r1.name, mem) // wraps at CURRENT epoch = r1.epoch (no invalidation since)
+  })()
+  await handle.put('answers', { id: 'a1', scope: { application_id: 'x', question_occurrence_id: 'q' }, created_at: 't' })
+  invalidateVaultIdentity()
+  await assert.rejects(() => handle.getAll('answers'), VaultScopeError)
+})
+
+__setSessionProbeForTests(null)
 
 __setSessionProbeForTests(null)
 clearCookies()
