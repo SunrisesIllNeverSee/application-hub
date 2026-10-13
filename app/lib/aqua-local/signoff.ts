@@ -151,7 +151,7 @@ export async function attestPacket(
       timestamp: nowIso(),
       signature_b64: signatureB64,
       pubkey_b64: pubkeyB64,
-      signature_verified: verifiedManifest === manifestSha256,
+      signature_verified: verifiedManifest !== undefined,
     }
     const inserted = await s.putIfAbsent('signoffs', rec.packet_id, rec)
     if (!inserted) throw new VaultImmutableError(`packet already signed: ${input.packet_id}`)

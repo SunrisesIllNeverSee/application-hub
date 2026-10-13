@@ -183,7 +183,8 @@ function readLocalSessionUid(): string | null {
       ? (() => {
           let b64 = raw.slice(7).replace(/-/g, '+').replace(/_/g, '/')
           b64 += '='.repeat((4 - (b64.length % 4)) % 4)
-          return decodeURIComponent(escape(atob(b64)))
+          const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))
+          return new TextDecoder().decode(bytes)
         })()
       : raw
     const parsed = JSON.parse(json) as { user?: { id?: string } }
@@ -545,11 +546,11 @@ export async function assertVaultSecretCompatible(
   storage: VaultStorage,
   secret: string,
 ): Promise<void> {
-  const versions = await storage.getAll<VersionRecord>('versions')
-  if (versions.length > 0) {
-    await tryUnlock(storage, secret) // decrypts oldest version
-    return
-  }
+  // tryUnlock already probes the oldest version AND — on a versionless
+  // vault — an encrypted intake blob, so intake-only vaults can't accept
+  // a mismatched secret either (IR-035 escrow).
+  const status = await tryUnlock(storage, secret)
+  if (status === 'ok') return
   const keys = await storage.getAll<{ key_blob: string }>('provider_keys')
   const secretBearing = keys.find((k) => k.key_blob)
   if (secretBearing) {

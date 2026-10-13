@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   const preBody = await req.clone().json().catch(() => null)
   if (preBody && typeof preBody === 'object' && !Array.isArray(preBody)) {
     const pre = refusePrivateTextFields(preBody as Record<string, unknown>, ['user_persona'], {
-      detail: 'persona matching runs on-device in local-first mode — no private text leaves the vault',
+      detail: 'persona matching is unavailable in local-first mode — private persona text is never transmitted',
     })
     if (pre) return pre
   }
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
   // that must not leave the device without an explicit consent boundary.
   // Persona-less calls (public catalog matching) stay allowed.
   const lfRefusal = refusePrivateTextFields(body, ['user_persona'], {
-    detail: 'persona matching runs on-device in local-first mode — no private text leaves the vault',
+    detail: 'persona matching is unavailable in local-first mode — private persona text is never transmitted',
   })
   if (lfRefusal) return lfRefusal
 

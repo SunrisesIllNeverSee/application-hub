@@ -169,6 +169,20 @@ await t('loadBank: encrypted intake blob decrypts + joins question text', async 
   assert.equal(lockedEntry.question_text, undefined)
 })
 
+await t('assertVaultSecretCompatible: intake-only vault refuses wrong secret', async () => {
+  const s = createMemoryStorage()
+  const { encryptText } = await import('../aqua-local/crypto.ts')
+  const { assertVaultSecretCompatible } = await import('./session.ts')
+  // vault holds ONLY an encrypted intake blob — no versions, no keys
+  await s.put('catalog_cache', {
+    key: 'intake:local-intake-x',
+    fetched_at: new Date().toISOString(),
+    blob_enc: JSON.stringify(await encryptText(SECRET, JSON.stringify({ application_id: 'local-intake-x', questions: [] }))),
+  })
+  await assertVaultSecretCompatible(s, SECRET) // passes
+  await assert.rejects(() => assertVaultSecretCompatible(s, 'wrong-secret'), VaultDecryptError)
+})
+
 await t('IR-026: cross-scope derivation — derived_from preserved, approval not inherited', async () => {
   const s = createMemoryStorage()
   const SECRET = 's2'
