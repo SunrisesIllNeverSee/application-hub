@@ -431,7 +431,7 @@ export function VaultPacketPanel({
       {frozenId && packetState && (
         <div className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
           <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-            Packet {frozenId} — <span className="uppercase">{packetState.state}</span>
+            Packet {frozenId} — <span className="uppercase">{packetState.state.toUpperCase()}</span>
           </p>
           <p className="break-all font-mono text-[11px] text-neutral-500 dark:text-neutral-400">
             manifest sha256: {manifestSha}

@@ -107,9 +107,25 @@ export async function resolveVaultDbName(): Promise<string> {
   // vault to the shared 'aqua-local' DB — dropping the unlocked secret and
   // potentially writing another user's data into the anon vault. Account
   // switches still register because logout clears the local session.
+  //
+  // IR-M07: supabase-js getSession() queues behind an in-flight token
+  // REFRESH — under auth rate-limiting (429/backoff) a local vault open
+  // can stall tens of seconds on a network it does not need. The uid is
+  // read synchronously from the persisted session first; the async path
+  // only runs as a bounded fallback.
+  const fastUid = readLocalSessionUid()
+  if (fastUid) {
+    const name = `aqua-local-${fastUid}`
+    lastResolvedDbName = name
+    return name
+  }
   try {
     const { createClient } = await import('@/lib/supabase/client')
-    const { data } = await createClient().auth.getSession()
+    const sessionPromise = createClient().auth.getSession()
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('session read timeout')), 1500),
+    )
+    const { data } = await Promise.race([sessionPromise, timeout])
     const uid = data.session?.user?.id
     const name = uid ? `aqua-local-${uid}` : (lastResolvedDbName ?? 'aqua-local')
     lastResolvedDbName = name
@@ -117,6 +133,27 @@ export async function resolveVaultDbName(): Promise<string> {
   } catch {
     return lastResolvedDbName ?? 'aqua-local'
   }
+}
+
+/** Synchronous uid read from supabase-js's persisted session — the vault's
+    DB key must never wait on a token refresh. Storage keys look like
+    `sb-<project-ref>-auth-token`; any parsed `user.id` is used. */
+function readLocalSessionUid(): string | null {
+  if (typeof localStorage === 'undefined') return null
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (!k || !/^sb-[a-z0-9]+-auth-token$/.test(k)) continue
+      const raw = localStorage.getItem(k)
+      if (!raw) continue
+      const parsed = JSON.parse(raw) as { user?: { id?: string } }
+      const id = parsed?.user?.id
+      if (typeof id === 'string' && id.length > 0) return id
+    }
+  } catch {
+    /* malformed entry — fall through to the async path */
+  }
+  return null
 }
 
 /**

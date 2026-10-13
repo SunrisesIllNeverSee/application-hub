@@ -26,6 +26,15 @@ function isPersonaValue(v: unknown): boolean {
 }
 
 export async function POST(req: Request) {
+  // IR-038: the private-text refusal runs BEFORE auth — persona content is
+  // dropped at the boundary regardless of caller identity under local-first.
+  const preBody = await req.clone().json().catch(() => null)
+  if (preBody && typeof preBody === 'object' && !Array.isArray(preBody)) {
+    const pre = refusePrivateTextFields(preBody as Record<string, unknown>, ['user_persona'], {
+      detail: 'persona matching runs on-device in local-first mode — no private text leaves the vault',
+    })
+    if (pre) return pre
+  }
   const { user, accessToken } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
