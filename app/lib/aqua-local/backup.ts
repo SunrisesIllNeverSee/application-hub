@@ -270,7 +270,7 @@ export async function previewVaultImport(
     stores,
     total_insert: all.reduce((n, s) => n + s.insert, 0),
     total_skip: all.reduce((n, s) => n + s.skip, 0),
-    version_titles: (payload.versions ?? []).map((v) => v.title_plaintext),
+    version_titles: (payload.versions ?? []).map((v) => v.title_plaintext ?? v.title),
   }
 }
 

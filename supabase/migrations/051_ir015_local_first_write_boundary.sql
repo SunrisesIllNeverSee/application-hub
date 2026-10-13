@@ -23,6 +23,9 @@
 --   answer_reviews — private review notes
 --   draft_runs     — generation history containing prompts/outputs
 --
+-- Scope: FOR INSERT, UPDATE, DELETE only — reads are NOT denied (the
+-- hosted read path may still surface legacy data during migration).
+--
 -- Public catalog + structured account metadata stays writable —
 -- local-first never needed a database gate for non-private data.
 -- ============================================================
@@ -68,7 +71,7 @@ BEGIN
     ) THEN
       EXECUTE format(
         'CREATE POLICY local_first_deny_write ON %I
-           AS RESTRICTIVE FOR ALL TO authenticated
+           AS RESTRICTIVE FOR INSERT, UPDATE, DELETE TO authenticated
            USING (NOT local_first_active())
            WITH CHECK (NOT local_first_active())',
         t)
@@ -87,6 +90,8 @@ END $outer$;
 -- 5. Activation (manual, owner-run, alongside the Vercel env pair):
 --    INSERT INTO _deploy_flags(key, value) VALUES ('local_first','1');
 --    Deactivation: DELETE FROM _deploy_flags WHERE key='local_first';
+--    Note: policy denies WRITES only — authenticated SELECT remains. The
+--    vault does not depend on hosted private reads under local-first.
 --
 -- Tests (run on a staging project BEFORE apply):
 --   a. flag absent → authenticated INSERT INTO profile_answers succeeds.

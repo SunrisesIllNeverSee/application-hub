@@ -252,13 +252,13 @@ export function extractQAPairsDeterministicReport(text: string): QAParseReport {
   let pendingQ: string | null = null
   let answerBuf: string[] = []
   const seen = new Set<string>()
-  let pendingUncertainty: { absorbed: number; dropped: number } = { absorbed: 0, dropped: 0 }
+  let pendingUncertainty: { absorbed: number } = { absorbed: 0 }
   let absorbedLines = 0
   let droppedQuestions = 0
   let uncertainBoundaries = 0
 
   const flush = () => {
-    if (!pendingQ) { pendingUncertainty = { absorbed: 0, dropped: 0 }; return }
+    if (!pendingQ) { pendingUncertainty = { absorbed: 0 }; return }
     const answer = answerBuf.join('\n').trim()
     if (answer.length >= 10) {
       const key = pendingQ.toLowerCase()
@@ -288,7 +288,7 @@ export function extractQAPairsDeterministicReport(text: string): QAParseReport {
     }
     pendingQ = null
     answerBuf = []
-    pendingUncertainty = { absorbed: 0, dropped: 0 }
+    pendingUncertainty = { absorbed: 0 }
   }
 
   for (const raw of lines) {

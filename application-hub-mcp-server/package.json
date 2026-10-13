@@ -1,7 +1,7 @@
 {
   "name": "aqua-mcp-server",
   "version": "1.0.1",
-  "description": "MCP server for AQUA Application Hub \u2014 programs, questions, rankings, and applicant intelligence. 27 tools for agent environments.",
+  "description": "MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence. 31 tools for agent environments.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {

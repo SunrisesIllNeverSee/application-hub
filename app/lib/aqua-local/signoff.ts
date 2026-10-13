@@ -13,7 +13,7 @@
 //   - signer_class is 'authenticated-account' | 'local-only' — a claim about
 //     identity backing, not about signature validity
 
-import { b64decode, b64encode, signManifestDigest, verifyManifestSignature } from './crypto.ts'
+import { signManifestDigest, verifyManifestSignature } from './crypto.ts'
 export { generateSignerKeyPair, signManifestDigest, verifyManifestSignature } from './crypto.ts'
 export type { SignerKeyPair } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
@@ -26,12 +26,6 @@ export class SignoffAckError extends Error {
     super(message)
     this.name = 'SignoffAckError'
   }
-}
-
-const te = new TextEncoder()
-
-function subtleOrNull(): SubtleCrypto | null {
-  return globalThis.crypto?.subtle ?? null
 }
 
 
@@ -114,6 +108,22 @@ export async function attestPacket(
   // Signoff + state advance commit in ONE tx — a crash between them would
   // otherwise leave 'prepared' + a live signoff, which wedges the packet
   // permanently (next attest hits putIfAbsent with no restored escape).
+  // IR-024 + tx-safety: the signature is verified BEFORE the transaction —
+  // verifyManifestSignature is WebCrypto and must not run inside an IDB tx
+  // (auto-commit → putIfAbsent throws TransactionInactiveError). We pass the
+  // digest we verified against; signPacket cross-checks it against the
+  // packet's real manifest inside the tx without re-running crypto.
+  let verifiedManifest: string | undefined
+  if (signatureB64 && pubkeyB64) {
+    const ok = await verifyManifestSignature(pubkeyB64, manifestSha256, signatureB64)
+    if (!ok) {
+      // A signature WE just computed failing to verify means the key pair
+      // is broken — refuse honestly rather than write unverifiable bytes.
+      throw new Error('signature could not be verified against this packet manifest')
+    }
+    verifiedManifest = manifestSha256
+  }
+
   const record = await storage.tx(['signoffs', 'packet_states', 'packets'], async (s) => {
     // Re-check STATE inside the tx — a concurrent discard between the
     // outer read and this write must still refuse before any write, or a
@@ -136,6 +146,7 @@ export async function attestPacket(
       signer_class: input.signer_class,
       signature_b64: signatureB64,
       pubkey_b64: pubkeyB64,
+      verified_with_manifest: verifiedManifest,
       user_ack: input.user_ack,
     })
     // IR-020/IR-029b: a re-attestation of a restored signoff replaces the

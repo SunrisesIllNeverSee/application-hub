@@ -136,14 +136,19 @@ export async function resolveVaultDbName(): Promise<string> {
 }
 
 /** Synchronous uid read from supabase-js's persisted session — the vault's
-    DB key must never wait on a token refresh. Storage keys look like
-    `sb-<project-ref>-auth-token`; any parsed `user.id` is used. */
+    DB key must never wait on a token refresh. Scoped to THIS deployment's
+    project ref (from NEXT_PUBLIC_SUPABASE_URL) so a shared origin hosting
+    multiple Supabase projects never resolves the wrong uid. */
 function readLocalSessionUid(): string | null {
   if (typeof localStorage === 'undefined') return null
   try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+    const ref = /^https:\/\/([a-z0-9-]+)\.supabase\.co/.exec(url)?.[1]
+    const wanted = ref ? `sb-${ref}-auth-token` : null
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
-      if (!k || !/^sb-[a-z0-9]+-auth-token$/.test(k)) continue
+      if (!k || !/^sb-[a-z0-9-]+-auth-token$/.test(k)) continue
+      if (wanted && k !== wanted) continue // wrong project on this origin
       const raw = localStorage.getItem(k)
       if (!raw) continue
       const parsed = JSON.parse(raw) as { user?: { id?: string } }
@@ -201,14 +206,13 @@ export async function loadBank(storage: VaultStorage, secret?: string | null): P
   // IR-014/035: titles + intake blobs are ciphertext at rest — decrypt when
   // the caller carries the vault secret (all bank displays run unlocked).
   if (secret) {
-    for (const v of versions) {
-      if (v.title_enc) {
-        v.title = await decryptVersionTitle(secret, v)
-        // keep the in-memory record consistent for downstream readers
-        // (readVersion/decryptVersionTitle would re-decrypt otherwise)
-        delete v.title_enc
-      }
-    }
+    // Per-record isolation: one corrupt title must not reject the whole
+    // bank view (contrast VaultPacketPanel's .catch(() => v.title)).
+    await Promise.all(versions.map(async (v) => {
+      if (!v.title_enc) return
+      v.title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
+      delete v.title_enc
+    }))
   }
 
   // Intake-scoped answers join their extracted question text — a bank slot

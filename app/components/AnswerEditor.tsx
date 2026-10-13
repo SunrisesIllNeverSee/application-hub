@@ -628,6 +628,7 @@ export function AnswerEditor({
           <button
             onClick={() => {
               setIsEditing(false)
+              setDerivedFrom(null) // a cancelled edit must not keep a stale source link
               if (!compact) setContent(initialAnswer?.content ?? '')
             }}
             className="btn-secondary text-xs py-1.5 px-3"

@@ -53,19 +53,16 @@ export default function AquaLocal() {
     if (!secret) return
     try {
       setBankLoading(true)
-      const t0 = Date.now()
       const storage = await vault.ensureStorage()
-      console.error('ensureStorage ms:', Date.now() - t0)
-      const t1 = Date.now()
       const entries = await loadBank(storage, vault.getSecret())
-      console.error('loadBank ms:', Date.now() - t1, 'entries=', entries.length)
-      setBankLoading(false)
       setBank(entries)
       const hasVersions = entries.some((e) => e.versions.length > 0)
       const last = lastBackupAt()
       setBackupDue(hasVersions && (last === null || Date.now() - last > BACKUP_REMINDER_MS))
     } catch {
       setBanner('Could not read the vault')
+    } finally {
+      setBankLoading(false)
     }
   }, [vault])
 

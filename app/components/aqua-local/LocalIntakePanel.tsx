@@ -358,7 +358,7 @@ export function LocalIntakePanel() {
               . Check the pairs below — the highlighted ones may be mis-split.
             </div>
           )}
-          {pairs.some((p) => p.uncertain) && (
+          {pairReport && pairReport.uncertain_boundaries > 0 && (
             <label className="flex items-start gap-2 text-[11px] text-amber-200">
               <input
                 type="checkbox"
@@ -373,7 +373,7 @@ export function LocalIntakePanel() {
             <div className="flex items-center gap-3">
               <button
                 className="btn-primary"
-                disabled={busy || (pairs.some((p) => p.uncertain) && !reviewedUncertain)}
+                disabled={busy || ((pairReport?.uncertain_boundaries ?? 0) > 0 && !reviewedUncertain)}
                 onClick={() => void importPairs()}
               >
                 {busy ? 'Importing…' : `Import ${pairs.length} answer${pairs.length === 1 ? '' : 's'} to vault bank`}
