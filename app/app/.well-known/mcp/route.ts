@@ -49,7 +49,7 @@ export async function GET() {
     resourceCategories: ['programs', 'questions', 'rankings'],
     promptTemplates: ['opportunity_scout', 'draft_answer', 'program_comparison'],
     repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
-    docs: 'https://aquaidp.xyz/developers#mcp',
+    docs: 'https://aquaidp.xyz/mcp',
     auth: {
       type: 'Supabase JWT',
       description: 'Authenticated tools require a Supabase access token from the user session. Public tools (programs, questions, rankings) work without auth.',
