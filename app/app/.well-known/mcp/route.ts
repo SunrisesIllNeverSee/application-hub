@@ -20,8 +20,8 @@ export async function GET() {
     description: 'MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence',
     transport: {
       stdio: {
-        command: 'npx',
-        args: ['-y', 'aqua-mcp-server'],
+        command: 'node',
+        args: ['application-hub-mcp-server/dist/index.js'],
         env: {
           SUPABASE_URL: '${NEXT_PUBLIC_SUPABASE_URL}',
           SUPABASE_ANON_KEY: '${NEXT_PUBLIC_SUPABASE_ANON_KEY}',
@@ -34,7 +34,8 @@ export async function GET() {
       },
     },
     npm: 'https://www.npmjs.com/package/aqua-mcp-server',
-    install: 'npx -y aqua-mcp-server',
+    npm_note: 'The published npm entry currently registers the package name only — install from source below until a dist-bearing release is published.',
+    install: 'git clone https://github.com/SunrisesIllNeverSee/application-hub.git && cd application-hub/application-hub-mcp-server && npm ci && npm run build && node dist/index.js',
     capabilities: {
       tools: true,
       resources: true,
