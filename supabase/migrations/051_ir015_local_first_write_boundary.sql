@@ -58,22 +58,23 @@ AS $$ SELECT EXISTS (
 --    Pattern: deny policy (WITH CHECK false when flag on) layered over the
 --    existing permissive policies. PostgreSQL uses PERMISSIVE policies by
 --    default — an explicit RESTRICTIVE policy ANDs with them.
-DO $$
+DO $outer$
 DECLARE t text;
 BEGIN
   FOREACH t IN ARRAY ARRAY['profile_answers', 'answer_reviews', 'draft_runs']
   LOOP
-    EXECUTE format(
-      'DO $$ BEGIN IF NOT EXISTS (
-         SELECT 1 FROM pg_policies WHERE tablename=%L AND policyname=''local_first_deny_write''
-       ) THEN
-         CREATE POLICY local_first_deny_write ON %I
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_policies WHERE tablename = t AND policyname = 'local_first_deny_write'
+    ) THEN
+      EXECUTE format(
+        'CREATE POLICY local_first_deny_write ON %I
            AS RESTRICTIVE FOR ALL TO authenticated
            USING (NOT local_first_active())
-           WITH CHECK (NOT local_first_active());
-       END IF; END $$', t, t)
+           WITH CHECK (NOT local_first_active())',
+        t)
+    END IF;
   END LOOP;
-END $$;
+END $outer$;
 
 -- 4. Rollback (manual, owner-run):
 --    DROP POLICY local_first_deny_write ON profile_answers;
