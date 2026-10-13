@@ -174,12 +174,14 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
     }
   }
   requireList('answers', payload.answers, 'id')
+  // title_plaintext is required to be a string but may be EMPTY — a saved
+  // version can legitimately carry a blank title. The per-version sha256
+  // check below still refuses tampered content.
   requireList('versions', payload.versions, 'id', [
     'answer_id',
     'sha256',
     'body_plaintext',
-    'title_plaintext',
-  ], ['title'])
+  ], ['title', 'title_plaintext'])
   requireList('approvals', payload.approvals, 'id', ['version_id'])
   requireList('packets', payload.packets, 'id')
   requireList('provenance', payload.provenance, 'version_id')
@@ -191,6 +193,9 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
 
   // Integrity: recompute each version sha256 over canonical plaintext before writing anything.
   for (const v of payload.versions ?? []) {
+    if (typeof v.title_plaintext !== 'string' && typeof v.title !== 'string') {
+      throw new VaultTamperError(`version ${v.id} has no title field`)
+    }
     const digest = await sha256Hex(canonicalJson({ title: v.title_plaintext ?? v.title, body: v.body_plaintext }))
     if (digest !== v.sha256) {
       throw new VaultTamperError(`version ${v.id} sha256 mismatch — refusing tampered backup`)
