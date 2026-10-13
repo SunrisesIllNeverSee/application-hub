@@ -1,0 +1,42 @@
+name: Publish MCP package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'mcp-v*'
+
+permissions: {}
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  publish-mcp:
+    name: publish aqua-mcp-server
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm-publish
+    permissions:
+      id-token: write # OIDC for npm trusted publishing + provenance
+      contents: read
+    defaults:
+      run:
+        working-directory: application-hub-mcp-server
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install + build + test
+        run: |
+          npm ci
+          npm run build
+          npx vitest run
+      - name: Publish to npm
+        # Trusted-publisher OIDC: no NPM_TOKEN required when the
+        # package's trusted publisher points at this workflow.
+        run: npm publish --provenance --access public
