@@ -16,12 +16,12 @@ export async function GET() {
   const manifest = {
     schemaVersion: '1.0',
     name: 'aqua-mcp-server',
-    version: '1.0.0',
+    version: '1.0.1',
     description: 'MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence',
     transport: {
       stdio: {
-        command: 'node',
-        args: ['application-hub-mcp-server/dist/index.js'],
+        command: 'npx',
+        args: ['-y', 'aqua-mcp-server'],
         env: {
           AQUA_LOCAL_FIRST: '1',
           SUPABASE_URL: '${NEXT_PUBLIC_SUPABASE_URL}',

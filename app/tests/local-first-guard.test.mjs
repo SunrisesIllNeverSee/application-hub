@@ -3,6 +3,7 @@
 // (Node 26 strips TypeScript types natively, so the .ts module imports directly.)
 
 import { test } from 'node:test'
+import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import {
   isLocalFirst,
@@ -146,4 +147,25 @@ test('publicUrlForLocalFirstStorage refuses userinfo URLs with honest 403', asyn
 test('publicUrlForLocalFirstStorage 400s on unparseable URL', async () => {
   const r = publicUrlForLocalFirstStorage('not a url')
   assert.equal(r.refuse.status, 400)
+})
+
+// Route-wiring checks: the helper is tested above; these assert the actual
+// routes invoke it — a code-level canary for the persona-egress boundary
+// (IR-038) and the build-time flag pairing (IR-015).
+test('smart-matcher route refuses user_persona under local-first (wiring)', () => {
+  const src = readFileSync(new URL('../app/api/hub/smart-matcher/route.ts', import.meta.url), 'utf8')
+  assert.ok(src.includes('refusePrivateTextFields'), 'route must call refusePrivateTextFields')
+  assert.ok(src.includes("'user_persona'"), 'route must name user_persona as a private field')
+  // the pre-auth refusal must run BEFORE the auth check — the boundary
+  // drops private text regardless of caller identity
+  const refuseIdx = src.indexOf('refusePrivateTextFields(preBody')
+  const authIdx = src.indexOf('getRequestUser(req)')
+  assert.ok(refuseIdx > -1 && authIdx > -1 && refuseIdx < authIdx,
+    'persona refusal must run before auth')
+})
+
+test('next.config fails the build on local-first flag mismatch (wiring)', () => {
+  const src = readFileSync(new URL('../next.config.mjs', import.meta.url), 'utf8')
+  assert.ok(/AQUA_LOCAL_FIRST/.test(src) && /NEXT_PUBLIC_AQUA_LOCAL_FIRST/.test(src))
+  assert.ok(/throw|Error/.test(src), 'mismatch must throw, not warn')
 })

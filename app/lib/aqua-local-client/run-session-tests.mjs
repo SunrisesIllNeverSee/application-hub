@@ -144,6 +144,31 @@ await t('loadBank: intake-scoped slots carry question text + entity label', asyn
   assert.equal(entry?.intake_label, 'Acme Incubator')
 })
 
+await t('loadBank: encrypted intake blob decrypts + joins question text', async () => {
+  const s = createMemoryStorage()
+  const { encryptText } = await import('../aqua-local/crypto.ts')
+  const appId = 'local-intake-acme-abc123'
+  await s.put('catalog_cache', {
+    key: `intake:${appId}`,
+    fetched_at: new Date().toISOString(),
+    blob_enc: JSON.stringify(await encryptText(SECRET, JSON.stringify({
+      application_id: appId,
+      entity: { name: 'Acme Incubator' },
+      questions: [{ occurrence_id: `${appId}-q1`, text: 'What is your unfair advantage?', order_index: 1 }],
+    }))),
+  })
+  await createAnswer(s, { application_id: appId, question_occurrence_id: `${appId}-q1` })
+  const bank = await loadBank(s, SECRET)
+  const entry = bank.find((e) => e.answer.scope.application_id === appId)
+  assert.equal(entry?.question_text, 'What is your unfair advantage?')
+  assert.equal(entry?.intake_label, 'Acme Incubator')
+  // no secret → encrypted record skipped, slot still lists without the join
+  const locked = await loadBank(s)
+  const lockedEntry = locked.find((e) => e.answer.scope.application_id === appId)
+  assert.ok(lockedEntry)
+  assert.equal(lockedEntry.question_text, undefined)
+})
+
 await t('IR-026: cross-scope derivation — derived_from preserved, approval not inherited', async () => {
   const s = createMemoryStorage()
   const SECRET = 's2'

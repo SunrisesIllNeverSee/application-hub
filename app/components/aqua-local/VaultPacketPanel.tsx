@@ -94,7 +94,7 @@ export function VaultPacketPanel({
       for (let i = 0; i < versions.length; i++) {
         const v = versions[i]
         if (v.title_enc) {
-          const title = await decryptVersionTitle(secret, v).catch(() => v.title)
+          const title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
           const { title_enc: _te, ...rest } = v // shallow copy — never write back plaintext
           versions[i] = { ...rest, title } as typeof v
         }

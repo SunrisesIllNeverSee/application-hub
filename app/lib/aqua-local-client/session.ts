@@ -217,7 +217,16 @@ export async function getStorage(): Promise<VaultStorage> {
  */
 export async function tryUnlock(storage: VaultStorage, secret: string): Promise<'ok' | 'empty'> {
   const versions = await storage.getAll<VersionRecord>('versions')
-  if (versions.length === 0) return 'empty'
+  if (versions.length === 0) {
+    // Intake-only vaults have no versions — an encrypted intake blob is a
+    // valid secret probe too (IR-035 records carry blob_enc).
+    const catalog = await storage.getAll<CatalogCacheRecord>('catalog_cache')
+    const encrypted = catalog.find((c) => c.blob_enc)
+    if (!encrypted) return 'empty'
+    const { decryptText } = await import('../aqua-local/crypto.ts')
+    await decryptText(secret, JSON.parse(encrypted.blob_enc!))
+    return 'ok'
+  }
   // Deterministic probe: oldest version.
   const sorted = [...versions].sort(
     (a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id),
@@ -528,8 +537,9 @@ export async function saveScopedVersion(
  * Assert `secret` can read every secret-bearing store already in the vault —
  * required before restoring a backup into a NON-EMPTY vault, since imported
  * bodies are re-encrypted under it. An empty vault accepts any secret (it
- * becomes the vault secret). Covers versions AND provider keys — the two
- * stores that carry EncryptedBlobs. Throws VaultDecryptError on mismatch.
+ * becomes the vault secret). Covers versions, provider keys, AND encrypted
+ * intake catalog blobs — the stores that carry EncryptedBlobs.
+ * Throws VaultDecryptError on mismatch.
  */
 export async function assertVaultSecretCompatible(
   storage: VaultStorage,

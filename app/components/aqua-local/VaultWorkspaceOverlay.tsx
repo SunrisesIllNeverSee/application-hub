@@ -55,7 +55,7 @@ function useVaultOccurrences(programId: string) {
           for (const k of Object.keys(map)) {
             const v = map[k]
             if (v?.title_enc) {
-              const title = await decryptVersionTitle(secret, v).catch(() => v.title)
+              const title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
               const { title_enc: _te, ...rest } = v // shallow copy — never write back plaintext
               map[k] = { ...rest, title } as typeof v
             }

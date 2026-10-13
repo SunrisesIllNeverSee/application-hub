@@ -350,12 +350,6 @@ export async function freezePacket(
 /** Sign a frozen packet. One signoff per packet; signature is optional
     (declared sign-off allowed).
     IR-024: a cryptographic signature is verified against the packet's
-    stored manifest digest AT THIS BOUNDARY — the lowest trust layer.
-    A signature that fails verification is refused outright; an absent
-    signature is a legitimate unsigned acknowledgement. */
-/** Sign a frozen packet. One signoff per packet; signature is optional
-    (declared sign-off allowed).
-    IR-024: a cryptographic signature is verified against the packet's
     stored manifest digest AT THIS BOUNDARY — the primitive itself.
     A signature that fails verification is refused outright; an absent
     signature is a legitimate unsigned acknowledgement.

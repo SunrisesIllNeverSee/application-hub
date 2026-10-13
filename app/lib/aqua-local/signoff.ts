@@ -111,9 +111,8 @@ export async function attestPacket(
   // permanently (next attest hits putIfAbsent with no restored escape).
   // IR-024 + tx-safety: the signature is verified BEFORE the transaction —
   // verifyManifestSignature is WebCrypto and must not run inside an IDB tx
-  // (auto-commit → putIfAbsent throws TransactionInactiveError). We pass the
-  // digest we verified against; signPacket cross-checks it against the
-  // packet's real manifest inside the tx without re-running crypto.
+  // (auto-commit → putIfAbsent throws TransactionInactiveError). The tx
+  // writes the signoff row directly with the flag computed here.
   let verifiedManifest: string | undefined
   if (signatureB64 && pubkeyB64) {
     const ok = await verifyManifestSignature(pubkeyB64, manifestSha256, signatureB64)

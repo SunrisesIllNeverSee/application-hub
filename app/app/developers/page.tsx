@@ -44,11 +44,11 @@ export default function DevelopersPage() {
           <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Get your auth token (requires active session)
 curl https://aquaidp.xyz/api/auth/token
 
-# Match a question against your answer bank
-curl -X POST https://aquaidp.xyz/api/match-question \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer <JWT>" \\
-  -d '{"text": "Tell us what you have built", "limit": 5}'
+# Inspect the public MCP tool catalog
+curl https://aquaidp.xyz/.well-known/mcp
+
+# Private answer matching happens in the local vault, not
+# /api/match-question — that route returns 403 under local-first.
 
 # Read the OpenAPI spec
 curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>

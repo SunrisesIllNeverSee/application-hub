@@ -74,7 +74,7 @@ export interface IntakeExtractionLike {
  * and question_occurrence ids remain stable across a re-import of the same
  * extraction (idempotent re-run produces the same occurrences).
  */
-export async function intakeApplicationId(entitySlug: string, questions: IntakeQuestionLike[]): Promise<string> {
+export async function intakeApplicationId(entitySlug: string, questions: IntakeQuestionLike[], storage?: VaultStorage): Promise<string> {
   // Content fingerprint via truncated sha256 — a 32-bit JS string hash has
   // non-trivial collision probability; silently merging two distinct
   // applications pastes under one id would lose data boundaries.
@@ -84,7 +84,17 @@ export async function intakeApplicationId(entitySlug: string, questions: IntakeQ
   const sig = questions.map((q) => q.normalized_text).join('|')
   const slugSeg = (await sha256Hex(`ent:${entitySlug}`)).slice(0, 8)
   const h = await sha256Hex(sig)
-  return `local-intake-${slugSeg}-${h.slice(0, 16)}`
+  const next = `local-intake-${slugSeg}-${h.slice(0, 16)}`
+  // Compat boundary: vaults written before the slug-hash fix carry
+  // `local-intake-<slug>-<hash>` ids. A re-import of the same intake must
+  // reuse the existing scope instead of duplicating slots/catalog rows —
+  // when storage is supplied, check the legacy id first.
+  if (storage) {
+    const legacy = `local-intake-${entitySlug}-${h.slice(0, 16)}`
+    const hit = await storage.get('catalog_cache', `intake:${legacy}`).catch(() => null)
+    if (hit) return legacy
+  }
+  return next
 }
 
 export async function importLocalIntake(
@@ -96,7 +106,7 @@ export async function importLocalIntake(
   if (!extraction.questions.length) {
     throw new Error('intake extraction produced no questions')
   }
-  const applicationId = await intakeApplicationId(extraction.entity.slug, extraction.questions)
+  const applicationId = await intakeApplicationId(extraction.entity.slug, extraction.questions, storage)
   const intakeId = `intake-${newId().slice(0, 12)}`
   const now = nowIso()
 
@@ -244,6 +254,17 @@ async function importOccurrenceId(questionText: string, dupIndex: number): Promi
   return `import-${h.slice(0, 16)}`
 }
 
+/** Pre-IR-036 scheme: position-indexed id. Computed during import so a
+    SAME-ORDER re-import of content written before the scheme change finds
+    its existing slot (IR-036 compat boundary). A reordered re-import of a
+    legacy batch can't relocate the old slot — the old scheme was itself
+    order-sensitive; documented residual. */
+async function importOccurrenceIdLegacy(questionText: string, batchIndex: number): Promise<string> {
+  const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
+  const h = await sha256Hex(`${norm}::${batchIndex}`)
+  return `import-${h.slice(0, 16)}`
+}
+
 /**
  * Write parsed Q&A pairs into the vault Answer Bank. Each pair becomes (or
  * extends) a bank-scoped answer whose first/next version carries the
@@ -264,7 +285,7 @@ export async function importLegacyQAPairs(
   const batchId = newId()
 
   // Phase 1 — validate + hash outside any transaction.
-  const prepared: Array<{ occ: string; title: string; body: string }> = []
+  const prepared: Array<{ occ: string; legacyOcc: string; title: string; body: string }> = []
   const normCounts = new Map<string, number>()
   let skipped = 0
   for (let idx = 0; idx < pairs.length; idx++) {
@@ -284,6 +305,7 @@ export async function importLegacyQAPairs(
     normCounts.set(norm, dupIndex + 1)
     prepared.push({
       occ: await importOccurrenceId(p.question_text, dupIndex),
+      legacyOcc: await importOccurrenceIdLegacy(p.question_text, idx),
       title: p.question_text.slice(0, 80),
       body: p.answer_text,
     })
@@ -300,7 +322,8 @@ export async function importLegacyQAPairs(
     const map = new Map<string, string>()
     for (const entry of prepared) {
       const key = `answer-bank::${entry.occ}`
-      let answer = byOccurrence.get(key)
+      const legacyKey = `answer-bank::${entry.legacyOcc}`
+      let answer = byOccurrence.get(key) ?? byOccurrence.get(legacyKey)
       if (!answer) {
         answer = await createAnswer(s, {
           application_id: 'answer-bank',

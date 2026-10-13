@@ -5,14 +5,16 @@
 -- owner authorization. Prepared migration per the M07 reconciliation
 -- directive; application is a deployment-custody decision.
 --
--- EXECUTION-VERIFIED against PostgreSQL 16.15 (scratch db, 2026-10-13):
---   flag absent → INSERT INTO profile_answers succeeds
---   flag='1'   → INSERT/UPDATE/DELETE all denied via the three policies
+-- EXECUTION-VERIFIED against PostgreSQL 16.15 on a scratch database
+-- carrying the REAL production table names (2026-10-13):
+--   flag absent → INSERT INTO profile_answers / intake_submissions
+--                 / ai_draft_runs / answer_reviews / application_answers
+--                 / profile_answer_history succeeds
+--   flag='1'   → INSERT/UPDATE/DELETE all denied on those tables
 --   flag='1'   → SELECT still returns rows (reads untouched)
 --   flag off   → writes restored (rollback path verified)
--- Syntax notes: INSERT policies accept WITH CHECK only; UPDATE carries
--- USING + WITH CHECK; DELETE carries USING only; one command keyword per
--- CREATE POLICY statement.
+-- Syntax notes: one command keyword per CREATE POLICY; INSERT carries
+-- WITH CHECK only; UPDATE carries USING + WITH CHECK; DELETE USING only.
 --
 -- Purpose: AQUA_LOCAL_FIRST + NEXT_PUBLIC_AQUA_LOCAL_FIRST gating lives
 -- in application code. A misconfigured deploy (server flag only) used to
@@ -27,13 +29,21 @@
 -- The same schema serves both custody models — flipping is a data change
 -- (owner operation), not a schema change.
 --
--- Tables covered (private-content stores in the hosted model):
---   profile_answers — answer bodies
---   answer_reviews — private review notes
---   draft_runs     — generation history containing prompts/outputs
+-- Tables covered — every user-private free-text store in the hosted
+-- model (server routes AND direct client writes alike):
+--   profile_answers        — answer bodies (direct client upsert exists)
+--   profile_answer_history — prior answer versions
+--   answer_reviews         — private review notes
+--   application_answers    — per-application answer text
+--   ai_draft_runs          — generation prompts + outputs
+--   intake_submissions     — RAW pasted application text (most sensitive)
 --
--- Scope: INSERT/UPDATE/DELETE only — reads are NOT denied (the hosted
--- read path may still surface legacy data during transition).
+-- Excluded deliberately: user_profiles / user_applications are structured
+-- account metadata (no free-text private content) and remain writable;
+-- team_* tables are collaborative state outside the per-user boundary;
+-- public catalog tables are public by definition.
+-- Each policy is guarded by to_regclass() so a renamed/dropped table
+-- cannot abort the block.
 -- ============================================================
 
 -- 1. Deployment flag table (service-role managed; read-only to clients).
@@ -64,14 +74,19 @@ AS $$ SELECT EXISTS (
 ) $$;
 
 -- 3. Deny private-content WRITES while local-first custody is active.
---    One policy per command keyword — PostgreSQL accepts exactly one
---    command per CREATE POLICY. INSERT gets WITH CHECK only (USING is
---    illegal on INSERT); UPDATE gets both; DELETE gets USING only.
 DO $outer$
 DECLARE t text;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['profile_answers', 'answer_reviews', 'draft_runs']
+  FOREACH t IN ARRAY ARRAY[
+    'profile_answers', 'profile_answer_history', 'answer_reviews',
+    'application_answers', 'ai_draft_runs', 'intake_submissions'
+  ]
   LOOP
+    -- existence guard: a renamed/dropped table must not abort the block
+    IF to_regclass('public.' || t) IS NULL THEN
+      RAISE NOTICE 'local_first boundary: table % not present — skipped', t;
+      CONTINUE;
+    END IF;
     IF NOT EXISTS (
       SELECT 1 FROM pg_policies WHERE tablename = t AND policyname = 'local_first_deny_insert'
     ) THEN
@@ -103,30 +118,24 @@ BEGIN
   END LOOP;
 END $outer$;
 
--- 4. Rollback (manual, owner-run):
---    DROP POLICY local_first_deny_insert ON profile_answers;
---    DROP POLICY local_first_deny_update ON profile_answers;
---    DROP POLICY local_first_deny_delete ON profile_answers;
---    DROP POLICY local_first_deny_insert ON answer_reviews;
---    DROP POLICY local_first_deny_update ON answer_reviews;
---    DROP POLICY local_first_deny_delete ON answer_reviews;
---    DROP POLICY local_first_deny_insert ON draft_runs;
---    DROP POLICY local_first_deny_update ON draft_runs;
---    DROP POLICY local_first_deny_delete ON draft_runs;
---    DROP FUNCTION local_first_active();
---    DROP TABLE _deploy_flags;
--- (table+function drops optional — policies no longer reference them.)
+-- 4. Rollback (manual, owner-run) — three policies per covered table:
+--    DROP POLICY local_first_deny_insert ON <table>;
+--    DROP POLICY local_first_deny_update ON <table>;
+--    DROP POLICY local_first_deny_delete ON <table>;
+--    for each of: profile_answers, profile_answer_history,
+--                 answer_reviews, application_answers, ai_draft_runs,
+--                 intake_submissions
+--    then optionally: DROP FUNCTION local_first_active();
+--                     DROP TABLE _deploy_flags;
 --
 -- 5. Activation (manual, owner-run, alongside the Vercel env pair):
 --    INSERT INTO _deploy_flags(key, value) VALUES ('local_first','1');
 --    Deactivation: DELETE FROM _deploy_flags WHERE key='local_first';
---    Note: policies deny WRITES only — authenticated SELECT remains. The
---    vault does not depend on hosted private reads under local-first.
+--    Note: policies deny WRITES only — authenticated SELECT remains.
 --
--- 6. Tests (run on a staging project BEFORE apply):
---   a. flag absent → authenticated INSERT INTO profile_answers succeeds.
---   b. flag='1'    → the same INSERT fails with RLS violation;
---                    UPDATE/DELETE similarly refused.
---   c. flag='1'    → SELECT on profile_answers still works (reads allowed).
---   d. flag='1'    → DELETE FROM _deploy_flags restores write access.
---   e. flag='1'    → INSERT into a public catalog-adjacent table still OK.
+-- 6. Tests (verified on scratch Postgres 16.15, 2026-10-13):
+--   a. flag absent → authenticated INSERT succeeds on every covered table
+--   b. flag='1'    → INSERT/UPDATE/DELETE refused (RLS violation)
+--   c. flag='1'    → SELECT on covered tables still returns rows
+--   d. flag off    → writes restored
+--   e. missing table → NOTICE logged, block completes for the rest
