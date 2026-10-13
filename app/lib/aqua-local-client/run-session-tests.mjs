@@ -217,3 +217,267 @@ await t('IR-026: cross-scope derivation — derived_from preserved, approval not
 })
 
 console.log(`\n${passed} passed`)
+
+// ---------------------------------------------------------------------------
+// M07-ID-001/002 — Supabase auth-cookie reassembly + vault identity isolation.
+// parseAuthCookieUid is pure (cookie header + project URL in, uid|null out).
+// resolveVaultDbName is exercised through the __setSessionProbeForTests seam
+// and a document.cookie shim — no network, no IndexedDB.
+// ---------------------------------------------------------------------------
+
+const SB_URL = 'https://testref0123.supabase.co'
+const SB_BASE = 'sb-testref0123-auth-token'
+const UID_A = 'user-aaa-111'
+const UID_B = 'user-bbb-222'
+
+function b64url(s) {
+  return Buffer.from(s, 'utf8').toString('base64')
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+/** supabase-ssr 'base64url' cookieEncoding → `base64-<b64url(JSON)>`. */
+function sessionValue(uid, extra = {}) {
+  return `base64-${b64url(JSON.stringify({ access_token: 'at', refresh_token: 'rt', user: { id: uid }, ...extra }))}`
+}
+/** Split an ENCODED cookie value into supabase-ssr-style chunk values
+    (each stored value is itself percent-encoded on write). */
+function chunkValue(encoded, n) {
+  const size = Math.ceil(encoded.length / n)
+  const out = []
+  for (let i = 0; i < n; i++) out.push(encodeURIComponent(decodeURIComponent(encoded.slice(i * size, (i + 1) * size))))
+  return out
+}
+function cookieHeader(entries) {
+  return entries.map(([k, v]) => `${k}=${v}`).join('; ')
+}
+function setCookies(...entries) {
+  globalThis.document = { cookie: cookieHeader(entries) }
+}
+function clearCookies() {
+  globalThis.document = { cookie: '' }
+}
+
+const {
+  parseAuthCookieUid,
+  resolveVaultDbName,
+  invalidateVaultIdentity,
+  currentResolvedUid,
+  __setSessionProbeForTests,
+  __wrapVaultHandleForTests,
+} = await import('./session.ts')
+const { VaultScopeError } = await import('../aqua-local/index.ts')
+
+// readLocalSessionUid derives the cookie name from the deployment URL.
+const PREV_SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+process.env.NEXT_PUBLIC_SUPABASE_URL = SB_URL
+
+// --- cookie reassembly matrix ---------------------------------------------
+
+await t('cookie: single unchunked session → uid', async () => {
+  const h = cookieHeader([[SB_BASE, encodeURIComponent(sessionValue(UID_A))]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+})
+
+await t('cookie: single RAW-JSON session (cookieEncoding=raw) → uid', async () => {
+  const h = cookieHeader([[SB_BASE, encodeURIComponent(JSON.stringify({ user: { id: UID_A } }))]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+})
+
+await t('cookie: M07-ID-001 regression — .0+.1 chunks reassemble (was: .0 dropped → null)', async () => {
+  const enc = encodeURIComponent(sessionValue(UID_A))
+  const [c0, c1] = chunkValue(enc, 2)
+  const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+})
+
+await t('cookie: three-chunk session reassembles', async () => {
+  const enc = encodeURIComponent(sessionValue(UID_B))
+  const [c0, c1, c2] = chunkValue(enc, 3)
+  const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1], [`${SB_BASE}.2`, c2]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_B)
+})
+
+await t('cookie: chunks present but .0 missing → refused', async () => {
+  const enc = encodeURIComponent(sessionValue(UID_A))
+  const [, c1] = chunkValue(enc, 2)
+  const h = cookieHeader([[`${SB_BASE}.1`, c1]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), null)
+})
+
+await t('cookie: missing MIDDLE chunk (.0+.2) → refused, never partial', async () => {
+  const enc = encodeURIComponent(sessionValue(UID_A))
+  const [c0, , c2] = chunkValue(enc, 3)
+  const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.2`, c2]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), null)
+})
+
+await t('cookie: malformed payload → refused', async () => {
+  assert.equal(parseAuthCookieUid(cookieHeader([[SB_BASE, 'not-json-not-base64']]), SB_URL), null)
+  assert.equal(parseAuthCookieUid(cookieHeader([[SB_BASE, 'base64-%%%bad%%%']]), SB_URL), null)
+})
+
+await t('cookie: wrong project ref → ignored', async () => {
+  const h = cookieHeader([['sb-otherref99-auth-token', encodeURIComponent(sessionValue(UID_A))]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), null)
+})
+
+await t('cookie: multiple projects on origin → only ours resolved', async () => {
+  const h = cookieHeader([
+    ['sb-otherref99-auth-token', encodeURIComponent(sessionValue(UID_B))],
+    ['unrelated', 'x'],
+    [SB_BASE, encodeURIComponent(sessionValue(UID_A))],
+  ])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+})
+
+await t('cookie: bare base wins over chunks (library precedence)', async () => {
+  const enc = encodeURIComponent(sessionValue(UID_B))
+  const [c0, c1] = chunkValue(enc, 2)
+  const h = cookieHeader([
+    [SB_BASE, encodeURIComponent(sessionValue(UID_A))],
+    [`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1],
+  ])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+})
+
+await t('cookie: unicode user metadata survives percent-encoded chunks', async () => {
+  const enc = encodeURIComponent(sessionValue(UID_A, { user_metadata: { name: 'Zoë Müller — 日本語' } }))
+  const [c0, c1, c2] = chunkValue(enc, 3)
+  const h = cookieHeader([[`${SB_BASE}.0`, c0], [`${SB_BASE}.1`, c1], [`${SB_BASE}.2`, c2]])
+  assert.equal(parseAuthCookieUid(h, SB_URL), UID_A)
+})
+
+await t('cookie: empty/absent → null', async () => {
+  assert.equal(parseAuthCookieUid('', SB_URL), null)
+  assert.equal(parseAuthCookieUid(cookieHeader([['other', 'v']]), SB_URL), null)
+})
+
+// --- vault identity lifecycle ----------------------------------------------
+// Reset: each block starts with a clean module state.
+
+await t('identity: cookie uid resolves its vault without touching the network probe', async () => {
+  invalidateVaultIdentity()
+  let probed = false
+  __setSessionProbeForTests(async () => { probed = true; return { uid: UID_B } })
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`)
+  assert.equal(probed, false, 'cookie fast-path must not hit the probe')
+  assert.equal(currentResolvedUid(), UID_A)
+})
+
+await t('identity: no cookie + probe uid → uid vault', async () => {
+  invalidateVaultIdentity()
+  clearCookies()
+  __setSessionProbeForTests(async () => ({ uid: UID_A }))
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`)
+  assert.equal(currentResolvedUid(), UID_A)
+})
+
+await t('identity: never-resolved + no session → shared anonymous vault', async () => {
+  invalidateVaultIdentity()
+  clearCookies()
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+})
+
+await t('identity: 429/timeout stall preserves the LIVE account vault (sticky)', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => { throw new Error('429 rate limited') })
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`) // resolves via cookie anyway
+  clearCookies() // now rely on the probe
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`, 'stall must not drop to anon vault')
+})
+
+await t('identity: sign-out (definitive null session) clears the sticky identity', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  await resolveVaultDbName()
+  invalidateVaultIdentity() // what VaultProvider does on SIGNED_OUT
+  clearCookies()
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+  assert.equal(currentResolvedUid(), null)
+})
+
+await t('identity: definitive null session clears sticky WITHOUT explicit invalidate', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: UID_A }))
+  await resolveVaultDbName()
+  clearCookies() // cookies gone — session ended elsewhere
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+  assert.equal(currentResolvedUid(), null)
+  // and a later stall must NOT resurrect the dead identity
+  __setSessionProbeForTests(async () => { throw new Error('timeout') })
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+})
+
+await t('identity: account switch A→B selects B vault, never A', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_A}`)
+  invalidateVaultIdentity() // SIGNED_OUT
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_B))]) // B signs in
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_B}`)
+  assert.equal(currentResolvedUid(), UID_B)
+})
+
+await t('identity: stale async callback cannot restore the previous account', async () => {
+  invalidateVaultIdentity()
+  clearCookies()
+  // Probe that resolves AFTER an invalidation with the OLD account's uid.
+  let release
+  const gate = new Promise((r) => { release = r })
+  __setSessionProbeForTests(async () => { await gate; return { uid: UID_A } })
+  const pending = resolveVaultDbName()
+  invalidateVaultIdentity() // sign-out lands mid-flight
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_B))]) // B session appears
+  release()
+  assert.equal(await pending, `aqua-local-${UID_B}`, 'stale A result must be discarded')
+  assert.equal(currentResolvedUid(), UID_B)
+})
+
+await t('identity: fresh cookie written mid-flight beats a stale probe uid', async () => {
+  invalidateVaultIdentity()
+  clearCookies() // absent at the fast-path check…
+  __setSessionProbeForTests(async () => {
+    // …then the session lands while the async probe is in flight — the
+    // probe's stale A result must lose to cookie B.
+    setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_B))])
+    return { uid: UID_A }
+  })
+  assert.equal(await resolveVaultDbName(), `aqua-local-${UID_B}`)
+  assert.equal(currentResolvedUid(), UID_B)
+})
+
+await t('identity: handle minted before sign-out is revoked — no stale writes', async () => {
+  invalidateVaultIdentity()
+  const mem = createMemoryStorage()
+  const handle = __wrapVaultHandleForTests(`aqua-local-${UID_A}`, mem)
+  await handle.put('answers', { id: 'a1', scope: { application_id: 'x', question_occurrence_id: 'q' }, created_at: 't' })
+  assert.equal((await handle.getAll('answers')).length, 1)
+  invalidateVaultIdentity() // SIGNED_OUT lands
+  await assert.rejects(() => handle.put('answers', { id: 'a2', scope: {}, created_at: 't' }), VaultScopeError)
+  await assert.rejects(() => handle.getAll('answers'), VaultScopeError)
+  await assert.rejects(() => handle.tx(['answers'], async () => {}), VaultScopeError)
+})
+
+await t('identity: post-sign-out vault selection stays anonymous under stall', async () => {
+  invalidateVaultIdentity()
+  setCookies([SB_BASE, encodeURIComponent(sessionValue(UID_A))])
+  __setSessionProbeForTests(async () => ({ uid: null }))
+  await resolveVaultDbName()
+  invalidateVaultIdentity()
+  clearCookies()
+  __setSessionProbeForTests(async () => { throw new Error('429 backoff') })
+  // Sticky was invalidated — the 429 stall can only yield the anon vault,
+  // never resurrect A.
+  assert.equal(await resolveVaultDbName(), 'aqua-local')
+})
+
+__setSessionProbeForTests(null)
+clearCookies()
+if (PREV_SB_URL === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+else process.env.NEXT_PUBLIC_SUPABASE_URL = PREV_SB_URL

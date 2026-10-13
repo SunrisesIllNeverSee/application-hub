@@ -27,6 +27,8 @@ import {
   resolveVaultDbName,
   tryUnlock,
   runVaultPrivacyMigration,
+  invalidateVaultIdentity,
+  currentResolvedUid,
   VaultDecryptError,
 } from './session'
 import type { VaultStorage } from './session'
@@ -141,19 +143,33 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     return secret
   }, [])
 
-  // IR-012: signing out in ANY tab must drop the in-memory secret — an
-  // unlocked vault must not survive the account it was unlocked under.
+  // IR-012 + M07-ID-002: signing out in ANY tab must drop the in-memory
+  // secret AND the module-level resolved identity — an unlocked vault must
+  // not survive the account it was unlocked under, and no stale vault name
+  // or handle may be reused by the next account. A sign-in as a DIFFERENT
+  // account (cookie swap ahead of SIGNED_OUT ordering) invalidates too.
   useEffect(() => {
     if (!LOCAL_FIRST) return
     let unsub: (() => void) | undefined
+    const resetVaultSession = () => {
+      invalidateVaultIdentity()
+      secretRef.current = null
+      storageRef.current = null
+      storageUidRef.current = null
+      setStatus('idle')
+      setVaultHasData(null)
+    }
     void import('@/lib/supabase/client').then(({ createClient }) => {
-      const { data } = createClient().auth.onAuthStateChange((event) => {
+      const { data } = createClient().auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') {
-          secretRef.current = null
-          storageRef.current = null
-          storageUidRef.current = null
-          setStatus('idle')
-          setVaultHasData(null)
+          resetVaultSession()
+        } else if (
+          (event === 'SIGNED_IN' || event === 'USER_UPDATED') &&
+          session?.user?.id &&
+          currentResolvedUid() &&
+          session.user.id !== currentResolvedUid()
+        ) {
+          resetVaultSession()
         }
       })
       unsub = data.subscription.unsubscribe

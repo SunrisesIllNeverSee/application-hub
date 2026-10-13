@@ -99,7 +99,81 @@ export interface BankEntry {
 // re-resolve, never hand a different user the previous user's vault handle.
 const storagePromises = new Map<string, Promise<VaultStorage>>()
 
+// Identity lifecycle (M07-ID-002). The resolved name + owning uid are a
+// routing hint bound to `resolutionEpoch`: invalidateVaultIdentity() clears
+// both and bumps the epoch, so an async resolution that lands AFTER a
+// sign-out/account-switch is discarded instead of resurrecting the previous
+// account's vault. Handles issued by getStorage() are epoch-bound — any
+// handle minted before an invalidation refuses further operations, so a
+// stale vault reference can never write under a new identity.
 let lastResolvedDbName: string | null = null
+let lastResolvedUid: string | null = null
+let resolutionEpoch = 0
+
+/**
+ * Forget the resolved vault identity and release uid-keyed vault handles.
+ * Call on SIGNED_OUT (this tab OR another — supabase-js broadcasts it) and
+ * on a sign-in whose account differs from the resolved one. Persistent
+ * IndexedDB data is never touched — this drops in-memory references only.
+ */
+export function invalidateVaultIdentity(): void {
+  resolutionEpoch++
+  lastResolvedDbName = null
+  lastResolvedUid = null
+  // Every cached handle is epoch-bound — all are dead after this bump, so
+  // drop them all (the next getStorage() reopens cleanly). Persistent
+  // IndexedDB data is untouched.
+  storagePromises.clear()
+}
+
+/** Uid owning the currently resolved vault — lets auth-change handlers spot
+    an account switch (returns null for anonymous/never-resolved). */
+export function currentResolvedUid(): string | null {
+  return lastResolvedUid
+}
+
+/**
+ * Bounded async session read — queues behind supabase-js's in-flight token
+ * refresh, so it races a timeout (a 429-stalled refresh must not block a
+ * local vault open). Injectable in tests via __setSessionProbeForTests.
+ */
+type SessionProbe = () => Promise<{ uid: string | null }>
+async function defaultSessionProbe(): Promise<{ uid: string | null }> {
+  const { createClient } = await import('@/lib/supabase/client')
+  const sessionPromise = createClient().auth.getSession()
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('session read timeout')), 1500),
+  )
+  const { data } = await Promise.race([sessionPromise, timeout])
+  return { uid: data.session?.user?.id ?? null }
+}
+let sessionProbe: SessionProbe = defaultSessionProbe
+
+/** TEST SEAM — never called by app code. Swap the async session read for a
+    controllable probe; pass null to restore the real implementation. */
+export function __setSessionProbeForTests(probe: SessionProbe | null): void {
+  sessionProbe = probe ?? defaultSessionProbe
+}
+
+/** TEST SEAM — never called by app code. Wrap a storage handle with the
+    epoch-bound revocation guard exactly as getStorage() does, so the
+    sign-out revocation contract is exercisable without IndexedDB. */
+export function __wrapVaultHandleForTests(dbName: string, inner: VaultStorage): VaultStorage {
+  return guardVaultHandle(dbName, resolutionEpoch, inner)
+}
+
+function rememberResolved(name: string, uid: string): string {
+  if (lastResolvedUid && lastResolvedUid !== uid) {
+    // Account switched without an invalidation landing first (e.g. cookie
+    // swap ahead of the auth listener) — kill every outstanding handle:
+    // a write meant for the previous account must never land in it now.
+    resolutionEpoch++
+    storagePromises.clear()
+  }
+  lastResolvedDbName = name
+  lastResolvedUid = uid
+  return name
+}
 
 export async function resolveVaultDbName(): Promise<string> {
   // Read the LOCAL session (no network): getUser() validates against the
@@ -114,69 +188,94 @@ export async function resolveVaultDbName(): Promise<string> {
   // is read synchronously from the auth cookies first (this app persists
   // sessions via @supabase/ssr → document.cookie, not localStorage); the
   // async path only runs as a bounded fallback.
+  const epoch = resolutionEpoch
   const fastUid = readLocalSessionUid()
-  if (fastUid) {
-    const name = `aqua-local-${fastUid}`
-    lastResolvedDbName = name
-    return name
-  }
+  if (fastUid) return rememberResolved(`aqua-local-${fastUid}`, fastUid)
   try {
-    const { createClient } = await import('@/lib/supabase/client')
-    const sessionPromise = createClient().auth.getSession()
-    const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('session read timeout')), 1500),
-    )
-    const { data } = await Promise.race([sessionPromise, timeout])
-    const uid = data.session?.user?.id
+    const { uid } = await sessionProbe()
+    if (epoch !== resolutionEpoch) {
+      // A sign-out/account-switch landed while the async read was in
+      // flight — this result is stale; resolve against current state.
+      return resolveVaultDbName()
+    }
+    // A session written mid-flight (cookie appeared after our first read)
+    // beats a stale probe result.
+    const lateUid = readLocalSessionUid()
+    if (lateUid) return rememberResolved(`aqua-local-${lateUid}`, lateUid)
     if (!uid) {
-      // Session undetermined — NEVER fall to the shared 'aqua-local' DB
-      // once a uid-keyed DB has been resolved: a stalled session read on a
-      // logged-in user would silently write into the anonymous vault.
-      if (lastResolvedDbName) return lastResolvedDbName
+      // Supabase definitively reports NO session — a sticky authenticated
+      // identity must not survive it (this is sign-out, not a stall).
+      lastResolvedDbName = null
+      lastResolvedUid = null
       return 'aqua-local'
     }
-    const name = `aqua-local-${uid}`
-    lastResolvedDbName = name
-    return name
+    return rememberResolved(`aqua-local-${uid}`, uid)
   } catch {
-    // Timeout/429-stall: sticky name if we have one, shared only as the
-    // never-resolved first-call fallback (anonymous surface).
+    if (epoch !== resolutionEpoch) return resolveVaultDbName()
+    // Timeout/429-stall: sticky name ONLY while the epoch is unchanged —
+    // an invalidated identity can never be reused here. 'aqua-local' is
+    // the never-resolved first-call fallback (anonymous surface) only.
     return lastResolvedDbName ?? 'aqua-local'
   }
 }
 
-/** Synchronous uid read from the persisted auth session. @supabase/ssr
-    (createBrowserClient) stores the session in document.cookie — chunked
-    as `sb-<ref>-auth-token`, `sb-<ref>-auth-token.0`, `.1`, … with each
-    chunk `base64-<base64url>` — never in localStorage. Scoped to THIS
-    deployment's project ref so multi-project origins can't cross-resolve. */
-function readLocalSessionUid(): string | null {
-  if (typeof document === 'undefined' || !document.cookie) return null
+/**
+ * Reassemble THIS project's supabase-ssr auth cookie(s) from a raw
+ * `document.cookie` header string and extract the session uid — or null.
+ *
+ * @supabase/ssr@0.4.x layout (mirrors its chunker/combineChunks exactly):
+ *   - small session:   `sb-<ref>-auth-token`  = percent-encoded full value
+ *   - large session:   `sb-<ref>-auth-token.0`, `.1`, `.2`, …
+ *                      each a percent-encoded slice; contiguous from .0
+ *   - payload:         raw JSON, or `base64-<base64url(JSON)>` (default
+ *                      cookieEncoding 'base64url')
+ *
+ * Rules: a bare base cookie wins over chunks (library precedence); a
+ * chunked set must be a contiguous 0..N run — a missing index means a
+ * half-written/rotated set and the partial value is REFUSED, never decoded
+ * into an authoritative identity. Other projects' `sb-*` cookies are
+ * ignored via the <ref> scoping.
+ */
+export function parseAuthCookieUid(cookieHeader: string, supabaseUrl: string): string | null {
+  if (!cookieHeader) return null
   try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-    const ref = /^https:\/\/([a-z0-9-]+)\.supabase\.co/.exec(url)?.[1]
+    const ref = /^https:\/\/([a-z0-9-]+)\.supabase\.co/.exec(supabaseUrl)?.[1]
     if (!ref) return null
     const base = `sb-${ref}-auth-token`
-    // Collect the base key plus chunk keys in numeric order.
-    const chunks: Array<[number, string]> = []
-    for (const pair of document.cookie.split(';')) {
+    const chunkRe = new RegExp(`^${base}\\.(\\d+)$`)
+    let single: string | null = null
+    const chunks = new Map<number, string>()
+    for (const pair of cookieHeader.split(';')) {
       const eq = pair.indexOf('=')
       if (eq === -1) continue
       const k = pair.slice(0, eq).trim()
       const v = pair.slice(eq + 1).trim()
-      if (k === base) chunks.push([0, v])
-      else {
-        const m = new RegExp(`^${base}\\.(\\d+)$`).exec(k)
-        if (m) chunks.push([Number(m[1]), v])
+      if (k === base) {
+        single = v
+        continue
+      }
+      const m = chunkRe.exec(k)
+      if (m) {
+        const i = Number(m[1])
+        if (chunks.has(i)) return null // duplicate chunk index — corrupt
+        chunks.set(i, v)
       }
     }
-    if (chunks.length === 0) return null
-    chunks.sort((a, b) => a[0] - b[0])
-    // Base cookie stores the full value OR chunk .0 carries it — supabase-ssr
-    // either writes a single `base64-…` value or split chunks. Concatenate
-    // the chunk values (excluding the bare base key when chunks exist).
-    const chunkOnly = chunks.filter(([i]) => i > 0)
-    const joined = (chunkOnly.length > 0 ? chunkOnly : chunks).map(([, v]) => v).join('')
+    let joined: string
+    if (single !== null) {
+      joined = single
+    } else if (chunks.size > 0) {
+      const parts: string[] = []
+      for (let i = 0; i < chunks.size; i++) {
+        const v = chunks.get(i)
+        if (v === undefined) return null // gap in 0..N — refuse partial
+        parts.push(v)
+      }
+      joined = parts.join('')
+    } else {
+      return null
+    }
+    if (!joined) return null
     const raw = decodeURIComponent(joined)
     // Cookie payload is either raw JSON or 'base64-<base64url>' (supabase-ssr).
     const json = raw.startsWith('base64-')
@@ -195,6 +294,39 @@ function readLocalSessionUid(): string | null {
   }
 }
 
+/** Synchronous uid read from the persisted auth session — a vault-ROUTING
+    hint only. It never grants remote privileges: Supabase auth remains the
+    authority for every privileged network operation. */
+function readLocalSessionUid(): string | null {
+  if (typeof document === 'undefined' || !document.cookie) return null
+  return parseAuthCookieUid(document.cookie, process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
+}
+
+/**
+ * Bind a vault handle to the resolution epoch that minted it. After
+ * invalidateVaultIdentity() (sign-out / account switch), every operation on
+ * a pre-invalidation handle refuses — a stale handle can never read or
+ * write under a new identity, even if a component still holds it.
+ */
+function guardVaultHandle(dbName: string, epoch: number, inner: VaultStorage): VaultStorage {
+  const revoked = () => {
+    if (epoch !== resolutionEpoch) {
+      throw new VaultScopeError(`vault handle for '${dbName}' revoked by sign-out/account switch`)
+    }
+  }
+  // Async wrappers keep the VaultStorage promise contract — a revocation
+  // surfaces as a rejection, never a synchronous throw into render paths.
+  return {
+    get: async (store, key) => (revoked(), inner.get(store, key)),
+    put: async (store, value) => (revoked(), inner.put(store, value)),
+    putIfAbsent: async (store, key, value) => (revoked(), inner.putIfAbsent(store, key, value)),
+    getAll: async (store) => (revoked(), inner.getAll(store)),
+    delete: async (store, key) => (revoked(), inner.delete(store, key)),
+    keys: async (store) => (revoked(), inner.keys(store)),
+    tx: async (stores, fn) => (revoked(), inner.tx(stores, fn)),
+  }
+}
+
 /**
  * Open the IndexedDB vault (memoized per authenticated user). F-UI1 + IN-01
  * review fix: the cache key is the user id, so signing out and in as a
@@ -203,9 +335,10 @@ function readLocalSessionUid(): string | null {
  */
 export async function getStorage(): Promise<VaultStorage> {
   const dbName = await resolveVaultDbName()
+  const epoch = resolutionEpoch
   let p = storagePromises.get(dbName)
   if (!p) {
-    p = openVaultStorage(dbName)
+    p = openVaultStorage(dbName).then((s) => guardVaultHandle(dbName, epoch, s))
     storagePromises.set(dbName, p)
   }
   return p
