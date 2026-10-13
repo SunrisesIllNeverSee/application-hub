@@ -2,7 +2,7 @@
 
 MCP server for the Application Hub — a platform that helps founders track, compare, and apply to accelerators, grants, and fellowships.
 
-Exposes 30 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
+Exposes 31 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
 
 ---
 
