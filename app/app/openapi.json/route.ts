@@ -37,7 +37,7 @@ export async function GET() {
         transport: 'stdio (local) or Streamable HTTP (self-hosted)',
         tools: 27,
         repo: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server',
-        docs: 'https://aquaidp.xyz/developers#mcp',
+        docs: 'https://aquaidp.xyz/mcp',
       },
     },
     externalDocs: {
