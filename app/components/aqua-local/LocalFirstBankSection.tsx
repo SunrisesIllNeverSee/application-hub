@@ -37,7 +37,7 @@ export function LocalFirstBankSection({
     if (!secret || vault.status !== 'unlocked') return
     try {
       const storage = await vault.ensureStorage()
-      setBank(await loadBank(storage))
+      setBank(await loadBank(storage, vault.getSecret()))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not read the vault')
     }

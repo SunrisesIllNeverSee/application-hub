@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useVault } from '@/lib/aqua-local-client/VaultProvider'
 import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 import { readBody } from '@/lib/aqua-local-client/session'
+import { decryptVersionTitle } from '@/lib/aqua-local'
 import type { AnswerRecord, VersionRecord, ApprovalRecord } from '@/lib/aqua-local'
 import type { ProfileAnswer, ProgramQuestionWithArchived } from '@/lib/database.types'
 import { QuestionTree } from '@/components/QuestionTree'
@@ -47,6 +48,13 @@ function useVaultOccurrences(programId: string) {
             .sort((x, y) => x.created_at.localeCompare(y.created_at) || x.id.localeCompare(y.id))
             .at(-1)
           if (latest) map[a.scope.question_occurrence_id] = latest
+        }
+        // IR-014: titles are ciphertext at rest — decrypt for display.
+        const secret = vault.getSecret()
+        if (secret) {
+          for (const v of Object.values(map)) {
+            if (v.title_enc) { v.title = await decryptVersionTitle(secret, v).catch(() => v.title); delete v.title_enc }
+          }
         }
         if (!cancelled) {
           setAnswered(map)

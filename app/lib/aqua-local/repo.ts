@@ -136,11 +136,13 @@ export async function buildVersionPayload(
   if (isBlankBody(input.body)) throw new VaultBlankBodyError()
   const sha256 = await sha256Hex(canonicalJson({ title: input.title, body: input.body }))
   const blob = await encryptText(secret, input.body)
+  const titleBlob = await encryptText(secret, input.title)
   const record: VersionRecord = {
     id: newId(),
     answer_id: input.answer_id,
     parent_version_id: parentVersionId,
-    title: input.title,
+    title: JSON.stringify(titleBlob),
+    title_enc: true,
     body: JSON.stringify(blob),
     sha256,
     method: input.method,
@@ -173,6 +175,11 @@ async function insertVersion(
 }
 
 /** Decrypt a stored version. Throws VaultDecryptError on wrong secret. */
+export async function decryptVersionTitle(secret: string, record: VersionRecord): Promise<string> {
+  if (!record.title_enc) return record.title // legacy plaintext
+  return decryptText(secret, JSON.parse(record.title))
+}
+
 export async function readVersion(
   storage: VaultStorage,
   secret: string,
@@ -181,7 +188,44 @@ export async function readVersion(
   const record = await storage.get<VersionRecord>('versions', versionId)
   if (!record) throw new VaultNotFoundError(`version not found: ${versionId}`)
   const body = await decryptText(secret, JSON.parse(record.body))
-  return { record, title: record.title, body }
+  const title = await decryptVersionTitle(secret, record)
+  return { record, title, body }
+}
+
+/** IR-014 + IR-035 unlock-time migration: encrypts legacy plaintext
+    version titles and intake catalog blobs in place. Runs after unlock —
+    crypto happens outside write transactions; records stay readable as
+    legacy plaintext if a run is interrupted mid-way. */
+export async function runVaultPrivacyMigration(
+  storage: VaultStorage,
+  secret: string,
+): Promise<{ titles_migrated: number; catalog_migrated: number }> {
+  const versions = await storage.getAll<VersionRecord>('versions')
+  const titleUpdates: VersionRecord[] = []
+  for (const v of versions) {
+    if (v.title_enc) continue
+    const blob = await encryptText(secret, v.title)
+    titleUpdates.push({ ...v, title: JSON.stringify(blob), title_enc: true })
+  }
+  if (titleUpdates.length) {
+    await storage.tx(['versions'], async (s) => {
+      for (const u of titleUpdates) await s.put('versions', u)
+    })
+  }
+  const cats = await storage.getAll<import('./schema.ts').CatalogCacheRecord>('catalog_cache')
+  const catUpdates: import('./schema.ts').CatalogCacheRecord[] = []
+  for (const c of cats) {
+    if (!c.key.startsWith('intake:') || c.blob_enc || c.blob === undefined) continue
+    const enc = await encryptText(secret, JSON.stringify(c.blob))
+    const { blob: _omit, ...rest } = c
+    catUpdates.push({ ...rest, blob_enc: JSON.stringify(enc) })
+  }
+  if (catUpdates.length) {
+    await storage.tx(['catalog_cache'], async (s) => {
+      for (const u of catUpdates) await s.put('catalog_cache', u)
+    })
+  }
+  return { titles_migrated: titleUpdates.length, catalog_migrated: catUpdates.length }
 }
 
 export async function listVersions(storage: VaultStorage, answerId: string): Promise<VersionRecord[]> {

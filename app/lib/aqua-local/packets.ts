@@ -50,7 +50,7 @@ import {
   SUBMISSION_METHODS,
   SUBMISSION_OUTCOMES,
 } from './schema.ts'
-import { compareApprovals, isBlankBody, VaultNotFoundError } from './repo.ts'
+import { compareApprovals, decryptVersionTitle, isBlankBody, VaultNotFoundError } from './repo.ts'
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -315,7 +315,8 @@ export async function freezeApplicationPacket(
       reasons.push(`version ${sel.version_id} cannot be decrypted under the provided secret`)
       continue
     }
-    const recomputed = await sha256Hex(canonicalJson({ title: version.title, body }))
+    const titlePlain = await decryptVersionTitle(secret, version)
+    const recomputed = await sha256Hex(canonicalJson({ title: titlePlain, body }))
     if (recomputed !== version.sha256) {
       reasons.push(`tampered version refused: ${sel.version_id} stored sha256 does not match recomputed`)
       continue
@@ -325,7 +326,7 @@ export async function freezeApplicationPacket(
       question_occurrence_id: occ,
       question_text_snapshot: sel.question_text_snapshot ?? '',
       version_id: version.id,
-      answer_title: version.title,
+      answer_title: titlePlain,
       answer_body: body,
       answer_sha256: version.sha256,
       approved: true,

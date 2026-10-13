@@ -49,9 +49,15 @@ export interface VersionRecord {
   id: string
   answer_id: string
   parent_version_id: string | null
+  /** IR-014: title is encrypted at rest — it is free-text user input that
+      can carry real private content, not harmless metadata. When
+      `title_enc` is set the field holds serialized EncryptedBlob (same
+      shape as `body`); legacy records without the flag keep plaintext
+      until the unlock-time migration rewrites them. */
   title: string
+  title_enc?: true
   body: string // serialized EncryptedBlob
-  sha256: string // sha256 of canonicalJson({ title, body_plaintext })
+  sha256: string // sha256 of canonicalJson({ title_plaintext, body_plaintext })
   method: VersionMethod
   provenance: string | null // free-form provenance note; see `provenance` store for structured receipt
   created_at: string
@@ -125,7 +131,13 @@ export interface ProvenanceRecord {
 
 export interface CatalogCacheRecord {
   key: string
-  blob: unknown
+  /** Plaintext blob — used for PUBLIC catalog data. For `intake:` keys the
+      extracted private text (question text, entity name, titles, URLs) is
+      stored in `blob_enc` instead (IR-035). */
+  blob?: unknown
+  /** Serialized EncryptedBlob of JSON.stringify(blob) — private intake
+      records only; requires the vault secret to read. */
+  blob_enc?: string
   fetched_at: string
 }
 

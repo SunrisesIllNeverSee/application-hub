@@ -52,7 +52,7 @@ export default function AquaLocal() {
     if (!secret) return
     try {
       const storage = await vault.ensureStorage()
-      const entries = await loadBank(storage)
+      const entries = await loadBank(storage, vault.getSecret())
       setBank(entries)
       const hasVersions = entries.some((e) => e.versions.length > 0)
       const last = lastBackupAt()

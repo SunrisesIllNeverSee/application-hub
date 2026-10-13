@@ -26,6 +26,7 @@ import {
   getStorage,
   resolveVaultDbName,
   tryUnlock,
+  runVaultPrivacyMigration,
   VaultDecryptError,
 } from './session'
 import type { VaultStorage } from './session'
@@ -118,6 +119,9 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       await tryUnlock(s, secret) // throws VaultDecryptError on wrong secret
       secretRef.current = secret
       setStatus('unlocked')
+      // IR-014/035: legacy plaintext titles + intake blobs migrate forward.
+      // Best-effort — a failed migration leaves data readable, not lost.
+      runVaultPrivacyMigration(s, secret).catch(() => {})
     },
     [ensureStorage],
   )

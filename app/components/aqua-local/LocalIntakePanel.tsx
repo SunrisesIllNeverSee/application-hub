@@ -76,7 +76,7 @@ export function LocalIntakePanel() {
         setProviders(list)
         setProviderId((cur) => cur || list[0]?.provider_id || '')
         const storage = await vault.ensureStorage()
-        setIntakes(await listLocalIntakes(storage))
+        setIntakes(await listLocalIntakes(storage, vault.getSecret()!))
       })
       .catch(() => undefined)
     return () => { cancelled = true }
@@ -168,7 +168,7 @@ export function LocalIntakePanel() {
       setQaResult(res)
       setPairs(null)
       setContent('')
-      setIntakes(await listLocalIntakes(storage))
+      setIntakes(await listLocalIntakes(storage, vault.getSecret()!))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Vault import failed')
     } finally {
@@ -182,7 +182,7 @@ export function LocalIntakePanel() {
     setError('')
     try {
       const storage = await vault.ensureStorage()
-      const res = await importLocalIntake(storage, extraction, {
+      const res = await importLocalIntake(storage, vault.getSecret()!, extraction, {
         source_type: 'manual_paste',
         source_url: sourceUrl.trim() || null,
         source_title: sourceTitle.trim() || null,
@@ -190,7 +190,7 @@ export function LocalIntakePanel() {
       setResult(res)
       setExtraction(null)
       setContent('')
-      setIntakes(await listLocalIntakes(storage))
+      setIntakes(await listLocalIntakes(storage, vault.getSecret()!))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Vault import failed')
     } finally {

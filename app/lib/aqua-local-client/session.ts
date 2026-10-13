@@ -14,6 +14,8 @@ import {
   createAnswer,
   createVersion,
   readVersion,
+  decryptVersionTitle,
+  runVaultPrivacyMigration,
   approveVersion,
   compareApprovals,
   exportVault,
@@ -62,6 +64,7 @@ export {
 }
 export type { VaultStorage, VersionMethod }
 export type { BackupPreview, ImportResult } from '../aqua-local/index.ts'
+export { runVaultPrivacyMigration, decryptVersionTitle } from '../aqua-local/index.ts'
 
 /** Scope for the onboarding upload path only; starter answers are scoped to
  *  the 'answer-bank' application so they show in the normal bank. */
@@ -149,7 +152,7 @@ export async function tryUnlock(storage: VaultStorage, secret: string): Promise<
 }
 
 /** Load the whole Answer Bank: answers + versions + latest approval + provenance. */
-export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
+export async function loadBank(storage: VaultStorage, secret?: string | null): Promise<BankEntry[]> {
   const [answers, versions, approvals, provenance, catalog] = await Promise.all([
     storage.getAll<AnswerRecord>('answers'),
     storage.getAll<VersionRecord>('versions'),
@@ -158,17 +161,34 @@ export async function loadBank(storage: VaultStorage): Promise<BankEntry[]> {
     storage.getAll<CatalogCacheRecord>('catalog_cache'),
   ])
 
+  // IR-014/035: titles + intake blobs are ciphertext at rest — decrypt when
+  // the caller carries the vault secret (all bank displays run unlocked).
+  if (secret) {
+    for (const v of versions) {
+      if (v.title_enc) {
+        v.title = await decryptVersionTitle(secret, v)
+        // keep the in-memory record consistent for downstream readers
+        // (readVersion/decryptVersionTitle would re-decrypt otherwise)
+        delete v.title_enc
+      }
+    }
+  }
+
   // Intake-scoped answers join their extracted question text — a bank slot
   // must be identifiable by WHAT was asked, not just opaque ids.
   const intakeMeta = new Map<string, { label: string; byOcc: Map<string, string> }>()
   for (const rec of catalog) {
     if (!rec.key.startsWith('intake:')) continue
-    const blob = rec.blob as {
+    const blob = (rec.blob_enc
+      ? (secret
+          ? JSON.parse(await decryptText(secret, JSON.parse(rec.blob_enc)))
+          : undefined) // encrypted intake record and no secret → skip
+      : rec.blob) as {
       application_id?: string
       entity?: { name?: string }
       application?: { title?: string }
       questions?: Array<{ occurrence_id?: string; text?: string }>
-    }
+    } | undefined
     if (!blob?.application_id || !Array.isArray(blob.questions)) continue
     intakeMeta.set(blob.application_id, {
       label: blob.entity?.name ?? blob.application?.title ?? blob.application_id,
@@ -351,7 +371,7 @@ export async function loadScopeEntry(
   secret: string,
   scope: { application_id: string; question_occurrence_id: string },
 ): Promise<ScopedAnswer> {
-  const bank = await loadBank(storage)
+  const bank = await loadBank(storage, secret)
   const matches = bank.filter(
     (e) => e.answer.scope.question_occurrence_id === scope.question_occurrence_id,
   )

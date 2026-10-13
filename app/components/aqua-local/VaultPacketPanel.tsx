@@ -10,6 +10,7 @@ import {
   listPackets,
   attestPacket,
   generateSignerKeyPair,
+  decryptVersionTitle,
   recordExternalSubmission,
   updateSubmissionOutcome,
   listSubmissionsForPacket,
@@ -87,6 +88,13 @@ export function VaultPacketPanel({
       storage.getAll<ApprovalRecord>('approvals'),
     ])
     const appAnswers = answers.filter((a) => a.scope.application_id === programId)
+    // IR-014: titles are ciphertext at rest — decrypt for display.
+    const secret = vault.getSecret()
+    if (secret) {
+      for (const v of versions) {
+        if (v.title_enc) { v.title = await decryptVersionTitle(secret, v).catch(() => v.title); delete v.title_enc }
+      }
+    }
     // IR-030: mirror the freeze gate — 'approved' only counts when the
     // latest decision is human and not backup-restored; everything else
     // keeps its real decision so the UI can label it.
