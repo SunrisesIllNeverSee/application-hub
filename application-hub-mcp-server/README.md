@@ -2,7 +2,7 @@
 
 MCP server for the Application Hub — a platform that helps founders track, compare, and apply to accelerators, grants, and fellowships.
 
-Exposes 21 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
+Exposes 30 tools, 7 resources, and 3 prompts over stdio (local) or HTTP (remote).
 
 ---
 
@@ -29,20 +29,15 @@ npm run dev        # tsx watch — auto-reloads on save
 npm run build && npm start
 ```
 
-### Local Codex / Cowork path
+### Build from source
 
-For this machine, Codex/Cowork can connect to the compiled MCP server at:
-
-```text
-/Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server/dist/index.js
-```
-
-`dist/` is local build output and is intentionally ignored by git. The public GitHub repo will not include it. If a local client cannot connect because `dist/index.js` is missing, rebuild it:
+`dist/` is local build output and intentionally not committed to git. To use the compiled server:
 
 ```bash
-cd /Users/dericmchenry/Desktop/application-hub/application-hub-mcp-server
-npm install
-npm run build
+git clone https://github.com/SunrisesIllNeverSee/application-hub.git
+cd application-hub/application-hub-mcp-server
+npm ci && npm run build
+# the server entry is dist/index.js
 ```
 
 ---
@@ -169,6 +164,32 @@ For remote Claude connections, point the MCP config at your deployed URL:
 | `hub_get_answer_review_context` | Gather saved-answer context for agent-side RNS/CIVITAE/MO§ES review |
 | `hub_save_answer_review` | Persist structured agent-side review output for one saved answer |
 | `hub_stress_test_answer` | Return deterministic follow-up prompts/checklist and optionally persist the run |
+| `hub_intake_application` | Intake a pasted program/application spec into the workspace |
+| `hub_fill_application` | Fill application questions from the user's answer bank (borrow-threshold aware) |
+| `hub_set_borrow_threshold` | Persist the preferred borrow threshold used by `hub_fill_application` |
+| `hub_search_answer_bank` | Search the user's answer bank |
+
+### Canonical hub tools (`aqua.*`)
+
+These bridge to the hosted canonical hub where applicable. Under
+`AQUA_LOCAL_FIRST=1`, tools that would transmit private application or answer
+text return an explicit refusal instead of writing to the hosted service.
+
+| Tool | Description |
+|---|---|
+| `aqua.ingest_application` | Submit raw application text for canonical processing (local-first: refused) |
+| `aqua.process_reward` | Record a reward signal (local-first: refused — free-form channel could carry private text) |
+| `aqua.get_variations` | Fetch canonical answer variations |
+| `aqua.qualify_answer` | Qualify an answer against the canonical rubric (local-first: refused) |
+| `aqua.get_canonical_package` | Fetch a canonical package |
+| `aqua.export_package` | Export a canonical package |
+
+### Local-first mode
+
+Set `AQUA_LOCAL_FIRST=1` in the server environment to run in local-first mode:
+private-write tools refuse instead of sending user content to the hosted hub.
+Read/discovery tools (`hub_search_programs`, `hub_get_program_detail`, etc.)
+remain available.
 
 ---
 
