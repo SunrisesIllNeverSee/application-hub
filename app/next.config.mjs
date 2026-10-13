@@ -30,7 +30,14 @@ const nextConfig = {
           // local-Ollama path. (LAN http endpoints remain browser-blocked
           // by Private Network Access regardless.) *.supabase.co already
           // allows arbitrary projects, so the boundary is honest either way.
-          "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com https: http://localhost:11434 http://127.0.0.1:11434",
+          // BYOK: users may point providers at arbitrary endpoints — https:
+          // covers tunnels/WAN daemons; localhost:11434 keeps the common
+          // local-Ollama path. (LAN http endpoints remain browser-blocked
+          // by Private Network Access regardless.) *.supabase.co already
+          // allows arbitrary projects, so the boundary is honest either way.
+          // wss://*.supabase.co is required for WebKit/Safari: Chromium's
+          // 'self' covers same-origin websockets per CSP3, WebKit's does not.
+          "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com https: http://localhost:11434 http://127.0.0.1:11434",
           "frame-src 'self' https://js.stripe.com",
           "form-action 'self'",
           "base-uri 'self'",
