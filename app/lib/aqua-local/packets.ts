@@ -35,15 +35,20 @@ import {
   sha256Hex,
 } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
-import type {
-  AnswerRecord,
-  ApprovalRecord,
-  PacketRecord,
-  PacketState,
-  PacketStateRecord,
-  ProvenanceRecord,
-  SignoffRecord,
-  VersionRecord,
+import {
+  type AnswerRecord,
+  type ApprovalRecord,
+  type PacketRecord,
+  type PacketState,
+  type PacketStateRecord,
+  type ProvenanceRecord,
+  type SignoffRecord,
+  type SubmissionMethod,
+  type SubmissionOutcome,
+  type SubmissionRecord,
+  type VersionRecord,
+  SUBMISSION_METHODS,
+  SUBMISSION_OUTCOMES,
 } from './schema.ts'
 import { compareApprovals, isBlankBody, VaultNotFoundError } from './repo.ts'
 
@@ -404,15 +409,16 @@ export async function freezeApplicationPacket(
 // ---------------------------------------------------------------------------
 
 /**
- * Allowed transitions. `submitted_external_observed` appears in NO target
- * list — it is declared but unreachable (no transport exists to produce a
- * real external receipt). advancePacketState additionally rejects it
- * unconditionally as defence in depth.
+ * Allowed transitions. `submitted_external_observed` is NOT a generic
+ * transition — it is written only by recordExternalSubmission after the
+ * packet has been exported (physical export precedes any real submission).
+ * advancePacketState rejects it unconditionally; the dedicated recorder
+ * performs the transition together with the attestation record.
  */
 const ALLOWED_TRANSITIONS: Readonly<Record<PacketState, readonly PacketState[]>> = {
   prepared: ['signed', 'exported', 'discarded'], // exported-direct allowed: unsigned export stays truthful
   signed: ['exported', 'discarded'],
-  exported: [],
+  exported: ['submitted_external_observed'],
   discarded: [],
   submitted_external_observed: [],
 }
@@ -429,10 +435,12 @@ export async function advancePacketState(
   packetId: string,
   target: PacketState,
 ): Promise<PacketStateRecord> {
-  // LF-23 hard refusal — there is no code path that sets this state.
+  // LF-23 — the public surface still refuses: observation is recorded only
+  // through recordExternalSubmission, which binds the state write to a
+  // user-attested submissions record.
   if (target === 'submitted_external_observed') {
     throw new PacketStateError(
-      'state submitted_external_observed is unreachable: no external submission transport exists',
+      'state submitted_external_observed is recorded via recordExternalSubmission only',
     )
   }
   const rec = await storage.get<PacketStateRecord>('packet_states', packetId)
@@ -449,6 +457,92 @@ export async function advancePacketState(
   }
   await storage.put('packet_states', next)
   return next
+}
+
+/**
+ * Records a user attestation that the exported packet was submitted through
+ * an external channel (the program's portal, email, etc.). Writes a
+ * submissions record and advances packet_states to
+ * submitted_external_observed. AQUA still never transmits — this is
+ * user-asserted bookkeeping bound to a real export.
+ */
+export async function recordExternalSubmission(
+  storage: VaultStorage,
+  packetId: string,
+  attestation: {
+    submitted_at: string
+    method: SubmissionMethod
+    portal_url?: string | null
+    confirmation_ref?: string | null
+    notes?: string | null
+  },
+): Promise<SubmissionRecord> {
+  const rec = await storage.get<PacketStateRecord>('packet_states', packetId)
+  if (!rec) throw new VaultNotFoundError(`packet state not found: ${packetId}`)
+  if (rec.state !== 'exported') {
+    throw new PacketStateError(
+      `external submission can only be recorded on an exported packet (current: ${rec.state})`,
+    )
+  }
+  if (!SUBMISSION_METHODS.includes(attestation.method)) {
+    throw new PacketStateError(`unknown submission method: ${attestation.method}`)
+  }
+  const now = nowIso()
+  const submission: SubmissionRecord = {
+    id: `sub-${crypto.randomUUID()}`,
+    packet_id: packetId,
+    submitted_at: attestation.submitted_at,
+    method: attestation.method,
+    portal_url: attestation.portal_url ?? null,
+    confirmation_ref: attestation.confirmation_ref ?? null,
+    outcome: 'pending',
+    outcome_at: null,
+    notes: attestation.notes ?? null,
+    created_at: now,
+    updated_at: now,
+  }
+  await storage.put('submissions', submission)
+  const next: PacketStateRecord = {
+    packet_id: rec.packet_id,
+    state: 'submitted_external_observed',
+    history: [...rec.history, { state: 'submitted_external_observed', at: now }],
+    updated_at: now,
+  }
+  await storage.put('packet_states', next)
+  return submission
+}
+
+/** Updates the recorded outcome of an external submission (interview /
+    accepted / rejected / withdrawn — stays pending until the user reports
+    a result). */
+export async function updateSubmissionOutcome(
+  storage: VaultStorage,
+  submissionId: string,
+  outcome: SubmissionOutcome,
+  notes?: string | null,
+): Promise<SubmissionRecord> {
+  const rec = await storage.get<SubmissionRecord>('submissions', submissionId)
+  if (!rec) throw new VaultNotFoundError(`submission not found: ${submissionId}`)
+  if (!SUBMISSION_OUTCOMES.includes(outcome)) {
+    throw new PacketStateError(`unknown submission outcome: ${outcome}`)
+  }
+  const next: SubmissionRecord = {
+    ...rec,
+    outcome,
+    outcome_at: outcome === 'pending' ? null : nowIso(),
+    notes: notes === undefined ? rec.notes : notes,
+    updated_at: nowIso(),
+  }
+  await storage.put('submissions', next)
+  return next
+}
+
+export async function listSubmissionsForPacket(
+  storage: VaultStorage,
+  packetId: string,
+): Promise<SubmissionRecord[]> {
+  const all = await storage.getAll<SubmissionRecord>('submissions')
+  return all.filter((s) => s.packet_id === packetId)
 }
 
 // ---------------------------------------------------------------------------

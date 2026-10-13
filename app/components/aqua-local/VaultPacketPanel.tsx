@@ -10,6 +10,9 @@ import {
   listPackets,
   attestPacket,
   generateSignerKeyPair,
+  recordExternalSubmission,
+  updateSubmissionOutcome,
+  listSubmissionsForPacket,
   verifyManifestSignature,
   PacketFreezeError,
   compareApprovals,
@@ -18,13 +21,14 @@ import {
   type VersionRecord,
   type PacketRecord,
   type PacketStateRecord,
+  type SubmissionRecord,
 } from '@/lib/aqua-local'
 import type { VaultStorage } from '@/lib/aqua-local-client/session'
 
 // LF-20..23 / Journey D — local application packet flow. Coverage → select
 // approved vault versions → freeze (manifest + sha256) → user sign-off →
-// local export. NOTHING is transmitted; the state machine has no external
-// submission state (submitted_external_observed is unreachable by design).
+// local export. NOTHING is transmitted; after export the user may record a
+// self-attested external submission (submitted_external_observed) + outcome.
 
 export interface PacketQuestion {
   archived_question_id: string
@@ -64,6 +68,9 @@ export function VaultPacketPanel({
   const vault = useVault()
   const [rows, setRows] = useState<RowState[]>([])
   const [packets, setPackets] = useState<(PacketRecord & { state?: string })[]>([])
+  const [submissions, setSubmissions] = useState<SubmissionRecord[]>([])
+  const [subForm, setSubForm] = useState({ portal_url: '', method: 'portal' as const, submitted_at: '', confirmation_ref: '', notes: '' })
+  const [subBusy, setSubBusy] = useState(false)
   const [frozenId, setFrozenId] = useState<string | null>(null)
   const [manifestSha, setManifestSha] = useState<string | null>(null)
   const [packetState, setPacketState] = useState<PacketStateRecord | null>(null)
@@ -243,6 +250,7 @@ export function VaultPacketPanel({
       a.click()
       URL.revokeObjectURL(url)
       setPacketState(await getPacketState(storage, frozenId))
+      setSubmissions(await listSubmissionsForPacket(storage, frozenId))
       setNotice('Packet exported — this file was written locally; nothing was submitted anywhere.')
       await loadRows(storage)
     } catch (e) {
@@ -260,6 +268,43 @@ export function VaultPacketPanel({
       await advancePacketState(storage, frozenId, 'discarded')
     } catch { /* state-only best effort */ }
     setFrozenId(null); setManifestSha(null); setPacketState(null); setAck(false); setVerifyResult('')
+    setSubmissions([])
+    setSubForm({ portal_url: '', method: 'portal', submitted_at: '', confirmation_ref: '', notes: '' })
+  }
+
+  async function handleRecordSubmission() {
+    if (!frozenId) return
+    setSubBusy(true); setError('')
+    try {
+      const storage = await vault.ensureStorage()
+      await recordExternalSubmission(storage, frozenId, {
+        submitted_at: subForm.submitted_at || new Date().toISOString(),
+        method: subForm.method,
+        portal_url: subForm.portal_url || null,
+        confirmation_ref: subForm.confirmation_ref || null,
+        notes: subForm.notes || null,
+      })
+      setPacketState(await getPacketState(storage, frozenId))
+      setSubmissions(await listSubmissionsForPacket(storage, frozenId))
+      setNotice('Submission recorded — a self-attested note that you submitted the exported file externally. Nothing was transmitted by AQUA.')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not record submission')
+    } finally {
+      setSubBusy(false)
+    }
+  }
+
+  async function handleOutcome(sub: SubmissionRecord, outcome: string) {
+    setSubBusy(true); setError('')
+    try {
+      const storage = await vault.ensureStorage()
+      await updateSubmissionOutcome(storage, sub.id, outcome as SubmissionRecord['outcome'])
+      setSubmissions(await listSubmissionsForPacket(storage, frozenId!))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not update outcome')
+    } finally {
+      setSubBusy(false)
+    }
   }
 
   if (vault.status !== 'unlocked') {
@@ -278,8 +323,8 @@ export function VaultPacketPanel({
         </h2>
         <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
           Select the approved vault version for each question, freeze the packet, sign it, and
-          export it locally. Nothing is submitted externally — the packet state machine has no
-          submission step.
+          export it locally. You submit the exported file through the program&rsquo;s own channel —
+          AQUA never transmits — then you can record that submission + its outcome here.
         </p>
       </div>
 
@@ -427,6 +472,96 @@ export function VaultPacketPanel({
               Close
             </button>
           </div>
+
+          {packetState.state === 'exported' && (
+            <div className="mt-3 space-y-2 rounded-md border border-neutral-200 p-3 dark:border-neutral-700">
+              <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                Record external submission
+              </p>
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                You submitted the exported file outside AQUA — record it here so the packet&rsquo;s
+                lifecycle reflects reality. Nothing is sent anywhere by this action.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={subForm.portal_url}
+                  onChange={(e) => setSubForm({ ...subForm, portal_url: e.target.value })}
+                  placeholder="Submission portal URL"
+                  className="input-field px-3 py-1.5 text-xs"
+                />
+                <select
+                  value={subForm.method}
+                  onChange={(e) => setSubForm({ ...subForm, method: e.target.value as typeof subForm.method })}
+                  className="input-field px-3 py-1.5 text-xs"
+                >
+                  <option value="portal">Portal</option>
+                  <option value="email">Email</option>
+                  <option value="post">Postal mail</option>
+                  <option value="in-person">In person</option>
+                  <option value="other">Other</option>
+                </select>
+                <input
+                  value={subForm.submitted_at}
+                  onChange={(e) => setSubForm({ ...subForm, submitted_at: e.target.value })}
+                  type="datetime-local"
+                  className="input-field px-3 py-1.5 text-xs"
+                />
+                <input
+                  value={subForm.confirmation_ref}
+                  onChange={(e) => setSubForm({ ...subForm, confirmation_ref: e.target.value })}
+                  placeholder="Confirmation / reference no. (optional)"
+                  className="input-field px-3 py-1.5 text-xs"
+                />
+              </div>
+              <input
+                value={subForm.notes}
+                onChange={(e) => setSubForm({ ...subForm, notes: e.target.value })}
+                placeholder="Notes (optional)"
+                className="input-field w-full px-3 py-1.5 text-xs"
+              />
+              <button
+                onClick={() => void handleRecordSubmission()}
+                disabled={subBusy}
+                className="btn-secondary px-4 py-2 text-xs disabled:opacity-50"
+              >
+                {subBusy ? 'Recording…' : 'Record submission'}
+              </button>
+            </div>
+          )}
+
+          {packetState.state === 'submitted_external_observed' && submissions.length > 0 && (
+            <div className="mt-3 space-y-2 rounded-md border border-success-500/30 bg-success-50/40 p-3 dark:border-success-800/40 dark:bg-success-950/20">
+              <p className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                External submission on record
+              </p>
+              {submissions.map((s) => (
+                <div key={s.id} className="space-y-1 text-xs text-neutral-600 dark:text-neutral-400">
+                  <p>
+                    {s.method}
+                    {s.portal_url ? ` · ${s.portal_url}` : ''} · {s.submitted_at.slice(0, 16).replace('T', ' ')}
+                    {s.confirmation_ref ? ` · ref ${s.confirmation_ref}` : ''}
+                  </p>
+                  {s.notes ? <p className="italic">{s.notes}</p> : null}
+                  <label className="flex items-center gap-2">
+                    Outcome:
+                    <select
+                      value={s.outcome}
+                      disabled={subBusy}
+                      onChange={(e) => void handleOutcome(s, e.target.value)}
+                      className="input-field px-2 py-1 text-xs"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="interview">Interview</option>
+                      <option value="accepted">Accepted</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="withdrawn">Withdrawn</option>
+                    </select>
+                    {s.outcome_at ? <span className="text-neutral-400">({s.outcome_at.slice(0, 10)})</span> : null}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { createMemoryStorage } from './vault.ts'
 import {
   createAnswer, createVersion, approveVersion, readVersion,
-  VaultImmutableError,
+  VaultImmutableError, VaultNotFoundError,
 } from './repo.ts'
 import { canonicalJson, decryptText, sha256Hex } from './crypto.ts'
 import {
@@ -23,6 +23,7 @@ import {
   freezeApplicationPacket, exportPacket, loadPacket, getPacketState,
   advancePacketState, canonicalManifestOf,
   PacketFreezeError, PacketStateError,
+  recordExternalSubmission, updateSubmissionOutcome, listSubmissionsForPacket,
 } from './packets.ts'
 import {
   generateSignerKeyPair, signManifestDigest, verifyManifestSignature,
@@ -376,7 +377,7 @@ await t('signoff: no key → truthful unsigned record', async () => {
 
 // ---------------- LF-23 submission boundary ----------------
 
-await t('state machine: prepared→signed→exported; submitted_external_observed unreachable', async () => {
+await t('state machine: prepared→signed→exported; submitted_external_observed only via attestation', async () => {
   const s = createMemoryStorage()
   const { version } = await seedApproved(s)
   const { packet } = await freezeApplicationPacket(s, SECRET, {
@@ -386,36 +387,91 @@ await t('state machine: prepared→signed→exported; submitted_external_observe
   const pid = packet.packet_id
   await assert.rejects(() => advancePacketState(s, pid, 'submitted_external_observed'), PacketStateError)
   await assert.rejects(() => advancePacketState(s, pid, 'bogus'), PacketStateError)
+  // recorder refuses before export — physical export precedes real submission
+  await assert.rejects(
+    () => recordExternalSubmission(s, pid, { submitted_at: new Date().toISOString(), method: 'portal' }),
+    /exported/,
+  )
   await attestPacket(s, {
     packet_id: pid, signer_class: 'local-only', user_ack: true,
     manifest_sha256: (await s.get('packets', pid)).manifest_sha256,
   })
   await assert.rejects(() => advancePacketState(s, pid, 'prepared'), PacketStateError)
+  // still refused while only signed — must export first
+  await assert.rejects(
+    () => recordExternalSubmission(s, pid, { submitted_at: new Date().toISOString(), method: 'portal' }),
+    /exported/,
+  )
   await exportPacket(s, pid, SECRET)
   const st = await getPacketState(s, pid)
   assert.equal(st.state, 'exported')
   assert.deepEqual(st.history.map((h) => h.state), ['prepared', 'signed', 'exported'])
   await assert.rejects(() => advancePacketState(s, pid, 'signed'), PacketStateError)
-  // greppable guarantee: no production code WRITES the unreachable state.
-  // Forbidden setter patterns only — declarations/comparisons are fine.
+
+  // attested submission path — binds state write to a submission record
+  const sub = await recordExternalSubmission(s, pid, {
+    submitted_at: '2026-10-13T12:00:00Z', method: 'portal',
+    portal_url: 'https://portal.example.com/app/1', confirmation_ref: 'REF-9',
+  })
+  const after = await getPacketState(s, pid)
+  assert.equal(after.state, 'submitted_external_observed')
+  assert.equal(after.history.at(-1).state, 'submitted_external_observed')
+  assert.equal(sub.packet_id, pid)
+  assert.equal(sub.outcome, 'pending')
+  assert.equal((await listSubmissionsForPacket(s, pid))[0].id, sub.id)
+  // advancePacketState still refuses the literal target even post-submission
+  await assert.rejects(() => advancePacketState(s, pid, 'submitted_external_observed'), PacketStateError)
+
+  // greppable guarantee: the ONLY setter path is inside recordExternalSubmission.
   const { readFileSync } = await import('node:fs')
   const srcDir = fileURLToPath(new URL('.', import.meta.url))
-  const FORBIDDEN = [
-    /state:\s*'submitted_external_observed'/,
-    /state\s*=\s*'submitted_external_observed'/,
-    /push\([^)]*'submitted_external_observed'/,
-    /put\([^)]*'submitted_external_observed'/,
-    /advancePacketState\([^)]*'submitted_external_observed'\s*\)/,
-  ]
+  const SETTER = /'submitted_external_observed'/
   for (const f of ['packets.ts', 'signoff.ts', 'providers.ts', 'repo.ts']) {
-    const code = readFileSync(join(srcDir, f), 'utf8')
-      .split('\n')
-      .filter((l) => !/^\s*(\*|\/\/)/.test(l))
-      .join('\n')
-    for (const re of FORBIDDEN) {
-      assert.ok(!re.test(code), `${f} contains a setter path for submitted_external_observed: ${re}`)
-    }
+    const lines = readFileSync(join(srcDir, f), 'utf8').split('\n')
+    const fnStart = lines.findIndex((l) => l.includes('export async function recordExternalSubmission'))
+    const fnEnd = fnStart === -1 ? -1 : lines.findIndex((l, i) => i > fnStart && l.startsWith('export async function'))
+    lines.forEach((l, i) => {
+      if (/^\s*(\*|\/\/)/.test(l)) return
+      const m = l.match(SETTER)
+      if (!m) return
+      const inRecorder = fnStart !== -1 && i > fnStart && (fnEnd === -1 || i < fnEnd)
+      // comparisons/refusals elsewhere are fine; writes only inside the recorder
+      const isWrite = /state:\s*'submitted_external_observed'/.test(l)
+        || /put\([^)]*'submitted_external_observed'/.test(l)
+        || /state:\s*'submitted_external_observed'/.test(l)
+      if (isWrite) assert.ok(inRecorder, `${f}:${i} writes the state outside recordExternalSubmission`)
+      if (f !== 'packets.ts') assert.ok(!isWrite, `${f} writes the state`)
+    })
   }
+})
+
+await t('submission: outcome update + guards', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  await exportPacket(s, packet.packet_id, SECRET)
+  const sub = await recordExternalSubmission(s, packet.packet_id, {
+    submitted_at: '2026-10-13T12:00:00Z', method: 'email',
+  })
+  const upd = await updateSubmissionOutcome(s, sub.id, 'interview')
+  assert.equal(upd.outcome, 'interview')
+  assert.ok(upd.outcome_at)
+  await assert.rejects(() => updateSubmissionOutcome(s, sub.id, 'bogus'), PacketStateError)
+  await assert.rejects(() => updateSubmissionOutcome(s, 'nope', 'accepted'), VaultNotFoundError)
+  // unknown method refused on a fresh exported packet (state check runs first)
+  const { version: v2 } = await seedApproved(s, { appId: 'app2', occ: 'q2' })
+  const { packet: p2 } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app2',
+    selections: [{ question_occurrence_id: 'q2', version_id: v2.id, question_text_snapshot: 'Q?' }],
+  })
+  await exportPacket(s, p2.packet_id, SECRET)
+  await assert.rejects(
+    () => recordExternalSubmission(s, p2.packet_id, { submitted_at: 'x', method: 'carrier-pigeon' }),
+    /unknown submission method/,
+  )
 })
 
 // ---------------- LF-22 export + standalone verifier ----------------

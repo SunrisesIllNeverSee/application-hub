@@ -5,7 +5,7 @@
 // packets, provenance, and signoffs live ONLY here. Never egress.
 
 export const DB_NAME = 'aqua-local'
-export const DB_VERSION = 3
+export const DB_VERSION = 4
 
 export const STORE_NAMES = [
   'answers',
@@ -19,6 +19,7 @@ export const STORE_NAMES = [
   'provider_keys',
   'provider_consents',
   'packet_states',
+  'submissions',
   'events',
 ] as const
 
@@ -190,9 +191,10 @@ export interface ProviderConsentRecord {
 }
 
 /**
- * LF-23 — packet lifecycle state. `submitted_external_observed` is a
- * DECLARED-but-UNREACHABLE member: it exists so exports/state reports can
- * honestly name the state, but no code path may set it (no transport exists).
+ * LF-23 — packet lifecycle state. `submitted_external_observed` is reachable
+ * ONLY through `recordExternalSubmission` — a user-attested record that the
+ * exported packet was submitted through a real external channel (portal,
+ * email). AQUA never transmits; the user attests after the fact.
  */
 export type PacketState =
   | 'prepared'
@@ -212,6 +214,44 @@ export interface PacketStateRecord {
   packet_id: string // primary key
   state: PacketState
   history: Array<{ state: PacketState; at: string }>
+  updated_at: string
+}
+
+export const SUBMISSION_METHODS = [
+  'portal',
+  'email',
+  'post',
+  'in-person',
+  'other',
+] as const
+export type SubmissionMethod = (typeof SUBMISSION_METHODS)[number]
+
+export const SUBMISSION_OUTCOMES = [
+  'pending',
+  'interview',
+  'accepted',
+  'rejected',
+  'withdrawn',
+] as const
+export type SubmissionOutcome = (typeof SUBMISSION_OUTCOMES)[number]
+
+/**
+ * User-attested external submission record — metadata class (no answer
+ * bodies; portal_url/confirmation_ref are user-typed identifiers like
+ * version titles). Written only by recordExternalSubmission, which also
+ * performs the packet_states transition.
+ */
+export interface SubmissionRecord {
+  id: string // primary key
+  packet_id: string
+  submitted_at: string // user-provided timestamp of the external submission
+  method: SubmissionMethod
+  portal_url: string | null
+  confirmation_ref: string | null
+  outcome: SubmissionOutcome
+  outcome_at: string | null
+  notes: string | null
+  created_at: string
   updated_at: string
 }
 
@@ -262,6 +302,11 @@ export const STORE_SPECS: StoreSpec[] = [
   },
   { name: 'packet_states', keyPath: 'packet_id', indexes: [] },
   {
+    name: 'submissions',
+    keyPath: 'id',
+    indexes: [{ name: 'by_packet', keyPath: 'packet_id' }],
+  },
+  {
     name: 'events',
     keyPath: 'id',
     indexes: [
@@ -299,6 +344,16 @@ export const MIGRATIONS: Array<(db: IDBDatabase) => void> = [
     }
   },
   // v2 → v3: LF-18 events ledger (idempotent — guarded like v1)
+  (db) => {
+    for (const spec of STORE_SPECS) {
+      if (db.objectStoreNames.contains(spec.name)) continue
+      const store = db.createObjectStore(spec.name, { keyPath: spec.keyPath })
+      for (const idx of spec.indexes) {
+        store.createIndex(idx.name, idx.keyPath, { unique: false })
+      }
+    }
+  },
+  // v3 → v4: submissions ledger (idempotent — guarded like v1)
   (db) => {
     for (const spec of STORE_SPECS) {
       if (db.objectStoreNames.contains(spec.name)) continue
