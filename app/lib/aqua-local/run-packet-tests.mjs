@@ -11,6 +11,7 @@ import { createMemoryStorage } from './vault.ts'
 import {
   createAnswer, createVersion, approveVersion, readVersion,
   VaultImmutableError, VaultNotFoundError,
+  signPacket,
 } from './repo.ts'
 import { canonicalJson, decryptText, sha256Hex } from './crypto.ts'
 import {
@@ -905,6 +906,80 @@ await t('IR-029: unreachable-state packet refuses signoff pre-write', async () =
   assert.equal(await s.get('signoffs', packet.packet_id), undefined)
 })
 
+
+await t('IR-024: primitive signPacket verifies signatures — forgery refused, export honest', async () => {
+  const s = createMemoryStorage()
+  const kp = await generateSignerKeyPair()
+  const a = await createAnswer(s, { application_id: 'app', question_occurrence_id: 'q1' })
+  const v = await createVersion(s, SECRET, {
+    answer_id: a.id, title: 'T', body: 'answer body text',
+    method: 'manual', provenance: 'test',
+  })
+  await approveVersion(s, {
+    version_id: v.id, version_sha256: v.sha256,
+    decision: 'approved', actor_class: 'human',
+  })
+  const { record: pktRec } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app',
+    selections: [{ question_occurrence_id: 'q1', version_id: v.id }],
+    packet_title: 'T',
+  })
+  // forged signature — refuses at the primitive boundary
+  const forged = await signManifestDigest(kp.privateKey, await sha256Hex('other-manifest'))
+  await assert.rejects(
+    () => signPacket(s, {
+      packet_id: pktRec.id, signer_class: 'local-only',
+      signature_b64: forged, pubkey_b64: kp.pubkey_b64, user_ack: true,
+    }),
+    /signature verification failed/,
+    'forged signature refused at primitive',
+  )
+  // signature without pubkey — refuses (unverifiable)
+  await assert.rejects(
+    () => signPacket(s, {
+      packet_id: pktRec.id, signer_class: 'local-only',
+      signature_b64: forged, pubkey_b64: null, user_ack: true,
+    }),
+    /verification key/,
+    'signature without key refused',
+  )
+  // REAL signature — accepted and marked verified
+  const realSig = await signManifestDigest(kp.privateKey, pktRec.manifest_sha256)
+  const so = await signPacket(s, {
+    packet_id: pktRec.id, signer_class: 'local-only',
+    signature_b64: realSig, pubkey_b64: kp.pubkey_b64, user_ack: true,
+  })
+  assert.equal(so.signature_verified, true)
+  // export carries the read-time verification result
+  const loaded = await loadPacket(s, pktRec.id, SECRET)
+  assert.equal(loaded.signoff.signature_verified, true)
+
+  // forged-at-rest record (raw put bypassing the primitive) cannot
+  // present as verified at materialization
+  const s2 = createMemoryStorage()
+  const a2 = await createAnswer(s2, { application_id: 'app', question_occurrence_id: 'q1' })
+  const v2 = await createVersion(s2, SECRET, {
+    answer_id: a2.id, title: 'T', body: 'answer body text',
+    method: 'manual', provenance: 'test',
+  })
+  await approveVersion(s2, {
+    version_id: v2.id, version_sha256: v2.sha256,
+    decision: 'approved', actor_class: 'human',
+  })
+  const { record: pktRec2 } = await freezeApplicationPacket(s2, SECRET, {
+    application_id: 'app',
+    selections: [{ question_occurrence_id: 'q1', version_id: v2.id }],
+    packet_title: 'T',
+  })
+  await s2.put('signoffs', {
+    packet_id: pktRec2.id, signer_class: 'local-only',
+    timestamp: new Date().toISOString(),
+    signature_b64: forged, pubkey_b64: kp.pubkey_b64,
+  })
+  const loaded2 = await loadPacket(s2, pktRec2.id, SECRET)
+  assert.equal(loaded2.signoff.signature_verified, false,
+    'forged-at-rest signoff reports unverified at read')
+})
 
 await t('IR-029b: prepared + restored signoff → attestation advances to signed', async () => {
   const s = createMemoryStorage()

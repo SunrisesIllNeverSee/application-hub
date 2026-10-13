@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { createMemoryStorage } from './vault.ts'
 import { decryptText } from './crypto.ts'
 import { importLocalIntake, listLocalIntakes, intakeApplicationId, importLegacyQAPairs } from './intake.ts'
-import { extractQAPairsDeterministic, parsePairs } from '../intake-extract-shared.ts'
+import { extractQAPairsDeterministic, extractQAPairsDeterministicReport, parsePairs } from '../intake-extract-shared.ts'
 import { extractManualIntake, buildIntakeMeta } from '../intake/manual-intake.ts'
 import { createVersion, approveVersion } from './repo.ts'
 import { freezeApplicationPacket } from './packets.ts'
@@ -232,5 +232,32 @@ await t('W2: provider-extracted pairs carry provider/model, never claim determin
   assert.equal(provenance[0].observed_flags.deterministic_parse, false)
 })
 
+
+await t('IR-037: ambiguous boundaries are flagged + counted, never silent', async () => {
+  // '?'-line inside an answer — absorbed but flagged
+  const ambiguous = `Q: What is your edge?
+A: We move fast.
+Is speed really the answer?
+Yes — speed compounds into defensible momentum.
+Q: Why now?
+A: The window closes.`
+  const rep = extractQAPairsDeterministicReport(ambiguous)
+  assert.equal(rep.absorbed_question_lines, 1, 'absorbed ?-line counted')
+  assert.equal(rep.pairs.filter((p) => p.uncertain).length, 1, 'pair flagged uncertain')
+  assert.ok(rep.pairs[0].uncertainty_reason?.includes('question-marked'), 'reason explains the ambiguity')
+  // a question with no answer gets dropped + counted
+  const dangling = `Q: First question here?
+A: A real answer text body.
+Q: A question with no answer?
+Q: Second real question?
+A: Another real answer text.`
+  const rep2 = extractQAPairsDeterministicReport(dangling)
+  assert.equal(rep2.dropped_questions, 1, 'dropped question counted')
+  assert.equal(rep2.uncertain_boundaries >= 1, true)
+  // a clean parse reports zero uncertainties
+  const clean = extractQAPairsDeterministicReport(QA_SAMPLE)
+  assert.equal(clean.uncertain_boundaries, 0)
+  assert.equal(clean.pairs.every((p) => !p.uncertain), true)
+})
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

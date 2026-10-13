@@ -126,7 +126,7 @@ export function RelatedVaultAnswers({
   programId: string | null
   queryText: string
   currentVersionId?: string | null
-  onPick: (body: string, title: string) => void
+  onPick: (body: string, title: string, derivedFrom: { version_id: string; version_sha256: string }) => void
 }) {
   const vault = useVault()
   const [related, setRelated] = useState<import('@/lib/aqua-local').RelatedAnswer[]>([])
@@ -171,7 +171,7 @@ export function RelatedVaultAnswers({
                 void (async () => {
                   const storage = await vault.ensureStorage()
                   const { body } = await readBody(storage, secret, r.version_id)
-                  onPick(body, r.title)
+                  onPick(body, r.title, { version_id: r.version_id, version_sha256: r.version_sha256 })
                 })()
               }}
               className="group block w-full text-left"

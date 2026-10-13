@@ -30,6 +30,15 @@ export interface EncryptedBlob {
 }
 
 const te = new TextEncoder()
+
+/** subtle is absent outside secure contexts — callers must fail closed. */
+function subtleOrNull(): SubtleCrypto | null {
+  try {
+    return globalThis.crypto?.subtle ?? null
+  } catch {
+    return null
+  }
+}
 const td = new TextDecoder()
 
 function getCrypto(): Crypto {
@@ -139,4 +148,64 @@ export function canonicalJson(value: unknown): string {
     .filter((k) => obj[k] !== undefined)
     .map((k) => `${JSON.stringify(k)}:${canonicalJson(obj[k])}`)
   return `{${parts.join(',')}}`
+}
+
+export interface SignerKeyPair {
+  privateKey: CryptoKey
+  /** Base64 SPKI — travels inside the packet signoff + export. */
+  pubkey_b64: string
+}
+
+/** Generate a vault-local ECDSA P-256 signing keypair. */
+export async function generateSignerKeyPair(): Promise<SignerKeyPair> {
+  const subtle = subtleOrNull()
+  if (!subtle) throw new Error('WebCrypto is not available in this environment')
+  const pair = await subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+    'verify',
+  ])
+  const spki = await subtle.exportKey('spki', pair.publicKey)
+  return { privateKey: pair.privateKey, pubkey_b64: b64encode(new Uint8Array(spki)) }
+}
+
+/** Sign the manifest digest hex string (UTF-8 bytes of the hex digest). */
+export async function signManifestDigest(
+  privateKey: CryptoKey,
+  manifestSha256Hex: string,
+): Promise<string> {
+  const subtle = subtleOrNull()
+  if (!subtle) throw new Error('WebCrypto is not available in this environment')
+  const sig = await subtle.sign(
+    { name: 'ECDSA', hash: 'SHA-256' },
+    privateKey,
+    te.encode(manifestSha256Hex),
+  )
+  return b64encode(new Uint8Array(sig))
+}
+
+/** Verify a signature over the manifest digest against a base64 SPKI pubkey. */
+export async function verifyManifestSignature(
+  pubkeyB64: string,
+  manifestSha256Hex: string,
+  signatureB64: string,
+): Promise<boolean> {
+  const subtle = subtleOrNull()
+  if (!subtle) return false
+  try {
+    const key = await subtle.importKey(
+      'spki',
+      b64decode(pubkeyB64) as BufferSource,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      false,
+      ['verify'],
+    )
+    return await subtle.verify(
+      { name: 'ECDSA', hash: 'SHA-256' },
+      key,
+      b64decode(signatureB64) as BufferSource,
+      te.encode(manifestSha256Hex),
+    )
+  } catch {
+    return false
+  }
 }

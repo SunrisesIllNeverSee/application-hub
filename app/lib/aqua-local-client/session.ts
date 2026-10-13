@@ -259,6 +259,9 @@ export interface SaveVersionInput {
   provider?: string | null
   model?: string | null
   observed_flags?: Record<string, boolean>
+  /** IR-026: provenance link to the source version the body was derived
+      from — used when reuse crosses application scope. */
+  derived_from?: { version_id: string; version_sha256: string } | null
 }
 
 /**
@@ -290,6 +293,7 @@ export async function saveVersion(
     provider: input.provider ?? null,
     model: input.model ?? null,
     observed_flags: input.observed_flags,
+    derived_from: input.derived_from ?? null,
   })
 }
 
@@ -407,6 +411,8 @@ export async function saveScopedVersion(
     provider?: string | null
     model?: string | null
     observed_flags?: Record<string, boolean>
+    /** IR-026: source version the drafted body was derived from. */
+    derived_from?: { version_id: string; version_sha256: string } | null
   },
 ): Promise<VersionRecord> {
   const candidates = await findAnswersForOccurrence(storage, scope.question_occurrence_id)
@@ -433,6 +439,7 @@ export async function saveScopedVersion(
     provider: input.provider ?? null,
     model: input.model ?? null,
     observed_flags: input.observed_flags,
+    derived_from: input.derived_from ?? null,
   })
 }
 

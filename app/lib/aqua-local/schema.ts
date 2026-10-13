@@ -56,6 +56,11 @@ export interface VersionRecord {
       until the unlock-time migration rewrites them. */
   title: string
   title_enc?: true
+  /** IR-026: provenance link to the source version this body was derived
+      from — set when text drafted/reused from ANOTHER scope becomes a new
+      answer's root version. Separate from parent_version_id (same-answer
+      lineage) — never implies approval transfer. */
+  derived_from?: { version_id: string; version_sha256: string } | null
   body: string // serialized EncryptedBlob
   sha256: string // sha256 of canonicalJson({ title_plaintext, body_plaintext })
   method: VersionMethod
@@ -163,6 +168,9 @@ export interface SignoffRecord {
   signature_b64: string | null
   /** Base64 SPKI public key that produced signature_b64 (ECDSA P-256). Null when unsigned. */
   pubkey_b64?: string | null
+  /** IR-024: whether signature_b64 verified against the packet manifest
+      digest at write time (pre-flag records carry undefined). */
+  signature_verified?: boolean
   /**
    * IR-003: set by backup import — a restored signoff is a claim carried by
    * the file, not a fresh attestation. attestPacket may overwrite it with a

@@ -146,6 +146,7 @@ export async function matchQuestionLocally(
 export interface RelatedAnswer {
   answer_id: string
   version_id: string
+  version_sha256: string
   title: string
   similarity: number
   confidence: 'high' | 'medium' | 'low'
@@ -176,6 +177,7 @@ export async function findRelatedVaultAnswers(
       out.push({
         answer_id: a.id,
         version_id: latest.id,
+        version_sha256: latest.sha256,
         title,
         similarity,
         confidence: confidenceOf(similarity),

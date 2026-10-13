@@ -5,7 +5,7 @@
 //  getStorage()/IndexedDB is never touched here.)
 import assert from 'node:assert/strict'
 import { createMemoryStorage } from '../aqua-local/vault.ts'
-import { createAnswer } from '../aqua-local/repo.ts'
+import { createAnswer, createVersion, approveVersion } from '../aqua-local/repo.ts'
 import { readVersion } from '../aqua-local/repo.ts'
 import { VaultDecryptError } from '../aqua-local/crypto.ts'
 import {
@@ -142,6 +142,39 @@ await t('loadBank: intake-scoped slots carry question text + entity label', asyn
   const entry = bank.find((e) => e.answer.scope.application_id === appId)
   assert.equal(entry?.question_text, 'What is your unfair advantage?')
   assert.equal(entry?.intake_label, 'Acme Incubator')
+})
+
+await t('IR-026: cross-scope derivation — derived_from preserved, approval not inherited', async () => {
+  const s = createMemoryStorage()
+  const SECRET = 's2'
+  const a1 = await createAnswer(s, { application_id: 'app-bank', question_occurrence_id: 'q-why' })
+  const v1 = await createVersion(s, SECRET, {
+    answer_id: a1.id, title: 'Why us', body: 'bank answer body text',
+    method: 'manual', provenance: 'seed',
+  })
+  await approveVersion(s, { version_id: v1.id, version_sha256: v1.sha256, decision: 'approved', actor_class: 'human' })
+  // reuse the bank body into a DIFFERENT application scope — root version
+  // (no same-answer parent) but provenance is preserved via derived_from
+  const v2 = await saveScopedVersion(s, SECRET,
+    { application_id: 'app-target', question_occurrence_id: 'q1' },
+    {
+      title: 'Why us', body: 'bank answer body text',
+      method: 'manual', provenance: 'reused',
+      derived_from: { version_id: v1.id, version_sha256: v1.sha256 },
+    })
+  assert.equal(v2.parent_version_id, null, 'scope crossing stays a root version')
+  assert.equal(v2.derived_from?.version_id, v1.id, 'derivation link preserved')
+  assert.equal(v2.derived_from?.version_sha256, v1.sha256, 'source sha pinned')
+  // source approval does NOT transfer — the derived version is unapproved
+  const approvals = await s.getAll('approvals')
+  assert.equal(approvals.filter((a) => a.version_id === v2.id).length, 0, 'no approval inheritance')
+  // backup roundtrip keeps the derivation metadata
+  const { exportVault, importVault } = await import('../aqua-local/backup.ts')
+  const exported = await exportVault(s, SECRET)
+  const s3 = createMemoryStorage()
+  await importVault(s3, SECRET, exported)
+  const restored = (await s3.getAll('versions')).find((v) => v.id === v2.id)
+  assert.equal(restored?.derived_from?.version_id, v1.id, 'derivation survives restore')
 })
 
 console.log(`\n${passed} passed`)

@@ -46,6 +46,18 @@ export type ExtractedPair = {
   answer_text: string
   theme: SpecTheme
   confidence: Confidence
+  /** IR-037: parser boundary was ambiguous — preview flags it for review. */
+  uncertain?: boolean
+  uncertainty_reason?: string
+}
+
+export interface QAParseReport {
+  pairs: ExtractedPair[]
+  /** Boundaries where the line grammar had a genuine either/or — user
+      should review before committing the import (IR-037). */
+  uncertain_boundaries: number
+  absorbed_question_lines: number
+  dropped_questions: number
 }
 
 export type ExtractedQuestion = {
@@ -234,30 +246,49 @@ const Q_RE = /^\s*(?:q\s*[:.)]|question\s*[:.)]|#{1,4}\s*|\d+[\).]\s+|[-*•]\s*
 const A_RE = /^\s*(?:a\s*[:.)]|answer\s*[:.)])\s*(.*)$/i
 const QLAB_RE = /^\s*(?:q|question)\s*[:.)]\s*(.+)$/i
 
-export function extractQAPairsDeterministic(text: string): ExtractedPair[] {
+export function extractQAPairsDeterministicReport(text: string): QAParseReport {
   const lines = text.split(/\r?\n/)
   const pairs: ExtractedPair[] = []
   let pendingQ: string | null = null
   let answerBuf: string[] = []
   const seen = new Set<string>()
+  let pendingUncertainty: { absorbed: number; dropped: number } = { absorbed: 0, dropped: 0 }
+  let absorbedLines = 0
+  let droppedQuestions = 0
+  let uncertainBoundaries = 0
 
   const flush = () => {
-    if (!pendingQ) return
+    if (!pendingQ) { pendingUncertainty = { absorbed: 0, dropped: 0 }; return }
     const answer = answerBuf.join('\n').trim()
     if (answer.length >= 10) {
       const key = pendingQ.toLowerCase()
       if (!seen.has(key)) {
         seen.add(key)
+        const uncertain = pendingUncertainty.absorbed > 0
+        if (uncertain) uncertainBoundaries++
         pairs.push({
           question_text: pendingQ.slice(0, 280),
           answer_text: answer,
           theme: 'other',
           confidence: 'draft',
+          ...(uncertain
+            ? {
+                uncertain: true,
+                uncertainty_reason:
+                  'question-marked lines inside the answer were treated as answer text — verify the boundary',
+              }
+            : {}),
         })
       }
+    } else if (answer.length === 0) {
+      // a pending question that never collected an answer is dropped —
+      // surface it so the user knows a Q may have been mis-split
+      droppedQuestions++
+      uncertainBoundaries++
     }
     pendingQ = null
     answerBuf = []
+    pendingUncertainty = { absorbed: 0, dropped: 0 }
   }
 
   for (const raw of lines) {
@@ -282,6 +313,12 @@ export function extractQAPairsDeterministic(text: string): ExtractedPair[] {
       pendingQ = qText.length >= 8 ? qText : null
       continue
     }
+    // IR-037: a '?'-terminated line inside an answer that did NOT become a
+    // question is a genuinely ambiguous boundary — record it.
+    if (pendingQ && line && /\?\s*$/.test(line) && !isQuestion) {
+      pendingUncertainty.absorbed++
+      absorbedLines++
+    }
     if (pendingQ && line) {
       answerBuf.push(line)
     } else if (pendingQ && !line) {
@@ -290,5 +327,9 @@ export function extractQAPairsDeterministic(text: string): ExtractedPair[] {
     }
   }
   flush()
-  return pairs
+  return { pairs, uncertain_boundaries: uncertainBoundaries, absorbed_question_lines: absorbedLines, dropped_questions: droppedQuestions }
+}
+
+export function extractQAPairsDeterministic(text: string): ExtractedPair[] {
+  return extractQAPairsDeterministicReport(text).pairs
 }

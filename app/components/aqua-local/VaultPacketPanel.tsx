@@ -147,7 +147,7 @@ export function VaultPacketPanel({
       })),
     )
     setPackets(withState)
-  }, [programId, questions])
+  }, [programId, questions, vault])
 
   useEffect(() => {
     if (vault.status !== 'unlocked') return

@@ -82,6 +82,9 @@ export function AnswerEditor({
   // consent receipt + provider/model provenance into the next save.
   const [assistOpen, setAssistOpen] = useState(false)
   const [draftProvenance, setDraftProvenance] = useState<DraftAssistResult | null>(null)
+  // IR-026: when the body was inserted from a related vault answer the
+  // save carries a derived_from link — provenance survives the scope jump.
+  const [derivedFrom, setDerivedFrom] = useState<{ version_id: string; version_sha256: string } | null>(null)
   const [copied, setCopied] = useState(false)
   // IN-01: latest vault version for this question scope (+ its approval).
   const [localVersion, setLocalVersion] = useState<BankVersion | null>(null)
@@ -248,6 +251,7 @@ export function AnswerEditor({
               // Generated drafts carry their consent receipt + provider/model
               // provenance; an AI proposal never auto-approves — the user
               // reviewed the text in this editor and clicked Save.
+              derived_from: derivedFrom,
               method: draftProvenance ? 'byok' : 'manual',
               provenance: draftProvenance ? `consent:${draftProvenance.consent_id}` : null,
               provider: draftProvenance?.provider ?? null,
@@ -264,6 +268,7 @@ export function AnswerEditor({
           })
           setDraftProvenance(null)
           setSaveState('saved')
+          setDerivedFrom(null)
           setIsEditing(false)
           setTimeout(() => setSaveState('idle'), 2000)
         } catch {
@@ -310,7 +315,7 @@ export function AnswerEditor({
         setTimeout(() => setSaveState('idle'), 2000)
       }
     })
-  }, [content, confidence, wordCount, archivedQuestionId, programId, initialAnswer, supabase, vault, questionText])
+  }, [content, confidence, wordCount, archivedQuestionId, programId, initialAnswer, supabase, vault, questionText, derivedFrom, draftProvenance])
 
   if (!isEditing && !compact) {
     return (
@@ -448,8 +453,9 @@ export function AnswerEditor({
           programId={programId ?? null}
           queryText={questionText || archivedQuestionId}
           currentVersionId={localVersion?.record.id ?? null}
-          onPick={(body) => {
+          onPick={(body, _title, derived) => {
             setContent(body)
+            setDerivedFrom(derived)
             setIsEditing(true)
             setDraftFeedback({
               type: 'info',

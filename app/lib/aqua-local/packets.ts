@@ -33,6 +33,7 @@ import {
   encryptText,
   nowIso,
   sha256Hex,
+  verifyManifestSignature,
 } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
 import {
@@ -111,6 +112,10 @@ export interface PacketSignoff {
   timestamp: string | null
   signature_b64: string | null
   pubkey_b64: string | null
+  /** IR-024: read-time verification result — the stored signature actually
+      verifies against this packet's manifest digest. Absent/unsigned →
+      omitted/false; forged-at-rest records can never export as verified. */
+  signature_verified?: boolean
   /** IR-023: true when the signoff came from a backup file — provenance is
       disclosed in exports rather than dropped at materialization. */
   restored_from_backup?: boolean
@@ -596,6 +601,12 @@ export async function loadPacket(
           timestamp: signoff.timestamp,
           signature_b64: signoff.signature_b64,
           pubkey_b64: signoff.pubkey_b64 ?? null,
+          // IR-024: re-verify at read — a signoff written before the
+          // primitive was hardened (or via raw puts) cannot present as
+          // verified if the signature fails.
+          signature_verified: signoff.signature_b64 && signoff.pubkey_b64
+            ? await verifyManifestSignature(signoff.pubkey_b64, record.manifest_sha256, signoff.signature_b64)
+            : false,
           ...(signoff.restored_from_backup ? { restored_from_backup: true } : {}),
         }
       : { signer_class: null, timestamp: null, signature_b64: null, pubkey_b64: null },
