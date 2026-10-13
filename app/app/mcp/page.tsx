@@ -161,5 +161,3 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
     </div>
   )
 }
-EOF
-npx tsc --noEmit 2>&1 | head -4
