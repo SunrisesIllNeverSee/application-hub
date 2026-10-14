@@ -214,6 +214,17 @@ export function VaultProvidersPanel() {
                     className="input w-full font-mono text-sm"
                     autoComplete="off"
                   />
+                  {/* R2-G — first-use warning: a newly configured or changed
+                      custom endpoint is the one place prompt content could be
+                      redirected. Warn explicitly at save time (in addition to
+                      the per-generation consent receipt naming the endpoint). */}
+                  {def.baseUrlLabel && baseUrl.trim() && baseUrl.trim() !== (cfg?.base_url ?? '') && (
+                    <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                      New endpoint: every generation you consent to will send its request — including
+                      draft text — from this browser directly to <span className="font-mono">{baseUrl.trim()}</span>.
+                      Save only an endpoint you operate or trust.
+                    </p>
+                  )}
                   {error[def.id] && (
                     <p className="text-xs text-danger-600 dark:text-danger-400">{error[def.id]}</p>
                   )}
