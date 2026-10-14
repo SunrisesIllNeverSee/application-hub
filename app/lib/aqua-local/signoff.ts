@@ -13,10 +13,13 @@
 //   - signer_class is 'authenticated-account' | 'local-only' — a claim about
 //     identity backing, not about signature validity
 
-import { b64decode, b64encode } from './crypto.ts'
+import { signManifestDigest, verifyManifestSignature } from './crypto.ts'
+export { generateSignerKeyPair, signManifestDigest, verifyManifestSignature } from './crypto.ts'
+export type { SignerKeyPair } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
+import { nowIso } from './crypto.ts'
 import type { SignerClass, SignoffRecord } from './schema.ts'
-import { signPacket as recordSignoff, VaultNotFoundError } from './repo.ts'
+import { VaultNotFoundError, VaultImmutableError } from './repo.ts'
 import { advancePacketState, getPacketState, PacketStateError } from './packets.ts'
 
 export class SignoffAckError extends Error {
@@ -26,71 +29,6 @@ export class SignoffAckError extends Error {
   }
 }
 
-const te = new TextEncoder()
-
-function subtleOrNull(): SubtleCrypto | null {
-  return globalThis.crypto?.subtle ?? null
-}
-
-export interface SignerKeyPair {
-  privateKey: CryptoKey
-  /** Base64 SPKI — travels inside the packet signoff + export. */
-  pubkey_b64: string
-}
-
-/** Generate a vault-local ECDSA P-256 signing keypair. */
-export async function generateSignerKeyPair(): Promise<SignerKeyPair> {
-  const subtle = subtleOrNull()
-  if (!subtle) throw new Error('WebCrypto is not available in this environment')
-  const pair = await subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
-    'sign',
-    'verify',
-  ])
-  const spki = await subtle.exportKey('spki', pair.publicKey)
-  return { privateKey: pair.privateKey, pubkey_b64: b64encode(new Uint8Array(spki)) }
-}
-
-/** Sign the manifest digest hex string (UTF-8 bytes of the hex digest). */
-export async function signManifestDigest(
-  privateKey: CryptoKey,
-  manifestSha256Hex: string,
-): Promise<string> {
-  const subtle = subtleOrNull()
-  if (!subtle) throw new Error('WebCrypto is not available in this environment')
-  const sig = await subtle.sign(
-    { name: 'ECDSA', hash: 'SHA-256' },
-    privateKey,
-    te.encode(manifestSha256Hex),
-  )
-  return b64encode(new Uint8Array(sig))
-}
-
-/** Verify a signature over the manifest digest against a base64 SPKI pubkey. */
-export async function verifyManifestSignature(
-  pubkeyB64: string,
-  manifestSha256Hex: string,
-  signatureB64: string,
-): Promise<boolean> {
-  const subtle = subtleOrNull()
-  if (!subtle) return false
-  try {
-    const key = await subtle.importKey(
-      'spki',
-      b64decode(pubkeyB64) as BufferSource,
-      { name: 'ECDSA', namedCurve: 'P-256' },
-      false,
-      ['verify'],
-    )
-    return await subtle.verify(
-      { name: 'ECDSA', hash: 'SHA-256' },
-      key,
-      b64decode(signatureB64) as BufferSource,
-      te.encode(manifestSha256Hex),
-    )
-  } catch {
-    return false
-  }
-}
 
 export interface AttestPacketInput {
   packet_id: string
@@ -171,6 +109,21 @@ export async function attestPacket(
   // Signoff + state advance commit in ONE tx — a crash between them would
   // otherwise leave 'prepared' + a live signoff, which wedges the packet
   // permanently (next attest hits putIfAbsent with no restored escape).
+  // IR-024 + tx-safety: the signature is verified BEFORE the transaction —
+  // verifyManifestSignature is WebCrypto and must not run inside an IDB tx
+  // (auto-commit → putIfAbsent throws TransactionInactiveError). The tx
+  // writes the signoff row directly with the flag computed here.
+  let verifiedManifest: string | undefined
+  if (signatureB64 && pubkeyB64) {
+    const ok = await verifyManifestSignature(pubkeyB64, manifestSha256, signatureB64)
+    if (!ok) {
+      // A signature WE just computed failing to verify means the key pair
+      // is broken — refuse honestly rather than write unverifiable bytes.
+      throw new Error('signature could not be verified against this packet manifest')
+    }
+    verifiedManifest = manifestSha256
+  }
+
   const record = await storage.tx(['signoffs', 'packet_states', 'packets'], async (s) => {
     // Re-check STATE inside the tx — a concurrent discard between the
     // outer read and this write must still refuse before any write, or a
@@ -188,13 +141,20 @@ export async function attestPacket(
     if (txPrior?.restored_from_backup) {
       await s.delete('signoffs', input.packet_id)
     }
-    const rec = await recordSignoff(s, {
+    // The signoff row is written here (not via repo.signPacket) because the
+    // signature was already verified pre-tx — signPacket's crypto verify
+    // cannot run inside an IDB transaction. signature_verified is the value
+    // attestPacket itself computed against the stored manifest digest.
+    const rec: SignoffRecord = {
       packet_id: input.packet_id,
       signer_class: input.signer_class,
+      timestamp: nowIso(),
       signature_b64: signatureB64,
       pubkey_b64: pubkeyB64,
-      user_ack: input.user_ack,
-    })
+      signature_verified: verifiedManifest !== undefined,
+    }
+    const inserted = await s.putIfAbsent('signoffs', rec.packet_id, rec)
+    if (!inserted) throw new VaultImmutableError(`packet already signed: ${input.packet_id}`)
     // IR-020/IR-029b: a re-attestation of a restored signoff replaces the
     // record — but the state transition is skipped ONLY when the packet is
     // already 'signed' AT TX TIME (txState, not the outer read — a racing

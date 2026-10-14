@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'AQUA MCP Server — 30 tools for agent environments',
+  title: 'AQUA MCP Server — 31 tools for agent environments',
   description:
-    'The AQUA MCP server exposes 30 tools across programs, questions, rankings, and applicant intelligence over stdio or self-hosted Streamable HTTP. Local-first mode refuses private writes to the hosted hub.',
+    'The AQUA MCP server exposes 31 tools across programs, questions, rankings, and applicant intelligence over stdio or self-hosted Streamable HTTP. Local-first mode refuses private writes to the hosted hub.',
   alternates: { canonical: '/mcp' },
 }
 
@@ -39,7 +39,7 @@ export default function McpPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">AQUA Application Hub</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">AQUA MCP server</h1>
           <p className="text-lg leading-7 text-neutral-600 dark:text-neutral-300">
-            A local/stdio Model Context Protocol server exposing 30 tools across
+            A local/stdio Model Context Protocol server exposing 31 tools across
             programs, questions, rankings, and applicant intelligence — for Claude
             Desktop, Cursor, Windsurf, and other agent environments.
           </p>
@@ -114,7 +114,7 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
               </p>
             </div>
             <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Authenticated — 13 tools</h3>
+              <h3 className="font-semibold">Authenticated — 14 tools</h3>
               <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                 Profile answers, application readiness, fit score, best programs,
                 rank answers, draft runs, save answers, review context, stress

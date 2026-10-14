@@ -34,6 +34,7 @@ import type { VersionRecord } from '@/lib/aqua-local'
 export default function AquaLocal() {
   const vault = useVault()
   const [bank, setBank] = useState<BankEntry[]>([])
+  const [bankLoading, setBankLoading] = useState(false)
   const [offline, setOffline] = useState(false)
   const [backupDue, setBackupDue] = useState(false)
   const [backupDismissed, setBackupDismissed] = useState(false)
@@ -51,14 +52,17 @@ export default function AquaLocal() {
     const secret = vault.getSecret()
     if (!secret) return
     try {
+      setBankLoading(true)
       const storage = await vault.ensureStorage()
-      const entries = await loadBank(storage)
+      const entries = await loadBank(storage, vault.getSecret())
       setBank(entries)
       const hasVersions = entries.some((e) => e.versions.length > 0)
       const last = lastBackupAt()
       setBackupDue(hasVersions && (last === null || Date.now() - last > BACKUP_REMINDER_MS))
     } catch {
       setBanner('Could not read the vault')
+    } finally {
+      setBankLoading(false)
     }
   }, [vault])
 
@@ -287,13 +291,17 @@ export default function AquaLocal() {
                 New answer
               </button>
             </div>
-            <AnswerBankList
-              bank={bank}
-              onEdit={handleEdit}
-              onNewVersion={handleNewVersion}
-              onApprove={handleApprove}
-              approvingId={approvingId}
-            />
+            {bankLoading && bank.length === 0 ? (
+              <p className="mt-3 text-xs text-neutral-400">Reading your encrypted vault…</p>
+            ) : (
+              <AnswerBankList
+                bank={bank}
+                onEdit={handleEdit}
+                onNewVersion={handleNewVersion}
+                onApprove={handleApprove}
+                approvingId={approvingId}
+              />
+            )}
 
             {target && (
               <div className="mt-4">

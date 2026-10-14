@@ -80,7 +80,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
         if (LOCAL_FIRST) {
           try {
             if (!vaultSecret) throw new Error('A vault secret is required in local-first mode.')
-            const storage = await getStorage()
+            const { storage } = await getStorage()
             // A vault may already exist with a different secret — writing
             // without unlocking first would encrypt this version under a key
             // the user's real secret can't open (mixed-key vault). Verify the

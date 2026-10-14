@@ -17,6 +17,7 @@ import {
   newId,
   nowIso,
   sha256Hex,
+  verifyManifestSignature,
 } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
 import type {
@@ -93,6 +94,9 @@ export interface CreateVersionInput {
   provider?: string | null
   model?: string | null
   observed_flags?: Record<string, boolean>
+  /** IR-026: provenance link to the source version this body was derived
+      from (cross-scope reuse). Never implies approval transfer. */
+  derived_from?: { version_id: string; version_sha256: string } | null
 }
 
 export async function createVersion(
@@ -127,7 +131,7 @@ export async function createVersion(
     auto-commit in real browsers. */
 export async function buildVersionPayload(
   secret: string,
-  input: Pick<CreateVersionInput, 'answer_id' | 'title' | 'body' | 'method' | 'provenance' | 'provider' | 'model' | 'observed_flags'>,
+  input: Pick<CreateVersionInput, 'answer_id' | 'title' | 'body' | 'method' | 'provenance' | 'provider' | 'model' | 'observed_flags' | 'derived_from'>,
   parentVersionId: string | null = null,
 ): Promise<{ record: VersionRecord; receipt: ProvenanceRecord }> {
   // The canon blank-guard applies to EVERY version writer, not only the
@@ -136,11 +140,14 @@ export async function buildVersionPayload(
   if (isBlankBody(input.body)) throw new VaultBlankBodyError()
   const sha256 = await sha256Hex(canonicalJson({ title: input.title, body: input.body }))
   const blob = await encryptText(secret, input.body)
+  const titleBlob = await encryptText(secret, input.title)
   const record: VersionRecord = {
     id: newId(),
     answer_id: input.answer_id,
     parent_version_id: parentVersionId,
-    title: input.title,
+    title: JSON.stringify(titleBlob),
+    title_enc: true,
+    derived_from: input.derived_from ?? null,
     body: JSON.stringify(blob),
     sha256,
     method: input.method,
@@ -173,6 +180,11 @@ async function insertVersion(
 }
 
 /** Decrypt a stored version. Throws VaultDecryptError on wrong secret. */
+export async function decryptVersionTitle(secret: string, record: VersionRecord): Promise<string> {
+  if (!record.title_enc) return record.title // legacy plaintext
+  return decryptText(secret, JSON.parse(record.title))
+}
+
 export async function readVersion(
   storage: VaultStorage,
   secret: string,
@@ -181,7 +193,44 @@ export async function readVersion(
   const record = await storage.get<VersionRecord>('versions', versionId)
   if (!record) throw new VaultNotFoundError(`version not found: ${versionId}`)
   const body = await decryptText(secret, JSON.parse(record.body))
-  return { record, title: record.title, body }
+  const title = await decryptVersionTitle(secret, record)
+  return { record, title, body }
+}
+
+/** IR-014 + IR-035 unlock-time migration: encrypts legacy plaintext
+    version titles and intake catalog blobs in place. Runs after unlock —
+    crypto happens outside write transactions; records stay readable as
+    legacy plaintext if a run is interrupted mid-way. */
+export async function runVaultPrivacyMigration(
+  storage: VaultStorage,
+  secret: string,
+): Promise<{ titles_migrated: number; catalog_migrated: number }> {
+  const versions = await storage.getAll<VersionRecord>('versions')
+  const titleUpdates: VersionRecord[] = []
+  for (const v of versions) {
+    if (v.title_enc) continue
+    const blob = await encryptText(secret, v.title)
+    titleUpdates.push({ ...v, title: JSON.stringify(blob), title_enc: true })
+  }
+  if (titleUpdates.length) {
+    await storage.tx(['versions'], async (s) => {
+      for (const u of titleUpdates) await s.put('versions', u)
+    })
+  }
+  const cats = await storage.getAll<import('./schema.ts').CatalogCacheRecord>('catalog_cache')
+  const catUpdates: import('./schema.ts').CatalogCacheRecord[] = []
+  for (const c of cats) {
+    if (!c.key.startsWith('intake:') || c.blob_enc || c.blob === undefined) continue
+    const enc = await encryptText(secret, JSON.stringify(c.blob))
+    const { blob: _omit, ...rest } = c
+    catUpdates.push({ ...rest, blob_enc: JSON.stringify(enc) })
+  }
+  if (catUpdates.length) {
+    await storage.tx(['catalog_cache'], async (s) => {
+      for (const u of catUpdates) await s.put('catalog_cache', u)
+    })
+  }
+  return { titles_migrated: titleUpdates.length, catalog_migrated: catUpdates.length }
 }
 
 export async function listVersions(storage: VaultStorage, answerId: string): Promise<VersionRecord[]> {
@@ -298,7 +347,16 @@ export async function freezePacket(
   return record
 }
 
-/** Sign a frozen packet. One signoff per packet; signature is optional (declared sign-off allowed). */
+/** Sign a frozen packet. One signoff per packet; signature is optional
+    (declared sign-off allowed).
+    IR-024: a cryptographic signature is verified against the packet's
+    stored manifest digest AT THIS BOUNDARY — the primitive itself.
+    A signature that fails verification is refused outright; an absent
+    signature is a legitimate unsigned acknowledgement.
+    NOTE: this primitive awaits WebCrypto and therefore must NOT be called
+    inside an IDB transaction (the tx auto-commits mid-call and later writes
+    throw TransactionInactiveError). The governed path attestPacket writes
+    its signoff inside its own tx with a signature it verified pre-tx. */
 export async function signPacket(
   storage: VaultStorage,
   input: {
@@ -315,12 +373,28 @@ export async function signPacket(
     throw new Error('packet sign-off requires explicit user acknowledgement')
   const packet = await storage.get<PacketRecord>('packets', input.packet_id)
   if (!packet) throw new VaultNotFoundError(`packet not found: ${input.packet_id}`)
+
+  let signatureVerified = false
+  if (input.signature_b64) {
+    if (!input.pubkey_b64)
+      throw new Error('signature presented without its verification key')
+    const ok = await verifyManifestSignature(
+      input.pubkey_b64,
+      packet.manifest_sha256,
+      input.signature_b64,
+    )
+    if (!ok)
+      throw new Error('signature verification failed — forged or mismatched signature refused')
+    signatureVerified = true
+  }
+
   const record: SignoffRecord = {
     packet_id: input.packet_id,
     signer_class: input.signer_class,
     timestamp: nowIso(),
     signature_b64: input.signature_b64 ?? null,
     pubkey_b64: input.pubkey_b64 ?? null,
+    signature_verified: signatureVerified,
   }
   const inserted = await storage.putIfAbsent('signoffs', record.packet_id, record)
   if (!inserted) throw new VaultImmutableError(`packet already signed: ${input.packet_id}`)

@@ -33,7 +33,7 @@ export function IntakePacketSection() {
     if (vault.status !== 'unlocked') return
     try {
       const storage = await vault.ensureStorage()
-      setIntakes((await listLocalIntakes(storage)) as IntakeRecord[])
+      setIntakes((await listLocalIntakes(storage, vault.getSecret()!)) as IntakeRecord[])
     } catch {
       setIntakes([])
     }

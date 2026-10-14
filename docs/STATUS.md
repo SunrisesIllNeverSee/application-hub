@@ -112,7 +112,9 @@ This pass is structurally implemented and statically verified, but it is not yet
   - Rewards and payout-ready contribution ledger
   - Aggregate stats/history for high-fidelity variants
   - Seeding entities and manual review gate for real application data
-- Migration chain high-water mark in repo is now `001-048` (`049` next).
+- Migration chain high-water mark in repo is now `001-051`.
+  - `051_ir015_local_first_write_boundary` APPLIED + ACTIVATED 2026-10-14 (owner-authorized): `_deploy_flags('local_first')='1'` set; 18 RESTRICTIVE deny-write policies (3×6 private-content tables) now enforce the local-first boundary at the database for the `authenticated` role; SELECT untouched; service_role unaffected. Verified live: pre-flag authenticated INSERT succeeded (dormant), post-flag INSERT → 42501, UPDATE/DELETE → row filtered (0 affected), SELECT → 200. Recorded in `supabase_migrations.schema_migrations`.
+  - DRIFT NOTE: `049_m05_reward_integrity` and `050_m05_migration_repairs` exist in `supabase/migrations/` but are NOT recorded/applied on the production project (`reward_credit_receipts` table absent; only pre-existing reward functions present). A future `supabase db push` will apply them — review before that push.
 - `supabase/functions/canonical-hub/` scaffolded with `ingest`, `qualify`, `export`, and `map_variant` actions.
 - `supabase/functions/smart-matcher/` scaffolded for persona-aware recommendations.
 - Next.js APIs added under `/api/hub/*` plus Stripe payout scaffold.

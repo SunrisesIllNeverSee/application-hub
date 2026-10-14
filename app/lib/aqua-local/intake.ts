@@ -20,7 +20,7 @@
 // duplicated or impersonated. Public program ingestion continues via
 // /api/import/submit-url + /api/import/program unchanged.
 
-import { newId, nowIso, sha256Hex } from './crypto.ts'
+import { decryptText, encryptText, newId, nowIso, sha256Hex } from './crypto.ts'
 import { buildVersionPayload, createAnswer, isBlankBody, VaultImmutableError } from './repo.ts'
 
 import type { VaultStorage } from './vault.ts'
@@ -74,24 +74,39 @@ export interface IntakeExtractionLike {
  * and question_occurrence ids remain stable across a re-import of the same
  * extraction (idempotent re-run produces the same occurrences).
  */
-export async function intakeApplicationId(entitySlug: string, questions: IntakeQuestionLike[]): Promise<string> {
+export async function intakeApplicationId(entitySlug: string, questions: IntakeQuestionLike[], storage?: VaultStorage): Promise<string> {
   // Content fingerprint via truncated sha256 — a 32-bit JS string hash has
   // non-trivial collision probability; silently merging two distinct
   // applications pastes under one id would lose data boundaries.
+  // IR-014 residual: the entity slug is a name fragment — hash it too so
+  // scope ids + the intake:<id> catalog key leak only the hash, never the
+  // entity text. Determinism preserved (same slug → same segment).
   const sig = questions.map((q) => q.normalized_text).join('|')
+  const slugSeg = (await sha256Hex(`ent:${entitySlug}`)).slice(0, 8)
   const h = await sha256Hex(sig)
-  return `local-intake-${entitySlug}-${h.slice(0, 16)}`
+  const next = `local-intake-${slugSeg}-${h.slice(0, 16)}`
+  // Compat boundary: vaults written before the slug-hash fix carry
+  // `local-intake-<slug>-<hash>` ids. A re-import of the same intake must
+  // reuse the existing scope instead of duplicating slots/catalog rows —
+  // when storage is supplied, check the legacy id first.
+  if (storage) {
+    const legacy = `local-intake-${entitySlug}-${h.slice(0, 16)}`
+    const hit = await storage.get('catalog_cache', `intake:${legacy}`).catch(() => null)
+    if (hit) return legacy
+  }
+  return next
 }
 
 export async function importLocalIntake(
   storage: VaultStorage,
+  secret: string,
   extraction: IntakeExtractionLike,
   input: LocalIntakeInput,
 ): Promise<LocalIntakeResult> {
   if (!extraction.questions.length) {
     throw new Error('intake extraction produced no questions')
   }
-  const applicationId = await intakeApplicationId(extraction.entity.slug, extraction.questions)
+  const applicationId = await intakeApplicationId(extraction.entity.slug, extraction.questions, storage)
   const intakeId = `intake-${newId().slice(0, 12)}`
   const now = nowIso()
 
@@ -101,6 +116,34 @@ export async function importLocalIntake(
   // transaction — a mid-import failure must not leave orphan slots without
   // the catalog record that names them.
   const occurrenceIds: string[] = []
+  const intakeBlob = {
+    intake_id: intakeId,
+    application_id: applicationId,
+    imported_at: now,
+    source: {
+      type: input.source_type,
+      url: input.source_url ?? extraction.application.source_url ?? null,
+      title: input.source_title ?? extraction.application.title ?? null,
+    },
+    entity: extraction.entity,
+    application: {
+      title: extraction.application.title,
+      vertical: extraction.application.vertical,
+      deadline_at: extraction.application.deadline_at,
+    },
+    questions: extraction.questions.map((q, i) => ({
+      occurrence_id: `${applicationId}-q${q.order_index}`,
+      text: q.question_text,
+      order_index: q.order_index,
+      is_required: q.is_required,
+      word_limit: q.word_limit,
+      char_limit: q.char_limit,
+    })),
+    custody: 'vault-local — raw pasted text was never stored or transmitted',
+  }
+  // IR-035: extracted private intake text encrypts at rest — crypto outside
+  // the IDB transaction (WebCrypto inside a tx risks auto-commit).
+  const blobEnc = JSON.stringify(await encryptText(secret, JSON.stringify(intakeBlob)))
   await storage.tx(['answers', 'catalog_cache', 'events'], async (s) => {
     // Dedup read INSIDE the tx — reading outside then writing inside is a
     // TOCTOU hole: two interleaved imports would each see 'no existing' and
@@ -124,31 +167,7 @@ export async function importLocalIntake(
 
     const record: CatalogCacheRecord = {
       key: `intake:${applicationId}`,
-      blob: {
-        intake_id: intakeId,
-        application_id: applicationId,
-        imported_at: now,
-        source: {
-          type: input.source_type,
-          url: input.source_url ?? extraction.application.source_url ?? null,
-          title: input.source_title ?? extraction.application.title ?? null,
-        },
-        entity: extraction.entity,
-        application: {
-          title: extraction.application.title,
-          vertical: extraction.application.vertical,
-          deadline_at: extraction.application.deadline_at,
-        },
-        questions: extraction.questions.map((q, i) => ({
-          occurrence_id: occurrenceIds[i],
-          text: q.question_text,
-          order_index: q.order_index,
-          is_required: q.is_required,
-          word_limit: q.word_limit,
-          char_limit: q.char_limit,
-        })),
-        custody: 'vault-local — raw pasted text was never stored or transmitted',
-      },
+      blob_enc: blobEnc,
       fetched_at: now,
     }
     await s.put('catalog_cache', record)
@@ -187,12 +206,19 @@ export async function importLocalIntake(
 /** Read all vault-local intake applications (newest first). */
 export async function listLocalIntakes(
   storage: VaultStorage,
+  secret: string,
 ): Promise<Array<Record<string, unknown>>> {
   const all = await storage.getAll<CatalogCacheRecord>('catalog_cache')
-  return all
-    .filter((r) => r.key.startsWith('intake:'))
-    .map((r) => r.blob as Record<string, unknown>)
-    .sort((a, b) => String(b.imported_at ?? '').localeCompare(String(a.imported_at ?? '')))
+  const out: Array<Record<string, unknown>> = []
+  for (const r of all) {
+    if (!r.key.startsWith('intake:')) continue
+    if (r.blob_enc) {
+      out.push(JSON.parse(await decryptText(secret, JSON.parse(r.blob_enc))) as Record<string, unknown>)
+    } else if (r.blob !== undefined) {
+      out.push(r.blob as Record<string, unknown>) // legacy plaintext row
+    }
+  }
+  return out.sort((a, b) => String(b.imported_at ?? '').localeCompare(String(a.imported_at ?? '')))
 }
 
 // ---------------------------------------------------------------------------
@@ -215,14 +241,26 @@ export interface LegacyImportResult {
 
 /** Deterministic occurrence id for an imported pair — stable so a re-import
     of the same Q&A adds a version rather than a duplicate answer.
-    IR-031: sha256 over the normalized text (upstream parsers already
-    truncate to 280 chars — discrimination for prefix-twins comes from the
-    mixed-in batch position, not the hash width), plus batch index so a
-    literal-duplicate question in the same import still gets its own slot. */
-async function importOccurrenceId(questionText: string, batchIndex: number): Promise<string> {
+    IR-031 + IR-036: order-invariant identity — sha256 over the normalized
+    question text only (no batch position), so a reordered re-import merges
+    into the same slots instead of multiplying answers. A literal-duplicate
+    question inside one batch still gets its own slot via dupIndex. */
+async function importOccurrenceId(questionText: string, dupIndex: number): Promise<string> {
   const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
-  // truncated sha256 — the previous 32-bit JS hash had non-trivial
-  // collision probability; two distinct questions must never share a slot.
+  // Length-prefixed structured input — a question literally ending in
+  // '::dup1' cannot collide with the second slot of its sibling text.
+  const payload = `q:${norm.length}:${norm}#dup:${dupIndex}`
+  const h = await sha256Hex(payload)
+  return `import-${h.slice(0, 16)}`
+}
+
+/** Pre-IR-036 scheme: position-indexed id. Computed during import so a
+    SAME-ORDER re-import of content written before the scheme change finds
+    its existing slot (IR-036 compat boundary). A reordered re-import of a
+    legacy batch can't relocate the old slot — the old scheme was itself
+    order-sensitive; documented residual. */
+async function importOccurrenceIdLegacy(questionText: string, batchIndex: number): Promise<string> {
+  const norm = questionText.replace(/\s+/g, ' ').trim().toLowerCase()
   const h = await sha256Hex(`${norm}::${batchIndex}`)
   return `import-${h.slice(0, 16)}`
 }
@@ -247,7 +285,8 @@ export async function importLegacyQAPairs(
   const batchId = newId()
 
   // Phase 1 — validate + hash outside any transaction.
-  const prepared: Array<{ occ: string; title: string; body: string }> = []
+  const prepared: Array<{ occ: string; legacyOcc: string; title: string; body: string }> = []
+  const normCounts = new Map<string, number>()
   let skipped = 0
   for (let idx = 0; idx < pairs.length; idx++) {
     const p = pairs[idx]
@@ -258,8 +297,15 @@ export async function importLegacyQAPairs(
     // IR-031b: a pair with no real question binds the answer to nothing —
     // skip rather than collapse every such pair into one slot.
     if (p.question_text.trim().length < 8) { skipped++; continue }
+    // IR-036: per-normalized-text occurrence counter — literal duplicates
+    // inside the same batch each get a distinct slot; identical text in
+    // different orders/batches always resolves to the same id.
+    const norm = p.question_text.replace(/\s+/g, ' ').trim().toLowerCase()
+    const dupIndex = normCounts.get(norm) ?? 0
+    normCounts.set(norm, dupIndex + 1)
     prepared.push({
-      occ: await importOccurrenceId(p.question_text, idx),
+      occ: await importOccurrenceId(p.question_text, dupIndex),
+      legacyOcc: await importOccurrenceIdLegacy(p.question_text, idx),
       title: p.question_text.slice(0, 80),
       body: p.answer_text,
     })
@@ -276,7 +322,8 @@ export async function importLegacyQAPairs(
     const map = new Map<string, string>()
     for (const entry of prepared) {
       const key = `answer-bank::${entry.occ}`
-      let answer = byOccurrence.get(key)
+      const legacyKey = `answer-bank::${entry.legacyOcc}`
+      let answer = byOccurrence.get(key) ?? byOccurrence.get(legacyKey)
       if (!answer) {
         answer = await createAnswer(s, {
           application_id: 'answer-bank',

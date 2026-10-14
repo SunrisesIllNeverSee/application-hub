@@ -52,7 +52,7 @@ interface BackupPayload {
   format_version: number
   exported_at: string
   answers: AnswerRecord[]
-  versions: Array<Omit<VersionRecord, 'body'> & { body_plaintext: string }>
+  versions: Array<Omit<VersionRecord, 'body' | 'title' | 'title_enc'> & { title_plaintext: string; body_plaintext: string; title?: string }>
   approvals: ApprovalRecord[]
   packets: PacketRecord[]
   provenance: ProvenanceRecord[]
@@ -70,8 +70,11 @@ export async function exportVault(storage: VaultStorage, secret: string): Promis
   const plainVersions = [] as BackupPayload['versions']
   for (const v of versions) {
     const bodyPlaintext = await decryptText(secret, JSON.parse(v.body))
-    const { body: _enc, ...rest } = v
-    plainVersions.push({ ...rest, body_plaintext: bodyPlaintext })
+    const titlePlaintext = v.title_enc
+      ? await decryptText(secret, JSON.parse(v.title))
+      : v.title
+    const { body: _enc, title: _t, title_enc: _te, ...rest } = v
+    plainVersions.push({ ...rest, title_plaintext: titlePlaintext, body_plaintext: bodyPlaintext })
   }
   const payload: BackupPayload = {
     format_version: BACKUP_FORMAT_VERSION,
@@ -84,7 +87,15 @@ export async function exportVault(storage: VaultStorage, secret: string): Promis
     imports: await storage.getAll<ImportRecord>('imports'),
     signoffs: await storage.getAll<SignoffRecord>('signoffs'),
     packet_states: await storage.getAll<PacketStateRecord>('packet_states'),
-    catalog_cache: await storage.getAll<CatalogCacheRecord>('catalog_cache'),
+    catalog_cache: await (async () => {
+      const rows = await storage.getAll<CatalogCacheRecord>('catalog_cache')
+      return Promise.all(rows.map(async (r) => {
+        if (!r.blob_enc) return r
+        const plain = JSON.parse(await decryptText(secret, JSON.parse(r.blob_enc))) as unknown
+        const { blob_enc: _b, ...rest } = r
+        return { ...rest, blob: plain }
+      }))
+    })(),
     events: await storage.getAll<EventRecord>('events'),
   }
   const blob = await encryptText(secret, canonicalJson(payload))
@@ -156,18 +167,21 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
         }
       }
       for (const f of stringOnlyFields) {
-        if (typeof r[f] !== 'string') {
+        if (r[f] !== undefined && typeof r[f] !== 'string') {
           throw new VaultTamperError(`backup ${store}[${i}] field must be a string: ${f}`)
         }
       }
     }
   }
   requireList('answers', payload.answers, 'id')
+  // title_plaintext is required to be a string but may be EMPTY — a saved
+  // version can legitimately carry a blank title. The per-version sha256
+  // check below still refuses tampered content.
   requireList('versions', payload.versions, 'id', [
     'answer_id',
     'sha256',
     'body_plaintext',
-  ], ['title'])
+  ], ['title', 'title_plaintext'])
   requireList('approvals', payload.approvals, 'id', ['version_id'])
   requireList('packets', payload.packets, 'id')
   requireList('provenance', payload.provenance, 'version_id')
@@ -179,7 +193,10 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
 
   // Integrity: recompute each version sha256 over canonical plaintext before writing anything.
   for (const v of payload.versions ?? []) {
-    const digest = await sha256Hex(canonicalJson({ title: v.title, body: v.body_plaintext }))
+    if (typeof v.title_plaintext !== 'string' && typeof v.title !== 'string') {
+      throw new VaultTamperError(`version ${v.id} has no title field`)
+    }
+    const digest = await sha256Hex(canonicalJson({ title: v.title_plaintext ?? v.title, body: v.body_plaintext }))
     if (digest !== v.sha256) {
       throw new VaultTamperError(`version ${v.id} sha256 mismatch — refusing tampered backup`)
     }
@@ -253,7 +270,7 @@ export async function previewVaultImport(
     stores,
     total_insert: all.reduce((n, s) => n + s.insert, 0),
     total_skip: all.reduce((n, s) => n + s.skip, 0),
-    version_titles: (payload.versions ?? []).map((v) => v.title),
+    version_titles: (payload.versions ?? []).map((v) => v.title_plaintext ?? v.title),
   }
 }
 
@@ -296,9 +313,10 @@ export async function importVault(
   }
   for (const v of payload.versions ?? []) {
     sourceIds.push(v.id)
-    const { body_plaintext, ...rest } = v
+    const { body_plaintext, title_plaintext, title: legacyTitle, ...rest } = v
     const blob = await encryptText(secret, body_plaintext)
-    const record: VersionRecord = { ...rest, body: JSON.stringify(blob), immutable: true }
+    const titleBlob = await encryptText(secret, title_plaintext ?? legacyTitle)
+    const record: VersionRecord = { ...rest, title: JSON.stringify(titleBlob), title_enc: true, body: JSON.stringify(blob), immutable: true }
     await dedupePut('versions', v.id, record)
   }
   // IR-003: imported approvals are claims, not fresh evidence. Strip the
@@ -331,7 +349,14 @@ export async function importVault(
     await dedupePut('packet_states', ps.packet_id, ps)
   }
   for (const c of payload.catalog_cache ?? []) {
-    await dedupePut('catalog_cache', c.key, c)
+    // IR-035: restored intake blobs re-encrypt under the target vault secret.
+    if (c.key.startsWith('intake:') && c.blob !== undefined && !c.blob_enc) {
+      const enc = await encryptText(secret, JSON.stringify(c.blob))
+      const { blob: _b, ...rest } = c
+      await dedupePut('catalog_cache', c.key, { ...rest, blob_enc: JSON.stringify(enc) })
+    } else {
+      await dedupePut('catalog_cache', c.key, c)
+    }
   }
   // LF-18: imported events keep their original seq — they are historical
   // receipts, and new local events allocate above max(existing seq), so a

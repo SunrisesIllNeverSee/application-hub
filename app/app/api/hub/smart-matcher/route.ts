@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getRequestUser } from '@/lib/supabase/request-auth'
+import { refusePrivateTextFields } from '@/lib/local-first-guard'
 
 // The actual edge-function contract (supabase/functions/smart-matcher):
 //   user_persona:   record — persona descriptors for matching
@@ -25,6 +26,15 @@ function isPersonaValue(v: unknown): boolean {
 }
 
 export async function POST(req: Request) {
+  // IR-038: the private-text refusal runs BEFORE auth — persona content is
+  // dropped at the boundary regardless of caller identity under local-first.
+  const preBody = await req.clone().json().catch(() => null)
+  if (preBody && typeof preBody === 'object' && !Array.isArray(preBody)) {
+    const pre = refusePrivateTextFields(preBody as Record<string, unknown>, ['user_persona'], {
+      detail: 'persona matching is unavailable in local-first mode — private persona text is never transmitted',
+    })
+    if (pre) return pre
+  }
   const { user, accessToken } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -41,6 +51,15 @@ export async function POST(req: Request) {
     return bad('JSON object body required')
   }
   const body = raw as Record<string, unknown>
+
+  // IR-038: user_persona is free-text caller content forwarded to the edge
+  // function — under local-first that is exactly the class of private text
+  // that must not leave the device without an explicit consent boundary.
+  // Persona-less calls (public catalog matching) stay allowed.
+  const lfRefusal = refusePrivateTextFields(body, ['user_persona'], {
+    detail: 'persona matching is unavailable in local-first mode — private persona text is never transmitted',
+  })
+  if (lfRefusal) return lfRefusal
 
   const { user_persona, vertical_filter, match_limit } = body
   const forwarded: Record<string, unknown> = { user_id: user.id }

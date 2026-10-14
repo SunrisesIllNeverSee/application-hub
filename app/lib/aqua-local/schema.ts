@@ -49,9 +49,26 @@ export interface VersionRecord {
   id: string
   answer_id: string
   parent_version_id: string | null
+  /** IR-014: title is encrypted at rest — it is free-text user input that
+      can carry real private content, not harmless metadata. When
+      `title_enc` is set the field holds serialized EncryptedBlob (same
+      shape as `body`); legacy records without the flag keep plaintext
+      until the unlock-time migration rewrites them. */
   title: string
+  title_enc?: true
+  /** IR-026: provenance link to the source version this body was derived
+      from — set when text drafted/reused from ANOTHER scope becomes a new
+      answer's root version. Separate from parent_version_id (same-answer
+      lineage) — never implies approval transfer. */
+  /** Cross-scope (or same-scope) provenance: the draft this version STARTED
+      FROM — the bank answer it was picked/derived from. Means "started
+      from", not "still resembles" — the editor may diverge the body freely;
+      the link records the seed, never a content claim. parent_version_id
+      stays strict same-answer lineage; this field carries the cross-scope
+      trace (IR-026). */
+  derived_from?: { version_id: string; version_sha256: string } | null
   body: string // serialized EncryptedBlob
-  sha256: string // sha256 of canonicalJson({ title, body_plaintext })
+  sha256: string // sha256 of canonicalJson({ title_plaintext, body_plaintext })
   method: VersionMethod
   provenance: string | null // free-form provenance note; see `provenance` store for structured receipt
   created_at: string
@@ -125,7 +142,13 @@ export interface ProvenanceRecord {
 
 export interface CatalogCacheRecord {
   key: string
-  blob: unknown
+  /** Plaintext blob — used for PUBLIC catalog data. For `intake:` keys the
+      extracted private text (question text, entity name, titles, URLs) is
+      stored in `blob_enc` instead (IR-035). */
+  blob?: unknown
+  /** Serialized EncryptedBlob of JSON.stringify(blob) — private intake
+      records only; requires the vault secret to read. */
+  blob_enc?: string
   fetched_at: string
 }
 
@@ -151,6 +174,9 @@ export interface SignoffRecord {
   signature_b64: string | null
   /** Base64 SPKI public key that produced signature_b64 (ECDSA P-256). Null when unsigned. */
   pubkey_b64?: string | null
+  /** IR-024: whether signature_b64 verified against the packet manifest
+      digest at write time (pre-flag records carry undefined). */
+  signature_verified?: boolean
   /**
    * IR-003: set by backup import — a restored signoff is a claim carried by
    * the file, not a fresh attestation. attestPacket may overwrite it with a

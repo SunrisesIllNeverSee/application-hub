@@ -17,7 +17,7 @@ import {
   type LegacyImportResult,
 } from '@/lib/aqua-local/intake'
 import {
-  extractQAPairsDeterministic,
+  extractQAPairsDeterministicReport,
   parsePairs,
   buildQAPairsPrompt,
   SYSTEM_PROMPT,
@@ -59,6 +59,8 @@ export function LocalIntakePanel() {
   // vault versions, not just question slots.
   const [mode, setMode] = useState<'questions' | 'qa'>('questions')
   const [pairs, setPairs] = useState<ExtractedPair[] | null>(null)
+  const [pairReport, setPairReport] = useState<{ uncertain_boundaries: number; absorbed_question_lines: number; dropped_questions: number } | null>(null)
+  const [reviewedUncertain, setReviewedUncertain] = useState(false)
   const [pairProvenance, setPairProvenance] = useState<{ deterministic_parse: boolean; provider?: string; model?: string }>({ deterministic_parse: true })
   const [qaResult, setQaResult] = useState<LegacyImportResult | null>(null)
   const [providers, setProviders] = useState<{ provider_id: string; base_url?: string; model_preference?: string }[]>([])
@@ -76,7 +78,7 @@ export function LocalIntakePanel() {
         setProviders(list)
         setProviderId((cur) => cur || list[0]?.provider_id || '')
         const storage = await vault.ensureStorage()
-        setIntakes(await listLocalIntakes(storage))
+        setIntakes(await listLocalIntakes(storage, vault.getSecret()!))
       })
       .catch(() => undefined)
     return () => { cancelled = true }
@@ -88,9 +90,11 @@ export function LocalIntakePanel() {
     setError('')
     setResult(null)
     setQaResult(null)
-    setPairs(null)
+    setPairs(null); setPairReport(null); setReviewedUncertain(false)
     if (mode === 'qa') {
-      setPairs(extractQAPairsDeterministic(content))
+      const report = extractQAPairsDeterministicReport(content)
+      setPairs(report.pairs)
+      setPairReport(report)
       setPairProvenance({ deterministic_parse: true })
       return
     }
@@ -123,7 +127,7 @@ export function LocalIntakePanel() {
 
   async function extractWithProvider() {
     setError('')
-    setResult(null); setQaResult(null); setPairs(null)
+    setResult(null); setQaResult(null); setPairs(null); setPairReport(null); setReviewedUncertain(false)
     setBusy(true)
     try {
       const storage = await vault.ensureStorage()
@@ -142,7 +146,7 @@ export function LocalIntakePanel() {
         model: chosen.model_preference,
         disclosed_config: { base_url: chosen.base_url, model_preference: chosen.model_preference },
       })
-      setPairs(parsePairs(text))
+      setPairs(parsePairs(text)); setPairReport(null)
       setPairProvenance({ deterministic_parse: false, provider: provider ?? undefined, model: model ?? undefined })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Provider extraction failed')
@@ -166,9 +170,9 @@ export function LocalIntakePanel() {
         source_url: sourceUrl.trim() || null,
       }, pairProvenance)
       setQaResult(res)
-      setPairs(null)
+      setPairs(null); setPairReport(null); setReviewedUncertain(false)
       setContent('')
-      setIntakes(await listLocalIntakes(storage))
+      setIntakes(await listLocalIntakes(storage, vault.getSecret()!))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Vault import failed')
     } finally {
@@ -182,7 +186,7 @@ export function LocalIntakePanel() {
     setError('')
     try {
       const storage = await vault.ensureStorage()
-      const res = await importLocalIntake(storage, extraction, {
+      const res = await importLocalIntake(storage, vault.getSecret()!, extraction, {
         source_type: 'manual_paste',
         source_url: sourceUrl.trim() || null,
         source_title: sourceTitle.trim() || null,
@@ -190,7 +194,7 @@ export function LocalIntakePanel() {
       setResult(res)
       setExtraction(null)
       setContent('')
-      setIntakes(await listLocalIntakes(storage))
+      setIntakes(await listLocalIntakes(storage, vault.getSecret()!))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Vault import failed')
     } finally {
@@ -249,13 +253,13 @@ export function LocalIntakePanel() {
       <div className="flex gap-2 text-xs">
         <button
           className={mode === 'questions' ? 'btn-primary' : 'btn-secondary'}
-          onClick={() => { setMode('questions'); setPairs(null); setExtraction(null); setResult(null); setQaResult(null) }}
+          onClick={() => { setMode('questions'); setPairs(null); setPairReport(null); setReviewedUncertain(false); setExtraction(null); setResult(null); setQaResult(null) }}
         >
           New application — extract questions
         </button>
         <button
           className={mode === 'qa' ? 'btn-primary' : 'btn-secondary'}
-          onClick={() => { setMode('qa'); setPairs(null); setExtraction(null); setResult(null); setQaResult(null) }}
+          onClick={() => { setMode('qa'); setPairs(null); setPairReport(null); setReviewedUncertain(false); setExtraction(null); setResult(null); setQaResult(null) }}
         >
           Answered application — import Q&A
         </button>
@@ -334,18 +338,47 @@ export function LocalIntakePanel() {
           </p>
           <div className="max-h-48 space-y-2 overflow-y-auto text-xs">
             {pairs.map((p, i) => (
-              <div key={i} className="text-neutral-300">
-                <p className="font-medium">{p.question_text}</p>
+              <div key={i} className={`text-neutral-300 ${p.uncertain ? 'rounded border-l-2 border-amber-600 pl-2' : ''}`}>
+                <p className="font-medium">
+                  {p.question_text}
+                  {p.uncertain && <span className="ml-2 text-[10px] text-amber-400">ambiguous</span>}
+                </p>
                 <p className="text-neutral-500 line-clamp-2">{p.answer_text}</p>
+                {p.uncertain && <p className="text-[10px] text-amber-500/80">{p.uncertainty_reason}</p>}
               </div>
             ))}
           </div>
+          {/* IR-037: ambiguous parse boundaries surface explicitly — the
+              user confirms they reviewed before committing the import. */}
+          {pairReport && pairReport.uncertain_boundaries > 0 && (
+            <div className="rounded border border-amber-800/60 bg-amber-950/30 p-2 text-[11px] text-amber-200">
+              {pairReport.uncertain_boundaries} ambiguous boundar{pairReport.uncertain_boundaries === 1 ? 'y was' : 'ies were'} detected
+              {pairReport.dropped_questions > 0 && ` (${pairReport.dropped_questions} question${pairReport.dropped_questions === 1 ? '' : 's'} had no answer and was dropped)`}
+              {pairReport.absorbed_question_lines > 0 && ` (${pairReport.absorbed_question_lines} question-marked line${pairReport.absorbed_question_lines === 1 ? '' : 's'} absorbed into answers)`}
+              . Check the pairs below — the highlighted ones may be mis-split.
+            </div>
+          )}
+          {pairReport && pairReport.uncertain_boundaries > 0 && (
+            <label className="flex items-start gap-2 text-[11px] text-amber-200">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={reviewedUncertain}
+                onChange={(e) => setReviewedUncertain(e.target.checked)}
+              />
+              I reviewed the ambiguous boundaries and the split looks correct.
+            </label>
+          )}
           {pairs.length > 0 && (
             <div className="flex items-center gap-3">
-              <button className="btn-primary" disabled={busy} onClick={() => void importPairs()}>
+              <button
+                className="btn-primary"
+                disabled={busy || ((pairReport?.uncertain_boundaries ?? 0) > 0 && !reviewedUncertain)}
+                onClick={() => void importPairs()}
+              >
                 {busy ? 'Importing…' : `Import ${pairs.length} answer${pairs.length === 1 ? '' : 's'} to vault bank`}
               </button>
-              <button className="text-xs text-neutral-400 hover:text-neutral-200" onClick={() => setPairs(null)}>
+              <button className="text-xs text-neutral-400 hover:text-neutral-200" onClick={() => { setPairs(null); setPairReport(null); setReviewedUncertain(false) }}>
                 Discard preview
               </button>
             </div>

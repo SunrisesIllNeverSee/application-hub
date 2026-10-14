@@ -1,3 +1,19 @@
+// IR-015 — local-first flag pairing is REQUIRED at build time. The
+// server flag (AQUA_LOCAL_FIRST) gates route handlers; the public twin
+// (NEXT_PUBLIC_AQUA_LOCAL_FIRST) gates direct client→Supabase writes.
+// Shipping the server flag without the public twin leaves private client
+// writes ungated — fail the build instead of deploying a half-closed
+// boundary.
+const lfServer = ['1', 'true'].includes((process.env.AQUA_LOCAL_FIRST ?? '').trim().toLowerCase())
+const lfClient = ['1', 'true'].includes((process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '').trim().toLowerCase())
+if (lfServer !== lfClient) {
+  throw new Error(
+    `local-first flag mismatch: AQUA_LOCAL_FIRST=${process.env.AQUA_LOCAL_FIRST ?? '<unset>'} ` +
+      `but NEXT_PUBLIC_AQUA_LOCAL_FIRST=${process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '<unset>'}. ` +
+      'Set BOTH (or neither) — a mismatched pair leaves private client writes ungated.',
+  )
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: { typedRoutes: false },

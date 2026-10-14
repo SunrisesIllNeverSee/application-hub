@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useVault } from '@/lib/aqua-local-client/VaultProvider'
 import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 import { readBody } from '@/lib/aqua-local-client/session'
+import { decryptVersionTitle } from '@/lib/aqua-local'
 import type { AnswerRecord, VersionRecord, ApprovalRecord } from '@/lib/aqua-local'
 import type { ProfileAnswer, ProgramQuestionWithArchived } from '@/lib/database.types'
 import { QuestionTree } from '@/components/QuestionTree'
@@ -47,6 +48,18 @@ function useVaultOccurrences(programId: string) {
             .sort((x, y) => x.created_at.localeCompare(y.created_at) || x.id.localeCompare(y.id))
             .at(-1)
           if (latest) map[a.scope.question_occurrence_id] = latest
+        }
+        // IR-014: titles are ciphertext at rest — decrypt for display.
+        const secret = vault.getSecret()
+        if (secret) {
+          for (const k of Object.keys(map)) {
+            const v = map[k]
+            if (v?.title_enc) {
+              const title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
+              const { title_enc: _te, ...rest } = v // shallow copy — never write back plaintext
+              map[k] = { ...rest, title } as typeof v
+            }
+          }
         }
         if (!cancelled) {
           setAnswered(map)
@@ -118,7 +131,7 @@ export function RelatedVaultAnswers({
   programId: string | null
   queryText: string
   currentVersionId?: string | null
-  onPick: (body: string, title: string) => void
+  onPick: (body: string, title: string, derivedFrom: { version_id: string; version_sha256: string }) => void
 }) {
   const vault = useVault()
   const [related, setRelated] = useState<import('@/lib/aqua-local').RelatedAnswer[]>([])
@@ -163,7 +176,7 @@ export function RelatedVaultAnswers({
                 void (async () => {
                   const storage = await vault.ensureStorage()
                   const { body } = await readBody(storage, secret, r.version_id)
-                  onPick(body, r.title)
+                  onPick(body, r.title, { version_id: r.version_id, version_sha256: r.version_sha256 })
                 })()
               }}
               className="group block w-full text-left"

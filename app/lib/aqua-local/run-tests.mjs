@@ -16,6 +16,7 @@ import {
   ProviderConsentError, ProviderKeyError, ProviderEgressError,
 } from './providers.ts'
 import { findRelatedVaultAnswers } from './match.ts'
+import { runVaultPrivacyMigration, decryptVersionTitle } from './repo.ts'
 
 const SECRET = 'correct-horse-battery-staple'
 let passed = 0
@@ -373,6 +374,33 @@ await t('match: overlap score + related vault answers are local-only', async () 
   assert.equal(hits[0].preview.slice(0, 10), 'I led a cr')
   const misses = await findRelatedVaultAnswers(s, SECRET, 'zzzzqqq unrelated tokens xyz')
   assert.equal(misses.length, 0)
+})
+
+// --- IR-014/035: unlock-time privacy migration over legacy plaintext ---
+await t('privacy migration encrypts legacy titles + intake blobs', async () => {
+  const s = createMemoryStorage()
+  const a = await createAnswer(s, { application_id: 'app1', question_occurrence_id: 'q1' })
+  // simulate a legacy record: plaintext title, no title_enc flag
+  const legacy = await createVersion(s, SECRET, { answer_id: a.id, title: 'legacy title', body: 'body', method: 'manual' })
+  const stored = await s.get('versions', legacy.id)
+  const { title_enc: _te, ...rest } = stored
+  await s.put('versions', { ...rest, title: 'legacy title' }) // strip flag → legacy plaintext record
+  // legacy intake catalog row: plaintext blob
+  await s.put('catalog_cache', {
+    key: 'intake:local-intake-x',
+    blob: { application_id: 'local-intake-x', entity: { name: 'Acme' }, questions: [{ occurrence_id: 'q1', text: 'Why Acme?' }] },
+    fetched_at: new Date().toISOString(),
+  })
+  const res = await runVaultPrivacyMigration(s, SECRET)
+  assert.equal(res.titles_migrated, 1)
+  assert.equal(res.catalog_migrated, 1)
+  const afterV = await s.get('versions', legacy.id)
+  assert.equal(afterV.title_enc, true)
+  assert.notEqual(afterV.title, 'legacy title') // ciphertext now
+  assert.equal(await decryptVersionTitle(SECRET, afterV), 'legacy title') // still readable
+  const afterC = await s.get('catalog_cache', 'intake:local-intake-x')
+  assert.equal(afterC.blob, undefined)
+  assert.ok(afterC.blob_enc)
 })
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

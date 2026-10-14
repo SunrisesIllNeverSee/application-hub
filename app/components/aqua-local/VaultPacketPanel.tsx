@@ -10,6 +10,7 @@ import {
   listPackets,
   attestPacket,
   generateSignerKeyPair,
+  decryptVersionTitle,
   recordExternalSubmission,
   updateSubmissionOutcome,
   listSubmissionsForPacket,
@@ -87,6 +88,18 @@ export function VaultPacketPanel({
       storage.getAll<ApprovalRecord>('approvals'),
     ])
     const appAnswers = answers.filter((a) => a.scope.application_id === programId)
+    // IR-014: titles are ciphertext at rest — decrypt for display.
+    const secret = vault.getSecret()
+    if (secret) {
+      for (let i = 0; i < versions.length; i++) {
+        const v = versions[i]
+        if (v.title_enc) {
+          const title = await decryptVersionTitle(secret, v).catch(() => '[undecryptable title]')
+          const { title_enc: _te, ...rest } = v // shallow copy — never write back plaintext
+          versions[i] = { ...rest, title } as typeof v
+        }
+      }
+    }
     // IR-030: mirror the freeze gate — 'approved' only counts when the
     // latest decision is human and not backup-restored; everything else
     // keeps its real decision so the UI can label it.
@@ -139,7 +152,7 @@ export function VaultPacketPanel({
       })),
     )
     setPackets(withState)
-  }, [programId, questions])
+  }, [programId, questions, vault])
 
   useEffect(() => {
     if (vault.status !== 'unlocked') return
@@ -423,7 +436,7 @@ export function VaultPacketPanel({
       {frozenId && packetState && (
         <div className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
           <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-            Packet {frozenId} — <span className="uppercase">{packetState.state}</span>
+            Packet {frozenId} — <span className="uppercase">{packetState.state.toUpperCase()}</span>
           </p>
           <p className="break-all font-mono text-[11px] text-neutral-500 dark:text-neutral-400">
             manifest sha256: {manifestSha}

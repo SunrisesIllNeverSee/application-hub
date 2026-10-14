@@ -2,8 +2,9 @@
 // Run: node lib/aqua-local/run-intake-tests.mjs   (Node >=22.6 type-strips)
 import assert from 'node:assert/strict'
 import { createMemoryStorage } from './vault.ts'
+import { decryptText } from './crypto.ts'
 import { importLocalIntake, listLocalIntakes, intakeApplicationId, importLegacyQAPairs } from './intake.ts'
-import { extractQAPairsDeterministic, parsePairs } from '../intake-extract-shared.ts'
+import { extractQAPairsDeterministic, extractQAPairsDeterministicReport, parsePairs } from '../intake-extract-shared.ts'
 import { extractManualIntake, buildIntakeMeta } from '../intake/manual-intake.ts'
 import { createVersion, approveVersion } from './repo.ts'
 import { freezeApplicationPacket } from './packets.ts'
@@ -42,7 +43,7 @@ await t('deterministic extraction produces questions', async () => {
 await t('intake import creates scoped answer slots + catalog record', async () => {
   const s = createMemoryStorage()
   const ex = extractionFor(SAMPLE)
-  const res = await importLocalIntake(s, ex, { source_type: 'manual_paste' })
+  const res = await importLocalIntake(s, SECRET, ex, { source_type: 'manual_paste' })
   assert.equal(res.question_count, 3)
   assert.ok(res.application_id.startsWith('local-intake-'))
   const answers = await s.getAll('answers')
@@ -50,20 +51,24 @@ await t('intake import creates scoped answer slots + catalog record', async () =
   assert.ok(answers.every((a) => a.scope.application_id === res.application_id))
   const catalog = await s.get('catalog_cache', `intake:${res.application_id}`)
   assert.ok(catalog)
-  assert.ok(!JSON.stringify(catalog.blob).includes(SAMPLE), 'raw pasted text never stored')
-  assert.equal(catalog.blob.questions.length, 3)
-  const intakes = await listLocalIntakes(s)
+  assert.ok(!JSON.stringify(catalog.blob ?? '').includes(SAMPLE), 'raw pasted text never stored')
+  // IR-035: intake blob is ciphertext at rest — plaintext only via decrypt
+  assert.ok(catalog.blob_enc, 'intake blob encrypted at rest')
+  assert.ok(!catalog.blob)
+  const blobPlain = JSON.parse(await decryptText(SECRET, JSON.parse(catalog.blob_enc)))
+  assert.equal(blobPlain.questions.length, 3)
+  const intakes = await listLocalIntakes(s, SECRET)
   assert.equal(intakes.length, 1)
 })
 
 await t('re-import does not clobber answered slots', async () => {
   const s = createMemoryStorage()
   const ex = extractionFor(SAMPLE)
-  const res = await importLocalIntake(s, ex, { source_type: 'manual_paste' })
+  const res = await importLocalIntake(s, SECRET, ex, { source_type: 'manual_paste' })
   const answers = await s.getAll('answers')
   await createVersion(s, SECRET, {
     answer_id: answers[0].id, title: 'mine', body: 'my answer', method: 'manual' })
-  await importLocalIntake(s, ex, { source_type: 'manual_paste' })
+  await importLocalIntake(s, SECRET, ex, { source_type: 'manual_paste' })
   const after = await s.getAll('answers')
   assert.equal(after.length, 3, 'no duplicate slots')
   const versions = await s.getAll('versions')
@@ -73,7 +78,7 @@ await t('re-import does not clobber answered slots', async () => {
 await t('intake-scoped versions flow through the packet path', async () => {
   const s = createMemoryStorage()
   const ex = extractionFor(SAMPLE)
-  const res = await importLocalIntake(s, ex, { source_type: 'manual_paste' })
+  const res = await importLocalIntake(s, SECRET, ex, { source_type: 'manual_paste' })
   const answers = await s.getAll('answers')
   const selections = []
   for (const a of answers) {
@@ -137,6 +142,26 @@ await t('legacy import lands versions in the bank — re-import extends not dupl
   assert.equal(answers.length, 3)
   const versions = await s.getAll('versions')
   assert.equal(versions.length, 6)
+})
+
+await t('IR-036: reordered re-import dedupes — no slot multiplication', async () => {
+  const s = createMemoryStorage()
+  const pairs = extractQAPairsDeterministic(QA_SAMPLE)
+  const r1 = await importLegacyQAPairs(s, SECRET, pairs, { label: 'yc' }, { deterministic_parse: true })
+  assert.equal(r1.created_answers, 3)
+  // identical pairs, reversed order → same slots, new versions only
+  const r2 = await importLegacyQAPairs(s, SECRET, [...pairs].reverse(), { label: 'yc2' }, { deterministic_parse: true })
+  assert.equal(r2.created_answers, 0, 'reordered re-import must not create new answers')
+  assert.equal(r2.added_versions, 3)
+  assert.equal((await s.getAll('answers')).length, 3)
+  // literal duplicates inside ONE batch still get distinct slots
+  const r3 = await importLegacyQAPairs(s, SECRET, [pairs[0], pairs[0]], { label: 'dup' }, { deterministic_parse: true })
+  assert.equal(r3.created_answers, 1, 'second copy of same question gets its own slot')
+  assert.equal((await s.getAll('answers')).length, 4)
+  // partial overlap: new question + old question merges only the old
+  const r4 = await importLegacyQAPairs(s, SECRET, [pairs[0], { question_text: 'A brand new question?', answer_text: 'brand new body text here', theme: 't', confidence: 'h' }], { label: 'mix' }, { deterministic_parse: true })
+  assert.equal(r4.created_answers, 1, 'only the new question creates a slot')
+  assert.equal((await s.getAll('answers')).length, 5)
 })
 
 await t('imported bodies stay encrypted + raw paste never stored', async () => {
@@ -207,5 +232,32 @@ await t('W2: provider-extracted pairs carry provider/model, never claim determin
   assert.equal(provenance[0].observed_flags.deterministic_parse, false)
 })
 
+
+await t('IR-037: ambiguous boundaries are flagged + counted, never silent', async () => {
+  // '?'-line inside an answer — absorbed but flagged
+  const ambiguous = `Q: What is your edge?
+A: We move fast.
+Is speed really the answer?
+Yes — speed compounds into defensible momentum.
+Q: Why now?
+A: The window closes.`
+  const rep = extractQAPairsDeterministicReport(ambiguous)
+  assert.equal(rep.absorbed_question_lines, 1, 'absorbed ?-line counted')
+  assert.equal(rep.pairs.filter((p) => p.uncertain).length, 1, 'pair flagged uncertain')
+  assert.ok(rep.pairs[0].uncertainty_reason?.includes('question-marked'), 'reason explains the ambiguity')
+  // a question with no answer gets dropped + counted
+  const dangling = `Q: First question here?
+A: A real answer text body.
+Q: A question with no answer?
+Q: Second real question?
+A: Another real answer text.`
+  const rep2 = extractQAPairsDeterministicReport(dangling)
+  assert.equal(rep2.dropped_questions, 1, 'dropped question counted')
+  assert.equal(rep2.uncertain_boundaries >= 1, true)
+  // a clean parse reports zero uncertainties
+  const clean = extractQAPairsDeterministicReport(QA_SAMPLE)
+  assert.equal(clean.uncertain_boundaries, 0)
+  assert.equal(clean.pairs.every((p) => !p.uncertain), true)
+})
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

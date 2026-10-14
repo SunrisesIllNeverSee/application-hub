@@ -569,12 +569,11 @@ export function createGoogleAdapter(opts?: { model?: string }): ProviderAdapter 
   }
 }
 
-/** Ollama (self-hosted) — direct browser call to the user's own endpoint.
-    Remote tunnels (ngrok et al.) do NOT get the ngrok-skip header: fetch()
-    sends `Accept: star-slash-star` — i.e. a non-HTML accept header, which
-    already passes ngrok's browser warning page,
-    while the extra header would FAIL the CORS preflight against Ollama's
-    fixed Access-Control-Allow-Headers list. */
+// Ollama (self-hosted) — direct browser call to the user's own endpoint.
+// Remote tunnels (ngrok et al.) do NOT get the ngrok-skip header: requests
+// send a non-HTML Accept header which already passes ngrok's browser
+// warning page, while the extra header would FAIL the CORS preflight
+// against the daemon's fixed Access-Control-Allow-Headers list.
 export function createOllamaAdapter(opts: { base_url: string; model?: string }): ProviderAdapter {
   const model = opts.model ?? DEFAULT_MODELS.ollama
   const base = opts.base_url.replace(/\/+$/, '')
