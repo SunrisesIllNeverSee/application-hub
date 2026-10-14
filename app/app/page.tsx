@@ -149,8 +149,12 @@ export default async function RootPage() {
             <p className="mt-7 max-w-xl text-xl leading-8 text-neutral-300">
               Reuse application answers across accelerators, grants, fellowships, and jobs. One answer bank for every application you&apos;ll ever write.
             </p>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-400">
+              Your private answers live in an encrypted vault on this device — never on our servers.
+              The database is configured to refuse storing them.
+            </p>
             <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-neutral-300">
-              {['Commitment Engine', 'Multi-Mode', 'Governed Answers'].map((item) => (
+              {['Commitment Engine', 'Multi-Mode', 'Governed Answers', 'Local-First Vault'].map((item) => (
                 <span key={item} className="rounded-md border border-neutral-800 bg-neutral-900 px-3 py-1.5">{item}</span>
               ))}
             </div>
