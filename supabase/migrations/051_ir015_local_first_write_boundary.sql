@@ -1,9 +1,13 @@
 -- ============================================================
 -- 051 — IR-015 local-first database write boundary (PROPOSAL)
 -- ============================================================
--- Status: PROPOSAL — DO NOT APPLY to production without explicit
--- owner authorization. Prepared migration per the M07 reconciliation
--- directive; application is a deployment-custody decision.
+-- Status: APPLIED + ACTIVATED on production 2026-10-14 (owner-authorized).
+--   _deploy_flags('local_first')='1' is SET — the deny-write policies below
+--   are LIVE for the authenticated role on all six covered tables.
+--   Verified live at application time: flag dormant → authenticated INSERT
+--   succeeded; flag='1' → INSERT 42501, UPDATE/DELETE filtered to 0 rows,
+--   SELECT unaffected; service_role bypasses (retained server paths work).
+--   Rollback remains as documented in section 4 below.
 --
 -- EXECUTION-VERIFIED against PostgreSQL 16.15 on a scratch database
 -- carrying the REAL production table names (2026-10-13):
