@@ -6,8 +6,9 @@
 ![Next.js](https://img.shields.io/badge/Next.js-14.2.35-black)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20RLS-3ECF8E)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6)
-![MCP](https://img.shields.io/badge/MCP-21%20tools-6E56CF)
+![MCP](https://img.shields.io/badge/MCP-31%20tools-6E56CF)
 ![Vercel](https://img.shields.io/badge/Vercel-Live-black)
+![Custody](https://img.shields.io/badge/Local--first%20custody-DB%20enforced-0A7EA4)
 
 Application Hub is a founder-first product built on a portable application graph. It turns recurring application questions into reusable assets, helps users build an answer bank that compounds over time, and exposes the full intelligence layer through both a web app and an MCP server.
 
@@ -30,11 +31,20 @@ The public wedge is startup opportunities. The underlying spine is broad enough 
 
 | Surface | State |
 |---|---|
-| Live app | `https://aquaidp.xyz` |
+| Live app | `https://aquaidp.xyz` — local-first build live |
+| Custody | Private answers/notes live in a browser-encrypted IndexedDB vault; Postgres **enforces** the boundary (RLS deny-write policies, migration 051 — see `docs/STATUS.md`) |
 | Archive + migration counts | See `docs/STATUS.md` (registry archived to `docs/archive/build-era/agents/`) |
-| MCP server | 21 tools, 7 resources, 3 prompts |
-| Web product | Hub, Bank, workspace, profile split, imports, BYOK |
+| MCP server | `aqua-mcp-server@1.0.1` on npm — 31 tools (25 `hub_*` + 6 `aqua.*`), manifest at `/.well-known/mcp`, docs at `/mcp` |
+| Web product | Hub, local vault bank, workspace, packet freeze/sign/export, imports, BYOK |
 | Review layer | persisted reviews + stress tests + starter reviewer family |
+
+## Local-First Custody (what "your data stays yours" means here)
+
+- **Vault**: answers, drafts, intake blobs, and provider keys are AES-GCM encrypted under your secret in this device's IndexedDB — `aqua-local-<your uid>` per account, isolated on sign-out/switch.
+- **Server contract**: private-content API routes refuse under the local-first flag (HTTP 403); the database enforces the same boundary with RESTRICTIVE RLS policies — authenticated writes to the six private-content tables are denied while `local_first` is active.
+- **BYOK**: generation goes browser → your provider directly (Anthropic/OpenAI/Google/Ollama); each generation writes a consent receipt naming the endpoint before egress; new custom endpoints get a first-use warning.
+- **Packets**: application packets freeze a sha256 manifest and are signed on-device (ECDSA). The server never sees the content unless you export it yourself.
+- **Honest limits**: Ollama on `localhost` is blocked by browser Private Network Access on hosted HTTPS — use an HTTPS endpoint or run the app locally.
 
 ## Architecture At A Glance
 
@@ -58,6 +68,14 @@ npm run build
 ```
 
 ### MCP server
+
+Published package:
+
+```bash
+npx aqua-mcp-server@1.0.1   # 31 tools; needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+```
+
+From source:
 
 ```bash
 cd application-hub-mcp-server
