@@ -17,20 +17,9 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Onboarding gate — block all (app) routes until user completes /onboarding.
-  // Legacy users with existing profile_answers were backfilled in migration 040.
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('onboarding_completed_at')
-    .eq('user_id', user.id)
-    .maybeSingle<{ onboarding_completed_at: string | null }>()
-
-  // M08-PRD-004 (owner d5): un-onboarded signed-in users may browse the
-  // catalog read-only; every other surface still gates to /onboarding.
+  // M08-PRD-004 (owner d5) + M08-PRD-003 (owner d4b): un-onboarded signed-in
+  // users AND unauthenticated guests may browse the catalog read-only; every
+  // other surface still gates (login for guests, onboarding for signed-in).
   // Path comes from the middleware-stamped x-aqua-path request header —
   // middleware unconditionally overwrites it on every matcher-covered route,
   // which is what makes trusting it here safe. If the route matcher ever
@@ -40,6 +29,30 @@ export default async function AppLayout({
   const isBrowseOnly =
     reqPath === '/applications' ||
     (reqPath.startsWith('/applications/') && reqPath !== '/applications/submit')
+
+  if (!user) {
+    if (!isBrowseOnly) redirect('/login')
+    // Guest browse: catalog content without app chrome (no sidebar/vault).
+    return (
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+        <header className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <a href="/" className="text-sm font-semibold text-neutral-900 dark:text-white">AQUA</a>
+          <a href="/login" className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-700">Sign in</a>
+        </header>
+        <main className="flex-1 min-w-0">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">{children}</div>
+        </main>
+      </div>
+    )
+  }
+
+  // Onboarding gate — block all (app) routes until user completes /onboarding.
+  // Legacy users with existing profile_answers were backfilled in migration 040.
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('onboarding_completed_at')
+    .eq('user_id', user.id)
+    .maybeSingle<{ onboarding_completed_at: string | null }>()
 
   if (!profile?.onboarding_completed_at && !isBrowseOnly) {
     redirect('/onboarding')

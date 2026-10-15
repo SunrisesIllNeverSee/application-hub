@@ -35,6 +35,9 @@ export async function initPostHog() {
     disable_external_dependency_loading: true,
     disable_surveys: true,
     capture_exceptions: false,
+    // d6 scope is pageviews only — no content telemetry. $$heatmap events
+    // are enabled server-side via feature flag; refuse them client-side.
+    enable_heatmaps: false,
     persistence: "localStorage+cookie",
   });
 }

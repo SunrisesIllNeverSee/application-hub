@@ -50,7 +50,8 @@ export default async function HubPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  const tab: TabKey = resolvedParams.tab === 'mine' ? 'mine' : 'discover'
+  // Guests (d4b) browse discover only — "My Applications" is personal data.
+  const tab: TabKey = resolvedParams.tab === 'mine' && user ? 'mine' : 'discover'
   let activeIdentity: ApplicantMode = DEFAULT_MODE
   let identities: ApplicantMode[] = [DEFAULT_MODE]
   let onboarded = true
@@ -319,6 +320,15 @@ export default async function HubPage({
         <section id="program-detail" className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto scroll-mt-4">
           {/* useSearchParams requires Suspense if this page is ever made static */}
           <Suspense fallback={null}><ScrollDetailOnSelect /></Suspense>
+          {!user && (
+            <div className="border-b border-neutral-200 bg-brand-50 px-4 py-2.5 text-xs text-neutral-700 dark:border-neutral-800 dark:bg-brand-900/20 dark:text-neutral-300">
+              Browsing as a guest —{' '}
+              <Link href="/login" className="font-medium text-brand-600 underline-offset-2 hover:underline dark:text-brand-400">
+                sign in
+              </Link>{' '}
+              to save answers, open workspaces, and prepare packets.
+            </div>
+          )}
           {!onboarded && (
             <div className="border-b border-neutral-200 bg-brand-50 px-4 py-2.5 text-xs text-neutral-700 dark:border-neutral-800 dark:bg-brand-900/20 dark:text-neutral-300">
               Browse mode — finish seeding your bank to unlock workspaces, drafts, and your vault.{' '}
