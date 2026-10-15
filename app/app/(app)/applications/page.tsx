@@ -21,6 +21,7 @@ import { formatDeadline, programTypeLabel, formatCheckSize, cn } from '@/lib/uti
 import { FundersDirectory } from '@/components/FundersDirectory'
 import { itemList } from '@/lib/jsonld'
 import { ScrollDetailOnSelect } from './ScrollDetailOnSelect'
+import { Suspense } from 'react'
 
 export const metadata = {
   title: 'Applications',
@@ -316,7 +317,8 @@ export default async function HubPage({
 
         {/* Right: detail panel */}
         <section id="program-detail" className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto scroll-mt-4">
-          <ScrollDetailOnSelect />
+          {/* useSearchParams requires Suspense if this page is ever made static */}
+          <Suspense fallback={null}><ScrollDetailOnSelect /></Suspense>
           {!onboarded && (
             <div className="border-b border-neutral-200 bg-brand-50 px-4 py-2.5 text-xs text-neutral-700 dark:border-neutral-800 dark:bg-brand-900/20 dark:text-neutral-300">
               Browse mode — finish seeding your bank to unlock workspaces, drafts, and your vault.{' '}

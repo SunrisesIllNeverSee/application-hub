@@ -115,15 +115,17 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         'signoffs', 'provider_keys', 'provider_consents', 'packet_states',
         'submissions', 'events',
       ] as const
-      const counts = await Promise.all(
-        userStores.map(async (store) => {
-          try {
-            return (await s.keys(store)).length
-          } catch (err) {
-            if (err instanceof DOMException && err.name === 'NotFoundError') return 0
-            throw err
-          }
-        }),
+      const counts = await s.tx([...userStores], (t) =>
+        Promise.all(
+          userStores.map(async (store) => {
+            try {
+              return (await t.keys(store)).length
+            } catch (err) {
+              if (err instanceof DOMException && err.name === 'NotFoundError') return 0
+              throw err
+            }
+          }),
+        ),
       )
       setVaultHasData(counts.some((c) => c > 0))
       setStatus('locked')
