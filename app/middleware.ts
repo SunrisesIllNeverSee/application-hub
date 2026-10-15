@@ -72,13 +72,18 @@ export async function middleware(request: NextRequest) {
 
   // M08-PRD-004 (owner d5): stamp the path so the (app) layout's onboarding
   // gate can apply the same browse-only exception as this middleware.
+  // Stamped directly on request.headers (not a copy) — the Supabase setAll
+  // cookie handler rebuilds NextResponse.next({ request }) on every session
+  // refresh, and a header on a detached copy would be silently dropped.
+  // INVARIANT: this stamp must stay unconditional for every matcher-covered
+  // route — it overwrites any client-supplied x-aqua-path, which is what makes
+  // trusting it in (app)/layout safe. Do not gate it behind conditions.
   const isBrowseOnlyPath =
     pathname === '/applications' ||
     (pathname.startsWith('/applications/') && pathname !== '/applications/submit')
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-aqua-path', pathname)
+  request.headers.set('x-aqua-path', pathname)
 
-  let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } })
+  let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

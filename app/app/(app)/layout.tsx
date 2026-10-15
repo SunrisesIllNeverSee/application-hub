@@ -31,7 +31,11 @@ export default async function AppLayout({
 
   // M08-PRD-004 (owner d5): un-onboarded signed-in users may browse the
   // catalog read-only; every other surface still gates to /onboarding.
-  // Path comes from the middleware-stamped x-aqua-path request header.
+  // Path comes from the middleware-stamped x-aqua-path request header —
+  // middleware unconditionally overwrites it on every matcher-covered route,
+  // which is what makes trusting it here safe. If the route matcher ever
+  // excludes a page, this header becomes attacker-controllable: re-derive
+  // server-side instead.
   const reqPath = (await headers()).get('x-aqua-path') ?? ''
   const isBrowseOnly =
     reqPath === '/applications' ||

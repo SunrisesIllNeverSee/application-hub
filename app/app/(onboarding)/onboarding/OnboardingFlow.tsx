@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { ArchivedQuestion } from '@/lib/database.types'
 import { ThemeTag } from '@/components/ThemeTag'
 import { cn } from '@/lib/utils'
@@ -229,9 +230,9 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
             We hide the rest of the product on purpose — fewer empty drawers, more meaningful first session.
           </p>
           <p className="mt-3 text-center text-xs">
-            <a href="/applications" className="text-brand-600 underline-offset-2 hover:underline dark:text-brand-400">
+            <Link href="/applications" className="text-brand-600 underline-offset-2 hover:underline dark:text-brand-400">
               Or explore the catalog first — you can come back and seed your bank anytime.
-            </a>
+            </Link>
           </p>
         </div>
       </div>

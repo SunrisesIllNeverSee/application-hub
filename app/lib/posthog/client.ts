@@ -24,6 +24,7 @@ export async function initPostHog() {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
     capture_pageview: true,
     capture_pageleave: true,
+    autocapture: false,
     persistence: "localStorage+cookie",
     capture_exceptions: true,
   });

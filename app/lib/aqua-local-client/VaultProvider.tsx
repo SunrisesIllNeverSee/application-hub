@@ -104,12 +104,26 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     if (secretRef.current) {
       setStatus('unlocked')
     } else {
-      // Probe all user-data stores so the unlock UI can distinguish first-run
+      // Probe every user-data store so the unlock UI can distinguish first-run
       // (create a secret) from existing-vault (enter secret). A versions-only
-      // probe mislabels intake-only or empty-version vaults as first-run.
-      const stores = ['versions', 'answers', 'imports', 'provider_keys', 'packets', 'events'] as const
+      // probe mislabels intake-only, provider-only, or packet-only vaults as
+      // first-run. getAllKeys is used — existence check only, no row loads.
+      // Missing-store errors are tolerated; handle revocation and other real
+      // failures propagate rather than mislabeling the vault as first-run.
+      const userStores = [
+        'versions', 'answers', 'approvals', 'packets', 'provenance', 'imports',
+        'signoffs', 'provider_keys', 'provider_consents', 'packet_states',
+        'submissions', 'events',
+      ] as const
       const counts = await Promise.all(
-        stores.map((store) => s.getAll(store).then((rows) => rows.length).catch(() => 0)),
+        userStores.map(async (store) => {
+          try {
+            return (await s.keys(store)).length
+          } catch (err) {
+            if (err instanceof DOMException && err.name === 'NotFoundError') return 0
+            throw err
+          }
+        }),
       )
       setVaultHasData(counts.some((c) => c > 0))
       setStatus('locked')
