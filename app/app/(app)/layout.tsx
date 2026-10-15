@@ -6,6 +6,7 @@ import { CreditToast } from '@/components/CreditToast'
 import { BetaEndBanner } from '@/components/BetaEndBanner'
 import { VaultProvider } from '@/lib/aqua-local-client/VaultProvider'
 import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
+import { isBrowseOnlyPath } from '@/lib/browse-gate'
 
 export default async function AppLayout({
   children,
@@ -26,9 +27,7 @@ export default async function AppLayout({
   // excludes a page, this header becomes attacker-controllable: re-derive
   // server-side instead.
   const reqPath = (await headers()).get('x-aqua-path') ?? ''
-  const isBrowseOnly =
-    reqPath === '/applications' ||
-    (reqPath.startsWith('/applications/') && reqPath !== '/applications/submit')
+  const isBrowseOnly = isBrowseOnlyPath(reqPath)
 
   if (!user) {
     if (!isBrowseOnly) redirect('/login')

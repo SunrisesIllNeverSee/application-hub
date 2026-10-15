@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { appendVaryAccept, preferredType } from '@/lib/accept.mjs'
+import { isBrowseOnlyPath } from '@/lib/browse-gate'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
@@ -78,9 +79,7 @@ export async function middleware(request: NextRequest) {
   // INVARIANT: this stamp must stay unconditional for every matcher-covered
   // route — it overwrites any client-supplied x-aqua-path, which is what makes
   // trusting it in (app)/layout safe. Do not gate it behind conditions.
-  const isBrowseOnlyPath =
-    pathname === '/applications' ||
-    (pathname.startsWith('/applications/') && pathname !== '/applications/submit')
+  const browseOnly = isBrowseOnlyPath(pathname)
   request.headers.set('x-aqua-path', pathname)
 
   let supabaseResponse = NextResponse.next({ request })
@@ -108,7 +107,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user && isProtected && !isBrowseOnlyPath) {
+  if (!user && isProtected && !browseOnly) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('next', pathname)
@@ -130,7 +129,7 @@ export async function middleware(request: NextRequest) {
       // M08-PRD-004 (owner d5 "explore first"): un-onboarded signed-in users
       // may browse the program catalog read-only. Everything that writes —
       // workspaces, vault, bank, submissions — still gates to /onboarding.
-      if (!onboarded && !pathname.startsWith('/onboarding') && !isBrowseOnlyPath) {
+      if (!onboarded && !pathname.startsWith('/onboarding') && !browseOnly) {
         const url = request.nextUrl.clone()
         url.pathname = '/onboarding'
         return NextResponse.redirect(url)
