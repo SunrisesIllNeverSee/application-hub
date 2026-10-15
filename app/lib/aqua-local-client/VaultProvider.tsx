@@ -104,10 +104,14 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     if (secretRef.current) {
       setStatus('unlocked')
     } else {
-      // Probe record count so the unlock UI can distinguish first-run
-      // (create a secret) from existing-vault (enter secret).
-      const versions = await s.getAll('versions')
-      setVaultHasData(versions.length > 0)
+      // Probe all user-data stores so the unlock UI can distinguish first-run
+      // (create a secret) from existing-vault (enter secret). A versions-only
+      // probe mislabels intake-only or empty-version vaults as first-run.
+      const stores = ['versions', 'answers', 'imports', 'provider_keys', 'packets', 'events'] as const
+      const counts = await Promise.all(
+        stores.map((store) => s.getAll(store).then((rows) => rows.length).catch(() => 0)),
+      )
+      setVaultHasData(counts.some((c) => c > 0))
       setStatus('locked')
     }
     return s

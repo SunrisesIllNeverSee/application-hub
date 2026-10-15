@@ -70,7 +70,15 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  let supabaseResponse = NextResponse.next({ request })
+  // M08-PRD-004 (owner d5): stamp the path so the (app) layout's onboarding
+  // gate can apply the same browse-only exception as this middleware.
+  const isBrowseOnlyPath =
+    pathname === '/applications' ||
+    (pathname.startsWith('/applications/') && pathname !== '/applications/submit')
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-aqua-path', pathname)
+
+  let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -114,7 +122,10 @@ export async function middleware(request: NextRequest) {
 
       const onboarded = !!profile?.onboarding_completed_at
 
-      if (!onboarded && !pathname.startsWith('/onboarding')) {
+      // M08-PRD-004 (owner d5 "explore first"): un-onboarded signed-in users
+      // may browse the program catalog read-only. Everything that writes —
+      // workspaces, vault, bank, submissions — still gates to /onboarding.
+      if (!onboarded && !pathname.startsWith('/onboarding') && !isBrowseOnlyPath) {
         const url = request.nextUrl.clone()
         url.pathname = '/onboarding'
         return NextResponse.redirect(url)

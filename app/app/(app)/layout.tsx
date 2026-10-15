@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/Sidebar'
 import { CreditToast } from '@/components/CreditToast'
@@ -28,7 +29,15 @@ export default async function AppLayout({
     .eq('user_id', user.id)
     .maybeSingle<{ onboarding_completed_at: string | null }>()
 
-  if (!profile?.onboarding_completed_at) {
+  // M08-PRD-004 (owner d5): un-onboarded signed-in users may browse the
+  // catalog read-only; every other surface still gates to /onboarding.
+  // Path comes from the middleware-stamped x-aqua-path request header.
+  const reqPath = (await headers()).get('x-aqua-path') ?? ''
+  const isBrowseOnly =
+    reqPath === '/applications' ||
+    (reqPath.startsWith('/applications/') && reqPath !== '/applications/submit')
+
+  if (!profile?.onboarding_completed_at && !isBrowseOnly) {
     redirect('/onboarding')
   }
 

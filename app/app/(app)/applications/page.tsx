@@ -20,6 +20,7 @@ import {
 import { formatDeadline, programTypeLabel, formatCheckSize, cn } from '@/lib/utils'
 import { FundersDirectory } from '@/components/FundersDirectory'
 import { itemList } from '@/lib/jsonld'
+import { ScrollDetailOnSelect } from './ScrollDetailOnSelect'
 
 export const metadata = {
   title: 'Applications',
@@ -51,14 +52,16 @@ export default async function HubPage({
   const tab: TabKey = resolvedParams.tab === 'mine' ? 'mine' : 'discover'
   let activeIdentity: ApplicantMode = DEFAULT_MODE
   let identities: ApplicantMode[] = [DEFAULT_MODE]
+  let onboarded = true
   if (user) {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('active_identity, identities')
+      .select('active_identity, identities, onboarding_completed_at')
       .eq('user_id', user.id)
-      .single<{ active_identity: ApplicantMode | null; identities: ApplicantMode[] | null }>()
+      .single<{ active_identity: ApplicantMode | null; identities: ApplicantMode[] | null; onboarding_completed_at: string | null }>()
     activeIdentity = profile?.active_identity ?? DEFAULT_MODE
     identities = profile?.identities ?? [DEFAULT_MODE]
+    onboarded = !!profile?.onboarding_completed_at
   }
 
   // Funders view short-circuits
@@ -312,7 +315,16 @@ export default async function HubPage({
         </aside>
 
         {/* Right: detail panel */}
-        <section className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto">
+        <section id="program-detail" className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto scroll-mt-4">
+          <ScrollDetailOnSelect />
+          {!onboarded && (
+            <div className="border-b border-neutral-200 bg-brand-50 px-4 py-2.5 text-xs text-neutral-700 dark:border-neutral-800 dark:bg-brand-900/20 dark:text-neutral-300">
+              Browse mode — finish seeding your bank to unlock workspaces, drafts, and your vault.{' '}
+              <Link href="/onboarding" className="font-medium text-brand-600 underline-offset-2 hover:underline dark:text-brand-400">
+                Finish setup →
+              </Link>
+            </div>
+          )}
           {selectedProgramWithFit ? (
             <ApplicationDetailPanel
               program={selectedProgramWithFit}
