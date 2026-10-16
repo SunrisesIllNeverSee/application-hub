@@ -37,11 +37,31 @@ export default async function ProgramDetailPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
 
-  const { data: program } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Public viewers (guests / un-onboarded) may only see owner-approved
+  // non-seeded records — the synthetic seed catalog must not read as
+  // validated application data on the public detail surface either.
+  let onboarded = true
+  if (user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('onboarding_completed_at')
+      .eq('user_id', user.id)
+      .maybeSingle<{ onboarding_completed_at: string | null }>()
+    onboarded = !!profile?.onboarding_completed_at
+  }
+  const publicCatalogView = !user || !onboarded
+
+  let programQuery = supabase
     .from('programs')
     .select('*')
     .eq('slug', slug)
-    .single<Program>()
+  if (publicCatalogView) programQuery = programQuery.neq('source', 'seeded')
+
+  const { data: program } = await programQuery.single<Program>()
 
   if (!program) notFound()
 

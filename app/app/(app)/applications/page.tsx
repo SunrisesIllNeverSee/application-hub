@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type {
   Program,
@@ -66,8 +67,10 @@ export default async function HubPage({
     onboarded = !!profile?.onboarding_completed_at
   }
 
-  // Funders view short-circuits
+  // Funders view short-circuits — the directory aggregates synthetic seed
+  // counts, so public viewers (guests / un-onboarded) get the catalog instead.
   if (resolvedParams.view === 'funders') {
+    if (!user || !onboarded) redirect('/applications')
     return (
       <div>
         <div className="mb-4">
@@ -107,6 +110,15 @@ export default async function HubPage({
 
   const activeDomain = resolvedParams.domain ?? 'founder'
   query = query.eq('domain', activeDomain)
+
+  // M08-PRD-003 (owner d4b): the public experience must not present the
+  // synthetic seed catalog as validated applications. Guests and
+  // un-onboarded browsers see owner-approved non-seeded records only;
+  // seeded rows stay visible to onboarded users until canonical promotion.
+  const publicCatalogView = !user || !onboarded
+  if (publicCatalogView) {
+    query = query.neq('source', 'seeded')
+  }
 
   const { data: programs } = await query.returns<Program[]>()
 
@@ -313,6 +325,7 @@ export default async function HubPage({
             mineRows={mineRows}
             sort={sort}
             selectedId={resolvedSelectedId}
+            publicCatalogView={publicCatalogView}
           />
         </aside>
 
@@ -371,12 +384,14 @@ function ApplicationsSidebar({
   mineRows,
   sort,
   selectedId,
+  publicCatalogView,
 }: {
   tab: TabKey
   sorted: ProgramWithFit[]
   mineRows: MineRow[]
   sort: string
   selectedId: string | null
+  publicCatalogView: boolean
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -459,7 +474,11 @@ function ApplicationsSidebar({
         ) : (
           sorted.length === 0 ? (
             <div className="p-4 text-center">
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">No programs match your filters.</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {publicCatalogView
+                  ? 'Verified programs are being prepared for public browsing. Sign in to explore the full catalog.'
+                  : 'No programs match your filters.'}
+              </p>
             </div>
           ) : (
             sorted.map((program) => {

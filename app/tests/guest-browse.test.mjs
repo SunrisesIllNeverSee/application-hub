@@ -58,3 +58,14 @@ test('guests never receive personal surfaces', async () => {
   // guest banner points at sign-in, not workspace actions
   assert.match(page, /Browsing as a guest/)
 })
+
+test('public viewers never see the synthetic seed catalog (d4b/WS7)', async () => {
+  const page = await read('app/(app)/applications/page.tsx')
+  const detail = await read('app/(app)/applications/[slug]/page.tsx')
+  // catalog query excludes seeded rows for guests + un-onboarded users
+  assert.match(page, /publicCatalogView/)
+  assert.match(page, /\.neq\('source', 'seeded'\)/)
+  assert.match(detail, /\.neq\('source', 'seeded'\)/)
+  // funders directory (synthetic aggregates) redirects public viewers
+  assert.match(page, /view === 'funders'[\s\S]{0,80}redirect\('\/applications'\)/)
+})
