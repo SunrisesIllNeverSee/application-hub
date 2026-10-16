@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 import Link from 'next/link'
 
 export const metadata = { title: 'Funders' }
@@ -44,11 +45,11 @@ export default async function FundersPage({ searchParams }: PageProps) {
 
   const { data: funderRows } = await query
 
-  // Get program counts per funder
-  const { data: countRows } = await supabase
-    .from('programs')
-    .select('funder_id')
-    .not('funder_id', 'is', null)
+  // Get program counts per funder — canonical programs only (uniform
+  // approved-only catalog policy, M08 WS7)
+  const { data: countRows } = await restrictToApprovedPrograms(
+    supabase.from('programs').select('funder_id').not('funder_id', 'is', null),
+  )
 
   const countMap: Record<string, number> = {}
   for (const row of countRows ?? []) {

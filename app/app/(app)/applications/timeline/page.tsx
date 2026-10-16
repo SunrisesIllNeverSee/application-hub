@@ -55,32 +55,14 @@ const STATUS_DOT = {
 export default async function TimelinePage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Public viewers (guests / un-onboarded) see approved records only — this
-  // page is on the guest-browse allowlist, so the synthetic seed catalog
-  // must be filtered here exactly as on the catalog and detail surfaces.
-  let onboarded = true
-  if (user) {
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('onboarding_completed_at')
-      .eq('user_id', user.id)
-      .maybeSingle<{ onboarding_completed_at: string | null }>()
-    onboarded = !!profile?.onboarding_completed_at
-  }
-  const publicCatalogView = !user || !onboarded
-
-  let programsQuery = supabase
-    .from('programs')
-    .select('*')
-    .order('deadline_at', { ascending: true, nullsFirst: false })
-  if (publicCatalogView) programsQuery = restrictToApprovedPrograms(programsQuery)
-
-  const { data: programs } = await programsQuery
-    .returns<Program[]>()
+  // Uniform approved-only catalog (M08 WS7): timeline is a catalog surface —
+  // approved records only, for every user class.
+  const { data: programs } = await restrictToApprovedPrograms(
+    supabase
+      .from('programs')
+      .select('*')
+      .order('deadline_at', { ascending: true, nullsFirst: false }),
+  ).returns<Program[]>()
 
   const all = programs ?? []
 
@@ -126,9 +108,7 @@ export default async function TimelinePage() {
 
       {all.length === 0 && (
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          {publicCatalogView
-            ? 'Verified programs are being prepared for public browsing. Sign in to see the full timeline.'
-            : 'No programs to show.'}
+          Verified programs are being prepared for public browsing.
         </p>
       )}
 

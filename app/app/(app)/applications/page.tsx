@@ -69,9 +69,11 @@ export default async function HubPage({
   }
 
   // Funders view short-circuits — the directory aggregates synthetic seed
-  // counts, so public viewers (guests / un-onboarded) get the catalog instead.
+  // counts, so under the uniform approved-only catalog policy (M08 WS7)
+  // all users are routed to the canonical catalog until canonical
+  // funders data exists.
   if (resolvedParams.view === 'funders') {
-    if (!user || !onboarded) redirect('/applications')
+    redirect('/applications')
     return (
       <div>
         <div className="mb-4">
@@ -112,14 +114,13 @@ export default async function HubPage({
   const activeDomain = resolvedParams.domain ?? 'founder'
   query = query.eq('domain', activeDomain)
 
-  // M08-PRD-003 (owner d4b): the public experience must not present the
-  // synthetic seed catalog as validated applications. Guests and
-  // un-onboarded browsers see owner-approved non-seeded records only;
-  // seeded rows stay visible to onboarded users until canonical promotion.
+  // M08-PRD-003 (owner d4b) + WS7 consistent policy: the catalog surface is
+  // approved-only for EVERY user class — synthetic/FundingCake/community
+  // records must not read as validated applications to anyone. Personal
+  // surfaces (My Applications, workspaces) are unaffected — they show the
+  // user's own saved rows, which are private data, not catalog claims.
   const publicCatalogView = !user || !onboarded
-  if (publicCatalogView) {
-    query = restrictToApprovedPrograms(query)
-  }
+  query = restrictToApprovedPrograms(query)
 
   const { data: programs } = await query.returns<Program[]>()
 

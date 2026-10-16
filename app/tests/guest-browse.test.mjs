@@ -59,24 +59,25 @@ test('guests never receive personal surfaces', async () => {
   assert.match(page, /Browsing as a guest/)
 })
 
-test('public viewers never see non-approved catalog (d4b/WS7) — allowlist semantics', async () => {
-  const gate = await read('lib/browse-gate.ts')
-  // every non-approved source enumerated: seeded, fundingcake (explicitly
-  // barred by owner), community, funder — only future 'canonical' passes
-  assert.match(gate, /"seeded"/)
-  assert.match(gate, /"fundingcake"/)
-  assert.match(gate, /"community"/)
-  assert.match(gate, /"funder"/)
-  assert.match(gate, /export function restrictToApprovedPrograms/)
+test('approved-only catalog is positive-allowlist and uniform (WS7)', async () => {
+  const registry = await read('lib/canonical-catalog.ts')
+  // positive criterion: explicit slug registry + never-match when empty —
+  // no unapproved row can become visible via a source-enum change
+  assert.match(registry, /CANONICAL_PROGRAM_SLUGS/)
+  assert.match(registry, /\.in\("slug", CANONICAL_PROGRAM_SLUGS\)/)
+  assert.match(registry, /00000000-0000-0000-0000-000000000000/)
+  // every catalog surface applies the filter unconditionally (all users)
   for (const rel of [
     'app/(app)/applications/page.tsx',
     'app/(app)/applications/[slug]/page.tsx',
     'app/(app)/applications/timeline/page.tsx',
+    'components/FundersDirectory.tsx',
+    'app/(app)/funders/page.tsx',
   ]) {
     const src = await read(rel)
     assert.match(src, /restrictToApprovedPrograms/, rel)
   }
   const page = await read('app/(app)/applications/page.tsx')
-  // funders directory (synthetic aggregates) redirects public viewers
-  assert.match(page, /view === 'funders'[\s\S]{0,80}redirect\('\/applications'\)/)
+  // funders aggregates are not a catalog surface — redirected for everyone
+  assert.match(page, /view === 'funders'[\s\S]{0,60}redirect\('\/applications'\)/)
 })
