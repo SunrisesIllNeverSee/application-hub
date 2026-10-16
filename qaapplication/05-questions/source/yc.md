@@ -1,3 +1,9 @@
+---
+entity_ref: EN-yc
+application_ref: AP-yc-2026-05
+slug: yc
+---
+
 # Y Combinator — Q-Only Index
 
 - **canonical:** ../../07-apply/yc.md

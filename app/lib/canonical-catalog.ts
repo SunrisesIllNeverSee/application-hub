@@ -9,7 +9,13 @@
 //
 // Empty today = no synthetic, FundingCake, community, or funder row can
 // ever become public merely because its source enum changes.
-export const CANONICAL_PROGRAM_SLUGS: readonly string[] = [];
+export const CANONICAL_PROGRAM_SLUGS: readonly string[] = [
+  "yc-summer-2026",
+  "founding-500",
+  "redbud-vc",
+  "cyberfund-monastery",
+  "3xcapital",
+];
 
 // Never-matches sentinel for empty registries (keeps the query well-formed
 // without hardcoding a real program id).
