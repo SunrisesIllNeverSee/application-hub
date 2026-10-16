@@ -59,13 +59,24 @@ test('guests never receive personal surfaces', async () => {
   assert.match(page, /Browsing as a guest/)
 })
 
-test('public viewers never see the synthetic seed catalog (d4b/WS7)', async () => {
+test('public viewers never see non-approved catalog (d4b/WS7) — allowlist semantics', async () => {
+  const gate = await read('lib/browse-gate.ts')
+  // every non-approved source enumerated: seeded, fundingcake (explicitly
+  // barred by owner), community, funder — only future 'canonical' passes
+  assert.match(gate, /"seeded"/)
+  assert.match(gate, /"fundingcake"/)
+  assert.match(gate, /"community"/)
+  assert.match(gate, /"funder"/)
+  assert.match(gate, /export function restrictToApprovedPrograms/)
+  for (const rel of [
+    'app/(app)/applications/page.tsx',
+    'app/(app)/applications/[slug]/page.tsx',
+    'app/(app)/applications/timeline/page.tsx',
+  ]) {
+    const src = await read(rel)
+    assert.match(src, /restrictToApprovedPrograms/, rel)
+  }
   const page = await read('app/(app)/applications/page.tsx')
-  const detail = await read('app/(app)/applications/[slug]/page.tsx')
-  // catalog query excludes seeded rows for guests + un-onboarded users
-  assert.match(page, /publicCatalogView/)
-  assert.match(page, /\.neq\('source', 'seeded'\)/)
-  assert.match(detail, /\.neq\('source', 'seeded'\)/)
   // funders directory (synthetic aggregates) redirects public viewers
   assert.match(page, /view === 'funders'[\s\S]{0,80}redirect\('\/applications'\)/)
 })

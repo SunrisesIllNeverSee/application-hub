@@ -12,6 +12,7 @@ import { SignificanceStars } from '@/components/SignificanceStars'
 import { DnaRadarChart } from '@/components/DnaRadarChart'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 import {
   formatCheckSize,
   formatEquity,
@@ -59,7 +60,7 @@ export default async function ProgramDetailPage({ params }: Props) {
     .from('programs')
     .select('*')
     .eq('slug', slug)
-  if (publicCatalogView) programQuery = programQuery.neq('source', 'seeded')
+  if (publicCatalogView) programQuery = restrictToApprovedPrograms(programQuery)
 
   const { data: program } = await programQuery.single<Program>()
 

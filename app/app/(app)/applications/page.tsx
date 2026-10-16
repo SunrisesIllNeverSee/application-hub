@@ -23,6 +23,7 @@ import { FundersDirectory } from '@/components/FundersDirectory'
 import { itemList } from '@/lib/jsonld'
 import { ScrollDetailOnSelect } from './ScrollDetailOnSelect'
 import { Suspense } from 'react'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 
 export const metadata = {
   title: 'Applications',
@@ -117,7 +118,7 @@ export default async function HubPage({
   // seeded rows stay visible to onboarded users until canonical promotion.
   const publicCatalogView = !user || !onboarded
   if (publicCatalogView) {
-    query = query.neq('source', 'seeded')
+    query = restrictToApprovedPrograms(query)
   }
 
   const { data: programs } = await query.returns<Program[]>()
