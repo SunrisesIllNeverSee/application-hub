@@ -27,6 +27,19 @@
 -- 1. Canonical source value (promotion rows carry this)
 ALTER TYPE program_source ADD VALUE IF NOT EXISTS 'canonical';
 
+-- 1b. Canonical records are service-side only: authenticated users must
+--     not be able to mint source='canonical' rows via the existing
+--     permissive insert policy. (service_role bypasses RLS entirely —
+--     promotion runs through the migration path regardless.)
+DROP POLICY IF EXISTS "programs_auth_insert" ON programs;
+
+CREATE POLICY "programs_auth_insert"
+  ON programs FOR INSERT
+  WITH CHECK (
+    auth.role() = 'authenticated'
+    AND (source IS NULL OR source <> 'canonical')
+  );
+
 -- 2. PROGRAMS — approved-only public read
 DROP POLICY IF EXISTS "programs_public_read" ON programs;
 
