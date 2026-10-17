@@ -22,9 +22,22 @@ export async function initPostHog() {
   realPosthog = mod.default;
   realPosthog.init(key, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
-    capture_pageview: false,
+    // { path, search } (not `true`): posthog-js only captures the INITIAL
+    // pageview for `true`; the object form also monitors history changes —
+    // path + search covers Next.js client navs and ?selected/?tab funnel
+    // interactions. Verified against posthog-js@1.420 history-autocapture.
+    capture_pageview: { path: true, search: true },
     capture_pageleave: true,
+    autocapture: false,
+    // Our CSP (script-src 'self') blocks posthog's remote plugin scripts —
+    // those failed loads stall the init chain before capture ever starts.
+    // Disable remote extension loading + surveys; capture stays in-bundle.
+    disable_external_dependency_loading: true,
+    disable_surveys: true,
+    capture_exceptions: false,
+    // d6 scope is pageviews only — no content telemetry. $$heatmap events
+    // are enabled server-side via feature flag; refuse them client-side.
+    enable_heatmaps: false,
     persistence: "localStorage+cookie",
-    capture_exceptions: true,
   });
 }

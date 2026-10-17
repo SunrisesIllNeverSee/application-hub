@@ -12,6 +12,7 @@ import { SignificanceStars } from '@/components/SignificanceStars'
 import { DnaRadarChart } from '@/components/DnaRadarChart'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 import {
   formatCheckSize,
   formatEquity,
@@ -37,11 +38,11 @@ export default async function ProgramDetailPage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
 
-  const { data: program } = await supabase
-    .from('programs')
-    .select('*')
-    .eq('slug', slug)
-    .single<Program>()
+  // Uniform approved-only catalog (M08 WS7): program detail is a catalog
+  // surface — approved records only, for every user class.
+  const { data: program } = await restrictToApprovedPrograms(
+    supabase.from('programs').select('*').eq('slug', slug),
+  ).single<Program>()
 
   if (!program) notFound()
 

@@ -1,3 +1,12 @@
+---
+entity_ref: EN-yc
+slug: yc
+name: Y Combinator
+url: https://www.ycombinator.com/
+type: accelerator
+status: open
+---
+
 # Y Combinator
 
 - **url:** https://www.ycombinator.com

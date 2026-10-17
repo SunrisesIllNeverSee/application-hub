@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 import type { Program } from '@/lib/database.types'
 import { programTypeLabel } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -54,11 +55,14 @@ const STATUS_DOT = {
 export default async function TimelinePage() {
   const supabase = await createClient()
 
-  const { data: programs } = await supabase
-    .from('programs')
-    .select('*')
-    .order('deadline_at', { ascending: true, nullsFirst: false })
-    .returns<Program[]>()
+  // Uniform approved-only catalog (M08 WS7): timeline is a catalog surface —
+  // approved records only, for every user class.
+  const { data: programs } = await restrictToApprovedPrograms(
+    supabase
+      .from('programs')
+      .select('*')
+      .order('deadline_at', { ascending: true, nullsFirst: false }),
+  ).returns<Program[]>()
 
   const all = programs ?? []
 
@@ -101,6 +105,12 @@ export default async function TimelinePage() {
           </div>
         ))}
       </div>
+
+      {all.length === 0 && (
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Verified programs are being prepared for public browsing.
+        </p>
+      )}
 
       {/* Closing Soon — most urgent first */}
       {closingSoon.length > 0 && (

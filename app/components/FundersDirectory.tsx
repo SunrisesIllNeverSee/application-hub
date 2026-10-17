@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 import Link from 'next/link'
 
 const TYPE_LABELS: Record<string, string> = {
@@ -41,11 +42,10 @@ export async function FundersDirectory({ filterType = '' }: FundersDirectoryProp
 
   const { data: funderRows } = await query
 
-  // Get program counts per funder
-  const { data: countRows } = await supabase
-    .from('programs')
-    .select('funder_id')
-    .not('funder_id', 'is', null)
+  // Get program counts per funder — canonical only (M08 WS7)
+  const { data: countRows } = await restrictToApprovedPrograms(
+    supabase.from('programs').select('funder_id').not('funder_id', 'is', null),
+  )
 
   const countMap: Record<string, number> = {}
   for (const row of countRows ?? []) {

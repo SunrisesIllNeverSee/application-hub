@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { appendVaryAccept, preferredType } from '@/lib/accept.mjs'
+import { isBrowseOnlyPath } from '@/lib/browse-gate'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
@@ -70,6 +71,17 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // M08-PRD-004 (owner d5): stamp the path so the (app) layout's onboarding
+  // gate can apply the same browse-only exception as this middleware.
+  // Stamped directly on request.headers (not a copy) — the Supabase setAll
+  // cookie handler rebuilds NextResponse.next({ request }) on every session
+  // refresh, and a header on a detached copy would be silently dropped.
+  // INVARIANT: this stamp must stay unconditional for every matcher-covered
+  // route — it overwrites any client-supplied x-aqua-path, which is what makes
+  // trusting it in (app)/layout safe. Do not gate it behind conditions.
+  const browseOnly = isBrowseOnlyPath(pathname)
+  request.headers.set('x-aqua-path', pathname)
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -95,7 +107,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user && isProtected) {
+  if (!user && isProtected && !browseOnly) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('next', pathname)
@@ -114,7 +126,10 @@ export async function middleware(request: NextRequest) {
 
       const onboarded = !!profile?.onboarding_completed_at
 
-      if (!onboarded && !pathname.startsWith('/onboarding')) {
+      // M08-PRD-004 (owner d5 "explore first"): un-onboarded signed-in users
+      // may browse the program catalog read-only. Everything that writes —
+      // workspaces, vault, bank, submissions — still gates to /onboarding.
+      if (!onboarded && !pathname.startsWith('/onboarding') && !browseOnly) {
         const url = request.nextUrl.clone()
         url.pathname = '/onboarding'
         return NextResponse.redirect(url)

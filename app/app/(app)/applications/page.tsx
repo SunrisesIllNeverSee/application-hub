@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type {
   Program,
@@ -20,6 +21,9 @@ import {
 import { formatDeadline, programTypeLabel, formatCheckSize, cn } from '@/lib/utils'
 import { FundersDirectory } from '@/components/FundersDirectory'
 import { itemList } from '@/lib/jsonld'
+import { ScrollDetailOnSelect } from './ScrollDetailOnSelect'
+import { Suspense } from 'react'
+import { restrictToApprovedPrograms } from '@/lib/browse-gate'
 
 export const metadata = {
   title: 'Applications',
@@ -48,21 +52,28 @@ export default async function HubPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  const tab: TabKey = resolvedParams.tab === 'mine' ? 'mine' : 'discover'
+  // Guests (d4b) browse discover only — "My Applications" is personal data.
+  const tab: TabKey = resolvedParams.tab === 'mine' && user ? 'mine' : 'discover'
   let activeIdentity: ApplicantMode = DEFAULT_MODE
   let identities: ApplicantMode[] = [DEFAULT_MODE]
+  let onboarded = true
   if (user) {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('active_identity, identities')
+      .select('active_identity, identities, onboarding_completed_at')
       .eq('user_id', user.id)
-      .single<{ active_identity: ApplicantMode | null; identities: ApplicantMode[] | null }>()
+      .single<{ active_identity: ApplicantMode | null; identities: ApplicantMode[] | null; onboarding_completed_at: string | null }>()
     activeIdentity = profile?.active_identity ?? DEFAULT_MODE
     identities = profile?.identities ?? [DEFAULT_MODE]
+    onboarded = !!profile?.onboarding_completed_at
   }
 
-  // Funders view short-circuits
+  // Funders view short-circuits — the directory aggregates synthetic seed
+  // counts, so under the uniform approved-only catalog policy (M08 WS7)
+  // all users are routed to the canonical catalog until canonical
+  // funders data exists.
   if (resolvedParams.view === 'funders') {
+    redirect('/applications')
     return (
       <div>
         <div className="mb-4">
@@ -102,6 +113,14 @@ export default async function HubPage({
 
   const activeDomain = resolvedParams.domain ?? 'founder'
   query = query.eq('domain', activeDomain)
+
+  // M08-PRD-003 (owner d4b) + WS7 consistent policy: the catalog surface is
+  // approved-only for EVERY user class — synthetic/FundingCake/community
+  // records must not read as validated applications to anyone. Personal
+  // surfaces (My Applications, workspaces) are unaffected — they show the
+  // user's own saved rows, which are private data, not catalog claims.
+  const publicCatalogView = !user || !onboarded
+  query = restrictToApprovedPrograms(query)
 
   const { data: programs } = await query.returns<Program[]>()
 
@@ -308,11 +327,31 @@ export default async function HubPage({
             mineRows={mineRows}
             sort={sort}
             selectedId={resolvedSelectedId}
+            publicCatalogView={publicCatalogView}
           />
         </aside>
 
         {/* Right: detail panel */}
-        <section className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto">
+        <section id="program-detail" className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto scroll-mt-4">
+          {/* useSearchParams requires Suspense if this page is ever made static */}
+          <Suspense fallback={null}><ScrollDetailOnSelect /></Suspense>
+          {!user && (
+            <div className="border-b border-neutral-200 bg-brand-50 px-4 py-2.5 text-xs text-neutral-700 dark:border-neutral-800 dark:bg-brand-900/20 dark:text-neutral-300">
+              Browsing as a guest —{' '}
+              <Link href="/login" className="font-medium text-brand-600 underline-offset-2 hover:underline dark:text-brand-400">
+                sign in
+              </Link>{' '}
+              to save answers, open workspaces, and prepare packets.
+            </div>
+          )}
+          {!onboarded && (
+            <div className="border-b border-neutral-200 bg-brand-50 px-4 py-2.5 text-xs text-neutral-700 dark:border-neutral-800 dark:bg-brand-900/20 dark:text-neutral-300">
+              Browse mode — finish seeding your bank to unlock workspaces, drafts, and your vault.{' '}
+              <Link href="/onboarding" className="font-medium text-brand-600 underline-offset-2 hover:underline dark:text-brand-400">
+                Finish setup →
+              </Link>
+            </div>
+          )}
           {selectedProgramWithFit ? (
             <ApplicationDetailPanel
               program={selectedProgramWithFit}
@@ -347,12 +386,14 @@ function ApplicationsSidebar({
   mineRows,
   sort,
   selectedId,
+  publicCatalogView,
 }: {
   tab: TabKey
   sorted: ProgramWithFit[]
   mineRows: MineRow[]
   sort: string
   selectedId: string | null
+  publicCatalogView: boolean
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -435,7 +476,11 @@ function ApplicationsSidebar({
         ) : (
           sorted.length === 0 ? (
             <div className="p-4 text-center">
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">No programs match your filters.</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {publicCatalogView
+                  ? 'Verified programs are being prepared for public browsing. Sign in to explore the full catalog.'
+                  : 'No programs match your filters.'}
+              </p>
             </div>
           ) : (
             sorted.map((program) => {
