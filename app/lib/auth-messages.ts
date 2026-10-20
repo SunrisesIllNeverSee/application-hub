@@ -20,9 +20,8 @@ export function describeAuthError(
   description?: string | null
 ): string | null {
   if (!code) return null
-  if (KNOWN[code]) return KNOWN[code]
-  const detail = description ? description.replace(/\+/g, ' ').trim().slice(0, 200) : ''
-  return detail
-    ? `Sign-in failed: ${detail}`
-    : 'Sign-in failed. Please try again.'
+  // Only fixed text is shown: ?error_description is attacker-controllable, so
+  // echoing it would let a crafted link put arbitrary text on the sign-in page.
+  void description
+  return KNOWN[code] ?? 'Sign-in failed. Please try again.'
 }

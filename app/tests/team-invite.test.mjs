@@ -131,7 +131,7 @@ test('login error messages: callback failure and provider errors', async () => {
   assert.match(describeAuthError('auth_callback_failed'), /could not complete your sign-in/i)
   assert.match(describeAuthError('access_denied'), /cancelled|not allowed/i)
   assert.equal(describeAuthError(null), null)
-  assert.match(describeAuthError('weird', 'Something+broke'), /Something broke/)
+  assert.doesNotMatch(describeAuthError('weird', 'Call 555-0100 for support'), /555-0100/)
   assert.match(describeAuthError('weird'), /Sign-in failed/)
   assert.ok(describeAuthError('weird', 'x'.repeat(500)).length < 260)
 })

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { appendVaryAccept, preferredType } from '@/lib/accept.mjs'
 import { isBrowseOnlyPath } from '@/lib/browse-gate'
+import { sanitizeNextPath } from '@/lib/safe-redirect'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
@@ -139,9 +140,9 @@ export async function middleware(request: NextRequest) {
       }
 
       if (onboarded && (isAuthOnlyRoute || pathname.startsWith('/onboarding'))) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/dash'
-        return NextResponse.redirect(url)
+        // A signed-in user sent to /login?next=... goes straight to next.
+        const next = pathname === '/login' ? sanitizeNextPath(request.nextUrl.searchParams.get('next')) : null
+        return NextResponse.redirect(new URL(next ?? '/dash', request.nextUrl.origin))
       }
     }
   }
