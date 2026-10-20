@@ -147,10 +147,17 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   )
 
   const lock = useCallback(() => {
+    const wasUnlocked = secretRef.current !== null
     secretRef.current = null
     setStatus((prev) => (prev === 'off' || prev === 'unsupported' ? prev : 'locked'))
-    setVaultHasData((prev) => prev ?? true)
-  }, [])
+    if (wasUnlocked) {
+      // M08-PRD-006: a first-run vault probed as empty may have been written to
+      // while unlocked, so re-probe instead of keeping the stale first-run label.
+      void ensureStorage().catch(() => setVaultHasData((prev) => prev ?? true))
+    } else {
+      setVaultHasData((prev) => prev ?? true)
+    }
+  }, [ensureStorage])
 
   const getSecret = useCallback((): string | null => {
     const secret = secretRef.current
