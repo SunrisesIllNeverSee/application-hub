@@ -23,24 +23,24 @@
 BEGIN;
 
 -- 1. Programs (canonical)
-INSERT INTO programs (slug, name, organization, type, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
-VALUES ('yc-summer-2026', 'Y Combinator — Summer 2026', 'Y Combinator', 'accel', 'closed', NULL, 'https://www.ycombinator.com/', 'Y Combinator Summer 2026 batch application (custom apply portal). Canonical record derived from the submitted application evidence in qaapplication/ (raw form DOM + portal export).', 'canonical', false, '{"Global"}', '{"startups","pre-seed"}', 'founder')
+INSERT INTO programs (slug, name, organization, type, kind, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
+VALUES ('yc-summer-2026', 'Y Combinator — Summer 2026', 'Y Combinator', 'accel', 'accelerator', 'closed', NULL, 'https://www.ycombinator.com/', 'Y Combinator Summer 2026 batch application (custom apply portal). Canonical record derived from the submitted application evidence in qaapplication/ (raw form DOM + portal export).', 'canonical', false, '{"Global"}', '{"startups","pre-seed"}', 'founder')
 ON CONFLICT (slug) DO NOTHING;
 
-INSERT INTO programs (slug, name, organization, type, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
-VALUES ('founding-500', 'The Founding 500', 'Hyperagent', 'accel', 'open', NULL, 'https://hyperagent.com/', 'Hyperagent-operated cohort program for agent-first founders (Airtable form). Canonical record derived from raw form DOM + submitted answers in qaapplication/.', 'canonical', true, '{"US","Global"}', '{"agents","pre-seed","cohort"}', 'founder')
+INSERT INTO programs (slug, name, organization, type, kind, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
+VALUES ('founding-500', 'The Founding 500', 'Hyperagent', 'accel', 'accelerator', 'open', NULL, 'https://hyperagent.com/', 'Hyperagent-operated cohort program for agent-first founders (Airtable form). Canonical record derived from raw form DOM + submitted answers in qaapplication/.', 'canonical', true, '{"US","Global"}', '{"agents","pre-seed","cohort"}', 'founder')
 ON CONFLICT (slug) DO NOTHING;
 
-INSERT INTO programs (slug, name, organization, type, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
-VALUES ('redbud-vc', 'Redbud VC — Pitch Us', 'Redbud VC', 'vc', 'open', NULL, 'https://redbud.vc', 'Redbud VC "Pitch Us" intake (Tally). Canonical record derived from raw Tally DOM + submitted answers in qaapplication/. Q27–Q30 are asset/attribution fields.', 'canonical', true, '{"US"}', '{"pre-seed","seed","middle-america"}', 'founder')
+INSERT INTO programs (slug, name, organization, type, kind, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
+VALUES ('redbud-vc', 'Redbud VC — Pitch Us', 'Redbud VC', 'vc', 'vc', 'open', NULL, 'https://redbud.vc', 'Redbud VC "Pitch Us" intake (Tally). Canonical record derived from raw Tally DOM + submitted answers in qaapplication/. Q27–Q30 are asset/attribution fields.', 'canonical', true, '{"US"}', '{"pre-seed","seed","middle-america"}', 'founder')
 ON CONFLICT (slug) DO NOTHING;
 
-INSERT INTO programs (slug, name, organization, type, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
-VALUES ('cyberfund-monastery', 'cyber.fund — The Monastery', 'cyber.fund', 'fellowship', 'open', NULL, 'https://cyber.fund/content/monastery', 'cyber.fund Monastery residency for AI-native founders ($2M uncapped SAFE, 12 weeks hybrid). Conversational application via proprietary agent; canonical record derived from the verbatim interaction transcript.', 'canonical', true, '{"Global"}', '{"ai-native","fellowship","residency"}', 'founder')
+INSERT INTO programs (slug, name, organization, type, kind, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
+VALUES ('cyberfund-monastery', 'cyber.fund — The Monastery', 'cyber.fund', 'fellowship', 'fellowship', 'open', NULL, 'https://cyber.fund/content/monastery', 'cyber.fund Monastery residency for AI-native founders ($2M uncapped SAFE, 12 weeks hybrid). Conversational application via proprietary agent; canonical record derived from the verbatim interaction transcript.', 'canonical', true, '{"Global"}', '{"ai-native","fellowship","residency"}', 'founder')
 ON CONFLICT (slug) DO NOTHING;
 
-INSERT INTO programs (slug, name, organization, type, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
-VALUES ('3xcapital', '3xCapital — Startup Submission', '3xCapital', 'vc', 'open', NULL, 'https://3xcapital.fund', '3xCapital startup submission (Tally). Canonical record derived from raw Tally page capture + submitted answers. Note: the sector select (DeFi/Infrastructure/Web2-to-Web3/Metaverse/GameFi/L1/L2/NFT/Other) was deliberately left unselected at submission — Web3-default taxonomy.', 'canonical', true, '{"Global"}', '{"pre-seed","seed"}', 'founder')
+INSERT INTO programs (slug, name, organization, type, kind, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)
+VALUES ('3xcapital', '3xCapital — Startup Submission', '3xCapital', 'vc', 'vc', 'open', NULL, 'https://3xcapital.fund', '3xCapital startup submission (Tally). Canonical record derived from raw Tally page capture + submitted answers. Note: the sector select (DeFi/Infrastructure/Web2-to-Web3/Metaverse/GameFi/L1/L2/NFT/Other) was deliberately left unselected at submission — Web3-default taxonomy.', 'canonical', true, '{"Global"}', '{"pre-seed","seed"}', 'founder')
 ON CONFLICT (slug) DO NOTHING;
 
 -- 2. Canonical questions (real verbatim only; deduped across programs)

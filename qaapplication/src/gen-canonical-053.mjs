@@ -9,6 +9,7 @@
 const PROGRAMS = [
   {
     slug: 'yc-summer-2026',
+    kind: 'accelerator',
     name: 'Y Combinator — Summer 2026',
     organization: 'Y Combinator',
     type: 'accel', status: 'closed', isRolling: false,
@@ -51,6 +52,7 @@ const PROGRAMS = [
   },
   {
     slug: 'founding-500',
+    kind: 'accelerator',
     name: 'The Founding 500',
     organization: 'Hyperagent',
     type: 'accel', status: 'open', isRolling: true,
@@ -74,6 +76,7 @@ const PROGRAMS = [
   },
   {
     slug: 'redbud-vc',
+    kind: 'vc',
     name: 'Redbud VC — Pitch Us',
     organization: 'Redbud VC',
     type: 'vc', status: 'open', isRolling: true,
@@ -113,6 +116,7 @@ const PROGRAMS = [
   },
   {
     slug: 'cyberfund-monastery',
+    kind: 'fellowship',
     name: 'cyber.fund — The Monastery',
     organization: 'cyber.fund',
     type: 'fellowship', status: 'open', isRolling: true,
@@ -138,6 +142,7 @@ const PROGRAMS = [
   },
   {
     slug: '3xcapital',
+    kind: 'vc',
     name: '3xCapital — Startup Submission',
     organization: '3xCapital',
     type: 'vc', status: 'open', isRolling: true,
@@ -228,8 +233,8 @@ out.push(`BEGIN;`)
 out.push(``)
 out.push(`-- 1. Programs (canonical)`)
 for (const p of PROGRAMS) {
-  out.push(`INSERT INTO programs (slug, name, organization, type, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)`)
-  out.push(`VALUES (${sqlStr(p.slug)}, ${sqlStr(p.name)}, ${sqlStr(p.organization)}, '${p.type}', '${p.status}', NULL, ${sqlStr(p.url)}, ${sqlStr(p.description)}, 'canonical', ${p.isRolling}, ${sqlArr(p.geo)}, ${sqlArr(p.tags)}, 'founder')`)
+  out.push(`INSERT INTO programs (slug, name, organization, type, kind, status, round, url, description, source, is_rolling, geo_focus, industry_tags, domain)`)
+  out.push(`VALUES (${sqlStr(p.slug)}, ${sqlStr(p.name)}, ${sqlStr(p.organization)}, '${p.type}', '${p.kind}', '${p.status}', NULL, ${sqlStr(p.url)}, ${sqlStr(p.description)}, 'canonical', ${p.isRolling}, ${sqlArr(p.geo)}, ${sqlArr(p.tags)}, 'founder')`)
   out.push(`ON CONFLICT (slug) DO NOTHING;`)
   out.push(``)
 }
