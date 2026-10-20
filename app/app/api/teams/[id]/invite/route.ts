@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-
-const APP_URL = 'https://application-hub-chi.vercel.app'
-const FROM_EMAIL = 'noreply@aquaidp.xyz'
+import { getSiteUrl } from '@/lib/site-url'
+import {
+  buildInviteAcceptUrl,
+  escapeHtml,
+  mapDeliveryStatus,
+  type InviteDelivery,
+} from '@/lib/team-invite'
 
 interface InviteBody {
   email?: unknown
@@ -32,7 +36,7 @@ export async function POST(
       .maybeSingle()
 
     if (!membership || !['owner', 'admin'].includes(membership.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Only team owners and admins can invite members.' }, { status: 403 })
     }
 
     // Load team name for the email
@@ -56,19 +60,6 @@ export async function POST(
       return NextResponse.json({ error: 'A valid email is required' }, { status: 400 })
     }
 
-    // Check if already a member
-    const { data: existingMember } = await supabase
-      .from('team_members')
-      .select('id')
-      .eq('team_id', teamId)
-      .eq('user_id',
-        // We can't look up user_id by email directly via anon client — skip for now;
-        // duplicate membership is blocked at DB level anyway
-        '00000000-0000-0000-0000-000000000000'
-      )
-      .maybeSingle()
-    void existingMember // handled by DB unique constraint on team_invites(team_id, email)
-
     // Upsert invite — renews token + expiry on re-invite
     const newExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     const { data: invite, error: inviteErr } = await supabase
@@ -88,22 +79,40 @@ export async function POST(
       .single()
 
     if (inviteErr || !invite) {
-      console.error('[POST /api/teams/[id]/invite] upsert error:', inviteErr)
-      return NextResponse.json({ error: inviteErr?.message ?? 'Failed to create invite' }, { status: 500 })
+      console.error('[POST /api/teams/[id]/invite] upsert error:', inviteErr?.code, inviteErr?.message)
+      // team_invites writes are owner-only under RLS (ti_owner_manage), so an
+      // admin who passes the role check above is still refused by the database.
+      if (inviteErr?.code === '42501') {
+        return NextResponse.json(
+          { error: 'Only the team owner can create invitations. Ask the owner to invite this person.' },
+          { status: 403 }
+        )
+      }
+      return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 })
     }
 
-    // Send invite email via Resend
+    // Send invite email via Resend. 'sent' means Resend accepted the message
+    // (HTTP 2xx), never that it reached the inbox; every other outcome is
+    // reported as it happened so the UI can offer the link for manual sharing.
+    const acceptUrl = buildInviteAcceptUrl(getSiteUrl(), invite.token)
     const resendApiKey = process.env.RESEND_API_KEY
-    if (resendApiKey) {
-      const acceptUrl = `${APP_URL}/teams/accept?token=${invite.token}`
+    const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'noreply@aquaidp.xyz'
+    const safeTeamName = escapeHtml(team.name)
+    const safeRole = escapeHtml(invite.role)
+    let delivery: InviteDelivery
+
+    if (!resendApiKey) {
+      console.warn('[POST /api/teams/[id]/invite] RESEND_API_KEY not set — email not sent')
+      delivery = mapDeliveryStatus({ apiKeyPresent: false })
+    } else {
       const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family:system-ui,-apple-system,sans-serif;color:#1a1a1a;max-width:520px;margin:0 auto;padding:32px 24px">
-  <h2 style="font-size:20px;font-weight:600;margin-bottom:8px">You've been invited to join ${team.name}</h2>
+  <h2 style="font-size:20px;font-weight:600;margin-bottom:8px">You've been invited to join ${safeTeamName}</h2>
   <p style="color:#555;margin-bottom:24px">
-    You've been invited to join <strong>${team.name}</strong> on Application Hub as a ${role}.
+    You've been invited to join <strong>${safeTeamName}</strong> on Application Hub as a ${safeRole}.
     Click the link below to accept — the invitation expires in 7 days.
   </p>
   <a href="${acceptUrl}"
@@ -128,25 +137,35 @@ export async function POST(
             'Authorization': `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
-            from: FROM_EMAIL,
+            from: `Application Hub <${fromEmail}>`,
             to: email,
             subject: `You've been invited to join ${team.name} on Application Hub`,
             html: emailHtml,
           }),
+          signal: AbortSignal.timeout(10_000),
         })
-        if (!emailRes.ok) {
-          const errBody = await emailRes.text()
-          console.error('[POST /api/teams/[id]/invite] Resend error:', errBody)
-          // Invite was created — still return success, email delivery is best-effort
+        delivery = mapDeliveryStatus({ apiKeyPresent: true, httpStatus: emailRes.status })
+        if (delivery === 'failed') {
+          // Provider error bodies can echo request data; log status only.
+          console.error('[POST /api/teams/[id]/invite] Resend rejected the email, status:', emailRes.status)
         }
       } catch (emailErr) {
-        console.error('[POST /api/teams/[id]/invite] email send failed:', emailErr)
+        delivery = mapDeliveryStatus({ apiKeyPresent: true, threw: true })
+        console.error('[POST /api/teams/[id]/invite] email send failed:', emailErr instanceof Error ? emailErr.name : 'unknown')
       }
-    } else {
-      console.warn('[POST /api/teams/[id]/invite] RESEND_API_KEY not set — skipping email')
     }
 
-    return NextResponse.json({ invited: true, invite_id: invite.id, email, role })
+    // accept_url is returned only when the email did not go out, so the
+    // inviter can share it by hand. Acceptance is still bound to the invited
+    // email address by the accept_team_invite RPC.
+    return NextResponse.json({
+      invited: true,
+      invite_id: invite.id,
+      email,
+      role: invite.role,
+      delivery,
+      ...(delivery === 'sent' ? {} : { accept_url: acceptUrl }),
+    })
 
   } catch (err) {
     console.error('[POST /api/teams/[id]/invite]', err)

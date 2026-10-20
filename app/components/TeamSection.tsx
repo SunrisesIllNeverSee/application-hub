@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { inviteDeliveryNotice, type InviteNotice } from '@/lib/team-invite'
 
 interface TeamMember {
   id: string
@@ -39,7 +40,9 @@ export function TeamSection({ tier, initialTeam, initialMemberCount }: Props) {
   // Invite state
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviting, setInviting] = useState(false)
-  const [inviteSuccess, setInviteSuccess] = useState<string | null>(null)
+  const [inviteNotice, setInviteNotice] = useState<InviteNotice | null>(null)
+  const [inviteLink, setInviteLink] = useState<string | null>(null)
+  const [linkCopied, setLinkCopied] = useState(false)
   const [inviteError, setInviteError] = useState<string | null>(null)
 
   const isTeamTier = tier === 'team'
@@ -79,7 +82,9 @@ export function TeamSection({ tier, initialTeam, initialMemberCount }: Props) {
     if (!team || !inviteEmail.trim()) return
     setInviting(true)
     setInviteError(null)
-    setInviteSuccess(null)
+    setInviteNotice(null)
+    setInviteLink(null)
+    setLinkCopied(false)
 
     try {
       const res = await fetch(`/api/teams/${team.id}/invite`, {
@@ -87,19 +92,39 @@ export function TeamSection({ tier, initialTeam, initialMemberCount }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: inviteEmail.trim() }),
       })
-      const data = await res.json() as { invited?: boolean; error?: string; email?: string }
+      const data = await res.json() as {
+        invited?: boolean
+        error?: string
+        email?: string
+        delivery?: string
+        accept_url?: string
+      }
 
       if (!res.ok || !data.invited) {
-        setInviteError(data.error ?? 'Failed to send invite. Please try again.')
+        setInviteError(data.error ?? 'Failed to create invite. Please try again.')
         return
       }
 
-      setInviteSuccess(`Invite sent to ${data.email ?? inviteEmail}.`)
+      // Report what actually happened: "email sent" only when the provider
+      // accepted it; otherwise the invite exists but must be shared by hand.
+      const notice = inviteDeliveryNotice(data.delivery, data.email ?? inviteEmail)
+      setInviteNotice(notice)
+      setInviteLink(notice.showLink && data.accept_url ? data.accept_url : null)
       setInviteEmail('')
     } catch {
       setInviteError('Network error. Please try again.')
     } finally {
       setInviting(false)
+    }
+  }
+
+  async function handleCopyLink() {
+    if (!inviteLink) return
+    try {
+      await navigator.clipboard.writeText(inviteLink)
+      setLinkCopied(true)
+    } catch {
+      setLinkCopied(false) // clipboard unavailable: the link stays selectable below
     }
   }
 
@@ -211,8 +236,35 @@ export function TeamSection({ tier, initialTeam, initialMemberCount }: Props) {
             </button>
           </form>
 
-          {inviteSuccess && (
-            <p className="text-xs text-success-600 dark:text-success-400">{inviteSuccess}</p>
+          {inviteNotice && (
+            <p
+              className={`text-xs ${
+                inviteNotice.tone === 'success'
+                  ? 'text-success-600 dark:text-success-400'
+                  : 'text-amber-600 dark:text-amber-400'
+              }`}
+            >
+              {inviteNotice.message}
+            </p>
+          )}
+          {inviteLink && (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                readOnly
+                value={inviteLink}
+                onFocus={e => e.currentTarget.select()}
+                aria-label="Invitation link"
+                className="input flex-1 text-xs"
+              />
+              <button
+                type="button"
+                onClick={() => void handleCopyLink()}
+                className="btn-secondary text-xs flex-shrink-0"
+              >
+                {linkCopied ? 'Copied' : 'Copy link'}
+              </button>
+            </div>
           )}
           {inviteError && (
             <p className="text-xs text-danger-600 dark:text-danger-400">{inviteError}</p>
