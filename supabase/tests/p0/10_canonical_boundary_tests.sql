@@ -153,8 +153,8 @@ SELECT p0.test('DBC-07','RESIDUAL: owner links own program to a canonical questi
  'dml', NULL,
  $q$UPDATE archived_questions SET asked_by_count=1 WHERE id='1b57fa6f-183c-4017-89f3-0d2008e22234'$q$);
 
-SELECT p0.test('DBC-09','RESIDUAL: authenticated holds TRUNCATE on program_questions (grants; not exposed via PostgREST)',
- 'EFFECT','EFFECT','authenticated',:'a2',
+SELECT p0.test('DBC-09','authenticated TRUNCATE on program_questions (revoked by 054)',
+ 'EFFECT','NOEFFECT','authenticated',:'a2',
  $q$TRUNCATE program_questions CASCADE$q$,
  $q$SELECT p0.effect((SELECT count(*) FROM program_questions)=0)$q$);
 

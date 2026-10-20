@@ -277,6 +277,10 @@ BEGIN
 END;
 $$;
 
+-- DBC-09: row-level guard triggers do not fire on TRUNCATE, and nothing in the app
+-- truncates or creates triggers through client roles.
+REVOKE TRUNCATE, TRIGGER ON public.programs, public.program_questions, public.archived_questions FROM anon, authenticated;
+
 COMMIT;
 
 -- ============================================================
