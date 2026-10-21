@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { inviteDeliveryNotice, type InviteNotice } from '@/lib/team-invite'
+import { TEAMS_AVAILABLE, inviteDeliveryNotice, type InviteNotice } from '@/lib/team-invite'
 
 interface TeamMember {
   id: string
@@ -126,6 +127,29 @@ export function TeamSection({ tier, initialTeam, initialMemberCount }: Props) {
     } catch {
       setLinkCopied(false) // clipboard unavailable: the link stays selectable below
     }
+  }
+
+  // Teams deferred: same card for every tier
+  if (!TEAMS_AVAILABLE) {
+    return (
+      <section>
+        <h2 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-4">
+          Team
+        </h2>
+        <div className="card p-5 flex flex-col gap-3 max-w-md">
+          <p className="text-sm font-medium text-neutral-900 dark:text-white">Coming soon</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Shared answer libraries, multi-seat access and collaborative workspaces are on the way.
+          </p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            <Link href="/contact" className="underline hover:text-neutral-700 dark:hover:text-neutral-200">
+              Contact us
+            </Link>{' '}
+            for more information.
+          </p>
+        </div>
+      </section>
+    )
   }
 
   // Not on team tier

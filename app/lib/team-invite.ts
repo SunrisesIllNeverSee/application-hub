@@ -75,7 +75,14 @@ export function inviteDeliveryNotice(delivery: unknown, email: string): InviteNo
   }
 }
 
+// Teams are deferred (owner decision, 2026-10-21): the UI shows "Coming soon"
+// and every team route and Team checkout refuses. Flip only when Teams launch,
+// together with re-granting client writes revoked by migration 056.
+export const TEAMS_AVAILABLE = false
+export const TEAMS_COMING_SOON_MESSAGE = 'Teams are coming soon. Contact us for more information.'
+
 export type TeamAcceptStatus =
+  | 'coming_soon'
   | 'joined'
   | 'already_member'
   | 'invalid_or_used'
@@ -85,6 +92,7 @@ export type TeamAcceptStatus =
   | 'error'
 
 const ACCEPT_STATUSES: readonly string[] = [
+  'coming_soon',
   'joined',
   'already_member',
   'invalid_or_used',
@@ -123,6 +131,8 @@ export interface TeamStatusBanner {
 export function teamStatusBanner(value: unknown): TeamStatusBanner | null {
   if (typeof value !== 'string' || !ACCEPT_STATUSES.includes(value)) return null
   switch (value as TeamAcceptStatus) {
+    case 'coming_soon':
+      return { tone: 'error', message: TEAMS_COMING_SOON_MESSAGE }
     case 'joined':
       return { tone: 'success', message: 'You joined the team.' }
     case 'already_member':

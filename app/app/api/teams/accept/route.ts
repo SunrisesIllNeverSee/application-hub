@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import {
+  TEAMS_AVAILABLE,
   TEAM_UI_PATH,
   buildInviteAcceptPath,
   isValidInviteToken,
@@ -23,6 +24,8 @@ export async function GET(req: NextRequest) {
     url.searchParams.set('team', status)
     return NextResponse.redirect(url)
   }
+
+  if (!TEAMS_AVAILABLE) return redirectToTeamUi('coming_soon')
 
   try {
     const token = req.nextUrl.searchParams.get('token')

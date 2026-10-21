@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getStripe, getPriceId, type SubscriptionTier, type BillingInterval } from '@/lib/stripe'
 import { isBetaMode } from '@/lib/beta'
+import { TEAMS_AVAILABLE } from '@/lib/team-invite'
 
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -11,7 +12,8 @@ function getAdminClient() {
   return createAdminClient(url, key)
 }
 
-const VALID_TIERS = ['pro', 'team'] as const
+// Team is not sold while Teams are deferred (see TEAMS_AVAILABLE).
+const VALID_TIERS = TEAMS_AVAILABLE ? (['pro', 'team'] as const) : (['pro'] as const)
 const VALID_INTERVALS = ['monthly', 'annual'] as const
 
 function isValidTier(v: unknown): v is SubscriptionTier {
@@ -36,7 +38,10 @@ export async function POST(req: NextRequest) {
     const { tier, interval } = body
 
     if (!isValidTier(tier)) {
-      return NextResponse.json({ error: 'tier must be "pro" or "team"' }, { status: 400 })
+      return NextResponse.json(
+        { error: TEAMS_AVAILABLE ? 'tier must be "pro" or "team"' : 'tier must be "pro"' },
+        { status: 400 }
+      )
     }
     if (!isValidInterval(interval)) {
       return NextResponse.json({ error: 'interval must be "monthly" or "annual"' }, { status: 400 })

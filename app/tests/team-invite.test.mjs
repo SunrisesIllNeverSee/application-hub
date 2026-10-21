@@ -13,6 +13,8 @@ import {
   inviteDeliveryNotice,
   rpcResultToStatus,
   teamStatusBanner,
+  TEAMS_AVAILABLE,
+  TEAMS_COMING_SOON_MESSAGE,
 } from '../lib/team-invite.ts'
 import { getSiteUrl, DEFAULT_SITE_URL } from '../lib/site-url.ts'
 import { parseEnabledProviders } from '../lib/auth-providers.ts'
@@ -153,4 +155,11 @@ test('callback prefers a known error_code (expired email link) over error', asyn
   assert.equal(pickAuthErrorCode('access_denied', 'some_unmapped_code'), 'access_denied')
   assert.equal(pickAuthErrorCode('access_denied', 'constructor'), 'access_denied')
   assert.equal(pickAuthErrorCode(null, null), null)
+})
+
+test('Teams deferred: flag off and accept redirect banner says coming soon', () => {
+  assert.equal(TEAMS_AVAILABLE, false)
+  assert.match(TEAMS_COMING_SOON_MESSAGE, /coming soon/i)
+  assert.match(TEAMS_COMING_SOON_MESSAGE, /contact us/i)
+  assert.deepEqual(teamStatusBanner('coming_soon'), { tone: 'error', message: TEAMS_COMING_SOON_MESSAGE })
 })
