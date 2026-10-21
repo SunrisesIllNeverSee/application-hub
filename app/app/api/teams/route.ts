@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { TEAMS_AVAILABLE, TEAMS_COMING_SOON_MESSAGE } from '@/lib/team-invite'
 
 function slugify(name: string): string {
   return name
@@ -12,6 +13,10 @@ function slugify(name: string): string {
 
 // POST /api/teams — create a team (owner must be on 'team' tier)
 export async function POST(req: NextRequest) {
+  if (!TEAMS_AVAILABLE) {
+    return NextResponse.json({ error: TEAMS_COMING_SOON_MESSAGE }, { status: 403 })
+  }
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
