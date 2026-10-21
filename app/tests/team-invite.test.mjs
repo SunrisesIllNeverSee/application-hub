@@ -30,19 +30,26 @@ test('invite URL targets the real handler on the canonical host', () => {
   assert.equal(buildInviteAcceptPath('abc'), '/api/teams/accept?token=abc')
 })
 
-test('getSiteUrl uses NEXT_PUBLIC_SITE_URL, defaults to aquaidp.xyz, ignores junk', () => {
-  const prev = process.env.NEXT_PUBLIC_SITE_URL
+test('getSiteUrl prefers NEXT_PUBLIC_APP_URL, then APP_URL, then NEXT_PUBLIC_SITE_URL; defaults to aquaidp.xyz; ignores junk', () => {
+  const keys = ['NEXT_PUBLIC_APP_URL', 'APP_URL', 'NEXT_PUBLIC_SITE_URL']
+  const prev = Object.fromEntries(keys.map((k) => [k, process.env[k]]))
   try {
-    delete process.env.NEXT_PUBLIC_SITE_URL
+    for (const k of keys) delete process.env[k]
     assert.equal(getSiteUrl(), DEFAULT_SITE_URL)
     assert.equal(DEFAULT_SITE_URL, 'https://aquaidp.xyz')
-    process.env.NEXT_PUBLIC_SITE_URL = 'https://example.test/'
-    assert.equal(getSiteUrl(), 'https://example.test')
-    process.env.NEXT_PUBLIC_SITE_URL = 'not a url'
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://site.test/'
+    assert.equal(getSiteUrl(), 'https://site.test')
+    process.env.APP_URL = 'https://app-server.test/path'
+    assert.equal(getSiteUrl(), 'https://app-server.test')
+    process.env.NEXT_PUBLIC_APP_URL = 'https://app.test/'
+    assert.equal(getSiteUrl(), 'https://app.test')
+    process.env.NEXT_PUBLIC_APP_URL = 'not a url'
     assert.equal(getSiteUrl(), DEFAULT_SITE_URL)
   } finally {
-    if (prev === undefined) delete process.env.NEXT_PUBLIC_SITE_URL
-    else process.env.NEXT_PUBLIC_SITE_URL = prev
+    for (const k of keys) {
+      if (prev[k] === undefined) delete process.env[k]
+      else process.env[k] = prev[k]
+    }
   }
 })
 
