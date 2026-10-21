@@ -91,7 +91,10 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
     .eq('user_id', user.id)
     .order('unlocked_at', { ascending: false })
 
-  const unlocked: UnlockedQuestion[] = (unlockedRows ?? []) as UnlockedQuestion[]
+  // The join is null when the unlocked question is outside the catalog read
+  // boundary (052), which crashed the page; only show questions the user can read.
+  const unlocked: UnlockedQuestion[] = ((unlockedRows ?? []) as UnlockedQuestion[])
+    .filter(u => u.archived_question != null)
   const unlockedIds = new Set(unlocked.map(u => u.archived_question_id))
 
   // Fetch user's existing answers
