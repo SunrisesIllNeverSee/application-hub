@@ -142,3 +142,15 @@ test('login error messages: callback failure and provider errors', async () => {
   assert.match(describeAuthError('weird'), /Sign-in failed/)
   assert.ok(describeAuthError('weird', 'x'.repeat(500)).length < 260)
 })
+
+test('callback prefers a known error_code (expired email link) over error', async () => {
+  const { pickAuthErrorCode, describeAuthError } = await import('../lib/auth-messages.ts')
+  // Live Supabase redirect for an invalid/reused link: error=access_denied&error_code=otp_expired
+  assert.equal(pickAuthErrorCode('access_denied', 'otp_expired'), 'otp_expired')
+  assert.match(describeAuthError(pickAuthErrorCode('access_denied', 'otp_expired')), /expired or was already used/i)
+  // OAuth cancel keeps the provider message; unknown codes never replace error
+  assert.equal(pickAuthErrorCode('access_denied', null), 'access_denied')
+  assert.equal(pickAuthErrorCode('access_denied', 'some_unmapped_code'), 'access_denied')
+  assert.equal(pickAuthErrorCode('access_denied', 'constructor'), 'access_denied')
+  assert.equal(pickAuthErrorCode(null, null), null)
+})

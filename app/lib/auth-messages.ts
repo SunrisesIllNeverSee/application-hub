@@ -15,6 +15,16 @@ const KNOWN: Record<string, string> = {
     'The sign-in provider is temporarily unavailable. Please try again in a moment.',
 }
 
+// Supabase reports an expired or reused email link as error=access_denied with
+// error_code=otp_expired; prefer the more specific code when we have text for it.
+export function pickAuthErrorCode(
+  error: string | null | undefined,
+  errorCode: string | null | undefined
+): string | null {
+  if (errorCode && Object.hasOwn(KNOWN, errorCode)) return errorCode
+  return error || null
+}
+
 export function describeAuthError(
   code: string | null | undefined,
   description?: string | null
