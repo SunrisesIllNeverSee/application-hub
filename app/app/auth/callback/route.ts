@@ -3,6 +3,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { resolveSafeRedirect, sanitizeNextPath } from '@/lib/safe-redirect'
+import { pickAuthErrorCode } from '@/lib/auth-messages'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
@@ -54,7 +55,10 @@ export async function GET(request: NextRequest) {
   // errors (?error=...&error_description=...) are forwarded, truncated, so the
   // login page can show them; the return path is kept so the user can retry.
   const loginUrl = new URL('/login', requestUrl.origin)
-  const providerError = requestUrl.searchParams.get('error')
+  const providerError = pickAuthErrorCode(
+    requestUrl.searchParams.get('error'),
+    requestUrl.searchParams.get('error_code')
+  )
   if (providerError) {
     loginUrl.searchParams.set('error', providerError.slice(0, 64))
     const description = requestUrl.searchParams.get('error_description')
