@@ -21,6 +21,7 @@ const PROTECTED_ROUTES = [
   '/archive',
   '/today',
   '/onboarding',
+  '/aqua-local',
 ]
 
 const AUTH_ONLY_ROUTES = ['/login']

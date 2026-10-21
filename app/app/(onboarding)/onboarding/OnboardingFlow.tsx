@@ -22,11 +22,13 @@ type StarterQuestion = Pick<
 
 interface OnboardingFlowProps {
   questions: StarterQuestion[]
+  /** Safe same-origin path the user was heading to before signing up. */
+  next?: string | null
 }
 
 type Step = 'choose' | 'starter' | 'upload' | 'review'
 
-export function OnboardingFlow({ questions }: OnboardingFlowProps) {
+export function OnboardingFlow({ questions, next }: OnboardingFlowProps) {
   const router = useRouter()
   const [step, setStep] = useState<Step>('choose')
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -38,6 +40,12 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
   const [vaultSecret, setVaultSecret] = useState('')
   const [reviewSummary, setReviewSummary] = useState<{ identity: string; themesCovered: number; topThemes: string[]; answersCount: number } | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Switching paths clears a previous path's error (e.g. the starter minimum).
+  function goTo(target: Step) {
+    setError(null)
+    setStep(target)
+  }
 
   function setAnswer(id: string, text: string) {
     setAnswers((prev) => ({ ...prev, [id]: text }))
@@ -164,7 +172,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
           </div>
 
           <button
-            onClick={() => router.push('/dash')}
+            onClick={() => router.push(next ?? '/dash')}
             className="w-full px-6 py-3 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold transition-colors"
           >
             Enter AQUA →
@@ -192,7 +200,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
 
           <div className="grid sm:grid-cols-2 gap-4">
             <button
-              onClick={() => setStep('starter')}
+              onClick={() => goTo('starter')}
               className="card p-6 text-left hover:border-brand-400 dark:hover:border-brand-600 transition-colors group"
             >
               <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center mb-4 text-brand-600 dark:text-brand-400">
@@ -209,7 +217,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
             </button>
 
             <button
-              onClick={() => setStep('upload')}
+              onClick={() => goTo('upload')}
               className="card p-6 text-left hover:border-brand-400 dark:hover:border-brand-600 transition-colors group"
             >
               <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center mb-4 text-brand-600 dark:text-brand-400">
@@ -246,7 +254,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
           {/* Header */}
           <div className="mb-8">
             <button
-              onClick={() => setStep('choose')}
+              onClick={() => goTo('choose')}
               className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors mb-3 inline-flex items-center gap-1"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -303,6 +311,11 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
                     placeholder="Answer in your own words — we'll save it as a timestamped captured moment."
                     className="w-full px-3 py-2 rounded-md border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow resize-y"
                   />
+                  {answer.trim().length > 0 && !ready && (
+                    <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                      Keep going — answers count once they are longer than 30 characters.
+                    </p>
+                  )}
                   {q.typical_word_limit && (
                     <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-600">
                       Typical limit on real applications: ~{q.typical_word_limit} words
@@ -357,7 +370,7 @@ export function OnboardingFlow({ questions }: OnboardingFlowProps) {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <button
-            onClick={() => setStep('choose')}
+            onClick={() => goTo('choose')}
             className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors mb-3 inline-flex items-center gap-1"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
