@@ -288,7 +288,7 @@ export default async function HubPage({
     : null
 
   return (
-    <div className="-mx-4 md:-mx-6 -my-4 md:-my-8 h-[calc(100vh-3.5rem)] md:h-screen flex flex-col">
+    <div className="-mx-4 md:-mx-6 -my-4 md:-my-8 md:h-screen flex flex-col">
       {hubItemList && (
         <script
           type="application/ld+json"
@@ -318,7 +318,7 @@ export default async function HubPage({
       </div>
 
       {/* Split layout */}
-      <div className="flex-1 flex flex-col md:flex-row min-h-0">
+      <div className="md:flex-1 flex flex-col md:flex-row md:min-h-0">
         {/* Left: program/application list */}
         <aside className="md:w-72 md:flex-shrink-0 md:border-r border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/40 md:h-full md:overflow-y-auto">
           <ApplicationsSidebar
@@ -332,7 +332,7 @@ export default async function HubPage({
         </aside>
 
         {/* Right: detail panel */}
-        <section id="program-detail" className="flex-1 flex flex-col min-h-0 min-w-0 overflow-y-auto scroll-mt-4">
+        <section id="program-detail" className="md:flex-1 flex flex-col md:min-h-0 min-w-0 md:overflow-y-auto scroll-mt-4">
           {/* useSearchParams requires Suspense if this page is ever made static */}
           <Suspense fallback={null}><ScrollDetailOnSelect /></Suspense>
           {!user && (

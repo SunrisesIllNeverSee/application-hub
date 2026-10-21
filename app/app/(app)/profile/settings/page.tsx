@@ -5,6 +5,7 @@ import { BillingAlerts } from '@/components/BillingAlerts'
 import { TeamSection } from '@/components/TeamSection'
 import { ExtensionTokenCard } from '@/components/ExtensionTokenCard'
 import type { SubscriptionTier } from '@/lib/database.types'
+import { teamStatusBanner } from '@/lib/team-invite'
 
 export const metadata = {
   title: 'Settings — Profile',
@@ -14,6 +15,7 @@ type SearchParams = {
   upgraded?: string
   upgrade_cancelled?: string
   session_id?: string
+  team?: string // result of /api/teams/accept (invitation acceptance)
 }
 
 export default async function ProfileSettingsPage({
@@ -81,8 +83,23 @@ export default async function ProfileSettingsPage({
   const showUpgradeSuccess = sp?.upgraded === 'true'
   const showUpgradeCancelled = sp?.upgrade_cancelled === 'true'
 
+  const teamBanner = teamStatusBanner(sp?.team)
+
   return (
     <div className="space-y-10">
+      {teamBanner && (
+        <div
+          role="status"
+          className={`max-w-2xl rounded-lg border px-4 py-3 text-sm ${
+            teamBanner.tone === 'success'
+              ? 'border-success-200 bg-success-50 text-success-700 dark:border-success-800 dark:bg-success-900/20 dark:text-success-300'
+              : 'border-danger-200 bg-danger-50 text-danger-700 dark:border-danger-800 dark:bg-danger-900/20 dark:text-danger-300'
+          }`}
+        >
+          {teamBanner.message}
+        </div>
+      )}
+
       <BillingAlerts
         showUpgradeSuccess={showUpgradeSuccess}
         showUpgradeCancelled={showUpgradeCancelled}

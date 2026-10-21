@@ -1,19 +1,69 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { buildAuthCallbackUrl, sanitizeNextPath } from '@/lib/safe-redirect'
+import { describeAuthError } from '@/lib/auth-messages'
+import {
+  NO_PROVIDERS,
+  fetchEnabledProviders,
+  type EnabledProviders,
+  type OAuthProviderId,
+} from '@/lib/auth-providers'
 
-type Mode = 'signin' | 'signup' | 'magic' | 'magic_sent'
+type Mode = 'signin' | 'signup' | 'magic' | 'magic_sent' | 'forgot' | 'forgot_sent'
 
 export default function LoginPage() {
+  // useSearchParams needs a Suspense boundary for static prerendering.
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // Validated same-origin return path (null when absent or unsafe).
+  const nextPath = sanitizeNextPath(searchParams.get('next'))
   const [mode, setMode] = useState<Mode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(() =>
+    describeAuthError(searchParams.get('error'), searchParams.get('error_description'))
+  )
   const [info, setInfo] = useState<string | null>(null)
+  // AUTH-02: provider buttons render only when Supabase reports them enabled.
+  // Hidden while loading and on any fetch failure (fail closed).
+  const [providers, setProviders] = useState<EnabledProviders>(NO_PROVIDERS)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchEnabledProviders(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      controller.signal
+    ).then((enabled) => {
+      if (!controller.signal.aborted) setProviders(enabled)
+    })
+    return () => controller.abort()
+  }, [])
+
+  const anyProvider = providers.github || providers.google || providers.linkedin_oidc
+
+  // Route handlers (e.g. /api/teams/accept) need a full navigation, not a
+  // client-side router transition.
+  function go(dest: string) {
+    if (dest.startsWith('/api/')) {
+      window.location.assign(dest)
+      return
+    }
+    router.push(dest)
+    router.refresh()
+  }
 
   function resetForm() {
     setError(null)
@@ -32,8 +82,7 @@ export default function LoginPage() {
     if (error) {
       setError(error.message)
     } else {
-      router.push('/dash')
-      router.refresh()
+      go(nextPath ?? '/dash')
     }
   }
 
@@ -47,32 +96,61 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: buildAuthCallbackUrl(window.location.origin, nextPath) },
     })
     setLoading(false)
     if (error) {
       setError(error.message)
+    } else if (data.session) {
+      // Email auto-confirm is on (or the address is already confirmed): the
+      // user is signed in now. Continue as for any new user — middleware
+      // routes un-onboarded users to onboarding.
+      go(nextPath ?? '/dash')
     } else {
-      setInfo('Account created — check your email to confirm, then sign in.')
+      setInfo('Account created. Check your email to confirm your address, then sign in.')
       setMode('signin')
       setPassword('')
     }
   }
 
-  async function handleOAuth(provider: 'github' | 'google' | 'linkedin_oidc') {
+  async function handleOAuth(provider: OAuthProviderId) {
+    setLoading(true)
+    setError(null)
+    try {
+      const supabase = createClient()
+      // Redirect host stays window.location.origin: the PKCE verifier cookie
+      // is host-scoped, so the flow must finish on the host that started it.
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: buildAuthCallbackUrl(window.location.origin, nextPath) },
+      })
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      }
+    } catch {
+      setError('Could not start sign-in with that provider. Please try again.')
+      setLoading(false)
+    }
+  }
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email.trim()) return
     setLoading(true)
     setError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: buildAuthCallbackUrl(window.location.origin, '/reset-password'),
     })
+    setLoading(false)
     if (error) {
       setError(error.message)
-      setLoading(false)
+    } else {
+      setMode('forgot_sent')
     }
   }
 
@@ -84,7 +162,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: buildAuthCallbackUrl(window.location.origin, nextPath) },
     })
     setLoading(false)
     if (error) {
@@ -115,8 +193,24 @@ export default function LoginPage() {
 
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8">
 
-          {/* Magic link sent state */}
-          {mode === 'magic_sent' ? (
+          {/* Password reset requested */}
+          {mode === 'forgot_sent' ? (
+            <div className="text-center py-4">
+              <h2 className="text-lg font-semibold text-white mb-2">Check your inbox</h2>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                If an account exists for{' '}
+                <span className="text-neutral-200 font-medium">{email}</span>,
+                we&apos;ve sent a link to reset your password. It can take a few
+                minutes to arrive, so check your spam folder if you don&apos;t see it.
+              </p>
+              <button
+                onClick={() => { setMode('signin'); resetForm() }}
+                className="mt-6 text-sm text-brand-400 hover:text-brand-300 transition-colors"
+              >
+                ← Back to sign in
+              </button>
+            </div>
+          ) : mode === 'magic_sent' ? (
             <div className="text-center py-4">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500/10 mb-4">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-green-400">
@@ -172,8 +266,9 @@ export default function LoginPage() {
               )}
 
               {/* OAuth providers */}
-              {isPasswordMode && (
+              {isPasswordMode && anyProvider && (
                 <div className="mb-5 space-y-2.5">
+                  {providers.github && (
                   <button
                     type="button"
                     onClick={() => handleOAuth('github')}
@@ -185,6 +280,8 @@ export default function LoginPage() {
                     </svg>
                     Continue with GitHub
                   </button>
+                  )}
+                  {providers.google && (
                   <button
                     type="button"
                     onClick={() => handleOAuth('google')}
@@ -199,6 +296,8 @@ export default function LoginPage() {
                     </svg>
                     Continue with Google
                   </button>
+                  )}
+                  {providers.linkedin_oidc && (
                   <button
                     type="button"
                     onClick={() => handleOAuth('linkedin_oidc')}
@@ -210,6 +309,7 @@ export default function LoginPage() {
                     </svg>
                     Continue with LinkedIn
                   </button>
+                  )}
                   <div className="flex items-center gap-3 mt-4">
                     <div className="flex-1 h-px bg-neutral-800" />
                     <span className="text-xs text-neutral-600">or</span>
@@ -272,14 +372,70 @@ export default function LoginPage() {
                     )}
                   </button>
 
-                  {/* Magic link fallback */}
-                  <div className="pt-2 text-center">
+                  {/* Recovery + magic link fallback */}
+                  <div className="pt-2 flex flex-col items-center gap-1.5">
+                    {mode === 'signin' && (
+                      <button
+                        type="button"
+                        onClick={() => { setMode('forgot'); resetForm() }}
+                        className="text-xs text-neutral-500 hover:text-neutral-400 transition-colors"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => { setMode('magic'); resetForm() }}
                       className="text-xs text-neutral-500 hover:text-neutral-400 transition-colors"
                     >
-                      {mode === 'signin' ? 'Forgot password? Use a magic link instead' : 'Prefer a magic link instead?'}
+                      Prefer a magic link instead?
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Forgot password mode */}
+              {mode === 'forgot' && (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="mb-2">
+                    <h2 className="text-base font-semibold text-white">Reset your password</h2>
+                    <p className="mt-1 text-sm text-neutral-400">Enter your email and we&apos;ll send you a link to choose a new password.</p>
+                  </div>
+                  <div>
+                    <label htmlFor="email-forgot" className="label text-neutral-300">Email address</label>
+                    <input
+                      id="email-forgot"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@yourcompany.com"
+                      className="input bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-brand-500"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading || !email.trim()}
+                    className="w-full btn-primary py-2.5"
+                  >
+                    {loading ? 'Sending…' : 'Send reset link'}
+                  </button>
+
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => { setMode('signin'); resetForm() }}
+                      className="text-xs text-neutral-500 hover:text-neutral-400 transition-colors"
+                    >
+                      ← Back to sign in
                     </button>
                   </div>
                 </form>
