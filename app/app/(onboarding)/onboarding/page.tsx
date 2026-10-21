@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import type { ArchivedQuestion } from '@/lib/database.types'
 import { OnboardingFlow } from './OnboardingFlow'
+import { sanitizeNextPath } from '@/lib/safe-redirect'
 
 export const metadata = { title: 'Welcome — AQUA' }
 
@@ -15,7 +16,12 @@ export const metadata = { title: 'Welcome — AQUA' }
  * On completion the user gets `onboarding_completed_at = NOW()` and is
  * redirected into /dash with their first AQUAscore signal in place.
  */
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>
+}) {
+  const { next } = await searchParams
   const supabase = await createClient()
 
   // 8 highest-significance archive questions across diverse themes.
@@ -40,5 +46,13 @@ export default async function OnboardingPage() {
     return acc
   }, [] as NonNullable<typeof rawQuestions>) ?? []
 
-  return <OnboardingFlow questions={starterQuestions} />
+  // The catalog read boundary (052) leaves few themes visible, so one-per-theme
+  // can yield fewer than the 5 answers /api/onboarding/complete requires. Top up
+  // to 8 with the next most significant questions.
+  for (const q of rawQuestions ?? []) {
+    if (starterQuestions.length >= 8) break
+    if (!starterQuestions.some((s) => s.id === q.id)) starterQuestions.push(q)
+  }
+
+  return <OnboardingFlow questions={starterQuestions} next={sanitizeNextPath(next)} />
 }
