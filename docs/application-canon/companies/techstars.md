@@ -6,6 +6,10 @@ type: accelerator
 domain: founder
 homepage: https://www.techstars.com
 linkedin: https://www.linkedin.com/company/techstars
+title: "Company Profile: Techstars"
+description: "Company Profile: Techstars (techstars.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Company Profile: Techstars

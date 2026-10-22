@@ -21,6 +21,11 @@ jobs:
           persist-credentials: false
       - name: Validate repository structure
         run: python3 .repo/scripts/repo_check.py --ci
+      - name: No unresolved merge-conflict markers
+        run: |
+          if git grep -nE '^(<<<<<<<|>>>>>>>) ' -- . ':!**/node_modules/**'; then
+            echo "Unresolved merge-conflict markers found" >&2; exit 1
+          fi
 
   migrations:
     name: Migration lint
@@ -57,6 +62,29 @@ jobs:
           print(f'OK: {len(files)} migrations')
           PYEOF
 
+  db-local-suites:
+    name: Local Postgres role-boundary suites
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Put Postgres server binaries on PATH
+        run: |
+          if ! ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y postgresql
+          fi
+          ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1 >> "$GITHUB_PATH"
+      # Throwaway local clusters only (initdb in RUNNER_TEMP, loopback TCP);
+      # these suites never connect to Supabase.
+      - name: P0 suite (054/055 boundary)
+        run: P0_PGROOT="$RUNNER_TEMP/p0" bash supabase/tests/p0/run_local.sh
+      - name: M09 suite (058 catalog provenance + promotion, rollback)
+        run: M09_PGROOT="$RUNNER_TEMP/m09" bash supabase/tests/m09/run_local.sh
+
   mcp-server:
     name: MCP server
     runs-on: ubuntu-latest
@@ -75,11 +103,51 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: application-hub-mcp-server/package-lock.json
+      # aqua-mcp-server 2.0: zero-dependency ESM on the aqua-companion
+      # (file:../aqua-companion). No build step; the package ships src/.
       - run: npm ci --ignore-scripts
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Build
-        run: npm run build
+      - name: TOOLS.json is generated from the registry and current
+        run: npm run manifest:check
+      - name: Hosted route's vendored catalog core matches src/catalog
+        run: npm run vendor:hosted:check
+      - name: Tests (protocol, public tools, not_public, keys, workspace tiers, injection, manifest)
+        run: npm test
+
+  aqua-companion:
+    name: AQUA companion
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      # The agent interface runs on vendored copies of pure app modules
+      # (aqua-companion/vendor/). Re-running the vendor script must change nothing.
+      - name: Vendored app modules are in sync
+        run: |
+          node aqua-companion/scripts/vendor.mjs
+          git diff --exit-code -- aqua-companion/vendor
+          test -z "$(git status --porcelain -- aqua-companion/vendor)"
+      # Zero dependencies. Tests import app/lib/aqua-local/*.ts via Node type stripping (Node 22.18+).
+      - name: Companion tests
+        run: node --test aqua-companion/test/*.test.mjs
+      # M09b: the tarball the site serves (app/public/companion/) is rebuilt with
+      # npm pack and must match; and it must run from an empty folder via npx.
+      - name: Served companion tarball matches the source
+        run: node aqua-companion/scripts/pack-site.mjs --check
+      - name: Tarball runs via npx from an empty folder
+        run: |
+          tgz="$(ls "$PWD"/app/public/companion/aqua-companion-*.tgz)"
+          cd "$(mktemp -d)" && npx --yes "file:$tgz" --help | head -1
+      # Agent guidance (llms.txt, llms-full.txt, /agents, /.well-known/mcp, /developers)
+      # is generated from the tool registry; counts and install lines can never drift.
+      - name: Agent guidance is generated from the registry
+        run: node scripts/gen-agent-guidance.mjs --check
 
   next-app:
     name: Next.js app
@@ -102,6 +170,12 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Agent-readiness tests
         run: npm run test:agent
+      - name: App unit tests (tests/*.test.mjs)
+        run: npm run test:unit
+      - name: Vault suites (aqua-local, session, score)
+        run: npm run test:vault
+      - name: Extension local-first tests
+        run: npm run test:extension
       - name: Typecheck
         run: npm run type-check
       - name: Build

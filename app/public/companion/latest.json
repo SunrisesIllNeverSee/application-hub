@@ -1,0 +1,8 @@
+{
+  "version": "0.2.0",
+  "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz",
+  "sha256": "68b16804806e3405afa6182ae2bd450d3018bfbd07e898b9e03a59f212c2e217",
+  "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz.sha256",
+  "install": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help",
+  "note": "Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; npm publication of aqua-companion is pending (owner gate GB2)."
+}

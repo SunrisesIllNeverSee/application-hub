@@ -78,7 +78,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: 'What is the Contribution Exchange?',
     answer:
-      'The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to signalaf.com — see signalaf.com/agents.md for the full agent carry guide. Agents interact with the Steward at signalaf.com/api/exchange/steward/aquaidp.xyz.',
+      'The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to signalaf.com — see signalaf.com/agents.md for the full agent carry guide. The aquaidp.xyz Steward endpoint is pending domain verification; start at signalaf.com/exchange.',
   },
   {
     question: 'How do I get started with AQUA?',

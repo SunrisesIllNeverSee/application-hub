@@ -7,6 +7,11 @@ domain: [founder / jobs / education / grants / general]
 status: [upcoming / open / submitted / closed / accepted / rejected / waitlisted]
 deadline: [YYYY-MM-DD or FUTURE EDIT]
 url: [application URL]
+type: Reference
+title: "Application Profile: [Application Name]"
+description: "Application Profile: [Application Name] (application-profile-template.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Application Profile: [Application Name]

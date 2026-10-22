@@ -26,10 +26,23 @@ export const LOCAL_FIRST_REFUSAL_MESSAGE =
 /**
  * True when the deployment is running in local-first mode.
  * Server-side flag: AQUA_LOCAL_FIRST=1 (also accepts 'true').
+ *
+ * FAIL CLOSED (M09 hardening H1): a production runtime — VERCEL_ENV=production,
+ * or NODE_ENV=production — is local-first unless the flag is EXPLICITLY
+ * '0'/'false'. A missing or junk value in production can therefore never
+ * silently re-open the legacy hosted private-write routes. Outside production
+ * (dev, tests, previews) an unset flag keeps the legacy default (off).
  */
-export function isLocalFirst(): boolean {
-  const v = process.env.AQUA_LOCAL_FIRST?.trim().toLowerCase()
-  return v === '1' || v === 'true'
+export function isLocalFirst(env: Record<string, string | undefined> = process.env): boolean {
+  const v = env.AQUA_LOCAL_FIRST?.trim().toLowerCase()
+  if (v === '1' || v === 'true') return true
+  if (v === '0' || v === 'false') return false
+  return isProductionRuntime(env)
+}
+
+/** VERCEL_ENV=production, or NODE_ENV=production. */
+export function isProductionRuntime(env: Record<string, string | undefined> = process.env): boolean {
+  return env.VERCEL_ENV?.trim() === 'production' || env.NODE_ENV?.trim() === 'production'
 }
 
 /**

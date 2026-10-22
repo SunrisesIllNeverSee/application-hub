@@ -1,25 +1,43 @@
 {
   "name": "aqua-mcp-server",
-  "version": "1.0.1",
-  "description": "MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence. 31 tools for agent environments.",
+  "version": "2.0.0",
+  "description": "MCP server for the AQUA Application Hub: the AQUA companion's tiered tools on a local encrypted workspace, plus read-only public catalog tools. No account token, no privileged key.",
   "type": "module",
-  "main": "dist/index.js",
   "bin": {
-    "aqua-mcp-server": "dist/index.js"
+    "aqua-mcp-server": "bin/aqua-mcp-server.mjs"
+  },
+  "exports": {
+    ".": "./src/catalog/index.mjs",
+    "./catalog": "./src/catalog/index.mjs",
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist",
+    "bin",
+    "src",
+    "TOOLS.json",
     "README.md"
   ],
+  "scripts": {
+    "start": "node bin/aqua-mcp-server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "manifest": "node scripts/gen-tools.mjs",
+    "manifest:check": "node scripts/gen-tools.mjs --check",
+    "vendor:hosted": "node scripts/vendor-hosted.mjs",
+    "vendor:hosted:check": "node scripts/vendor-hosted.mjs --check",
+    "live-check": "node scripts/live-check.mjs",
+    "inspector": "npx @modelcontextprotocol/inspector node bin/aqua-mcp-server.mjs",
+    "vendor:companion": "node scripts/vendor-companion.mjs",
+    "vendor:companion:check": "node scripts/vendor-companion.mjs --check"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "keywords": [
     "mcp",
     "model-context-protocol",
     "aqua",
     "application-hub",
     "agent",
-    "claude",
-    "cursor",
-    "windsurf",
     "local-first"
   ],
   "repository": {
@@ -32,32 +50,5 @@
     "url": "https://github.com/SunrisesIllNeverSee/application-hub/issues"
   },
   "license": "MIT",
-  "scripts": {
-    "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build",
-    "clean": "rm -rf dist",
-    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
-    "@supabase/supabase-js": "^2.49.0",
-    "dotenv": "^17.4.2",
-    "express": "^4.18.0",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.0",
-    "@types/node": "^22.10.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "vitest": "^2.0.0"
-  }
+  "dependencies": {}
 }

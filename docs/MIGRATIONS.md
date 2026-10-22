@@ -94,3 +94,18 @@ same day, not signs of a broken database history.
 - If you are writing docs, point to this file instead of re-explaining the duplicate-prefix caveat everywhere.
 
 The goal is stable history, not cosmetic perfection.
+
+## Production application status, 052 to 057 (recorded 2026-10-22)
+
+Migrations 052 to 057 are **applied in production**. The file headers of 052 to 055 still read "PREPARED, DO NOT APPLY"; those headers are historical (written before owner authorization) and are intentionally not edited, per the no-rename and no-casual-edit policy above.
+
+| Migration | Applied effect |
+|---|---|
+| 052 canonical catalog read boundary | Public/anon reads limited to canonical program rows and their questions/stats |
+| 053 canonical promotion | Promotion of the 5 canonical programs |
+| 054 canonical write boundary | Database-level write boundary for canonical catalog tables |
+| 055 team invite acceptance | Team invite acceptance path |
+| 056 deferred teams write boundary | Write lockdown for deferred Teams tables |
+| 057 complete deferred teams write lockdown | Completes the Teams write lockdown |
+
+056 and 057 use timestamp-style prefixes (`20261021214324_`, `20261021214559_`) because they were created through the Supabase CLI. Treat the production migration ledger as authoritative over file headers.

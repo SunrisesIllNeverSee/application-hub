@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BREADCRUMBS } from '@/lib/jsonld'
+import { AGENT_GUIDANCE as G } from '@/lib/agent-guidance.generated.mjs'
 
 export const metadata: Metadata = {
   title: 'AQUA Application Hub Developer Portal — API, MCP, OpenAPI',
-  description:
-    'Developer resources for AQUA Application Hub at aquaidp.xyz: OpenAPI spec, REST API, MCP server with 31 registered tools, authentication, Appfeeder extension, and agent integration guidance.',
+  description: `Developer resources for AQUA Application Hub at aquaidp.xyz: OpenAPI spec, REST API, the local AQUA companion (stdio MCP, ${G.total} tools), authentication, Appfeeder extension, and agent integration guidance.`,
   alternates: { canonical: '/developers' },
 }
 
@@ -29,7 +29,7 @@ export default function DevelopersPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">AQUA Application Hub Developers</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">AQUA developer portal</h1>
           <p className="max-w-3xl text-xl leading-relaxed text-neutral-600 dark:text-neutral-300">
-            An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub REST API exposes these capabilities with typed operations, a local MCP server with 31 registered tools for agent environments, and a deferred Appfeeder capture integration. Public discovery routes are available without authentication; user-account endpoints require a Supabase session cookie or Bearer JWT.
+            An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub REST API exposes these capabilities with typed operations, the local AQUA companion (a stdio MCP server with {G.total} tools) for agent environments, and a deferred Appfeeder capture integration. Public discovery routes are available without authentication; user-account endpoints require a Supabase session cookie or Bearer JWT.
           </p>
         </header>
 
@@ -39,13 +39,14 @@ export default function DevelopersPage() {
             Public discovery APIs are available without authentication; private account APIs require a session or Bearer JWT. Under local-first mode, legacy hosted private-answer write routes refuse requests (HTTP 403 with local_first:true).
             Sign in at <Link href="/login" className="text-brand-600 hover:underline dark:text-brand-400">/login</Link> to get
             a session cookie, or retrieve a Bearer JWT from <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-sm dark:bg-neutral-800">GET /api/auth/token</code> for
-            extension or agent use. Start with the OpenAPI document for typed operations and error models.
+            the browser extension. Agents never need a JWT: they work through the local AQUA companion. Start with the OpenAPI document for typed operations and error models.
           </p>
           <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Get your auth token (requires active session)
 curl https://aquaidp.xyz/api/auth/token
 
-# Inspect the public MCP tool catalog
+# The local-first MCP manifest and the public catalog configuration
 curl https://aquaidp.xyz/.well-known/mcp
+curl https://aquaidp.xyz/.well-known/aqua-catalog.json
 
 # Private answer matching happens in the local vault, not
 # /api/match-question — that route returns 403 under local-first.
@@ -88,7 +89,7 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
               </p>
             </div>
             <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Bearer JWT (extension/agent)</h3>
+              <h3 className="font-semibold">Bearer JWT (browser extension)</h3>
               <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                 Send <code className="text-xs">Authorization: Bearer &lt;JWT&gt;</code> with API requests.
                 Get the JWT from <code className="text-xs">GET /api/auth/token</code> while logged in.
@@ -98,55 +99,45 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
         </section>
 
         <section className="space-y-4">
-          <h2 id="mcp" className="text-2xl font-semibold tracking-tight">MCP server</h2>
+          <h2 id="mcp" className="text-2xl font-semibold tracking-tight">MCP server: the local AQUA companion</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The AQUA MCP source registers 31 tools across programs, questions,
-            rankings, intelligence, and user-authenticated operations. It runs
-            locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted
-            via Streamable HTTP transport. There is no public hosted MCP endpoint
-            at aquaidp.xyz — the server runs in the user agent environment and
-            connects to the user Supabase session.
+            Agents work through the AQUA companion, a zero-dependency command-line tool and stdio MCP
+            server the user runs on their own machine. It works on one consented, encrypted workspace
+            plus the public catalog, holds no account token and no database key, and cannot approve,
+            sign, freeze, export or submit anything: the human approves in the browser review. It
+            registers {G.total} tools ({G.tiers.map((t) => `${t.count} ${t.tier}`).join(', ')}); tiers are enforced in code.
+            The full guide is at{' '}
+            <Link href="/agents" className="text-brand-600 hover:underline dark:text-brand-400">/agents</Link>.
           </p>
-          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The MCP manifest is published at{' '}
-            <a href="/.well-known/mcp" className="text-brand-600 hover:underline dark:text-brand-400">/.well-known/mcp</a>.
-            Source code is in the repository under{' '}
-            <a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server" className="text-brand-600 hover:underline dark:text-brand-400">application-hub-mcp-server/</a>.
-          </p>
-          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Published package (1.0.1+) — real dist/, runnable via npx:
-npx aqua-mcp-server
+          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Install (versioned tarball from this site; Node.js 22+)
+${G.install.help}
 
-# Or clone and build from source:
-git clone https://github.com/SunrisesIllNeverSee/application-hub
-cd application-hub/application-hub-mcp-server
-npm ci && npm run build
-node dist/index.js
+# Connect Claude Code (the server starts without a workspace)
+${G.install.claude_code}
 
-# Run via Streamable HTTP (self-hosted)
-TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
+# Self-check: config, catalog, workspace, keychain
+${G.install.doctor}`}</code></pre>
+          <ul className="list-disc space-y-1 pl-6 text-sm text-neutral-600 dark:text-neutral-300">
+            <li>npm: {G.companion.npm_status}</li>
+            <li>{G.mcp_server.status}</li>
+            <li>Hosted read-only MCP at <code className="text-xs">{G.hosted_mcp.url}</code>: {G.hosted_mcp.status}.</li>
+            <li>Public catalog configuration: <a href="/.well-known/aqua-catalog.json" className="text-brand-600 hover:underline dark:text-brand-400">/.well-known/aqua-catalog.json</a> (publishable/anon key only).</li>
+          </ul>
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Public tools (11)</h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                Program search, detail, rankings, heat scores, questions, similar
-                questions, universal questions, program DNA, question significance,
-                acceptance stats. No auth required.
-              </p>
-            </div>
-            <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Authenticated tools (14)</h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                Profile answers, application readiness, fit score, find best
-                programs, rank answers, log draft runs, save answers, review
-                context, stress test, intake, fill, borrow threshold, answer bank
-                search. Requires Supabase JWT.
-              </p>
-            </div>
+            {G.tiers.map((t) => (
+              <div key={t.tier} className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+                <h3 className="font-semibold">{t.tier} ({t.count})</h3>
+                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{t.meaning}</p>
+                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+                  {G.tools.filter((x) => x.tier === t.tier).map((x) => x.name).join(', ')}
+                </p>
+              </div>
+            ))}
           </div>
           <p className="text-sm text-neutral-600 dark:text-neutral-300">
-            Six additional canonical <code className="text-xs">aqua.*</code> tools cover ingest, qualification,
-            reward, variation and package operations. Private-content write tools refuse
-            in local-first mode; tool availability does not imply remote vault access.
+            The machine-readable manifest is at{' '}
+            <a href="/.well-known/mcp" className="text-brand-600 hover:underline dark:text-brand-400">/.well-known/mcp</a>.
+            Source: <a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-companion" className="text-brand-600 hover:underline dark:text-brand-400">aqua-companion/</a>.
           </p>
         </section>
 
@@ -186,7 +177,7 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
             For agent guidance including when-to-use, how-to-use, limitations,
             and Markdown content negotiation, see{' '}
             <a href="/llms.txt" className="text-brand-600 hover:underline dark:text-brand-400">llms.txt</a>.
-            For Contribution Exchange behavior, see the{' '}
+            The step-by-step agent path is the{' '}
             <a href="/agents" className="text-brand-600 hover:underline dark:text-brand-400">agent guide</a>.
             The MCP manifest at{' '}
             <a href="/.well-known/mcp" className="text-brand-600 hover:underline dark:text-brand-400">/.well-known/mcp</a> describes
@@ -199,7 +190,7 @@ TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
             Full source code is available at{' '}
             <a href="https://github.com/SunrisesIllNeverSee/application-hub" className="text-brand-600 hover:underline dark:text-brand-400">github.com/SunrisesIllNeverSee/application-hub</a>.
-            The MCP server is in <code className="text-xs">application-hub-mcp-server/</code>, the
+            The agent companion is in <code className="text-xs">aqua-companion/</code>, the
             Next.js app is in <code className="text-xs">app/</code>, and the Appfeeder extension is
             in <code className="text-xs">appfeeder/</code>.
           </p>

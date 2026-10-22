@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Cal.com AEO Playbook — Review Analysis & Lessons for SigRank"
+description: "Cal.com AEO Playbook — Review Analysis & Lessons for SigRank (CALCOM_LESSONS_ANALYSIS.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Cal.com AEO Playbook — Review Analysis & Lessons for SigRank
 
 > How Cal.com engineered themselves into the #1 ChatGPT-recommended scheduling tool,

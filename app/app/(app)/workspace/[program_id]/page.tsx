@@ -25,6 +25,7 @@ import {
   VaultCompiledOutput,
 } from '@/components/aqua-local/VaultWorkspaceOverlay'
 import { VaultPacketPanel } from '@/components/aqua-local/VaultPacketPanel'
+import { WorkspaceReviewLink } from '@/components/review/WorkspaceReviewLink'
 
 interface Props {
   params: Promise<{ program_id: string }>
@@ -161,6 +162,12 @@ export default async function WorkspaceDetailPage({ params, searchParams }: Prop
             </div>
           </div>
           <div className="flex-shrink-0 flex items-center gap-3">
+            {isLocalFirst() && questions.length > 0 && (
+              <WorkspaceReviewLink
+                programId={program.id}
+                questions={questions.map((q) => ({ archived_question_id: q.archived_question_id, order_index: q.order_index }))}
+              />
+            )}
             <div className="hidden md:block">
               {isLocalFirst() ? (
                 <VaultReadiness programId={program.id} questions={questions} />

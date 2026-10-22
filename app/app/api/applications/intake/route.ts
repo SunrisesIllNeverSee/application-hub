@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { parseRequirements } from '@/lib/catalog/normalize'
 import {
   MODEL,
   SYSTEM_PROMPT,
@@ -11,10 +11,11 @@ import {
   resolveAnthropicClient,
   extractQuestionsWithGroq,
   loadEmbeddingIntegrations,
-  findOrCreateArchivedQuestion,
+  decideArchivedQuestion,
   findOrCreateProgram,
   type SourceKind,
   type ExtractedQuestion,
+  type ArchivedQuestionDecision,
 } from '@/lib/intake-extract'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
 
@@ -169,17 +170,19 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Shared-infra writes (programs, program_questions, archived_questions) go
-    // through the admin client when available — archive tables are shared
-    // infrastructure, and RLS may not grant direct user inserts. User-owned
-    // writes (user_applications, unlocks) stay on the user-scoped client.
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    const infraClient = serviceKey
-      ? createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey)
-      : supabase
+    // M09 hardening H1: the application text is USER-SUPPLIED. This legacy
+    // route never writes the shared catalog with the service role — every
+    // write runs on the caller's user-scoped client, so RLS + migration 054
+    // decide (canonical programs / program_questions / archived_questions are
+    // service-side only). Questions that do not link to an EXISTING canonical
+    // question are never created as canonical rows: they stay per-user
+    // (staged in this user's app_import_sessions.raw_text and returned as
+    // staged_questions); public templates enter the catalog only through the
+    // curator pipeline (/api/catalog/candidates).
+    const catalogClient = supabase
 
     // ── 3. Index the program ────────────────────────────────────────────────
-    const program = await findOrCreateProgram(infraClient, {
+    const program = await findOrCreateProgram(catalogClient, {
       name: program_name.trim(),
       organization: typeof organization === 'string' ? organization.trim() : undefined,
       applyUrl: typeof program_url === 'string' ? program_url.trim() : undefined,
@@ -188,31 +191,51 @@ export async function POST(req: NextRequest) {
     })
     if (!program) {
       return NextResponse.json(
-        { error: 'Failed to create program record', session_id: sessionRow?.id ?? null },
-        { status: 500 }
+        {
+          error: 'program_not_in_catalog',
+          detail:
+            'This program is not in the catalog and cannot be created from pasted text. ' +
+            'Submit the public application through the catalog candidate pipeline (POST /api/catalog/candidates).',
+          candidate_pipeline: '/api/catalog/candidates',
+          session_id: sessionRow?.id ?? null,
+        },
+        { status: 422 }
       )
     }
 
     // ── 4. Index the questions, individually ────────────────────────────────
     const embedByok = await loadEmbeddingIntegrations(supabase, user.id)
 
-    let newQuestions = 0
+    void embedByok // embeddings are only written for NEW canonical questions, which intake no longer creates
+    const newQuestions = 0
     let reusedQuestions = 0
     let linked = 0
     const failures: string[] = []
+    // Questions with no exact/normalized canonical match: kept per-user only.
+    const stagedQuestions: Array<{ order_index: number; question_text: string; theme: string } & ArchivedQuestionDecision> = []
+    // M09 W2: every canonical-question decision is reported; only exact /
+    // normalized matches auto-link. Everything else is STAGED (never a new
+    // canonical row) and flagged for review when it resembled one.
+    const matchDecisions: Array<{ order_index: number; archived_question_id: string | null; was_new: boolean; staged?: boolean } & ArchivedQuestionDecision> = []
 
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i]
-      const archived = await findOrCreateArchivedQuestion(infraClient, q.question_text, q.theme, embedByok)
-      if (!archived) {
-        failures.push(q.question_text.slice(0, 80))
+      const { linkId, decision } = await decideArchivedQuestion(catalogClient, q.question_text)
+      if (!linkId) {
+        stagedQuestions.push({ order_index: i, question_text: q.question_text, theme: q.theme, ...decision })
+        matchDecisions.push({ order_index: i, archived_question_id: null, was_new: false, staged: true, ...decision })
         continue
       }
-      if (archived.wasNew) newQuestions++
-      else reusedQuestions++
+      const archived = { id: linkId, wasNew: false, decision }
+      reusedQuestions++
+      matchDecisions.push({ order_index: i, archived_question_id: archived.id, was_new: false, ...archived.decision })
+
+      // The occurrence keeps its own limits even when it links an existing
+      // canonical question whose wording carried different (or no) limits.
+      const req = parseRequirements(q.question_text)
 
       // Link occurrence to program (exact wording preserved in asked_as)
-      const { data: existingLink } = await infraClient
+      const { data: existingLink } = await catalogClient
         .from('program_questions')
         .select('id')
         .eq('program_id', program.id)
@@ -220,12 +243,14 @@ export async function POST(req: NextRequest) {
         .maybeSingle()
 
       if (!existingLink) {
-        const { error: linkError } = await infraClient.from('program_questions').insert({
+        const { error: linkError } = await catalogClient.from('program_questions').insert({
           program_id: program.id,
           archived_question_id: archived.id,
           asked_as: q.question_text,
           order_index: i,
-          is_required: true,
+          is_required: req.required ?? true,
+          word_limit: req.word_limit ?? null,
+          char_limit: req.char_limit ?? null,
         })
         if (linkError) failures.push(q.question_text.slice(0, 80))
         else linked++
@@ -281,6 +306,10 @@ export async function POST(req: NextRequest) {
       new_questions: newQuestions,
       reused_questions: reusedQuestions,
       failures,
+      staged_questions: stagedQuestions,
+      candidate_pipeline: stagedQuestions.length ? '/api/catalog/candidates' : null,
+      match_decisions: matchDecisions,
+      needs_review: matchDecisions.filter((d) => d.needs_review).length,
       extraction,
       workspace_url: `/workspace/${program.id}`,
       fill_url: applicationId ? `/api/applications/${applicationId}/fill` : null,

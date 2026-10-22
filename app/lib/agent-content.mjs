@@ -1,3 +1,11 @@
+import { AGENT_GUIDANCE, AGENTS_MARKDOWN } from './agent-guidance.generated.mjs'
+
+// Tool lists, counts and install lines below come from the generated guidance
+// (scripts/gen-agent-guidance.mjs) so they cannot drift from the registry.
+const G = AGENT_GUIDANCE
+const TOOL_NAMES = G.tools.map((t) => t.name).join(', ')
+const TIER_SUMMARY = G.tiers.map((t) => `${t.count} ${t.tier}`).join(', ')
+
 export const MARKDOWN_PAGES = {
   '/': `# AQUA Application Hub
 
@@ -13,7 +21,7 @@ Smart Matcher compares the material already present in an answer bank with the q
 
 ## Agent access
 
-Agents should read https://aquaidp.xyz/llms.txt for when-to-use guidance. The repository includes a local/stdio MCP server for answer retrieval, fit and ranking tools, review context, persisted stress tests, and write-back. Do not assume a hosted public MCP endpoint. Web users can start at https://aquaidp.xyz/login.
+Agents work through the local AQUA companion, a command-line tool and stdio MCP server the user runs on their own machine (${G.total} tools: ${TIER_SUMMARY}). Private answers stay in the user's browser vault and encrypted companion workspace; approvals happen only in the browser review. Install: \`${G.install.help}\`. Full guide: https://aquaidp.xyz/agents (Markdown: https://aquaidp.xyz/agents.md) and https://aquaidp.xyz/llms.txt. The hosted read-only endpoint ${G.hosted_mcp.url} is ${G.hosted_mcp.status}. Web users start at https://aquaidp.xyz/login.
 
 ## Trust and identity
 
@@ -145,23 +153,24 @@ Composite scoring combines personal fit with an estimated program-value signal t
 
 AQUA does not decide who gets into a program, does not expose a leaderboard ranking founders against one another, and does not represent any accelerator, grantmaker, employer, school, or fellowship listed in the archive. The detailed human-readable methodology is available at https://aquaidp.xyz/about/scoring.
 `,
+  '/agents': AGENTS_MARKDOWN,
   '/developers': `# AQUA Application Hub Developer Portal
 
-An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub exposes an authenticated REST API with typed operations, a local MCP server with 27 tools for agent environments, and the Appfeeder browser extension for capturing answers from program websites. This document is the Markdown representation of the developer portal at https://aquaidp.xyz/developers.
+An application infrastructure API lets developers programmatically access reusable application answers, opportunity fit scoring, and application graph data. The AQUA Application Hub exposes an authenticated REST API with typed operations, the local AQUA companion (a stdio MCP server with ${G.total} tools) for agent environments, and the Appfeeder browser extension for capturing answers from program websites. This document is the Markdown representation of the developer portal at https://aquaidp.xyz/developers.
 
 ## Quickstart
 
-AQUA is an authenticated product. Sign in at https://aquaidp.xyz/login to get a session cookie, or retrieve a Bearer JWT from GET /api/auth/token for extension or agent use.
+Public discovery routes need no authentication. Account endpoints need a session: sign in at https://aquaidp.xyz/login, or retrieve a Bearer JWT from GET /api/auth/token for the browser extension. Agents never need a JWT: private answers are handled locally through the AQUA companion, and hosted private-answer routes refuse requests under local-first (HTTP 403).
 
 \`\`\`bash
-# Get your auth token (requires active session)
-curl https://aquaidp.xyz/api/auth/token
+# Public catalog configuration (publishable/anon key only)
+curl https://aquaidp.xyz/.well-known/aqua-catalog.json
 
-# Match a question against your answer bank
-curl -X POST https://aquaidp.xyz/api/match-question \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer <JWT>" \\
-  -d '{"text": "Tell us what you have built", "limit": 5}'
+# Machine-readable MCP manifest (local-first companion)
+curl https://aquaidp.xyz/.well-known/mcp
+
+# OpenAPI spec
+curl https://aquaidp.xyz/openapi.json
 \`\`\`
 
 ## OpenAPI specification
@@ -173,23 +182,23 @@ The full OpenAPI 3.0.3 document is published at https://aquaidp.xyz/openapi.json
 AQUA uses Supabase Auth. Two credential types are accepted:
 
 - Session cookie (browser): After login, Supabase sets an sb-access-token cookie. The web app and browser extension use this automatically.
-- Bearer JWT (extension/agent): Send Authorization: Bearer <JWT> with API requests. Get the JWT from GET /api/auth/token while logged in.
+- Bearer JWT (browser extension): Send Authorization: Bearer <JWT> with API requests. Get the JWT from GET /api/auth/token while logged in. MCP tools never take a JWT.
 
-## MCP server
+## MCP server (the local AQUA companion)
 
-The AQUA MCP server exposes 27 tools across programs, questions, rankings, intelligence, and user-authenticated operations. It is published on npm as aqua-mcp-server and can be run with npx -y aqua-mcp-server. It runs locally via stdio (Claude Desktop, Cursor, Windsurf) or self-hosted via Streamable HTTP transport. There is no public hosted MCP endpoint at aquaidp.xyz. The MCP manifest is at https://aquaidp.xyz/.well-known/mcp. Source code is at https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-mcp-server.
+Agents use the local AQUA companion: a zero-dependency command-line tool and stdio MCP server that works on one consented, encrypted workspace on the user's machine plus the public catalog. It holds no account token and no database key, and it cannot approve, sign, freeze, export or submit anything. It registers ${G.total} tools (${TIER_SUMMARY}); tiers are enforced in code.
 
-## CLI
+- Install today: \`${G.install.help}\` (sha256 at ${G.companion.tarball.sha256_url}).
+- Connect Claude Code: \`${G.install.claude_code}\`
+- npm: ${G.companion.npm_status}
+- aqua-mcp-server: ${G.mcp_server.status}
+- Hosted read-only MCP: ${G.hosted_mcp.url} (${G.hosted_mcp.status}).
+- Public catalog configuration: ${G.catalog_config.url} (publishable/anon key only).
+- The MCP manifest is at https://aquaidp.xyz/.well-known/mcp; the full agent guide is https://aquaidp.xyz/agents.
 
-The AQUA MCP server is published on npm at https://www.npmjs.com/package/aqua-mcp-server. Install globally with npm install -g aqua-mcp-server or run directly with npx -y aqua-mcp-server.
+### Tools
 
-### Public tools (11, no auth required)
-
-hub_search_programs, hub_get_program_detail, hub_get_program_by_slug, hub_get_program_rankings, hub_get_heat_scores, hub_get_program_questions, hub_find_similar_questions, hub_get_universal_questions, hub_get_program_dna, hub_get_question_significance, hub_get_acceptance_stats.
-
-### Authenticated tools (16, require Supabase JWT)
-
-hub_get_profile_answers, hub_get_application_readiness, hub_get_fit_score, hub_find_best_programs, hub_rank_my_answers, hub_log_draft_run, hub_save_answer, hub_get_answer_review_context, hub_save_answer_review, hub_stress_test_answer, hub_intake_application, hub_fill_application, hub_set_borrow_threshold, hub_search_answer_bank.
+${TOOL_NAMES}.
 
 ## Error handling
 
@@ -201,7 +210,7 @@ The Appfeeder Chrome extension captures answers from application form fields usi
 
 ## Agent integration
 
-For agent guidance see https://aquaidp.xyz/llms.txt. For Contribution Exchange behavior see https://aquaidp.xyz/agents. The MCP manifest at https://aquaidp.xyz/.well-known/mcp describes the tool surface in machine-readable form.
+For agent guidance see https://aquaidp.xyz/agents and https://aquaidp.xyz/llms.txt. The MCP manifest at https://aquaidp.xyz/.well-known/mcp describes the tool surface in machine-readable form. The Contribution Exchange is not part of AQUA; it lives at https://signalaf.com/exchange.
 `,
 
   '/faq': `# AQUA Application Hub — Frequently Asked Questions
@@ -242,11 +251,11 @@ Answer lineage is the connection between an answer variant and its source materi
 
 ## Is AQUA free?
 
-AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at aquaidp.xyz is the canonical public product surface. The local MCP server and developer resources are publicly accessible.
+AQUA is operated by Ello Cello LLC and is part of the broader MO§ES product family. The web application at aquaidp.xyz is the canonical public product surface. The local AQUA companion and developer resources are publicly accessible.
 
 ## How does the MCP server work?
 
-AQUA ships a local MCP server (Model Context Protocol) that exposes answer retrieval, ranking, review-context, stress-test, and write-back capabilities for power users operating through agent environments. The MCP server runs locally via stdio — install it with npx aqua-mcp-server. There is no hosted public MCP endpoint at aquaidp.xyz; the server is designed for local use alongside your agent client.
+AQUA's agent path is the local AQUA companion, a stdio MCP server the user runs on their own machine. It works on one encrypted, consented workspace: it can import forms and submitted history, match questions, search the user's own answers and stage drafts, but approvals, signing and export stay with the user in the browser. Install it with \`${G.install.help}\`; see https://aquaidp.xyz/agents. A hosted read-only endpoint at ${G.hosted_mcp.url} is ${G.hosted_mcp.status}.
 
 ## What is the Appfeeder extension?
 
@@ -262,11 +271,11 @@ No. AQUA has no relationship with any program admissions process. No score AQUA 
 
 ## What is the Contribution Exchange?
 
-The Contribution Exchange is an agent-facing protocol that allows AI agents to propose or request contributions through a central Steward. It has moved to signalaf.com — see signalaf.com/agents.md for the full agent carry guide.
+It is not part of AQUA. It lives at https://signalaf.com/exchange.
 
 ## How do I get started with AQUA?
 
-Visit aquaidp.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Developers can install the MCP server with npx aqua-mcp-server for agent-based workflows.
+Visit aquaidp.xyz and create an account. Build your answer bank by importing existing application answers or capturing new ones with the Appfeeder extension. Use Smart Matcher to find programs where your profile aligns. Check the Hub for ranked opportunities. Agents can help through the local AQUA companion: see https://aquaidp.xyz/agents.
 `,
   '/application-infrastructure': `# Application Infrastructure — Concepts, Guides, and Comparisons
 

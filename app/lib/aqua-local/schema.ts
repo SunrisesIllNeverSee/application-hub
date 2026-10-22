@@ -5,7 +5,7 @@
 // packets, provenance, and signoffs live ONLY here. Never egress.
 
 export const DB_NAME = 'aqua-local'
-export const DB_VERSION = 4
+export const DB_VERSION = 5
 
 export const STORE_NAMES = [
   'answers',
@@ -21,6 +21,13 @@ export const STORE_NAMES = [
   'packet_states',
   'submissions',
   'events',
+  // v5 (M09 W4) — private application workspace + evidence-based review
+  'app_instances',
+  'facts',
+  'evidence',
+  'reviews',
+  'comments',
+  'suggestions',
 ] as const
 
 export type StoreName = (typeof STORE_NAMES)[number]
@@ -67,6 +74,17 @@ export interface VersionRecord {
       stays strict same-answer lineage; this field carries the cross-scope
       trace (IR-026). */
   derived_from?: { version_id: string; version_sha256: string } | null
+  /** v5: evidence records cited when this version was written. Metadata
+      only — NOT part of the content hash (sha256 covers title + body), so
+      citing evidence never changes what an approval binds. Later links are
+      recorded on the evidence record itself (versions are immutable). */
+  evidence_ids?: string[]
+  /** M09b: set on answers imported as SUBMITTED history (aqua-companion
+      import-history). Metadata only — not part of the content hash. */
+  history?: true
+  /** M09b: serialized EncryptedBlob of a history.ts HistoryMeta (program,
+      exact question, submission date, source hash, placeholder scan). */
+  history_enc?: string
   body: string // serialized EncryptedBlob
   sha256: string // sha256 of canonicalJson({ title_plaintext, body_plaintext })
   method: VersionMethod
@@ -96,7 +114,24 @@ export interface ApprovalRecord {
    * needs a fresh local decision before a packet can select it.
    */
   restored_from_backup?: boolean
+  /** v5: who decided. Present on every v5 write (recordHumanApproval /
+      legacy approveVersion); absent on v4 rows, which stay readable. */
+  actor_id?: string | null
+  /** v5: the surface the decision came through. `legacy` = the pre-v5
+      approveVersion primitive. Absent on v4 rows. */
+  via?: ApprovalVia
+  /** M09b: `via: 'history_attestation'` only — the date the user says the
+      answer was SUBMITTED (YYYY-MM-DD or ISO date-time). The approval counts
+      as of this date; `at` stays the time the user confirmed it. */
+  effective_at?: string
+  /** M09b: `via: 'history_attestation'` only — the user's attestation
+      statement, serialized EncryptedBlob under the vault secret. */
+  attestation_enc?: string
 }
+
+/** `history_attestation` (M09b): the user confirmed an imported answer as
+    actually submitted (repo.ts recordHistoryAttestation). */
+export type ApprovalVia = 'review_ui' | 'decision_file' | 'history_attestation' | 'legacy'
 
 /**
  * LF-18 — append-only audit event ledger. Every governed mutation that
@@ -281,6 +316,228 @@ export interface SubmissionRecord {
   updated_at: string
 }
 
+// ---------------------------------------------------------------------------
+// v5 (M09 W4) — private application workspace + evidence-based review.
+// Encryption rule: EVERY free-text field is stored as `*_enc` (serialized
+// EncryptedBlob under the vault secret). Plaintext fields are ids, enums,
+// hashes, timestamps, and identifier-shaped keys only.
+// ---------------------------------------------------------------------------
+
+export type AppInstanceSourceKind = 'catalog' | 'url' | 'paste' | 'file' | 'existing'
+
+/** One question as it appears in THIS application instance. */
+export interface InstanceQuestionRef {
+  /** Public `program_questions.id`, or a local `LQ-` id for local-only apps. */
+  question_occurrence_id: string
+  /** Normalized/canonical question id (public `archived_questions.id`) when matched. */
+  canonical_question_id?: string | null
+  order: number
+}
+
+/**
+ * Decrypted shape of `AppInstanceRecord.local_template_enc` — the full
+ * application template for apps that exist only locally (exact question
+ * wording, limits, required flags, sections). Never stored in plaintext.
+ */
+export interface LocalAppTemplate {
+  title: string
+  org: string
+  cycle_year?: number | null
+  deadline?: string | null
+  sections?: Array<{ section_id: string; title: string }>
+  questions: Array<{
+    question_occurrence_id: string // LQ- id (assigned when absent)
+    canonical_question_id?: string | null
+    text: string // exact wording
+    word_limit?: number | null
+    char_limit?: number | null
+    required: boolean
+    section_id?: string | null
+    order: number
+    /** M09 W6: exact wording as originally extracted, kept when the user
+        recorded a correction (`text` then holds the corrected wording). */
+    original_text?: string | null
+  }>
+  /** M09 W6: corrections recorded during extraction review (Step B). The
+      originals stay alongside — nothing is silently rewritten. */
+  corrections?: LocalTemplateCorrection[]
+  /** M09 W6: how the template arrived (method, source hash, reuse signal). */
+  import_meta?: LocalTemplateImportMeta | null
+}
+
+export interface LocalTemplateCorrection {
+  /** Index of the question in the reviewed extraction (null = template-level). */
+  question_index: number | null
+  field: string
+  from: string | number | boolean | null
+  to: string | number | boolean | null
+  at: string
+}
+
+export interface LocalTemplateImportMeta {
+  method: 'url_fetch' | 'paste' | 'file'
+  content_sha256?: string | null
+  reuse?: 'allowed' | 'unknown' | 'disallowed' | null
+  file_format?: string | null
+  extracted_at: string
+  question_count_extracted: number
+  /** Catalog program the user linked this import to (kept inside the
+      encrypted template; the instance itself stays local-only so a program
+      keeps exactly one catalog-backed instance). */
+  linked_program_id?: string | null
+  linked_cycle_id?: string | null
+}
+
+/**
+ * A private working instance of one application. Catalog-backed instances
+ * reference the public template by id (program_id / ap_serial / cycle_id /
+ * template_revision_sha) and do not duplicate public catalog text;
+ * local-only instances (`LA-` ids) carry their template encrypted.
+ */
+export interface AppInstanceRecord {
+  instance_id: string // 'AI-…' (catalog-backed) | 'LA-…' (local-only)
+  /** Answer scope key: answers for this instance bind
+      `scope.application_id === application_id`. Defaults to instance_id. */
+  application_id: string
+  program_id?: string | null
+  ap_serial?: string | null
+  cycle_id?: string | null
+  template_revision_sha?: string | null
+  local_template_enc?: string
+  question_refs: InstanceQuestionRef[]
+  source: {
+    kind: AppInstanceSourceKind
+    /** URL / file name / catalog ref — free text, so encrypted. */
+    ref_enc?: string
+  }
+  created_at: string
+}
+
+export type FactKind = 'personal' | 'organization' | 'project'
+
+/**
+ * Immutable fact version. An update is a NEW row whose `supersedes` names
+ * the previous fact_version_id; a deletion is a `retracted` tombstone row.
+ * `key` is identifier-shaped (enforced: /^[a-z0-9][a-z0-9_.:-]{0,63}$/) —
+ * never free text — so it may stay plaintext for lookup.
+ */
+export interface FactRecord {
+  fact_version_id: string // primary key
+  fact_id: string
+  kind: FactKind
+  key: string
+  value_enc: string
+  supersedes?: string | null
+  evidence_ids: string[]
+  created_at: string
+  method: VersionMethod
+  retracted?: true
+}
+
+export type EvidenceKind = 'document' | 'url' | 'passage' | 'note'
+export type EvidenceVerification = 'unverified' | 'user_confirmed' | 'source_checked'
+export type EvidenceTargetKind = 'version' | 'fact' | 'claim'
+
+/**
+ * Evidence is supporting material — NOT an approval and NOT a
+ * recommendation. `links` and `verification` are mutable metadata (evidence
+ * can be linked to more targets or re-checked over time); title/excerpt/url
+ * are encrypted.
+ */
+export interface EvidenceRecord {
+  evidence_id: string
+  kind: EvidenceKind
+  title_enc: string
+  excerpt_enc?: string
+  /** User-provided URLs can carry private tokens/paths — encrypted. */
+  url_enc?: string
+  content_sha256: string
+  captured_at: string
+  verification: EvidenceVerification
+  freshness_checked_at?: string | null
+  links: Array<{ target_kind: EvidenceTargetKind; target_id: string }>
+}
+
+export const REVIEW_DECISIONS = [
+  'under_review',
+  'needs_evidence',
+  'needs_revision',
+  'rejected',
+  'superseded',
+  'evidence_requested',
+  'help_requested',
+] as const
+/** Review decisions are NOT approvals — 'approved' is deliberately absent. */
+export type ReviewDecision = (typeof REVIEW_DECISIONS)[number]
+
+/** Append-only review decision, hash-bound to the exact version reviewed. */
+export interface ReviewRecord {
+  review_id: string
+  answer_id: string
+  version_id: string
+  version_sha256: string
+  decision: ReviewDecision
+  rationale_enc?: string
+  actor_class: ActorClass
+  actor_id: string
+  at: string
+  seq?: number // events-ledger seq; stripped on backup restore
+  restored_from_backup?: boolean
+}
+
+/**
+ * M09 hardening: the surface a comment arrived through. Absent = written in
+ * this browser (review UI). 'decision_file' = imported from an offline
+ * review decision file (shown as imported); 'companion' = staged by the
+ * aqua-companion CLI / agent and imported (shown as "from companion — review").
+ */
+export type CommentVia = 'review_ui' | 'decision_file' | 'companion'
+export const COMMENT_VIAS: readonly CommentVia[] = ['review_ui', 'decision_file', 'companion']
+
+/** Discussion attached to an exact version (and its hash). */
+export interface CommentRecord {
+  comment_id: string
+  answer_id: string
+  version_id: string
+  version_sha256: string
+  thread_id: string
+  parent_comment_id?: string | null
+  body_enc: string
+  actor_class: ActorClass
+  actor_id: string
+  at: string
+  seq: number
+  via?: CommentVia
+}
+
+export type SuggestionKind = 'reuse' | 'draft' | 'recommendation' | 'evidence_gap'
+export type ReuseClassificationKind = 'direct' | 'adapt' | 'gap'
+
+/**
+ * Agent/system recommendation — distinct from evidence and from approvals.
+ * Writing a suggestion NEVER writes an approval or a review decision.
+ */
+export interface SuggestionRecord {
+  suggestion_id: string
+  instance_id?: string | null
+  question_occurrence_id: string
+  kind: SuggestionKind
+  classification?: ReuseClassificationKind | null
+  candidate_version_id?: string | null
+  /** Hash of the candidate version at suggestion time. */
+  candidate_version_sha256?: string | null
+  /** Machine reason codes (e.g. 'over_word_limit') — no free text. */
+  reason_codes?: string[]
+  explanation_enc: string
+  weaknesses_enc?: string
+  unsupported_claims_enc?: string
+  evidence_ids: string[]
+  provider?: string | null
+  model?: string | null
+  created_at: string
+  restored_from_backup?: boolean
+}
+
 export interface StoreSpec {
   name: StoreName
   keyPath: string
@@ -340,6 +597,41 @@ export const STORE_SPECS: StoreSpec[] = [
       { name: 'by_entity', keyPath: 'entity_id' },
     ],
   },
+  // --- v5 ---
+  { name: 'app_instances', keyPath: 'instance_id', indexes: [{ name: 'by_program', keyPath: 'program_id' }] },
+  {
+    name: 'facts',
+    keyPath: 'fact_version_id',
+    indexes: [
+      { name: 'by_fact', keyPath: 'fact_id' },
+      { name: 'by_key', keyPath: 'key' },
+    ],
+  },
+  { name: 'evidence', keyPath: 'evidence_id', indexes: [] },
+  {
+    name: 'reviews',
+    keyPath: 'review_id',
+    indexes: [
+      { name: 'by_version', keyPath: 'version_id' },
+      { name: 'by_answer', keyPath: 'answer_id' },
+    ],
+  },
+  {
+    name: 'comments',
+    keyPath: 'comment_id',
+    indexes: [
+      { name: 'by_version', keyPath: 'version_id' },
+      { name: 'by_thread', keyPath: 'thread_id' },
+    ],
+  },
+  {
+    name: 'suggestions',
+    keyPath: 'suggestion_id',
+    indexes: [
+      { name: 'by_occurrence', keyPath: 'question_occurrence_id' },
+      { name: 'by_candidate', keyPath: 'candidate_version_id' },
+    ],
+  },
 ]
 
 /**
@@ -380,6 +672,19 @@ export const MIGRATIONS: Array<(db: IDBDatabase) => void> = [
     }
   },
   // v3 → v4: submissions ledger (idempotent — guarded like v1)
+  (db) => {
+    for (const spec of STORE_SPECS) {
+      if (db.objectStoreNames.contains(spec.name)) continue
+      const store = db.createObjectStore(spec.name, { keyPath: spec.keyPath })
+      for (const idx of spec.indexes) {
+        store.createIndex(idx.name, idx.keyPath, { unique: false })
+      }
+    }
+  },
+  // v4 → v5 (M09 W4): app_instances, facts, evidence, reviews, comments,
+  // suggestions. ADDITIVE ONLY — creates missing stores, never touches an
+  // existing store or its rows (v4 versions/approvals stay byte-identical;
+  // the new optional fields are simply absent on them).
   (db) => {
     for (const spec of STORE_SPECS) {
       if (db.objectStoreNames.contains(spec.name)) continue

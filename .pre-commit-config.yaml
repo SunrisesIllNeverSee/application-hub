@@ -1,3 +1,7 @@
+# Optional wrapper for the pre-commit framework. NOT the authoritative path.
+# Authoritative: `bash .repo/scripts/install-hooks.sh` (core.hooksPath=.repo/git-hooks).
+# Both run the same check (.repo/scripts/repo_check.py). Do not use both: the pre-commit
+# framework refuses to install while core.hooksPath is set. See docs/REPOSITORY-STANDARD.md.
 repos:
   - repo: local
     hooks:

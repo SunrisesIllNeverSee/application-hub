@@ -18,8 +18,11 @@ const EXCHANGE_JSON = {
   },
   counterparty_agent: {
     mode: 'hosted_steward',
-    endpoint: 'https://signalaf.com/api/exchange/steward/aquaidp.xyz',
-    policy: 'https://signalaf.com/api/exchange/steward/aquaidp.xyz',
+    // aquaidp.xyz is not yet a verified domain on the SignalAF Steward, so no
+    // per-domain endpoint is advertised. Restore it once
+    // https://signalaf.com/api/exchange/steward/aquaidp.xyz returns 200.
+    status: 'pending_domain_verification',
+    overview: 'https://signalaf.com/exchange',
     human_role: 'governance_and_escalation',
   },
   contribution_scopes: [
@@ -41,8 +44,6 @@ const EXCHANGE_JSON = {
     overview: 'https://signalaf.com/exchange',
     agent_guide: 'https://signalaf.com/agents.md',
     manifest: 'https://signalaf.com/api/exchange/manifest',
-    counterparty_agent:
-      'https://signalaf.com/api/exchange/steward/aquaidp.xyz',
     company_control: 'https://signalaf.com/exchange/control',
     company_signup: 'https://signalaf.com/exchange/company',
     agent_signup: 'https://signalaf.com/exchange/agent',
@@ -81,7 +82,6 @@ const EXCHANGE_JSON = {
     'DID/VC',
   ],
   signals: {
-    schema: 'https://signalaf.com/schemas/exchange-signal/1.0',
     collection: 'https://signalaf.com/api/exchange/signals?domain=aquaidp.xyz',
     human: 'https://signalaf.com/exchange/signals?domain=aquaidp.xyz',
     authentication: 'https://signalaf.com/agents.md#signal-authentication',

@@ -9,6 +9,11 @@ is_universal: [true / false]
 typical_word_limit: [N]
 asked_by:
   - [company-slug]
+type: Reference
+title: "Question Profile: [Question text]"
+description: "Question Profile: [Question text] (question-profile-template.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Question Profile: [Question text]

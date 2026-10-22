@@ -1,10 +1,20 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { AGENT_GUIDANCE } from '@/lib/agent-guidance.generated.mjs'
+// Tool counts come from the generated aqua-mcp-server manifest (vendored with
+// the hosted route), so this page can never disagree with the server.
+import TOOLS from '../api/mcp/_vendor/TOOLS.json'
+
+type ModeKey = 'stdio-workspace' | 'stdio-catalog' | 'hosted'
+const COUNTS = TOOLS.counts as Record<ModeKey, number>
+const TIERS = TOOLS.tiers as Record<ModeKey, Record<string, number>>
+const tierLine = (m: ModeKey) => Object.entries(TIERS[m]).map(([t, n]) => `${n} ${t}`).join(', ')
+const INSTALL = AGENT_GUIDANCE.install as Record<string, string>
+const ABSENT = (TOOLS.intentionally_absent as Array<{ name: string; why: string }>)
 
 export const metadata: Metadata = {
-  title: 'AQUA MCP Server — 31 tools for agent environments',
-  description:
-    'The AQUA MCP server exposes 31 tools across programs, questions, rankings, and applicant intelligence over stdio or self-hosted Streamable HTTP. Local-first mode refuses private writes to the hosted hub.',
+  title: 'AQUA MCP server 2.0: local-first agent tools',
+  description: `aqua-mcp-server 2.0 gives AI agents your local encrypted AQUA workspace (${COUNTS['stdio-workspace']} tiered tools) and the public AQUA catalog, plus a read-only hosted endpoint at https://aquaidp.xyz/mcp. No account token, no privileged key; approvals happen in the browser.`,
   alternates: { canonical: '/mcp' },
 }
 
@@ -16,6 +26,24 @@ const BREADCRUMB = {
     { '@type': 'ListItem', position: 2, name: 'MCP Server', item: 'https://aquaidp.xyz/mcp' },
   ],
 }
+
+const pre = 'overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900'
+const p = 'leading-7 text-neutral-600 dark:text-neutral-300'
+const card = 'rounded-lg border border-neutral-200 p-4 dark:border-neutral-800'
+const a = 'text-brand-600 hover:underline dark:text-brand-400'
+
+const MODES: Array<{ key: ModeKey; name: string; how: string; what: string }> = [
+  { key: 'stdio-workspace', name: 'Local, with your workspace', how: 'npx -y aqua-mcp-server --workspace ~/AQUA', what: 'Your encrypted AQUA workspace with tiered tools: search your answer bank, import an application from inbox/, stage drafts, check review status, prepare an export. Plus the public catalog tools.' },
+  { key: 'stdio-catalog', name: 'Local, no workspace yet', how: 'npx -y aqua-mcp-server', what: 'The public catalog tools, plus the setup tools (locate_workspace, init_workspace, doctor). init_workspace creates a workspace only after you confirm the folder in your MCP client.' },
+  { key: 'hosted', name: 'Hosted, read-only', how: 'https://aquaidp.xyz/mcp', what: 'The public catalog only: approved programs, their exact questions, limits and deadlines. No sign-in, no workspace, nothing private. Rate-limited.' },
+]
+
+const TIER_TEXT: Array<[string, string]> = [
+  ['read', 'Only reads your workspace or the public catalog.'],
+  ['private_write', 'Stages private records in your local workspace (drafts, imports, evidence). Refused with --read-only. Nothing it writes counts as approved.'],
+  ['human_consent', 'Acts only after you confirm in your MCP client (creating a workspace). Your passphrase never goes through the agent.'],
+  ['human_only', 'Never acts. Returns the steps you take in the AQUA browser app: approve an answer, sign, freeze and export a packet, submit, attest.'],
+]
 
 export default function McpPage() {
   return (
@@ -39,122 +67,120 @@ export default function McpPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">AQUA Application Hub</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">AQUA MCP server</h1>
           <p className="text-lg leading-7 text-neutral-600 dark:text-neutral-300">
-            A local/stdio Model Context Protocol server exposing 31 tools across
-            programs, questions, rankings, and applicant intelligence — for Claude
-            Desktop, Cursor, Windsurf, and other agent environments.
+            aqua-mcp-server {TOOLS.package_version} lets an AI agent (Claude Code, Claude Desktop, Cursor and
+            others) work on your applications from your own computer. Your answers stay in your
+            local, encrypted AQUA workspace. The agent can read, match and draft. You approve
+            in the AQUA browser app.
           </p>
         </header>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-semibold tracking-tight">What it is</h2>
-          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The server runs in the user&rsquo;s agent environment and connects to
-            the user&rsquo;s Supabase session. There is no public hosted MCP
-            endpoint at aquaidp.xyz — the server is deliberately local: stdio for
-            agent clients, or self-hosted Streamable HTTP for your own tooling.
-          </p>
-          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            The machine-readable manifest is published at{' '}
-            <a href="/.well-known/mcp" className="text-brand-600 hover:underline dark:text-brand-400">/.well-known/mcp</a>.
-            Source code is in the repository under{' '}
-            <a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server" className="text-brand-600 hover:underline dark:text-brand-400">application-hub-mcp-server/</a>{' '}
-            and on npm as <code className="text-xs">aqua-mcp-server</code>.
+          <h2 className="text-2xl font-semibold tracking-tight">Local-first by design</h2>
+          <p className={p}>
+            The server holds no account token and no privileged database key. Its only credential
+            is the public catalog key that this website sends to every browser, and it refuses to
+            start with any other key. Private work happens in a workspace on your machine,
+            decrypted in memory only, with every agent call recorded in the workspace&rsquo;s own
+            audit log. Catalog requests carry only public program ids.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-semibold tracking-tight">Install &amp; run</h2>
-          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# npm (published)
-npm install -g aqua-mcp-server
+          <h2 className="text-2xl font-semibold tracking-tight">Three ways to connect</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {MODES.map((m) => (
+              <div key={m.key} className={card}>
+                <h3 className="font-semibold">{m.name}: {COUNTS[m.key]} tools</h3>
+                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{tierLine(m.key)}</p>
+                <p className="mt-2 font-mono text-xs break-all">{m.how}</p>
+                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">{m.what}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-# Run directly without installing
-npx -y aqua-mcp-server
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold tracking-tight">Install</h2>
+          <p className={p}>
+            Node.js 22 or newer. aqua-mcp-server {TOOLS.package_version} is not on npm yet. Until it
+            is, the same companion tool set runs from the AQUA companion package published on this
+            site. Check its sha256 at <a href={(AGENT_GUIDANCE.companion as { tarball: { sha256_url: string } }).tarball.sha256_url} className={a}>the published checksum</a> first.
+          </p>
+          <pre className={pre}><code>{`# today: the AQUA companion from aquaidp.xyz
+${INSTALL.help}
+${INSTALL.init}
+${INSTALL.claude_code_with_workspace}
 
-# Or build from source
-git clone https://github.com/SunrisesIllNeverSee/application-hub
-cd application-hub/application-hub-mcp-server
-npm ci && npm run build
-node dist/index.js
+# hosted, read-only public catalog (works now)
+claude mcp add --transport http aqua-public https://aquaidp.xyz/mcp
 
-# Self-hosted Streamable HTTP
-TRANSPORT=http PORT=3000 node dist/index.js`}</code></pre>
+# once aqua-mcp-server ${TOOLS.package_version} is on npm
+claude mcp add aqua -- npx -y aqua-mcp-server --workspace ~/AQUA --keychain`}</code></pre>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Client configuration</h2>
-          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            Claude Desktop (<code className="text-xs">~/Library/Application Support/Claude/claude_desktop_config.json</code>),
-            Cursor (<code className="text-xs">~/.cursor/mcp.json</code>), or Windsurf
-            (<code className="text-xs">~/.codeium/windsurf/mcp_config.json</code>):
+          <p className={p}>
+            Claude Desktop, Cursor, or a project <code className="text-xs">.mcp.json</code>. The workspace passphrase
+            comes from the macOS Keychain (<code className="text-xs">--keychain</code>) or the server&rsquo;s
+            environment, never from the chat. Add <code className="text-xs">--read-only</code> to allow reading only.
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`{
+          <pre className={pre}><code>{`{
   "mcpServers": {
     "aqua": {
       "command": "npx",
-      "args": ["-y", "aqua-mcp-server"],
-      "env": {
-        "SUPABASE_URL": "https://your-project.supabase.co",
-        "SUPABASE_ANON_KEY": "your-anon-key",
-        "SUPABASE_ACCESS_TOKEN": "your-session-jwt"
-      }
+      "args": ["-y", "aqua-mcp-server", "--workspace", "/Users/you/AQUA", "--keychain"]
+    },
+    "aqua-public": {
+      "type": "http",
+      "url": "https://aquaidp.xyz/mcp"
     }
   }
 }`}</code></pre>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-semibold tracking-tight">Tools</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Public — 11 tools</h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                Program search, detail, slug lookup, rankings, heat scores,
-                questions, similar questions, universal questions, program DNA,
-                question significance, acceptance stats. No auth required.
-              </p>
-            </div>
-            <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Authenticated — 14 tools</h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                Profile answers, application readiness, fit score, best programs,
-                rank answers, draft runs, save answers, review context, stress
-                test, intake, fill, borrow threshold, answer bank search.
-                Requires a Supabase session JWT.
-              </p>
-            </div>
-            <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-              <h3 className="font-semibold">Canonical hub — 6 tools</h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                The <code className="text-xs">aqua.*</code> family bridges to the
-                hosted canonical hub. Under local-first mode, private-write tools
-                return explicit refusals instead of transmitting user content.
-              </p>
-            </div>
-          </div>
+          <h2 className="text-2xl font-semibold tracking-tight">Tiers</h2>
+          <p className={p}>Every tool declares a tier in code, and the server enforces it. Tool descriptions are not what keeps it in line.</p>
+          <ul className="space-y-2">
+            {TIER_TEXT.map(([t, text]) => (
+              <li key={t} className="text-sm text-neutral-600 dark:text-neutral-300">
+                <code className="text-xs font-semibold">{t}</code>: {text}
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-2xl font-semibold tracking-tight">Local-first mode</h2>
-          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
-            Set <code className="text-xs">AQUA_LOCAL_FIRST=1</code> in the server
-            environment to enable local-first mode. Private-write tools
-            (<code className="text-xs">aqua.ingest_application</code>,{' '}
-            <code className="text-xs">aqua.process_reward</code>,{' '}
-            <code className="text-xs">aqua.qualify_answer</code>, and similar)
-            return an explicit refusal instead of sending user content to the
-            hosted hub. Read and discovery tools remain available. This mirrors
-            the web app&rsquo;s local-first custody model — private answer
-            content stays on the user&rsquo;s device.
+          <h2 className="text-2xl font-semibold tracking-tight">Where you approve</h2>
+          <p className={p}>
+            Approvals, signatures, freezing and exporting a packet, and submitting are yours, in the
+            AQUA browser app. The agent stages drafts in your workspace. You export a backup, restore it at{' '}
+            <Link href="/aqua-local" className={a}>AQUA Local</Link>, and approve each answer on the review
+            board, where an approval binds the exact version. Nothing an agent does counts as an approval.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold tracking-tight">Not available to agents</h2>
+          <ul className="list-disc space-y-1 pl-5 text-sm text-neutral-600 dark:text-neutral-300">
+            {ABSENT.map((x) => (
+              <li key={x.name}><code className="text-xs">{x.name}</code>: {x.why}</li>
+            ))}
+          </ul>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            Upgrading from 1.x? Versions below 2.0 needed a privileged key and wrote private answers to a hosted store. They are retired. The migration table is in the package README.
           </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">More</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-600 dark:text-neutral-300">
-            <li><a href="/.well-known/mcp" className="text-brand-600 hover:underline dark:text-brand-400">/.well-known/mcp</a> — machine-readable manifest</li>
-            <li><a href="/openapi.json" className="text-brand-600 hover:underline dark:text-brand-400">/openapi.json</a> — REST API specification</li>
-            <li><Link href="/developers" className="text-brand-600 hover:underline dark:text-brand-400">/developers</Link> — REST API, authentication, extension docs</li>
-            <li><a href="https://github.com/SunrisesIllNeverSee/application-hub" className="text-brand-600 hover:underline dark:text-brand-400">GitHub repository</a> — source + issues</li>
+            <li><Link href="/agents" className={a}>/agents</Link>: the full agent journey and every tool</li>
+            <li><a href="/.well-known/mcp" className={a}>/.well-known/mcp</a>: machine-readable manifest</li>
+            <li><a href="/.well-known/aqua-catalog.json" className={a}>/.well-known/aqua-catalog.json</a>: public catalog config (publishable key only)</li>
+            <li><a href="/llms.txt" className={a}>/llms.txt</a>: guidance for language models</li>
+            <li><a href="https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server" className={a}>application-hub-mcp-server/</a>: source and README</li>
           </ul>
         </section>
       </main>

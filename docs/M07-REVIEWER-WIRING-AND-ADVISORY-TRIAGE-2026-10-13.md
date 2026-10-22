@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "AQUA M07 — Independent wiring and residual-finding review"
+description: "AQUA M07 — Independent wiring and residual-finding review (M07-REVIEWER-WIRING-AND-ADVISORY-TRIAGE-2026-10-13.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-10-13
+---
 # AQUA M07 — Independent wiring and residual-finding review
 
 Review baseline: production `cbf6986`. This note is a source-level audit, **not** an owner policy decision, merged product change, production deployment, or a declaration that all listed findings are resolved. Owner's M07 request is to complete outstanding issues fully.

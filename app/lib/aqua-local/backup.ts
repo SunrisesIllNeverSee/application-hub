@@ -7,6 +7,16 @@
 //   - Import: envelope decrypt (wrong secret / tampered → refuse),
 //     format-version migration guard, per-version sha256 verification,
 //     dedup by id across every store, and an `imports` ledger entry.
+//
+// v5 / BACKUP_FORMAT_VERSION 2 — adds app_instances, facts, evidence,
+// reviews, comments, suggestions. Their free-text fields are already
+// `*_enc` ciphertext under the vault secret; the backup secret IS the vault
+// secret (restore requires assertVaultSecretCompatible), so they travel
+// as-is inside the encrypted envelope. v1 backups (no v5 arrays) restore
+// unchanged. On restore, records that carry DECISIONS are marked
+// `restored_from_backup` (approvals, signoffs as before; reviews and
+// suggestions in v5) and reviews lose their imported `seq`, so a file can
+// never outrank or satisfy a fresh local decision.
 
 import {
   canonicalJson,
@@ -20,19 +30,25 @@ import { VaultDecryptError } from './crypto.ts'
 import type { VaultStorage } from './vault.ts'
 import type {
   AnswerRecord,
+  AppInstanceRecord,
   ApprovalRecord,
   CatalogCacheRecord,
+  CommentRecord,
   EventRecord,
+  EvidenceRecord,
+  FactRecord,
   ImportRecord,
   PacketRecord,
   PacketStateRecord,
   ProvenanceRecord,
+  ReviewRecord,
   SignoffRecord,
   StoreName,
+  SuggestionRecord,
   VersionRecord,
 } from './schema.ts'
 
-export const BACKUP_FORMAT_VERSION = 1
+export const BACKUP_FORMAT_VERSION = 2
 
 export class VaultTamperError extends Error {
   constructor(message: string) {
@@ -62,10 +78,66 @@ interface BackupPayload {
   catalog_cache: CatalogCacheRecord[]
   /** LF-18 audit ledger — portable so a restored vault keeps its receipts. */
   events?: EventRecord[]
+  // v2 (vault v5) — absent in v1 files
+  app_instances?: AppInstanceRecord[]
+  facts?: FactRecord[]
+  evidence?: EvidenceRecord[]
+  reviews?: ReviewRecord[]
+  comments?: CommentRecord[]
+  suggestions?: SuggestionRecord[]
+  /** M09 hardening: account fingerprint INSIDE the encrypted (authenticated)
+      payload — HMAC-SHA256 of the vault uid keyed by the vault secret.
+      Absent on older backups (= account unknown). */
+  account_fp?: string
+  account_fp_scheme?: typeof BACKUP_ACCOUNT_FP_SCHEME
 }
 
-/** Export the full vault to a portable, encrypted JSON string. Requires the secret to decrypt bodies. */
-export async function exportVault(storage: VaultStorage, secret: string): Promise<string> {
+// ---------------------------------------------------------------------------
+// Account fingerprint (M09 hardening)
+// ---------------------------------------------------------------------------
+// Lets a consumer of the backup (aqua-companion import-backup) bind a
+// workspace to the account automatically, and refuse another account's
+// backup, without the account id ever appearing in the file: the value is
+// keyed by the vault secret, so it cannot be computed or correlated without
+// it, and it sits inside the AES-GCM payload, so it cannot be swapped.
+
+export const BACKUP_ACCOUNT_FP_SCHEME = 'hmac-sha256:vault-secret:v1'
+const ACCOUNT_FP_PREFIX = 'aqua-vault-account:v1:'
+
+/** HMAC-SHA256(key = vault secret, msg = 'aqua-vault-account:v1:' + lowercased uid), hex. */
+export async function backupAccountFingerprint(secret: string, uid: string): Promise<string> {
+  const norm = String(uid ?? '').trim().toLowerCase()
+  if (!norm) throw new Error('account uid is empty')
+  const enc = new TextEncoder()
+  const key = await globalThis.crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  const sig = new Uint8Array(await globalThis.crypto.subtle.sign('HMAC', key, enc.encode(ACCOUNT_FP_PREFIX + norm)))
+  return Array.from(sig, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+/**
+ * 'match' / 'mismatch' when the backup carries an account fingerprint,
+ * 'unknown' when it does not (older backups). Decrypts + verifies the file.
+ */
+export async function backupAccountStatus(
+  secret: string,
+  exportedJson: string,
+  uid: string | null,
+): Promise<'match' | 'mismatch' | 'unknown'> {
+  const payload = await decryptBackupPayload(secret, exportedJson)
+  if (!payload.account_fp || payload.account_fp_scheme !== BACKUP_ACCOUNT_FP_SCHEME || !uid) return 'unknown'
+  return payload.account_fp === (await backupAccountFingerprint(secret, uid)) ? 'match' : 'mismatch'
+}
+
+/**
+ * Export the full vault to a portable, encrypted JSON string. Requires the
+ * secret to decrypt bodies. With `account_uid` (the signed-in vault uid) the
+ * payload carries the account fingerprint above.
+ */
+export async function exportVault(
+  storage: VaultStorage,
+  secret: string,
+  opts: { account_uid?: string | null } = {},
+): Promise<string> {
   const versions = await storage.getAll<VersionRecord>('versions')
   const plainVersions = [] as BackupPayload['versions']
   for (const v of versions) {
@@ -97,6 +169,16 @@ export async function exportVault(storage: VaultStorage, secret: string): Promis
       }))
     })(),
     events: await storage.getAll<EventRecord>('events'),
+    app_instances: await storage.getAll<AppInstanceRecord>('app_instances'),
+    facts: await storage.getAll<FactRecord>('facts'),
+    evidence: await storage.getAll<EvidenceRecord>('evidence'),
+    reviews: await storage.getAll<ReviewRecord>('reviews'),
+    comments: await storage.getAll<CommentRecord>('comments'),
+    suggestions: await storage.getAll<SuggestionRecord>('suggestions'),
+  }
+  if (opts.account_uid) {
+    payload.account_fp = await backupAccountFingerprint(secret, opts.account_uid)
+    payload.account_fp_scheme = BACKUP_ACCOUNT_FP_SCHEME
   }
   const blob = await encryptText(secret, canonicalJson(payload))
   return JSON.stringify({ format: 'aqua-local-backup', ...blob }, null, 2)
@@ -132,7 +214,8 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
     throw new VaultTamperError('backup payload failed to decrypt/parse')
   }
 
-  // Version migration guard: refuse newer formats; older than supported also refused (none exist at v1).
+  // Version migration guard: refuse newer formats; v1 and v2 are accepted
+  // (v1 simply has no v5 store arrays).
   if (typeof payload.format_version !== 'number' || payload.format_version > BACKUP_FORMAT_VERSION) {
     throw new VaultBackupVersionError(
       `backup format_version ${payload.format_version} is newer than supported ${BACKUP_FORMAT_VERSION}`,
@@ -140,6 +223,9 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
   }
   if (payload.format_version < 1) {
     throw new VaultBackupVersionError(`backup format_version ${payload.format_version} unsupported`)
+  }
+  if (payload.account_fp !== undefined && !(typeof payload.account_fp === 'string' && /^[0-9a-f]{64}$/.test(payload.account_fp))) {
+    throw new VaultTamperError('backup account_fp is malformed')
   }
 
   // Structural validation (FB7R-07): every store must be an array of objects
@@ -181,8 +267,10 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
     'answer_id',
     'sha256',
     'body_plaintext',
-  ], ['title', 'title_plaintext'])
-  requireList('approvals', payload.approvals, 'id', ['version_id'])
+  ], ['title', 'title_plaintext', 'history_enc'])
+  // M09b: history_attestation approvals carry effective_at + attestation_enc
+  // (ciphertext under the vault secret — travels as-is, like other *_enc).
+  requireList('approvals', payload.approvals, 'id', ['version_id'], ['via', 'effective_at', 'attestation_enc'])
   requireList('packets', payload.packets, 'id')
   requireList('provenance', payload.provenance, 'version_id')
   requireList('imports', payload.imports, 'batch_id')
@@ -190,6 +278,13 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
   requireList('packet_states', payload.packet_states, 'packet_id')
   requireList('catalog_cache', payload.catalog_cache, 'key')
   requireList('events', payload.events, 'id')
+  // v2 stores — encrypted fields must be strings when present.
+  requireList('app_instances', payload.app_instances, 'instance_id', ['application_id'], ['local_template_enc'])
+  requireList('facts', payload.facts, 'fact_version_id', ['fact_id', 'kind', 'key', 'value_enc'])
+  requireList('evidence', payload.evidence, 'evidence_id', ['kind', 'title_enc', 'content_sha256'], ['excerpt_enc', 'url_enc'])
+  requireList('reviews', payload.reviews, 'review_id', ['version_id', 'version_sha256', 'decision', 'actor_class'], ['rationale_enc'])
+  requireList('comments', payload.comments, 'comment_id', ['version_id', 'version_sha256', 'thread_id', 'body_enc'])
+  requireList('suggestions', payload.suggestions, 'suggestion_id', ['question_occurrence_id', 'kind', 'explanation_enc'], ['weaknesses_enc', 'unsupported_claims_enc'])
 
   // Integrity: recompute each version sha256 over canonical plaintext before writing anything.
   for (const v of payload.versions ?? []) {
@@ -262,6 +357,12 @@ export async function previewVaultImport(
   for (const ps of payload.packet_states ?? []) await track('packet_states', ps.packet_id)
   for (const c of payload.catalog_cache ?? []) await track('catalog_cache', c.key)
   for (const e of payload.events ?? []) await track('events', e.id)
+  for (const r of payload.app_instances ?? []) await track('app_instances', r.instance_id)
+  for (const r of payload.facts ?? []) await track('facts', r.fact_version_id)
+  for (const r of payload.evidence ?? []) await track('evidence', r.evidence_id)
+  for (const r of payload.reviews ?? []) await track('reviews', r.review_id)
+  for (const r of payload.comments ?? []) await track('comments', r.comment_id)
+  for (const r of payload.suggestions ?? []) await track('suggestions', r.suggestion_id)
 
   const all = Object.values(stores)
   return {
@@ -297,7 +398,13 @@ export async function importVault(
       | 'signoffs'
       | 'packet_states'
       | 'catalog_cache'
-      | 'events',
+      | 'events'
+      | 'app_instances'
+      | 'facts'
+      | 'evidence'
+      | 'reviews'
+      | 'comments'
+      | 'suggestions',
     key: string,
     value: unknown,
   ) => {
@@ -363,6 +470,35 @@ export async function importVault(
   // restore can never collide with or overwrite the ledger.
   for (const e of payload.events ?? []) {
     await dedupePut('events', e.id, e)
+  }
+
+  // v2 (vault v5) stores. Ciphertext fields travel as-is (same secret).
+  for (const r of payload.app_instances ?? []) {
+    sourceIds.push(r.instance_id)
+    await dedupePut('app_instances', r.instance_id, r)
+  }
+  for (const r of payload.facts ?? []) {
+    sourceIds.push(r.fact_version_id)
+    await dedupePut('facts', r.fact_version_id, r)
+  }
+  for (const r of payload.evidence ?? []) {
+    sourceIds.push(r.evidence_id)
+    await dedupePut('evidence', r.evidence_id, r)
+  }
+  // Review decisions are decisions: restored + seq stripped (like approvals)
+  // so they never govern status or block/satisfy freeze.
+  for (const r of payload.reviews ?? []) {
+    sourceIds.push(r.review_id)
+    const { seq: _stripped, ...rest } = r
+    await dedupePut('reviews', r.review_id, { ...rest, restored_from_backup: true })
+  }
+  for (const r of payload.comments ?? []) {
+    sourceIds.push(r.comment_id)
+    await dedupePut('comments', r.comment_id, r)
+  }
+  for (const r of payload.suggestions ?? []) {
+    sourceIds.push(r.suggestion_id)
+    await dedupePut('suggestions', r.suggestion_id, { ...r, restored_from_backup: true })
   }
 
   const batch: ImportRecord = {

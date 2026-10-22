@@ -13,6 +13,7 @@ import { DnaRadarChart } from '@/components/DnaRadarChart'
 import { ThemeTag } from '@/components/ThemeTag'
 import { ScoreTooltip } from '@/components/ScoreTooltip'
 import { restrictToApprovedPrograms } from '@/lib/browse-gate'
+import { isLocalFirst } from '@/lib/local-first-guard'
 import {
   formatCheckSize,
   formatEquity,
@@ -22,6 +23,7 @@ import {
   getHeatSignal,
   programTypeLabel,
 } from '@/lib/utils'
+import { currentOccurrences } from '@/lib/catalog-promotion/occurrences'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -70,7 +72,8 @@ export default async function ProgramDetailPage({ params }: Props) {
     .maybeSingle<ProgramNextCycle>()
 
   const dna = dnaRows ?? []
-  const questions = questionRows ?? []
+  // 058: hide occurrences superseded by a newer template revision
+  const questions = currentOccurrences(questionRows)
   const nextCycle = nextCycleRow ?? null
   const deadline = formatDeadline(nextCycle?.closes_at ?? program.deadline_at)
   const heat = getHeatSignal(program.heat_score, program.program_value_score)
@@ -126,7 +129,7 @@ export default async function ProgramDetailPage({ params }: Props) {
           </div>
           <div className="flex-shrink-0 flex flex-col gap-2">
             <Link
-              href={`/workspace/${program.id}`}
+              href={isLocalFirst() ? `/apply?program=${encodeURIComponent(program.slug)}` : `/workspace/${program.id}`}
               className="btn-primary"
             >
               Start Application

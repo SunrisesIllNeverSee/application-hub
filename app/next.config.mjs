@@ -1,3 +1,4 @@
+import { assertPublishableKey, isPlaceholderValue, PublishableKeyError } from './lib/public-catalog-config.mjs'
 // IR-015 — local-first flag pairing is REQUIRED at build time. The
 // server flag (AQUA_LOCAL_FIRST) gates route handlers; the public twin
 // (NEXT_PUBLIC_AQUA_LOCAL_FIRST) gates direct client→Supabase writes.
@@ -12,6 +13,37 @@ if (lfServer !== lfClient) {
       `but NEXT_PUBLIC_AQUA_LOCAL_FIRST=${process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '<unset>'}. ` +
       'Set BOTH (or neither) — a mismatched pair leaves private client writes ungated.',
   )
+}
+// M09 hardening H1 — production fails CLOSED. The server guard treats a
+// production runtime as local-first unless AQUA_LOCAL_FIRST is explicitly
+// '0'/'false' (lib/local-first-guard.ts). A Vercel production build must
+// therefore carry the client twin too, or explicitly opt BOTH out with '0'.
+const lfExplicitOff = (v) => ['0', 'false'].includes((v ?? '').trim().toLowerCase())
+if (
+  process.env.VERCEL_ENV === 'production' &&
+  !lfClient &&
+  !(lfExplicitOff(process.env.AQUA_LOCAL_FIRST) && lfExplicitOff(process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST))
+) {
+  throw new Error(
+    'local-first is ON by default in production (server guard fails closed). ' +
+      'Set AQUA_LOCAL_FIRST=1 and NEXT_PUBLIC_AQUA_LOCAL_FIRST=1, or explicitly opt BOTH out with 0.',
+  )
+}
+
+// M09b B1.5 — /.well-known/aqua-catalog.json publishes NEXT_PUBLIC_SUPABASE_ANON_KEY
+// to agents. Refuse to BUILD with a secret or service-role-shaped value there
+// (it would also ship in every browser bundle). Placeholders are allowed.
+{
+  const k = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!isPlaceholderValue(k)) {
+    try {
+      assertPublishableKey(k)
+    } catch (e) {
+      if (e instanceof PublishableKeyError && e.code !== 'unrecognized') {
+        throw new Error(`NEXT_PUBLIC_SUPABASE_ANON_KEY refused at build time: ${e.message}. Only the publishable (anon) key belongs in a NEXT_PUBLIC_ variable.`)
+      }
+    }
+  }
 }
 
 /** @type {import('next').NextConfig} */

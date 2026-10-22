@@ -1,7 +1,7 @@
 standard:
   name: ello-repo-standard
   version: "1.0.0"
-  mode: migrate
+  mode: enforce
 
 repo:
   name: application-hub
@@ -13,8 +13,8 @@ repo:
 
 structure:
   profile: platform
-  allowed_root_dirs_extra: [.firecrawl, .vercel, app, appfeeder, application-hub-mcp-server, qaapplication, seed, supabase, webextension, system-devin]
-  allowed_root_files_extra: [.claudeignore, .mcp.json, REPO_INDEX.md]
+  allowed_root_dirs_extra: [.claude, .ello, .firecrawl, .vercel, aqua-companion, app, appfeeder, application-hub-mcp-server, qaapplication, seed, supabase, webextension, system-devin]
+  allowed_root_files_extra: [CLAUDE.md, .claudeignore, .mcp.json, REPO_INDEX.md]
   document_roots: [docs]
   artifact_roots: [artifacts, seed]
   archive_roots: [archive, docs/archive]
@@ -29,9 +29,10 @@ knowledge:
   okf_severity: warn
 
 coordination:
-  micro_enabled: true
+  # One bus only: aquarnd .coord/micro. This repo's .coord/ is machine-local and gitignored.
+  micro_enabled: false
   micro_root: .coord/micro
-  macro_enabled: true
+  macro_enabled: false
   macro_root: .coord/macro
 
 github:

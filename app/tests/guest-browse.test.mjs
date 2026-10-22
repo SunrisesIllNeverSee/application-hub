@@ -61,11 +61,15 @@ test('guests never receive personal surfaces', async () => {
 
 test('approved-only catalog is positive-allowlist and uniform (WS7)', async () => {
   const registry = await read('lib/canonical-catalog.ts')
-  // positive criterion: explicit slug registry + never-match when empty —
-  // no unapproved row can become visible via a source-enum change
+  // M09 (058): the M08 slug registry stays as a floor, and rows carrying
+  // source='canonical' are also approved — that value is writable only by
+  // the service-side promotion path (054 guard triggers; curated publish in
+  // 058), so a client still cannot make an unapproved row visible.
+  // Behaviour is unit-tested in catalog-promotion-visibility.test.mjs.
   assert.match(registry, /CANONICAL_PROGRAM_SLUGS/)
-  assert.match(registry, /\.in\("slug", CANONICAL_PROGRAM_SLUGS\)/)
-  assert.match(registry, /00000000-0000-0000-0000-000000000000/)
+  assert.match(registry, /slug\.in\./)
+  assert.match(registry, /source\.eq\.\$\{APPROVED_SOURCE\}/)
+  assert.match(registry, /APPROVED_SOURCE = "canonical"/)
   // every catalog surface applies the filter unconditionally (all users)
   for (const rel of [
     'app/(app)/applications/page.tsx',

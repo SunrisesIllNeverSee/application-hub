@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "SEO / GEO / AEO Playbook — What We Did on signalaf.com and What to Expect"
+description: "SEO / GEO / AEO Playbook — What We Did on signalaf.com and What to Expect (SEO_GEO_AEO_PLAYBOOK.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo]
+timestamp: 2026-08-25
+---
 # SEO / GEO / AEO Playbook — What We Did on signalaf.com and What to Expect
 
 > This is a teaching document. It walks through everything we did on

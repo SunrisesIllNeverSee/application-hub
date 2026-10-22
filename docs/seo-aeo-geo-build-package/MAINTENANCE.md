@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "AQUA SEO/AEO/GEO Maintenance Process"
+description: "AQUA SEO/AEO/GEO Maintenance Process (MAINTENANCE.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo]
+timestamp: 2026-08-25
+---
 # AQUA SEO/AEO/GEO Maintenance Process
 
 > Phase 6 — ongoing maintenance cadence after Phases 1-5 are complete.

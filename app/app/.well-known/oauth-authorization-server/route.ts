@@ -33,7 +33,7 @@ export async function GET() {
     registration_endpoint: 'https://aquaidp.xyz/login',
     agent_auth: {
       skill:
-        'Public tools (programs, questions, rankings) work without auth. Authenticated tools (answer bank, fit scores, application intake) require a Supabase session JWT.',
+        'Public pages and the public catalog work without auth. Signed-in routes use the browser session; never ask a person to paste a token into chat. Private answers are local-first and never served by any API. See /.well-known/auth.md.',
       register_uri: 'https://aquaidp.xyz/login',
       methods: [
         {
@@ -42,9 +42,8 @@ export async function GET() {
           authorization_endpoint: `${supabaseUrl}/auth/v1/oauth/authorize`,
           token_endpoint: `${supabaseUrl}/auth/v1/oauth/token`,
           callback: 'https://aquaidp.xyz/auth/callback',
-          providers: ['github', 'twitter', 'email_magic_link'],
+          providers: ['github', 'email_magic_link', 'email_password'],
           scopes: ['openid', 'profile', 'email', 'offline_access'],
-          session_check: 'GET https://aquaidp.xyz/api/auth/session',
         },
       ],
     },

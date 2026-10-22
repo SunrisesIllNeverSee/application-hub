@@ -146,8 +146,11 @@ test('llms.txt references developer portal, OpenAPI, and MCP manifest', async ()
   assert.match(llms, /\/openapi\.json/)
   assert.match(llms, /\.well-known\/mcp/)
   assert.match(llms, /OpenAPI 3\.0\.3/)
-  assert.match(llms, /27 tools/)
-  assert.match(llms, /npx -y aqua-mcp-server/)
+  // M09b: count and install line come from the generated guidance (scripts/gen-agent-guidance.mjs)
+  const g = JSON.parse(await read('lib/agent-guidance.generated.json'))
+  assert.ok(llms.includes(`${g.total} tools`))
+  assert.ok(llms.includes(g.install.help))
+  assert.match(llms, /npx -y aqua-mcp-server/) // named honestly as "once 2.0.0 is published"
   assert.match(llms, /npmjs\.com/)
 })
 

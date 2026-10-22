@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { AGENT_GUIDANCE as G } from '@/lib/agent-guidance.generated.mjs'
 
 export const revalidate = 3600
 
@@ -8,7 +9,7 @@ export async function GET() {
     name: 'AQUA Application Hub',
     version: '1.0.0',
     description:
-      'Founder-first application infrastructure — portable application graph of recurring questions, reusable answers, fit signals, and review history. Local MCP server with 27 tools for agent environments.',
+      `Founder-first application infrastructure — portable application graph of recurring questions, reusable answers, fit signals, and review history. Local-first: agents work through the local AQUA companion (stdio MCP, ${G.total} tools); see https://aquaidp.xyz/agents.`,
     url: 'https://aquaidp.xyz',
     protocolVersion: '0.3.0',
     supportedInterfaces: [
@@ -63,7 +64,7 @@ export async function GET() {
       schemes: ['oauth2'],
       credentials: [],
       description:
-        'Public tools (programs, questions, rankings) work without auth. Authenticated tools require a Supabase session JWT. See /.well-known/oauth-authorization-server.',
+        'Agent tools run locally in the AQUA companion and take no token or JWT; private answers stay on the user\'s device and approvals happen in the browser. Web sign-in for humans: /.well-known/oauth-authorization-server.',
     },
   }
 

@@ -17,7 +17,9 @@ import {
   verifyManifestSignature,
   PacketFreezeError,
   compareApprovals,
+  approvalGate,
   type AnswerRecord,
+  type ReviewRecord,
   type ApprovalRecord,
   type VersionRecord,
   type PacketRecord,
@@ -44,7 +46,7 @@ interface VersionChoice {
   created_at: string
   /** 'agent'/'restored' are honest labels for decisions that cannot satisfy
       the freeze gate — they display but never qualify. */
-  decision: 'approved' | 'rejected' | 'agent' | 'restored' | null
+  decision: 'approved' | 'rejected' | 'agent' | 'restored' | 'reopened' | null
   method: string
 }
 
@@ -61,10 +63,16 @@ export function VaultPacketPanel({
   programId,
   programName,
   questions,
+  initialSkipReasons,
+  onStateChange,
 }: {
   programId: string
   programName: string
   questions: PacketQuestion[]
+  /** M09 W6: skip reasons already given in the prepare step (by occurrence id). */
+  initialSkipReasons?: Record<string, string>
+  /** M09 W6: notified after freeze / sign / export / submission record. */
+  onStateChange?: (state: string | null) => void
 }) {
   const vault = useVault()
   const [rows, setRows] = useState<RowState[]>([])
@@ -82,10 +90,11 @@ export function VaultPacketPanel({
   const [verifyResult, setVerifyResult] = useState('')
 
   const loadRows = useCallback(async (storage: VaultStorage) => {
-    const [answers, versions, approvals] = await Promise.all([
+    const [answers, versions, approvals, reviews] = await Promise.all([
       storage.getAll<AnswerRecord>('answers'),
       storage.getAll<VersionRecord>('versions'),
       storage.getAll<ApprovalRecord>('approvals'),
+      storage.getAll<ReviewRecord>('reviews'),
     ])
     const appAnswers = answers.filter((a) => a.scope.application_id === programId)
     // IR-014: titles are ciphertext at rest — decrypt for display.
@@ -122,13 +131,16 @@ export function VaultPacketPanel({
       const vs = versions
         .filter((v) => answerIds.has(v.answer_id))
         .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
-        .map((v) => ({
-          id: v.id,
-          title: v.title,
-          created_at: v.created_at,
-          decision: latestDecision.get(v.id) ?? null,
-          method: v.method,
-        }))
+        .map((v) => {
+          // M09 W5: 'approved' must mean exactly what the v5 freeze gate
+          // accepts (status.ts approvalGate) — a later human review that
+          // reopened the version, or a hash mismatch, does not qualify.
+          const latest = latestDecision.get(v.id) ?? null
+          const gate = approvalGate(v, approvals, reviews)
+          const decision: VersionChoice['decision'] =
+            latest === 'approved' && !gate.approved ? (gate.blocked_by_review ? 'reopened' : null) : latest
+          return { id: v.id, title: v.title, created_at: v.created_at, decision, method: v.method }
+        })
       // IR-030: never auto-prefer a version that can't freeze — only
       // human-approved, non-restored versions qualify.
       const preferred =
@@ -139,7 +151,7 @@ export function VaultPacketPanel({
         required: Boolean(q.is_required),
         versions: vs,
         selected: preferred?.id ?? '',
-        skipReason: '',
+        skipReason: preferred ? '' : initialSkipReasons?.[occ] ?? '',
       }
     })
     setRows(next)
@@ -152,7 +164,7 @@ export function VaultPacketPanel({
       })),
     )
     setPackets(withState)
-  }, [programId, questions, vault])
+  }, [programId, questions, vault, initialSkipReasons])
 
   useEffect(() => {
     if (vault.status !== 'unlocked') return
@@ -193,7 +205,9 @@ export function VaultPacketPanel({
       })
       setFrozenId(record.id)
       setManifestSha(record.manifest_sha256)
-      setPacketState(await getPacketState(storage, record.id))
+      const frozenState = await getPacketState(storage, record.id)
+      setPacketState(frozenState)
+      onStateChange?.(frozenState?.state ?? null)
       setNotice(`Packet frozen: ${packet.packet_id} · manifest sha256 ${record.manifest_sha256.slice(0, 16)}…`)
       await loadRows(storage)
     } catch (e) {
@@ -230,7 +244,9 @@ export function VaultPacketPanel({
         pubkey_b64: kp.pubkey_b64,
         manifest_sha256: manifestSha,
       })
-      setPacketState(await getPacketState(storage, frozenId))
+      const signedState = await getPacketState(storage, frozenId)
+      setPacketState(signedState)
+      onStateChange?.(signedState?.state ?? null)
       const pkt = await storage.get<{ signature_b64: string | null; pubkey_b64: string | null }>(
         'signoffs', frozenId)
       if (pkt?.signature_b64 && pkt.pubkey_b64) {
@@ -262,8 +278,10 @@ export function VaultPacketPanel({
       a.download = `${programName.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-packet-${frozenId}.json`
       a.click()
       URL.revokeObjectURL(url)
-      setPacketState(await getPacketState(storage, frozenId))
+      const exportedState = await getPacketState(storage, frozenId)
+      setPacketState(exportedState)
       setSubmissions(await listSubmissionsForPacket(storage, frozenId))
+      onStateChange?.(exportedState?.state ?? null)
       setNotice('Packet exported — this file was written locally; nothing was submitted anywhere.')
       await loadRows(storage)
     } catch (e) {
@@ -297,8 +315,10 @@ export function VaultPacketPanel({
         confirmation_ref: subForm.confirmation_ref || null,
         notes: subForm.notes || null,
       })
-      setPacketState(await getPacketState(storage, frozenId))
+      const submittedState = await getPacketState(storage, frozenId)
+      setPacketState(submittedState)
       setSubmissions(await listSubmissionsForPacket(storage, frozenId))
+      onStateChange?.(submittedState?.state ?? null)
       setNotice('Submission recorded — a self-attested note that you submitted the exported file externally. Nothing was transmitted by AQUA.')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not record submission')
@@ -393,7 +413,7 @@ export function VaultPacketPanel({
                       {r.versions.map((v) => (
                         <option key={v.id} value={v.id}>
                           {v.title || 'untitled'} · {v.method} ·{' '}
-                          {v.decision === 'agent' ? 'agent-reviewed' : v.decision === 'restored' ? 'restored' : (v.decision ?? 'unapproved')} · {v.created_at.slice(0, 10)}
+                          {v.decision === 'agent' ? 'agent-reviewed' : v.decision === 'restored' ? 'restored' : v.decision === 'reopened' ? 'review reopened' : (v.decision ?? 'unapproved')} · {v.created_at.slice(0, 10)}
                         </option>
                       ))}
                     </select>

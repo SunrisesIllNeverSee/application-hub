@@ -18,6 +18,9 @@ export interface VaultStorage {
   keys(store: StoreName): Promise<string[]>
   /** Run fn inside a single atomic transaction across the given stores. */
   tx<R>(stores: StoreName[], fn: (s: VaultStorage) => Promise<R>): Promise<R>
+  /** Release the underlying connection (sign-out / account switch). Optional:
+      in-memory and wrapped handles may omit it. Idempotent. */
+  close?(): void
 }
 
 function reqToPromise<T>(req: IDBRequest<T>): Promise<T> {
@@ -39,7 +42,14 @@ export function openVaultDb(dbName: string = DB_NAME): Promise<IDBDatabase> {
         MIGRATIONS[v]?.(db)
       }
     }
-    req.onsuccess = () => resolve(req.result)
+    req.onsuccess = () => {
+      const db = req.result
+      // v5 upgrade safety: another tab opening a newer schema fires
+      // versionchange here — close so its upgrade is not blocked (this
+      // handle then fails closed; the next getStorage() reopens).
+      db.onversionchange = () => db.close()
+      resolve(db)
+    }
     req.onerror = () => reject(req.error ?? new Error('failed to open aqua-local vault'))
     req.onblocked = () => reject(new Error('aqua-local vault upgrade blocked by open connection'))
   })
@@ -117,6 +127,9 @@ class IdbStorage implements VaultStorage {
   }
   tx<R>(stores: StoreName[], fn: (s: VaultStorage) => Promise<R>): Promise<R> {
     return this.run('readwrite', stores, fn)
+  }
+  close(): void {
+    this.db.close()
   }
 }
 

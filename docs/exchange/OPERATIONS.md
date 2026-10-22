@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Exchange Gateway — Operator Runbook"
+description: "Exchange Gateway — Operator Runbook (OPERATIONS.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-08-22
+---
 # Exchange Gateway — Operator Runbook
 
 ## Company state

@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "ChatGPT Search AEO Log — SigRank SignalAF"
+description: "ChatGPT Search AEO Log — SigRank SignalAF (CHATGPT_SEARCH_LOG_0817.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # ChatGPT Search AEO Log — SigRank SignalAF
 
 ## Run metadata

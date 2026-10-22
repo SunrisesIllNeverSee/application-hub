@@ -31,6 +31,10 @@ const NAV = [
   { href: '/workstation', label: 'Workstation', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 17v-2m3 2v-4m3 4v-6M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>) },
   // IN-01: vault link visible only under the local-first flag — one bank,
   // no duplication (the vault surface is the answer bank).
+  // M09 W6: the unified application journey (local-first path).
+  ...(LOCAL_FIRST
+    ? [{ href: '/apply', label: 'Start application', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>) }]
+    : []),
   ...(LOCAL_FIRST
     ? [{ href: '/aqua-local', label: 'Local vault', icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>) }]
     : []),

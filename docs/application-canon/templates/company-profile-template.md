@@ -6,6 +6,10 @@ type: [accelerator / vc / employer / foundation / university / government]
 domain: [founder / jobs / education / grants / general]
 homepage: [URL]
 linkedin: [LinkedIn URL]
+title: "Company Profile: [Company Name]"
+description: "Company Profile: [Company Name] (company-profile-template.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Company Profile: [Company Name]

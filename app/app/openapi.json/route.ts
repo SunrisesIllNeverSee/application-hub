@@ -208,9 +208,10 @@ export async function GET() {
     paths: {
       '/match-question': {
         post: {
+          deprecated: true,
           operationId: 'matchQuestion',
           summary: 'Match a question against the user answer bank',
-          description: 'Core of the Appfeeder browser extension. Takes a form-field label or question text and returns the top matching archived questions plus the user saved answer for each. Uses vector search with full-text fallback.',
+          description: 'Disabled on aquaidp.xyz: AQUA is local-first, so this route refuses private answer content and is kept only for self-hosted legacy mode. Use the in-browser vault or the local AQUA companion instead. Core of the Appfeeder browser extension. Takes a form-field label or question text and returns the top matching archived questions plus the user saved answer for each. Uses vector search with full-text fallback.',
           tags: ['matching'],
           requestBody: {
             required: true,
@@ -228,9 +229,10 @@ export async function GET() {
       },
       '/applications/intake': {
         post: {
+          deprecated: true,
           operationId: 'intakeApplication',
           summary: 'Ingest a raw application and extract questions',
-          description: 'Paste raw application text. The system archives the source, indexes the program, extracts and embeds every question, and opens a user application row.',
+          description: 'Disabled on aquaidp.xyz: AQUA is local-first, so this route refuses private answer content and is kept only for self-hosted legacy mode. Use the in-browser vault or the local AQUA companion instead. Paste raw application text. The system archives the source, indexes the program, extracts and embeds every question, and opens a user application row.',
           tags: ['applications'],
           requestBody: {
             required: true,
@@ -245,9 +247,10 @@ export async function GET() {
       },
       '/answers/capture': {
         post: {
+          deprecated: true,
           operationId: 'captureAnswer',
           summary: 'Capture an answer from a form field',
-          description: 'Called by the Appfeeder extension when a user finishes typing in a form field. Semantically matches the question, then saves a new answer version (never overwrites, always appends).',
+          description: 'Disabled on aquaidp.xyz: AQUA is local-first, so this route refuses private answer content and is kept only for self-hosted legacy mode. Use the in-browser vault or the local AQUA companion instead. Called by the Appfeeder extension when a user finishes typing in a form field. Semantically matches the question, then saves a new answer version (never overwrites, always appends).',
           tags: ['answers'],
           requestBody: {
             required: true,
@@ -293,9 +296,10 @@ export async function GET() {
       },
       '/hub/ingest': {
         post: {
+          deprecated: true,
           operationId: 'hubIngest',
           summary: 'Ingest a program or application into the canonical hub',
-          description: 'Proxies to the canonical-hub Supabase function. Used for structured intake with idempotency keys.',
+          description: 'Disabled on aquaidp.xyz: AQUA is local-first, so this route refuses private answer content and is kept only for self-hosted legacy mode. Use the in-browser vault or the local AQUA companion instead. Proxies to the canonical-hub Supabase function. Used for structured intake with idempotency keys.',
           tags: ['hub'],
           requestBody: { required: true, content: { 'application/json': { schema: { type: 'object' } } } },
           responses: {
@@ -336,9 +340,10 @@ export async function GET() {
       },
       '/draft': {
         post: {
+          deprecated: true,
           operationId: 'generateDraft',
           summary: 'Generate a draft answer',
-          description: 'Uses BYOK (bring-your-own-key) or platform LLM to generate a draft answer for a question. Respects the user connected integrations.',
+          description: 'Disabled on aquaidp.xyz: AQUA is local-first, so this route refuses private answer content and is kept only for self-hosted legacy mode. Use the in-browser vault or the local AQUA companion instead. Uses BYOK (bring-your-own-key) or platform LLM to generate a draft answer for a question. Respects the user connected integrations.',
           tags: ['drafting'],
           requestBody: {
             required: true,

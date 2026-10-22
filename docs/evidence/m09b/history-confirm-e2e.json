@@ -1,0 +1,65 @@
+{
+  "base": "local next dev (dev harness, synthetic data)",
+  "results": [
+    {
+      "name": "desktop: history is grouped by application and submission date with exact wording",
+      "ok": true,
+      "ms": 74
+    },
+    {
+      "name": "desktop: nothing is preselected and the confirm button is disabled",
+      "ok": true,
+      "ms": 10
+    },
+    {
+      "name": "desktop: placeholder and unknown-date items are disabled with the reason shown",
+      "ok": true,
+      "ms": 79
+    },
+    {
+      "name": "desktop: selecting is not enough — the attestation must be ticked",
+      "ok": true,
+      "ms": 198
+    },
+    {
+      "name": "desktop: confirming 2 items marks them confirmed as of their submission date",
+      "ok": true,
+      "ms": 571
+    },
+    {
+      "name": "desktop: no page errors",
+      "ok": true,
+      "ms": 0
+    },
+    {
+      "name": "mobile: history is grouped by application and submission date with exact wording",
+      "ok": true,
+      "ms": 99
+    },
+    {
+      "name": "mobile: nothing is preselected and the confirm button is disabled",
+      "ok": true,
+      "ms": 7
+    },
+    {
+      "name": "mobile: placeholder and unknown-date items are disabled with the reason shown",
+      "ok": true,
+      "ms": 90
+    },
+    {
+      "name": "mobile: selecting is not enough — the attestation must be ticked",
+      "ok": true,
+      "ms": 215
+    },
+    {
+      "name": "mobile: confirming 2 items marks them confirmed as of their submission date",
+      "ok": true,
+      "ms": 589
+    },
+    {
+      "name": "mobile: no page errors",
+      "ok": true,
+      "ms": 0
+    }
+  ]
+}

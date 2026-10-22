@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "LF-Provider-Egress-Policy"
+description: "LF-Provider-Egress-Policy (LF-Provider-Egress-Policy.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-10-10
+---
 # LF-Provider-Egress-Policy
 
 Scope: `app/lib/aqua-local/` — the local-first vault. LF-19.

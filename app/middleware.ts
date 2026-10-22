@@ -3,6 +3,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { appendVaryAccept, preferredType } from '@/lib/accept.mjs'
 import { isBrowseOnlyPath } from '@/lib/browse-gate'
 import { sanitizeNextPath } from '@/lib/safe-redirect'
+import { planUrlFragmentRedirect, stripUrlFromNext } from '@/lib/url-privacy'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
@@ -22,10 +23,13 @@ const PROTECTED_ROUTES = [
   '/today',
   '/onboarding',
   '/aqua-local',
+  '/apply',
+  '/review',
+  '/history',
 ]
 
 const AUTH_ONLY_ROUTES = ['/login']
-const NON_NEGOTIATED_PREFIXES = ['/api/', '/auth/', '/_next/', '/_vercel/']
+const NON_NEGOTIATED_PREFIXES = ['/api/', '/auth/', '/_next/', '/_vercel/', '/.well-known/']
 
 function isProtectedPath(pathname: string) {
   return PROTECTED_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'))
@@ -47,8 +51,42 @@ function markdownRewrite(request: NextRequest, pathname: string) {
   return response
 }
 
+function isMcpTransportRequest(request: NextRequest) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return true
+  return (request.headers.get('accept') || '').includes('text/event-stream')
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Hosted read-only MCP (aqua-mcp-server 2.0): `/mcp` is both the human page
+  // (app/mcp/page.tsx) and the Streamable HTTP endpoint. MCP traffic — any
+  // non-GET/HEAD method, or a GET that asks for an SSE stream — is rewritten to
+  // the handler at /api/mcp before content negotiation (which would 406 an MCP
+  // `Accept: application/json, text/event-stream`). Browsers keep the page.
+  if (pathname === '/mcp' && isMcpTransportRequest(request)) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/api/mcp'
+    return NextResponse.rewrite(url)
+  }
+
+  // M09 hardening M5: a `url=` query value (deep link `/apply?url=…`, or one
+  // nested in `next=`) can be a private link. Move it into the URL FRAGMENT
+  // before anything renders, so it never reaches page-view analytics,
+  // Referer headers, the login `next` parameter or later server logs.
+  if ((request.method === 'GET' || request.method === 'HEAD') && !NON_NEGOTIATED_PREFIXES.some((p) => pathname.startsWith(p))) {
+    const plan = planUrlFragmentRedirect(request.nextUrl.search, { pathname })
+    if (plan) {
+      const target = request.nextUrl.clone()
+      target.search = plan.search
+      target.hash = plan.fragment
+      const res = NextResponse.redirect(target, 303)
+      res.headers.set('Cache-Control', 'no-store')
+      res.headers.set('Referrer-Policy', 'no-referrer')
+      return res
+    }
+  }
+
   const isProtected = isProtectedPath(pathname)
   const isNegotiable = isNegotiablePath(pathname, isProtected)
 
@@ -115,7 +153,8 @@ export async function middleware(request: NextRequest) {
     // Keep the query string so deep links survive login; the login page
     // validates `next` with the shared safe-redirect helper.
     url.search = ''
-    url.searchParams.set('next', pathname + request.nextUrl.search)
+    // M5: never carry `url=` in `next` (it travels in the fragment instead).
+    url.searchParams.set('next', stripUrlFromNext(pathname + request.nextUrl.search))
     return NextResponse.redirect(url)
   }
 

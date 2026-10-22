@@ -6,6 +6,10 @@ type: accelerator
 domain: founder
 homepage: https://www.ycombinator.com
 linkedin: https://www.linkedin.com/company/y-combinator
+title: "Company Profile: Y Combinator"
+description: "Company Profile: Y Combinator (y-combinator.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Company Profile: Y Combinator

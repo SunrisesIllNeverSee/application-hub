@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Everything an Agent Needs to Know — Contribution Exchange v0.2"
+description: "Everything an Agent Needs to Know — Contribution Exchange v0.2 (AGENT_BROCHURE.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-10-06
+---
 # Everything an Agent Needs to Know — Contribution Exchange v0.2
 
 ## The point

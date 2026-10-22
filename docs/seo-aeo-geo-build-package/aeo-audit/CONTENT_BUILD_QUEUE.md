@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Content Build Queue — /vs/ Pages + 'Best Of' Listicles"
+description: "Content Build Queue — /vs/ Pages + 'Best Of' Listicles (CONTENT_BUILD_QUEUE.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Content Build Queue — /vs/ Pages + "Best Of" Listicles
 
 > **STATUS: COMPLETE (verified 2026-08-20)**

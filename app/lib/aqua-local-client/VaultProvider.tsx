@@ -218,4 +218,35 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   return <VaultContext.Provider value={value}>{children}</VaultContext.Provider>
 }
 
+/**
+ * DEV HARNESS / TESTS ONLY — serves an already-open storage handle and a
+ * fixed secret through the same context the real provider uses, so vault
+ * surfaces can be exercised against a synthetic in-memory vault without a
+ * login. Never mounted by (app) routes; the only caller is
+ * app/dev/review-harness, which 404s in production.
+ */
+export function FixedVaultProvider({
+  storage,
+  secret,
+  children,
+}: {
+  storage: VaultStorage
+  secret: string
+  children: ReactNode
+}) {
+  const value = useMemo<VaultContextValue>(
+    () => ({
+      enabled: true,
+      status: 'unlocked',
+      vaultHasData: true,
+      ensureStorage: async () => storage,
+      unlock: async () => {},
+      lock: () => {},
+      getSecret: () => secret,
+    }),
+    [storage, secret],
+  )
+  return <VaultContext.Provider value={value}>{children}</VaultContext.Provider>
+}
+
 export { VaultDecryptError }

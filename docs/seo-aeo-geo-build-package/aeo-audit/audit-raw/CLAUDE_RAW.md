@@ -1,3 +1,10 @@
+---
+type: Findings
+title: "Claude AEO Raw Evidence"
+description: "Claude AEO Raw Evidence (CLAUDE_RAW.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Claude AEO Raw Evidence
 
 - Engine: Claude

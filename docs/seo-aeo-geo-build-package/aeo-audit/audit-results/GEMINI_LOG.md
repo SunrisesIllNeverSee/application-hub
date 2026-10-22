@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Gemini AEO Log — SigRank SignalAF"
+description: "Gemini AEO Log — SigRank SignalAF (GEMINI_LOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Gemini AEO Log — SigRank SignalAF
 
 ## Run metadata

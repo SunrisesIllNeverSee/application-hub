@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Perplexity AEO Monitoring Log — SigRank SignalAF"
+description: "Perplexity AEO Monitoring Log — SigRank SignalAF (PERPLEXITY_LOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Perplexity AEO Monitoring Log — SigRank SignalAF
 
 ## Run: 2026-08-16

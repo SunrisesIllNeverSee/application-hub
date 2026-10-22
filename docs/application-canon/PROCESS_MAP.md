@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Application Canon — Process Map"
+description: "Application Canon — Process Map (PROCESS_MAP.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
+---
 # Application Canon — Process Map
 
 **Status:** Planning document, open for edits

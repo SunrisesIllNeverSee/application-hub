@@ -24,6 +24,7 @@ import { itemList } from '@/lib/jsonld'
 import { ScrollDetailOnSelect } from './ScrollDetailOnSelect'
 import { Suspense } from 'react'
 import { restrictToApprovedPrograms } from '@/lib/browse-gate'
+import { isLocalFirst } from '@/lib/local-first-guard'
 
 export const metadata = {
   title: 'Applications',
@@ -312,6 +313,9 @@ export default async function HubPage({
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {user && <ModeSelector activeIdentity={activeIdentity} identities={identities} />}
+            {user && isLocalFirst() && (
+              <Link href="/apply" className="btn-primary px-3 py-1.5 text-xs">Start an application</Link>
+            )}
             <ApplicationsTabs tab={tab} />
           </div>
         </div>

@@ -40,6 +40,7 @@ export function LocalDraftAssist({
   wordLimit,
   programId,
   currentDraft,
+  revisionInstruction,
   onResult,
   onCancel,
 }: {
@@ -49,6 +50,10 @@ export function LocalDraftAssist({
   wordLimit?: number
   programId?: string
   currentDraft: string
+  /** M09 W5 "Ask agent to revise": the user's instruction. When set, the
+      current draft is always sent (that is the thing being revised) and the
+      instruction is disclosed in the consent box. */
+  revisionInstruction?: string
   onResult: (r: DraftAssistResult) => void
   onCancel: () => void
 }) {
@@ -56,7 +61,9 @@ export function LocalDraftAssist({
   const [providers, setProviders] = useState<ProviderConfigSummary[]>([])
   const [providerId, setProviderId] = useState('')
   const [model, setModel] = useState('')
-  const [includeDraft, setIncludeDraft] = useState(false)
+  const revising = Boolean(revisionInstruction && revisionInstruction.trim())
+  const [includeDraftChoice, setIncludeDraft] = useState(false)
+  const includeDraft = revising || includeDraftChoice
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
   const [programKind, setProgramKind] = useState<string | null>(null)
@@ -113,10 +120,12 @@ export function LocalDraftAssist({
       wordLimit: wordLimit ?? 300,
       existingAnswerContext:
         includeDraft && currentDraft.trim()
-          ? `\n\nUser's current draft for this exact question:\n${currentDraft}\n\nImprove and adapt this — don't start from scratch.`
+          ? revising
+            ? `\n\nUser's current answer for this exact question:\n${currentDraft}\n\nRevise this answer following the user's instruction below. Keep everything the instruction does not ask to change.\n\nUser's revision instruction:\n${revisionInstruction!.trim()}`
+            : `\n\nUser's current draft for this exact question:\n${currentDraft}\n\nImprove and adapt this — don't start from scratch.`
           : undefined,
     })
-  }, [programKind, questionText, questionTheme, wordLimit, includeDraft, currentDraft])
+  }, [programKind, questionText, questionTheme, wordLimit, includeDraft, currentDraft, revising, revisionInstruction])
 
   async function handleGenerate() {
     const secret = vault.getSecret()
@@ -150,7 +159,7 @@ export function LocalDraftAssist({
   return (
     <div className="space-y-3 rounded-lg border border-brand-200 p-4 dark:border-brand-800/60">
       <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-        Draft with AI — consent required
+        {revising ? 'Revise with AI — consent required' : 'Draft with AI — consent required'}
       </h3>
 
       {providers.length === 0 ? (
@@ -215,7 +224,9 @@ export function LocalDraftAssist({
               <li>The question text + theme + word limit (~{targetWords} target)</li>
               <li>An application-coach system instruction</li>
               {includeDraft && <li>Your current draft text (context)</li>}
+              {revising && <li>Your revision instruction: “{revisionInstruction!.trim()}”</li>}
             </ul>
+            {!revising && (
             <label className="mt-2 flex items-center gap-2">
               <input
                 type="checkbox"
@@ -228,6 +239,7 @@ export function LocalDraftAssist({
                 {currentDraft.trim() ? '' : ' (editor is empty)'}
               </span>
             </label>
+            )}
             <p className="mt-2 text-neutral-400 dark:text-neutral-500">
               Nothing is sent to the AQUA server. A consent receipt is recorded
               in your vault before the request leaves this device.
@@ -247,7 +259,7 @@ export function LocalDraftAssist({
               disabled={generating || !providerId}
               className="btn-primary px-4 py-1.5 text-xs disabled:opacity-60"
             >
-              {generating ? 'Contacting provider…' : `Authorize & generate via ${providerName}`}
+              {generating ? 'Contacting provider…' : `Authorize & ${revising ? 'revise' : 'generate'} via ${providerName}`}
             </button>
           </div>
         </>

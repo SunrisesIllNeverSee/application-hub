@@ -6,6 +6,11 @@ domain: founder
 word_limit: 25
 status: draft
 last_updated: 2026-09-06
+type: Reference
+title: "Answer Variant: One-liner — YC W26"
+description: "Answer Variant: One-liner — YC W26 (one-liner-yc-w26.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Answer Variant: One-liner — YC W26

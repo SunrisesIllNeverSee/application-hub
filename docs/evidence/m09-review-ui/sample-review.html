@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>AQUA review — Sample Accelerator 2027</title>
+<style>
+:root{--banner:#fffbeb;--btnfg:#fff;--bg:#fff;--fg:#171717;--muted:#737373;--card:#fff;--border:#e5e5e5;--sec:#fafafa;--brand:#0369a1;--rec:#f0f9ff;--rec-b:#7dd3fc;--ok:#15803d;--okb:#f0fdf4;--warn:#b45309;--warnb:#fffbeb;--bad:#dc2626;--badb:#fef2f2;--info:#0284c7;--infob:#f0f9ff;--neu:#525252;--neub:#f5f5f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--banner:#3a2208;--btnfg:#0a0a0a;--bg:#0a0a0a;--fg:#fafafa;--muted:#a3a3a3;--card:#171717;--border:#262626;--sec:#1c1c1c;--brand:#38bdf8;--rec:#0c4a6e33;--rec-b:#075985;--ok:#4ade80;--okb:#14532d55;--warn:#fbbf24;--warnb:#78350f55;--bad:#f87171;--badb:#7f1d1d55;--info:#38bdf8;--infob:#0c4a6e55;--neu:#d4d4d4;--neub:#262626}}
+:root[data-theme=dark]{--banner:#3a2208;--btnfg:#0a0a0a;--bg:#0a0a0a;--fg:#fafafa;--muted:#a3a3a3;--card:#171717;--border:#262626;--sec:#1c1c1c;--brand:#38bdf8;--rec:#0c4a6e33;--rec-b:#075985;--ok:#4ade80;--okb:#14532d55;--warn:#fbbf24;--warnb:#78350f55;--bad:#f87171;--badb:#7f1d1d55;--info:#38bdf8;--infob:#0c4a6e55;--neu:#d4d4d4;--neub:#262626}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.banner{position:sticky;top:0;z-index:5;background:var(--banner);color:var(--warn);border-bottom:1px solid var(--border);padding:10px 16px;font-weight:600;font-size:14px}
+.intro{background:var(--warnb);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;margin:12px 0}
+main{max-width:920px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0 4px}h2{font-size:17px;margin:0 0 8px}h3{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 8px}h4{font-size:14px;margin:12px 0 4px}
+.muted{color:var(--muted)}.small{font-size:12px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;overflow-wrap:anywhere}
+.summary{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0}
+.card-head{border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px}.qn{color:var(--muted);font-weight:500;margin-right:4px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;border:1px solid var(--border)}
+.t-success{color:var(--ok);background:var(--okb)}.t-warning{color:var(--warn);background:var(--warnb)}.t-danger{color:var(--bad);background:var(--badb)}.t-info{color:var(--info);background:var(--infob)}.t-neutral{color:var(--neu);background:var(--neub)}
+.tag{display:inline-block;font-size:11px;border:1px solid var(--border);border-radius:6px;padding:0 6px;color:var(--muted)}
+.sec{background:var(--sec);border:1px solid var(--border);border-radius:10px;padding:12px;margin:10px 0}
+.rec{background:var(--rec);border:2px dashed var(--rec-b)}.rec-label{display:inline-block;margin-left:6px;text-transform:none;letter-spacing:0;font-size:12px;color:var(--info);border:1px solid var(--rec-b);border-radius:6px;padding:0 6px}
+dl{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;margin:0}dt{color:var(--muted);font-size:13px}dd{margin:0}
+@media (max-width:560px){dl{grid-template-columns:1fr}dt{margin-top:6px}main{padding:12px}.card{padding:12px}.banner{font-size:13px;padding:8px 12px}.footer{padding:8px 12px}.footer #count{width:100%;font-size:12px}}
+.answer p{margin:0 0 10px}.meta{color:var(--muted);font-size:13px;margin:2px 0}
+.warn{color:var(--warn);font-weight:600}.gap{color:var(--bad);font-weight:600}
+blockquote{margin:6px 0;padding:6px 10px;border-left:3px solid var(--border);color:var(--fg)}
+ul,ol{padding-left:20px;margin:4px 0}.lineage li.current{font-weight:600}
+.evidence{list-style:none;padding:0}.evidence>li{border:1px solid var(--border);border-radius:8px;padding:8px;margin:6px 0;background:var(--card)}
+a{color:var(--brand)}
+.thread{border-left:2px solid var(--border);padding-left:8px;margin:6px 0}.cm.reply{margin-left:14px}.cm p{margin:2px 0 6px}
+.decide{border:2px solid var(--brand);border-radius:10px;padding:12px;margin-top:12px}.decide legend{font-weight:600;padding:0 4px}
+.choices{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0}.choices label{display:flex;gap:6px;align-items:center;min-height:32px}
+label.block{display:block;font-size:13px;color:var(--muted)}
+textarea{display:block;width:100%;margin-top:4px;background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:8px;font:inherit}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.footer{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+button{font:inherit;font-weight:600;border-radius:8px;padding:8px 14px;border:1px solid var(--border);background:var(--brand);color:var(--btnfg);cursor:pointer;min-height:40px}
+button.secondary{background:var(--sec);color:var(--fg)}
+</style>
+</head>
+<body data-instance="LA-cca5966d-cb0c-46da-945b-84447db26fda" data-exported="2026-10-22T17:09:52.430Z">
+<div class="banner" role="note">Offline review file — clicking here does NOT update AQUA.</div>
+<main>
+<p class="intro"><strong>How this file works.</strong> Your choices below only build a decision file. Download it, then import it in AQUA (Review board → Import decisions) and confirm there — nothing changes until you do. This file contains your private answers in plain text; keep it somewhere safe.</p>
+<h1>Sample Accelerator 2027</h1>
+<p class="muted">Sample Ventures (synthetic) · instance <span class="mono">LA-cca5966d-cb0c-46da-945b-84447db26fda</span> · exported 2026-10-22 17:09 UTC</p>
+<div class="summary"><span class="pill t-neutral">6 questions</span><span class="pill t-success">0 approved</span><span class="pill t-danger">1 without an answer</span></div>
+<article class="card" id="q-1">
+<header class="card-head">
+  <h2><span class="qn">Q1</span> Describe your company and what it does.</h2>
+  <div class="pills">
+    <span class="pill t-neutral">Status: Under review</span>
+    <span class="pill t-info" title="Advice only — not evidence, not approval">Agent recommendation: Direct</span>
+    <span class="pill t-neutral">Human review: No human review decision yet</span>
+    <span class="pill t-warning">Approval: Not approved — v1 was approved, v2 is not</span>
+  </div>
+</header>
+<section class="sec"><h3>Question context</h3>
+  <dl>
+    <dt>Program</dt><dd>Sample Accelerator 2027 · Sample Ventures (synthetic)</dd>
+    <dt>Original question</dt><dd>Describe your company and what it does.</dd>
+    <dt>Canonical question</dt><dd>Not matched</dd>
+    <dt>Requirements</dt><dd>Required · Max 150 words</dd>
+    <dt>Deadline</dt><dd>2027-03-01 (131 days left)</dd>
+  </dl>
+</section>
+<section class="sec"><h3>Proposed final answer</h3>
+<p class="meta">v2 of 2 · Written by you · last edited 2026-10-22 17:09</p>
+<p class="meta">17 / 150 words · 111 characters</p>
+<h4>Company overview</h4><div class="answer"><p>Example Labs builds a scheduling assistant for small veterinary clinics with one to five vets. (synthetic edit)</p></div>
+<p class="mono small">version fc87ccbb-343c-4f47-a2aa-b319818c6af5 · sha256 fd0b2c656b29d897a4c6f4611e84a44cbb6be2aad7502eece2da041331b93aa0</p>
+<p><span class="pill t-warning">Not approved — v1 was approved, v2 is not</span> <span class="muted">The approval of v1 (sha256 f476ba57f5aa…) does not carry over to edited versions.</span></p>
+</section>
+<section class="sec"><h3>Evidence</h3>
+<ul class="evidence"><li><div class="ev-head"><strong>Product one-pager (synthetic)</strong> <span class="tag">note</span> <span class="pill t-success">Confirmed by you</span> <span class="muted">Checked 21 days ago</span></div><blockquote>Scheduling, reminders and rescheduling for clinics with 1–5 vets.</blockquote><p class="mono muted">content sha256 c8f68e8b957c…</p></li><li><div class="ev-head"><strong>Public product page (synthetic)</strong> <span class="tag">url</span> <span class="pill t-warning">Unverified</span> <span class="muted">Never checked</span></div><p><a href="https://example.com/example-labs" rel="noopener noreferrer" target="_blank">https://example.com/example-labs</a></p><p class="mono muted">content sha256 54283ca96882…</p></li></ul>
+
+<h4>Unsupported or uncertain claims</h4><p class="muted">No claims flagged.</p>
+<h4>Version lineage</h4><ol class="lineage"><li><span class="mono">v1</span> · Written by you · 2026-10-22 17:09 · <span class="mono">sha256 f476ba57f5aa…</span> · <strong>approved</strong><ul><li>Approved by human · 2026-10-22 17:09</li></ul></li><li class="current"><span class="mono">v2</span> · Written by you · 2026-10-22 17:09 · <span class="mono">sha256 fd0b2c656b29…</span> · child of v1 · <em>displayed</em></li></ol>
+</section>
+<section class="sec rec"><h3>Agent recommendation <span class="rec-label">Recommendation — not evidence, not approval</span></h3>
+<p><strong>Direct — an approved answer already fits</strong></p>
+
+<h4>Why this answer</h4><ul><li>Written or edited by you.</li></ul>
+<h4>Closeness to the question</h4><p>0% term overlap with the question (low). Local word-overlap check, not AI and not a quality score — good answers often use different words.</p>
+<h4>Potential weaknesses</h4><p class="muted">None detected.</p>
+<h4>Missing evidence</h4><ul><li>1 linked evidence item is unverified.</li><li>1 evidence item has not been checked recently.</li></ul>
+<h4>Conflicts with your facts</h4><p class="muted">No conflicts detected (heuristic check).</p>
+<h4>Suggested improvements</h4><p class="muted">None.</p>
+</section>
+
+<fieldset class="decide" data-occ="LQ-854ea757-6860-4f7b-a3b9-82924c47afa1" data-version="fc87ccbb-343c-4f47-a2aa-b319818c6af5" data-sha="fd0b2c656b29d897a4c6f4611e84a44cbb6be2aad7502eece2da041331b93aa0">
+  <legend>Your decision for v2 <span class="muted">(offline — fills the decision file only)</span></legend>
+  <p class="mono small">version fc87ccbb-343c-4f47-a2aa-b319818c6af5<br>sha256 fd0b2c656b29d897a4c6f4611e84a44cbb6be2aad7502eece2da041331b93aa0</p>
+  <div class="choices">
+    <label><input type="radio" name="d-0" value="approve"> Approve this exact version</label>
+    <label><input type="radio" name="d-0" value="needs_revision"> Needs revision</label>
+    <label><input type="radio" name="d-0" value="needs_evidence"> Needs evidence</label>
+    <label><input type="radio" name="d-0" value="" checked> No decision</label>
+  </div>
+  <label class="block">Comment or instruction (optional)<textarea rows="3" name="c-0"></textarea></label>
+</fieldset>
+</article>
+<article class="card" id="q-2">
+<header class="card-head">
+  <h2><span class="qn">Q2</span> What traction do you have so far? Include specific numbers.</h2>
+  <div class="pills">
+    <span class="pill t-info">Status: Suggested</span>
+    <span class="pill t-info" title="Advice only — not evidence, not approval">Agent recommendation: Adapt</span>
+    <span class="pill t-neutral">Human review: No human review decision yet</span>
+    <span class="pill t-neutral">Approval: Not approved</span>
+  </div>
+</header>
+<section class="sec"><h3>Question context</h3>
+  <dl>
+    <dt>Program</dt><dd>Sample Accelerator 2027 · Sample Ventures (synthetic)</dd>
+    <dt>Original question</dt><dd>What traction do you have so far? Include specific numbers.</dd>
+    <dt>Canonical question</dt><dd>Not matched</dd>
+    <dt>Requirements</dt><dd>Required · Max 60 words</dd>
+    <dt>Deadline</dt><dd>2027-03-01 (131 days left)</dd>
+  </dl>
+</section>
+<section class="sec"><h3>Proposed final answer</h3>
+<p class="meta">v1 of 1 · Written by you · last edited 2026-10-22 17:09</p>
+<p class="meta">20 / 60 words · 115 characters</p>
+<h4>Traction</h4><div class="answer"><p>In 2024 we signed 35 paying customers through the Earlier Program 2024 pilot and grew revenue 12% month over month.</p></div>
+<p class="mono small">version bb9c0818-2923-4bca-99d6-29b6a80de8f9 · sha256 8a956dbadd4312564b6042186ce547a0b96a68c1356cd0d3ce10ecbab2d1f651</p>
+<p><span class="pill t-neutral">Not approved</span> <span class="muted">Only your explicit approval of this exact version counts.</span></p>
+</section>
+<section class="sec"><h3>Evidence</h3>
+<p class="gap">No evidence linked to this version.</p>
+
+<h4>Unsupported or uncertain claims</h4><ul><li>12% month-over-month revenue growth (no source linked) <span class="tag">flagged by agent</span></li></ul>
+<h4>Version lineage</h4><p>Started from another answer: version <span class="mono">b3b22593…</span> (sha256 <span class="mono">3315c811ee73…</span>) “Traction (2024)” for question <span class="mono">LQ-c157dcf4-bfc0-4a79-a20e-29d06b9feb3b</span>. Approval never transfers.</p><ol class="lineage"><li class="current"><span class="mono">v1</span> · Written by you · 2026-10-22 17:09 · <span class="mono">sha256 8a956dbadd43…</span> · <em>displayed</em></li></ol>
+</section>
+<section class="sec rec"><h3>Agent recommendation <span class="rec-label">Recommendation — not evidence, not approval</span></h3>
+<p><strong>Adapt — related answer needs revision</strong></p>
+<ul><li>answers a related but different question (similarity 0.33)</li><li>mentions another program/organization: Earlier Program 2024</li><li>references year(s) 2024 — older than the 2027 cycle</li></ul>
+<h4>Why this answer</h4><ul><li>Started from another answer in your bank (provenance recorded, approval not transferred).</li><li>Reuses the approved 2024 traction answer; the question now asks for current numbers.</li></ul>
+<h4>Closeness to the question</h4><p>0% term overlap with the question (low). Local word-overlap check, not AI and not a quality score — good answers often use different words.</p>
+<h4>Potential weaknesses</h4><ul><li>Numbers are from 2024.</li><li>Names the earlier program.</li><li>mentions another program/organization: Earlier Program 2024</li><li>references year(s) 2024 — older than the 2027 cycle</li></ul>
+<h4>Missing evidence</h4><ul><li>No evidence linked to this version.</li><li>1 claim flagged as unsupported or challenged.</li></ul>
+<h4>Conflicts with your facts</h4><ul><li>Mentions &quot;customers&quot; with 35, but your fact org.customers = 40.</li></ul>
+<h4>Suggested improvements</h4><ul><li>Remove or replace references to Earlier Program 2024.</li><li>Update dated year references (2024).</li><li>Attach a note, link, passage or file excerpt that supports the key claims.</li><li>Reconcile with your fact org.customers (40).</li></ul>
+</section>
+
+<fieldset class="decide" data-occ="LQ-0c226548-8d8f-4d3b-a350-b096e4878cb8" data-version="bb9c0818-2923-4bca-99d6-29b6a80de8f9" data-sha="8a956dbadd4312564b6042186ce547a0b96a68c1356cd0d3ce10ecbab2d1f651">
+  <legend>Your decision for v1 <span class="muted">(offline — fills the decision file only)</span></legend>
+  <p class="mono small">version bb9c0818-2923-4bca-99d6-29b6a80de8f9<br>sha256 8a956dbadd4312564b6042186ce547a0b96a68c1356cd0d3ce10ecbab2d1f651</p>
+  <div class="choices">
+    <label><input type="radio" name="d-1" value="approve"> Approve this exact version</label>
+    <label><input type="radio" name="d-1" value="needs_revision"> Needs revision</label>
+    <label><input type="radio" name="d-1" value="needs_evidence"> Needs evidence</label>
+    <label><input type="radio" name="d-1" value="" checked> No decision</label>
+  </div>
+  <label class="block">Comment or instruction (optional)<textarea rows="3" name="c-1"></textarea></label>
+</fieldset>
+</article>
+<article class="card" id="q-3">
+<header class="card-head">
+  <h2><span class="qn">Q3</span> Why is your team uniquely positioned to build this?</h2>
+  <div class="pills">
+    <span class="pill t-info">Status: Suggested</span>
+    <span class="pill t-info" title="Advice only — not evidence, not approval">Agent recommendation: Gap</span>
+    <span class="pill t-neutral">Human review: No human review decision yet</span>
+    <span class="pill t-neutral">Approval: Not approved</span>
+  </div>
+</header>
+<section class="sec"><h3>Question context</h3>
+  <dl>
+    <dt>Program</dt><dd>Sample Accelerator 2027 · Sample Ventures (synthetic)</dd>
+    <dt>Original question</dt><dd>Why is your team uniquely positioned to build this?</dd>
+    <dt>Canonical question</dt><dd>Not matched</dd>
+    <dt>Requirements</dt><dd>Required · Max 100 words</dd>
+    <dt>Deadline</dt><dd>2027-03-01 (131 days left)</dd>
+  </dl>
+</section>
+<section class="sec"><h3>Proposed final answer</h3>
+<p class="meta">v2 of 2 · AI draft · your key · ollama / mock-model · last edited 2026-10-22 17:09</p>
+<p class="meta">17 / 100 words · 119 characters</p>
+<h4>Team</h4><div class="answer"><p>Our two founders spent six years running clinic software support and shipped two scheduling tools (synthetic revision).</p></div>
+<p class="mono small">version 506b6917-dd99-42fd-a535-9044d7175e83 · sha256 b1f858026e80116d2e2fcbd25814e66c11722f3e1b55451c53d0a62e4510b599</p>
+<p><span class="pill t-neutral">Not approved</span> <span class="muted">Only your explicit approval of this exact version counts.</span></p>
+</section>
+<section class="sec"><h3>Evidence</h3>
+<ul class="evidence"><li><div class="ev-head"><strong>Founder bio note (synthetic)</strong> <span class="tag">note</span> <span class="pill t-warning">Unverified</span> <span class="muted">Never checked</span></div><blockquote>Six years on a clinic-software support team (synthetic).</blockquote><p class="mono muted">content sha256 72d57c82b408…</p></li></ul>
+
+<h4>Unsupported or uncertain claims</h4><p class="muted">No claims flagged.</p>
+<h4>Version lineage</h4><ol class="lineage"><li><span class="mono">v1</span> · AI draft · your key · 2026-10-22 17:09 · <span class="mono">sha256 5ba165d72db2…</span><ul><li>Evidence requested · 2026-10-22 17:09 — “Source for six years of clinic software support (synthetic)”</li></ul></li><li class="current"><span class="mono">v2</span> · AI draft · your key · 2026-10-22 17:09 · <span class="mono">sha256 b1f858026e80…</span> · child of v1 · <em>displayed</em></li></ol>
+</section>
+<section class="sec rec"><h3>Agent recommendation <span class="rec-label">Recommendation — not evidence, not approval</span></h3>
+<p><strong>Gap — no suitable answer in your bank</strong></p>
+<ul><li>no related answer in the vault</li></ul>
+<h4>Why this answer</h4><ul><li>Drafted by an AI provider at your request.</li><li>Revised by ollama / mock-model at your request: “Name the two scheduling tools by type (synthetic instruction).”</li></ul>
+<h4>Closeness to the question</h4><p>0% term overlap with the question (low). Local word-overlap check, not AI and not a quality score — good answers often use different words.</p>
+<h4>Potential weaknesses</h4><p class="muted">None detected.</p>
+<h4>Missing evidence</h4><ul><li>1 linked evidence item is unverified.</li><li>1 evidence item has not been checked recently.</li></ul>
+<h4>Conflicts with your facts</h4><p class="muted">No conflicts detected (heuristic check).</p>
+<h4>Suggested improvements</h4><p class="muted">None.</p>
+</section>
+<section class="sec"><h4>Discussion (2)</h4><div class="thread"><div class="cm"><span class="tag">on v1</span> <span class="muted">2026-10-22 17:09</span><p>Mention the two shipped scheduling tools by type (synthetic).</p></div></div><div class="thread"><div class="cm"><span class="tag">on v1</span> <span class="muted">2026-10-22 17:09</span><p>Revision requested from agent: Name the two scheduling tools by type (synthetic instruction).</p></div></div></section>
+<fieldset class="decide" data-occ="LQ-b0f3e89b-9970-4d84-9d98-f402ed39679d" data-version="506b6917-dd99-42fd-a535-9044d7175e83" data-sha="b1f858026e80116d2e2fcbd25814e66c11722f3e1b55451c53d0a62e4510b599">
+  <legend>Your decision for v2 <span class="muted">(offline — fills the decision file only)</span></legend>
+  <p class="mono small">version 506b6917-dd99-42fd-a535-9044d7175e83<br>sha256 b1f858026e80116d2e2fcbd25814e66c11722f3e1b55451c53d0a62e4510b599</p>
+  <div class="choices">
+    <label><input type="radio" name="d-2" value="approve"> Approve this exact version</label>
+    <label><input type="radio" name="d-2" value="needs_revision"> Needs revision</label>
+    <label><input type="radio" name="d-2" value="needs_evidence"> Needs evidence</label>
+    <label><input type="radio" name="d-2" value="" checked> No decision</label>
+  </div>
+  <label class="block">Comment or instruction (optional)<textarea rows="3" name="c-2"></textarea></label>
+</fieldset>
+</article>
+<article class="card" id="q-4">
+<header class="card-head">
+  <h2><span class="qn">Q4</span> What will you do with the funding?</h2>
+  <div class="pills">
+    <span class="pill t-warning">Status: Needs evidence</span>
+    <span class="pill t-info" title="Advice only — not evidence, not approval">Agent recommendation: Gap</span>
+    <span class="pill t-warning">Human review: Evidence requested</span>
+    <span class="pill t-neutral">Approval: Not approved</span>
+  </div>
+</header>
+<section class="sec"><h3>Question context</h3>
+  <dl>
+    <dt>Program</dt><dd>Sample Accelerator 2027 · Sample Ventures (synthetic)</dd>
+    <dt>Original question</dt><dd>What will you do with the funding?</dd>
+    <dt>Canonical question</dt><dd>Not matched</dd>
+    <dt>Requirements</dt><dd>Required · Max 40 words · Max 260 characters</dd>
+    <dt>Deadline</dt><dd>2027-03-01 (131 days left)</dd>
+  </dl>
+</section>
+<section class="sec"><h3>Proposed final answer</h3>
+<p class="meta">v1 of 1 · Written by you · last edited 2026-10-22 17:09</p>
+<p class="meta">45 / 40 words · 281 / 260 characters</p><p class="warn">Over limit by 5 words and 21 characters.</p>
+<h4>Use of funds</h4><div class="answer"><p>We will hire two engineers to build the reminders engine and integrations, one clinic success lead to onboard new customers, and spend the remainder on a regional sales pilot across three states, plus compliance work for data handling and a modest marketing budget for conferences.</p></div>
+<p class="mono small">version 31921c46-59ce-440d-9f10-002479d61b32 · sha256 8d40170b6b2303196e7fd8bd32fe3447e239e9e182dd8f3ad7d7bacdc0e52574</p>
+<p><span class="pill t-neutral">Not approved</span> <span class="muted">Only your explicit approval of this exact version counts.</span></p>
+</section>
+<section class="sec"><h3>Evidence</h3>
+<p class="gap">No evidence linked to this version.</p>
+
+<h4>Unsupported or uncertain claims</h4><ul><li>three-state sales pilot budget <span class="tag">challenged by you</span></li></ul>
+<h4>Version lineage</h4><ol class="lineage"><li class="current"><span class="mono">v1</span> · Written by you · 2026-10-22 17:09 · <span class="mono">sha256 8d40170b6b23…</span> · <em>displayed</em><ul><li>Evidence requested · 2026-10-22 17:09 — “Challenged claim: three-state sales pilot budget”</li></ul></li></ol>
+</section>
+<section class="sec rec"><h3>Agent recommendation <span class="rec-label">Recommendation — not evidence, not approval</span></h3>
+<p><strong>Gap — no suitable answer in your bank</strong></p>
+<ul><li>no related answer in the vault</li></ul>
+<h4>Why this answer</h4><ul><li>Written or edited by you.</li></ul>
+<h4>Closeness to the question</h4><p>0% term overlap with the question (low). Local word-overlap check, not AI and not a quality score — good answers often use different words.</p>
+<h4>Potential weaknesses</h4><ul><li>over word limit by 5 words (45/40)</li><li>over character limit by 21 characters (281/260)</li></ul>
+<h4>Missing evidence</h4><ul><li>No evidence linked to this version.</li><li>1 claim flagged as unsupported or challenged.</li></ul>
+<h4>Conflicts with your facts</h4><p class="muted">No conflicts detected (heuristic check).</p>
+<h4>Suggested improvements</h4><ul><li>Trim about 5 words to fit the 40-word limit.</li><li>Cut about 21 characters to fit the 260-character limit.</li><li>Attach a note, link, passage or file excerpt that supports the key claims.</li></ul>
+</section>
+
+<fieldset class="decide" data-occ="LQ-cf5b03eb-be0b-40e5-82b9-47470bc3244c" data-version="31921c46-59ce-440d-9f10-002479d61b32" data-sha="8d40170b6b2303196e7fd8bd32fe3447e239e9e182dd8f3ad7d7bacdc0e52574">
+  <legend>Your decision for v1 <span class="muted">(offline — fills the decision file only)</span></legend>
+  <p class="mono small">version 31921c46-59ce-440d-9f10-002479d61b32<br>sha256 8d40170b6b2303196e7fd8bd32fe3447e239e9e182dd8f3ad7d7bacdc0e52574</p>
+  <div class="choices">
+    <label><input type="radio" name="d-3" value="approve"> Approve this exact version</label>
+    <label><input type="radio" name="d-3" value="needs_revision"> Needs revision</label>
+    <label><input type="radio" name="d-3" value="needs_evidence"> Needs evidence</label>
+    <label><input type="radio" name="d-3" value="" checked> No decision</label>
+  </div>
+  <label class="block">Comment or instruction (optional)<textarea rows="3" name="c-3"></textarea></label>
+</fieldset>
+</article>
+<article class="card" id="q-5">
+<header class="card-head">
+  <h2><span class="qn">Q5</span> Anything else we should know?</h2>
+  <div class="pills">
+    <span class="pill t-danger">Status: Gap — no answer yet</span>
+    <span class="pill t-info" title="Advice only — not evidence, not approval">Agent recommendation: Gap</span>
+    <span class="pill t-neutral">Human review: No human review decision yet</span>
+    <span class="pill t-neutral">Approval: Nothing to approve</span>
+  </div>
+</header>
+<section class="sec"><h3>Question context</h3>
+  <dl>
+    <dt>Program</dt><dd>Sample Accelerator 2027 · Sample Ventures (synthetic)</dd>
+    <dt>Original question</dt><dd>Anything else we should know?</dd>
+    <dt>Canonical question</dt><dd>Not matched</dd>
+    <dt>Requirements</dt><dd>Optional · No stated length limit</dd>
+    <dt>Deadline</dt><dd>2027-03-01 (131 days left)</dd>
+  </dl>
+</section>
+<section class="sec"><h3>Proposed final answer</h3>
+<p class="gap">No answer has been written for this question yet.</p>
+</section>
+<section class="sec"><h3>Evidence</h3>
+<p class="gap">No evidence linked to this version.</p>
+
+<h4>Unsupported or uncertain claims</h4><p class="muted">No claims flagged.</p>
+<h4>Version lineage</h4><p class="muted">No versions yet.</p>
+</section>
+<section class="sec rec"><h3>Agent recommendation <span class="rec-label">Recommendation — not evidence, not approval</span></h3>
+<p><strong>Gap — no suitable answer in your bank</strong></p>
+<ul><li>no related answer in the vault</li></ul>
+<h4>Why this answer</h4><p class="muted">No rationale recorded.</p>
+<h4>Closeness to the question</h4><p>Not computed.</p>
+<h4>Potential weaknesses</h4><p class="muted">None detected.</p>
+<h4>Missing evidence</h4><p class="muted">None detected.</p>
+<h4>Conflicts with your facts</h4><p class="muted">No conflicts detected (heuristic check).</p>
+<h4>Suggested improvements</h4><p class="muted">None.</p>
+</section>
+
+<p class="muted">No version to decide on yet.</p>
+</article>
+<article class="card" id="q-6">
+<header class="card-head">
+  <h2><span class="qn">Q6</span> Who are your main competitors and how are you different?</h2>
+  <div class="pills">
+    <span class="pill t-neutral">Status: Under review</span>
+    <span class="pill t-info" title="Advice only — not evidence, not approval">Agent recommendation: Gap</span>
+    <span class="pill t-neutral">Human review: No human review decision yet</span>
+    <span class="pill t-warning">Approval: Not approved — v1 was approved, v2 is not</span>
+  </div>
+</header>
+<section class="sec"><h3>Question context</h3>
+  <dl>
+    <dt>Program</dt><dd>Sample Accelerator 2027 · Sample Ventures (synthetic)</dd>
+    <dt>Original question</dt><dd>Who are your main competitors and how are you different?</dd>
+    <dt>Canonical question</dt><dd>Not matched</dd>
+    <dt>Requirements</dt><dd>Optional · Max 120 words</dd>
+    <dt>Deadline</dt><dd>2027-03-01 (131 days left)</dd>
+  </dl>
+</section>
+<section class="sec"><h3>Proposed final answer</h3>
+<p class="meta">v2 of 2 · Written by you · last edited 2026-10-22 17:09</p>
+<p class="meta">23 / 120 words · 151 characters</p>
+<h4>Competitors</h4><div class="answer"><p>Large practice-management suites include scheduling, but they are priced and built for multi-site hospitals. We focus on clinics with one to five vets.</p></div>
+<p class="mono small">version 3c05c732-7773-4985-bb24-253a7b37d9d1 · sha256 6ae6f7a699d0d2267a727809d236fc2268cc0dedf99c95b4a8c300ac7b0658d4</p>
+<p><span class="pill t-warning">Not approved — v1 was approved, v2 is not</span> <span class="muted">The approval of v1 (sha256 b26be1304760…) does not carry over to edited versions.</span></p>
+</section>
+<section class="sec"><h3>Evidence</h3>
+<p class="gap">No evidence linked to this version.</p>
+
+<h4>Unsupported or uncertain claims</h4><p class="muted">No claims flagged.</p>
+<h4>Version lineage</h4><ol class="lineage"><li><span class="mono">v1</span> · Written by you · 2026-10-22 17:09 · <span class="mono">sha256 b26be1304760…</span> · <strong>approved</strong><ul><li>Approved by human · 2026-10-22 17:09</li></ul></li><li class="current"><span class="mono">v2</span> · Written by you · 2026-10-22 17:09 · <span class="mono">sha256 6ae6f7a699d0…</span> · child of v1 · <em>displayed</em></li></ol>
+</section>
+<section class="sec rec"><h3>Agent recommendation <span class="rec-label">Recommendation — not evidence, not approval</span></h3>
+<p><strong>Gap — no suitable answer in your bank</strong></p>
+<ul><li>no related answer in the vault</li></ul>
+<h4>Why this answer</h4><ul><li>Written or edited by you.</li></ul>
+<h4>Closeness to the question</h4><p>0% term overlap with the question (low). Local word-overlap check, not AI and not a quality score — good answers often use different words.</p>
+<h4>Potential weaknesses</h4><p class="muted">None detected.</p>
+<h4>Missing evidence</h4><ul><li>No evidence linked to this version.</li></ul>
+<h4>Conflicts with your facts</h4><p class="muted">No conflicts detected (heuristic check).</p>
+<h4>Suggested improvements</h4><ul><li>Attach a note, link, passage or file excerpt that supports the key claims.</li></ul>
+</section>
+<section class="sec"><h4>Discussion (2)</h4><div class="thread"><div class="cm"><span class="tag">on v1</span> <span class="muted">2026-10-22 17:09</span><p>Name one example competitor category more concretely.</p></div></div><div class="thread"><div class="cm"><span class="tag">on v2</span> <span class="muted">2026-10-22 17:09</span><p>v2 reads better (synthetic).</p></div></div></section>
+<fieldset class="decide" data-occ="LQ-7e5687f3-d923-40ed-b639-8b63ee0cee43" data-version="3c05c732-7773-4985-bb24-253a7b37d9d1" data-sha="6ae6f7a699d0d2267a727809d236fc2268cc0dedf99c95b4a8c300ac7b0658d4">
+  <legend>Your decision for v2 <span class="muted">(offline — fills the decision file only)</span></legend>
+  <p class="mono small">version 3c05c732-7773-4985-bb24-253a7b37d9d1<br>sha256 6ae6f7a699d0d2267a727809d236fc2268cc0dedf99c95b4a8c300ac7b0658d4</p>
+  <div class="choices">
+    <label><input type="radio" name="d-5" value="approve"> Approve this exact version</label>
+    <label><input type="radio" name="d-5" value="needs_revision"> Needs revision</label>
+    <label><input type="radio" name="d-5" value="needs_evidence"> Needs evidence</label>
+    <label><input type="radio" name="d-5" value="" checked> No decision</label>
+  </div>
+  <label class="block">Comment or instruction (optional)<textarea rows="3" name="c-5"></textarea></label>
+</fieldset>
+</article>
+</main>
+<div class="footer"><span id="count" class="muted" aria-live="polite"></span><span><button type="button" class="secondary" id="theme">Toggle light/dark</button> <button type="button" id="download">Download decision file</button></span></div>
+<script>
+function aquaBuildDecisionFile(meta, entries, now) {
+  var out = [];
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var comment = typeof e.comment === 'string' && e.comment.replace(/\s+/g, '') ? e.comment : null;
+    var decision = e.decision || (comment ? 'comment' : null);
+    if (!decision) continue;
+    out.push({
+      question_occurrence_id: e.question_occurrence_id,
+      version_id: e.version_id,
+      version_sha256: e.version_sha256,
+      decision: decision,
+      comment: comment,
+      decided_at: e.decided_at || now
+    });
+  }
+  return {
+    format: "aqua-review-decisions",
+    version: 1,
+    notice: "Offline review decisions. Opening or clicking in the review HTML did NOT update AQUA. Import this file in AQUA (Review board → Import decisions) and confirm to apply.",
+    instance_id: meta.instance_id,
+    review_exported_at: meta.review_exported_at || null,
+    created_at: now,
+    decisions: out
+  };
+}
+(function(){
+  var meta = { instance_id: document.body.getAttribute('data-instance'), review_exported_at: document.body.getAttribute('data-exported') };
+  function collect(){
+    var sets = document.querySelectorAll('fieldset.decide');
+    var entries = [];
+    for (var i = 0; i < sets.length; i++) {
+      var f = sets[i];
+      var checked = f.querySelector('input[type=radio]:checked');
+      var ta = f.querySelector('textarea');
+      entries.push({ question_occurrence_id: f.getAttribute('data-occ'), version_id: f.getAttribute('data-version'), version_sha256: f.getAttribute('data-sha'), decision: checked && checked.value ? checked.value : null, comment: ta ? ta.value : null });
+    }
+    return aquaBuildDecisionFile(meta, entries, new Date().toISOString());
+  }
+  function update(){ var n = collect().decisions.length; document.getElementById('count').textContent = n + (n === 1 ? ' decision' : ' decisions') + ' in the decision file (not applied to AQUA)'; }
+  document.addEventListener('change', update); document.addEventListener('input', update); update();
+  document.getElementById('download').addEventListener('click', function(){
+    var file = collect();
+    var blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'aqua-decisions-' + meta.instance_id + '-' + file.created_at.slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  });
+  document.getElementById('theme').addEventListener('click', function(){
+    var r = document.documentElement; var dark = r.getAttribute('data-theme') === 'dark' || (!r.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    r.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+})();
+</script>
+</body>
+</html>

@@ -27,16 +27,16 @@
 // the hosted composite (that would double-count hosted answers and
 // fabricate a unified number neither dataset supports).
 
-import { computeAquaScore, type AquaScoreInputs } from '@/lib/aquascore'
-import { decryptText } from '@/lib/aqua-local/crypto'
-import { compareApprovals } from '@/lib/aqua-local/repo'
-import type { VaultStorage } from '@/lib/aqua-local/vault'
+import { computeAquaScore, type AquaScoreInputs } from '../aquascore.ts'
+import { decryptText } from '../aqua-local/crypto.ts'
+import { compareApprovals } from '../aqua-local/repo.ts'
+import type { VaultStorage } from '../aqua-local/vault.ts'
 import type {
   AnswerRecord,
   VersionRecord,
   ApprovalRecord,
   CatalogCacheRecord,
-} from '@/lib/aqua-local/schema'
+} from '../aqua-local/schema.ts'
 
 export interface VaultScoreBreakdown {
   composite: number

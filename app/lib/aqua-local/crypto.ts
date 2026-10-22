@@ -131,6 +131,36 @@ export async function decryptText(secret: string, blob: EncryptedBlob): Promise<
   }
 }
 
+/** v5 field helpers: a `*_enc` field is a serialized EncryptedBlob. */
+export async function encryptField(secret: string, plaintext: string): Promise<string> {
+  return JSON.stringify(await encryptText(secret, plaintext))
+}
+
+export async function decryptField(secret: string, enc: string): Promise<string> {
+  let blob: EncryptedBlob
+  try {
+    blob = JSON.parse(enc) as EncryptedBlob
+  } catch {
+    throw new VaultDecryptError('encrypted field is not a serialized blob')
+  }
+  return decryptText(secret, blob)
+}
+
+/** Encrypt when present; undefined stays undefined (optional *_enc fields). */
+export async function encryptOptionalField(
+  secret: string,
+  plaintext: string | null | undefined,
+): Promise<string | undefined> {
+  return plaintext == null || plaintext === '' ? undefined : encryptField(secret, plaintext)
+}
+
+export async function decryptOptionalField(
+  secret: string,
+  enc: string | null | undefined,
+): Promise<string | null> {
+  return enc ? decryptField(secret, enc) : null
+}
+
 export async function sha256Hex(text: string): Promise<string> {
   const digest = await getCrypto().subtle.digest('SHA-256', te.encode(text))
   return Array.from(new Uint8Array(digest))

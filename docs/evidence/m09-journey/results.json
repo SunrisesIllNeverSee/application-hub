@@ -1,0 +1,215 @@
+[
+  {
+    "viewport": "w1440",
+    "path": "catalog",
+    "steps": [
+      "B: 3 active",
+      "C: created AI-…",
+      "D: gap, gap, skip",
+      "E: review CTA → /review/<id>?program=prog-example-accel; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "AI-",
+    "classifications": [
+      "gap",
+      "gap",
+      "skip"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w1440",
+    "path": "paste",
+    "steps": [
+      "B: 3 active",
+      "B: wording corrected, original kept",
+      "C: created LA-…",
+      "D: adapt, gap, skip",
+      "E: review CTA → /review/<id>; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "LA-",
+    "classifications": [
+      "adapt",
+      "gap",
+      "skip"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w1440",
+    "path": "file",
+    "steps": [
+      "pdf-unsupported-message",
+      "B: 3 active",
+      "C: created LA-…",
+      "D: gap, gap, direct",
+      "E: review CTA → /review/<id>; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "LA-",
+    "classifications": [
+      "gap",
+      "gap",
+      "direct"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w1440",
+    "path": "url",
+    "steps": [
+      "A: ?url= deep link prefilled, not fetched, stripped from the address bar",
+      "private-link-refused-locally",
+      "B: 5 active",
+      "B: duplicate merged, contact field removed",
+      "B: candidate shown → confirmed → 503 handled (\"open soon\")",
+      "C: created LA-…",
+      "D: direct, direct, skip",
+      "E: review CTA → /review/<id>; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "LA-",
+    "classifications": [
+      "direct",
+      "direct",
+      "skip"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w1440",
+    "path": "mine",
+    "instances": 4,
+    "all_submitted": true
+  },
+  {
+    "viewport": "w1440",
+    "path": "reopen",
+    "historical_readonly": true
+  },
+  {
+    "viewport": "w390",
+    "path": "catalog",
+    "steps": [
+      "B: 3 active",
+      "C: created AI-…",
+      "D: gap, gap, skip",
+      "E: review CTA → /review/<id>?program=prog-example-accel; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "AI-",
+    "classifications": [
+      "gap",
+      "gap",
+      "skip"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w390",
+    "path": "paste",
+    "steps": [
+      "B: 3 active",
+      "B: wording corrected, original kept",
+      "C: created LA-…",
+      "D: adapt, gap, skip",
+      "E: review CTA → /review/<id>; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "LA-",
+    "classifications": [
+      "adapt",
+      "gap",
+      "skip"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w390",
+    "path": "file",
+    "steps": [
+      "pdf-unsupported-message",
+      "B: 3 active",
+      "C: created LA-…",
+      "D: gap, gap, direct",
+      "E: review CTA → /review/<id>; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "LA-",
+    "classifications": [
+      "gap",
+      "gap",
+      "direct"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w390",
+    "path": "url",
+    "steps": [
+      "A: ?url= deep link prefilled, not fetched, stripped from the address bar",
+      "private-link-refused-locally",
+      "B: 5 active",
+      "B: duplicate merged, contact field removed",
+      "B: candidate shown → confirmed → 503 handled (\"open soon\")",
+      "C: created LA-…",
+      "D: direct, direct, skip",
+      "E: review CTA → /review/<id>; approved via harness stand-in",
+      "F: ready to freeze",
+      "G: frozen, signed, exported; verify-packet exit 0",
+      "H: submission recorded → read-only historical view"
+    ],
+    "instance_id_prefix": "LA-",
+    "classifications": [
+      "direct",
+      "direct",
+      "skip"
+    ],
+    "verify_exit": 0,
+    "verify_summary": "PASS — 10/10 checks passed"
+  },
+  {
+    "viewport": "w390",
+    "path": "mine",
+    "instances": 4,
+    "all_submitted": true
+  },
+  {
+    "viewport": "w390",
+    "path": "reopen",
+    "historical_readonly": true
+  },
+  {
+    "privacy": {
+      "request_bodies_with_private_content": 0,
+      "extract_url_requests": 2,
+      "extract_url_bodies_url_only": true,
+      "candidate_requests": 2,
+      "other_api_or_offsite_requests": [
+        "GET https://www.googletagmanager.com/gtag/js"
+      ]
+    }
+  }
+]
