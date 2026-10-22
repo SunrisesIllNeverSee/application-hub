@@ -22,44 +22,52 @@ Do not use AQUA as an admissions oracle, acceptance-probability service, or exte
 AQUA is local-first. A user's private answers live in an encrypted vault in their browser and, if they choose, in an encrypted companion workspace folder on their own computer. They are never stored on AQUA's servers, and no AQUA service hands them to an agent. An agent helps a user by running the **AQUA companion** on the user's machine: a command-line tool and stdio MCP server that works on one consented, encrypted workspace plus the public catalog.
 
 ### 1. Install
-- Today: the companion ships as a versioned tarball from this site (Node.js 22+, no dependencies):
-  `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help`
-- sha256: `68b16804806e3405afa6182ae2bd450d3018bfbd07e898b9e03a59f212c2e217` (also at https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz.sha256; https://aquaidp.xyz/companion/latest.json lists the current version).
-- npm: not yet on npm: publishing aqua-companion is owner gate GB2. Until then install from the tarball above.
-- `aqua-mcp-server`: aqua-mcp-server 2.0.0 is built on the companion and is not yet published. Once OWNER publishes it (gate GB1), `npx -y aqua-mcp-server` runs it; until then use the companion tarball. Versions below 2.0 are legacy and must not be used.
-- Self-check: `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz doctor` reports configuration, catalog connectivity, workspace and keychain status.
+- Primary (npm, Node.js 22+): `npx -y aqua-mcp-server --help`. aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used. Its companion command line is `npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA`.
+- Fallback: the companion also ships as a versioned tarball from this site (no dependencies):
+  `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help`
+- sha256: `a36c492d6bb57bec1d6ff9ef164cd4e46ea1a7128ae11d95aa9074fbe6b62280` (also at https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz.sha256; https://aquaidp.xyz/companion/latest.json lists the current version).
+- From a downloaded, verified copy: `npx --yes --package <path>/aqua-companion-0.2.3.tgz aqua-companion --help`. (Pass the file with `--package`: npx treats a bare absolute `.tgz` path as a program to run and fails with "Permission denied".)
+- npm: aqua-companion is not published on npm by itself (owner gate GB2). aqua-mcp-server on npm includes it, so use that; the tarball above is the fallback.
+- Self-check: `aqua-companion doctor` (or `npx -y aqua-mcp-server companion doctor`; tarball: `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz doctor`) reports configuration, catalog connectivity, workspace and keychain status.
 
 ### 2. Connect it to the agent (MCP over stdio)
 ```
-claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --keychain
+claude mcp add aqua -- npx -y aqua-mcp-server --keychain
 ```
-The server starts even when no workspace exists yet. Workspace tools then return `workspace_not_initialized` with next steps.
+Fallback (tarball): `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --keychain`
+The server starts even when no workspace exists yet. Workspace tools then return `workspace_not_initialized` with next steps. `init --path <folder>` creates `<folder>/AQUA`; the server and the CLI find a workspace only through `--workspace`, `AQUA_WORKSPACE`, or the folder they run in (or a parent). After init, re-add the server with the workspace and restart the client:
+```
+claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keychain
+```
+(Tarball fallback: `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --workspace <folder>/AQUA --keychain`)
 
 ### 3. Workspace setup and consent
 - `locate_workspace` (read) reports where a workspace is or would be created.
 - `init_workspace` (human_consent) uses MCP elicitation when the client supports it: the user confirms the folder and consent in the client UI, outside the model. Otherwise it returns `requires_human` with the exact command, for example `aqua-companion init --path <folder>`.
 - The workspace passphrase is typed by the user (terminal prompt, macOS Keychain or the server's own environment). It never travels through the model or a tool argument, and no tool accepts a password, token or JWT.
+- `--keychain` reads the passphrase from a macOS Keychain item the user creates once after init: `security add-generic-password -s aqua-companion -a <workspace id> -w` (it prompts; the workspace id is in `aqua-companion status`). Without that item, drop `--keychain` and give the server `AQUA_PASSPHRASE` in its own environment instead (trade-offs: docs/AGENT.md in the package).
 - The agent reads files only from the workspace `inbox/` folder. Ask the user to place files there.
 
 ### 4. Tiers (enforced in code, not by asking the agent to behave)
-- **read** (23): Always allowed. Only reads the workspace or the public catalog cache.
-- **private_write** (8): Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything.
+- **read** (22): Always allowed. Only reads the workspace or the public catalog cache.
+- **private_write** (9): Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything.
 - **human_consent** (1): Acts only after the human confirms in the MCP client UI (elicitation). Without that capability it returns requires_human with the exact command for the user to run.
 - **human_only** (5): Never acts. Returns requires_human with the steps the user takes in the AQUA browser app (approve, sign, freeze/export, submit, attest).
 
 ### 5. Submitted history
-The user copies past submitted applications (md, txt, docx, html, json, csv) into `inbox/`. `import_history` (or `aqua-companion import-history <folder>`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. After `aqua-companion export-backup` and Restore in the browser, the user confirms them at https://aquaidp.xyz/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
+The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside `inbox/`, for example `inbox/history/`. `import_history { folder: "history" }` (or `aqua-companion import-history <folder>`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a `parse_confidence` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After `aqua-companion export-backup` and Restore in the browser, the user confirms them at https://aquaidp.xyz/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
 
 ### 6. The human approves in the browser
 Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from https://aquaidp.xyz/aqua-local after Restore. The approval round trip:
-1. The user runs `aqua-companion export-backup <file>`.
+1. The user runs `aqua-companion export-backup <file> --workspace <folder>/AQUA` (the same rule: leave out `--workspace` only when running inside the workspace folder).
 2. In the browser: AQUA Local, Restore backup, review and approve.
 3. The user exports a browser backup and puts it in the workspace `inbox/`.
 4. The agent runs `sync_from_vault_export`; `read_review_status` then shows the human approvals with hashes preserved.
 5. `prepare_packet` reports readiness; the user freezes and exports the packet in the browser; `verify_packet` checks the export. The agent never submits anything.
 
 ### 7. Public catalog configuration
-https://aquaidp.xyz/.well-known/aqua-catalog.json returns `{version, supabase_url, publishable_key, tables, notes}`. The key is the public publishable/anon key the web app already ships to every browser; row-level security limits it to approved canonical catalog rows. Clients must publishable/anon key only; clients refuse any other role and fetch it only from https://aquaidp.xyz (or a local override file).
+https://aquaidp.xyz/.well-known/aqua-catalog.json returns `{version, supabase_url, publishable_key, tables, notes}`. The key is the public publishable/anon key the web app already ships to every browser; row-level security limits it to approved canonical catalog rows. Clients must use the publishable/anon key only; they refuse any other role and fetch the configuration only from https://aquaidp.xyz (or a local override file).
+The companion keeps a public catalog cache: discover_applications, get_application_details and match_canonical_questions refresh an empty or stale cache (older than 24 hours; AQUA_CATALOG_MAX_AGE_HOURS changes it, 0 turns it off) with the same public read-only request as refresh_catalog. Offline or unconfigured, they answer from the cache and return catalog_empty: run refresh_catalog when there is nothing cached.
 
 ### 8. Hosted read-only MCP
 https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and prompts; no authentication, no workspace tools; rate-limited).
@@ -80,7 +88,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 | `attach_evidence` | private_write | Stage an evidence record for a file the user placed in inbox/ (its sha256 is recorded) and optionally link it to a version. |
 | `attest_submission` | human_only | Never executes. |
 | `create_draft_version` | private_write | Stage a NEW, unapproved draft version of an answer in this workspace (method recorded as an agent draft). |
-| `discover_applications` | read | Search the cached public AQUA catalog (approved canonical programs) and list the applications in this workspace. |
+| `discover_applications` | read | Search the cached public AQUA catalog (approved programs) and list the applications in this workspace. |
 | `doctor` | read | Self-check: Node and companion version, the public catalog configuration (source, origin, key role: only anon/publishable is accepted), connectivity and a canonical-only catalog read (counts only), workspace and macOS… |
 | `export_packet` | human_only | Never executes. |
 | `get_application_details` | read | Full template of one application: exact question wording, parsed requirements (limits, required, time context, qualifiers), deadline and time zone, and where the data came from and how it was verified. |
@@ -103,7 +111,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 | `match_canonical_questions` | read | Match an application's questions (or given question texts) against canonical questions in the cached public catalog with the tiered matcher (exact, normalized, semantic, novel). |
 | `prepare_catalog_candidate` | private_write | Build a sanitized public catalog candidate (program, deadlines, public question wording only) from a staged application imported with a public source_url. |
 | `prepare_packet` | read | Readiness report for freezing an application packet: per question the selectable approved version, whether its approval is bound to the exact hash, length limits, required questions, and content integrity. |
-| `present_review_decisions` | read | Build the offline AQUA review file (HTML) for one application from workspace data and save it under exports/reviews/ (skipped in read-only mode). |
+| `present_review_decisions` | private_write | Build the offline AQUA review file (HTML, containing the user's answers in plain text) for one application and save it under exports/reviews/ (at most 25 files are kept; refused under --read-only). |
 | `read_review_status` | read | Derived review status of every question in an application (gap, suggested, needs evidence, under review, approved, ...) and the Direct / Adapt / Gap reuse recommendation against the rest of the answer bank. |
 | `record_observed_submission` | private_write | Store an observation that an application may have been submitted (for example a confirmation e-mail the user saved in inbox/), flagged requires_human_attestation. |
 | `refresh_catalog` | read | Fetch approved canonical programs, cycles and questions from the configured public AQUA catalog endpoint (read-only, public key, nothing from the workspace is sent). |
@@ -115,13 +123,13 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 | `verify_packet` | read | Verify an exported AQUA packet JSON placed in inbox/ (or packets/): canonical manifest, manifest hash, packet id, per-answer hashes, provenance receipts and the signature if present. |
 
 ## The fresh-agent journey
-1. **Install**: npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help (check the published sha256 first)
-2. **Set up a workspace**: init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`; the passphrase is typed by the user, never sent through the model
-3. **Load submitted history**: the user puts past submitted applications in the workspace inbox/; import_history stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history
+1. **Install**: npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)
+2. **Set up a workspace**: init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`, which creates <folder>/AQUA; then restart the MCP server with --workspace <folder>/AQUA. The passphrase is typed by the user, never sent through the model
+3. **Load submitted history**: the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: "history" } stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history
 4. **Ingest the application**: import_local_application (a file in inbox/) or get_application_details for a catalog program
 5. **Match and reuse**: match_canonical_questions, search_answer_bank, read_review_status (Direct / Adapt / Gap)
 6. **Draft**: create_draft_version stages unapproved drafts; request_evidence / attach_evidence
-7. **Human review and approval**: the user runs export-backup, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board
+7. **Human review and approval**: the user runs export-backup <file> --workspace <folder>/AQUA, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board
 8. **Return approvals to the agent**: the user exports a browser backup into inbox/; sync_from_vault_export imports it; read_review_status shows approved with the hash preserved
 9. **Packet**: prepare_packet (readiness), the user freezes/exports in the browser, verify_packet checks the export. Nothing is ever submitted by the agent.
 

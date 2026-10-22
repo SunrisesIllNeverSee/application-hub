@@ -14,6 +14,8 @@ import {
   privateWriteRefusal,
   LOCAL_FIRST_REFUSAL_MESSAGE,
 } from '../lib/local-first-guard.ts'
+import { clientLocalFirst } from '../lib/aqua-local-client/flag.ts'
+import { resolveLocalFirstBuildFlags } from '../lib/local-first-build.mjs'
 
 const REFUSAL = 'local-first mode: private content stays on device'
 
@@ -199,7 +201,76 @@ test('next.config fails the build on local-first flag mismatch (wiring)', () => 
   const src = readFileSync(new URL('../next.config.mjs', import.meta.url), 'utf8')
   assert.ok(/AQUA_LOCAL_FIRST/.test(src) && /NEXT_PUBLIC_AQUA_LOCAL_FIRST/.test(src))
   assert.ok(/throw|Error/.test(src), 'mismatch must throw, not warn')
-  assert.match(src, /process\.env\.VERCEL_ENV === 'production'/, 'production build requires the client twin (fail closed)')
+  assert.match(src, /resolveLocalFirstBuildFlags\(process\.env\)/, 'next.config runs the shared build resolver')
+  const lib = readFileSync(new URL('../lib/local-first-build.mjs', import.meta.url), 'utf8')
+  assert.match(lib, /VERCEL_ENV \?\? ''\)\.trim\(\) === 'production'/, 'Vercel production requires both flags explicitly')
+})
+
+// ─── M09 review M4: client gate fails closed under the same conditions ──────
+
+test('M4: client flag fails closed in production builds; explicit values win; dev keeps legacy off', () => {
+  for (const env of ['production', ' production ']) {
+    for (const v of [undefined, '', 'yes', 'on', ' ']) assert.equal(clientLocalFirst(v, env), true, `unset/junk ${JSON.stringify(v)} in ${env}`)
+    for (const v of ['0', 'false', ' FALSE ']) assert.equal(clientLocalFirst(v, env), false, `explicit off ${v}`)
+    for (const v of ['1', 'true', 'TRUE']) assert.equal(clientLocalFirst(v, env), true)
+  }
+  for (const env of [undefined, 'development', 'test']) {
+    assert.equal(clientLocalFirst(undefined, env), false, `unset in ${env}`)
+    assert.equal(clientLocalFirst('1', env), true)
+  }
+})
+
+test('M4: server guard and client gate agree on every flag/environment combination', () => {
+  const values = [undefined, '', '1', 'true', '0', 'false', 'junk']
+  const envs = [
+    { NODE_ENV: 'production' }, { NODE_ENV: 'production', VERCEL_ENV: 'preview' },
+    { NODE_ENV: 'development' }, {},
+  ]
+  for (const e of envs) for (const v of values) {
+    // a matched pair (same value on both sides) must resolve identically
+    assert.equal(
+      isLocalFirst({ ...e, AQUA_LOCAL_FIRST: v }),
+      clientLocalFirst(v, e.NODE_ENV),
+      `pair ${JSON.stringify(v)} in ${JSON.stringify(e)}`,
+    )
+  }
+})
+
+test('M4: build resolver — previews/self-hosted default both ON, mismatches and unset Vercel production refused', () => {
+  const prod = { NODE_ENV: 'production' }
+  // neither set, self-hosted / preview production build → both on, client default made explicit
+  for (const e of [prod, { ...prod, VERCEL_ENV: 'preview' }, { VERCEL_ENV: 'preview' }]) {
+    const r = resolveLocalFirstBuildFlags(e)
+    assert.equal(r.serverOn, true); assert.equal(r.clientOn, true)
+    assert.deepEqual(r.defaults, { NEXT_PUBLIC_AQUA_LOCAL_FIRST: '1' })
+  }
+  // explicit matched pairs
+  assert.equal(resolveLocalFirstBuildFlags({ ...prod, AQUA_LOCAL_FIRST: '1', NEXT_PUBLIC_AQUA_LOCAL_FIRST: '1' }).clientOn, true)
+  assert.equal(resolveLocalFirstBuildFlags({ ...prod, AQUA_LOCAL_FIRST: '0', NEXT_PUBLIC_AQUA_LOCAL_FIRST: '0' }).clientOn, false)
+  assert.deepEqual(resolveLocalFirstBuildFlags({ ...prod, AQUA_LOCAL_FIRST: '1', NEXT_PUBLIC_AQUA_LOCAL_FIRST: '1' }).defaults, {})
+  // server explicitly off but client unset in a production build: effective mismatch
+  assert.throws(() => resolveLocalFirstBuildFlags({ ...prod, AQUA_LOCAL_FIRST: '0' }), /mismatch/)
+  assert.throws(() => resolveLocalFirstBuildFlags({ ...prod, NEXT_PUBLIC_AQUA_LOCAL_FIRST: 'false' }), /mismatch/)
+  assert.throws(() => resolveLocalFirstBuildFlags({ AQUA_LOCAL_FIRST: '1' }), /mismatch/)
+  // Vercel production: explicit configuration required
+  assert.throws(() => resolveLocalFirstBuildFlags({ ...prod, VERCEL_ENV: 'production' }), /ON by default in production/)
+  assert.equal(resolveLocalFirstBuildFlags({ ...prod, VERCEL_ENV: 'production', AQUA_LOCAL_FIRST: '0', NEXT_PUBLIC_AQUA_LOCAL_FIRST: '0' }).serverOn, false)
+  // dev: legacy off, no defaults
+  const dev = resolveLocalFirstBuildFlags({ NODE_ENV: 'development' })
+  assert.equal(dev.serverOn, false); assert.equal(dev.clientOn, false); assert.deepEqual(dev.defaults, {})
+})
+
+test('M4: vault pages and client surfaces gate on the shared fail-closed flag', () => {
+  for (const rel of ['../app/(app)/aqua-local/page.tsx', '../app/(app)/history/page.tsx']) {
+    const src = readFileSync(new URL(rel, import.meta.url), 'utf8')
+    assert.match(src, /from '@\/lib\/aqua-local-client\/flag'/, rel)
+    assert.match(src, /if \(!LOCAL_FIRST\) notFound\(\)/, rel)
+  }
+  const editor = readFileSync(new URL('../components/AnswerEditor.tsx', import.meta.url), 'utf8')
+  assert.match(editor, /import \{ LOCAL_FIRST \} from '@\/lib\/aqua-local-client\/flag'/)
+  const flag = readFileSync(new URL('../lib/aqua-local-client/flag.ts', import.meta.url), 'utf8')
+  assert.match(flag, /= process\.env\.NEXT_PUBLIC_AQUA_LOCAL_FIRST/, 'literal read so Next inlines it')
+  assert.match(flag, /= process\.env\.NODE_ENV/)
 })
 
 test('health route reports the effective (fail-closed) flag', () => {

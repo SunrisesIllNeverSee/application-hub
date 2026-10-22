@@ -150,7 +150,7 @@ test('llms.txt references developer portal, OpenAPI, and MCP manifest', async ()
   const g = JSON.parse(await read('lib/agent-guidance.generated.json'))
   assert.ok(llms.includes(`${g.total} tools`))
   assert.ok(llms.includes(g.install.help))
-  assert.match(llms, /npx -y aqua-mcp-server/) // named honestly as "once 2.0.0 is published"
+  assert.match(llms, /npx -y aqua-mcp-server/) // the primary install (published to npm)
   assert.match(llms, /npmjs\.com/)
 })
 

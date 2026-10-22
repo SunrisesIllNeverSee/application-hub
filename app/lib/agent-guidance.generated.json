@@ -3,21 +3,21 @@
   "tool_source": "application-hub-mcp-server/TOOLS.json",
   "companion": {
     "package": "aqua-companion",
-    "version": "0.2.0",
+    "version": "0.2.3",
     "tarball": {
-      "file": "aqua-companion-0.2.0.tgz",
-      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz",
-      "sha256": "68b16804806e3405afa6182ae2bd450d3018bfbd07e898b9e03a59f212c2e217",
-      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz.sha256",
+      "file": "aqua-companion-0.2.3.tgz",
+      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz",
+      "sha256": "a36c492d6bb57bec1d6ff9ef164cd4e46ea1a7128ae11d95aa9074fbe6b62280",
+      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz.sha256",
       "latest_url": "https://aquaidp.xyz/companion/latest.json",
       "packed": true
     },
-    "npm_status": "not yet on npm: publishing aqua-companion is owner gate GB2. Until then install from the tarball above."
+    "npm_status": "aqua-companion is not published on npm by itself (owner gate GB2). aqua-mcp-server on npm includes it, so use that; the tarball above is the fallback."
   },
   "mcp_server": {
     "package": "aqua-mcp-server",
-    "version": "2.0.0",
-    "status": "aqua-mcp-server 2.0.0 is built on the companion and is not yet published. Once OWNER publishes it (gate GB1), `npx -y aqua-mcp-server` runs it; until then use the companion tarball. Versions below 2.0 are legacy and must not be used."
+    "version": "2.0.2",
+    "status": "aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used."
   },
   "hosted_mcp": {
     "url": "https://aquaidp.xyz/mcp",
@@ -35,25 +35,30 @@
       "tables",
       "notes"
     ],
-    "rule": "publishable/anon key only; clients refuse any other role and fetch it only from https://aquaidp.xyz (or a local override file)"
+    "rule": "use the publishable/anon key only; they refuse any other role and fetch the configuration only from https://aquaidp.xyz (or a local override file)",
+    "auto_refresh": "discover_applications, get_application_details and match_canonical_questions refresh an empty or stale cache (older than 24 hours; AQUA_CATALOG_MAX_AGE_HOURS changes it, 0 turns it off) with the same public read-only request as refresh_catalog. Offline or unconfigured, they answer from the cache and return catalog_empty: run refresh_catalog when there is nothing cached"
   },
   "install": {
-    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help",
-    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz init --path <folder>",
-    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz doctor",
-    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --keychain",
-    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --workspace <folder>/AQUA --keychain",
-    "npm_later": "npx -y aqua-mcp-server   # once aqua-mcp-server 2.0.0 is published (GB1)"
+    "mcp_help": "npx -y aqua-mcp-server --help",
+    "mcp_claude_code": "claude mcp add aqua -- npx -y aqua-mcp-server --keychain",
+    "mcp_claude_code_with_workspace": "claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keychain",
+    "mcp_companion_cli": "npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA",
+    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help",
+    "local_copy": "npx --yes --package <path>/aqua-companion-0.2.3.tgz aqua-companion --help",
+    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz init --path <folder>",
+    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz doctor",
+    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --keychain",
+    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --workspace <folder>/AQUA --keychain"
   },
   "tiers": [
     {
       "tier": "read",
-      "count": 23,
+      "count": 22,
       "meaning": "Always allowed. Only reads the workspace or the public catalog cache."
     },
     {
       "tier": "private_write",
-      "count": 8,
+      "count": 9,
       "meaning": "Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything."
     },
     {
@@ -114,7 +119,7 @@
       "name": "discover_applications",
       "tier": "read",
       "title": "discover_applications",
-      "summary": "Search the cached public AQUA catalog (approved canonical programs) and list the applications in this workspace.",
+      "summary": "Search the cached public AQUA catalog (approved programs) and list the applications in this workspace.",
       "modes": [
         "stdio-workspace"
       ]
@@ -344,9 +349,9 @@
     },
     {
       "name": "present_review_decisions",
-      "tier": "read",
+      "tier": "private_write",
       "title": "present_review_decisions",
-      "summary": "Build the offline AQUA review file (HTML) for one application from workspace data and save it under exports/reviews/ (skipped in read-only mode).",
+      "summary": "Build the offline AQUA review file (HTML, containing the user's answers in plain text) for one application and save it under exports/reviews/ (at most 25 files are kept; refused under --read-only).",
       "modes": [
         "stdio-workspace"
       ]
@@ -462,15 +467,15 @@
   "journey": [
     {
       "step": "Install",
-      "how": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help (check the published sha256 first)"
+      "how": "npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)"
     },
     {
       "step": "Set up a workspace",
-      "how": "init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`; the passphrase is typed by the user, never sent through the model"
+      "how": "init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`, which creates <folder>/AQUA; then restart the MCP server with --workspace <folder>/AQUA. The passphrase is typed by the user, never sent through the model"
     },
     {
       "step": "Load submitted history",
-      "how": "the user puts past submitted applications in the workspace inbox/; import_history stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history"
+      "how": "the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: \"history\" } stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history"
     },
     {
       "step": "Ingest the application",
@@ -486,7 +491,7 @@
     },
     {
       "step": "Human review and approval",
-      "how": "the user runs export-backup, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board"
+      "how": "the user runs export-backup <file> --workspace <folder>/AQUA, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board"
     },
     {
       "step": "Return approvals to the agent",

@@ -102,20 +102,21 @@ export default function McpPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Install</h2>
           <p className={p}>
-            Node.js 22 or newer. aqua-mcp-server {TOOLS.package_version} is not on npm yet. Until it
-            is, the same companion tool set runs from the AQUA companion package published on this
-            site. Check its sha256 at <a href={(AGENT_GUIDANCE.companion as { tarball: { sha256_url: string } }).tarball.sha256_url} className={a}>the published checksum</a> first.
+            Node.js 22 or newer. aqua-mcp-server {TOOLS.package_version} is on npm: <code className="text-xs">npx -y aqua-mcp-server</code> is the
+            primary install, and it includes the companion. The same companion tool set is also served as a tarball from
+            this site, as a fallback. Check its sha256 at <a href={(AGENT_GUIDANCE.companion as { tarball: { sha256_url: string } }).tarball.sha256_url} className={a}>the published checksum</a> first.
           </p>
-          <pre className={pre}><code>{`# today: the AQUA companion from aquaidp.xyz
-${INSTALL.help}
-${INSTALL.init}
-${INSTALL.claude_code_with_workspace}
+          <pre className={pre}><code>{`# primary: aqua-mcp-server ${TOOLS.package_version} from npm
+${INSTALL.mcp_help}
+${INSTALL.mcp_claude_code_with_workspace}
 
 # hosted, read-only public catalog (works now)
 claude mcp add --transport http aqua-public https://aquaidp.xyz/mcp
 
-# once aqua-mcp-server ${TOOLS.package_version} is on npm
-claude mcp add aqua -- npx -y aqua-mcp-server --workspace ~/AQUA --keychain`}</code></pre>
+# fallback: the AQUA companion tarball from aquaidp.xyz
+${INSTALL.help}
+${INSTALL.init}
+${INSTALL.claude_code_with_workspace}`}</code></pre>
         </section>
 
         <section className="space-y-4">

@@ -21,7 +21,7 @@ Smart Matcher compares the material already present in an answer bank with the q
 
 ## Agent access
 
-Agents work through the local AQUA companion, a command-line tool and stdio MCP server the user runs on their own machine (${G.total} tools: ${TIER_SUMMARY}). Private answers stay in the user's browser vault and encrypted companion workspace; approvals happen only in the browser review. Install: \`${G.install.help}\`. Full guide: https://aquaidp.xyz/agents (Markdown: https://aquaidp.xyz/agents.md) and https://aquaidp.xyz/llms.txt. The hosted read-only endpoint ${G.hosted_mcp.url} is ${G.hosted_mcp.status}. Web users start at https://aquaidp.xyz/login.
+Agents work through the local AQUA companion, a command-line tool and stdio MCP server the user runs on their own machine (${G.total} tools: ${TIER_SUMMARY}). Private answers stay in the user's browser vault and encrypted companion workspace; approvals happen only in the browser review. Install: \`${G.install.mcp_help}\` (fallback: the companion tarball, \`${G.install.help}\`). Full guide: https://aquaidp.xyz/agents (Markdown: https://aquaidp.xyz/agents.md) and https://aquaidp.xyz/llms.txt. The hosted read-only endpoint ${G.hosted_mcp.url} is ${G.hosted_mcp.status}. Web users start at https://aquaidp.xyz/login.
 
 ## Trust and identity
 
@@ -188,8 +188,8 @@ AQUA uses Supabase Auth. Two credential types are accepted:
 
 Agents use the local AQUA companion: a zero-dependency command-line tool and stdio MCP server that works on one consented, encrypted workspace on the user's machine plus the public catalog. It holds no account token and no database key, and it cannot approve, sign, freeze, export or submit anything. It registers ${G.total} tools (${TIER_SUMMARY}); tiers are enforced in code.
 
-- Install today: \`${G.install.help}\` (sha256 at ${G.companion.tarball.sha256_url}).
-- Connect Claude Code: \`${G.install.claude_code}\`
+- Install: \`${G.install.mcp_help}\` (aqua-mcp-server from npm, primary). Fallback: the companion tarball, \`${G.install.help}\` (sha256 at ${G.companion.tarball.sha256_url}).
+- Connect Claude Code: \`${G.install.mcp_claude_code}\` (tarball fallback: \`${G.install.claude_code}\`)
 - npm: ${G.companion.npm_status}
 - aqua-mcp-server: ${G.mcp_server.status}
 - Hosted read-only MCP: ${G.hosted_mcp.url} (${G.hosted_mcp.status}).
