@@ -35,6 +35,9 @@ jobs:
         run: |
           npm ci
           npm test
+      - name: Upgrade npm for trusted publishing
+        # Node's bundled npm is 10.x — OIDC trusted publishing requires >= 11.5.1.
+        run: npm install -g npm@11.5.1
       - name: Publish to npm
         # Trusted-publisher OIDC: no NPM_TOKEN required when the
         # package's trusted publisher points at this workflow.
