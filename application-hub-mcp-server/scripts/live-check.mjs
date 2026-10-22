@@ -5,7 +5,7 @@
 // default https://aquaidp.xyz/.well-known/aqua-catalog.json); any non-public
 // key is refused before a request is made.
 //   node scripts/live-check.mjs [--json]
-import { CANONICAL_PROGRAM_SLUGS } from 'aqua-companion/vendor/lib/canonical-catalog.mjs'
+import { CANONICAL_PROGRAM_SLUGS } from '../src/vendor/companion/vendor/lib/canonical-catalog.mjs'
 import { resolveCatalogConfig } from '../src/node/config.mjs'
 import { CatalogClient, CatalogError, inList } from '../src/catalog/rest.mjs'
 import { CatalogData } from '../src/catalog/data.mjs'

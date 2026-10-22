@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { render, MANIFEST_PATH } from '../scripts/gen-tools.mjs'
 import { drift } from '../scripts/vendor-hosted.mjs'
 import { INIT, req, runServer, scratch } from './helpers.mjs'
-import { main as companionMain } from 'aqua-companion/src/cli.mjs'
+import { main as companionMain } from '../src/vendor/companion/src/cli.mjs'
 import { catalogBackend } from '../src/catalog/backend.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')

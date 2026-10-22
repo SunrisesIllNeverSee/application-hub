@@ -13,8 +13,8 @@
 // an exit code and never calls process.exit, so tests drive it in-process.
 
 import readline from 'node:readline'
-import { main as companionMain } from 'aqua-companion/src/cli.mjs'
-import { CANONICAL_PROGRAM_SLUGS } from 'aqua-companion/vendor/lib/canonical-catalog.mjs'
+import { main as companionMain } from '../vendor/companion/src/cli.mjs'
+import { CANONICAL_PROGRAM_SLUGS } from '../vendor/companion/vendor/lib/canonical-catalog.mjs'
 import { KeyRefusal } from '../catalog/key.mjs'
 import { CatalogClient } from '../catalog/rest.mjs'
 import { CatalogData } from '../catalog/data.mjs'
