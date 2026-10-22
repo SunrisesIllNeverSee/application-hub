@@ -1,0 +1,96 @@
+
+==================== cluster ====================
+NOTICE:  database "m09test" does not exist, skipping
+PostgreSQL 17.11 (Homebrew) on aarch64-apple-darwin27.0.0, compiled by Apple clang version 21.0.0 (clang-2100.3.34.2), 64-bit
+
+==================== full chain 001 -> 059, GRANTS_MODE=revoked: m09test ====================
+default privileges set before 001: revoked
+  008_intelligence_layer_v2.sql: known verbatim failure (4 statement error(s); restated by 050)
+  019_fundingcake_seed.sql: known verbatim failure (1 statement error(s); restated by 050)
+  028_solofounders_seed.sql: known verbatim failure (1 statement error(s); restated by 050)
+  m09test (revoked defaults): 59 migrations applied
+
+==================== idempotency: re-apply 058 and 059 ====================
+re-apply: grants unchanged (123 relation/column ACL lines)
+
+==================== fresh rebuild is independent of default privileges ====================
+NOTICE:  database "m09ref_default" does not exist, skipping
+  008_intelligence_layer_v2.sql: known verbatim failure (4 statement error(s); restated by 050)
+  019_fundingcake_seed.sql: known verbatim failure (1 statement error(s); restated by 050)
+  028_solofounders_seed.sql: known verbatim failure (1 statement error(s); restated by 050)
+  m09ref_default (default defaults): 59 migrations applied
+EQUAL: revoked rebuild == default rebuild (123 lines)
+NOTICE:  database "m09ref_strict" does not exist, skipping
+  008_intelligence_layer_v2.sql: known verbatim failure (4 statement error(s); restated by 050)
+  019_fundingcake_seed.sql: known verbatim failure (1 statement error(s); restated by 050)
+  028_solofounders_seed.sql: known verbatim failure (1 statement error(s); restated by 050)
+  m09ref_strict (strict defaults): 59 migrations applied
+EQUAL: revoked rebuild == strict rebuild (123 lines)
+
+==================== fresh rebuild equals production (snapshot 2026-10-22) ====================
+EQUAL: rebuild == production for 66 in-repo relations; out-of-repo (not rebuilt): 9
+objects added by 058 (not in production yet): 13 relations, 44 column ACLs
+
+==================== seed + harness (p0 02/03) ====================
+canonical programs=5 relationships=103 serials=216
+
+==================== existing p0 suites, phase post, full chain ====================
+  10_canonical_boundary_tests.sql: PASS lines 59
+  20_team_invite_tests.sql: PASS lines 83
+p0: all pass except 3 known full-chain (fixture-schema) divergences: P-3e:error:23505 P-4e:rows=1 P-4f:error:42501
+
+==================== 058 catalog provenance + promotion suite ====================
+phase=post total=131 pass=131 fail=0
+
+==================== 50 grants suite (role probes vs class expectations) ====================
+KNOWN-EXCESSIVE | class a | anon | 17 relation(s) | privs adw | aggregate_versions,archived_questions,beta_settings,canonical_commitments,funders,lineage_events,opportunities,program_cycles,program_dna,program_listings,program_next_cycle,program_questions,program_stats,programs,seeding_entities,starter_packages,subscription_plans
+KNOWN-EXCESSIVE | class a | authenticated | 17 relation(s) | privs adw | aggregate_versions,archived_questions,beta_settings,canonical_commitments,funders,lineage_events,opportunities,program_cycles,program_dna,program_listings,program_next_cycle,program_questions,program_stats,programs,seeding_entities,starter_packages,subscription_plans
+KNOWN-EXCESSIVE | class a | service_role | 2 relation(s) | privs adw | opportunities,program_next_cycle
+KNOWN-EXCESSIVE | class b | anon | 30 relation(s) | privs Uadrw | acceptance_reports,ai_usage,canonical_user_credits,community_messages,contribution_rewards,credit_events,deadline_alerts,import_queue,intake_application_layers,intake_applications,intake_applications_ref_seq_seq,intake_entities,intake_entities_ref_seq_seq,intake_events,intake_gate_reviews,intake_questions,intake_questions_ref_seq_seq,intake_submissions_ref_seq_seq,reward_credit_receipts,user_achievements,user_applications,user_contribution_summary,user_contributions,user_credit_balance,user_integrations,user_profiles,user_program_fit,user_question_unlocks,user_starter_claims,user_subscriptions
+KNOWN-EXCESSIVE | class b | authenticated | 28 relation(s) | privs adrw | acceptance_reports,ai_usage,canonical_user_credits,community_messages,contribution_rewards,credit_events,deadline_alerts,import_queue,intake_application_layers,intake_applications,intake_applications_ref_seq_seq,intake_entities,intake_entities_ref_seq_seq,intake_events,intake_gate_reviews,intake_questions,intake_questions_ref_seq_seq,intake_submissions_ref_seq_seq,reward_credit_receipts,user_achievements,user_contribution_summary,user_contributions,user_credit_balance,user_profiles,user_program_fit,user_question_unlocks,user_starter_claims,user_subscriptions
+KNOWN-EXCESSIVE | class b | service_role | 2 relation(s) | privs adw | user_contribution_summary,user_credit_balance
+KNOWN-EXCESSIVE | class c | anon | 7 relation(s) | privs adrw | _deploy_flags,answer_variants,application_packages,connected_integrations,program_signals,recruiter_alerts,stripe_events
+KNOWN-EXCESSIVE | class c | authenticated | 7 relation(s) | privs adrw | _deploy_flags,answer_variants,application_packages,connected_integrations,program_signals,recruiter_alerts,stripe_events
+KNOWN-EXCESSIVE | class d | anon | 8 relation(s) | privs adrw | ai_draft_runs,answer_reviews,answer_stress_tests,app_import_sessions,application_answers,intake_submissions,profile_answer_history,profile_answers
+KNOWN-EXCESSIVE | class d | authenticated | 8 relation(s) | privs adw | ai_draft_runs,answer_reviews,answer_stress_tests,app_import_sessions,application_answers,intake_submissions,profile_answer_history,profile_answers
+KNOWN-EXCESSIVE | class e | anon | 4 relation(s) | privs r | team_answers,team_invites,team_members,teams
+grants: probe fallback to catalog | team_answers | 6 probe(s) | 42P17 infinite recursion detected in policy for relation "team_members"
+grants: probe fallback to catalog | team_invites | 8 probe(s) | 42P17 infinite recursion detected in policy for relation "team_members"
+grants: probe fallback to catalog | team_members | 8 probe(s) | 42P17 infinite recursion detected in policy for relation "team_members"
+grants: probe fallback to catalog | teams | 2 probe(s) | 42P17 infinite recursion detected in policy for relation "teams"
+KNOWN-EXCESSIVE-NONCRUD | anon/authenticated hold TRUNCATE/REFERENCES/TRIGGER/MAINTAIN on 62 relation(s)
+grants: probes=936 pass=936 fail=0 | excessive=395 missing=0
+phase=post total=936 pass=936 fail=0
+
+==================== rollback: the 058 documented ROLLBACK block, then re-apply ====================
+NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to function p0m.step(uuid,catalog_candidate_state,uuid,text,text,jsonb)
+drop cascades to function p0m.try_as(text,text)
+drop cascades to function p0m.to_approved(uuid)
+psql:$M09_PGROOT/rollback058.sql:1: WARNING:  there is already a transaction in progress
+psql:$M09_PGROOT/rollback058.sql:9: NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to constraint program_questions_source_id_fkey on table program_questions
+drop cascades to constraint program_questions_template_revision_id_fkey on table program_questions
+drop cascades to constraint program_questions_superseded_by_revision_id_fkey on table program_questions
+psql:$M09_PGROOT/rollback058.sql:14: NOTICE:  drop cascades to constraint programs_entity_id_fkey on table programs
+WARNING:  there is no transaction in progress
+after rollback: catalog_relations/new_columns/legacy_occurrences = 0/0/103
+after re-apply: backfilled serials = 216
+ROLLBACK PASS (058 grants identical after re-apply)
+
+==================== summary (GRANTS_MODE=revoked) ====================
+      suite      | total | passed | known_full_chain | failed 
+-----------------+-------+--------+------------------+--------
+ 058 suite       |   131 |    131 |                0 |      0
+ 50 grants suite |   936 |    936 |                0 |      0
+ p0 suites       |    86 |     83 |                3 |      0
+(3 rows)
+
+         finding         | count 
+-------------------------+-------
+ KNOWN-EXCESSIVE         |   395
+ KNOWN-EXCESSIVE-NONCRUD |   476
+(2 rows)
+
+ALL PASS (GRANTS_MODE=revoked)
+[runner] local cluster stopped

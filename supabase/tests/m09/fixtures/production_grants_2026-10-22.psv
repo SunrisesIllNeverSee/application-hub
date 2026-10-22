@@ -1,0 +1,83 @@
+# Production Data API grants snapshot, public schema (project AppFeeder).
+# Captured 2026-10-22 with read-only catalog queries (pg_class.relacl via
+# aclexplode); no column-level ACLs exist in production. Format:
+#   relname|relkind|anon=<p> authenticated=<p> PUBLIC=<p> service_role=<p>
+# privilege letters: a=INSERT r=SELECT w=UPDATE d=DELETE D=TRUNCATE
+# x=REFERENCES t=TRIGGER m=MAINTAIN U=USAGE ('-' = none).
+# OUT_OF_REPO marks objects created outside supabase/migrations (other
+# apps sharing the project); a fresh rebuild does not create them.
+_deploy_flags|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+acceptance_reports|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+aggregate_versions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+ai_draft_runs|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+ai_usage|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+answer_reviews|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+answer_stress_tests|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+answer_variants|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+app_import_sessions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+application_answers|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+application_packages|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+archived_questions|r|anon=arwdxm authenticated=arwdxm PUBLIC=- service_role=arwdDxtm
+beta_settings|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+canonical_commitments|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+canonical_user_credits|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+community_messages|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+connected_integrations|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+contribution_rewards|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+credit_events|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+deadline_alerts|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+exchange_agents|r|anon=- authenticated=- PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+exchange_companies|r|anon=- authenticated=- PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+exchange_events|r|anon=- authenticated=- PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+exchange_records|r|anon=- authenticated=- PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+exchange_settlements|r|anon=- authenticated=- PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+funders|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+import_queue|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_application_layers|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_applications_ref_seq_seq|S|anon=rwU authenticated=rwU PUBLIC=- service_role=rwU
+intake_applications|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_entities_ref_seq_seq|S|anon=rwU authenticated=rwU PUBLIC=- service_role=rwU
+intake_entities|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_events|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_gate_reviews|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_questions_ref_seq_seq|S|anon=rwU authenticated=rwU PUBLIC=- service_role=rwU
+intake_questions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+intake_submissions_ref_seq_seq|S|anon=rwU authenticated=rwU PUBLIC=- service_role=rwU
+intake_submissions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+lineage_events|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+opportunities|v|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+profile_answer_history|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+profile_answers|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+program_cycles|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+program_dna|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+program_listings|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+program_next_cycle|v|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+program_questions|r|anon=arwdxm authenticated=arwdxm PUBLIC=- service_role=arwdDxtm
+program_signals|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+program_stats|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+programs|r|anon=arwdxm authenticated=arwdxm PUBLIC=- service_role=arwdDxtm
+recruiter_alerts|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+reward_credit_receipts|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+seeding_entities|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+sigrank_operators_id_seq|S|anon=rwU authenticated=rwU PUBLIC=- service_role=rwU|OUT_OF_REPO
+sigrank_operators|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+sigrank_sessions_id_seq|S|anon=rwU authenticated=rwU PUBLIC=- service_role=rwU|OUT_OF_REPO
+sigrank_sessions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm|OUT_OF_REPO
+starter_packages|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+stripe_events|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+subscription_plans|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+team_answers|r|anon=rxtm authenticated=rxtm PUBLIC=- service_role=arwdDxtm
+team_invites|r|anon=rxtm authenticated=rxtm PUBLIC=- service_role=arwdDxtm
+team_members|r|anon=rxtm authenticated=rxtm PUBLIC=- service_role=arwdDxtm
+teams|r|anon=rxtm authenticated=rxtm PUBLIC=- service_role=arwdDxtm
+user_achievements|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_applications|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_contribution_summary|v|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_contributions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_credit_balance|v|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_integrations|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_profiles|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_program_fit|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_question_unlocks|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_starter_claims|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm
+user_subscriptions|r|anon=arwdDxtm authenticated=arwdDxtm PUBLIC=- service_role=arwdDxtm

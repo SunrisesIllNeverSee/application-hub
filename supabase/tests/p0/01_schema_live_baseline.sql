@@ -52,7 +52,8 @@ CREATE TABLE programs (
   scrape_url text, last_scraped_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
-  deadline_at timestamptz, equity_pct double precision,
+  -- production (008): deadline_at is GENERATED ALWAYS AS (closes_at) STORED
+  deadline_at timestamptz GENERATED ALWAYS AS (closes_at) STORED, equity_pct double precision,
   cash_value_usd bigint, credit_value_usd integer,
   program_value_score double precision, network_score double precision,
   brand_score double precision, follow_on_rate_pct double precision,

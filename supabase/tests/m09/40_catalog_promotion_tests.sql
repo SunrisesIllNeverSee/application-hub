@@ -83,7 +83,7 @@ VALUES ('dddddddd-0000-0000-0000-000000000003', :'a2', 'cccccccc-0000-0000-0000-
     {"asked_as": "What problem are you solving, and why now? (250 words max)", "order_index": 1, "section": "Company",
      "required": true, "word_limit": 250, "response_type": "text_long", "time_context": "now",
      "mapping": {"canonical_question_id": "838aefff-6a28-4bef-81d9-e76bbece8d45", "tier": "semantic", "confidence": 0.82,
-                 "rationale": "same underlying ask; adds a why-now qualifier and a 250-word limit"}},
+                 "rationale": "same underlying ask; adds a why-now qualifier and a 250-word limit", "origin": "curator"}},
     {"asked_as": "Describe your team.", "order_index": 2, "section": "Team", "required": true, "response_type": "text_long"},
     {"asked_as": "Link to your deck", "order_index": 3, "section": "Materials", "required": false, "response_type": "url"}
   ],
@@ -411,7 +411,7 @@ SELECT 'dddddddd-0000-0000-0000-000000000004', '00000000-0000-0000-0000-00000000
                          'response_type','text_long',
                          'mapping', jsonb_build_object('canonical_question_id',
                             (SELECT q.archived_question_id FROM program_questions q WHERE q.program_id=p.id AND q.asked_as='Describe your team.'),
-                            'tier','curator','rationale','reworded in Fall 2027 form')),
+                            'tier','curator','origin','curator','rationale','reworded in Fall 2027 form')),
       jsonb_build_object('asked_as','What is your biggest risk?','order_index',3,'section','Risk','required',true,'response_type','text_long'))),
   p.id
 FROM programs p WHERE p.name='Test Accelerator Spring 2027'
@@ -615,10 +615,10 @@ SELECT p0.test('CP-H-3','RLS enabled on all 8 new tables; every policy on them i
 SELECT p0.test('CP-H-4','no new SECURITY DEFINER function; publish RPC executable by service_role only',
  'n/a','definer=0 publish: anon=false auth=false public=false svc=true invoker=true','postgres',NULL, $q$SELECT 'x'$q$,
  $q$SELECT 'definer='||(SELECT count(*) FROM pg_proc WHERE (proname LIKE 'catalog\_%' OR proname LIKE 'guard\_catalog%' OR proname IN ('guard_programs_entity','guard_program_questions_provenance')) AND prosecdef)
-      ||' publish: anon='||has_function_privilege('anon','public.catalog_publish_candidate(uuid,uuid)','EXECUTE')
-      ||' auth='||has_function_privilege('authenticated','public.catalog_publish_candidate(uuid,uuid)','EXECUTE')
-      ||' public='||has_function_privilege('public','public.catalog_publish_candidate(uuid,uuid)','EXECUTE')
-      ||' svc='||has_function_privilege('service_role','public.catalog_publish_candidate(uuid,uuid)','EXECUTE')
+      ||' publish: anon='||has_function_privilege('anon','public.catalog_publish_candidate(uuid,uuid,text)','EXECUTE')
+      ||' auth='||has_function_privilege('authenticated','public.catalog_publish_candidate(uuid,uuid,text)','EXECUTE')
+      ||' public='||has_function_privilege('public','public.catalog_publish_candidate(uuid,uuid,text)','EXECUTE')
+      ||' svc='||has_function_privilege('service_role','public.catalog_publish_candidate(uuid,uuid,text)','EXECUTE')
       ||' invoker='||(SELECT NOT prosecdef FROM pg_proc WHERE proname='catalog_publish_candidate')$q$,
  'scalar');
 
@@ -717,5 +717,180 @@ SELECT p0.test('CP-K-6','authenticated calling submit directly is refused',
  'n/a','error:42501','authenticated',:'a2',
  $q$SELECT catalog_submit_candidate('00000000-0000-0000-0000-0000000000a2', '{"url":"https://apply.example.test/k-6","capture_method":"public_paste"}', '{"program":{"name":"K-6"},"questions":[]}')::text$q$,
  $q$SELECT current_setting('p0.last')$q$, 'scalar');
+
+
+-- ============================================================
+-- CP-M: release review M5 (mapping origin) and M6 (source freshness)
+-- ============================================================
+CREATE OR REPLACE FUNCTION p0m.to_verified(p_c uuid) RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  PERFORM p0m.step(p_c, 'extracted', NULL, 'system');
+  PERFORM p0m.step(p_c, 'matched', '00000000-0000-0000-0000-0000000000c1', 'curator');
+  UPDATE catalog_candidates SET checks = '{"all_passed": true}' WHERE id = p_c;
+  PERFORM p0m.step(p_c, 'verified', '00000000-0000-0000-0000-0000000000c1', 'curator');
+END $$;
+-- a candidate with K3's payload, a distinct program name and question 0 mapping = p_map (NULL: none)
+CREATE OR REPLACE FUNCTION p0m.mk_cand(p_id uuid, p_src uuid, p_name text, p_map jsonb) RETURNS void LANGUAGE sql AS $$
+  INSERT INTO catalog_candidates (id, submitted_by, source_id, payload)
+  SELECT p_id, '00000000-0000-0000-0000-0000000000a2', p_src,
+         jsonb_set(CASE WHEN p_map IS NULL THEN payload #- '{questions,0,mapping}'
+                        ELSE jsonb_set(payload, '{questions,0,mapping}', p_map) END,
+                   '{program,name}', to_jsonb(p_name))
+    FROM catalog_candidates WHERE id = 'dddddddd-0000-0000-0000-000000000003'
+  ON CONFLICT (id) DO NOTHING
+$$;
+INSERT INTO catalog_sources (id, url, capture_method, snapshot_text, reuse, robots_disallow, verification_status) VALUES
+ ('cccccccc-0000-0000-0000-000000000003','https://stale.example.test/form','public_paste','stale form text','allowed',NULL,'stale'),
+ ('cccccccc-0000-0000-0000-000000000004','https://failed.example.test/form','public_paste','failed form text','allowed',NULL,'failed'),
+ ('cccccccc-0000-0000-0000-000000000005','https://noreuse.example.test/form','public_paste','no reuse form text','disallowed',NULL,'verified'),
+ ('cccccccc-0000-0000-0000-000000000006','https://robots.example.test/form','public_paste','robots form text','allowed',true,'verified'),
+ ('cccccccc-0000-0000-0000-000000000007','https://fresh.example.test/form','public_paste','fresh form text','allowed',false,'verified')
+ON CONFLICT (id) DO NOTHING;
+\set cq '838aefff-6a28-4bef-81d9-e76bbece8d45'
+-- approve-path candidates (verified)
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000001','cccccccc-0000-0000-0000-000000000003','M6 stale approve', NULL);
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000002','cccccccc-0000-0000-0000-000000000004','M6 failed approve', NULL);
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000003','cccccccc-0000-0000-0000-000000000005','M6 noreuse approve', NULL);
+SELECT p0m.to_verified(id) FROM catalog_candidates WHERE id IN ('eeeeeeee-0000-0000-0000-000000000001','eeeeeeee-0000-0000-0000-000000000002','eeeeeeee-0000-0000-0000-000000000003') AND state='candidate';
+-- publish-path candidates (approved)
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000004','cccccccc-0000-0000-0000-000000000003','M6 stale override on approval', NULL);
+SELECT p0m.to_verified('eeeeeeee-0000-0000-0000-000000000004') WHERE (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000004')='candidate';
+SELECT p0m.step('eeeeeeee-0000-0000-0000-000000000004','approved','00000000-0000-0000-0000-0000000000c1','curator',
+                'page is unchanged, checked by hand', '{"source_override": true}')
+ WHERE (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000004')='verified';
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000005','cccccccc-0000-0000-0000-000000000003','M6 stale no override', NULL);
+SELECT p0m.to_approved('eeeeeeee-0000-0000-0000-000000000005') WHERE (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000005')='candidate';
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000006','cccccccc-0000-0000-0000-000000000006','M6 robots no override', NULL);
+SELECT p0m.to_approved('eeeeeeee-0000-0000-0000-000000000006') WHERE (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000006')='candidate';
+-- mapping-origin candidates (approved, fresh source)
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000007','cccccccc-0000-0000-0000-000000000007','M5 no origin',
+  jsonb_build_object('canonical_question_id', :'cq', 'tier', 'exact'));
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000008','cccccccc-0000-0000-0000-000000000007','M5 auto match',
+  jsonb_build_object('canonical_question_id', :'cq', 'tier', 'exact', 'origin', 'auto_match'));
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-000000000009','cccccccc-0000-0000-0000-000000000007','M5 auto semantic',
+  jsonb_build_object('canonical_question_id', :'cq', 'tier', 'semantic', 'origin', 'auto_match'));
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-00000000000a','cccccccc-0000-0000-0000-000000000007','M5 curator pick',
+  jsonb_build_object('canonical_question_id', :'cq', 'tier', 'curator', 'origin', 'curator'));
+SELECT p0m.to_approved(id) FROM catalog_candidates WHERE id IN ('eeeeeeee-0000-0000-0000-000000000007','eeeeeeee-0000-0000-0000-000000000008','eeeeeeee-0000-0000-0000-000000000009','eeeeeeee-0000-0000-0000-00000000000a') AND state='candidate';
+-- a candidate at 'extracted' for the transition patch tests
+SELECT p0m.mk_cand('eeeeeeee-0000-0000-0000-00000000000b','cccccccc-0000-0000-0000-000000000007','M5 transition', NULL);
+SELECT p0m.step('eeeeeeee-0000-0000-0000-00000000000b','extracted',NULL,'system') WHERE (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-00000000000b')='candidate';
+
+-- ---- M5: mapping provenance ----
+SELECT p0.test('CP-M-1','submit strips a submitter mapping (even a forged origin) and keeps it only as suggested_mapping',
+ 'n/a','mapping=false origin_kept=false suggested=submitter_suggested tier=exact','service_role',NULL,
+ $q$SELECT catalog_submit_candidate(
+      p_submitted_by => '00000000-0000-0000-0000-0000000000a2',
+      p_source => '{"url":"https://apply.example.test/m-1","capture_method":"public_paste"}',
+      p_payload => '{"program":{"name":"M-1","organization":"Org","kind":"grant"},"questions":[{"asked_as":"Q one?","order_index":1,"mapping":{"canonical_question_id":"838aefff-6a28-4bef-81d9-e76bbece8d45","tier":"exact","origin":"auto_match"}}]}')->>'id'$q$,
+ $q$SELECT 'mapping='||(q ? 'mapping')::text||' origin_kept='||(q::text LIKE '%auto_match%')::text
+         ||' suggested='||(q->'suggested_mapping'->>'decision')||' tier='||(q->'suggested_mapping'->>'tier')
+      FROM catalog_candidates c, jsonb_array_elements(c.payload->'questions') q WHERE c.id=current_setting('p0.last')::uuid$q$,
+ 'scalar');
+SELECT p0.test('CP-M-2','transition drops a mapping without a recorded origin, keeps auto_match, and stores a curator override as origin curator',
+ 'n/a','state=matched m0=false m1=auto_match m2=curator','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-00000000000b', to_state => 'matched', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator',
+      payload_patch => jsonb_build_object('questions', jsonb_build_array(
+        jsonb_build_object('asked_as','Q0?','order_index',1,'mapping', jsonb_build_object('canonical_question_id','838aefff-6a28-4bef-81d9-e76bbece8d45','tier','exact')),
+        jsonb_build_object('asked_as','Q1?','order_index',2,'mapping', jsonb_build_object('canonical_question_id','00000000-0000-4000-8000-000000000001','tier','exact','origin','auto_match')),
+        jsonb_build_object('asked_as','Q2?','order_index',3))),
+      mappings => '[{"index": 2, "canonical_question_id": "838aefff-6a28-4bef-81d9-e76bbece8d45", "tier": "semantic"}]')::text$q$,
+ $q$SELECT 'state='||c.state||' m0='||(c.payload->'questions'->0 ? 'mapping')::text||' m1='||coalesce(c.payload->'questions'->1->'mapping'->>'origin','-')||' m2='||(c.payload->'questions'->2->'mapping'->>'origin') FROM catalog_candidates c WHERE c.id='eeeeeeee-0000-0000-0000-00000000000b'$q$,
+ 'scalar');
+SELECT p0.test('CP-M-3','publish refuses a canonical mapping without a recorded origin',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000007','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-4','publish: an auto_match exact link is recorded auto_linked',
+ 'n/a','auto_linked','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000008','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT (SELECT decision FROM question_mapping_decisions WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000008' ORDER BY decided_at LIMIT 1)$q$,
+ 'scalar');
+SELECT p0.test('CP-M-5','publish: a curator choice is recorded confirmed (never auto_linked)',
+ 'n/a','confirmed','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-00000000000a','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT (SELECT decision FROM question_mapping_decisions WHERE candidate_id='eeeeeeee-0000-0000-0000-00000000000a' ORDER BY decided_at LIMIT 1)$q$,
+ 'scalar');
+SELECT p0.test('CP-M-6','publish refuses an auto_match link whose tier is not exact/normalized (semantic needs a curator)',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000009','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+
+-- ---- M6: source freshness ----
+SELECT p0.test('CP-M-7','approve refuses a stale source without an override',
+ 'n/a','error:23514 state=verified','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000001', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator')::text$q$,
+ $q$SELECT current_setting('p0.last')||' state='||(SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000001')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-8','approve refuses an override whose note is under 10 characters',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000001', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator', note => 'short', evidence => '{"source_override": true}')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-9','approve refuses an override flag without a note (failed source)',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000002', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator', evidence => '{"source_override": true}')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-10','approve refuses a reuse-disallowed source without an override',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000003', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-11','approve with a recorded override (flag + note) succeeds; the event keeps source_override and the problems',
+ 'n/a','approved override=true problems=1','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000001', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator', note => 'page is unchanged; checked by hand', evidence => '{"source_override": true}')::text::text$q$,
+ $q$SELECT (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000001')||' override='||(SELECT evidence->>'source_override' FROM catalog_candidate_events WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000001' AND to_state='approved' ORDER BY id DESC LIMIT 1)||' problems='||(SELECT jsonb_array_length(evidence->'source_problems') FROM catalog_candidate_events WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000001' AND to_state='approved' ORDER BY id DESC LIMIT 1)$q$,
+ 'scalar');
+SELECT p0.test('CP-M-12','re-opening a closed source (reuse disallowed -> allowed) needs a note of 10+ characters',
+ 'n/a','error:23514 reuse=disallowed','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000003', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator', source_review => '{"reuse": "allowed"}')::text$q$,
+ $q$SELECT current_setting('p0.last')||' reuse='||(SELECT reuse FROM catalog_sources WHERE id='cccccccc-0000-0000-0000-000000000005')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-13','re-opening with a note works: the source is re-reviewed and approve then needs no override',
+ 'n/a','approved reuse=allowed','service_role',NULL,
+ $q$SELECT catalog_transition_candidate(candidate_id => 'eeeeeeee-0000-0000-0000-000000000003', to_state => 'approved', actor_id => '00000000-0000-0000-0000-0000000000c1', actor_role => 'curator', note => 'terms page now allows reuse (checked)', source_review => '{"reuse": "allowed"}')::text::text$q$,
+ $q$SELECT (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000003')||' reuse='||(SELECT reuse FROM catalog_sources WHERE id='cccccccc-0000-0000-0000-000000000005')$q$,
+ 'scalar');
+
+-- ---- M6: source freshness on publish ----
+SELECT p0.test('CP-M-14','publish refuses a stale source with no override on record',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000005','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-15','publish refuses when robots disallow reuse and no override is on record',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000006','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-16','publish with a note under 10 characters is still refused',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000005','00000000-0000-0000-0000-0000000000c1','short')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar');
+SELECT p0.test('CP-M-17','publish with a curator note (10+) overrides a stale source; the publish event records it',
+ 'n/a','published override=publish_note','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000005','00000000-0000-0000-0000-0000000000c1','stale flag is a false alarm, verified manually')::text$q$,
+ $q$SELECT (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000005')||' override='||(SELECT evidence->>'source_override' FROM catalog_candidate_events WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000005' AND to_state='published' ORDER BY id DESC LIMIT 1)$q$,
+ 'scalar');
+SELECT p0.test('CP-M-18','publish uses the approval override on record when the source was not re-checked since',
+ 'n/a','published override=approval','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000004','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000004')||' override='||(SELECT evidence->>'source_override' FROM catalog_candidate_events WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000004' AND to_state='published' ORDER BY id DESC LIMIT 1)$q$,
+ 'scalar');
+SELECT p0.test('CP-M-19','publish refuses the approval override when the source was re-checked after it',
+ 'n/a','error:23514','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000004','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT current_setting('p0.last')$q$,
+ 'scalar', NULL,
+ $q$UPDATE catalog_sources SET last_checked_at = now() + interval '1 hour' WHERE id='cccccccc-0000-0000-0000-000000000003'$q$);
+SELECT p0.test('CP-M-20','a fresh source publishes with no override and records none',
+ 'n/a','published override=<null>','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('eeeeeeee-0000-0000-0000-000000000008','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000008')||' override='||coalesce((SELECT evidence->>'source_override' FROM catalog_candidate_events WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000008' AND to_state='published' ORDER BY id DESC LIMIT 1),'<null>')$q$,
+ 'scalar');
 
 SELECT p0.report();

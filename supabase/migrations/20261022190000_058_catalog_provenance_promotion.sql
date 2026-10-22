@@ -30,7 +30,7 @@
 --                               one-transaction review step (source review,
 --                               program match, payload/mappings, checks,
 --                               event); SECURITY INVOKER, service_role only
---   catalog_publish_candidate(candidate_id, curator_id)
+--   catalog_publish_candidate(candidate_id, curator_id, note)
 --                               SECURITY INVOKER, service_role only
 --   catalog_submit_candidate(p_submitted_by, p_source, p_payload, p_auto_extract)
 --                               source evidence + candidate inserted in ONE
@@ -42,6 +42,15 @@
 --     authenticated anywhere; table DML/TRUNCATE privileges revoked from
 --     anon/authenticated; 054-style guard triggers raise 42501 unless the
 --     current role is a canonical writer (postgres / service_role).
+--   * Grants are explicit for anon, authenticated AND service_role on every
+--     new table and sequence (section 12), so the result is identical
+--     under the pre- and post-2026-10-30 Supabase default privileges.
+--     Ship together with 059: on a database built under the new defaults
+--     the publish/transition/submit functions (SECURITY INVOKER, run as
+--     service_role) need 059's explicit grants on the existing tables they
+--     touch (programs, program_cycles, archived_questions,
+--     program_questions). On production today those grants already exist,
+--     so applying 058 before, with or after 059 behaves the same.
 --   * Public SELECT of provenance only where tied to source='canonical'
 --     programs. Candidates/events readable only by their submitter; the
 --     submitter's event view is column-limited (no curator actor id, note
@@ -73,7 +82,7 @@
 -- re-apply, succeeds.
 --   BEGIN;
 --   DROP FUNCTION IF EXISTS public.catalog_submit_candidate(uuid, jsonb, jsonb, boolean);
---   DROP FUNCTION IF EXISTS public.catalog_publish_candidate(uuid, uuid);
+--   DROP FUNCTION IF EXISTS public.catalog_publish_candidate(uuid, uuid, text);
 --   DROP FUNCTION IF EXISTS public.catalog_transition_candidate(uuid, public.catalog_candidate_state, uuid, text, text, jsonb, jsonb, uuid, jsonb, jsonb, jsonb, boolean);
 --   DROP TRIGGER IF EXISTS program_questions_provenance_guard ON public.program_questions;
 --   DROP TRIGGER IF EXISTS programs_entity_guard ON public.programs;
@@ -830,12 +839,15 @@ CREATE POLICY catalog_curators_self_read ON public.catalog_curators
   USING (user_id = auth.uid());
 
 -- ------------------------------------------------------------
--- 12. Privileges (Supabase default privileges grant ALL to anon/authenticated)
+-- 12. Privileges: explicit for every role, independent of default
+--     privileges (Supabase stops granting new public tables/sequences to
+--     anon/authenticated/service_role on 2026-10-30; before that it grants
+--     everything). Start from nothing, then grant exactly what is needed.
 -- ------------------------------------------------------------
 REVOKE ALL ON TABLE public.catalog_entities, public.catalog_sources, public.program_template_revisions,
                     public.question_mapping_decisions, public.catalog_serials, public.catalog_curators,
                     public.catalog_candidates, public.catalog_candidate_events
-  FROM PUBLIC, anon, authenticated;
+  FROM PUBLIC, anon, authenticated, service_role;
 GRANT SELECT ON TABLE public.catalog_entities, public.catalog_serials TO anon, authenticated;
 -- Column-level grants: public provenance omits the bounded snapshot text and
 -- curator/candidate identifiers (service-side only). Client reads must name
@@ -855,15 +867,26 @@ GRANT SELECT ON TABLE public.catalog_candidates, public.catalog_curators
 -- the review evidence. Curator tooling reads events with service_role.
 GRANT SELECT (id, candidate_id, from_state, to_state, actor_role, at, public_outcome)
   ON public.catalog_candidate_events TO authenticated;
-GRANT ALL ON TABLE public.catalog_entities, public.catalog_sources, public.program_template_revisions,
-                   public.question_mapping_decisions, public.catalog_serials, public.catalog_curators,
-                   public.catalog_candidates, public.catalog_candidate_events
+-- service_role: the curator routes and the SECURITY INVOKER submit /
+-- transition / publish functions read and write these tables. CRUD only:
+-- no TRUNCATE, REFERENCES, TRIGGER or MAINTAIN. UPDATE/DELETE on the
+-- append-only tables stay granted so the guard trigger, not a privilege
+-- error, explains the refusal.
+GRANT SELECT, INSERT, UPDATE, DELETE
+  ON TABLE public.catalog_entities, public.catalog_sources, public.program_template_revisions,
+           public.question_mapping_decisions, public.catalog_serials, public.catalog_curators,
+           public.catalog_candidates, public.catalog_candidate_events
   TO service_role;
 
+-- Sequences: catalog_assign_serial() calls nextval() as service_role
+-- (USAGE); SELECT allows currval/last_value reads. The apply-time setval()
+-- of the backfill below runs as the owner, so no role needs UPDATE. The
+-- identity sequence of catalog_candidate_events needs no grant for INSERT;
+-- it is stated anyway so every sequence's ACL is explicit.
 REVOKE ALL ON SEQUENCE public.catalog_serial_en_seq, public.catalog_serial_ap_seq,
                        public.catalog_serial_qu_seq, public.catalog_serial_aq_seq,
                        public.catalog_candidate_events_id_seq
-  FROM PUBLIC, anon, authenticated;
+  FROM PUBLIC, anon, authenticated, service_role;
 GRANT USAGE, SELECT ON SEQUENCE public.catalog_serial_en_seq, public.catalog_serial_ap_seq,
                                 public.catalog_serial_qu_seq, public.catalog_serial_aq_seq,
                                 public.catalog_candidate_events_id_seq
@@ -1194,6 +1217,8 @@ DECLARE
   v_review   jsonb := catalog_transition_candidate.source_review;
   v_clear    boolean := coalesce(catalog_transition_candidate.clear_program_match, false);
   c          public.catalog_candidates%ROWTYPE;
+  v_src      public.catalog_sources%ROWTYPE;
+  v_problems text[];
   v_payload  jsonb;
   v_m        jsonb;
   v_ix       int;
@@ -1228,6 +1253,18 @@ BEGIN
   END IF;
 
   -- 1. source review signals (evidence columns stay immutable via trigger)
+  IF v_review IS NOT NULL AND v_review <> '{}'::jsonb AND c.source_id IS NOT NULL THEN
+    -- M09 review M6: re-opening a source the evidence closed (reuse
+    -- disallowed -> allowed/unknown, robots disallow -> not, stale/failed ->
+    -- another status) must say why: a note of 10+ characters.
+    SELECT * INTO v_src FROM public.catalog_sources WHERE id = c.source_id;
+    IF ((v_src.reuse = 'disallowed' AND v_review ? 'reuse' AND v_review->>'reuse' <> 'disallowed')
+        OR (v_src.robots_disallow IS TRUE AND v_review ? 'robots_disallow' AND (v_review->>'robots_disallow')::boolean IS NOT TRUE)
+        OR (v_src.verification_status IN ('stale','failed') AND v_review ? 'verification_status' AND v_review->>'verification_status' <> v_src.verification_status))
+       AND length(btrim(coalesce(v_note, ''))) < 10 THEN
+      RAISE EXCEPTION 'source_review re-opens a source the evidence closed: a note of 10+ characters is required' USING ERRCODE = '23514';
+    END IF;
+  END IF;
   IF v_review IS NOT NULL AND v_review <> '{}'::jsonb THEN
     IF jsonb_typeof(v_review) <> 'object' THEN
       RAISE EXCEPTION 'source_review must be an object' USING ERRCODE = '22023';
@@ -1291,11 +1328,22 @@ BEGIN
         END IF;
         v_payload := jsonb_set(v_payload, ARRAY['questions', v_ix::text, 'mapping'],
           jsonb_strip_nulls(jsonb_build_object('canonical_question_id', lower(v_m->>'canonical_question_id'),
-                                               'tier', v_tier, 'rationale', left(v_m->>'rationale', 2000))));
+                                               'tier', v_tier, 'rationale', left(v_m->>'rationale', 2000),
+                                               'origin', 'curator')));
       END IF;
     END LOOP;
   ELSIF v_maps IS NOT NULL AND jsonb_typeof(v_maps) <> 'array' THEN
     RAISE EXCEPTION 'mappings must be an array' USING ERRCODE = '22023';
+  END IF;
+  -- M09 review M5: a canonical link only ever comes from AQUA's own matcher
+  -- ('auto_match') or a curator override ('curator'). Any other mapping (a
+  -- submitter's, or one without a recorded origin) is dropped here; a
+  -- submitter's proposal survives only as the display-only suggested_mapping.
+  IF jsonb_typeof(v_payload->'questions') = 'array' THEN
+    v_payload := jsonb_set(v_payload, '{questions}', coalesce((
+      SELECT jsonb_agg(CASE WHEN q ? 'mapping' AND coalesce(q->'mapping'->>'origin', '') NOT IN ('auto_match','curator')
+                            THEN q - 'mapping' ELSE q END ORDER BY o)
+        FROM jsonb_array_elements(v_payload->'questions') WITH ORDINALITY AS t(q, o)), '[]'::jsonb));
   END IF;
   IF (SELECT count(*) <> count(DISTINCT q->'mapping'->>'canonical_question_id')
         FROM jsonb_array_elements(coalesce(v_payload->'questions', '[]'::jsonb)) q
@@ -1311,7 +1359,31 @@ BEGIN
     UPDATE public.catalog_candidates SET checks = v_checks WHERE id = c.id;
   END IF;
 
-  -- 5. the event; self-approval is allowed but recorded
+  -- 5. M09 review M6: approving needs evidence that is still good. A stale
+  -- or failed source, reuse disallowed, or robots disallowing reuse blocks
+  -- approval unless the curator overrides explicitly: evidence.source_override
+  -- = true AND a note of 10+ characters, both recorded on the event.
+  IF v_to = 'approved' THEN
+    IF c.source_id IS NULL THEN
+      v_problems := ARRAY['no source evidence attached'];
+    ELSE
+      SELECT * INTO v_src FROM public.catalog_sources WHERE id = c.source_id;
+      v_problems := ARRAY(SELECT x FROM unnest(ARRAY[
+          CASE WHEN v_src.verification_status = 'stale' THEN 'source changed since capture (stale)' END,
+          CASE WHEN v_src.verification_status = 'failed' THEN 'source verification failed' END,
+          CASE WHEN v_src.reuse = 'disallowed' THEN 'source reuse is disallowed' END,
+          CASE WHEN v_src.robots_disallow IS TRUE THEN 'robots/terms disallow reuse' END]) x WHERE x IS NOT NULL);
+    END IF;
+    IF cardinality(v_problems) > 0 THEN
+      IF coalesce(v_evidence->>'source_override', '') <> 'true' OR length(btrim(coalesce(v_note, ''))) < 10 THEN
+        RAISE EXCEPTION 'cannot approve: % (a curator override needs evidence.source_override and a note of 10+ characters)',
+          array_to_string(v_problems, '; ') USING ERRCODE = '23514';
+      END IF;
+      v_evidence := v_evidence || jsonb_build_object('source_override', true, 'source_problems', to_jsonb(v_problems));
+    END IF;
+  END IF;
+
+  -- 6. the event; self-approval is allowed but recorded
   IF v_to = 'approved' AND v_actor IS NOT NULL AND v_actor = c.submitted_by THEN
     v_self := true;
     v_evidence := v_evidence || jsonb_build_object('self_approved', true);
@@ -1327,7 +1399,10 @@ $fn$;
 -- ------------------------------------------------------------
 -- 14. Publish (service_role only, one transaction)
 -- ------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.catalog_publish_candidate(candidate_id uuid, curator_id uuid)
+-- M09 review M6: publish takes an optional override note (3rd argument).
+-- 058 is unapplied in production, so the earlier 2-argument form is dropped.
+DROP FUNCTION IF EXISTS public.catalog_publish_candidate(uuid, uuid);
+CREATE OR REPLACE FUNCTION public.catalog_publish_candidate(candidate_id uuid, curator_id uuid, note text DEFAULT NULL)
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY INVOKER
@@ -1337,8 +1412,13 @@ AS $fn$
 DECLARE
   v_cid        uuid := catalog_publish_candidate.candidate_id;
   v_curator    uuid := catalog_publish_candidate.curator_id;
+  v_note       text := btrim(catalog_publish_candidate.note);
   c            public.catalog_candidates%ROWTYPE;
   v_src        public.catalog_sources%ROWTYPE;
+  v_ev         public.catalog_candidate_events%ROWTYPE;
+  v_problems   text[];
+  v_override   text;
+  v_origin     text;
   v_payload    jsonb;
   v_prog       jsonb;
   v_ent        jsonb;
@@ -1408,8 +1488,46 @@ BEGIN
     RAISE EXCEPTION 'catalog_publish_candidate: candidate has no source evidence' USING ERRCODE = '23514';
   END IF;
   SELECT * INTO v_src FROM public.catalog_sources WHERE id = c.source_id;
-  IF v_src.reuse = 'disallowed' THEN
-    RAISE EXCEPTION 'catalog_publish_candidate: source reuse is disallowed' USING ERRCODE = '23514';
+  -- M09 review M6: evidence must still be good. Stale/failed source, reuse
+  -- disallowed or robots disallowing reuse refuses publish unless a curator
+  -- override with a note (10+ characters) is on record: either this call's
+  -- note, or the approval's recorded source_override, provided the source was
+  -- not re-checked after that approval.
+  v_problems := ARRAY(SELECT x FROM unnest(ARRAY[
+      CASE WHEN v_src.verification_status = 'stale' THEN 'source changed since capture (stale)' END,
+      CASE WHEN v_src.verification_status = 'failed' THEN 'source verification failed' END,
+      CASE WHEN v_src.reuse = 'disallowed' THEN 'source reuse is disallowed' END,
+      CASE WHEN v_src.robots_disallow IS TRUE THEN 'robots/terms disallow reuse' END]) x WHERE x IS NOT NULL);
+  IF cardinality(v_problems) > 0 THEN
+    IF length(coalesce(v_note, '')) >= 10 THEN
+      v_override := 'publish_note';
+    ELSE
+      SELECT * INTO v_ev FROM public.catalog_candidate_events
+       WHERE candidate_id = c.id AND to_state = 'approved' ORDER BY id DESC LIMIT 1;
+      IF FOUND AND coalesce(v_ev.evidence->>'source_override', '') = 'true' AND length(btrim(coalesce(v_ev.note, ''))) >= 10 THEN
+        IF v_src.last_checked_at IS NOT NULL AND v_src.last_checked_at > v_ev.at THEN
+          RAISE EXCEPTION 'catalog_publish_candidate: the source was re-checked after the approval override (%); approve again or publish with a note', array_to_string(v_problems, '; ')
+            USING ERRCODE = '23514';
+        END IF;
+        v_override := 'approval';
+      END IF;
+    END IF;
+    IF v_override IS NULL THEN
+      RAISE EXCEPTION 'catalog_publish_candidate: source is not fresh (%): a curator override with a note is required', array_to_string(v_problems, '; ')
+        USING ERRCODE = '23514';
+    END IF;
+  END IF;
+  -- M09 review M5: every canonical link needs a recorded origin. 'auto_match'
+  -- (AQUA's exact/normalized matcher) or 'curator' (an override). A
+  -- submitter's suggestion (suggested_mapping) is never read here.
+  IF EXISTS (SELECT 1 FROM jsonb_array_elements(v_questions) q
+              WHERE q->'mapping'->>'canonical_question_id' IS NOT NULL
+                AND coalesce(q->'mapping'->>'origin', '') NOT IN ('auto_match','curator')) THEN
+    RAISE EXCEPTION 'catalog_publish_candidate: a canonical mapping needs a recorded origin (auto_match or curator)' USING ERRCODE = '23514';
+  END IF;
+  IF EXISTS (SELECT 1 FROM jsonb_array_elements(v_questions) q
+              WHERE q->'mapping'->>'origin' = 'auto_match' AND coalesce(q->'mapping'->>'tier', '') NOT IN ('exact','normalized')) THEN
+    RAISE EXCEPTION 'catalog_publish_candidate: only exact/normalized matches can be auto-linked; a semantic match needs a curator confirmation' USING ERRCODE = '23514';
   END IF;
 
   v_name   := btrim(v_prog->>'name');
@@ -1456,7 +1574,8 @@ BEGIN
       description  = coalesce(v_prog->>'description', description),
       entity_id    = coalesce(entity_id, v_entity_id),
       is_rolling   = coalesce((v_cycle->>'is_rolling')::boolean, is_rolling),
-      deadline_at  = coalesce(v_deadline, deadline_at)
+      -- programs.deadline_at is GENERATED ALWAYS AS (closes_at) (008); write closes_at.
+      closes_at    = coalesce(v_deadline, closes_at)
     WHERE id = v_program_id;
   ELSE
     v_base := left(btrim(regexp_replace(lower(coalesce(v_prog->>'slug', v_name)), '[^a-z0-9]+', '-', 'g'), '-'), 80);
@@ -1467,7 +1586,7 @@ BEGIN
       v_slug := v_base || '-' || v_n;
     END LOOP;
     INSERT INTO public.programs (slug, name, organization, type, kind, status, url, apply_url, description,
-                                 source, is_rolling, geo_focus, industry_tags, domain, entity_id, deadline_at)
+                                 source, is_rolling, geo_focus, industry_tags, domain, entity_id, closes_at)
     VALUES (v_slug, v_name, btrim(v_prog->>'organization'), v_type::program_type, v_kind::opportunity_kind,
             coalesce(v_prog->>'status', 'open')::program_status, v_prog->>'url', v_prog->>'apply_url',
             v_prog->>'description', 'canonical', coalesce((v_cycle->>'is_rolling')::boolean, false),
@@ -1564,9 +1683,11 @@ BEGIN
         RAISE EXCEPTION 'catalog_publish_candidate: canonical question % not found',
           v_q->'mapping'->>'canonical_question_id' USING ERRCODE = '23503';
       END IF;
+      v_origin := v_q->'mapping'->>'origin';
       v_tier := coalesce(v_q->'mapping'->>'tier', 'curator');
       IF v_tier = 'novel' THEN v_tier := 'curator'; END IF;
-      v_decision := CASE WHEN v_tier IN ('exact','normalized') THEN 'auto_linked' ELSE 'confirmed' END;
+      -- auto_linked ONLY for AQUA's own match; a curator's choice is 'confirmed'
+      v_decision := CASE WHEN v_origin = 'auto_match' THEN 'auto_linked' ELSE 'confirmed' END;
     ELSE
       INSERT INTO public.archived_questions (text, theme, response_type, asked_by_count, is_universal, example_programs, domain)
       VALUES (coalesce(nullif(btrim(v_q->>'canonical_text'), ''), v_q->>'asked_as'),
@@ -1618,10 +1739,13 @@ BEGIN
    WHERE id = c.id;
 
   INSERT INTO public.catalog_candidate_events (candidate_id, from_state, to_state, actor, actor_role, note, evidence)
-  VALUES (c.id, 'approved', 'published', v_curator, 'curator', 'published',
+  VALUES (c.id, 'approved', 'published', v_curator, 'curator', coalesce(v_note, 'published'),
           jsonb_build_object('program_id', v_program_id, 'revision_id', v_rev_id, 'revision', v_rev,
                              'occurrences_created', v_created, 'occurrences_carried', cardinality(v_carried),
-                             'occurrences_retired', v_retired, 'canonical_created', v_new_cq));
+                             'occurrences_retired', v_retired, 'canonical_created', v_new_cq)
+          || CASE WHEN v_override IS NOT NULL
+                  THEN jsonb_build_object('source_override', v_override, 'source_problems', to_jsonb(v_problems))
+                  ELSE '{}'::jsonb END);
 
   RETURN jsonb_build_object(
     'candidate_id', c.id,
@@ -1668,6 +1792,7 @@ DECLARE
   v_state public.catalog_candidate_state;
   v_at    timestamptz;
   v_bad   text;
+  v_pl    jsonb := p_payload;
 BEGIN
   IF p_submitted_by IS NULL THEN
     RAISE EXCEPTION 'submitted_by is required' USING ERRCODE = '22023';
@@ -1701,8 +1826,21 @@ BEGIN
       CASE WHEN jsonb_typeof(p_source->'reuse_signals') = 'array' THEN p_source->'reuse_signals' ELSE '[]'::jsonb END)), '{}'))
   RETURNING id INTO v_src;
 
+  -- M09 review M5: whatever the caller sent, a submitted question never
+  -- carries a canonical `mapping`. A submitter's proposal is kept only as the
+  -- display-only suggested_mapping (decision 'submitter_suggested'); links
+  -- come later from AQUA's matcher or a curator override.
+  IF jsonb_typeof(v_pl->'questions') = 'array' THEN
+    v_pl := jsonb_set(v_pl, '{questions}', coalesce((
+      SELECT jsonb_agg(CASE WHEN q ? 'mapping'
+                            THEN (q - 'mapping') || jsonb_build_object('suggested_mapping',
+                                   coalesce(q->'suggested_mapping',
+                                            ((q->'mapping') - 'origin') || jsonb_build_object('decision', 'submitter_suggested')))
+                            ELSE q END ORDER BY o)
+        FROM jsonb_array_elements(v_pl->'questions') WITH ORDINALITY AS t(q, o)), '[]'::jsonb));
+  END IF;
   INSERT INTO public.catalog_candidates (submitted_by, source_id, payload)
-  VALUES (p_submitted_by, v_src, p_payload)
+  VALUES (p_submitted_by, v_src, v_pl)
   RETURNING id, state, submitted_at INTO v_id, v_state, v_at;
 
   IF p_auto_extract THEN
@@ -1727,7 +1865,7 @@ $fn$;
 -- ------------------------------------------------------------
 REVOKE EXECUTE ON FUNCTION
   public.catalog_submit_candidate(uuid, jsonb, jsonb, boolean),
-  public.catalog_publish_candidate(uuid, uuid),
+  public.catalog_publish_candidate(uuid, uuid, text),
   public.catalog_transition_candidate(uuid, public.catalog_candidate_state, uuid, text, text, jsonb, jsonb, uuid, jsonb, jsonb, jsonb, boolean),
   public.catalog_assign_serial(text, uuid),
   public.catalog_transition_allowed(public.catalog_candidate_state, public.catalog_candidate_state),
@@ -1747,7 +1885,7 @@ FROM PUBLIC, anon, authenticated;
 
 GRANT EXECUTE ON FUNCTION
   public.catalog_submit_candidate(uuid, jsonb, jsonb, boolean),
-  public.catalog_publish_candidate(uuid, uuid),
+  public.catalog_publish_candidate(uuid, uuid, text),
   public.catalog_transition_candidate(uuid, public.catalog_candidate_state, uuid, text, text, jsonb, jsonb, uuid, jsonb, jsonb, jsonb, boolean),
   public.catalog_assign_serial(text, uuid),
   public.catalog_transition_allowed(public.catalog_candidate_state, public.catalog_candidate_state),

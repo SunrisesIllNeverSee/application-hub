@@ -109,3 +109,42 @@ Migrations 052 to 057 are **applied in production**. The file headers of 052 to 
 | 057 complete deferred teams write lockdown | Completes the Teams write lockdown |
 
 056 and 057 use timestamp-style prefixes (`20261021214324_`, `20261021214559_`) because they were created through the Supabase CLI. Treat the production migration ledger as authoritative over file headers.
+
+## Explicit Data API grants (rule from 059 on, recorded 2026-10-22)
+
+From **2026-10-30** Supabase no longer grants `anon`, `authenticated` or
+`service_role` access to new tables and sequences in `public`. Migration
+059 (`20261022200000_059_explicit_data_api_grants.sql`, PREPARED) restates
+every existing grant explicitly and sets the new default for future
+objects. Inventory, classes and the owner apply order are in
+`docs/DATA-API-GRANTS.md`.
+
+Every migration **after 059** that creates a table or sequence in `public`
+must, in the same file:
+
+1. `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` and its policies;
+2. `REVOKE ALL ... FROM PUBLIC, anon, authenticated, service_role`, then
+   `GRANT` exactly what each role needs: SELECT columns for
+   anon/authenticated, the CRUD the routes use, service_role CRUD where
+   server code or functions need it;
+3. grant or revoke every sequence it creates, including the implicit
+   `<table>_<column>_seq` of `serial`/`bigserial` columns (identity
+   columns need no sequence grant for INSERT);
+4. revoke `EXECUTE` on new functions from `PUBLIC, anon, authenticated`
+   and grant it to the roles that call them. Function defaults are
+   unchanged by Supabase, so this is still required.
+
+Never rely on default privileges: the result must be identical under the
+old and new Supabase defaults. CI enforces 1 to 3
+(`scripts/lint_migration_grants.py`, "Migration lint" job). The
+`db-local-suites` job rebuilds the whole chain under both defaults
+(`GRANTS_MODE=default|revoked`). When a migration adds a table, add its
+expected grants to `supabase/tests/m09/50_grants_tests.sql` (`GR-COVER`
+fails on unclassified relations).
+
+| Migration | Status (2026-10-22) |
+|---|---|
+| 058 catalog provenance promotion | PREPARED, not applied; explicit grants for every role; ship with 059 |
+| 059 explicit Data API grants | PREPARED, not applied; apply before 2026-10-30; no effective change on production |
+| `proposed/060` tighten grants | Proposal only, outside the chain; needs an owner decision per section |
+| 061 bind user RPCs to the caller | PREPARED, not applied; user-id functions (`claim_starter_package`, `run_daily_drip`, `compute_user_fit_scores`, `increment_draft_count`, `seed_signup_questions`) accept only the caller's own user id (service_role, owner sessions and the signup trigger excepted); recompute jobs and `get_top_programs_by_value` service_role only, the latter SECURITY INVOKER and approved programs only; trigger functions and RLS helpers least-privilege EXECUTE; no SECURITY DEFINER function in public executable by anon; also fixes the `run_daily_drip` ambiguous-column error. Independent of 058/059; supersedes 060 G |
