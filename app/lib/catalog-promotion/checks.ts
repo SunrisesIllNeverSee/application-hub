@@ -18,6 +18,7 @@ export type SourceFacts = {
   robots_disallow?: boolean | null
   verification_status?: string | null
   snapshot_text?: string | null
+  last_checked_at?: string | null
 }
 
 export type ExistingProgram = {
@@ -139,7 +140,9 @@ export function matchQuestions(questions: CandidateQuestion[], canonical: { id: 
   return out
 }
 
-/** Adds suggested mappings to questions that have none (curator-supplied mappings win). */
+/** Adds AQUA's own exact/normalized matches (origin 'auto_match') to questions
+    that have no mapping (curator-supplied mappings win). Submitter
+    suggestions live in `suggested_mapping` and never block a match. */
 export function applyMatches(payload: CandidatePayload, matches: QuestionMatch[]): CandidatePayload {
   const taken = new Set(payload.questions.map((q) => q.mapping?.canonical_question_id).filter(Boolean) as string[])
   const questions = payload.questions.map((q, i) => {
@@ -147,9 +150,37 @@ export function applyMatches(payload: CandidatePayload, matches: QuestionMatch[]
     const m = matches.find((x) => x.index === i)
     if (!m || taken.has(m.canonical_question_id)) return q
     taken.add(m.canonical_question_id)
-    return { ...q, mapping: { canonical_question_id: m.canonical_question_id, tier: m.tier, confidence: 1 } }
+    return { ...q, mapping: { canonical_question_id: m.canonical_question_id, tier: m.tier, confidence: 1, origin: 'auto_match' as const } }
   })
   return { ...payload, questions }
+}
+
+// ─── M09 review M6: source freshness for approve / publish ─────────────────
+
+export type SourceFreshness = { fresh: boolean; problems: string[] }
+
+/**
+ * A canonical template may only be approved or published from evidence that
+ * is still good: the source must not be stale (page changed since capture)
+ * or failed (recheck could not fetch it), reuse must not be disallowed, and
+ * robots/terms must not disallow reuse. Mirrors what 058 should enforce in
+ * SQL (see the M6 note for LEAD).
+ */
+export function sourceFreshness(src: SourceFacts | null): SourceFreshness {
+  const problems: string[] = []
+  if (!src) problems.push('no source evidence attached')
+  else {
+    if (src.verification_status === 'stale') problems.push('source changed since capture (stale)')
+    if (src.verification_status === 'failed') problems.push('source verification failed')
+    if (src.reuse === 'disallowed') problems.push('source reuse is disallowed')
+    if (src.robots_disallow === true) problems.push('robots/terms disallow reuse')
+  }
+  return { fresh: problems.length === 0, problems }
+}
+
+/** An explicit curator override needs `override: true` and a note of 10+ characters. */
+export function curatorOverrideAllowed(override: boolean | undefined, note: string | undefined | null): boolean {
+  return override === true && (note ?? '').trim().length >= 10
 }
 
 function inSnapshot(snapshot: string, needle: string): boolean {

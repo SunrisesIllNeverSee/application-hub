@@ -83,7 +83,7 @@ test('JWTs, bearer tokens and API keys are rejected as secrets', () => {
     ['requirements', 'Authorization: Bearer abcdefghijklmnopqrstuvwxyz012345', 'secret:bearer_token'],
     ['eligibility', `key ${'sk' + '_live_' + '51H' + 'x'.repeat(22)}`, 'secret:api_key'],
     ['eligibility', 'sk-ant-api03-abcdefghijklmnopqrstuvwxyz0123', 'secret:api_key'],
-    ['eligibility', 'AKIAIOSFODNN7EXAMPLE is our key', 'secret:api_key'],
+    ['eligibility', `${'AKIA' + 'IOSFODNN7EXAMPLE'} is our key`, 'secret:api_key'],
     ['requirements', 'password: hunter2hunter2', 'secret:credential_assignment'],
   ]) {
     const p = base()

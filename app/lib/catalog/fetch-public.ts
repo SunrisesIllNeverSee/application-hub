@@ -284,12 +284,51 @@ function decodeBody(bytes: Uint8Array, contentType: string): string {
 
 interface RobotsRule { allow: boolean; path: string }
 
-function ruleMatches(path: string, pattern: string): boolean {
+/**
+ * Bounds on attacker-controlled robots.txt input. A rule over a bound cannot
+ * be evaluated cheaply, so it is resolved conservatively: an over-limit
+ * Disallow in our group counts as disallowing the path, an over-limit Allow is
+ * ignored, and a file with more rules than ROBOTS_MAX_RULES is treated as
+ * disallowing everything. (Only the site's own reuse signal is affected.)
+ */
+export const ROBOTS_MAX_RULES = 1000
+export const ROBOTS_MAX_PATTERN = 512
+export const ROBOTS_MAX_WILDCARDS = 16
+
+/**
+ * robots.txt path matching: `*` matches any run of characters, a trailing `$`
+ * anchors the end, everything else is literal, and an unanchored pattern
+ * matches a prefix of the path. No regex: the pattern is split on `*` and each
+ * literal segment is located left-to-right with indexOf, taking the leftmost
+ * occurrence (optimal for `*`-only globs), so the scan never backtracks.
+ */
+export function robotsPatternMatches(path: string, pattern: string): boolean {
   if (!pattern) return false
   const anchored = pattern.endsWith('$')
   const body = anchored ? pattern.slice(0, -1) : pattern
-  const re = new RegExp('^' + body.split('*').map((p) => p.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + (anchored ? '$' : ''))
-  return re.test(path)
+  const segs = body.split('*')
+  const first = segs[0]
+  if (!path.startsWith(first)) return false
+  if (segs.length === 1) return anchored ? path.length === first.length : true
+  let pos = first.length
+  const lastIdx = segs.length - 1
+  for (let k = 1; k < lastIdx; k++) {
+    const seg = segs[k]
+    if (!seg) continue
+    const at = path.indexOf(seg, pos)
+    if (at < 0) return false
+    pos = at + seg.length
+  }
+  const last = segs[lastIdx]
+  if (!anchored) return !last || path.indexOf(last, pos) >= 0
+  return path.length - last.length >= pos && path.endsWith(last)
+}
+
+function ruleOverLimit(pattern: string): boolean {
+  if (pattern.length > ROBOTS_MAX_PATTERN) return true
+  let stars = 0
+  for (let i = 0; i < pattern.length; i++) if (pattern[i] === '*' && pattern[i - 1] !== '*') stars++
+  return stars > ROBOTS_MAX_WILDCARDS
 }
 
 /** Evaluate robots.txt for our token (falls back to "*"). Returns true when the path is disallowed. */
@@ -297,6 +336,7 @@ export function robotsDisallows(robotsTxt: string, pathWithQuery: string, token 
   const groups: Array<{ agents: string[]; rules: RobotsRule[] }> = []
   let cur: { agents: string[]; rules: RobotsRule[] } | null = null
   let lastWasAgent = false
+  let ruleCount = 0
   for (const rawLine of robotsTxt.split(/\r?\n/)) {
     const line = rawLine.replace(/#.*$/, '').trim()
     if (!line) continue
@@ -312,15 +352,17 @@ export function robotsDisallows(robotsTxt: string, pathWithQuery: string, token 
     }
     lastWasAgent = false
     if (!cur) continue
-    if (key === 'disallow') cur.rules.push({ allow: false, path: val })
-    else if (key === 'allow') cur.rules.push({ allow: true, path: val })
+    if (key !== 'disallow' && key !== 'allow') continue
+    if (++ruleCount > ROBOTS_MAX_RULES) return true
+    cur.rules.push({ allow: key === 'allow', path: val })
   }
   const mine = groups.filter((g) => g.agents.some((a) => a !== '*' && token.includes(a.replace(/\*$/, '')) ))
   const chosen = mine.length ? mine : groups.filter((g) => g.agents.includes('*'))
   let best: RobotsRule | null = null
   for (const g of chosen) for (const r of g.rules) {
     if (!r.path) continue
-    if (!ruleMatches(pathWithQuery, r.path)) continue
+    if (ruleOverLimit(r.path)) { if (!r.allow) return true; continue }
+    if (!robotsPatternMatches(pathWithQuery, r.path)) continue
     if (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.allow)) best = r
   }
   return !!best && !best.allow

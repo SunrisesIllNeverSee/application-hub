@@ -301,13 +301,24 @@ test('transition approved: self-approval allowed and surfaced; database refusals
 })
 
 // ================= publish =================
+const FRESH_SRC = { id: SRC, url: 'https://program.example.org/apply', capture_method: 'url_fetch', reuse: 'allowed', robots_disallow: false, verification_status: 'verified', last_checked_at: '2026-10-22T12:00:00Z' }
+function publishResponder({ source = FRESH_SRC, approvedEvent = null, rpcResult = { data: { program_slug: 'example-program', revision: 1 }, error: null } } = {}) {
+  return (st) => {
+    if (st.table === 'catalog_candidates') return { data: { id: CAND, state: 'approved', source_id: SRC }, error: null }
+    if (st.table === 'catalog_sources') return { data: source, error: null }
+    if (st.table === 'catalog_candidate_events') return { data: approvedEvent, error: null }
+    if (st.op === 'rpc') return rpcResult
+    return null
+  }
+}
+
 test('publish: curator only; one RPC with (candidate_id, curator_id); 55000 -> 409 not_approved', async () => {
   assert.equal((await handlePublish(post({}), deps(), CAND)).status, 403)
-  const db = fakeDb((st) => (st.op === 'rpc' ? { data: { program_slug: 'example-program', revision: 1 }, error: null } : null))
+  const db = fakeDb(publishResponder())
   const r = await handlePublish(post({}), deps({ curator: true, user: CURATOR, db }), CAND)
   assert.equal(r.status, 200)
   assert.deepEqual(rpcs(db, 'catalog_publish_candidate')[0].payload, { candidate_id: CAND, curator_id: CURATOR })
-  const no = fakeDb((st) => (st.op === 'rpc' ? { data: null, error: { code: '55000', message: 'candidate is verified, must be approved' } } : null))
+  const no = fakeDb(publishResponder({ rpcResult: { data: null, error: { code: '55000', message: 'candidate is verified, must be approved' } } }))
   const r2 = await handlePublish(post({}), deps({ curator: true, user: CURATOR, db: no }), CAND)
   assert.equal(r2.status, 409)
   assert.deepEqual(await r2.json(), { error: 'not_approved' })
@@ -358,4 +369,118 @@ test('M1: recheck at the outbound concurrency cap answers 503 and records NO fai
   assert.equal(r.status, 503)
   assert.equal((await r.json()).error, 'source_fetch_busy')
   assert.equal(writes(db).length, 0, 'a local busy refusal says nothing about the source')
+})
+
+
+// ================= M09 review M5: submitter mappings are suggestions only =================
+const OTHER_Q = '44444444-4444-4444-8444-444444444444'
+
+test('M5: submit stores submitter mappings as submitter_suggested, never as a canonical mapping', async () => {
+  const db = fakeDb(submitResponder)
+  const payload = { ...PAYLOAD, questions: [{ ...PAYLOAD.questions[0], mapping: { canonical_question_id: OTHER_Q, tier: 'exact', confidence: 1, origin: 'auto_match' } }] }
+  const r = await handleSubmit(post({ payload, source: { url: 'https://program.example.org/apply', capture_method: 'public_paste', snapshot_text: 'x' } }), deps({ db }))
+  assert.equal(r.status, 201)
+  const stored = rpcs(db, 'catalog_submit_candidate')[0].payload.p_payload
+  assert.equal(stored.questions[0].mapping, undefined, 'no canonical mapping is stored from a submitter')
+  assert.deepEqual(stored.questions[0].suggested_mapping, { canonical_question_id: OTHER_Q, tier: 'exact', confidence: 1, decision: 'submitter_suggested' })
+})
+
+test('M5: at matched, a stored submitter mapping is demoted and cannot block AQUA\'s own match', async () => {
+  // a pre-fix row: the submitter mapped the question to an unrelated canonical question as "exact"
+  const legacy = { ...PAYLOAD, questions: [{ ...PAYLOAD.questions[0], mapping: { canonical_question_id: OTHER_Q, tier: 'exact' } }] }
+  const db = fakeDb(reviewResponder(candidateRow({ payload: legacy })))
+  const r = await handleTransition(post({ to: 'matched' }), deps({ curator: true, user: CURATOR, db }), CAND)
+  assert.equal(r.status, 200, JSON.stringify(await r.clone().json()))
+  const a = rpcs(db, 'catalog_transition_candidate')[0].payload
+  const q = a.payload_patch.questions[0]
+  assert.equal(q.mapping.canonical_question_id, CANON_Q, 'the real exact match wins')
+  assert.equal(q.mapping.origin, 'auto_match')
+  assert.equal(q.suggested_mapping.canonical_question_id, OTHER_Q)
+  assert.equal(q.suggested_mapping.decision, 'submitter_suggested')
+  assert.equal(a.evidence.suggestions_demoted, 1)
+})
+
+test('M5: a suggestion with no real match stays a suggestion until a curator override confirms it', async () => {
+  const suggested = { ...PAYLOAD, questions: [{ ...PAYLOAD.questions[0], asked_as: 'Something nobody else asks', suggested_mapping: { canonical_question_id: OTHER_Q, tier: 'exact', decision: 'submitter_suggested' } }] }
+  const db = fakeDb(reviewResponder(candidateRow({ payload: suggested })))
+  const r = await handleTransition(post({ to: 'matched' }), deps({ curator: true, user: CURATOR, db }), CAND)
+  assert.equal(r.status, 200)
+  const a = rpcs(db, 'catalog_transition_candidate')[0].payload
+  assert.equal(a.payload_patch, null, 'nothing to patch: no canonical mapping was created')
+  // the curator confirms it explicitly
+  const db2 = fakeDb(reviewResponder(candidateRow({ payload: suggested })))
+  const ok = await handleTransition(post({ to: 'matched', mappings: [{ index: 0, canonical_question_id: OTHER_Q, tier: 'curator' }] }), deps({ curator: true, user: CURATOR, db: db2 }), CAND)
+  assert.equal(ok.status, 200)
+  assert.deepEqual(rpcs(db2, 'catalog_transition_candidate')[0].payload.mappings, [{ index: 0, canonical_question_id: OTHER_Q, tier: 'curator' }])
+})
+
+// ================= M09 review M6: stale / failed / disallowed sources =================
+const SNAP = 'Deadline: May 1, 2027 5pm ET\nWhat problem are you solving? (max 250 words)'
+const srcWith = (over) => ({ id: SRC, url: 'https://program.example.org/apply', capture_method: 'url_fetch', reuse: 'allowed', robots_disallow: false, verification_status: 'verified', snapshot_text: SNAP, ...over })
+
+test('M6: approve is refused for a stale, failed, disallowed or robots-blocked source; an override with a note is recorded', async () => {
+  for (const over of [{ verification_status: 'stale' }, { verification_status: 'failed' }, { reuse: 'disallowed' }, { robots_disallow: true }]) {
+    const db = fakeDb(reviewResponder(candidateRow({ state: 'verified' }), srcWith(over)))
+    const r = await handleTransition(post({ to: 'approved' }), deps({ curator: true, user: CURATOR, db }), CAND)
+    assert.equal(r.status, 422, JSON.stringify(over))
+    const body = await r.json()
+    assert.equal(body.error, 'source_not_fresh')
+    assert.ok(body.problems.length >= 1)
+    assert.equal(rpcs(db, 'catalog_transition_candidate').length, 0)
+    // override without a (long enough) note: still refused
+    const db1 = fakeDb(reviewResponder(candidateRow({ state: 'verified' }), srcWith(over)))
+    assert.equal((await handleTransition(post({ to: 'approved', override: true, note: 'ok' }), deps({ curator: true, user: CURATOR, db: db1 }), CAND)).status, 422)
+    // explicit override with a note goes through and is recorded
+    const db2 = fakeDb(reviewResponder(candidateRow({ state: 'verified' }), srcWith(over)))
+    const ok = await handleTransition(post({ to: 'approved', override: true, note: 'program staff confirmed the page change is cosmetic' }), deps({ curator: true, user: CURATOR, db: db2 }), CAND)
+    assert.equal(ok.status, 200)
+    const a = rpcs(db2, 'catalog_transition_candidate')[0].payload
+    assert.equal(a.evidence.source_override, true)
+    assert.ok(a.evidence.source_problems.length >= 1)
+    assert.match(a.note, /cosmetic/)
+  }
+  // a fresh source needs no override
+  const fresh = fakeDb(reviewResponder(candidateRow({ state: 'verified' }), srcWith({})))
+  assert.equal((await handleTransition(post({ to: 'approved' }), deps({ curator: true, user: CURATOR, db: fresh }), CAND)).status, 200)
+})
+
+test('M6: publish is refused when the source went stale/failed/disallowed, unless the approval recorded an override and nothing changed since', async () => {
+  for (const over of [{ verification_status: 'stale' }, { verification_status: 'failed' }, { reuse: 'disallowed' }, { robots_disallow: true }]) {
+    const db = fakeDb(publishResponder({ source: { ...FRESH_SRC, ...over } }))
+    const r = await handlePublish(post({}), deps({ curator: true, user: CURATOR, db }), CAND)
+    assert.equal(r.status, 409, JSON.stringify(over))
+    assert.equal((await r.json()).error, 'source_not_fresh')
+    assert.equal(rpcs(db, 'catalog_publish_candidate').length, 0)
+  }
+  const approvedEvent = { to_state: 'approved', note: 'program staff confirmed the page change is cosmetic', evidence: { source_override: true }, at: '2026-10-22T13:00:00Z' }
+  // override recorded at approve time, source not re-checked since → publish proceeds
+  const ok = fakeDb(publishResponder({ source: { ...FRESH_SRC, verification_status: 'stale', last_checked_at: '2026-10-22T12:30:00Z' }, approvedEvent }))
+  assert.equal((await handlePublish(post({}), deps({ curator: true, user: CURATOR, db: ok }), CAND)).status, 200)
+  // source re-checked AFTER the override → refused again
+  const later = fakeDb(publishResponder({ source: { ...FRESH_SRC, verification_status: 'failed', last_checked_at: '2026-10-22T14:00:00Z' }, approvedEvent }))
+  const r2 = await handlePublish(post({}), deps({ curator: true, user: CURATOR, db: later }), CAND)
+  assert.equal(r2.status, 409)
+  assert.match((await r2.json()).reason, /re-checked after/)
+  // a fresh curator override note (10+ characters) on the publish call goes to the RPC, which records it
+  const withNote = fakeDb(publishResponder({ source: { ...FRESH_SRC, verification_status: 'stale' } }))
+  assert.equal((await handlePublish(post({ note: 'stale flag is a false alarm, verified manually' }), deps({ curator: true, user: CURATOR, db: withNote }), CAND)).status, 200)
+  assert.equal(rpcs(withNote, 'catalog_publish_candidate')[0].payload.note, 'stale flag is a false alarm, verified manually')
+  const shortNote = fakeDb(publishResponder({ source: { ...FRESH_SRC, verification_status: 'stale' } }))
+  assert.equal((await handlePublish(post({ note: 'short' }), deps({ curator: true, user: CURATOR, db: shortNote }), CAND)).status, 409)
+  // an approval without an override (or without a note) does not count
+  const noNote = fakeDb(publishResponder({ source: { ...FRESH_SRC, verification_status: 'stale', last_checked_at: '2026-10-22T12:30:00Z' }, approvedEvent: { ...approvedEvent, note: null } }))
+  assert.equal((await handlePublish(post({}), deps({ curator: true, user: CURATOR, db: noNote }), CAND)).status, 409)
+})
+
+test('LOW: source_review that re-opens a closed source needs a note', async () => {
+  const db = fakeDb(reviewResponder(candidateRow({ state: 'extracted' }), srcWith({ reuse: 'disallowed' })))
+  const r = await handleTransition(post({ to: 'matched', source_review: { reuse: 'allowed' } }), deps({ curator: true, user: CURATOR, db }), CAND)
+  assert.equal(r.status, 422)
+  assert.equal((await r.json()).error, 'note_required')
+  assert.equal(rpcs(db, 'catalog_transition_candidate').length, 0)
+  const db2 = fakeDb(reviewResponder(candidateRow({ state: 'extracted' }), srcWith({ verification_status: 'stale' })))
+  assert.equal((await handleTransition(post({ to: 'matched', source_review: { verification_status: 'verified' } }), deps({ curator: true, user: CURATOR, db: db2 }), CAND)).status, 422)
+  const db3 = fakeDb(reviewResponder(candidateRow({ state: 'extracted' }), srcWith({ reuse: 'disallowed' })))
+  const ok = await handleTransition(post({ to: 'matched', note: 'terms page updated to allow reuse', source_review: { reuse: 'allowed' } }), deps({ curator: true, user: CURATOR, db: db3 }), CAND)
+  assert.equal(ok.status, 200)
 })

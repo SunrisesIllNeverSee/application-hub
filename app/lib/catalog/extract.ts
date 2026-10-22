@@ -347,10 +347,26 @@ function containsControl(el: HElement): HElement | null {
   return found
 }
 
+/** Distinct id references of an aria-* IDREFS attribute, capped (bounds per-control work). */
+const MAX_ID_REFS = 16
+/** Longest prompt/description text kept per occurrence, and occurrences kept per page. */
+const MAX_PROMPT_CHARS = 4000
+const MAX_HTML_OCCURRENCES = 1000
+const clip = (t: string) => t.length > MAX_PROMPT_CHARS ? t.slice(0, MAX_PROMPT_CHARS) : t
+function idRefs(v: string | undefined): string[] {
+  if (!v) return []
+  const out: string[] = []
+  for (const id of v.split(/\s+/)) {
+    if (id && !out.includes(id)) { out.push(id); if (out.length >= MAX_ID_REFS) break }
+  }
+  return out
+}
+
 /** Extract occurrences + program hints from an HTML page or form. */
 export function extractFromHtml(html: string, opts: { baseUrl?: string } = {}): ExtractionResult {
   const root = parseHtml(html ?? '')
   const warnings: string[] = []
+  if (root.truncated) warnings.push('page exceeds parse limits; only the first part was read')
   const byId = new Map<string, HElement>()
   const labelFor = new Map<string, HElement>()
   walk(root, (el) => {
@@ -361,15 +377,19 @@ export function extractFromHtml(html: string, opts: { baseUrl?: string } = {}): 
   for (const [id, lab] of labelFor) if (byId.has(id) && isControl(byId.get(id)!)) labelNodes.add(lab)
   walk(root, (el) => {
     if (!isControl(el)) return
-    for (const id of (el.attrs['aria-labelledby'] ?? '').split(/\s+/).filter(Boolean)) { const t = byId.get(id); if (t) labelNodes.add(t) }
-    for (const id of (el.attrs['aria-describedby'] ?? '').split(/\s+/).filter(Boolean)) { const t = byId.get(id); if (t) labelNodes.add(t) }
+    for (const id of idRefs(el.attrs['aria-labelledby'])) { const t = byId.get(id); if (t) labelNodes.add(t) }
+    for (const id of idRefs(el.attrs['aria-describedby'])) { const t = byId.get(id); if (t) labelNodes.add(t) }
   })
   // radiogroup labelledby targets are prompts for the group
   walk(root, (el) => {
     if (el.attrs.role === 'radiogroup' || el.attrs.role === 'group') {
-      for (const id of (el.attrs['aria-labelledby'] ?? '').split(/\s+/).filter(Boolean)) { const t = byId.get(id); if (t) labelNodes.add(t) }
+      for (const id of idRefs(el.attrs['aria-labelledby'])) { const t = byId.get(id); if (t) labelNodes.add(t) }
     }
   })
+  // Many controls may reference the same (possibly large) element; compute each text once.
+  const plainText = new Map<HElement, string>()
+  const labelTextOf = new Map<HElement, string>()
+  const textOnce = (n: HElement) => { let t = plainText.get(n); if (t === undefined) { t = clip(textOf(n)); plainText.set(n, t) } return t }
 
   // ── linearize ──
   const events: HtmlEvent[] = []
@@ -435,7 +455,8 @@ export function extractFromHtml(html: string, opts: { baseUrl?: string } = {}): 
     lastStandalone = null
   }
   const pushOcc = (asked: string, field: ExtractedField, locator: string, extraReq?: Requirements, description?: string, filled?: string) => {
-    const askedClean = ws(asked)
+    const askedClean = clip(ws(clip(asked)))
+    if (description) description = clip(description)
     let req = parseRequirements(askedClean)
     if (description) req = mergeRequirements(req, parseRequirements(description))
     if (extraReq) req = mergeRequirements(req, extraReq)
@@ -462,23 +483,24 @@ export function extractFromHtml(html: string, opts: { baseUrl?: string } = {}): 
 
   const labelText = (el: HElement): string => {
     const skip = (n: HElement) => isControl(n) || n.tag === 'select' || n.tag === 'option'
+    const once = (n: HElement) => { let t = labelTextOf.get(n); if (t === undefined) { t = clip(textOf(n, skip)); labelTextOf.set(n, t) } return t }
     if (el.attrs['aria-label']) return ws(el.attrs['aria-label'])
-    const lb = (el.attrs['aria-labelledby'] ?? '').split(/\s+/).filter(Boolean).map((id) => byId.get(id)).filter(Boolean) as HElement[]
-    if (lb.length) return ws(lb.map((n) => textOf(n, skip)).join(' '))
-    if (el.attrs.id && labelFor.has(el.attrs.id)) return textOf(labelFor.get(el.attrs.id)!, skip)
-    for (let p = el.parent; p; p = p.parent) if (p.tag === 'label') return textOf(p, skip)
+    const lb = idRefs(el.attrs['aria-labelledby']).map((id) => byId.get(id)).filter(Boolean) as HElement[]
+    if (lb.length) return ws(lb.map(once).join(' '))
+    if (el.attrs.id && labelFor.has(el.attrs.id)) return once(labelFor.get(el.attrs.id)!)
+    for (let p = el.parent; p; p = p.parent) if (p.tag === 'label') return once(p)
     return ''
   }
   const describedBy = (el: HElement): string | undefined => {
-    const ids = (el.attrs['aria-describedby'] ?? '').split(/\s+/).filter(Boolean)
-    const t = ids.map((id) => byId.get(id)).filter(Boolean).map((n) => textOf(n!)).join(' ').trim()
+    const ids = idRefs(el.attrs['aria-describedby'])
+    const t = ids.map((id) => byId.get(id)).filter(Boolean).map((n) => textOnce(n!)).join(' ').trim()
     return t || undefined
   }
   const groupPrompt = (el: HElement): string => {
     for (let p = el.parent; p; p = p.parent) {
       if ((p.attrs.role === 'radiogroup' || p.attrs.role === 'group') && (p.attrs['aria-labelledby'] || p.attrs['aria-label'])) {
         if (p.attrs['aria-label']) return ws(p.attrs['aria-label'])
-        return ws(p.attrs['aria-labelledby'].split(/\s+/).map((id) => byId.get(id)).filter(Boolean).map((n) => textOf(n!)).join(' '))
+        return ws(idRefs(p.attrs['aria-labelledby']).map((id) => byId.get(id)).filter(Boolean).map((n) => textOnce(n!)).join(' '))
       }
       if (p.tag === 'fieldset' && promptFieldsets.has(p)) return promptFieldsets.get(p)!
     }
@@ -486,6 +508,7 @@ export function extractFromHtml(html: string, opts: { baseUrl?: string } = {}): 
   }
 
   for (const ev of events) {
+    if (occurrences.length >= MAX_HTML_OCCURRENCES) { warnings.push(`more than ${MAX_HTML_OCCURRENCES} questions; the rest were not read`); break }
     if (ev.type === 'heading') {
       flushPendingAsStandalone()
       if (/\?\s*\**\s*$/.test(ev.text)) { pending.push({ text: ev.text, el: ev.el }); continue }
