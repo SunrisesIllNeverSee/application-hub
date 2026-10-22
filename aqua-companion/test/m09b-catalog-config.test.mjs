@@ -48,7 +48,8 @@ test('the default config comes from https://aquaidp.xyz/.well-known/aqua-catalog
   assert.equal(cfg.source, 'well-known')
   assert.equal(cfg.origin, DOC.supabase_url)
   assert.equal(cfg.key_role, 'anon')
-  assert.deepEqual(cfg.tables, DOC.tables)
+  assert.equal(cfg.tables.programs, 'programs', 'a remote document cannot rename tables')
+  assert.deepEqual(Object.keys(cfg.tables).sort(), ['acceptance_reports', 'archived_questions', 'program_cycles', 'program_dna', 'program_questions', 'program_stats', 'programs'])
   assert.equal(f.calls.length, 1)
   assert.equal(f.calls[0].url, 'https://aquaidp.xyz/.well-known/aqua-catalog.json')
   assert.equal(f.calls[0].init.method, 'GET')
@@ -94,7 +95,8 @@ test('doctor: config, connectivity, canonical-only read (counts), workspace, key
   const f = fakeFetch((u) => {
     if (u.pathname === CONFIG_PATH) return DOC
     if (u.pathname === '/rest/v1/programs') {
-      assert.equal(u.searchParams.get('source'), 'eq.canonical', 'canonical-only read')
+      assert.match(u.searchParams.get('or') ?? '', /^\(slug\.in\.\(.*\),source\.eq\.canonical\)$/, 'approved-only read: registry slug OR source canonical')
+      assert.equal(u.searchParams.get('source'), null)
       return CATALOG_FIXTURE.programs.filter((p) => p.source === 'canonical').slice(0, 1)
     }
     return undefined

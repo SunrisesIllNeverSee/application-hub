@@ -22,10 +22,12 @@ import { COMPANION_VERSION, MANIFEST, isWorkspaceManifest, readManifestAt } from
 import { resolveCatalogConfig } from './catalog.mjs'
 import { getPublicJson } from './net.mjs'
 import { KEYCHAIN_SERVICE, keychainRead } from './secrets.mjs'
-import { CANONICAL_PROGRAM_SLUGS } from '../vendor/lib/canonical-catalog.mjs'
+import { CANONICAL_PROGRAM_SLUGS, approvedProgramsFilter } from '../vendor/lib/canonical-catalog.mjs'
 
 export const INIT_COMMAND = 'aqua-companion init --path'
-const ELICIT_TIMEOUT_MS = 10 * 60 * 1000
+const ELICIT_TIMEOUT_MS = 2 * 60 * 1000
+const ELICIT_COOLDOWN_MS = 5 * 60 * 1000
+const MAX_ELICIT_PROMPTS = 3
 
 /** POSIX shell quoting for a path shown in a command the user copies. */
 export function shellQuote(p) {
@@ -169,6 +171,16 @@ export async function initWorkspaceTool(s, args) {
   if (!passphrase || passphrase.length < 8) {
     return human('The workspace passphrase is chosen by the user in a terminal prompt. This server has no AQUA_PASSPHRASE in its environment, and a passphrase never travels through the agent or a tool argument.')
   }
+  // Consent prompts are rationed (release review LOW): at most MAX_ELICIT_PROMPTS per hour, and none for
+  // ELICIT_COOLDOWN_MS after a prompt failed or timed out (nobody answered); declines count toward the hourly cap. A looping agent cannot spam the user,
+  // and cannot hold the request chain for long (the prompt itself times out after ELICIT_TIMEOUT_MS).
+  const es = s.elicitState ?? (s.elicitState = { times: [], blockedUntil: 0 })
+  const nowMs = Date.now()
+  es.times = es.times.filter((t) => nowMs - t < 3600_000)
+  if (nowMs < es.blockedUntil || es.times.length >= MAX_ELICIT_PROMPTS) {
+    return human('Too many confirmation requests in a short time, or nobody answered the last one. No new prompt was shown. The user can create the workspace with the command below at any time.', { prompt_limited: true })
+  }
+  es.times.push(nowMs)
   let response
   try {
     response = await s.elicit({
@@ -176,7 +188,8 @@ export async function initWorkspaceTool(s, args) {
       requestedSchema: elicitSchema(base),
     }, { timeoutMs: ELICIT_TIMEOUT_MS })
   } catch (e) {
-    return human(`The confirmation request failed (${e?.message ?? e}).`)
+    es.blockedUntil = Date.now() + ELICIT_COOLDOWN_MS // nobody answered: do not queue another prompt at once
+    return human('The confirmation request failed or timed out.')
   }
   if (!response || response.action !== 'accept' || response.content?.consent !== true) {
     return { status: 'declined', action: response?.action ?? 'cancel', created: false, message: 'The user did not confirm. Nothing was created.' }
@@ -225,12 +238,14 @@ export async function doctorReport(s, { live = true } = {}) {
   if (cfg?.configured && live) {
     try {
       const slugs = [...CANONICAL_PROGRAM_SLUGS]
-      const q = new URLSearchParams({ select: 'id,slug,source', source: 'eq.canonical', slug: `in.(${slugs.map((x) => `"${x}"`).join(',')})`, limit: '1000' })
+      // Same approval rule as the app (approvedProgramsFilter): registry slug OR source canonical.
+      const q = new URLSearchParams({ select: 'id,slug,source', or: `(${approvedProgramsFilter(slugs)})`, limit: '1000' })
       const rows = await getPublicJson(cfg.origin, `/rest/v1/programs?${q}`, cfg.key, { fetchImpl: s.fetchImpl })
       const list = Array.isArray(rows) ? rows : []
-      const nonCanonical = list.filter((r) => r?.source !== 'canonical').length
+      const registry = new Set(slugs)
+      const unapproved = list.filter((r) => r?.source !== 'canonical' && !registry.has(r?.slug)).length
       add('connectivity', 'ok', `reached ${cfg.origin} with the public key`)
-      add('canonical_read', nonCanonical ? 'fail' : list.length ? 'ok' : 'warn', `${list.length} approved canonical program(s) readable${nonCanonical ? `; ${nonCanonical} non-canonical row(s) returned` : ''}`, { programs: list.length, registry: slugs.length })
+      add('canonical_read', unapproved ? 'fail' : list.length ? 'ok' : 'warn', `${list.length} approved program(s) readable${unapproved ? `; ${unapproved} unapproved row(s) returned` : ''}`, { programs: list.length, registry: slugs.length })
     } catch (e) {
       add('connectivity', 'fail', e?.message ?? String(e))
     }

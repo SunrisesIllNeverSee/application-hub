@@ -2,8 +2,8 @@
 // `npm run vendor:companion` in application-hub-mcp-server/ (CI checks these copies).
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/aqua-local/verify-packet.mjs
-// source-sha256: bb2d90622399dbb0b76af8bf744d04cf82774c5001e406b32538ee1d6d1599c6
-// body-sha256: 22e643d2e1732c2e8e9053131552bd5f659da91b8097f4736e16416f16ac2ae2
+// source-sha256: e2fad28ab964276b157372ecb2bb06704b5dff980cf079890ca3fbc99a75ee10
+// body-sha256: 62c680e4b299e7858fad6b4460913fa05945cfec3a0ca705aae8cbfd519f4fd6
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // LF-22 — standalone packet verifier. Stdlib Node only (no imports from the
 // app): recomputes the canonical manifest, per-answer sha256, packet_id, and
@@ -112,8 +112,18 @@ export async function verifyPacketText(raw) {
   // --- check 6: per-answer sha256 ---
   const questions = Array.isArray(packet.questions) ? packet.questions : []
   let allAnswersOk = questions.length > 0
+  let skipsOk = true
   for (const q of questions) {
-    if (q.skipped) continue
+    if (q.skipped === true) {
+      // A skip is an explanation, never a hidden answer: no version, body,
+      // title or hash, not approved, and a non-blank reason.
+      const ok = q.approved === false && q.version_id == null && q.answer_body == null &&
+        q.answer_title == null && q.answer_sha256 == null &&
+        typeof q.skip_reason === 'string' && q.skip_reason.trim() !== ''
+      if (!ok) skipsOk = false
+      continue
+    }
+    if (q.skipped !== false && q.skipped !== undefined) { allAnswersOk = false; continue }
     const expected = await sha256Hex(canonicalJson({ title: q.answer_title, body: q.answer_body }))
     if (expected !== q.answer_sha256 || q.approved !== true || !q.version_id) {
       allAnswersOk = false
@@ -122,7 +132,12 @@ export async function verifyPacketText(raw) {
   check(
     'per-answer sha256',
     allAnswersOk,
-    `${questions.filter((q) => !q.skipped).length} answer(s) hashed`,
+    `${questions.filter((q) => q.skipped !== true).length} answer(s) hashed`,
+  )
+  check(
+    'skipped entries are explained and carry no answer',
+    skipsOk,
+    `${questions.filter((q) => q.skipped === true).length} skip(s)`,
   )
 
   // --- check 7: provenance declared-vs-observed honesty ---

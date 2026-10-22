@@ -23,15 +23,40 @@ import path from 'node:path'
 import { decryptWithKeys, macHex, nowIso, DecryptError } from './crypto.mjs'
 import { mkdirInside } from './fsafe.mjs'
 import { AGENT_LOG, INBOX_DIR, Workspace, WorkspaceError, keyCheckText } from './workspace.mjs'
-import { readCatalog, resolveCatalogConfig } from './catalog.mjs'
+import { buildSnapshot, catalogMaxAgeHours, catalogNeedsRefresh, fetchPublicCatalog, readCatalog, resolveCatalogConfig, saveSnapshot } from './catalog.mjs'
 import { loadModel } from './mcp-model.mjs'
 import { resolveSecrets } from './secrets.mjs'
 import { warnEnvSecret } from './io.mjs'
 import { cmdImportBackup, cmdInit } from './commands.mjs'
-import { TIER, TOOL_MAP, TOOLS, ToolRefusal, UNTRUSTED_NOTICE, argsCanonical, validateArgs } from './mcp-tools.mjs'
+import { MAX_REVIEW_FILES, TIER, TOOL_MAP, TOOLS, ToolRefusal, UNTRUSTED_NOTICE, argsCanonical, validateArgs } from './mcp-tools.mjs'
 import { defaultBase, initCommandFor, shellQuote } from './setup.mjs'
 
 const MUTATORS = ['writeRecord', 'saveManifest', 'audit']
+
+/**
+ * WRITE POLICY (M7). Tiers are honest: only private_write tools write to the
+ * workspace, and a tool handler never receives a writable workspace unless
+ * its tier is private_write. The dispatcher enforces three explicit,
+ * documented exceptions:
+ *
+ *   1. the agent audit log (audit/agent.jsonl): an append-only record of every
+ *      call (HMACs of arguments, never content). It is written for every tool
+ *      and ALSO under --read-only. It is the only workspace file that changes
+ *      under --read-only.
+ *   2. the PUBLIC catalog cache (catalog-cache/snapshots/): public data only,
+ *      refreshed by the tools below through the dispatcher-owned
+ *      t.persistCatalog(); the handlers themselves get a write-refusing
+ *      workspace. Skipped under --read-only (kept in memory for the session).
+ *   3. nothing else. present_review_decisions writes plaintext answers into an
+ *      HTML file, so it is private_write (refused under --read-only).
+ */
+export const CATALOG_CACHE_WRITERS = Object.freeze(['refresh_catalog', 'discover_applications', 'get_application_details', 'match_canonical_questions'])
+for (const tdef of TOOLS) {
+  const mayWrite = tdef.tier === TIER.PRIVATE_WRITE || tdef.tier === TIER.HUMAN_CONSENT
+  if (!mayWrite && (tdef.writes || tdef.autoRefreshCatalog || (tdef.network && !tdef.setup)) && !CATALOG_CACHE_WRITERS.includes(tdef.name)) {
+    throw new Error(`tool ${tdef.name} is not private_write but is not on the documented write-exception list`)
+  }
+}
 /** Error classes whose messages are built by companion code from fixed text (safe to show as server statements). */
 const OWN_ERRORS = new Set(['WorkspaceError', 'DecryptError', 'KeyMismatchError', 'CatalogNetworkError', 'PathSafetyError', 'UsageError', 'EnvelopeError', 'CatalogKeyRefusal', 'HistoryImportError'])
 
@@ -69,6 +94,7 @@ export class Session {
     this.keys = null
     this.catalogOverride = null
     this.catalogCfg = null
+    this.autoRefreshFailedAt = 0
     this.root = null
     this.mode = 'not_initialized'
   }
@@ -109,7 +135,7 @@ export class Session {
     this.workspaceId = ws.manifest.workspace_id
     this.root = ws.root
     this.ctx.flags = { ...this.ctx.flags, workspace: ws.root }
-    mkdirInside(ws.root, INBOX_DIR) // the drop folder for files the user hands to the agent
+    if (!this.readOnly) mkdirInside(ws.root, INBOX_DIR) // the drop folder for files the user hands to the agent (--read-only changes nothing)
     this.mode = 'ready'
   }
 
@@ -136,9 +162,11 @@ export class Session {
 
   /** What setup tools receive (works with or without a workspace). */
   setupContext() {
+    const self = this
     return {
       env: this.ctx.env, cwd: this.ctx.cwd, flags: this.ctx.flags, workspace: this.workspaceFlag, keychain: this.keychain, readOnly: this.readOnly,
       fetchImpl: this.fetchImpl, exec: this.exec, platform: this.platform, elicit: this.elicit,
+      get elicitState() { return self.elicitState }, set elicitState(v) { self.elicitState = v },
       state: () => this.state(), attach: (root) => this.attach(root), createWorkspace: (base) => this.createWorkspace(base),
     }
   }
@@ -176,6 +204,45 @@ export class Session {
       this.catalogCfg = { configured: false, reason: e.message, refused: e?.name === 'CatalogKeyRefusal' }
     }
     return this.catalogCfg
+  }
+
+  /**
+   * Catalog auto-refresh for the catalog read tools (discover_applications,
+   * get_application_details, match_canonical_questions): when the cached
+   * public catalog is empty or older than AQUA_CATALOG_MAX_AGE_HOURS (default
+   * 24; 0 turns this off), fetch it with the same read-only, anon-key-only
+   * path as refresh_catalog. The public cache is saved unless the server runs
+   * --read-only (then it is kept for this session). Offline or unconfigured:
+   * the cache is used as it is and the result says so. A failed attempt is
+   * not retried for 5 minutes.
+   */
+  async catalogForRead(ws) {
+    const cached = await readCatalog(ws, { override: this.catalogOverride })
+    const maxAge = catalogMaxAgeHours(this.ctx.env)
+    const need = catalogNeedsRefresh(cached, { maxAgeHours: maxAge, now: Date.now() })
+    if (!need) return { cat: cached, refresh: { attempted: false, reason: maxAge === 0 ? 'disabled' : 'fresh', max_age_hours: maxAge } }
+    if (Date.now() - this.autoRefreshFailedAt < 5 * 60 * 1000) return { cat: cached, refresh: { attempted: false, reason: 'recently_failed', stale_reason: need, max_age_hours: maxAge } }
+    const cfg = await this.catalogConfig()
+    if (!cfg.configured) return { cat: cached, refresh: { attempted: false, reason: 'not_configured', stale_reason: need, max_age_hours: maxAge, detail: cfg.reason } }
+    try {
+      const body = await fetchPublicCatalog(cfg, { fetchImpl: this.fetchImpl })
+      const snap = await buildSnapshot(body, { origin: cfg.origin, kind: 'supabase-rest' })
+      let persisted = false
+      if (this.readOnly) this.catalogOverride = snap
+      else {
+        const writable = await this.openWorkspace()
+        await saveSnapshot(writable, snap, { via: 'agent-auto-refresh' }) // exception 2: public catalog cache only
+        persisted = true
+        this.catalogOverride = null
+      }
+      return {
+        cat: await readCatalog(ws, { override: snap }),
+        refresh: { attempted: true, refreshed: true, persisted, stale_reason: need, origin: cfg.origin, programs: snap.programs.length, fetched_at: snap.fetched_at, max_age_hours: maxAge },
+      }
+    } catch (e) {
+      this.autoRefreshFailedAt = Date.now()
+      return { cat: cached, refresh: { attempted: true, refreshed: false, reason: 'offline', stale_reason: need, max_age_hours: maxAge, detail: String(e?.message ?? e).slice(0, 300) } }
+    }
   }
 
   /** import-backup for sync_from_vault_export: the same code path as the CLI, with this session's secrets. */
@@ -230,6 +297,7 @@ export class Session {
       argsMac = null
     }
     const v = validateArgs(def.inputSchema, rawArgs)
+    let catalogState = null
     if (!v.ok) {
       result = { status: 'invalid_arguments', errors: v.errors }
       isError = true
@@ -242,22 +310,46 @@ export class Session {
           result = await def.handler(this.setupContext(), v.args)
         } else {
           let ws = await this.openWorkspace()
-          const writesAllowed = def.tier === TIER.PRIVATE_WRITE || (def.tier === TIER.READ && def.network && !this.readOnly)
-          if (!writesAllowed) ws = readOnlyView(ws, def.tier)
+          if (def.tier !== TIER.PRIVATE_WRITE) ws = readOnlyView(ws, def.tier)
+          const mayPersistCatalog = CATALOG_CACHE_WRITERS.includes(def.name) && !this.readOnly
           let model = null
           let catalog = null
+          let catalogRefresh = null
           const t = {
             ws,
             readOnly: this.readOnly,
-            exportsWritable: def.writes === 'exports' && !this.readOnly,
+            exportsWritable: def.writes === 'exports' && def.tier === TIER.PRIVATE_WRITE && !this.readOnly,
             fetchImpl: this.fetchImpl,
             now: () => nowIso(),
             catalogConfig: () => this.catalogConfig(),
+            /** Dispatcher-owned public-cache write (exception 2). Returns { persisted, changed }. */
+            persistCatalog: async (snap) => {
+              if (!mayPersistCatalog) {
+                this.catalogOverride = snap
+                catalog = null
+                return { persisted: false, changed: false }
+              }
+              const writable = await this.openWorkspace()
+              const { changed } = await saveSnapshot(writable, snap, { via: 'agent' })
+              this.catalogOverride = null
+              catalog = null
+              return { persisted: true, changed }
+            },
             setCatalogOverride: (snap) => { this.catalogOverride = snap; catalog = null },
-            catalog: async () => (catalog ??= await readCatalog(ws, { override: this.catalogOverride })),
+            catalog: async () => {
+              if (catalog) return catalog
+              if (def.autoRefreshCatalog) {
+                const r = await this.catalogForRead(ws)
+                catalogRefresh = r.refresh
+                return (catalog = r.cat)
+              }
+              return (catalog = await readCatalog(ws, { override: this.catalogOverride }))
+            },
+            catalogRefresh: () => catalogRefresh,
             model: async () => (model ??= await loadModel(ws, this.vaultSecret)),
             importBackupFile: (abs, o) => this.importBackupFile(abs, o),
           }
+          catalogState = () => ({ refresh: catalogRefresh, cat: catalog })
           result = def.tier === TIER.HUMAN_ONLY ? await def.handler({ now: t.now }, v.args) : await def.handler(t, v.args)
         }
         if (result?.status === 'requires_human' && def.tier === TIER.HUMAN_CONSENT) isError = false
@@ -270,6 +362,13 @@ export class Session {
           result = { status: 'error', error: 'internal', message: 'The tool failed. The detail is in untrusted_content.', untrusted: { detail: String(e?.message ?? e).slice(0, 2000) } }
           if (this.ctx.env.AQUA_COMPANION_DEBUG && e?.stack) this.ctx.stderr.write(`${e.stack}\n`)
         }
+      }
+    }
+    if (def.autoRefreshCatalog && catalogState && result && typeof result === 'object') {
+      const { refresh, cat } = catalogState()
+      if (refresh) result = { ...result, catalog_refresh: refresh }
+      if (cat && !cat.programs.length && !cat.canonical_questions.length && !cat.vault_programs.length) {
+        result = { ...result, catalog_empty: 'run refresh_catalog', catalog_empty_note: 'The public catalog cache is empty and could not be refreshed automatically (offline or not configured). Run refresh_catalog when online, or import a catalog file.' }
       }
     }
     await this.audit({ tool: name, tier: def.tier, args_mac: argsMac, result_status: result.status, read_only: this.readOnly, started_at: started })
@@ -299,10 +398,10 @@ export function shape(name, tier, result) {
 export function annotationsFor(tdef) {
   return {
     title: tdef.title,
-    readOnlyHint: tdef.tier === TIER.READ && !tdef.writes && !tdef.network,
+    readOnlyHint: tdef.tier === TIER.READ && !tdef.writes && !tdef.network && !CATALOG_CACHE_WRITERS.includes(tdef.name),
     destructiveHint: false,
     idempotentHint: tdef.tier !== TIER.PRIVATE_WRITE && tdef.tier !== TIER.HUMAN_CONSENT,
-    openWorldHint: Boolean(tdef.network),
+    openWorldHint: Boolean(tdef.network || tdef.autoRefreshCatalog),
   }
 }
 
@@ -320,8 +419,8 @@ export function annotationsFor(tdef) {
  * @param {object} [opts.stderr]
  * @returns {Promise<{ tools: Array<{name, tier, title, description, inputSchema, annotations, handler}>, dispatch: (name: string, args?: object) => Promise<{result: object, isError: boolean}>, session: Session, state: () => object, setElicitor: (fn) => void }>}
  */
-export async function createAquaToolRegistry({ workspace, readOnly = false, keychain = false, env = process.env, cwd = process.cwd(), fetchImpl, elicit = null, stderr = process.stderr, exec, platform } = {}) {
-  const session = await new Session({ env, cwd, stderr, flags: workspace ? { workspace } : {} }, { readOnly, keychain, fetchImpl, elicit, exec, platform }).init()
+export async function createAquaToolRegistry({ workspace, flags = {}, readOnly = false, keychain = false, env = process.env, cwd = process.cwd(), fetchImpl, elicit = null, stderr = process.stderr, exec, platform } = {}) {
+  const session = await new Session({ env, cwd, stderr, flags: { ...flags, ...(workspace ? { workspace } : {}) } }, { readOnly, keychain, fetchImpl, elicit, exec, platform }).init()
   const dispatch = async (name, args = {}) => {
     const r = await session.callTool(name, args)
     if (r.unknown) throw new UnknownToolError(name)

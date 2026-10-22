@@ -48,7 +48,7 @@ test('catalog sync (CLI) and refresh_catalog (MCP) read only public canonical ro
     assert.equal(fake.requests.length, 0)
     r = await run(['catalog', 'sync', '--catalog-config', cfg, '--workspace', root, '--yes'])
     assert.equal(r.code, 0, r.err)
-    assert.match(r.out, /Saved 1 program/)
+    assert.match(r.out, /Saved 2 program/)
     assert.deepEqual([...new Set(fake.requests.map((q) => new URL(q.url, 'http://x').pathname))].sort(), ['/rest/v1/archived_questions', '/rest/v1/program_cycles', '/rest/v1/program_questions', '/rest/v1/programs'])
     for (const q of fake.requests) {
       assert.equal(q.method, 'GET')
@@ -58,18 +58,19 @@ test('catalog sync (CLI) and refresh_catalog (MCP) read only public canonical ro
       for (const secret of [MARK, wsId, 'synthetic-workspace-pass', 'synthetic-vault-secret']) assert.equal(decodeURIComponent(q.url).includes(secret), false)
     }
     const programsUrl = decodeURIComponent(fake.requests.find((q) => q.url.startsWith('/rest/v1/programs')).url)
-    assert.match(programsUrl, /source=eq\.canonical/)
-    assert.match(programsUrl, /slug=in\.\(/)
+    // same approval rule as the site's approvedProgramsFilter(): registry slug OR source canonical
+    assert.match(programsUrl, /or=\(slug\.in\.\([^)]*\),source\.eq\.canonical\)/)
+    assert.doesNotMatch(programsUrl, /[?&]source=eq\.canonical/)
     // the snapshot is public plaintext, approved rows only
     const [[, entry]] = snapshotEntries(root)
     const file = JSON.parse(fs.readFileSync(path.join(root, entry.path), 'utf8'))
     assert.equal(file.scope, 'public')
-    assert.deepEqual(file.data.programs.map((p) => p.id), ['p-synth-1'])
+    assert.deepEqual(file.data.programs.map((p) => p.id), ['p-synth-1', 'p-curator-published'])
     assert.deepEqual(file.data.questions.map((q) => q.id).sort(), ['pq-1', 'pq-2'])
     assert.deepEqual(file.data.canonical_questions.map((q) => q.id).sort(), ['aq-1', 'aq-2'])
     assert.equal((await run(['verify', '--workspace', root])).code, 0)
     r = await run(['catalog', 'status', '--catalog-config', cfg, '--workspace', root])
-    assert.match(r.out, /1 program\(s\)/)
+    assert.match(r.out, /2 program\(s\)/)
 
     // same data again: unchanged, no new snapshot
     r = await run(['catalog', 'sync', '--catalog-config', cfg, '--workspace', root, '--yes'])
@@ -83,7 +84,7 @@ test('catalog sync (CLI) and refresh_catalog (MCP) read only public canonical ro
       const rf = await c.call('refresh_catalog')
       assert.equal(rf.status, 'ok', JSON.stringify(rf))
       assert.equal(rf.persisted, true)
-      assert.equal(rf.programs, 1)
+      assert.equal(rf.programs, 2)
       const d = await c.call('discover_applications', { query: 'accelerator' })
       assert.equal(d.catalog.endpoint_configured, true)
       assert.ok(d.catalog_program_ids.includes('p-synth-1'))

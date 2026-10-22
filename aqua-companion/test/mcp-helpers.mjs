@@ -128,12 +128,13 @@ export const FORM_MD = [
   '',
 ].join('\n')
 
-/** Synthetic public catalog rows (one approved program, plus rows that must be filtered out). */
+/** Synthetic public catalog rows: a registry program, a curator-published (source canonical,
+    outside the registry) program, and an unapproved row that must be filtered out. */
 export const CATALOG_FIXTURE = {
   programs: [
     { id: 'p-synth-1', slug: 'yc-summer-2026', name: 'Synthetic Accelerator Program', organization: 'Synthetic Org', description: 'A synthetic program for tests.', source: 'canonical', deadline_at: '2026-11-01T07:00:00Z', is_rolling: false, apply_url: 'https://example.org/apply' },
     { id: 'p-not-approved', slug: 'some-community-row', name: 'Unapproved Synthetic Row', organization: 'Nobody', source: 'community' },
-    { id: 'p-not-registered', slug: 'not-in-registry', name: 'Unregistered Synthetic Row', organization: 'Nobody', source: 'canonical' },
+    { id: 'p-curator-published', slug: 'curator-published-synth', name: 'Curator Published Synthetic Program', organization: 'Synthetic Curated Org', source: 'canonical' },
   ],
   cycles: [{ id: 'c-1', program_id: 'p-synth-1', cycle_name: 'S27', closes_at: '2026-11-01T07:00:00Z', is_active: true }],
   questions: [

@@ -34,7 +34,7 @@ test('every capability works end to end on a synthetic workspace', async () => {
     assert.equal(d.status, 'ok')
     assert.ok(d.catalog_program_ids.includes('p-synth-1'))
     assert.equal(d.catalog_program_ids.includes('p-not-approved'), false, 'non-canonical rows are never cached')
-    assert.equal(d.catalog_program_ids.includes('p-not-registered'), false, 'slugs outside the approval registry are never cached')
+    assert.ok(d.catalog_program_ids.includes('p-curator-published'), 'curator-published (source canonical) programs outside the registry are kept, as on the site')
     assert.ok(d.workspace_instance_ids.includes(v.inst.instance_id))
     assert.equal(d.untrusted_content.notice, UNTRUSTED_NOTICE)
     assert.equal(d.catalog.endpoint_configured, false)

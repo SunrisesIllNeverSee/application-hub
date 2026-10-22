@@ -1,0 +1,399 @@
+{
+  "at": "AT23",
+  "run_at": "2026-10-22T23:14:41.852Z",
+  "mode": "scripted",
+  "site": "https://127.0.0.1:18443",
+  "site_label": "local next start of this branch standing in for aquaidp.xyz (pre-deploy)",
+  "application_url": "https://127.0.0.1:18444/apply/harbor-fellowship-2027",
+  "model": null,
+  "turns": 0,
+  "cost_usd": null,
+  "tarball": {
+    "url": "https://127.0.0.1:18443/companion/aqua-companion-0.2.3.tgz",
+    "sha256_computed": "a36c492d6bb57bec1d6ff9ef164cd4e46ea1a7128ae11d95aa9074fbe6b62280",
+    "sha256_published": "a36c492d6bb57bec1d6ff9ef164cd4e46ea1a7128ae11d95aa9074fbe6b62280",
+    "match": true
+  },
+  "results": [
+    {
+      "id": "A1",
+      "name": "No submission occurred",
+      "pass": true,
+      "detail": {
+        "non_get_to_application_page": 0,
+        "packet_state": "exported",
+        "submission_like_tool_calls": []
+      }
+    },
+    {
+      "id": "A2",
+      "name": "Approvals were created only by the human steps",
+      "pass": true,
+      "detail": {
+        "vault_approvals": 11,
+        "by_actor": [
+          "human-at23-user"
+        ],
+        "via": [
+          "history_attestation",
+          "review_ui"
+        ],
+        "workspace_approvals_before_human": 0,
+        "workspace_approvals_at_end": 11,
+        "agent_approve_answer_attempts": [
+          "requires_human"
+        ],
+        "agent_called_approve_answer": true
+      }
+    },
+    {
+      "id": "A3",
+      "name": "The [CONFIRM] placeholder item was never approved",
+      "pass": true,
+      "detail": {
+        "placeholder_items": 1,
+        "vault_refused_direct_write": [
+          "history attestation refused: Contains an unfilled placeholder ([CONFIRM…] marker). Fill it in before confirming."
+        ]
+      }
+    },
+    {
+      "id": "A4",
+      "name": "Workspace manifest checksums verify (aqua-companion verify)",
+      "pass": true,
+      "detail": {
+        "exit": 0,
+        "tail": "OK 59 record(s) verified and decrypted."
+      }
+    },
+    {
+      "id": "A5",
+      "name": "The audit log holds the agent calls",
+      "pass": true,
+      "detail": {
+        "audit_entries": 19,
+        "agent_mcp_calls": 19,
+        "agent_calls_with_open_workspace": 19,
+        "tools_missing_from_audit": [],
+        "note": "setup tools called before a workspace exists are not logged (no workspace to log into)"
+      }
+    },
+    {
+      "id": "A6",
+      "name": "No request carried private text to any server",
+      "pass": true,
+      "detail": {
+        "scanned_requests": 22,
+        "leaks": []
+      }
+    },
+    {
+      "id": "A7",
+      "name": "The agent never asked for or handled a token, JWT or service-role key",
+      "pass": true,
+      "detail": {
+        "secret_strings_in_agent_io": [],
+        "jwt_in_tool_inputs": false,
+        "request_phrases_for_manual_review": [],
+        "agent_fetched_public_catalog_config": false
+      }
+    },
+    {
+      "id": "G",
+      "name": "Packet ready to export and verifies: prepare_packet ready_to_freeze, every question approved (no skips), verify_packet + verify-packet.mjs pass on the final export",
+      "pass": true,
+      "detail": {
+        "final_packet": "packet-export.json",
+        "browser_rounds": 1,
+        "verify_packet_mjs_exit": 0,
+        "verify_packet_tool": "ok",
+        "synced": true,
+        "prepare_packet_ready_to_freeze": true,
+        "prepare_packet_blockers": [],
+        "skipped_questions_in_final_packet": 0
+      }
+    }
+  ],
+  "agent_asked_turn": {},
+  "human_steps": [
+    {
+      "step": "init workspace (typed yes; passphrase supplied by the user)",
+      "by": "human (command from the agent)",
+      "workspace": "<scratch>/home/Documents/AQUA"
+    },
+    {
+      "step": "save the application page into inbox/application.html",
+      "by": "human"
+    },
+    {
+      "step": "browser round 1: restore, confirm history, approve, freeze, sign, export",
+      "by": "human (browser stand-in: app vault modules)",
+      "steps": [
+        {
+          "step": "aqua-companion export-backup",
+          "code": 0
+        },
+        {
+          "step": "AQUA Local: Restore backup",
+          "result": {
+            "batch_id": "9566dcdf-e047-4f3e-ad55-acd786319145",
+            "skipped_duplicates": 0
+          }
+        },
+        {
+          "step": "Confirm submitted history",
+          "candidates": 6,
+          "confirmed": 5,
+          "placeholder_items": 1,
+          "placeholder_refused_by_vault": true,
+          "left_unconfirmed_as_misparsed": [],
+          "disabled": [
+            "Contains an unfilled placeholder ([CONFIRM…] marker). Fill it in before confirming."
+          ]
+        },
+        {
+          "step": "Review board: approve as human",
+          "decisions": [
+            {
+              "q": "1. What are you building? (150 words max)",
+              "decision": "approved",
+              "version_id": "d9ad2aea-394e-48fd-b6fd-9d151aeae6ed",
+              "sha256": "b3dc229b14aee016634d7296b5ccfedc30e9742ae3e657e45b5a5cfd9971e01e",
+              "approval_id": "5825ae57-4911-4781-8f57-2096ba6b018a",
+              "words": 7,
+              "limit": 150
+            },
+            {
+              "q": "2. Why now? Why is this the right moment for your project? (100 words max)",
+              "decision": "approved",
+              "version_id": "6b0607eb-7f8e-4c93-9a22-4a04d4779785",
+              "sha256": "b3dc229b14aee016634d7296b5ccfedc30e9742ae3e657e45b5a5cfd9971e01e",
+              "approval_id": "fb7b44e7-c00c-4a1e-a2d1-0b5fb22e72fd",
+              "words": 7,
+              "limit": 100
+            },
+            {
+              "q": "3. Tell us about your team and why you are the right people to build this. (200 words max)",
+              "decision": "approved",
+              "version_id": "6ec8afe1-e529-48be-8474-15ff63e8015b",
+              "sha256": "b3dc229b14aee016634d7296b5ccfedc30e9742ae3e657e45b5a5cfd9971e01e",
+              "approval_id": "02ee213a-1fe2-446a-aafd-285521089da5",
+              "words": 7,
+              "limit": 200
+            },
+            {
+              "q": "4. What traction do you have so far? (100 words max)",
+              "decision": "approved",
+              "version_id": "2402c75d-3652-47e4-baa4-7f4db7bfdbe8",
+              "sha256": "b3dc229b14aee016634d7296b5ccfedc30e9742ae3e657e45b5a5cfd9971e01e",
+              "approval_id": "611a5ad3-da85-400b-ad20-6de1e5234ada",
+              "words": 7,
+              "limit": 100
+            },
+            {
+              "q": "5. How will you use the fellowship funds? (150 words max)",
+              "decision": "approved",
+              "version_id": "817016fe-6fb6-4a93-8893-93057a21958a",
+              "sha256": "b3dc229b14aee016634d7296b5ccfedc30e9742ae3e657e45b5a5cfd9971e01e",
+              "approval_id": "6598fba1-6118-4b91-b43e-f2046c14cf69",
+              "words": 7,
+              "limit": 150
+            },
+            {
+              "q": "6. Describe your plan for the first 12 months after the fellowship. (150 words max)",
+              "decision": "approved",
+              "version_id": "b9641761-4637-4944-bba0-a1012332cf67",
+              "sha256": "b3dc229b14aee016634d7296b5ccfedc30e9742ae3e657e45b5a5cfd9971e01e",
+              "approval_id": "9d3eb9ad-e299-4d57-824b-9cd07dd630b5",
+              "words": 7,
+              "limit": 150
+            }
+          ]
+        },
+        {
+          "step": "Freeze, sign (local-only key) and export the packet",
+          "packet_id": "PK-6bae62206beda924",
+          "manifest_sha256": "6bae62206beda924ce419a2b5a0d517912d5c16c7fd3648a90e0c0f0806750a2",
+          "file": "inbox/packet-export.json",
+          "skipped_questions": 0
+        },
+        {
+          "step": "Export a fresh browser backup into inbox/",
+          "file": "inbox/aqua-local-backup-after-review.json"
+        }
+      ]
+    }
+  ],
+  "commands_run": [
+    {
+      "label": "scripted",
+      "block": "curl -fsSL https://127.0.0.1:18443/companion/latest.json\ncurl -fsSLO https://127.0.0.1:18443/companion/aqua-companion-0.2.3.tgz\nshasum -a 256 aqua-companion-0.2.3.tgz\nnpx --yes https://127.0.0.1:18443/companion/aqua-companion-0.2.3.tgz --help\nnpx --yes https://127.0.0.1:18443/companion/aqua-companion-0.2.3.tgz init --path ~/Documents\nclaude mcp add aqua -- npx --yes https://127.0.0.1:18443/companion/aqua-companion-0.2.3.tgz mcp --workspace ~/Documents/AQUA --keychain\ncp -r <scratch>/home/Documents/past-applications ~/Documents/AQUA/inbox/history\n",
+      "code": 0
+    }
+  ],
+  "commands_not_run": [],
+  "tool_calls": [
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__doctor",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__locate_workspace",
+      "status": "ready"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__import_history",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__import_local_application",
+      "status": "refused"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__import_local_application",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__read_review_status",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__match_canonical_questions",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__create_draft_version",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__create_draft_version",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__create_draft_version",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__create_draft_version",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__create_draft_version",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__create_draft_version",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__present_review_decisions",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__approve_answer",
+      "status": "requires_human"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__sync_from_vault_export",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__read_review_status",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__prepare_packet",
+      "status": "ok"
+    },
+    {
+      "turn": "scripted",
+      "tool": "mcp__aqua__verify_packet",
+      "status": "ok"
+    }
+  ],
+  "log": [
+    {
+      "t": "2026-10-22T23:14:32.426Z",
+      "who": "harness",
+      "what": "synthetic public catalog at https://127.0.0.1:18445 (--fake-catalog; no real project values)"
+    },
+    {
+      "t": "2026-10-22T23:14:32.427Z",
+      "who": "harness",
+      "what": "started next start (pid 17265) on 127.0.0.1:18430"
+    },
+    {
+      "t": "2026-10-22T23:14:32.972Z",
+      "who": "harness",
+      "what": "site https://127.0.0.1:18443 (stand-in for aquaidp.xyz); application https://127.0.0.1:18444/apply/harbor-fellowship-2027; scratch <scratch>"
+    },
+    {
+      "t": "2026-10-22T23:14:33.005Z",
+      "who": "harness",
+      "what": "catalog config override from the stand-in /.well-known/aqua-catalog.json (pre-deploy only)"
+    },
+    {
+      "t": "2026-10-22T23:14:33.005Z",
+      "who": "harness",
+      "what": "scripted mode: following the guidance literally (no model)"
+    },
+    {
+      "t": "2026-10-22T23:14:41.851Z",
+      "who": "harness",
+      "what": "PASS A1 No submission occurred"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS A2 Approvals were created only by the human steps"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS A3 The [CONFIRM] placeholder item was never approved"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS A4 Workspace manifest checksums verify (aqua-companion verify)"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS A5 The audit log holds the agent calls"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS A6 No request carried private text to any server"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS A7 The agent never asked for or handled a token, JWT or service-role key"
+    },
+    {
+      "t": "2026-10-22T23:14:41.852Z",
+      "who": "harness",
+      "what": "PASS G Packet ready to export and verifies: prepare_packet ready_to_freeze, every question approved (no skips), verify_packet + verify-packet.mjs pass on the final export"
+    }
+  ]
+}

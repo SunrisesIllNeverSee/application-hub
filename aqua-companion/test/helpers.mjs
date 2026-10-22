@@ -107,7 +107,7 @@ export async function buildVault() {
   const q2 = tpl.questions[1].question_occurrence_id
   const answer = await app.createAnswer(s, { application_id: inst.application_id, question_occurrence_id: q1 })
   const version = await app.createVersion(s, VAULT, { answer_id: answer.id, title: 'Synthetic answer', body: `We build a synthetic widget. ${MARK}`, method: 'manual' })
-  const approval = await app.recordHumanApproval(s, { version_id: version.id, expected_sha256: version.sha256, actor_id: 'u-test', via: 'review_ui' })
+  const approval = await app.recordHumanApproval(s, { version_id: version.id, expected_sha256: version.sha256, actor_id: 'u-test', via: 'review_ui', secret: VAULT })
   const evidence = await app.addEvidence(s, VAULT, { kind: 'note', title: `Synthetic note ${MARK}`, excerpt: 'Synthetic excerpt', links: [{ target_kind: 'version', target_id: version.id }] })
   const comment = await app.addComment(s, VAULT, { version_id: version.id, body: `Synthetic comment ${MARK}`, actor_class: 'human', actor_id: 'u-test' })
   await app.recordReviewDecision(s, VAULT, { version_id: version.id, expected_sha256: version.sha256, decision: 'help_requested', rationale: 'synthetic', actor_class: 'human', actor_id: 'u-test' })

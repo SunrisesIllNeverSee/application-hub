@@ -45,7 +45,7 @@ Node.js 22 or newer.
 npx -y aqua-mcp-server --help
 ```
 
-> Until 2.0.0 is published to npm, use the tarball from the AQUA team: `npx -y ./aqua-mcp-server-2.0.0.tgz`. Or run it from a checkout: `node application-hub-mcp-server/bin/aqua-mcp-server.mjs` after `npm install` in that folder.
+> The package includes the AQUA companion (no separate install, no dependencies). From a repository checkout you can also run `node application-hub-mcp-server/bin/aqua-mcp-server.mjs`; after changing the companion, run `npm run vendor:companion` in this folder (CI checks the copy). The companion is also served as a tarball at https://aquaidp.xyz/companion/latest.json, as a fallback.
 
 ### Claude Code
 

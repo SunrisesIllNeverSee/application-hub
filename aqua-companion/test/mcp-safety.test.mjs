@@ -19,6 +19,7 @@ const PRIVATE_WRITE_CALLS = (ids) => [
   ['attach_evidence', { file: 'form.md', title: 'synthetic' }],
   ['record_observed_submission', { file: 'form.md' }],
   ['import_history', { folder: 'history' }],
+  ['present_review_decisions', { application_id: ids.instance }],
   ['sync_from_vault_export', { file: 'form.md' }],
 ]
 
@@ -43,9 +44,6 @@ test('--read-only refuses every private_write tool before it runs; reads still w
     }
     const st = await c.call('read_review_status', { application_id: v.inst.instance_id })
     assert.equal(st.status, 'ok')
-    const pr = await c.call('present_review_decisions', { application_id: v.inst.instance_id })
-    assert.equal(pr.saved_to, null)
-    assert.equal(pr.not_saved_reason, 'read_only')
   } finally {
     await c.close()
   }

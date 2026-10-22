@@ -45,6 +45,8 @@ export function openConfined(root, abs, flags, mode, { created = false } = {}) {
     const b = fs.statSync(real)
     if (a.dev !== b.dev || a.ino !== b.ino) throw new PathSafetyError(`opened file changed during open: ${path.relative(root, abs)}`)
     if (!a.isFile()) throw new PathSafetyError(`not a regular file: ${path.relative(root, abs)}`)
+    // a hard link can alias a file outside the workspace (O_NOFOLLOW does not see it): refuse any multiply-linked file
+    if (a.nlink > 1) throw new PathSafetyError(`hard-linked file refused: ${path.relative(root, abs)}`)
     ok = true
     return fd
   } finally {
@@ -116,18 +118,16 @@ export function mkdirInside(root, rel) {
   let cur = root
   for (const part of norm.split('/')) {
     cur = path.join(cur, part)
-    let st = null
+    // mkdir first, then inspect on EEXIST: there is no lstat-then-mkdir window in which a symlink could be planted
     try {
-      st = fs.lstatSync(cur)
-    } catch (e) {
-      if (e.code !== 'ENOENT') throw e
-    }
-    if (st) {
-      if (st.isSymbolicLink()) throw new PathSafetyError(`symlink in workspace path refused: ${norm}`)
-      if (!st.isDirectory()) throw new PathSafetyError(`not a directory: ${norm}`)
+      fs.mkdirSync(cur, { mode: 0o700 })
       continue
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e
     }
-    fs.mkdirSync(cur, { mode: 0o700 })
+    const st = fs.lstatSync(cur)
+    if (st.isSymbolicLink()) throw new PathSafetyError(`symlink in workspace path refused: ${norm}`)
+    if (!st.isDirectory()) throw new PathSafetyError(`not a directory: ${norm}`)
   }
   return cur
 }

@@ -4,6 +4,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { INIT, req, runServer } from './helpers.mjs'
@@ -17,7 +18,7 @@ test('initialize echoes every supported version and falls back to the newest', a
     const res = r.responses.get(1).result
     assert.equal(res.protocolVersion, v)
     assert.equal(res.serverInfo.name, 'aqua-mcp-server')
-    assert.equal(res.serverInfo.version, '2.0.0')
+    assert.equal(res.serverInfo.version, JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version)
     assert.deepEqual(Object.keys(res.capabilities).sort(), ['prompts', 'resources', 'tools'])
     assert.equal(typeof res.instructions, 'string')
   }

@@ -1,0 +1,31 @@
+{
+  "entries": 41,
+  "by_tool": {
+    "doctor": 1,
+    "locate_workspace": 1,
+    "import_history": 1,
+    "discover_applications": 1,
+    "search_answer_bank": 5,
+    "read_review_status": 4,
+    "import_local_application": 2,
+    "match_canonical_questions": 1,
+    "create_draft_version": 10,
+    "request_evidence": 6,
+    "present_review_decisions": 2,
+    "sync_from_vault_export": 2,
+    "prepare_packet": 3,
+    "verify_packet": 2
+  },
+  "first_entry_fields": [
+    "seq",
+    "at",
+    "op",
+    "tool",
+    "tier",
+    "args_mac",
+    "result_status",
+    "read_only",
+    "started_at",
+    "prev"
+  ]
+}

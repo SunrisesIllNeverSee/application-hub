@@ -18,8 +18,8 @@
     {
       "path": "lib/aqua-local/history.mjs",
       "source": "app/lib/aqua-local/history.ts",
-      "source_sha256": "56e522b8cc9c47e23a2787a5f353dabd8f759a2177c0a8195ef42289f85ce480",
-      "body_sha256": "30e4100b8ad09485987b5e481af4450b3d901f608fe77326e4124b2f17acddb2"
+      "source_sha256": "8f6396893fab300afddd75f7575164bb33283680f41b07fbb3303bf0b21497a0",
+      "body_sha256": "7478f28210177eda0a1fb1735dc6e1c9c2f72a906d6f116df76fca353f84a786"
     },
     {
       "path": "lib/aqua-local/match.mjs",
@@ -28,22 +28,28 @@
       "body_sha256": "e77b257ca0f15dc9d041fcc0b8e9cb4ce179cdd814aaebe83283f758bf2e34e4"
     },
     {
+      "path": "lib/aqua-local/placeholders.mjs",
+      "source": "app/lib/aqua-local/placeholders.ts",
+      "source_sha256": "6199d25c93634791b4bf17a6d11846ced6b940ca53c64a1f197c7565806f112a",
+      "body_sha256": "0947762914555bd2f5b52e1020a6653653e4873ded38ff8548f3902af2bb579e"
+    },
+    {
       "path": "lib/aqua-local/repo.mjs",
       "source": "app/lib/aqua-local/repo.ts",
-      "source_sha256": "f1d51da6d22708f2ba756517cd8e3474aca224d73ed7a6b68074cb0d7a736cd5",
-      "body_sha256": "428f0bbf4b41847b26db4d5a67ea1f2bc06dd403c4484b9e9ab42474bf2218ce"
+      "source_sha256": "04a42745142a9f249f3f41dfc4843d216d80c38e7850671ad568db9feee71ef2",
+      "body_sha256": "f1e5e20017ae9cc4f53a9170fb46be9506a5594806da5df7680c0ff6c2506186"
     },
     {
       "path": "lib/aqua-local/status.mjs",
       "source": "app/lib/aqua-local/status.ts",
-      "source_sha256": "29bc50b6aa9759b4a82b774352f0c0ad4301e081b9aec9305e5809699f052ac0",
-      "body_sha256": "9add138ffc513a012e9b6cff393dd6b267d711577b53feed38518001c6a26fe9"
+      "source_sha256": "e5ed22e304b4e3476c9660e3fb7d6d0d5aa1c2aeee7352b318d6d3e252d77c51",
+      "body_sha256": "613347f48e37a6dd1690b5d7fe51cf10b11b5c1046809fd18339439370ab8ce5"
     },
     {
       "path": "lib/aqua-local/verify-packet.mjs",
       "source": "app/lib/aqua-local/verify-packet.mjs",
-      "source_sha256": "bb2d90622399dbb0b76af8bf744d04cf82774c5001e406b32538ee1d6d1599c6",
-      "body_sha256": "22e643d2e1732c2e8e9053131552bd5f659da91b8097f4736e16416f16ac2ae2"
+      "source_sha256": "e2fad28ab964276b157372ecb2bb06704b5dff980cf079890ca3fbc99a75ee10",
+      "body_sha256": "62c680e4b299e7858fad6b4460913fa05945cfec3a0ca705aae8cbfd519f4fd6"
     },
     {
       "path": "lib/canonical-catalog.mjs",
@@ -60,8 +66,8 @@
     {
       "path": "lib/catalog/extract.mjs",
       "source": "app/lib/catalog/extract.ts",
-      "source_sha256": "d0b58c7e9163318ade0ae7f62aca7a811fbcf9777c25ff8510b0109e13fc2baf",
-      "body_sha256": "cf4c83f283d1775b34190b935fafce9057bbc19ded671bcce2a8fb11c5265956"
+      "source_sha256": "28abae383e6c82a890d1695dcb1aca0a26554bad193b474bdbf9df33599c7b91",
+      "body_sha256": "3d2c768456b1b19ee91271397df1d2b63ab287bb6690307c657ff8e9558972e8"
     },
     {
       "path": "lib/catalog/files.mjs",
@@ -72,8 +78,8 @@
     {
       "path": "lib/catalog/html.mjs",
       "source": "app/lib/catalog/html.ts",
-      "source_sha256": "e98930726c9590a6891b862e680fc418c30b6da7d1d90e7ed7333299a089e11d",
-      "body_sha256": "848809e9bc44ff27ccd5dde79ba82fbd016543937be39b7991f5b3c54c1c8ee1"
+      "source_sha256": "99a75336db46d81f4ecb735eea73f421135186e72e586f33bfb1fa0642fd5737",
+      "body_sha256": "ecb8c8ae7d39bef0be13a200122072105a34578fca5d42944e503343d69b2464"
     },
     {
       "path": "lib/catalog/match.mjs",

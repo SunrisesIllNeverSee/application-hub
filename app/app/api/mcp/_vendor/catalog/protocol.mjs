@@ -25,7 +25,7 @@ import { PromptError } from './prompts.mjs'
 
 /** Newest first. The server answers with the client's version when supported, else the newest. */
 export const SUPPORTED_PROTOCOL_VERSIONS = Object.freeze(['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'])
-export const PACKAGE_VERSION = '2.0.0'
+export const PACKAGE_VERSION = '2.0.2'
 
 const rpcError = (id, code, message, data) => ({ jsonrpc: '2.0', id: id ?? null, error: { code, message, ...(data ? { data } : {}) } })
 const rpcResult = (id, result) => ({ jsonrpc: '2.0', id, result })

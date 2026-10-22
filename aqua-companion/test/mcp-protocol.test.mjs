@@ -37,7 +37,7 @@ test('initialize negotiates the protocol version; tools/list declares every tool
       assert.ok(t.description.startsWith(`[tier: ${tier}]`), t.name)
       assert.equal(t.inputSchema.type, 'object')
       assert.equal(t.inputSchema.additionalProperties, false)
-      assert.equal(t.annotations.readOnlyHint, tier === TIER.READ && !['present_review_decisions', 'refresh_catalog', 'doctor'].includes(t.name))
+      assert.equal(t.annotations.readOnlyHint, tier === TIER.READ && !['refresh_catalog', 'discover_applications', 'get_application_details', 'match_canonical_questions', 'doctor'].includes(t.name))
       // no tool takes a secret, token or JWT
       for (const p of Object.keys(t.inputSchema.properties)) assert.doesNotMatch(p, /pass|secret|token|jwt|key|auth/i, `${t.name}.${p}`)
     }

@@ -14,9 +14,9 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { canonicalJson, sha256Hex, nowIso } from './crypto.mjs'
 import { confirmPlan, out, UsageError } from './io.mjs'
-import { CONFIG_ORIGIN, CONFIG_PATH, CatalogNetworkError, endpointOrigin, getCatalogConfigJson, getPublicJson } from './net.mjs'
+import { CONFIG_ORIGIN, CONFIG_PATH, CatalogNetworkError, SUPABASE_ORIGIN_RE, endpointOrigin, getCatalogConfigJson, getConfigJsonFromUrl, getPublicJson, safeText } from './net.mjs'
 import { rid, splitRid } from './workspace.mjs'
-import { CANONICAL_PROGRAM_SLUGS } from '../vendor/lib/canonical-catalog.mjs'
+import { APPROVED_SOURCE, CANONICAL_PROGRAM_SLUGS, approvedProgramsFilter } from '../vendor/lib/canonical-catalog.mjs'
 
 export const SNAPSHOT_KEY = 'public-catalog-snapshot'
 export const SNAPSHOT_RID = rid('catalog', SNAPSHOT_KEY)
@@ -60,6 +60,9 @@ export function describeKey(key) {
   return { kind: 'unknown', role: null, ref: null }
 }
 
+/** A JWT role claim is config-derived text: show it only when it is a short plain word. */
+const roleLabel = (role) => (role === null || role === undefined ? 'none' : typeof role === 'string' && /^[a-z_]{1,24}$/.test(role) ? role : 'unrecognized')
+
 /**
  * Refuse anything that is not a public key. Accepted: a publishable key
  * (sb_publishable_...) or a JWT whose role is "anon". Hard refusal for
@@ -69,62 +72,135 @@ export function assertPublicKey(key) {
   const d = describeKey(key)
   if (d.kind === 'secret') throw new CatalogKeyRefusal('That is a Supabase SECRET key. Only the public publishable (anon) key may be configured; nothing was saved or sent.', 'service_role')
   if (d.kind === 'jwt' && d.role === 'service_role') throw new CatalogKeyRefusal('That key carries role "service_role". Service-role keys are refused outright; only the public anon / publishable key may be configured. Nothing was sent.', 'service_role')
-  if (d.kind === 'jwt' && d.role !== 'anon') throw new CatalogKeyRefusal(`That key carries role "${d.role ?? 'none'}". Only the public anon / publishable key may be configured; nothing was sent.`, d.role)
+  if (d.kind === 'jwt' && d.role !== 'anon') throw new CatalogKeyRefusal(`That key carries role "${roleLabel(d.role)}". Only the public anon / publishable key may be configured; nothing was sent.`, roleLabel(d.role))
   if (d.kind === 'unknown') throw new CatalogKeyRefusal('That key is neither a publishable key (sb_publishable_...) nor an anon JWT, so its role cannot be checked. Nothing was sent.', null)
   return d
 }
 
-function fromObject(cfg, base) {
-  const url = cfg?.supabase_url
-  const key = cfg?.publishable_key
-  if (isPlaceholder(url) || isPlaceholder(key)) return { configured: false, ...base, reason: `the public catalog endpoint is not configured (placeholders in ${base.path ?? base.config_url})` }
-  const origin = endpointOrigin(url)
-  const d = assertPublicKey(key)
-  return { configured: true, ...base, origin, key, key_role: d.role, key_kind: d.kind, project_ref: d.ref ?? (origin.match(/^https:\/\/([a-z0-9]{20})\.supabase\.co$/)?.[1] ?? null) }
-}
-
-const OFFLINE = (env) => ['1', 'true'].includes(String(env?.AQUA_CATALOG_OFFLINE ?? '').trim().toLowerCase())
+export const CATALOG_TABLES = Object.freeze({
+  programs: 'programs', program_cycles: 'program_cycles', program_questions: 'program_questions', archived_questions: 'archived_questions',
+  program_dna: 'program_dna', program_stats: 'program_stats', acceptance_reports: 'acceptance_reports',
+})
+const TABLE_NAME = /^[a-z_][a-z0-9_]{0,62}$/
 
 /**
- * Synchronous configuration from a local file only: --catalog-config F,
- * AQUA_CATALOG_CONFIG, else the bundled config/public-catalog.json.
- * { configured, origin, key, path, source, reason }
+ * The ONE catalog configuration object parser (aqua-mcp-server uses it through
+ * resolveCatalogConfig as well). `remote`: the document came over the network,
+ * where it is untrusted: its origin must be https://<ref>.supabase.co and it
+ * cannot rename tables. Local files and env stay the user's choice. Error
+ * messages are fixed text; nothing from the document is echoed.
+ */
+export function parseConfigObject(cfg, { remote = false, base = {} } = {}) {
+  if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) throw new CatalogNetworkError('the catalog configuration is not a JSON object', 'config')
+  const url = cfg.supabase_url
+  const key = cfg.publishable_key
+  if (isPlaceholder(url) || isPlaceholder(key)) return { configured: false, ...base, reason_code: 'placeholders', reason: `the public catalog endpoint is not configured (placeholders in ${base.path ?? base.config_url ?? 'the configuration'})` }
+  const origin = endpointOrigin(url)
+  if (remote && !SUPABASE_ORIGIN_RE.test(origin)) throw new CatalogNetworkError('a remote catalog configuration must name an https://<ref>.supabase.co project', 'config')
+  const d = assertPublicKey(key)
+  const tables = { ...CATALOG_TABLES }
+  if (cfg.tables !== undefined && !remote) {
+    if (!cfg.tables || typeof cfg.tables !== 'object' || Array.isArray(cfg.tables)) throw new CatalogNetworkError('catalog config "tables" must be an object', 'config')
+    for (const [logical, name] of Object.entries(cfg.tables)) {
+      if (!(logical in CATALOG_TABLES)) continue
+      if (typeof name !== 'string' || !TABLE_NAME.test(name)) throw new CatalogNetworkError('a catalog config table name is not a plain identifier', 'config')
+      tables[logical] = name
+    }
+  }
+  return { configured: true, ...base, origin, key: String(key).trim(), key_role: d.role, key_kind: d.kind, tables, project_ref: d.ref ?? (origin.match(/^https:\/\/([a-z0-9]{20})\.supabase\.co$/)?.[1] ?? null) }
+}
+
+const OFFLINE = (ctx) => ctx.flags?.offline === true || ['1', 'true'].includes(String(ctx.env?.AQUA_CATALOG_OFFLINE ?? '').trim().toLowerCase())
+const IS_URL = /^https?:\/\//i
+const unconfigured = (source, reason_code, reason, extra = {}) => ({ configured: false, source, reason_code, reason, ...extra })
+
+function readConfigFile(abs) {
+  let raw
+  try {
+    const st = fs.statSync(abs)
+    if (!st.isFile() || st.size > 64 * 1024) throw new Error('x')
+    raw = fs.readFileSync(abs, 'utf8')
+  } catch {
+    return { error: unconfigured('file', 'unreadable', `no readable catalog config at ${abs}`, { path: abs }) }
+  }
+  try {
+    return { value: JSON.parse(raw) }
+  } catch {
+    return { error: unconfigured('file', 'not_json', `the catalog config at ${abs} is not JSON`, { path: abs }) }
+  }
+}
+
+/**
+ * Synchronous configuration from a local file only (kept for the CLI's offline
+ * paths and tests): --catalog-config F, AQUA_CATALOG_CONFIG, else the bundled file.
  */
 export function loadCatalogConfig(ctx) {
   const explicit = ctx.flags?.['catalog-config'] ?? ctx.env?.AQUA_CATALOG_CONFIG ?? null
-  const p = explicit ?? DEFAULT_CONFIG_PATH
-  const abs = path.resolve(ctx.cwd ?? process.cwd(), p)
-  let cfg
-  try {
-    cfg = JSON.parse(fs.readFileSync(abs, 'utf8'))
-  } catch {
-    return { configured: false, path: abs, source: explicit ? 'file' : 'bundled', reason: `no readable catalog config at ${abs}` }
-  }
-  return fromObject(cfg, { path: abs, source: explicit ? 'file' : 'bundled' })
+  const abs = path.resolve(ctx.cwd ?? process.cwd(), explicit ?? DEFAULT_CONFIG_PATH)
+  const f = readConfigFile(abs)
+  const base = { path: abs, source: explicit ? 'file' : 'bundled' }
+  if (f.error) return { ...f.error, source: base.source }
+  return parseConfigObject(f.value, { remote: false, base })
 }
 
 /**
- * M09b: the default catalog configuration comes from
- * https://aquaidp.xyz/.well-known/aqua-catalog.json (fetch allowlist: that
- * origin and path only). Order: a local file override (--catalog-config /
- * AQUA_CATALOG_CONFIG), the bundled file when it holds real values, then the
- * well-known document. AQUA_CATALOG_OFFLINE=1 skips the fetch. The key is
- * decoded and anything but anon / publishable is refused.
+ * THE catalog configuration resolver, shared by the companion and
+ * aqua-mcp-server (which calls this, so the two can never diverge). Order:
+ *   1. --catalog-config <file or https URL>
+ *   2. AQUA_SUPABASE_URL + AQUA_PUBLISHABLE_KEY
+ *   3. AQUA_CATALOG_CONFIG_URL (https URL)
+ *   4. AQUA_CATALOG_CONFIG (local file)
+ *   5. the bundled config/public-catalog.json when it holds real values
+ *   6. --offline / AQUA_CATALOG_OFFLINE=1: not configured
+ *   7. https://aquaidp.xyz/.well-known/aqua-catalog.json
+ * Anything fetched over the network (3, a URL in 1, 7) is untrusted: it must
+ * name https://<ref>.supabase.co and cannot rename tables. Key checks: only
+ * anon / publishable (CatalogKeyRefusal otherwise). Result:
+ * { configured, source, origin, key, key_role, key_kind, tables, reason_code, reason, ... }.
+ * `reason` is fixed companion text (plus the user's own path/URL); text from a
+ * remote document is never put into it.
  */
 export async function resolveCatalogConfig(ctx, { fetchImpl } = {}) {
-  const local = loadCatalogConfig(ctx)
-  const explicit = Boolean(ctx.flags?.['catalog-config'] ?? ctx.env?.AQUA_CATALOG_CONFIG)
-  if (local.configured || explicit) return local
-  const config_url = `${CONFIG_ORIGIN}${CONFIG_PATH}`
-  if (OFFLINE(ctx.env)) return { configured: false, source: 'well-known', config_url, reason: 'the public catalog endpoint is not configured (AQUA_CATALOG_OFFLINE is set and no local config file was given)' }
-  let doc
-  try {
-    doc = await getCatalogConfigJson({ fetchImpl })
-  } catch (e) {
-    return { configured: false, source: 'well-known', config_url, reason: `the public catalog configuration could not be loaded from ${config_url} (${e.message}); pass --catalog-config <file> to use a local copy` }
+  const flags = ctx.flags ?? {}
+  const env = ctx.env ?? {}
+  const cwd = ctx.cwd ?? process.cwd()
+  const flagValue = flags['catalog-config'] ? String(flags['catalog-config']) : null
+  const remoteFetch = async (url, base) => {
+    let doc
+    try {
+      doc = base.source === 'well-known' ? await getCatalogConfigJson({ fetchImpl }) : await getConfigJsonFromUrl(url, { fetchImpl })
+    } catch (e) {
+      return unconfigured(base.source, 'unreachable', `the public catalog configuration could not be loaded from ${base.config_url} (${safeText(e?.message)}); pass --catalog-config <file> to use a local copy`, { config_url: base.config_url })
+    }
+    try {
+      return { ...parseConfigObject(doc, { remote: true, base }), version: doc?.version ?? null }
+    } catch (e) {
+      if (e instanceof CatalogKeyRefusal) throw e
+      return unconfigured(base.source, 'invalid', `${base.config_url} did not return a usable catalog configuration (${safeText(e?.message)})`, { config_url: base.config_url })
+    }
   }
-  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return { configured: false, source: 'well-known', config_url, reason: `${config_url} did not return a configuration object` }
-  return { ...fromObject(doc, { source: 'well-known', config_url }), version: doc.version ?? null, tables: doc.tables ?? null }
+  if (flagValue) {
+    if (IS_URL.test(flagValue)) return remoteFetch(flagValue, { source: 'url', config_url: flagValue })
+    const abs = path.resolve(cwd, flagValue)
+    const f = readConfigFile(abs)
+    if (f.error) return f.error
+    return parseConfigObject(f.value, { base: { path: abs, source: 'file' } })
+  }
+  if (env.AQUA_SUPABASE_URL || env.AQUA_PUBLISHABLE_KEY) {
+    return parseConfigObject({ supabase_url: env.AQUA_SUPABASE_URL, publishable_key: env.AQUA_PUBLISHABLE_KEY }, { base: { source: 'env' } })
+  }
+  if (env.AQUA_CATALOG_CONFIG_URL) return remoteFetch(env.AQUA_CATALOG_CONFIG_URL, { source: 'url', config_url: String(env.AQUA_CATALOG_CONFIG_URL) })
+  if (env.AQUA_CATALOG_CONFIG) {
+    const abs = path.resolve(cwd, String(env.AQUA_CATALOG_CONFIG))
+    const f = readConfigFile(abs)
+    if (f.error) return f.error
+    return parseConfigObject(f.value, { base: { path: abs, source: 'file' } })
+  }
+  const bundled = loadCatalogConfig({ ...ctx, flags: {}, env: {} })
+  if (bundled.configured) return bundled
+  const config_url = `${CONFIG_ORIGIN}${CONFIG_PATH}`
+  if (OFFLINE(ctx)) return unconfigured('well-known', 'offline', 'the public catalog endpoint is not configured (offline mode is set and no local config file was given)', { config_url })
+  return remoteFetch(config_url, { source: 'well-known', config_url })
 }
 
 // ---------------------------------------------------------------------------
@@ -144,9 +220,13 @@ function rows(v, what) {
 }
 
 /**
- * Validate catalog rows into the snapshot body. Programs are kept only when
- * they are canonical AND their slug is in the approval registry
- * (app/lib/canonical-catalog.ts, vendored) unless `allowAnySlug`.
+ * Validate catalog rows into the snapshot body. A program is approved, and
+ * kept, on the same rule as the app's approvedProgramsFilter()
+ * (app/lib/canonical-catalog.ts, vendored): its slug is in the approval
+ * registry OR its source is 'canonical' (published by a curator through the
+ * 058 promotion pipeline). `allowAnySlug` also keeps rows outside the
+ * registry that carry no source at all (an exported file without the column);
+ * a row with any other explicit source still needs a registry slug.
  */
 export function sanitizeCatalog(raw, { allowAnySlug = false } = {}) {
   const allow = new Set(CANONICAL_PROGRAM_SLUGS)
@@ -155,12 +235,12 @@ export function sanitizeCatalog(raw, { allowAnySlug = false } = {}) {
     const pid = id(p.id)
     const slug = id(p.slug)
     if (!pid || !slug || !str(p.name, 500)) continue
-    if (p.source !== undefined && p.source !== 'canonical') continue
-    if (!allowAnySlug && !allow.has(slug)) continue
+    const canonical = p.source === APPROVED_SOURCE
+    if (!canonical && !allow.has(slug) && !(allowAnySlug && p.source === undefined)) continue
     programs.push({
       id: pid, slug, name: str(p.name, 500), organization: str(p.organization, 500), description: str(p.description, 10_000),
       url: str(p.url, 2000), apply_url: str(p.apply_url, 2000), deadline_at: iso(p.deadline_at), closes_at: iso(p.closes_at),
-      opens_at: iso(p.opens_at), is_rolling: bool(p.is_rolling), status: str(p.status, 40), source: 'canonical',
+      opens_at: iso(p.opens_at), is_rolling: bool(p.is_rolling), status: str(p.status, 40), source: canonical ? APPROVED_SOURCE : str(p.source, 40),
       kind: str(p.kind, 40), type: str(p.type, 40), round: str(p.round, 200), cohort_name: str(p.cohort_name, 200),
       updated_at: iso(p.updated_at), last_scraped_at: iso(p.last_scraped_at),
     })
@@ -212,11 +292,9 @@ async function pagedGet(cfg, table, params, fetchImpl) {
   throw new CatalogNetworkError(`the catalog returned more than ${PAGE * MAX_PAGES} ${table} rows`, 'too_large')
 }
 
-/** Fetch public canonical programs + cycles + questions. Sends table/column names and public ids only. */
+/** Fetch approved public programs (registry slug OR source canonical) + cycles + questions. Sends table/column names and public ids only. */
 export async function fetchPublicCatalog(cfg, { fetchImpl } = {}) {
-  const slugs = [...CANONICAL_PROGRAM_SLUGS]
-  if (!slugs.length) return { programs: [], cycles: [], questions: [], canonical_questions: [] }
-  const programs = await pagedGet(cfg, 'programs', { select: PROGRAM_COLS, source: 'eq.canonical', slug: inList(slugs), order: 'slug.asc' }, fetchImpl)
+  const programs = await pagedGet(cfg, 'programs', { select: PROGRAM_COLS, or: `(${approvedProgramsFilter()})`, order: 'slug.asc' }, fetchImpl)
   const kept = sanitizeCatalog({ programs }).programs
   const ids = kept.map((p) => p.id)
   if (!ids.length) return sanitizeCatalog({ programs })
@@ -233,6 +311,25 @@ export async function fetchPublicCatalog(cfg, { fetchImpl } = {}) {
 // ---------------------------------------------------------------------------
 // the cached snapshot
 // ---------------------------------------------------------------------------
+
+export const DEFAULT_CATALOG_MAX_AGE_HOURS = 24
+
+/** AQUA_CATALOG_MAX_AGE_HOURS (hours, >= 0; 0 = never auto-refresh). Default 24. */
+export function catalogMaxAgeHours(env = {}) {
+  const raw = env?.AQUA_CATALOG_MAX_AGE_HOURS
+  if (raw === undefined || raw === null || String(raw).trim() === '') return DEFAULT_CATALOG_MAX_AGE_HOURS
+  const n = Number(raw)
+  return Number.isFinite(n) && n >= 0 ? n : DEFAULT_CATALOG_MAX_AGE_HOURS
+}
+
+/** Why a cached catalog view should be refreshed ('empty' | 'stale'), or null. */
+export function catalogNeedsRefresh(cat, { maxAgeHours = DEFAULT_CATALOG_MAX_AGE_HOURS, now = Date.now() } = {}) {
+  if (maxAgeHours === 0) return null
+  if (!cat?.snapshot || !cat.programs?.length) return 'empty'
+  const at = Date.parse(cat.snapshot.fetched_at ?? '')
+  if (!Number.isFinite(at) || now - at > maxAgeHours * 3600 * 1000) return 'stale'
+  return null
+}
 
 export async function buildSnapshot(body, { origin, kind }) {
   const content_sha256 = await sha256Hex(canonicalJson(body))
@@ -343,7 +440,7 @@ export async function cmdCatalog(ctx, sub, arg, { openUnlocked }) {
     if (!cfg.configured) throw new UsageError(`Cannot sync: ${cfg.reason}. See aqua-companion/docs/AGENT.md ("Public catalog"). Cached data, if any, still works offline.`)
     const ws = await openUnlocked(ctx)
     const lines = [
-      `read public canonical programs, cycles and questions from ${cfg.origin} (read-only GET requests with the public publishable key)`,
+      `read approved public programs (registry slug or source canonical), cycles and questions from ${cfg.origin} (read-only GET requests with the public publishable key)`,
       'nothing from this workspace is sent; only table names, column names and public catalog ids are in the requests',
       `replace the cached snapshot in ${SNAPSHOT_DIR}/ (the previous snapshot stays in the index as archived)`,
     ]
@@ -369,7 +466,7 @@ export async function cmdCatalog(ctx, sub, arg, { openUnlocked }) {
     const ws = await openUnlocked(ctx)
     const lines = [
       `import ${body.programs.length} canonical program(s), ${body.questions.length} question occurrence(s) from ${path.basename(abs)}`,
-      'only approved canonical programs (source canonical, slug in the approval registry) and their public questions are kept',
+      'only approved programs (slug in the approval registry, or source canonical: curator-published) and their public questions are kept',
       `replace the cached snapshot in ${SNAPSHOT_DIR}/ (the previous snapshot stays in the index as archived)`,
     ]
     if (!(await confirmPlan(ctx, 'import a public catalog file', lines))) return 0

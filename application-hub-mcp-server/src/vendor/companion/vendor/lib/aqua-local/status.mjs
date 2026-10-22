@@ -2,8 +2,8 @@
 // `npm run vendor:companion` in application-hub-mcp-server/ (CI checks these copies).
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/aqua-local/status.ts
-// source-sha256: 29bc50b6aa9759b4a82b774352f0c0ad4301e081b9aec9305e5809699f052ac0
-// body-sha256: 9add138ffc513a012e9b6cff393dd6b267d711577b53feed38518001c6a26fe9
+// source-sha256: e5ed22e304b4e3476c9660e3fb7d6d0d5aa1c2aeee7352b318d6d3e252d77c51
+// body-sha256: 613347f48e37a6dd1690b5d7fe51cf10b11b5c1046809fd18339439370ab8ce5
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // NETWORK-BOUNDARY: no fetch/import of remote APIs allowed in aqua-local
 //
@@ -113,7 +113,9 @@ const reviewKey = (r              ) => ({ seq: r.seq, at: r.at, id: r.review_id 
  *   - it must be actor_class 'human', not restored_from_backup, and its
  *     version_sha256 must equal the stored version sha256 (F-V1);
  *   - v5: a later HUMAN, hash-bound, non-restored review decision in
- *     REOPENING_REVIEW_DECISIONS blocks it (review reopened ⇒ re-approve).
+ *     REOPENING_REVIEW_DECISIONS blocks it (review reopened ⇒ re-approve);
+ *   - M09b: a history version (`history: true`) needs a live history
+ *     attestation before any approval of it counts.
  * Agent-class review decisions and suggestions can never satisfy or
  * block this gate.
  */
@@ -128,11 +130,38 @@ function historyAttestationComplete(a                )          {
   )
 }
 
-export function approvalGate(
+/**
+ * M09b: an imported submitted-history version (`history: true`) is approved
+ * only through the history screen. True when a complete, non-restored,
+ * human `history_attestation` row bound to the version's current sha256
+ * exists. The normal approval path (recordHumanApproval) refuses history
+ * versions without one, and the gate below ignores approvals of a history
+ * version until one exists (covers rows written before that refusal).
+ */
+export function hasLiveHistoryAttestation(
   version                                      ,
+  approvals                  ,
+)          {
+  return approvals.some(
+    (a) =>
+      a.version_id === version.id &&
+      a.via === 'history_attestation' &&
+      a.decision === 'approved' &&
+      a.actor_class === 'human' &&
+      !a.restored_from_backup &&
+      a.version_sha256 === version.sha256 &&
+      historyAttestationComplete(a),
+  )
+}
+
+export function approvalGate(
+  version                                                              ,
   approvals                  ,
   reviews                 = [],
 )               {
+  if (version.history === true && !hasLiveHistoryAttestation(version, approvals)) {
+    return { approval: null, blocked_by_review: null, approved: false }
+  }
   const forVersion = approvals
     .filter((a) => a.version_id === version.id)
     .sort((a, b) => compareDecisionRows(approvalKey(a), approvalKey(b)))
