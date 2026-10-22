@@ -13,7 +13,7 @@ import {
   VaultImmutableError, VaultNotFoundError,
   signPacket,
 } from './repo.ts'
-import { canonicalJson, decryptText, sha256Hex } from './crypto.ts'
+import { canonicalJson, decryptText, encryptText, sha256Hex } from './crypto.ts'
 import {
   storeProviderKey, loadProviderKey, deleteProviderKey,
   generateWithConsent, generateVersion, createMockProvider,
@@ -23,7 +23,7 @@ import {
 import {
   freezeApplicationPacket, exportPacket, loadPacket, getPacketState,
   advancePacketState, canonicalManifestOf,
-  PacketFreezeError, PacketStateError,
+  PacketFreezeError, PacketStateError, PacketVerificationError, verifyPacket,
   recordExternalSubmission, updateSubmissionOutcome, listSubmissionsForPacket,
 } from './packets.ts'
 import {
@@ -793,10 +793,22 @@ await t('IR-020: restored signoff can be re-attested without state churn', async
   // restored signoff marked
   const imported = await s2.get('signoffs', packet.packet_id)
   assert.equal(imported.restored_from_backup, true)
+  // M3: a restored packet is never re-signed on trust — without the secret
+  // (no re-verification possible) or without a live local approval it is refused
+  await assert.rejects(() => attestPacket(s2, {
+    packet_id: packet.packet_id, signer_class: 'authenticated-account', user_ack: true,
+    manifest_sha256: record.manifest_sha256,
+  }), PacketVerificationError)
+  await assert.rejects(() => attestPacket(s2, {
+    packet_id: packet.packet_id, signer_class: 'authenticated-account', user_ack: true,
+    manifest_sha256: record.manifest_sha256, secret: SECRET,
+  }), PacketVerificationError)
+  // a fresh local human approval makes it verify again
+  await approveVersion(s2, { version_id: version.id, decision: 'approved', actor_class: 'human' })
   // re-attestation replaces it without signed→signed throw
   const so = await attestPacket(s2, {
     packet_id: packet.packet_id, signer_class: 'authenticated-account', user_ack: true,
-    manifest_sha256: record.manifest_sha256,
+    manifest_sha256: record.manifest_sha256, secret: SECRET,
   })
   assert.equal(so.restored_from_backup, undefined)
   assert.equal((await getPacketState(s2, packet.packet_id)).state, 'signed')
@@ -825,6 +837,9 @@ await t('IR-023: exported signoff discloses restored provenance', async () => {
   const dump = await exportVault(s1, SECRET)
   const s2 = createMemoryStorage()
   await importVault(s2, SECRET, dump)
+  // M3: restored approvals are not live here, so the restored packet is not exportable yet
+  await assert.rejects(() => exportPacket(s2, packet.packet_id, SECRET), PacketVerificationError)
+  await approveVersion(s2, { version_id: version.id, decision: 'approved', actor_class: 'human' })
   const doc = JSON.parse(await exportPacket(s2, packet.packet_id, SECRET))
   assert.equal(doc.packet.signoff.restored_from_backup, true)
 })
@@ -1002,5 +1017,115 @@ await t('IR-029b: prepared + restored signoff → attestation advances to signed
   assert.equal(st.state, 'signed', 'inconsistent prepared+signoff must advance, not wedge')
 })
 
+
+// ---------------- M09 review M3: restored packets are re-verified ----------------
+
+async function restoredPacket() {
+  const { exportVault, importVault } = await import('./backup.ts')
+  const s1 = createMemoryStorage()
+  const { version } = await seedApproved(s1)
+  const { packet, record } = await freezeApplicationPacket(s1, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  const s2 = createMemoryStorage()
+  await importVault(s2, SECRET, await exportVault(s1, SECRET))
+  return { s1, s2, version, packet, record }
+}
+
+await t('M3: a restored packet is marked restored and refused for export until it re-verifies; failure marks it unverified', async () => {
+  const { s2, version, packet } = await restoredPacket()
+  const stored = await s2.get('packets', packet.packet_id)
+  assert.equal(stored.restored_from_backup, true)
+  await assert.rejects(() => exportPacket(s2, packet.packet_id, SECRET), (e) => {
+    assert.ok(e instanceof PacketVerificationError)
+    assert.ok(e.reasons.some((r) => /no live human approval/.test(r)))
+    return true
+  })
+  const marked = await s2.get('packets', packet.packet_id)
+  assert.ok(marked.unverified && marked.unverified.reasons.length > 0, 'marked unverified')
+  assert.equal((await getPacketState(s2, packet.packet_id)).state, 'prepared', 'state did not advance')
+  // fresh local approval → verifies, exports, clears the mark
+  await approveVersion(s2, { version_id: version.id, decision: 'approved', actor_class: 'human' })
+  assert.equal((await verifyPacket(s2, packet.packet_id, SECRET)).ok, true)
+  const doc = JSON.parse(await exportPacket(s2, packet.packet_id, SECRET))
+  assert.equal(doc.manifest_sha256, (await s2.get('packets', packet.packet_id)).manifest_sha256)
+  const after = await s2.get('packets', packet.packet_id)
+  assert.equal(after.unverified, undefined)
+  assert.ok(after.verified_at)
+})
+
+await t('M3: exportPacket re-runs the gate for local packets too (revoked after freeze → refused)', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  await approveVersion(s, { version_id: version.id, decision: 'rejected', actor_class: 'human' })
+  await assert.rejects(() => exportPacket(s, packet.packet_id, SECRET), PacketVerificationError)
+})
+
+await t('M3: a hand-built packet record (forged approved:true, digest recomputed) is refused', async () => {
+  const s = createMemoryStorage()
+  const a = await createAnswer(s, { application_id: 'app1', question_occurrence_id: 'q1' })
+  const v = await createVersion(s, SECRET, { answer_id: a.id, title: 't', body: 'never approved', method: 'manual' })
+  const content = {
+    application_id: 'app1', created_at: '2026-10-22T00:00:00.000Z', attachments: [], provenance: [],
+    questions: [{ question_occurrence_id: 'q1', question_text_snapshot: 'Q?', version_id: v.id, answer_title: 't', answer_body: 'never approved', answer_sha256: v.sha256, approved: true, skipped: false, skip_reason: null }],
+  }
+  const manifestJson = canonicalJson(content)
+  const sha = await sha256Hex(manifestJson)
+  const id = `PK-${sha.slice(0, 16)}`
+  await s.put('packets', { id, application_id: 'app1', manifest_enc: JSON.stringify(await encryptText(SECRET, manifestJson)), manifest_sha256: sha, frozen_at: content.created_at })
+  await s.put('packet_states', { packet_id: id, state: 'prepared', history: [{ state: 'prepared', at: content.created_at }], updated_at: content.created_at })
+  await assert.rejects(() => exportPacket(s, id, SECRET), PacketVerificationError)
+  await assert.rejects(() => attestPacket(s, { packet_id: id, signer_class: 'local-only', user_ack: true, manifest_sha256: sha, secret: SECRET }), PacketVerificationError)
+  // once marked unverified, signing without the secret is refused too
+  await assert.rejects(() => attestPacket(s, { packet_id: id, signer_class: 'local-only', user_ack: true, manifest_sha256: sha }), PacketVerificationError)
+})
+
+await t('M3: manifest digest drift and answer re-hash drift are caught', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s)
+  const { packet, record } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  })
+  const manifest = JSON.parse(await decryptText(SECRET, JSON.parse(record.manifest_enc)))
+  manifest.questions[0].answer_body = 'swapped after freeze'
+  await s.put('packets', { ...record, manifest_enc: JSON.stringify(await encryptText(SECRET, canonicalJson(manifest))) })
+  const r = await verifyPacket(s, packet.packet_id, SECRET)
+  assert.equal(r.ok, false)
+  assert.ok(r.reasons.some((x) => /manifest does not hash/.test(x)))
+  assert.ok(r.reasons.some((x) => /answer does not hash/.test(x)))
+})
+
+await t('M2/M3: freeze refuses an approved version whose body still has a placeholder', async () => {
+  const s = createMemoryStorage()
+  const { version } = await seedApproved(s, { body: 'Revenue \uFF3BCONFIRM\uFF3D' })
+  await assert.rejects(() => freezeApplicationPacket(s, SECRET, {
+    application_id: 'app1',
+    selections: [{ question_occurrence_id: 'q1', version_id: version.id, question_text_snapshot: 'Q?' }],
+  }), (e) => e instanceof PacketFreezeError && e.reasons.some((x) => /placeholder/.test(x)))
+})
+
+await t('verifier: a skipped entry carrying a hidden answer fails even with a self-consistent digest', async () => {
+  const s = createMemoryStorage()
+  const { packet } = await freezeApplicationPacket(s, SECRET, {
+    application_id: 'app-skip',
+    selections: [{ question_occurrence_id: 'q1', skip_reason: 'not applicable', question_text_snapshot: 'Q?' }],
+  })
+  const json = await exportPacket(s, packet.packet_id, SECRET)
+  assert.match(verifyCli(json), /skipped entries are explained/)
+  const doc = JSON.parse(json)
+  doc.packet.questions[0].answer_body = 'hidden answer'
+  const { packet_id: _p, signoff: _s, ...content } = doc.packet
+  doc.manifest_json = canonicalJson(content)
+  doc.manifest_sha256 = await sha256Hex(doc.manifest_json)
+  doc.packet.packet_id = `PK-${doc.manifest_sha256.slice(0, 16)}`
+  const out = verifyCli(JSON.stringify(doc), { expectFail: true })
+  assert.match(out, /FAIL.*skipped entries|skipped entries[^\n]*FAIL/)
+})
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

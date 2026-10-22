@@ -34,7 +34,9 @@ import type {
   VersionMethod,
   VersionRecord,
 } from './schema.ts'
-import { HISTORY_VIA, describePlaceholders, findPlaceholders, normalizeEffectiveAt } from './history.ts'
+import { HISTORY_VIA, normalizeEffectiveAt } from './history.ts'
+import { describePlaceholders, findPlaceholders } from './placeholders.ts'
+import { hasLiveHistoryAttestation } from './status.ts'
 
 export class VaultScopeError extends Error {
   constructor(message: string) {
@@ -73,12 +75,13 @@ export class VaultApprovalMismatchError extends Error {
   }
 }
 
-/** M09b: a submitted-history confirmation was refused because the answer
-    still carries an unfilled placeholder. `markers` = history.ts rule ids. */
+/** M09b: a submitted-history confirmation or a human approval was refused
+    because the answer still carries an unfilled placeholder. `markers` =
+    placeholders.ts rule ids. */
 export class VaultPlaceholderError extends Error {
   markers: string[]
-  constructor(markers: string[]) {
-    super(`history attestation refused: ${describePlaceholders(markers)}`)
+  constructor(markers: string[], action = 'history attestation') {
+    super(`${action} refused: ${describePlaceholders(markers)}`)
     this.name = 'VaultPlaceholderError'
     this.markers = markers
   }
@@ -192,6 +195,32 @@ export async function buildVersionPayload(
     observed_flags: input.observed_flags ?? {},
   }
   return { record, receipt }
+}
+
+/**
+ * First draft for a question that has no answer yet: create the answer AND
+ * its first version (+ provenance receipt) in ONE transaction, so a refused
+ * or failed version write can never leave an empty answer shell behind
+ * (M09 AT22). Validation and crypto run before the transaction opens.
+ */
+export async function createAnswerWithVersion(
+  storage: VaultStorage,
+  secret: string,
+  scope: { application_id: string; question_occurrence_id: string },
+  input: Omit<CreateVersionInput, 'answer_id' | 'parent_version_id'>,
+): Promise<{ answer: AnswerRecord; version: VersionRecord }> {
+  if (!scope?.application_id || !scope.question_occurrence_id) {
+    throw new VaultScopeError('answer scope requires application_id and question_occurrence_id')
+  }
+  if (isBlankBody(input.body)) throw new VaultBlankBodyError()
+  const answer: AnswerRecord = { id: newId(), scope, created_at: nowIso() }
+  const { record, receipt } = await buildVersionPayload(secret, { ...input, answer_id: answer.id }, null)
+  await storage.tx(['answers', 'versions', 'provenance'], async (s) => {
+    if (!(await s.putIfAbsent('answers', answer.id, answer))) throw new VaultImmutableError(`answer id collision refused: ${answer.id}`)
+    if (!(await s.putIfAbsent('versions', record.id, record))) throw new VaultImmutableError(`version id collision refused: ${record.id}`)
+    await s.put('provenance', receipt)
+  })
+  return { answer, version: record }
 }
 
 /** Put a pre-built version record + provenance receipt. Inside a caller tx
@@ -373,10 +402,25 @@ export interface HumanDecisionInput {
   /** Who decided — the signed-in uid or a vault-local user label. */
   actor_id: string
   via: Exclude<ApprovalVia, 'legacy' | 'history_attestation'>
-  /** Optional: also decrypt + rehash the stored plaintext and require it to
-      equal expected_sha256 (catches a tampered row whose stored sha256 was
-      left intact). Crypto runs BEFORE the write transaction. */
+  /** Decrypt + rehash the stored plaintext and require it to equal
+      expected_sha256 (catches a tampered row whose stored sha256 was left
+      intact). REQUIRED for approvals: the decrypted body is also scanned
+      for unfilled placeholders. Optional for revocations. Crypto runs
+      BEFORE the write transaction. */
   secret?: string
+}
+
+/** Thrown (before any write) when an approval targets an imported
+    submitted-history version that has not been confirmed on the history
+    screen (recordHistoryAttestation). */
+export class VaultHistoryApprovalError extends VaultScopeError {
+  constructor(versionId: string) {
+    super(
+      `version ${versionId} is an imported submitted-history record: confirm it on the history screen ` +
+        '(history attestation) before approving it here',
+    )
+    this.name = 'VaultHistoryApprovalError'
+  }
 }
 
 const HUMAN_VIA: ReadonlyArray<Exclude<ApprovalVia, 'legacy' | 'history_attestation'>> = ['review_ui', 'decision_file']
@@ -396,13 +440,31 @@ async function recordHumanDecision(
   if (!HUMAN_VIA.includes(input.via)) {
     throw new VaultScopeError(`human decision via must be one of ${HUMAN_VIA.join('|')}`)
   }
+  const approving = decision === 'approved'
+  if (approving && !input.secret) {
+    // Same refusal precedence as the in-transaction checks, then fail closed:
+    // without the secret the body cannot be scanned for placeholders.
+    const stored = await storage.get<VersionRecord>('versions', input.version_id)
+    if (!stored) throw new VaultNotFoundError(`version not found: ${input.version_id}`)
+    if (stored.sha256 !== input.expected_sha256) {
+      throw new VaultApprovalMismatchError(`version ${input.version_id} sha256 does not match the reviewed sha256 — decision refused`)
+    }
+    throw new VaultScopeError('human approval requires the vault secret: the answer is checked for unfilled placeholders first')
+  }
   if (input.secret) {
-    const { title, body } = await readVersion(storage, input.secret, input.version_id)
+    const { record, title, body } = await readVersion(storage, input.secret, input.version_id)
     const recomputed = await sha256Hex(canonicalJson({ title, body }))
     if (recomputed !== input.expected_sha256) {
       throw new VaultApprovalMismatchError(
         `version ${input.version_id} plaintext does not hash to the reviewed sha256 — refused`,
       )
+    }
+    if (approving) {
+      if (record.history === true && !hasLiveHistoryAttestation(record, await storage.getAll<ApprovalRecord>('approvals'))) {
+        throw new VaultHistoryApprovalError(input.version_id)
+      }
+      const markers = findPlaceholders(body)
+      if (markers.length) throw new VaultPlaceholderError(markers, 'approval')
     }
   }
   return storage.tx(['versions', 'approvals', 'events'], async (s) => {
@@ -415,6 +477,9 @@ async function recordHumanDecision(
         `version ${input.version_id} sha256 is ${version.sha256.slice(0, 12)}…, ` +
           `reviewed ${input.expected_sha256.slice(0, 12)}… — decision refused`,
       )
+    }
+    if (approving && version.history === true && !hasLiveHistoryAttestation(version, await s.getAll<ApprovalRecord>('approvals'))) {
+      throw new VaultHistoryApprovalError(input.version_id)
     }
     return writeApprovalDecision(s, version, {
       decision,
@@ -471,8 +536,9 @@ export interface HistoryAttestationInput {
  *   - the version is not an imported history record (`history: true`);
  *   - the decrypted title+body does not hash to `expected_sha256`, or the
  *     stored row's sha256 differs (checked again inside the write tx);
- *   - the BODY contains an unfilled placeholder (history.ts
- *     findPlaceholders: [CONFIRM, [ASSET NEEDED, TODO, TBD, XXX, <…>, {{…}});
+ *   - the BODY contains an unfilled placeholder (findPlaceholders in
+ *     placeholders.ts, the one shared detector, which canonicalizes
+ *     Unicode and spacing before matching);
  *     this rule lives here, in the vault write, not only in the UI;
  *   - effective_at is not a real date or is in the future;
  *   - the statement or actor_id is blank.

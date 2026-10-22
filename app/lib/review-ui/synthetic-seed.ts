@@ -47,12 +47,12 @@ export async function seedSyntheticReview(storage: VaultStorage, secret: string)
     title: 'Company overview',
     body: 'Example Labs builds a scheduling assistant for small veterinary clinics. Clinics book, remind and reschedule appointments from one screen.',
   })
-  await approveAsHuman(storage, { version_id: bankCompany.id, expected_sha256: bankCompany.sha256, actor_id: ACTOR })
+  await approveAsHuman(storage, { version_id: bankCompany.id, expected_sha256: bankCompany.sha256, actor_id: ACTOR, secret })
   const bankTraction = await saveInstanceDraft(storage, secret, bank.instance_id, bankQ[1], {
     title: 'Traction (2024)',
     body: 'In 2024 we signed 35 paying customers through the Earlier Program 2024 pilot and grew revenue 12% month over month.',
   })
-  await approveAsHuman(storage, { version_id: bankTraction.id, expected_sha256: bankTraction.sha256, actor_id: ACTOR })
+  await approveAsHuman(storage, { version_id: bankTraction.id, expected_sha256: bankTraction.sha256, actor_id: ACTOR, secret })
 
   // The application under review.
   const inst = await createInstance(storage, secret, {
@@ -148,7 +148,7 @@ export async function seedSyntheticReview(storage: VaultStorage, secret: string)
     title: 'Competitors',
     body: 'Large practice-management suites include scheduling, but they are priced for hospitals. We focus on small clinics.',
   })
-  await approveAsHuman(storage, { version_id: comp1.id, expected_sha256: comp1.sha256, actor_id: ACTOR })
+  await approveAsHuman(storage, { version_id: comp1.id, expected_sha256: comp1.sha256, actor_id: ACTOR, secret })
   await addVersionComment(storage, secret, {
     version_id: comp1.id,
     expected_sha256: comp1.sha256,

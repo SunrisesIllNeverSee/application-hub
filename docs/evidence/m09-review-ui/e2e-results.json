@@ -2,22 +2,22 @@
   {
     "name": "desktop: board lists every question with status, filters and progress",
     "ok": true,
-    "ms": 892
+    "ms": 931
   },
   {
     "name": "desktop: APPROVE requires confirm and binds the displayed version hash",
     "ok": true,
-    "ms": 705
+    "ms": 703
   },
   {
     "name": "desktop: EDIT creates a new child version and the approval does not transfer",
     "ok": true,
-    "ms": 482
+    "ms": 500
   },
   {
     "name": "desktop: EVIDENCE / HELP request is recorded and is not an approval",
     "ok": true,
-    "ms": 899
+    "ms": 898
   },
   {
     "name": "desktop: DISCUSS comment is bound to the displayed version, history labelled across versions",
@@ -27,52 +27,52 @@
   {
     "name": "desktop: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved",
     "ok": true,
-    "ms": 834
+    "ms": 818
   },
   {
     "name": "desktop: one-at-a-time mode with next / previous",
     "ok": true,
-    "ms": 984
+    "ms": 999
   },
   {
     "name": "desktop: export HTML → decide offline → decision file → import → confirm",
     "ok": true,
-    "ms": 2220
+    "ms": 2549
   },
   {
     "name": "desktop: dark theme renders the card",
     "ok": true,
-    "ms": 451
+    "ms": 453
   },
   {
     "name": "desktop: no page errors",
     "ok": true,
-    "ms": 0
+    "ms": 1
   },
   {
     "name": "mobile: board lists every question with status, filters and progress",
     "ok": true,
-    "ms": 925
+    "ms": 907
   },
   {
     "name": "mobile: APPROVE requires confirm and binds the displayed version hash",
     "ok": true,
-    "ms": 751
+    "ms": 752
   },
   {
     "name": "mobile: EDIT creates a new child version and the approval does not transfer",
     "ok": true,
-    "ms": 551
+    "ms": 547
   },
   {
     "name": "mobile: EVIDENCE / HELP request is recorded and is not an approval",
     "ok": true,
-    "ms": 934
+    "ms": 935
   },
   {
     "name": "mobile: DISCUSS comment is bound to the displayed version, history labelled across versions",
     "ok": true,
-    "ms": 997
+    "ms": 898
   },
   {
     "name": "mobile: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved",
@@ -87,7 +87,7 @@
   {
     "name": "mobile: export HTML → decide offline → decision file → import → confirm",
     "ok": true,
-    "ms": 2349
+    "ms": 2666
   },
   {
     "name": "mobile: no page errors",

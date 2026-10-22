@@ -49,7 +49,7 @@ async function seed(s, { app = 'app1', occ = 'q1', title = 't', body = 'answer b
   return { answer: a, version: v }
 }
 const approve = (s, v) =>
-  recordHumanApproval(s, { version_id: v.id, expected_sha256: v.sha256, actor_id: 'u-test', via: 'review_ui' })
+  recordHumanApproval(s, { version_id: v.id, expected_sha256: v.sha256, actor_id: 'u-test', via: 'review_ui', secret: SECRET })
 
 const V5_STORES = ['app_instances', 'facts', 'evidence', 'reviews', 'comments', 'suggestions']
 
@@ -596,7 +596,7 @@ await t('agent cannot approve: v5 APIs have no agent approval path; agent signal
   })
   await addComment(s, SECRET, { version_id: version.id, body: 'LGTM — approved', actor_class: 'agent', actor_id: 'companion' })
   // recordHumanApproval has no actor_class input: even a forged one is ignored
-  const r = await recordHumanApproval(s, { version_id: version.id, expected_sha256: version.sha256, actor_id: 'u', via: 'review_ui', actor_class: 'agent' })
+  const r = await recordHumanApproval(s, { version_id: version.id, expected_sha256: version.sha256, actor_id: 'u', via: 'review_ui', actor_class: 'agent', secret: SECRET })
   assert.equal(r.actor_class, 'human')
   await recordHumanRevocation(s, { version_id: version.id, expected_sha256: version.sha256, actor_id: 'u', via: 'review_ui' })
   // only the human rows exist in the approvals ledger
@@ -756,7 +756,7 @@ await t('board: Direct / Adapt / Gap per question + derived status; drafting fro
     },
   })
   const b1 = await saveInstanceDraft(s, SECRET, bankInst.instance_id, 'LQ-bank-1', { title: 'Problem', body: 'Clinics lose hours to phone scheduling.' })
-  await approveAsHuman(s, { version_id: b1.id, expected_sha256: b1.sha256, actor_id: 'u' })
+  await approveAsHuman(s, { version_id: b1.id, expected_sha256: b1.sha256, actor_id: 'u', secret: SECRET })
   await saveInstanceDraft(s, SECRET, bankInst.instance_id, 'LQ-bank-2', { title: 'Team', body: 'Two engineers and a nurse.' })
 
   const inst = await createInstance(s, SECRET, {

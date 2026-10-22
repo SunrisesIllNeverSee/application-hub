@@ -376,6 +376,8 @@ export function suggestionFromClassification(
 // it is preselected.
 
 const REVIEW_EXPORT_EVENT = 'review_exported'
+/** A decision file carrying the nonce was applied: the nonce is spent (M09 review, LOW). */
+const REVIEW_NONCE_USED_EVENT = 'review_export_nonce_used'
 const NONCE_RE = /^[0-9a-f]{32,128}$/
 
 /** 32 random bytes, lowercase hex. */
@@ -412,7 +414,29 @@ export async function isKnownReviewExportNonce(
   if (typeof input.nonce !== 'string' || !NONCE_RE.test(input.nonce)) return false
   const want = await sha256Hex(input.nonce)
   const events = await storage.getAll<EventRecord>('events')
-  return events.some(
-    (e) => e.kind === REVIEW_EXPORT_EVENT && e.entity_id === input.instance_id && (e.payload as { nonce_sha256?: unknown })?.nonce_sha256 === want,
-  )
+  const match = (kind: string) => (e: EventRecord) =>
+    e.kind === kind && e.entity_id === input.instance_id && (e.payload as { nonce_sha256?: unknown })?.nonce_sha256 === want
+  // Single use: once a decision file with this nonce was applied, a second
+  // file carrying it (a replay, or one forged from the exported HTML) is
+  // treated as foreign.
+  return events.some(match(REVIEW_EXPORT_EVENT)) && !events.some(match(REVIEW_NONCE_USED_EVENT))
+}
+
+/** Spend a review-export nonce after its decision file was applied. No-op for an unknown nonce. */
+export async function consumeReviewExportNonce(
+  storage: VaultStorage,
+  input: { instance_id: string; nonce: string | null | undefined },
+): Promise<boolean> {
+  if (!(await isKnownReviewExportNonce(storage, input))) return false
+  const nonce_sha256 = await sha256Hex(input.nonce as string)
+  await storage.tx(['events'], async (s) => {
+    await appendLedgerEvent(s, {
+      kind: REVIEW_NONCE_USED_EVENT,
+      entity: 'app_instance',
+      entity_id: input.instance_id,
+      payload: { nonce_sha256 },
+      at: nowIso(),
+    })
+  })
+  return true
 }

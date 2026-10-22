@@ -243,6 +243,8 @@ export function VaultPacketPanel({
         privateKey: kp.privateKey,
         pubkey_b64: kp.pubkey_b64,
         manifest_sha256: manifestSha,
+        // M3: re-verify against this vault before signing
+        secret: vault.getSecret(),
       })
       const signedState = await getPacketState(storage, frozenId)
       setPacketState(signedState)

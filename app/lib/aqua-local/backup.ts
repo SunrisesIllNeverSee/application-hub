@@ -436,9 +436,13 @@ export async function importVault(
     const { seq: _stripped, ...rest } = a
     await dedupePut('approvals', a.id, { ...rest, restored_from_backup: true })
   }
+  // M09 review M3: a restored packet is a claim, like a restored approval.
+  // Mark it so export/sign re-verify it against THIS vault first; drop any
+  // verification bookkeeping the file carried.
   for (const p of payload.packets ?? []) {
     sourceIds.push(p.id)
-    await dedupePut('packets', p.id, p)
+    const { unverified: _u, verified_at: _v, ...rest } = p as PacketRecord
+    await dedupePut('packets', p.id, { ...rest, restored_from_backup: true })
   }
   for (const p of payload.provenance ?? []) {
     sourceIds.push(p.version_id)

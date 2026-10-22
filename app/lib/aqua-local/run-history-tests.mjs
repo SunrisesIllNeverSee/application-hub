@@ -14,6 +14,10 @@ import { approvalGate } from './status.ts'
 import { exportVault, importVault } from './backup.ts'
 import { decryptField, encryptField } from './crypto.ts'
 import { findPlaceholders, normalizeEffectiveAt, isCalendarDate, HISTORY_FORMAT, describePlaceholders } from './history.ts'
+import * as Shared from './placeholders.ts'
+import { recordHumanRevocation, VaultHistoryApprovalError } from './repo.ts'
+import { approveAsHuman } from '../aqua-local-client/review.ts'
+import fs from 'node:fs'
 
 const SECRET = 'synthetic-history-secret'
 const MARK = 'ZQX-HISTORY-PRIVATE-MARKER'
@@ -148,6 +152,154 @@ await t('backup v2 carries history approvals and history_enc; restored ones stay
   // the user can confirm it again locally
   await attest(s2, rv)
   assert.equal(approvalGate(rv, await listApprovals(s2)).approved, true)
+})
+
+// ─── M1: placeholder detection cannot be bypassed by Unicode / spacing ──────
+
+const BYPASS_FORMS = {
+  'fullwidth brackets': 'We grew 3x \uFF3BCONFIRM\uFF3D last year.',
+  'fullwidth letters': 'Revenue \uFF34\uFF2F\uFF24\uFF2F.',
+  'zero-width space': 'Revenue is TO\u200BDO.',
+  'zero-width joiner + BOM': 'Launch T\u200DB\uFEFFD.',
+  'soft hyphen': 'Pending TO\u00ADDO',
+  'combining strike-through': 'T\u0336O\u0336D\u0336O\u0336 next',
+  'Cyrillic Te': 'Revenue \u0422ODO.',
+  'Cyrillic O + Greek Omicron': 'Revenue T\u041ED\u039F.',
+  'spaced TO DO': 'Revenue: TO DO',
+  'dotted T.B.D.': 'Date: T.B.D.',
+  'spaced T B D': 'Date: T B D',
+  'lower dotted t.b.d.': 'date t.b.d. soon',
+  'spaced X X X': 'Contact X X X',
+  '[NAME]': 'Our CEO [NAME] leads sales.',
+  '[COMPANY NAME]': 'At [COMPANY NAME] we build tools.',
+  'mustache across a newline': 'Hello {{first\nname}}!',
+  '[ASSET NEEDED] across a newline': 'See [ASSET\nNEEDED: chart]',
+  '[insert …]': 'We have [insert number] customers.',
+  '[your …]': 'Founded by [your name].',
+  '[Company name]': 'We are [Company name], a startup.',
+  '[add …]': 'Our moat: [add detail here]',
+  'lorem ipsum': 'Lorem ipsum dolor sit amet.',
+  'free-standing ??': 'We have ?? paying users.',
+  'currency ??': 'MRR is $?? today.',
+  'blank ___': 'Our TAM is ___ billion.',
+  'NBSP inside a marker': '[\u00A0CONFIRM metric]',
+}
+
+await t('M1: Unicode, confusable, spacing and generic placeholder forms are all detected', () => {
+  for (const [name, text] of Object.entries(BYPASS_FORMS)) {
+    assert.notDeepEqual(findPlaceholders(text), [], `${name}: ${JSON.stringify(text)}`)
+  }
+})
+
+await t('M1: ordinary prose stays clean (low false-positive rate)', () => {
+  const clean = [
+    'I have a lot to do this quarter, and we plan to do it well.',
+    'Really?? Yes, we doubled revenue.',
+    'Why now? Because costs fell. Why us? Experience.',
+    'See the results [1] and the appendix [2].',
+    'Read the [link](https://example.org/x) for the full story.',
+    'As the founder said, "[...] we grew fast."',
+    'The quote reads "teh [sic] product".',
+    'Our CEO [Jane] built the first version.',
+    'We use snake_case names like user_id in our API.',
+    'If x < y and z > w we pivot.',
+    'Café résumé naïve façade — all fine.',
+    'XX large and X-ray imaging.',
+    'We are a toddler-focused todolist? no.',
+    'Price: $5 <10% margin',
+    'Q&A sessions happen weekly.',
+    'Our TBD-free roadmap is public.'.replace('TBD-free', 'fully dated'),
+    'Москва and Αθήνα are cities we sell in.',
+    'Is it ready? We think so.',
+  ]
+  for (const text of clean) assert.deepEqual(findPlaceholders(text), [], text)
+})
+
+await t('M1: one shared detector module serves the vault, the /history screen and the companion', () => {
+  assert.equal(findPlaceholders, Shared.findPlaceholders, 'history.ts re-exports the shared detector')
+  assert.equal(describePlaceholders, Shared.describePlaceholders)
+  const here = new URL('.', import.meta.url)
+  const read = (rel) => fs.readFileSync(new URL(rel, here), 'utf8')
+  for (const rel of ['./history.ts', './history-review.ts', './repo.ts']) {
+    const src = read(rel)
+    assert.ok(!/\{ id: '[a-z_]+', label: '[^']*', re: /.test(src), `${rel} must not carry its own rule table`)
+  }
+  assert.match(read('./repo.ts'), /from '\.\/placeholders\.ts'/)
+  assert.match(read('./history.ts'), /from '\.\/placeholders\.ts'/)
+  assert.match(read('./history-review.ts'), /findPlaceholders/)
+  assert.equal(Shared.normalizeForPlaceholderScan('\uFF3BTO\u200BDO\uFF3D'), '[TODO]')
+})
+
+await t('M1: the vault write refuses the bypass forms too; nothing is written', async () => {
+  for (const [name, body] of Object.entries(BYPASS_FORMS)) {
+    const s = createMemoryStorage()
+    const v = await historyVersion(s, body)
+    await assert.rejects(() => attest(s, v), VaultPlaceholderError, name)
+    assert.equal((await listApprovals(s)).length, 0, name)
+  }
+})
+
+// ─── M2: the normal approval path guards history versions and placeholders ──
+
+const human = (v, over = {}) => ({ version_id: v.id, expected_sha256: v.sha256, actor_id: 'u-test', via: 'review_ui', secret: SECRET, ...over })
+
+await t('M2: recordHumanApproval / approveAsHuman refuse an unattested history version; nothing is written', async () => {
+  for (const via of ['review_ui', 'decision_file']) {
+    const s = createMemoryStorage()
+    const v = await historyVersion(s, 'Clean synthetic submitted answer.')
+    await assert.rejects(() => recordHumanApproval(s, human(v, { via })), VaultHistoryApprovalError)
+    await assert.rejects(() => approveAsHuman(s, { version_id: v.id, expected_sha256: v.sha256, via, secret: SECRET }), VaultHistoryApprovalError)
+    assert.equal((await listApprovals(s)).length, 0)
+    assert.equal((await listEvents(s)).length, 0)
+  }
+})
+
+await t('M2: once attested on the history screen, the normal path may record a further approval', async () => {
+  const s = createMemoryStorage()
+  const v = await historyVersion(s, 'Clean synthetic submitted answer.')
+  await attest(s, v)
+  const rec = await recordHumanApproval(s, human(v))
+  assert.equal(rec.decision, 'approved')
+  assert.equal(approvalGate(v, await listApprovals(s)).approved, true)
+})
+
+await t('M2: a restored (non-live) attestation does not unlock the normal path', async () => {
+  const s = createMemoryStorage()
+  const v = await historyVersion(s, 'Clean synthetic submitted answer.')
+  const a = await attest(s, v)
+  await s.put('approvals', { ...a, restored_from_backup: true })
+  await assert.rejects(() => recordHumanApproval(s, human(v)), VaultHistoryApprovalError)
+})
+
+await t('M2: the gate ignores a pre-existing normal approval of an unattested history version', async () => {
+  const v = { id: 'vh', sha256: 'c'.repeat(64), history: true }
+  const row = { id: 'ap1', version_id: 'vh', version_sha256: v.sha256, decision: 'approved', actor_class: 'human', at: '2026-10-22T00:00:00Z', seq: 1, actor_id: 'u', via: 'review_ui' }
+  assert.equal(approvalGate(v, [row]).approved, false, 'history version: review_ui approval alone is not enough')
+  assert.equal(approvalGate({ id: 'vh', sha256: v.sha256 }, [row]).approved, true, 'non-history version: unchanged')
+  const att = { ...row, id: 'ap0', seq: 0, via: 'history_attestation', effective_at: '2025-03-01', attestation_enc: '{"x":1}' }
+  assert.equal(approvalGate(v, [att, row]).approved, true)
+})
+
+await t('M2: recordHumanApproval refuses bodies with placeholders (including bypass forms); nothing is written', async () => {
+  for (const body of ['Our traction: [CONFIRM metric]', 'Revenue \uFF3BCONFIRM\uFF3D', 'Team: TO\u200BDO', 'We have [insert number] users']) {
+    const s = createMemoryStorage()
+    const v = await historyVersion(s, body, { history: false })
+    await assert.rejects(() => recordHumanApproval(s, human(v)), (e) => e instanceof VaultPlaceholderError && /approval refused/.test(e.message), body)
+    await assert.rejects(() => approveAsHuman(s, { version_id: v.id, expected_sha256: v.sha256, secret: SECRET }), VaultPlaceholderError)
+    assert.equal((await listApprovals(s)).length, 0)
+    assert.equal((await listEvents(s)).length, 0)
+  }
+})
+
+await t('M2: approval without the vault secret fails closed; revocation still works without it', async () => {
+  const s = createMemoryStorage()
+  const v = await historyVersion(s, 'A clean normal draft.', { history: false })
+  await assert.rejects(() => recordHumanApproval(s, human(v, { secret: undefined })), VaultScopeError)
+  await assert.rejects(() => recordHumanApproval(s, human(v, { secret: undefined, expected_sha256: 'd'.repeat(64) })), VaultApprovalMismatchError)
+  assert.equal((await listApprovals(s)).length, 0)
+  await recordHumanApproval(s, human(v))
+  const rev = await recordHumanRevocation(s, human(v, { secret: undefined }))
+  assert.equal(rev.decision, 'rejected')
 })
 
 console.log(`\n${passed} tests passed${process.exitCode ? ' (with failures)' : ''}`)

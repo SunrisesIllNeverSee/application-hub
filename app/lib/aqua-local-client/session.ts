@@ -11,7 +11,7 @@
 
 import {
   openVaultStorage,
-  createAnswer,
+  createAnswerWithVersion,
   createVersion,
   readVersion,
   decryptVersionTitle,
@@ -629,14 +629,24 @@ export async function saveVersion(
   secret: string,
   input: SaveVersionInput,
 ): Promise<VersionRecord> {
-  let answerId = input.answer_id
+  const answerId = input.answer_id
   if (!answerId) {
     const scope = input.scope
     if (!scope?.application_id || !scope.question_occurrence_id) {
       throw new VaultScopeError('new answer requires application_id and question_occurrence_id')
     }
-    const answer = await createAnswer(storage, scope)
-    answerId = answer.id
+    // AT22: answer + first version in ONE transaction (no empty answer shell on refusal/failure).
+    const { version } = await createAnswerWithVersion(storage, secret, scope, {
+      title: input.title,
+      body: input.body,
+      method: input.method ?? 'manual',
+      provenance: input.provenance ?? null,
+      provider: input.provider ?? null,
+      model: input.model ?? null,
+      observed_flags: input.observed_flags,
+      derived_from: input.derived_from ?? null,
+    })
+    return version
   }
   return createVersion(storage, secret, {
     answer_id: answerId,

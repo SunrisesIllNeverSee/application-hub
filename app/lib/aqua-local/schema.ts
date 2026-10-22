@@ -164,6 +164,15 @@ export interface PacketRecord {
   manifest_json?: string // legacy plaintext manifests (pre-IR-002)
   manifest_sha256: string
   frozen_at: string
+  /** M09 review M3: the record came from a backup import. A restored packet
+      is a claim: it exports or signs only after verifyPacket passes against
+      THIS vault (manifest re-hash, answer re-hash, live approval gate). */
+  restored_from_backup?: true
+  /** Set when verifyPacket last refused this packet; it cannot be exported
+      or signed as verified until a later verification passes. */
+  unverified?: { at: string; reasons: string[] }
+  /** Last time verifyPacket passed for this record (export/sign). */
+  verified_at?: string
 }
 
 /** Structured generation provenance receipt (LF contract §5). */

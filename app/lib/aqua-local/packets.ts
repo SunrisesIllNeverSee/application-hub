@@ -54,6 +54,7 @@ import {
 } from './schema.ts'
 import { decryptVersionTitle, isBlankBody, VaultNotFoundError } from './repo.ts'
 import { approvalGate } from './status.ts'
+import { describePlaceholders, findPlaceholders } from './placeholders.ts'
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -65,6 +66,17 @@ export class PacketFreezeError extends Error {
   constructor(reasons: string[]) {
     super(`packet freeze refused: ${reasons.join('; ')}`)
     this.name = 'PacketFreezeError'
+    this.reasons = reasons
+  }
+}
+
+/** M09 review M3: export/sign refused because the packet does not verify
+    against this vault (see verifyPacket). The record is marked unverified. */
+export class PacketVerificationError extends Error {
+  readonly reasons: string[]
+  constructor(reasons: string[]) {
+    super(`packet verification failed — re-approve the answers and freeze a new packet: ${reasons.join('; ')}`)
+    this.name = 'PacketVerificationError'
     this.reasons = reasons
   }
 }
@@ -324,6 +336,11 @@ export async function freezeApplicationPacket(
     const recomputed = await sha256Hex(canonicalJson({ title: titlePlain, body }))
     if (recomputed !== version.sha256) {
       reasons.push(`tampered version refused: ${sel.version_id} stored sha256 does not match recomputed`)
+      continue
+    }
+    const markers = findPlaceholders(body)
+    if (markers.length) {
+      reasons.push(`version ${sel.version_id} still has an unfilled placeholder: ${describePlaceholders(markers)}`)
       continue
     }
 
@@ -628,19 +645,124 @@ export async function listPackets(
 // LF-22 export — portable plaintext JSON (distinct from encrypted vault backup)
 // ---------------------------------------------------------------------------
 
+export interface PacketVerification {
+  ok: boolean
+  reasons: string[]
+}
+
+/**
+ * M09 review M3 — re-verify a stored packet against THIS vault, trusting
+ * nothing the record (or a backup it came from) claims:
+ *   - the manifest re-hashes to the record's manifest_sha256, and the packet
+ *     id is derived from it;
+ *   - every included answer re-hashes to its answer_sha256, the version
+ *     still exists with that sha256 and scope, the approval gate is approved
+ *     NOW (live, human, hash-bound, not restored, not reopened), and the body
+ *     has no unfilled placeholder;
+ *   - every other entry is an explained skip carrying no answer.
+ * Pure read: never writes.
+ */
+export async function verifyPacketManifest(
+  storage: VaultStorage,
+  record: PacketRecord,
+  manifestJson: string,
+): Promise<PacketVerification> {
+  const reasons: string[] = []
+  const sha = await sha256Hex(manifestJson)
+  if (sha !== record.manifest_sha256) reasons.push('manifest does not hash to the stored manifest_sha256')
+  if (record.id !== `PK-${record.manifest_sha256.slice(0, 16)}`) reasons.push('packet id is not derived from its manifest digest')
+  let manifest: Partial<FrozenPacket>
+  try { manifest = JSON.parse(manifestJson) } catch { return { ok: false, reasons: [...reasons, 'manifest is not valid JSON'] } }
+  if (manifest.application_id !== record.application_id) reasons.push('manifest application_id does not match the packet record')
+  const questions = Array.isArray(manifest.questions) ? manifest.questions : null
+  if (!questions) return { ok: false, reasons: [...reasons, 'manifest has no questions list'] }
+  const approvals = await storage.getAll<ApprovalRecord>('approvals')
+  const reviews = await storage.getAll<ReviewRecord>('reviews')
+  for (const q of questions) {
+    const occ = q?.question_occurrence_id ?? '?'
+    if (q.skipped === true) {
+      if (q.version_id !== null || q.answer_body !== null || q.answer_sha256 !== null || q.approved !== false ||
+        typeof q.skip_reason !== 'string' || isBlankBody(q.skip_reason)) {
+        reasons.push(`question ${occ}: skipped entry must carry an explanation and no answer`)
+      }
+      continue
+    }
+    if (q.approved !== true || !q.version_id || typeof q.answer_body !== 'string' || typeof q.answer_sha256 !== 'string') {
+      reasons.push(`question ${occ}: entry is neither an approved answer nor an explained skip`)
+      continue
+    }
+    const rehash = await sha256Hex(canonicalJson({ title: q.answer_title, body: q.answer_body }))
+    if (rehash !== q.answer_sha256) { reasons.push(`question ${occ}: answer does not hash to its answer_sha256`); continue }
+    const version = await storage.get<VersionRecord>('versions', q.version_id)
+    if (!version || version.sha256 !== q.answer_sha256) { reasons.push(`question ${occ}: version ${q.version_id} is not in this vault with that sha256`); continue }
+    const answer = await storage.get<AnswerRecord>('answers', version.answer_id)
+    if (!answer || answer.scope.application_id !== record.application_id || answer.scope.question_occurrence_id !== occ) {
+      reasons.push(`question ${occ}: version ${q.version_id} is not bound to this application/question`)
+      continue
+    }
+    const gate = approvalGate(version, approvals, reviews)
+    if (!gate.approved) { reasons.push(`question ${occ}: version ${q.version_id} has no live human approval in this vault`); continue }
+    const markers = findPlaceholders(q.answer_body)
+    if (markers.length) reasons.push(`question ${occ}: ${describePlaceholders(markers)}`)
+  }
+  return { ok: reasons.length === 0, reasons }
+}
+
+/** verifyPacketManifest for a stored packet id (reads the manifest; needs the
+    secret for encrypted manifests). Never writes. */
+export async function verifyPacket(
+  storage: VaultStorage,
+  packetId: string,
+  secret: string | null = null,
+): Promise<PacketVerification> {
+  const record = await storage.get<PacketRecord>('packets', packetId)
+  if (!record) throw new VaultNotFoundError(`packet not found: ${packetId}`)
+  return verifyPacketManifest(storage, record, await readManifestJson(storage, record, secret))
+}
+
+/**
+ * Verify before a packet leaves the vault (export) or is signed. On failure
+ * the record is marked `unverified` and PacketVerificationError is thrown;
+ * on success any earlier `unverified` mark is cleared. Exported for
+ * signoff.ts.
+ */
+export async function requireVerifiedPacket(
+  storage: VaultStorage,
+  packetId: string,
+  secret: string | null,
+): Promise<{ record: PacketRecord; manifestJson: string }> {
+  const record = await storage.get<PacketRecord>('packets', packetId)
+  if (!record) throw new VaultNotFoundError(`packet not found: ${packetId}`)
+  const manifestJson = await readManifestJson(storage, record, secret)
+  const current = (await storage.get<PacketRecord>('packets', packetId)) ?? record // readManifestJson may self-heal
+  const result = await verifyPacketManifest(storage, current, manifestJson)
+  const at = nowIso()
+  if (!result.ok) {
+    await storage.put('packets', { ...current, unverified: { at, reasons: result.reasons } })
+    throw new PacketVerificationError(result.reasons)
+  }
+  const { unverified: _cleared, ...rest } = current
+  const next: PacketRecord = { ...rest, verified_at: at }
+  await storage.put('packets', next)
+  return { record: next, manifestJson }
+}
+
 /**
  * Produce the portable export document. Copy/download only — this returns a
  * string for the caller to save/share; nothing is transmitted anywhere.
  * Advances state prepared|signed → exported.
+ *
+ * M09 review M3: re-verifies the packet first (requireVerifiedPacket —
+ * manifest re-hash, answer re-hash, live approval gate, placeholders). A
+ * packet that fails, e.g. one restored from a backup whose approvals are not
+ * live here, is marked unverified and is not exported.
  */
 export async function exportPacket(
   storage: VaultStorage,
   packetId: string,
   secret: string | null = null,
 ): Promise<string> {
-  const record = await storage.get<PacketRecord>('packets', packetId)
-  if (!record) throw new VaultNotFoundError(`packet not found: ${packetId}`)
-  const manifestJson = await readManifestJson(storage, record, secret)
+  const { record, manifestJson } = await requireVerifiedPacket(storage, packetId, secret)
   const state = await getPacketState(storage, packetId)
   if (state && state.state === 'exported') {
     // Idempotent: re-export of the same packet returns an identical document.

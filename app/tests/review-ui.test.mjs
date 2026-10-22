@@ -417,10 +417,25 @@ test('a version changed between plan and confirm is refused at write time', asyn
   // Tamper the stored hash after planning (simulates a concurrent change).
   const stored = await s.get('versions', v.id)
   await s.put('versions', { ...stored, sha256: SHA_B })
-  const res = await applyDecisionPlan(s, SECRET, plan, 'u-test')
+  const res = await applyDecisionPlan(s, SECRET, plan, 'u-test', new Set([v.id]))
   assert.equal(res[0].ok, false)
   assert.match(res[0].error, /refused|mismatch|does not hash/i)
   assert.equal((await listApprovals(s, v.id)).length, 0)
+})
+
+test('LOW: applyDecisionPlan applies nothing without an explicit selection', async () => {
+  const s = createMemoryStorage()
+  const seed = await seedSyntheticReview(s, SECRET)
+  const rows = await listInstanceQuestions(s, SECRET, seed.instance_id, { classify: false })
+  const v = rows.find((r) => r.question_occurrence_id === seed.occ.company).versions.at(-1)
+  const file = buildDecisionFile({ instance_id: seed.instance_id }, [
+    { question_occurrence_id: seed.occ.company, version_id: v.id, version_sha256: v.sha256, decision: 'approve' },
+  ], NOW)
+  const plan = planDecisionImport(file, seed.instance_id, currentStates(rows), { origin: 'this_vault' })
+  const before = (await listApprovals(s, v.id)).length
+  await assert.rejects(() => applyDecisionPlan(s, SECRET, plan, 'u-test'), /selected/)
+  assert.deepEqual(await applyDecisionPlan(s, SECRET, plan, 'u-test', new Set()), [])
+  assert.equal((await listApprovals(s, v.id)).length, before)
 })
 
 // ---------------------------------------------------------------------------
@@ -509,6 +524,25 @@ test('M2: export nonce recorded (hashed) in the vault; only that nonce + instanc
   assert.notEqual(await issueReviewExportNonce(s, seed.instance_id), nonce, 'fresh nonce per export')
 })
 
+test('LOW: an export nonce is single-use — after its file is applied, the same nonce reads as foreign', async () => {
+  const s = createMemoryStorage()
+  const seed = await seedSyntheticReview(s, SECRET)
+  const nonce = await issueReviewExportNonce(s, seed.instance_id)
+  const rows = await listInstanceQuestions(s, SECRET, seed.instance_id, { classify: false })
+  const v = rows.find((r) => r.question_occurrence_id === seed.occ.company).versions.at(-1)
+  const file = buildDecisionFile({ instance_id: seed.instance_id, export_nonce: nonce }, [
+    { question_occurrence_id: seed.occ.company, version_id: v.id, version_sha256: v.sha256, decision: 'needs_evidence', comment: 'Need a source (synthetic)' },
+  ], NOW)
+  const origin = await decisionFileOrigin(s, seed.instance_id, file.export_nonce)
+  assert.equal(origin, 'this_vault')
+  const plan = planDecisionImport(file, seed.instance_id, currentStates(rows), { origin })
+  const res = await applyDecisionPlan(s, SECRET, plan, 'u-test', new Set([v.id]), { nonce, instanceId: seed.instance_id })
+  assert.ok(res.some((r) => r.ok))
+  assert.equal(await decisionFileOrigin(s, seed.instance_id, nonce), 'foreign', 'replayed or forged file with a spent nonce is foreign')
+  const ev = (await s.getAll('events')).find((e) => e.kind === 'review_export_nonce_used')
+  assert.ok(ev && !JSON.stringify(ev).includes(nonce), 'only the nonce hash is kept')
+})
+
 test('M2: applying a foreign plan needs explicit confirmation; imported comments carry via decision_file', async () => {
   const s = createMemoryStorage()
   const seed = await seedSyntheticReview(s, SECRET)
@@ -542,6 +576,10 @@ test('M2: approve rows get a locally decrypted excerpt capped at ~300 chars', as
   }
   const short = await readDecisionExcerpts(s, SECRET, [ids[0]], 5)
   assert.match(short.get(ids[0]), /^.{5}…$/su)
+  const full = await readDecisionExcerpts(s, SECRET, ids, Number.POSITIVE_INFINITY)
+  for (const id of ids) assert.ok([...full.get(id)].length >= [...ex.get(id)].length - 1, 'uncapped read is never shorter than the excerpt')
+  const panel = await readFile(new URL('../components/review/DecisionImportPanel.tsx', import.meta.url), 'utf8')
+  assert.match(panel, /readDecisionExcerpts\(storage, secret, ids, Number\.POSITIVE_INFINITY\)/, 'the import dialog shows the full answer it would approve')
 })
 
 test('M3: agent / companion comments are labelled "From companion — review"; via is validated', async () => {

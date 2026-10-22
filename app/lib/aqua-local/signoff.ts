@@ -20,7 +20,8 @@ import type { VaultStorage } from './vault.ts'
 import { nowIso } from './crypto.ts'
 import type { SignerClass, SignoffRecord } from './schema.ts'
 import { VaultNotFoundError, VaultImmutableError } from './repo.ts'
-import { advancePacketState, getPacketState, PacketStateError } from './packets.ts'
+import { advancePacketState, getPacketState, PacketStateError, PacketVerificationError, requireVerifiedPacket } from './packets.ts'
+import type { PacketRecord } from './schema.ts'
 
 export class SignoffAckError extends Error {
   constructor(message = 'packet sign-off refused: explicit user acknowledgement (user_ack: true) is required') {
@@ -43,6 +44,13 @@ export interface AttestPacketInput {
   pubkey_b64?: string | null
   /** Required to compute the signature — the packet's manifest_sha256. */
   manifest_sha256: string
+  /**
+   * Vault secret (M09 review M3). When given, the packet is re-verified
+   * against this vault before signing (manifest re-hash, answer re-hash,
+   * live approval gate). REQUIRED for a packet restored from a backup or
+   * marked unverified: those are never signed on trust.
+   */
+  secret?: string | null
 }
 
 /**
@@ -81,8 +89,14 @@ export async function attestPacket(
   // IR-005: sign the STORED packet's manifest digest — never trust the
   // caller's manifest_sha256. A foreign digest would produce a 'signed'
   // packet whose signature cannot verify against the real manifest.
-  const packet = await storage.get<{ manifest_sha256: string }>('packets', input.packet_id)
+  const packet = await storage.get<PacketRecord>('packets', input.packet_id)
   if (!packet) throw new VaultNotFoundError(`packet not found: ${input.packet_id}`)
+  if ((packet.restored_from_backup || packet.unverified) && !input.secret) {
+    throw new PacketVerificationError([
+      'this packet was restored from a backup or failed verification — unlock the vault so it can be re-verified before signing',
+    ])
+  }
+  if (input.secret) await requireVerifiedPacket(storage, input.packet_id, input.secret)
   if (input.manifest_sha256 !== packet.manifest_sha256) {
     throw new SignoffAckError(
       `manifest digest mismatch: caller claimed ${input.manifest_sha256}, stored packet has ${packet.manifest_sha256}`,
