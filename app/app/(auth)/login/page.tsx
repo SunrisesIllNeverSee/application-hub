@@ -500,10 +500,7 @@ function LoginForm() {
 
         <p className="mt-8 text-center text-xs text-neutral-600">
           Built by{' '}
-          <a href="https://ellocello.com" className="text-neutral-500 hover:text-neutral-400 transition-colors"
-            target="_blank" rel="noopener noreferrer">
-            Ello Cello LLC
-          </a>
+          <span className="text-neutral-500">Ello Cello LLC</span>
         </p>
       </div>
     </div>

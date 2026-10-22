@@ -1,74 +1,35 @@
-import { NextResponse } from 'next/server'
+/**
+ * app/.well-known/auth.md/route.ts
+ *
+ * Plain-language authentication guide for agents, referenced by the
+ * oauth-* and api-catalog discovery documents.
+ */
 
 export const revalidate = 3600
 
-export async function GET() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const AUTH_MD = `# AQUA authentication
 
-  const md = `# AQUA Application Hub — Agent Authentication
+AQUA (https://aquaidp.xyz) uses Supabase Auth. People sign in at https://aquaidp.xyz/login with an email magic link, email + password, or GitHub.
 
-## Overview
+## What needs no sign-in
+- Public pages, the public application catalog, \`/llms.txt\`, \`/openapi.json\`, and the discovery documents under \`/.well-known/\`.
+- \`GET /api/health\`.
 
-AQUA Application Hub (aquaidp.xyz) uses Supabase for authentication. Public
-tools (programs, questions, rankings) work without auth. Authenticated tools
-(answer bank, fit scores, application intake) require a Supabase session JWT.
+## What needs a signed-in person
+- Signed-in app pages and the authenticated API routes listed in \`/.well-known/oauth-protected-resource\`.
+- Requests use the browser session cookie. A route may also accept \`Authorization: Bearer <Supabase access token>\` from the same person's own client.
 
-## Public endpoints (no auth required)
+## Private answers never use these endpoints
+AQUA is local-first. Answers, drafts, evidence, approvals and application packets live in an encrypted vault in the user's own browser. They are not stored on or sent to AQUA's servers, so no API exposes them.
 
-- GET / — homepage
-- GET /about — about page
-- GET /about/scoring — scoring methodology
-- GET /faq — FAQ
-- GET /developers — developer portal
-- GET /agents — agent guide
-- GET /llms.txt — LLM instructions
-- GET /openapi.json — OpenAPI spec
-- GET /.well-known/mcp — MCP server manifest
-- GET /api/programs — program search (public)
-- GET /api/questions — question bank (public)
-- GET /api/rankings — program rankings (public)
-
-## Authenticated endpoints (Supabase JWT required)
-
-- POST /api/answers — save an answer
-- GET /api/answers — list saved answers
-- POST /api/applications — submit an application
-- GET /api/profile — get user profile
-- GET /api/workspace — get workspace data
-- All MCP tools in the "authenticated" category
-
-## Authentication methods
-
-### Browser (cookie-based)
-Users sign in via the web UI at https://aquaidp.xyz/login. Supabase sets a
-session cookie that authenticates subsequent requests.
-
-### Agent / extension (Bearer JWT)
-Agents obtain a JWT via the OAuth flow described in
-/.well-known/oauth-authorization-server, then send it as:
-
-\`\`\`
-Authorization: Bearer <jwt>
-\`\`\`
-
-### MCP server
-The local MCP server (npx aqua-mcp-server) accepts a Supabase
-access token via the SUPABASE_ACCESS_TOKEN environment variable.
-
-## OAuth discovery
-
-- Authorization server metadata: /.well-known/oauth-authorization-server
-- Protected resource metadata: /.well-known/oauth-protected-resource
-- Issuer: ${supabaseUrl}/auth/v1
-- Registration: https://aquaidp.xyz/login
-
-## Web Bot Auth
-
-aquaidp.xyz signs outgoing bot/agent requests using Ed25519. Verification keys
-are published at /.well-known/http-message-signatures-directory.
+## Agents
+- Do not ask a person to paste a session token or JWT into a chat.
+- To work with a person's applications, use the local AQUA companion (a command-line tool and stdio MCP server that the user runs on their own machine). It holds no account token and no server keys.
+- Approving answers, signing packets and submitting applications are human-only actions inside the AQUA app.
 `
 
-  return new NextResponse(md, {
+export async function GET() {
+  return new Response(AUTH_MD, {
     headers: {
       'Content-Type': 'text/markdown; charset=utf-8',
       'Cache-Control': 'public, max-age=3600',

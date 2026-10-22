@@ -32,13 +32,12 @@ export async function GET() {
       'https://aquaidp.xyz/.well-known/mcp',
     ],
     protected_endpoints: [
-      'https://aquaidp.xyz/api/answers',
-      'https://aquaidp.xyz/api/applications',
-      'https://aquaidp.xyz/api/profile',
-      'https://aquaidp.xyz/api/workspace',
+      'https://aquaidp.xyz/api/auth/token',
+      'https://aquaidp.xyz/api/profile/identity',
+      'https://aquaidp.xyz/api/profile/fundscore',
     ],
     notes:
-      'Public tools (programs, questions, rankings) work without auth. Authenticated tools (answer bank, fit scores, application intake) require a Supabase session JWT.',
+      'Public pages and the public catalog work without auth. Signed-in routes use the browser session. Private answers are local-first: they live in the user\'s encrypted browser vault and are never served by any API. See /.well-known/auth.md.',
   }
 
   return NextResponse.json(metadata, {

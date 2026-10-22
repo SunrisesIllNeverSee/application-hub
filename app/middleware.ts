@@ -25,7 +25,7 @@ const PROTECTED_ROUTES = [
 ]
 
 const AUTH_ONLY_ROUTES = ['/login']
-const NON_NEGOTIATED_PREFIXES = ['/api/', '/auth/', '/_next/', '/_vercel/']
+const NON_NEGOTIATED_PREFIXES = ['/api/', '/auth/', '/_next/', '/_vercel/', '/.well-known/']
 
 function isProtectedPath(pathname: string) {
   return PROTECTED_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'))

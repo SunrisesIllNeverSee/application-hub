@@ -73,7 +73,7 @@ Use AQUA when a user needs to:
 The Contribution Exchange has moved from aquaidp.xyz to signalaf.com (SigRank). AQUA is now pure application infrastructure. The exchange is hosted on signalaf.com's control plane.
 
 - Exchange Profile: https://aquaidp.xyz/.well-known/exchange.json (points to signalaf.com)
-- Domain counterparty agent: https://signalaf.com/api/exchange/steward/aquaidp.xyz
+- Domain counterparty agent: pending domain verification (start at https://signalaf.com/exchange)
 - Full carry guide: https://signalaf.com/agents.md
 - Contribution Exchange MCP: https://signalaf.com/api/exchange/mcp
 - Proposal API: POST https://signalaf.com/api/exchange/proposals
