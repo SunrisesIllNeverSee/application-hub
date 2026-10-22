@@ -31,11 +31,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
-      - name: Install + build + test
+      - name: Install + test
         run: |
           npm ci
-          npm run build
-          npx vitest run
+          npm test
       - name: Publish to npm
         # Trusted-publisher OIDC: no NPM_TOKEN required when the
         # package's trusted publisher points at this workflow.
