@@ -1,0 +1,283 @@
+{
+  "generated_at": "2026-10-22T23:12:04.954Z",
+  "base": "localhost (next dev, /dev/journey harness)",
+  "checks": [
+    {
+      "at": "AT21",
+      "name": "account A writes only to its own IndexedDB database",
+      "pass": true,
+      "detail": {
+        "names": [
+          "aqua-local-<uidA>"
+        ],
+        "listA": 1
+      }
+    },
+    {
+      "at": "AT21",
+      "name": "no shared/anonymous vault is created while signed in",
+      "pass": true
+    },
+    {
+      "at": "AT21",
+      "name": "sign-out closes account A's IndexedDB connection",
+      "pass": true
+    },
+    {
+      "at": "AT21",
+      "name": "after sign-out the open tab drops the secret: list hidden, unlock required",
+      "pass": true,
+      "detail": {
+        "listAfter": 0,
+        "unlockShown": true
+      }
+    },
+    {
+      "at": "AT21",
+      "name": "account B gets a first-run vault (A's secret and data are not inherited)",
+      "pass": true
+    },
+    {
+      "at": "AT21",
+      "name": "account B sees none of A's applications",
+      "pass": true
+    },
+    {
+      "at": "AT21",
+      "name": "A and B have different IndexedDB database names; A's data untouched, B's empty",
+      "pass": true,
+      "detail": {
+        "names": [
+          "aqua-local",
+          "aqua-local-<uidA>",
+          "aqua-local-<uidB>"
+        ],
+        "counts": {
+          "aqua-local": {
+            "app_instances": 0,
+            "answers": 0,
+            "versions": 0,
+            "approvals": 0
+          },
+          "aqua-local-<uidA>": {
+            "app_instances": 1,
+            "answers": 0,
+            "versions": 0,
+            "approvals": 0
+          },
+          "aqua-local-<uidB>": {
+            "app_instances": 0,
+            "answers": 0,
+            "versions": 0,
+            "approvals": 0
+          }
+        }
+      }
+    },
+    {
+      "at": "AT21",
+      "name": "after the switch the app never opened A's database again",
+      "pass": true,
+      "detail": {
+        "opened_by_b_page": [
+          "aqua-local-<uidB>"
+        ]
+      }
+    },
+    {
+      "at": "AT21",
+      "name": "B opening A's instance URL does not reveal it",
+      "pass": true
+    },
+    {
+      "at": "AT21",
+      "name": "switching A→B (SIGNED_IN as another account) closes A's connection",
+      "pass": true
+    },
+    {
+      "at": "AT21",
+      "name": "switching A→B locks the open tab (A's list no longer shown)",
+      "pass": true
+    },
+    {
+      "at": "AT15",
+      "name": "device 1 holds the application locally",
+      "pass": true
+    },
+    {
+      "at": "AT15",
+      "name": "device 2 (same account) starts a first-run vault and lists nothing",
+      "pass": true
+    },
+    {
+      "at": "AT15",
+      "name": "device 2 UI makes no automatic-sync claim",
+      "pass": true,
+      "detail": "no match for the sync-claim pattern"
+    },
+    {
+      "at": "AT15",
+      "name": "device 2 says the data is on this device",
+      "pass": true
+    },
+    {
+      "at": "AT15",
+      "name": "device 2 makes no sync/API request; no off-site request except the GA4 script GET (no body, aborted)",
+      "pass": true,
+      "detail": {
+        "api": [],
+        "offsite": [
+          "GET www.googletagmanager.com/gtag/js"
+        ]
+      }
+    },
+    {
+      "at": "AT22",
+      "name": "URL import failure (abort) shows an error and no review/instance step",
+      "pass": true,
+      "detail": " Nothing was created — try again, or paste the questions instead."
+    },
+    {
+      "at": "AT22",
+      "name": "URL import failure (500) shows an error and no review/instance step",
+      "pass": true,
+      "detail": "internal Nothing was created."
+    },
+    {
+      "at": "AT22",
+      "name": "URL import failure (422) shows an error and no review/instance step",
+      "pass": true,
+      "detail": "source_fetch_failed Nothing was created."
+    },
+    {
+      "at": "AT22",
+      "name": "URL import failure (garbage) shows an error and no review/instance step",
+      "pass": true,
+      "detail": " Nothing was created."
+    },
+    {
+      "at": "AT22",
+      "name": "failed URL imports wrote nothing to the vault",
+      "pass": true,
+      "detail": {
+        "before": {
+          "app_instances": 0,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        },
+        "after": {
+          "app_instances": 0,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        }
+      }
+    },
+    {
+      "at": "AT22",
+      "name": "extract-url request bodies were {url} only",
+      "pass": true
+    },
+    {
+      "at": "AT22",
+      "name": "instance creation storage failure: error shown, nothing saved, no navigation",
+      "pass": true,
+      "detail": {
+        "error": "Could not create the application: synthetic quota failure. Nothing was saved.",
+        "before": {
+          "app_instances": 0,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        },
+        "after": {
+          "app_instances": 0,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        }
+      }
+    },
+    {
+      "at": "AT22",
+      "name": "retry after the failure creates exactly one instance",
+      "pass": true
+    },
+    {
+      "at": "AT22",
+      "name": "a write failure inside the first-draft transaction rolls back: no answer, no version",
+      "pass": true,
+      "detail": {
+        "before": {
+          "app_instances": 1,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        },
+        "after": {
+          "app_instances": 1,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        }
+      }
+    },
+    {
+      "at": "AT22",
+      "name": "a refused draft (invisible characters only) writes no answer and no version",
+      "pass": true,
+      "detail": {
+        "before": {
+          "app_instances": 1,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        },
+        "after": {
+          "app_instances": 1,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        },
+        "message": "empty, whitespace-only, or invisible-characters-only"
+      }
+    },
+    {
+      "at": "AT22",
+      "name": "a valid draft afterwards creates exactly one answer + one version",
+      "pass": true,
+      "detail": {
+        "before": {
+          "app_instances": 1,
+          "answers": 0,
+          "versions": 0,
+          "approvals": 0
+        },
+        "after": {
+          "app_instances": 1,
+          "answers": 1,
+          "versions": 1,
+          "approvals": 0
+        }
+      }
+    },
+    {
+      "at": "AT22",
+      "name": "no request (URL or body) carried pasted text, drafts or vault secrets",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "requests": {
+    "total_recorded": 67,
+    "api_calls": [
+      "POST /api/catalog/extract-url"
+    ],
+    "offsite_hosts_attempted_and_aborted": [
+      "www.googletagmanager.com"
+    ],
+    "bodies_or_urls_with_private_content": 0
+  },
+  "pass": true
+}

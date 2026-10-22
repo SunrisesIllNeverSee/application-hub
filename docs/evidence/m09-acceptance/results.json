@@ -1,0 +1,2668 @@
+{
+  "milestone": "M09",
+  "generated_at": "2026-10-22T23:14:22.805Z",
+  "branch": "m09/integration",
+  "commit": "472bc6e",
+  "node": "v26.10.0",
+  "stages": [
+    {
+      "stage": "unit",
+      "command": "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+      "exit": 0,
+      "seconds": 14,
+      "counts": {
+        "total": 424,
+        "pass": 424,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "acceptance",
+      "command": "cd app && node --test tests/acceptance/at15-no-sync-claim.test.mjs",
+      "exit": 0,
+      "seconds": 0,
+      "counts": {
+        "total": 4,
+        "pass": 4,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "vault",
+      "command": "cd app && npm run -s test:vault   (10 runner scripts)",
+      "exit": 0,
+      "seconds": 21,
+      "counts": {
+        "total": 213,
+        "pass": 213,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "companion",
+      "command": "node --test aqua-companion/test/*.test.mjs",
+      "exit": 0,
+      "seconds": 9,
+      "counts": {
+        "total": 116,
+        "pass": 116,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "db",
+      "command": "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh",
+      "exit": 0,
+      "seconds": 2,
+      "counts": {
+        "total": 237,
+        "pass": 237,
+        "fail": 0,
+        "skip": 0
+      },
+      "summary": [
+        "==================== rollback: the migration's documented ROLLBACK block, then re-apply ====================",
+        "ROLLBACK PASS",
+        "       suite        | total | passed | failed ",
+        " 058 suite          |   151 |    151 |      0",
+        " existing p0 suites |    86 |     86 |      0",
+        "ALL PASS"
+      ]
+    },
+    {
+      "stage": "catalog-sql",
+      "command": "M09_E2E_PGROOT=<scratch> node --test tests/acceptance/catalog-promotion-sql.e2e.mjs",
+      "exit": 0,
+      "seconds": 3,
+      "counts": {
+        "total": 7,
+        "pass": 7,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "browser:review-ui",
+      "command": "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+      "exit": 0,
+      "seconds": 20,
+      "counts": {
+        "total": 19,
+        "pass": 19,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "browser:journey",
+      "command": "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+      "exit": 0,
+      "seconds": 53,
+      "counts": {
+        "total": 13,
+        "pass": 13,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    {
+      "stage": "browser:acceptance",
+      "command": "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+      "exit": 0,
+      "seconds": 123,
+      "counts": {
+        "total": 28,
+        "pass": 28,
+        "fail": 0,
+        "skip": 0
+      },
+      "server_outbound_attempts_refused_by_deny_proxy": [
+        "registry.npmjs.org:443",
+        "acceptance0ref.supabase.co:443"
+      ]
+    },
+    {
+      "stage": "prod:build",
+      "command": "NEXT_PUBLIC_AQUA_LOCAL_FIRST=1 AQUA_LOCAL_FIRST=1 NEXT_PUBLIC_SUPABASE_URL=<placeholder> next build",
+      "exit": 0,
+      "seconds": 14
+    },
+    {
+      "stage": "prod:routes",
+      "command": "next start -p 3978; unauthenticated GET of protected routes (redirect: manual); hosted MCP POST /mcp tools/list and browser GET /mcp",
+      "exit": 0,
+      "seconds": 0,
+      "observed": [
+        {
+          "path": "/apply",
+          "status": 307,
+          "location": "/login?next=%2Fapply",
+          "expect": "redirect /login?next=%2Fapply"
+        },
+        {
+          "path": "/apply?path=mine",
+          "status": 307,
+          "location": "/login?next=%2Fapply%3Fpath%3Dmine",
+          "expect": "redirect /login (next has no url=)"
+        },
+        {
+          "path": "/apply/LA-x",
+          "status": 307,
+          "location": "/login?next=%2Fapply%2FLA-x",
+          "expect": "redirect /login"
+        },
+        {
+          "path": "/review/x",
+          "status": 307,
+          "location": "/login?next=%2Freview%2Fx",
+          "expect": "redirect /login?next=%2Freview%2Fx"
+        },
+        {
+          "path": "/history",
+          "status": 307,
+          "location": "/login?next=%2Fhistory",
+          "expect": "redirect /login?next=%2Fhistory"
+        },
+        {
+          "path": "/admin/catalog",
+          "status": 404,
+          "location": "",
+          "expect": "404 (curators only)"
+        },
+        {
+          "path": "/aqua-local",
+          "status": 307,
+          "location": "/login?next=%2Faqua-local",
+          "expect": "redirect /login"
+        },
+        {
+          "path": "/questions",
+          "status": 307,
+          "location": "/login?next=%2Fquestions",
+          "expect": "redirect /login"
+        },
+        {
+          "path": "/dev/journey",
+          "status": 404,
+          "location": "",
+          "expect": "404 (harness)"
+        },
+        {
+          "path": "/dev/review-harness",
+          "status": 404,
+          "location": "",
+          "expect": "404 (harness)"
+        },
+        {
+          "path": "/apply?url=https%3A%2F%2Fprogram.example.org%2Fapply",
+          "status": 303,
+          "location": "/apply?path=url#url=https%3A%2F%2Fprogram.example.org%2Fapply",
+          "expect": "303 to #url= fragment (M5)"
+        },
+        {
+          "path": "POST /mcp tools/list",
+          "status": 200,
+          "location": "",
+          "tools": 11,
+          "expect": "200 JSON-RPC tools/list with 11 hosted tools"
+        },
+        {
+          "path": "GET /mcp (browser)",
+          "status": 200,
+          "location": "",
+          "content_type": "text/html",
+          "expect": "200 text/html docs page"
+        }
+      ],
+      "server_outbound_attempts_refused_by_deny_proxy": []
+    },
+    {
+      "stage": "agent",
+      "command": "recorded run 2026-10-22T19:11:43.776Z (re-run with --agent)",
+      "exit": 0,
+      "seconds": 0,
+      "mode": "real_agent",
+      "recorded": true,
+      "counts": {
+        "total": 15,
+        "pass": 15,
+        "fail": 0,
+        "skip": 0
+      }
+    }
+  ],
+  "totals": {
+    "unit": {
+      "total": 424,
+      "pass": 424,
+      "fail": 0,
+      "skip": 0
+    },
+    "acc": {
+      "total": 11,
+      "pass": 11,
+      "fail": 0,
+      "skip": 0
+    },
+    "vault": {
+      "total": 213,
+      "pass": 213,
+      "fail": 0,
+      "skip": 0
+    },
+    "companion": {
+      "total": 116,
+      "pass": 116,
+      "fail": 0,
+      "skip": 0
+    },
+    "db": {
+      "total": 237,
+      "pass": 237,
+      "fail": 0,
+      "skip": 0
+    },
+    "browser": {
+      "total": 60,
+      "pass": 60,
+      "fail": 0,
+      "skip": 0
+    },
+    "prod": {
+      "total": 13,
+      "pass": 13,
+      "fail": 0,
+      "skip": 0
+    },
+    "agent": {
+      "total": 15,
+      "pass": 15,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "summary": {
+    "pass": 22,
+    "partial": 0,
+    "fail": 0,
+    "not_run": 0
+  },
+  "acceptance": [
+    {
+      "id": "AT01",
+      "title": "User selects existing application",
+      "expected": "Existing universal template is reused",
+      "status": "pass",
+      "key_assertion": "Catalog start creates an AI- instance with ids only; a second start / workspace link reuses it and writes nothing.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-journey/results.json",
+        "docs/evidence/m09-journey/w1440-catalog-B-review.jpg",
+        "docs/evidence/m09-journey.md"
+      ],
+      "commands": [
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "unit:journey-activate.test.mjs::catalog path: AI- instance with ids only, W5 workspace convention (application_id = program_id, occurrence = archived_question_id)",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-activate.test.mjs",
+          "name": "catalog path: AI- instance with ids only, W5 workspace convention (application_id = program_id, occurrence = archived_question_id)"
+        },
+        {
+          "ref": "unit:journey-activate.test.mjs::one instance per program: a second catalog start (or one made by the W5 workspace link) is reused, nothing written",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-activate.test.mjs",
+          "name": "one instance per program: a second catalog start (or one made by the W5 workspace link) is reused, nothing written"
+        },
+        {
+          "ref": "unit:journey-review.test.mjs::catalog template summary: public questions, exact catalog match, no corrections needed",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-review.test.mjs",
+          "name": "catalog template summary: public questions, exact catalog match, no corrections needed"
+        },
+        {
+          "ref": "unit:journey-review.test.mjs::program match: clear, pick from catalog, catalog-template choice",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-review.test.mjs",
+          "name": "program match: clear, pick from catalog, catalog-template choice"
+        },
+        {
+          "ref": "vault::app_instances: catalog-backed AI- instance stores ids only (no public text duplicated)",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "app_instances: catalog-backed AI- instance stores ids only (no public text duplicated)"
+        },
+        {
+          "ref": "browser:journey::w1440 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        }
+      ]
+    },
+    {
+      "id": "AT02",
+      "title": "User imports new public application",
+      "expected": "Candidate is extracted and staged; no automatic publication",
+      "status": "pass",
+      "key_assertion": "Real route handler + local Postgres (058): submit → state `extracted`, event candidate>extracted:system, 0 program rows, anon has no read path; url_fetch stores server-captured evidence only.",
+      "note": "PostgREST is replaced by a SQL adapter that runs each call as service_role / authenticated(+RLS) / anon; grants, RLS, triggers and the 058 RPCs decide.",
+      "artifacts": [
+        "docs/evidence/m09-acceptance/results.json",
+        "app/tests/acceptance/catalog-promotion-sql.e2e.mjs",
+        "supabase/tests/m09/40_catalog_promotion_tests.sql"
+      ],
+      "commands": [
+        "M09_E2E_PGROOT=<scratch> node --test tests/acceptance/catalog-promotion-sql.e2e.mjs",
+        "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT02: a submitted public application is staged (extracted), never published, invisible to anon",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT02: a submitted public application is staged (extracted), never published, invisible to anon"
+        },
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT02: url_fetch submission stores SERVER-captured evidence; filled values never enter the snapshot",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT02: url_fetch submission stores SERVER-captured evidence; filled values never enter the snapshot"
+        },
+        {
+          "ref": "db::CP-K-1",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-K-1 service_role submit inserts source + candidate in one call and auto-extracts"
+        },
+        {
+          "ref": "db::CP-K-4",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-K-4 submit without questions stays in candidate (no auto step)"
+        },
+        {
+          "ref": "db::CP-C-2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-C-2 candidate -> published is illegal"
+        },
+        {
+          "ref": "db::CP-B-2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-B-2 anon cannot read candidates (no grant)"
+        },
+        {
+          "ref": "db::CP-B-3",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-B-3 submitter a2 sees only own candidates (K1,K3,K5)"
+        },
+        {
+          "ref": "db::CP-B-6",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-B-6 non-canonical provenance stays hidden even from the program owner"
+        },
+        {
+          "ref": "unit:catalog-promotion-handlers.test.mjs::submit public_paste: client snapshot stored as client-supplied, auto-advance via the transition RPC",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-handlers.test.mjs",
+          "name": "submit public_paste: client snapshot stored as client-supplied, auto-advance via the transition RPC"
+        },
+        {
+          "ref": "unit:catalog-promotion-handlers.test.mjs::submit url_fetch: server fetches, ignores client snapshot, stores server-observed evidence (public text only)",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-handlers.test.mjs",
+          "name": "submit url_fetch: server fetches, ignores client snapshot, stores server-observed evidence (public text only)"
+        },
+        {
+          "ref": "unit:journey-candidate.test.mjs::submit: 201 ok, 400 errors, 422 reuse/fetch, 503 \"open soon\", network failure honest",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-candidate.test.mjs",
+          "name": "submit: 201 ok, 400 errors, 422 reuse/fetch, 503 \"open soon\", network failure honest"
+        },
+        {
+          "ref": "browser:journey::w1440 url A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 url A→H (LA-…; D: direct, direct, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 url A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 url A→H (LA-…; D: direct, direct, skip; PASS — 11/11 checks passed)"
+        }
+      ]
+    },
+    {
+      "id": "AT03",
+      "title": "User imports local answered application",
+      "expected": "Answers remain private and local",
+      "status": "pass",
+      "key_assertion": "Filled values are captured separately as private; local imports are never offered as catalog candidates; bodies stay encrypted; no request body carries pasted/answer text.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-journey/results.json",
+        "docs/evidence/m09-journey/w1440-paste-B-review.jpg"
+      ],
+      "commands": [
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "node --test aqua-companion/test/*.test.mjs",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "unit:catalog-extract.test.mjs::HTML: filled textarea/input values are captured separately (private)",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-extract.test.mjs",
+          "name": "HTML: filled textarea/input values are captured separately (private)"
+        },
+        {
+          "ref": "unit:catalog-classify.test.mjs::classification: answer prose, filled values, PII and secrets are private; prompts potentially public",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-classify.test.mjs",
+          "name": "classification: answer prose, filled values, PII and secrets are private; prompts potentially public"
+        },
+        {
+          "ref": "unit:catalog-classify.test.mjs::classification: local import → everything non-private is uncertain",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-classify.test.mjs",
+          "name": "classification: local import → everything non-private is uncertain"
+        },
+        {
+          "ref": "unit:catalog-files.test.mjs::csv with question/limit/section/answer columns → records (answer kept private)",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-files.test.mjs",
+          "name": "csv with question/limit/section/answer columns → records (answer kept private)"
+        },
+        {
+          "ref": "unit:journey-review.test.mjs::paste (local): wording is the user's own, everything stays uncertain/private, no candidate",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-review.test.mjs",
+          "name": "paste (local): wording is the user's own, everything stays uncertain/private, no candidate"
+        },
+        {
+          "ref": "unit:journey-candidate.test.mjs::eligibility: local imports, disallowed reuse and refused candidates are never offered",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-candidate.test.mjs",
+          "name": "eligibility: local imports, disallowed reuse and refused candidates are never offered"
+        },
+        {
+          "ref": "vault::imported bodies stay encrypted + raw paste never stored",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-intake-tests.mjs",
+          "name": "imported bodies stay encrypted + raw paste never stored"
+        },
+        {
+          "ref": "vault::app_instances: local-only LA-/LQ- ids, template + source ref encrypted, readable back",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "app_instances: local-only LA-/LQ- ids, template + source ref encrypted, readable back"
+        },
+        {
+          "ref": "companion:lifecycle.test.mjs::import-application: txt / md / json / html extraction keeps exact wording; unsupported or empty files are refused",
+          "status": "pass",
+          "suite": "companion",
+          "file": "lifecycle.test.mjs",
+          "name": "import-application: txt / md / json / html extraction keeps exact wording; unsupported or empty files are refused"
+        },
+        {
+          "ref": "browser:journey::privacy: no request body carries private content",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "privacy: {\"request_bodies_with_private_content\":0,\"extract_url_requests\":2,\"extract_url_bodies_url_only\":true,\"candidate_requests\":2,\"other_api_or_offsite_requests\":[\"GET https://www.googletagmanager.com/gtag/js\"]}"
+        },
+        {
+          "ref": "browser:journey::w1440 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        }
+      ]
+    },
+    {
+      "id": "AT04",
+      "title": "Application has duplicate questions",
+      "expected": "Existing canonical identities are reused appropriately",
+      "status": "pass",
+      "key_assertion": "Exact/normalized wording links the existing canonical id; prefix/semantic/ambiguous matches are never auto-linked; in-application duplicates merge; active-occurrence uniqueness holds in Postgres.",
+      "note": null,
+      "artifacts": [
+        "app/tests/catalog-match.test.mjs",
+        "docs/evidence/m09-acceptance/results.json"
+      ],
+      "commands": [
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "M09_E2E_PGROOT=<scratch> node --test tests/acceptance/catalog-promotion-sql.e2e.mjs",
+        "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh"
+      ],
+      "assertions": [
+        {
+          "ref": "unit:catalog-match.test.mjs::exact tier: folded wording equal → auto-link, no differences",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "exact tier: folded wording equal → auto-link, no differences"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::normalized tier: numbering + limit clause ignored for the key",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "normalized tier: numbering + limit clause ignored for the key"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::matchBatch detects duplicates within one application",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "matchBatch detects duplicates within one application"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::false-merge guard: shared prefix is NOT a match (old ILIKE behaviour)",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "false-merge guard: shared prefix is NOT a match (old ILIKE behaviour)"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::ambiguous catalog duplicates → link withheld for review",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "ambiguous catalog duplicates → link withheld for review"
+        },
+        {
+          "ref": "unit:catalog-promotion-checks.test.mjs::exact and normalized matching against canonical questions; curator mappings win",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-checks.test.mjs",
+          "name": "exact and normalized matching against canonical questions; curator mappings win"
+        },
+        {
+          "ref": "unit:journey-review.test.mjs::duplicates: merge keeps the stricter limit + required, remove/restore round-trips",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-review.test.mjs",
+          "name": "duplicates: merge keeps the stricter limit + required, remove/restore round-trips"
+        },
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT17: publish needs approval; verification needs passing checks (source reuse affirmed) or a noted override",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT17: publish needs approval; verification needs passing checks (source reuse affirmed) or a noted override"
+        },
+        {
+          "ref": "db::CP-G-2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-G-2 reworded occurrence keeps the canonical link; mapping history appended (5 decisions)"
+        },
+        {
+          "ref": "db::CP-G-4",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-G-4 active-occurrence uniqueness still holds (duplicate active canonical link refused)"
+        },
+        {
+          "ref": "db::CP-I-7",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-I-7 unknown canonical id in mappings: refused, payload untouched"
+        }
+      ]
+    },
+    {
+      "id": "AT05",
+      "title": "Application changes one requirement",
+      "expected": "New occurrence context is preserved",
+      "status": "pass",
+      "key_assertion": "Same wording + new limit links the canonical id and flags limits_changed; qualifiers/time context stay in the key; revision 2 supersedes revision 1 with rev-1 occurrences preserved verbatim.",
+      "note": null,
+      "artifacts": [
+        "app/tests/catalog-match.test.mjs",
+        "supabase/tests/m09/40_catalog_promotion_tests.sql"
+      ],
+      "commands": [
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh"
+      ],
+      "assertions": [
+        {
+          "ref": "unit:catalog-match.test.mjs::same wording, new word limit → links canonical, flags limits_changed",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "same wording, new word limit → links canonical, flags limits_changed"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::structural limit (e.g. maxlength) also counts as a limit change",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "structural limit (e.g. maxlength) also counts as a limit change"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::added qualifier → semantic tier, never auto-linked, qualifier reported",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "added qualifier → semantic tier, never auto-linked, qualifier reported"
+        },
+        {
+          "ref": "unit:catalog-match.test.mjs::changed time context → not normalized-equal; reported",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-match.test.mjs",
+          "name": "changed time context → not normalized-equal; reported"
+        },
+        {
+          "ref": "unit:catalog-normalize.test.mjs::normalizeQuestion keeps time context and qualifiers in the key (they change meaning)",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-normalize.test.mjs",
+          "name": "normalizeQuestion keeps time context and qualifiers in the key (they change meaning)"
+        },
+        {
+          "ref": "vault::classify: Adapt — different question qualifier under the same canonical id",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — different question qualifier under the same canonical id"
+        },
+        {
+          "ref": "db::CP-G-1",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-G-1 revision 2 supersedes revision 1; rev-1 occurrences preserved verbatim"
+        },
+        {
+          "ref": "db::CP-F-3",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-F-3 a later canonical text change does not alter the occurrence's asked_as"
+        },
+        {
+          "ref": "db::CP-F-4",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-F-4 published occurrence wording cannot be rewritten in place (service_role)"
+        },
+        {
+          "ref": "db::CP-G-3",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-G-3 a superseded occurrence cannot be reactivated (service_role)"
+        }
+      ]
+    },
+    {
+      "id": "AT06",
+      "title": "User has a matching approved answer",
+      "expected": "AQUA suggests reuse with evidence",
+      "status": "pass",
+      "key_assertion": "Classifier returns Direct (approved, same canonical, within limits) with reasons; the board/card show the candidate, its evidence count and recommendation; file path walk classifies Direct.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-review-ui/desktop-01-board.png",
+        "docs/evidence/m09-journey/w1440-file-D-populate.jpg"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::classify: Direct — approved, same canonical, within limits, no flags",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Direct — approved, same canonical, within limits, no flags"
+        },
+        {
+          "ref": "vault::classify: Direct — normalized-equal wording without canonical ids",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Direct — normalized-equal wording without canonical ids"
+        },
+        {
+          "ref": "vault::classify: prefers a Direct candidate over a newer Adapt one; lists alternatives",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: prefers a Direct candidate over a newer Adapt one; lists alternatives"
+        },
+        {
+          "ref": "vault::board: Direct / Adapt / Gap per question + derived status; drafting from a candidate is suggested, never approved",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "board: Direct / Adapt / Gap per question + derived status; drafting from a candidate is suggested, never approved"
+        },
+        {
+          "ref": "vault::match: overlap score + related vault answers are local-only",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-tests.mjs",
+          "name": "match: overlap score + related vault answers are local-only"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::seeded cards: lineage, derived source, fact conflict, challenge, gap",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "seeded cards: lineage, derived source, fact conflict, challenge, gap"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::card view model keeps status, recommendation, review and approval separate",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "card view model keeps status, recommendation, review and approval separate"
+        },
+        {
+          "ref": "browser:review-ui::desktop: board lists every question with status, filters and progress",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: board lists every question with status, filters and progress"
+        },
+        {
+          "ref": "browser:review-ui::mobile: board lists every question with status, filters and progress",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: board lists every question with status, filters and progress"
+        },
+        {
+          "ref": "browser:journey::w1440 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        }
+      ]
+    },
+    {
+      "id": "AT07",
+      "title": "Answer is related but insufficient",
+      "expected": "AQUA recommends adaptation, not automatic approval",
+      "status": "pass",
+      "key_assertion": "Adapt for over-limit, other program named, stale year, unapproved source, qualifier change, medium similarity; drafting from it creates a SUGGESTED, unapproved version.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-journey/w1440-paste-D-populate.jpg"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::classify: Adapt — over word limit by N",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — over word limit by N"
+        },
+        {
+          "ref": "vault::classify: Adapt — over char limit",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — over char limit"
+        },
+        {
+          "ref": "vault::classify: Adapt — mentions another program/org name",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — mentions another program/org name"
+        },
+        {
+          "ref": "vault::classify: Adapt — dated year older than cycle",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — dated year older than cycle"
+        },
+        {
+          "ref": "vault::classify: Adapt — unapproved source",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — unapproved source"
+        },
+        {
+          "ref": "vault::classify: Adapt — related but different question (medium similarity)",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Adapt — related but different question (medium similarity)"
+        },
+        {
+          "ref": "vault::board: Direct / Adapt / Gap per question + derived status; drafting from a candidate is suggested, never approved",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "board: Direct / Adapt / Gap per question + derived status; drafting from a candidate is suggested, never approved"
+        },
+        {
+          "ref": "vault::IR-026: cross-scope derivation — derived_from preserved, approval not inherited",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-session-tests.mjs",
+          "name": "IR-026: cross-scope derivation — derived_from preserved, approval not inherited"
+        },
+        {
+          "ref": "browser:journey::w1440 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        }
+      ]
+    },
+    {
+      "id": "AT08",
+      "title": "No appropriate answer exists",
+      "expected": "AQUA identifies a gap",
+      "status": "pass",
+      "key_assertion": "Classifier returns Gap; the card shows \"Gap — no answer yet\"; the real agent (AT19) found 4 gaps and drafted them unapproved.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-journey/w1440-catalog-D-populate.jpg",
+        "docs/evidence/m09-acceptance/at19/outcome.json"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+        "recorded run 2026-10-22T19:11:43.776Z (re-run with --agent)"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::classify: Gap — nothing related; empty candidate list",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "classify: Gap — nothing related; empty candidate list"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::seeded cards: lineage, derived source, fact conflict, challenge, gap",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "seeded cards: lineage, derived source, fact conflict, challenge, gap"
+        },
+        {
+          "ref": "browser:journey::w1440 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "agent::Gap drafts exist in the workspace (version records >= 1)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "Gap drafts exist in the workspace (version records >= 1) (real_agent, 2026-10-22T19:11:43.776Z)"
+        }
+      ]
+    },
+    {
+      "id": "AT09",
+      "title": "User edits an approved answer",
+      "expected": "New version created; approval does not transfer",
+      "status": "pass",
+      "key_assertion": "Edit creates a child version that is NOT approved; v1 keeps its approval pinned to the old sha256 (unit + browser at 1440 and 390).",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-review-ui/desktop-04-edited-not-approved.png",
+        "docs/evidence/m09-review-ui/mobile-04b-lineage.png"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::edit approved → new child version, NOT approved; parent keeps its approval",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "edit approved → new child version, NOT approved; parent keeps its approval"
+        },
+        {
+          "ref": "vault::approving v2 leaves the v1 approval pinned to the OLD sha256",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-approval-tests.mjs",
+          "name": "approving v2 leaves the v1 approval pinned to the OLD sha256"
+        },
+        {
+          "ref": "vault::immutable versions + parent chain",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-tests.mjs",
+          "name": "immutable versions + parent chain"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::approve binds the displayed hash; edit creates an unapproved child; requests are not approvals",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "approve binds the displayed hash; edit creates an unapproved child; requests are not approvals"
+        },
+        {
+          "ref": "browser:review-ui::desktop: EDIT creates a new child version and the approval does not transfer",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: EDIT creates a new child version and the approval does not transfer"
+        },
+        {
+          "ref": "browser:review-ui::mobile: EDIT creates a new child version and the approval does not transfer",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: EDIT creates a new child version and the approval does not transfer"
+        }
+      ]
+    },
+    {
+      "id": "AT10",
+      "title": "Agent recommends approval",
+      "expected": "No human approval is fabricated",
+      "status": "pass",
+      "key_assertion": "No agent approval path exists; agent signals never satisfy freeze; companion human_only tools never mutate; a real Claude agent calling approve_answer got requires_human and the workspace holds 0 approvals.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-review-ui/desktop-06b-agent-revision.png",
+        "docs/evidence/m09-acceptance/at19/transcript.stream.jsonl"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "node --test aqua-companion/test/*.test.mjs",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+        "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh",
+        "recorded run 2026-10-22T19:11:43.776Z (re-run with --agent)"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::agent cannot approve: v5 APIs have no agent approval path; agent signals never satisfy freeze",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "agent cannot approve: v5 APIs have no agent approval path; agent signals never satisfy freeze"
+        },
+        {
+          "ref": "vault::suggestions: written ONLY to suggestions; text encrypted; never an approval or review",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "suggestions: written ONLY to suggestions; text encrypted; never an approval or review"
+        },
+        {
+          "ref": "vault::IR-017: agent-classed approval does not satisfy the packet gate",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "IR-017: agent-classed approval does not satisfy the packet gate"
+        },
+        {
+          "ref": "vault::agent-classed approval never counts",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-score-tests.mjs",
+          "name": "agent-classed approval never counts"
+        },
+        {
+          "ref": "companion:mcp-safety.test.mjs::human_only tools never mutate; a read tool that tries to write is stopped by the dispatcher",
+          "status": "pass",
+          "suite": "companion",
+          "file": "mcp-safety.test.mjs",
+          "name": "human_only tools never mutate; a read tool that tries to write is stopped by the dispatcher"
+        },
+        {
+          "ref": "companion:mcp-safety.test.mjs::prompt injection in an imported file stays data: wrapped in untrusted_content, tools and instructions unchanged, nothing approved",
+          "status": "pass",
+          "suite": "companion",
+          "file": "mcp-safety.test.mjs",
+          "name": "prompt injection in an imported file stays data: wrapped in untrusted_content, tools and instructions unchanged, nothing approved"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::M3: agent / companion comments are labelled \"From companion — review\"; via is validated",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "M3: agent / companion comments are labelled \"From companion — review\"; via is validated"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::W8: companion agent drafts are labelled \"Drafted by agent (companion)\"",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "W8: companion agent drafts are labelled \"Drafted by agent (companion)\""
+        },
+        {
+          "ref": "browser:review-ui::desktop: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved"
+        },
+        {
+          "ref": "browser:review-ui::mobile: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved"
+        },
+        {
+          "ref": "db::CP-I-8",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-I-8 self-approval allowed but recorded on the approval event (self_approved=true)"
+        },
+        {
+          "ref": "agent::approve_answer refused as human-only (requires_human)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "approve_answer refused as human-only (requires_human) (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::approvals in workspace = 0",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "approvals in workspace = 0 (real_agent, 2026-10-22T19:11:43.776Z)"
+        }
+      ]
+    },
+    {
+      "id": "AT11",
+      "title": "User requests evidence",
+      "expected": "Evidence or an explicit evidence gap is displayed",
+      "status": "pass",
+      "key_assertion": "Evidence request sets \"Needs evidence\" without approving; attached evidence links to the version without changing it; dangling evidence reported; the agent recorded an evidence gap.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-review-ui/desktop-05-evidence-request.png",
+        "docs/evidence/m09-review-ui/desktop-05b-evidence-linked.png"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+        "recorded run 2026-10-22T19:11:43.776Z (re-run with --agent)"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::evidence: encrypted, linked to version WITHOUT changing the version, union with cited ids, dangling reported",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "evidence: encrypted, linked to version WITHOUT changing the version, union with cited ids, dangling reported"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::seeded cards: lineage, derived source, fact conflict, challenge, gap",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "seeded cards: lineage, derived source, fact conflict, challenge, gap"
+        },
+        {
+          "ref": "browser:review-ui::desktop: EVIDENCE / HELP request is recorded and is not an approval",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: EVIDENCE / HELP request is recorded and is not an approval"
+        },
+        {
+          "ref": "browser:review-ui::mobile: EVIDENCE / HELP request is recorded and is not an approval",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: EVIDENCE / HELP request is recorded and is not an approval"
+        },
+        {
+          "ref": "agent::evidence requested (evidence_request records >= 1)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "evidence requested (evidence_request records >= 1) (real_agent, 2026-10-22T19:11:43.776Z)"
+        }
+      ]
+    },
+    {
+      "id": "AT12",
+      "title": "User adds a comment",
+      "expected": "Comment remains linked to its answer/version",
+      "status": "pass",
+      "key_assertion": "Comments bind to the exact version + sha; replies join the thread; cross-answer replies refused; older comments read \"on v1 (earlier version)\".",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-review-ui/desktop-06-discuss-history.png"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::comments: bound to exact version + sha, replies join the thread, cross-answer replies refused",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "comments: bound to exact version + sha, replies join the thread, cross-answer replies refused"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::M2: applying a foreign plan needs explicit confirmation; imported comments carry via decision_file",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "M2: applying a foreign plan needs explicit confirmation; imported comments carry via decision_file"
+        },
+        {
+          "ref": "browser:review-ui::desktop: DISCUSS comment is bound to the displayed version, history labelled across versions",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: DISCUSS comment is bound to the displayed version, history labelled across versions"
+        },
+        {
+          "ref": "browser:review-ui::mobile: DISCUSS comment is bound to the displayed version, history labelled across versions",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: DISCUSS comment is bound to the displayed version, history labelled across versions"
+        }
+      ]
+    },
+    {
+      "id": "AT13",
+      "title": "User approves exact final answer",
+      "expected": "Approval binds to version hash",
+      "status": "pass",
+      "key_assertion": "Approve needs a confirm that shows the sha256; hash mismatch or swapped content is refused and writes nothing; one ledger receipt per approval.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-review-ui/desktop-02-approve-confirm.png",
+        "docs/evidence/m09-review-ui/desktop-03-approved.png"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::recordHumanApproval: hash-bound — mismatch refused and nothing written",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "recordHumanApproval: hash-bound — mismatch refused and nothing written"
+        },
+        {
+          "ref": "vault::recordHumanApproval: a swapped row (stored sha kept, plaintext changed) is refused with secret",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "recordHumanApproval: a swapped row (stored sha kept, plaintext changed) is refused with secret"
+        },
+        {
+          "ref": "vault::swapped version content after approval → approval void, freeze refused",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-approval-tests.mjs",
+          "name": "swapped version content after approval → approval void, freeze refused"
+        },
+        {
+          "ref": "vault::every approval writes exactly one events-ledger receipt, atomically",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-approval-tests.mjs",
+          "name": "every approval writes exactly one events-ledger receipt, atomically"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::a version changed between plan and confirm is refused at write time",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "a version changed between plan and confirm is refused at write time"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::no UI surface calls the unbound legacy approval primitive",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "no UI surface calls the unbound legacy approval primitive"
+        },
+        {
+          "ref": "unit:journey-prepare.test.mjs::vault integration: only human hash-bound approvals count; tampered body → sha mismatch",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-prepare.test.mjs",
+          "name": "vault integration: only human hash-bound approvals count; tampered body → sha mismatch"
+        },
+        {
+          "ref": "browser:review-ui::desktop: APPROVE requires confirm and binds the displayed version hash",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: APPROVE requires confirm and binds the displayed version hash"
+        },
+        {
+          "ref": "browser:review-ui::mobile: APPROVE requires confirm and binds the displayed version hash",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: APPROVE requires confirm and binds the displayed version hash"
+        }
+      ]
+    },
+    {
+      "id": "AT14",
+      "title": "User freezes a packet",
+      "expected": "Only eligible approved answers are accepted",
+      "status": "pass",
+      "key_assertion": "Freeze refuses unapproved/foreign-scope selections, missing coverage, unexplained skips, over-limit and hash mismatches; agent signals never satisfy; all 8 browser walks freeze only after \"ready\".",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-journey/w1440-paste-F-prepare.jpg",
+        "docs/evidence/m09-journey/results.json"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::freeze: happy path binds approved version",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "freeze: happy path binds approved version"
+        },
+        {
+          "ref": "vault::freeze: unexplained skip refused",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "freeze: unexplained skip refused"
+        },
+        {
+          "ref": "vault::freeze: explained skip allowed",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "freeze: explained skip allowed"
+        },
+        {
+          "ref": "vault::freeze: missing question coverage refused",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "freeze: missing question coverage refused"
+        },
+        {
+          "ref": "vault::freeze: unapproved selection refused",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "freeze: unapproved selection refused"
+        },
+        {
+          "ref": "vault::freeze: foreign-scope version refused",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "freeze: foreign-scope version refused"
+        },
+        {
+          "ref": "vault::freeze: agent suggestion / agent review never satisfy; human reopening review blocks; re-approval unblocks; included_in_packet after freeze",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "freeze: agent suggestion / agent review never satisfy; human reopening review blocks; re-approval unblocks; included_in_packet after freeze"
+        },
+        {
+          "ref": "unit:journey-prepare.test.mjs::all approved, within limits, hashes match → ready",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-prepare.test.mjs",
+          "name": "all approved, within limits, hashes match → ready"
+        },
+        {
+          "ref": "unit:journey-prepare.test.mjs::required missing vs missing approval",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-prepare.test.mjs",
+          "name": "required missing vs missing approval"
+        },
+        {
+          "ref": "unit:journey-prepare.test.mjs::a required question cannot be skipped",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-prepare.test.mjs",
+          "name": "a required question cannot be skipped"
+        },
+        {
+          "ref": "unit:journey-prepare.test.mjs::over word / char limit",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-prepare.test.mjs",
+          "name": "over word / char limit"
+        },
+        {
+          "ref": "unit:journey-prepare.test.mjs::sha mismatch and undecryptable block",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-prepare.test.mjs",
+          "name": "sha mismatch and undecryptable block"
+        },
+        {
+          "ref": "browser:journey::w1440 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 url A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 url A→H (LA-…; D: direct, direct, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 url A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 url A→H (LA-…; D: direct, direct, skip; PASS — 11/11 checks passed)"
+        }
+      ]
+    },
+    {
+      "id": "AT15",
+      "title": "User imports on another device",
+      "expected": "No false claim of automatic private-data synchronization",
+      "status": "pass",
+      "key_assertion": "Second browser context, same account: first-run vault, empty list, \"on this device\" copy, no sync-claim wording, zero API calls; static scan of all UI copy and docs finds no sync claim; the vault client has no network path.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-acceptance/screens/at15-01-device-2-first-run.png",
+        "docs/evidence/m09-acceptance/screens/at15-02-device-2-empty-list.png",
+        "docs/evidence/m09-acceptance/browser-results.json"
+      ],
+      "commands": [
+        "cd app && node --test tests/acceptance/at15-no-sync-claim.test.mjs",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+        "cd app && npm run -s test:vault   (10 runner scripts)"
+      ],
+      "assertions": [
+        {
+          "ref": "acc:at15-no-sync-claim.test.mjs::AT15: no user-facing copy claims automatic sync of private data",
+          "status": "pass",
+          "suite": "acc",
+          "file": "at15-no-sync-claim.test.mjs",
+          "name": "AT15: no user-facing copy claims automatic sync of private data"
+        },
+        {
+          "ref": "acc:at15-no-sync-claim.test.mjs::AT15: the sync contract says import/export only, no automatic or hosted sync",
+          "status": "pass",
+          "suite": "acc",
+          "file": "at15-no-sync-claim.test.mjs",
+          "name": "AT15: the sync contract says import/export only, no automatic or hosted sync"
+        },
+        {
+          "ref": "acc:at15-no-sync-claim.test.mjs::AT15: the browser vault client has no network path of its own (no fetch in lib/aqua-local-client)",
+          "status": "pass",
+          "suite": "acc",
+          "file": "at15-no-sync-claim.test.mjs",
+          "name": "AT15: the browser vault client has no network path of its own (no fetch in lib/aqua-local-client)"
+        },
+        {
+          "ref": "acc:at15-no-sync-claim.test.mjs::AT15: device-scoped copy is present where the vault is opened and restored",
+          "status": "pass",
+          "suite": "acc",
+          "file": "at15-no-sync-claim.test.mjs",
+          "name": "AT15: device-scoped copy is present where the vault is opened and restored"
+        },
+        {
+          "ref": "browser:acceptance::AT15 device 1 holds the application locally",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT15 device 1 holds the application locally"
+        },
+        {
+          "ref": "browser:acceptance::AT15 device 2 (same account) starts a first-run vault and lists nothing",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT15 device 2 (same account) starts a first-run vault and lists nothing"
+        },
+        {
+          "ref": "browser:acceptance::AT15 device 2 UI makes no automatic-sync claim",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT15 device 2 UI makes no automatic-sync claim",
+          "detail": "\"no match for the sync-claim pattern\""
+        },
+        {
+          "ref": "browser:acceptance::AT15 device 2 says the data is on this device",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT15 device 2 says the data is on this device"
+        },
+        {
+          "ref": "browser:acceptance::AT15 device 2 makes no sync/API request; no off-site request except the GA4 script GET (no body, aborted)",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT15 device 2 makes no sync/API request; no off-site request except the GA4 script GET (no body, aborted)",
+          "detail": "{\"api\":[],\"offsite\":[\"GET www.googletagmanager.com/gtag/js\"]}"
+        },
+        {
+          "ref": "vault::egress boundary: network calls exist ONLY at the EGRESS-DECLARED site in providers.ts",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-approval-tests.mjs",
+          "name": "egress boundary: network calls exist ONLY at the EGRESS-DECLARED site in providers.ts"
+        },
+        {
+          "ref": "vault::backup roundtrip into fresh vault",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-tests.mjs",
+          "name": "backup roundtrip into fresh vault"
+        }
+      ]
+    },
+    {
+      "id": "AT16",
+      "title": "User initializes local workspace",
+      "expected": "Folder created with explicit consent, manifest, and no destructive overwrite",
+      "status": "pass",
+      "key_assertion": "init without --yes on a non-terminal creates nothing; manifest has schema/kdf/key check/authority and no secrets; re-init, non-empty and symlinked targets refused; the packed tarball initialised the AT19 workspace.",
+      "note": null,
+      "artifacts": [
+        "aqua-companion/test/init.test.mjs",
+        "aqua-companion/README.md"
+      ],
+      "commands": [
+        "node --test aqua-companion/test/*.test.mjs",
+        "recorded run 2026-10-22T19:11:43.776Z (re-run with --agent)"
+      ],
+      "assertions": [
+        {
+          "ref": "companion:init.test.mjs::init without --yes on a non-terminal refuses and creates nothing; --dry-run creates nothing",
+          "status": "pass",
+          "suite": "companion",
+          "file": "init.test.mjs",
+          "name": "init without --yes on a non-terminal refuses and creates nothing; --dry-run creates nothing"
+        },
+        {
+          "ref": "companion:init.test.mjs::init creates the layout and a manifest with schema, kdf, key check, authority and no secrets",
+          "status": "pass",
+          "suite": "companion",
+          "file": "init.test.mjs",
+          "name": "init creates the layout and a manifest with schema, kdf, key check, authority and no secrets"
+        },
+        {
+          "ref": "companion:init.test.mjs::init refuses to re-initialize an existing workspace and points to status",
+          "status": "pass",
+          "suite": "companion",
+          "file": "init.test.mjs",
+          "name": "init refuses to re-initialize an existing workspace and points to status"
+        },
+        {
+          "ref": "companion:init.test.mjs::init refuses a non-empty folder that is not an AQUA workspace, and a symlinked target",
+          "status": "pass",
+          "suite": "companion",
+          "file": "init.test.mjs",
+          "name": "init refuses a non-empty folder that is not an AQUA workspace, and a symlinked target"
+        },
+        {
+          "ref": "companion:init.test.mjs::init accepts an existing EMPTY AQUA folder and rejects short passphrases",
+          "status": "pass",
+          "suite": "companion",
+          "file": "init.test.mjs",
+          "name": "init accepts an existing EMPTY AQUA folder and rejects short passphrases"
+        },
+        {
+          "ref": "companion:cli.test.mjs::bin: init -> status -> verify as a real process; consent and passphrase rules hold",
+          "status": "pass",
+          "suite": "companion",
+          "file": "cli.test.mjs",
+          "name": "bin: init -> status -> verify as a real process; consent and passphrase rules hold"
+        },
+        {
+          "ref": "companion:lifecycle.test.mjs::passphrase and vault secret are never written into the workspace or its exports",
+          "status": "pass",
+          "suite": "companion",
+          "file": "lifecycle.test.mjs",
+          "name": "passphrase and vault secret are never written into the workspace or its exports"
+        },
+        {
+          "ref": "agent::aqua-companion verify passes after the session",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "aqua-companion verify passes after the session (real_agent, 2026-10-22T19:11:43.776Z)"
+        }
+      ]
+    },
+    {
+      "id": "AT17",
+      "title": "User publishes catalog candidate",
+      "expected": "Publication requires authorization and source verification",
+      "status": "pass",
+      "key_assertion": "Real handlers + Postgres: non-curators 403, anon 401, direct RPC/UPDATE by a client role 42501; publish before approval 409; verified refused (422) until the curator affirms source reuse; publish then creates the canonical program in one RPC; a disallowed source can never publish.",
+      "note": "PostgREST replaced by a role-faithful SQL adapter (see AT02).",
+      "artifacts": [
+        "app/tests/acceptance/catalog-promotion-sql.e2e.mjs",
+        "docs/evidence/m09-acceptance/results.json"
+      ],
+      "commands": [
+        "M09_E2E_PGROOT=<scratch> node --test tests/acceptance/catalog-promotion-sql.e2e.mjs",
+        "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "node --test aqua-companion/test/*.test.mjs",
+        "NEXT_PUBLIC_AQUA_LOCAL_FIRST=1 AQUA_LOCAL_FIRST=1 NEXT_PUBLIC_SUPABASE_URL=<placeholder> next build",
+        "next start -p 3978; unauthenticated GET of protected routes (redirect: manual); hosted MCP POST /mcp tools/list and browser GET /mcp"
+      ],
+      "assertions": [
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT17: only curators may review or publish; client roles cannot call the publish RPC at all",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT17: only curators may review or publish; client roles cannot call the publish RPC at all"
+        },
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT17: publish needs approval; verification needs passing checks (source reuse affirmed) or a noted override",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT17: publish needs approval; verification needs passing checks (source reuse affirmed) or a noted override"
+        },
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT17: curator publish creates the canonical program in one RPC; anon then reads it; terminal afterwards",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT17: curator publish creates the canonical program in one RPC; anon then reads it; terminal afterwards"
+        },
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT17: a url_fetch candidate whose source becomes reuse-disallowed cannot be verified or published",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT17: a url_fetch candidate whose source becomes reuse-disallowed cannot be verified or published"
+        },
+        {
+          "ref": "db::CP-E-1",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-E-1 authenticated cannot EXECUTE catalog_publish_candidate"
+        },
+        {
+          "ref": "db::CP-E-2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-E-2 anon cannot EXECUTE catalog_publish_candidate"
+        },
+        {
+          "ref": "db::CP-E-3",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-E-3 service_role publish with a non-curator curator_id is refused"
+        },
+        {
+          "ref": "db::CP-E-4",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-E-4 publish of a non-approved candidate is refused"
+        },
+        {
+          "ref": "db::CP-E-5",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-E-5 publish refused when source reuse is disallowed"
+        },
+        {
+          "ref": "db::CP-C-4",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-C-4 matched requires a curator (system refused)"
+        },
+        {
+          "ref": "db::CP-C-5",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-C-5 curator role claimed by a non-curator is refused"
+        },
+        {
+          "ref": "db::CP-C-7",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-C-7 verified without passing checks and without override is refused"
+        },
+        {
+          "ref": "db::CP-C-8",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-C-8 verified with curator override note is accepted"
+        },
+        {
+          "ref": "db::CP-C-14",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-C-14 approved -> published by a bare event (bypassing publish) is refused"
+        },
+        {
+          "ref": "db::CP-J-1",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-J-1 url_fetch source requires fetched_at + server content digest"
+        },
+        {
+          "ref": "db::CP-J-3",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-J-3 client-supplied capture cannot claim server fetch fields"
+        },
+        {
+          "ref": "db::CP-A-guard",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-A-guard policy+grant regression: open INSERT policy on catalog_curators; user self-grants curator"
+        },
+        {
+          "ref": "db::CP-A-guard2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-A-guard2 policy+grant regression: open UPDATE on candidates; submitter self-approves own candidate"
+        },
+        {
+          "ref": "db::CP-H-4",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-H-4 no new SECURITY DEFINER function; publish RPC executable by service_role only"
+        },
+        {
+          "ref": "db::CP-F-1",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-F-1 curator publish creates canonical program + entity + cycle + occurrences + revision + serials + decisions + event"
+        },
+        {
+          "ref": "db::CP-F-6",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-F-6 published candidate is terminal (no re-publish)"
+        },
+        {
+          "ref": "unit:catalog-promotion-handlers.test.mjs::publish: curator only; one RPC with (candidate_id, curator_id); 55000 -> 409 not_approved",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-handlers.test.mjs",
+          "name": "publish: curator only; one RPC with (candidate_id, curator_id); 55000 -> 409 not_approved"
+        },
+        {
+          "ref": "unit:catalog-promotion-handlers.test.mjs::transition verified: failing checks -> 422 without calling the RPC; override with a note goes through",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-handlers.test.mjs",
+          "name": "transition verified: failing checks -> 422 without calling the RPC; override with a note goes through"
+        },
+        {
+          "ref": "unit:catalog-promotion-checks.test.mjs::a successfully captured source is NOT reusable until a curator affirms reuse",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-checks.test.mjs",
+          "name": "a successfully captured source is NOT reusable until a curator affirms reuse"
+        },
+        {
+          "ref": "companion:mcp-protocol.test.mjs::privileged operations are absent; unknown methods, bad JSON and early calls are JSON-RPC errors",
+          "status": "pass",
+          "suite": "companion",
+          "file": "mcp-protocol.test.mjs",
+          "name": "privileged operations are absent; unknown methods, bad JSON and early calls are JSON-RPC errors"
+        },
+        {
+          "ref": "prod::/admin/catalog → 404 (curators only)",
+          "status": "pass",
+          "suite": "prod",
+          "file": "next start",
+          "name": "/admin/catalog → 404 (expected 404 (curators only))"
+        }
+      ]
+    },
+    {
+      "id": "AT18",
+      "title": "User exports application",
+      "expected": "Export is integrity-verifiable and does not claim external submission",
+      "status": "pass",
+      "key_assertion": "verify-packet passes clean (signed and unsigned) packets and fails 4 tamper cases and a packet claiming submitted_external_observed; all 8 browser exports verify 10/10; the HTML review says it does not update AQUA.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-journey/w1440-paste-G-export.jpg",
+        "docs/evidence/m09-review-ui/desktop-08-export-notice.png"
+      ],
+      "commands": [
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "vault::export: verifier PASS on clean packet (signed)",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export: verifier PASS on clean packet (signed)"
+        },
+        {
+          "ref": "vault::export: verifier PASS on unsigned packet (truthful)",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export: verifier PASS on unsigned packet (truthful)"
+        },
+        {
+          "ref": "vault::export tamper: modified answer body → verifier FAIL",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export tamper: modified answer body → verifier FAIL"
+        },
+        {
+          "ref": "vault::export tamper: swapped version_id → verifier FAIL",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export tamper: swapped version_id → verifier FAIL"
+        },
+        {
+          "ref": "vault::export tamper: truncated file → verifier FAIL",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export tamper: truncated file → verifier FAIL"
+        },
+        {
+          "ref": "vault::export tamper: foreign signature → verifier FAIL",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export tamper: foreign signature → verifier FAIL"
+        },
+        {
+          "ref": "vault::export tamper: packet claims submitted_external_observed → verifier FAIL",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "export tamper: packet claims submitted_external_observed → verifier FAIL"
+        },
+        {
+          "ref": "vault::state machine: prepared→signed→exported; submitted_external_observed only via attestation",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-packet-tests.mjs",
+          "name": "state machine: prepared→signed→exported; submitted_external_observed only via attestation"
+        },
+        {
+          "ref": "unit:review-ui.test.mjs::HTML export is self-contained, escaped, and says it does not update AQUA",
+          "status": "pass",
+          "suite": "unit",
+          "file": "review-ui.test.mjs",
+          "name": "HTML export is self-contained, escaped, and says it does not update AQUA"
+        },
+        {
+          "ref": "browser:journey::w1440 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 catalog A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 catalog A→H (AI-…; D: gap, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 paste A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 paste A→H (LA-…; D: adapt, gap, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 file A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 file A→H (LA-…; D: gap, gap, direct; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w1440 url A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w1440 url A→H (LA-…; D: direct, direct, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:journey::w390 url A→H",
+          "status": "pass",
+          "suite": "browser",
+          "file": "journey.browser.mjs",
+          "name": "w390 url A→H (LA-…; D: direct, direct, skip; PASS — 11/11 checks passed)"
+        },
+        {
+          "ref": "browser:review-ui::desktop: export HTML → decide offline → decision file → import → confirm",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "desktop: export HTML → decide offline → decision file → import → confirm"
+        },
+        {
+          "ref": "browser:review-ui::mobile: export HTML → decide offline → decision file → import → confirm",
+          "status": "pass",
+          "suite": "browser",
+          "file": "review-ui.e2e.mjs",
+          "name": "mobile: export HTML → decide offline → decision file → import → confirm"
+        }
+      ]
+    },
+    {
+      "id": "AT19",
+      "title": "Agent works without repo access",
+      "expected": "Supported user workflow operates through product/companion interfaces",
+      "status": "pass",
+      "key_assertion": "A headless Claude Code session in a scratch dir holding only the npm-packed companion (no git repo, built-in tools disabled, only mcp__aqua__*) imported the form, matched, drafted 4 Gap drafts, requested evidence, prepared the readiness report; approve_answer → requires_human; 0 approvals; audit chain verifies.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-acceptance/at19/outcome.json",
+        "docs/evidence/m09-acceptance/at19/transcript.stream.jsonl",
+        "app/tests/acceptance/at19-real-agent.mjs"
+      ],
+      "commands": [
+        "recorded run 2026-10-22T19:11:43.776Z (re-run with --agent)",
+        "node --test aqua-companion/test/*.test.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "agent::scratch dir is not inside a git repository",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "scratch dir is not inside a git repository (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::agent used only AQUA MCP tools",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "agent used only AQUA MCP tools (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::application imported (1 app_instance record)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "application imported (1 app_instance record) (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::matching ran",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "matching ran (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::Gap drafts exist in the workspace (version records >= 1)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "Gap drafts exist in the workspace (version records >= 1) (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::evidence requested (evidence_request records >= 1)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "evidence requested (evidence_request records >= 1) (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::packet readiness report prepared",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "packet readiness report prepared (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::approve_answer was attempted",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "approve_answer was attempted (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::approve_answer refused as human-only (requires_human)",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "approve_answer refused as human-only (requires_human) (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::approvals in workspace = 0",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "approvals in workspace = 0 (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::signoffs in workspace = 0",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "signoffs in workspace = 0 (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::audit log has entries for the agent session",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "audit log has entries for the agent session (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::audit records approve_answer as requires_human",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "audit records approve_answer as requires_human (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::audit log carries no answer plaintext",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "audit log carries no answer plaintext (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "agent::aqua-companion verify passes after the session",
+          "status": "pass",
+          "suite": "agent",
+          "file": "at19-real-agent.mjs",
+          "name": "aqua-companion verify passes after the session (real_agent, 2026-10-22T19:11:43.776Z)"
+        },
+        {
+          "ref": "companion:mcp-vendor.test.mjs::a copy of aqua-companion/ alone (no repository, no type stripping) serves the agent interface",
+          "status": "pass",
+          "suite": "companion",
+          "file": "mcp-vendor.test.mjs",
+          "name": "a copy of aqua-companion/ alone (no repository, no type stripping) serves the agent interface"
+        },
+        {
+          "ref": "companion:mcp-vendor.test.mjs::no runtime import reaches outside aqua-companion/",
+          "status": "pass",
+          "suite": "companion",
+          "file": "mcp-vendor.test.mjs",
+          "name": "no runtime import reaches outside aqua-companion/"
+        }
+      ]
+    },
+    {
+      "id": "AT20",
+      "title": "Local companion encounters conflicts",
+      "expected": "Conflict is surfaced; no silent overwrite",
+      "status": "pass",
+      "key_assertion": "Same id with different content is recorded as a conflict and never overwritten; approvals never rewritten; stale manifests cannot overwrite another run; duplicate ids in a backup refused; resolve --keep both forks.",
+      "note": null,
+      "artifacts": [
+        "aqua-companion/test/bridge.test.mjs",
+        "aqua-companion/docs/SYNC.md"
+      ],
+      "commands": [
+        "node --test aqua-companion/test/*.test.mjs",
+        "cd app && npm run -s test:vault   (10 runner scripts)"
+      ],
+      "assertions": [
+        {
+          "ref": "companion:bridge.test.mjs::conflicts: same id with different content is recorded, never overwritten; approvals are never rewritten silently",
+          "status": "pass",
+          "suite": "companion",
+          "file": "bridge.test.mjs",
+          "name": "conflicts: same id with different content is recorded, never overwritten; approvals are never rewritten silently"
+        },
+        {
+          "ref": "companion:hardening.test.mjs::a run holding a stale manifest cannot overwrite another run's save",
+          "status": "pass",
+          "suite": "companion",
+          "file": "hardening.test.mjs",
+          "name": "a run holding a stale manifest cannot overwrite another run's save"
+        },
+        {
+          "ref": "companion:hardening.test.mjs::re-importing the same difference does not open a second conflict",
+          "status": "pass",
+          "suite": "companion",
+          "file": "hardening.test.mjs",
+          "name": "re-importing the same difference does not open a second conflict"
+        },
+        {
+          "ref": "companion:hardening.test.mjs::two different records with one id inside a backup are refused, not silently dropped",
+          "status": "pass",
+          "suite": "companion",
+          "file": "hardening.test.mjs",
+          "name": "two different records with one id inside a backup are refused, not silently dropped"
+        },
+        {
+          "ref": "companion:hardening.test.mjs::a retracted staged record stays retracted when the vault copy comes back",
+          "status": "pass",
+          "suite": "companion",
+          "file": "hardening.test.mjs",
+          "name": "a retracted staged record stays retracted when the vault copy comes back"
+        },
+        {
+          "ref": "companion:lifecycle.test.mjs::resolve --keep both forks a staged record under a new id and archives the original",
+          "status": "pass",
+          "suite": "companion",
+          "file": "lifecycle.test.mjs",
+          "name": "resolve --keep both forks a staged record under a new id and archives the original"
+        },
+        {
+          "ref": "companion:lifecycle.test.mjs::backup -> restore-workspace round trip; wrong passphrase refused; never overwrites",
+          "status": "pass",
+          "suite": "companion",
+          "file": "lifecycle.test.mjs",
+          "name": "backup -> restore-workspace round trip; wrong passphrase refused; never overwrites"
+        },
+        {
+          "ref": "vault::concurrent approvals on one version → distinct seqs, deterministic latest",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-approval-tests.mjs",
+          "name": "concurrent approvals on one version → distinct seqs, deterministic latest"
+        },
+        {
+          "ref": "vault::two tabs approving different versions of one answer stay coherent",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-approval-tests.mjs",
+          "name": "two tabs approving different versions of one answer stay coherent"
+        },
+        {
+          "ref": "vault::preview: counts insert vs skip, writes nothing",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-tests.mjs",
+          "name": "preview: counts insert vs skip, writes nothing"
+        }
+      ]
+    },
+    {
+      "id": "AT21",
+      "title": "User signs out or switches accounts",
+      "expected": "Private data remains correctly isolated",
+      "status": "pass",
+      "key_assertion": "Real IndexedDB, two uids: `aqua-local-<uidA>` vs `aqua-local-<uidB>`; sign-out (other tab) closes A's connection and locks the tab; B gets a first-run vault, sees none of A's data and never opens A's DB; A→B switch closes A; protected routes redirect when signed out.",
+      "note": "Identity is a synthetic auth cookie + supabase-js BroadcastChannel events (no production login); real-login run deferred to the post-merge production check.",
+      "artifacts": [
+        "docs/evidence/m09-acceptance/screens/at21-02-after-sign-out.png",
+        "docs/evidence/m09-acceptance/screens/at21-03-account-b-empty.png",
+        "docs/evidence/m09-acceptance/browser-results.json"
+      ],
+      "commands": [
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "node --test aqua-companion/test/*.test.mjs",
+        "NEXT_PUBLIC_AQUA_LOCAL_FIRST=1 AQUA_LOCAL_FIRST=1 NEXT_PUBLIC_SUPABASE_URL=<placeholder> next build",
+        "next start -p 3978; unauthenticated GET of protected routes (redirect: manual); hosted MCP POST /mcp tools/list and browser GET /mcp"
+      ],
+      "assertions": [
+        {
+          "ref": "browser:acceptance::AT21 account A writes only to its own IndexedDB database",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 account A writes only to its own IndexedDB database",
+          "detail": "{\"names\":[\"aqua-local-<uidA>\"],\"listA\":1}"
+        },
+        {
+          "ref": "browser:acceptance::AT21 no shared/anonymous vault is created while signed in",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 no shared/anonymous vault is created while signed in"
+        },
+        {
+          "ref": "browser:acceptance::AT21 sign-out closes account A's IndexedDB connection",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 sign-out closes account A's IndexedDB connection"
+        },
+        {
+          "ref": "browser:acceptance::AT21 after sign-out the open tab drops the secret: list hidden, unlock required",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 after sign-out the open tab drops the secret: list hidden, unlock required",
+          "detail": "{\"listAfter\":0,\"unlockShown\":true}"
+        },
+        {
+          "ref": "browser:acceptance::AT21 account B gets a first-run vault (A's secret and data are not inherited)",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 account B gets a first-run vault (A's secret and data are not inherited)"
+        },
+        {
+          "ref": "browser:acceptance::AT21 account B sees none of A's applications",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 account B sees none of A's applications"
+        },
+        {
+          "ref": "browser:acceptance::AT21 A and B have different IndexedDB database names; A's data untouched, B's empty",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 A and B have different IndexedDB database names; A's data untouched, B's empty",
+          "detail": "{\"names\":[\"aqua-local\",\"aqua-local-<uidA>\",\"aqua-local-<uidB>\"],\"counts\":{\"aqua-local\":{\"app_instances\":0,\"answers\":0,\"versions\":0,\"approvals\":0},\"aqua-local-<uidA>\":{\"app_instances\":1,\"answers\":0,\"versions\":0,\"approvals\":0},\"aqua-local-<uidB>\":{\"app_instances\":0,\"answers\":0,\"versions\":0,\"approvals\""
+        },
+        {
+          "ref": "browser:acceptance::AT21 after the switch the app never opened A's database again",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 after the switch the app never opened A's database again",
+          "detail": "{\"opened_by_b_page\":[\"aqua-local-<uidB>\"]}"
+        },
+        {
+          "ref": "browser:acceptance::AT21 B opening A's instance URL does not reveal it",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 B opening A's instance URL does not reveal it"
+        },
+        {
+          "ref": "browser:acceptance::AT21 switching A→B (SIGNED_IN as another account) closes A's connection",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 switching A→B (SIGNED_IN as another account) closes A's connection"
+        },
+        {
+          "ref": "browser:acceptance::AT21 switching A→B locks the open tab (A's list no longer shown)",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT21 switching A→B locks the open tab (A's list no longer shown)"
+        },
+        {
+          "ref": "vault::isolation: two uids get separate vaults; switching revokes the old handle; sign-out closes + locks",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-v5-tests.mjs",
+          "name": "isolation: two uids get separate vaults; switching revokes the old handle; sign-out closes + locks"
+        },
+        {
+          "ref": "vault::identity: account switch A→B selects B vault, never A",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-session-tests.mjs",
+          "name": "identity: account switch A→B selects B vault, never A"
+        },
+        {
+          "ref": "vault::identity: handle minted before sign-out is revoked — no stale writes",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-session-tests.mjs",
+          "name": "identity: handle minted before sign-out is revoked — no stale writes"
+        },
+        {
+          "ref": "vault::identity: stale async callback cannot restore the previous account",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-session-tests.mjs",
+          "name": "identity: stale async callback cannot restore the previous account"
+        },
+        {
+          "ref": "companion:bridge.test.mjs::account binding: first import binds; another account is refused unless --allow-account-mismatch",
+          "status": "pass",
+          "suite": "companion",
+          "file": "bridge.test.mjs",
+          "name": "account binding: first import binds; another account is refused unless --allow-account-mismatch"
+        },
+        {
+          "ref": "vault::payload for a different user is refused when expectedUserId given",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-legacy-import-tests.mjs",
+          "name": "payload for a different user is refused when expectedUserId given"
+        },
+        {
+          "ref": "prod::/apply → redirect /login?next=%2Fapply",
+          "status": "pass",
+          "suite": "prod",
+          "file": "next start",
+          "name": "/apply → 307 /login?next=%2Fapply (expected redirect /login?next=%2Fapply)"
+        },
+        {
+          "ref": "prod::/review/x → redirect /login?next=%2Freview%2Fx",
+          "status": "pass",
+          "suite": "prod",
+          "file": "next start",
+          "name": "/review/x → 307 /login?next=%2Freview%2Fx (expected redirect /login?next=%2Freview%2Fx)"
+        },
+        {
+          "ref": "prod::/aqua-local → redirect /login",
+          "status": "pass",
+          "suite": "prod",
+          "file": "next start",
+          "name": "/aqua-local → 307 /login?next=%2Faqua-local (expected redirect /login)"
+        },
+        {
+          "ref": "prod::/apply/LA-x → redirect /login",
+          "status": "pass",
+          "suite": "prod",
+          "file": "next start",
+          "name": "/apply/LA-x → 307 /login?next=%2Fapply%2FLA-x (expected redirect /login)"
+        }
+      ]
+    },
+    {
+      "id": "AT22",
+      "title": "Import or network operation fails",
+      "expected": "No partial authoritative state or silent private-content egress",
+      "status": "pass",
+      "key_assertion": "Browser: URL import abort/500/422/garbage → \"Nothing was created\", vault counts unchanged, bodies {url} only; IndexedDB write failures during instance creation and first draft roll back fully (two vault bugs fixed); DB: failed submit leaves no orphan source; no request carried private text.",
+      "note": null,
+      "artifacts": [
+        "docs/evidence/m09-acceptance/screens/at22-01-url-import-network-failure.png",
+        "docs/evidence/m09-acceptance/screens/at22-03-refused-draft.png",
+        "docs/evidence/m09-acceptance/browser-results.json"
+      ],
+      "commands": [
+        "REVIEW_BASE_URL=http://localhost:3977 PLAYWRIGHT_MODULE=<playwright> node tests/e2e/review-ui.e2e.mjs",
+        "PW_CORE=<playwright-core> BASE_URL=http://localhost:3977 node tests/browser/journey.browser.mjs",
+        "PLAYWRIGHT_MODULE=<playwright> BASE_URL=http://localhost:3977 node tests/acceptance/acceptance.browser.mjs",
+        "cd app && npm run -s test:unit   (node --test tests/*.test.mjs)",
+        "M09_E2E_PGROOT=<scratch> node --test tests/acceptance/catalog-promotion-sql.e2e.mjs",
+        "M09_PGROOT=<scratch> supabase/tests/m09/run_local.sh",
+        "cd app && npm run -s test:vault   (10 runner scripts)",
+        "node --test aqua-companion/test/*.test.mjs"
+      ],
+      "assertions": [
+        {
+          "ref": "browser:acceptance::AT22 URL import failure (abort) shows an error and no review/instance step",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 URL import failure (abort) shows an error and no review/instance step",
+          "detail": "\" Nothing was created — try again, or paste the questions instead.\""
+        },
+        {
+          "ref": "browser:acceptance::AT22 URL import failure (500) shows an error and no review/instance step",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 URL import failure (500) shows an error and no review/instance step",
+          "detail": "\"internal Nothing was created.\""
+        },
+        {
+          "ref": "browser:acceptance::AT22 URL import failure (422) shows an error and no review/instance step",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 URL import failure (422) shows an error and no review/instance step",
+          "detail": "\"source_fetch_failed Nothing was created.\""
+        },
+        {
+          "ref": "browser:acceptance::AT22 URL import failure (garbage) shows an error and no review/instance step",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 URL import failure (garbage) shows an error and no review/instance step",
+          "detail": "\" Nothing was created.\""
+        },
+        {
+          "ref": "browser:acceptance::AT22 failed URL imports wrote nothing to the vault",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 failed URL imports wrote nothing to the vault",
+          "detail": "{\"before\":{\"app_instances\":0,\"answers\":0,\"versions\":0,\"approvals\":0},\"after\":{\"app_instances\":0,\"answers\":0,\"versions\":0,\"approvals\":0}}"
+        },
+        {
+          "ref": "browser:acceptance::AT22 extract-url request bodies were {url} only",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 extract-url request bodies were {url} only"
+        },
+        {
+          "ref": "browser:acceptance::AT22 instance creation storage failure: error shown, nothing saved, no navigation",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 instance creation storage failure: error shown, nothing saved, no navigation",
+          "detail": "{\"error\":\"Could not create the application: synthetic quota failure. Nothing was saved.\",\"before\":{\"app_instances\":0,\"answers\":0,\"versions\":0,\"approvals\":0},\"after\":{\"app_instances\":0,\"answers\":0,\"versions\":0,\"approvals\":0}}"
+        },
+        {
+          "ref": "browser:acceptance::AT22 retry after the failure creates exactly one instance",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 retry after the failure creates exactly one instance"
+        },
+        {
+          "ref": "browser:acceptance::AT22 a write failure inside the first-draft transaction rolls back: no answer, no version",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 a write failure inside the first-draft transaction rolls back: no answer, no version",
+          "detail": "{\"before\":{\"app_instances\":1,\"answers\":0,\"versions\":0,\"approvals\":0},\"after\":{\"app_instances\":1,\"answers\":0,\"versions\":0,\"approvals\":0}}"
+        },
+        {
+          "ref": "browser:acceptance::AT22 a refused draft (invisible characters only) writes no answer and no version",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 a refused draft (invisible characters only) writes no answer and no version",
+          "detail": "{\"before\":{\"app_instances\":1,\"answers\":0,\"versions\":0,\"approvals\":0},\"after\":{\"app_instances\":1,\"answers\":0,\"versions\":0,\"approvals\":0},\"message\":\"empty, whitespace-only, or invisible-characters-only\"}"
+        },
+        {
+          "ref": "browser:acceptance::AT22 a valid draft afterwards creates exactly one answer + one version",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 a valid draft afterwards creates exactly one answer + one version",
+          "detail": "{\"before\":{\"app_instances\":1,\"answers\":0,\"versions\":0,\"approvals\":0},\"after\":{\"app_instances\":1,\"answers\":1,\"versions\":1,\"approvals\":0}}"
+        },
+        {
+          "ref": "browser:acceptance::AT22 no request (URL or body) carried pasted text, drafts or vault secrets",
+          "status": "pass",
+          "suite": "browser",
+          "file": "acceptance.browser.mjs",
+          "name": "AT22 no request (URL or body) carried pasted text, drafts or vault secrets",
+          "detail": "[]"
+        },
+        {
+          "ref": "unit:draft-atomicity.test.mjs::journey draft: a refused first version leaves no answer record behind",
+          "status": "pass",
+          "suite": "unit",
+          "file": "draft-atomicity.test.mjs",
+          "name": "journey draft: a refused first version leaves no answer record behind"
+        },
+        {
+          "ref": "unit:draft-atomicity.test.mjs::bank draft (session.saveVersion): a refused first version leaves no answer record behind",
+          "status": "pass",
+          "suite": "unit",
+          "file": "draft-atomicity.test.mjs",
+          "name": "bank draft (session.saveVersion): a refused first version leaves no answer record behind"
+        },
+        {
+          "ref": "acc:catalog-promotion-sql.e2e.mjs::AT02/AT22: a private-data submission is refused with nothing written",
+          "status": "pass",
+          "suite": "acc",
+          "file": "catalog-promotion-sql.e2e.mjs",
+          "name": "AT02/AT22: a private-data submission is refused with nothing written"
+        },
+        {
+          "ref": "unit:journey-activate.test.mjs::URL import failures (network, 422, private link, bad body) return errors and create no instance",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-activate.test.mjs",
+          "name": "URL import failures (network, 422, private link, bad body) return errors and create no instance"
+        },
+        {
+          "ref": "unit:journey-activate.test.mjs::failure safety: a blocked model writes nothing; one call → one instance",
+          "status": "pass",
+          "suite": "unit",
+          "file": "journey-activate.test.mjs",
+          "name": "failure safety: a blocked model writes nothing; one call → one instance"
+        },
+        {
+          "ref": "unit:catalog-fetch.test.mjs::timeout aborts and yields no partial result",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-fetch.test.mjs",
+          "name": "timeout aborts and yields no partial result"
+        },
+        {
+          "ref": "unit:catalog-promotion-handlers.test.mjs::L8: submit is ONE atomic RPC; a database refusal leaves nothing half-written client-side",
+          "status": "pass",
+          "suite": "unit",
+          "file": "catalog-promotion-handlers.test.mjs",
+          "name": "L8: submit is ONE atomic RPC; a database refusal leaves nothing half-written client-side"
+        },
+        {
+          "ref": "db::CP-K-2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-K-2 a failing candidate insert leaves NO orphan source row (atomic)"
+        },
+        {
+          "ref": "db::CP-I-1",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-I-1 failure after writes leaves nothing behind: source review + payload patch + checks, then verified refused by the event rule"
+        },
+        {
+          "ref": "db::CP-I-2",
+          "status": "pass",
+          "suite": "db",
+          "name": "CP-I-2 payload patch on a verified candidate is refused and the source review in the same call is rolled back"
+        },
+        {
+          "ref": "vault::malformed backup → wholesale refusal, zero partial writes (FB7R-07)",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-tests.mjs",
+          "name": "malformed backup → wholesale refusal, zero partial writes (FB7R-07)"
+        },
+        {
+          "ref": "vault::missing consent → ProviderConsentError, no egress",
+          "status": "pass",
+          "suite": "vault",
+          "file": "run-tests.mjs",
+          "name": "missing consent → ProviderConsentError, no egress"
+        },
+        {
+          "ref": "companion:bridge.test.mjs::import-backup: wrong vault secret, tampered file and newer format are refused before any write",
+          "status": "pass",
+          "suite": "companion",
+          "file": "bridge.test.mjs",
+          "name": "import-backup: wrong vault secret, tampered file and newer format are refused before any write"
+        }
+      ]
+    }
+  ]
+}

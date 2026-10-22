@@ -46,6 +46,9 @@ cd app && npm run test:vault       # lib/aqua-local run-*.mjs, session, score ru
 cd app && npm run type-check && npm run build
 cd application-hub-mcp-server && npm test && npm run check   # vitest, typecheck, build
 python3 .repo/scripts/repo_check.py --ci
+python3 scripts/lint_migration_grants.py            # explicit grants in migrations after 059
+bash supabase/tests/p0/run_local.sh && bash supabase/tests/m09/run_local.sh   # local Postgres suites
+GRANTS_MODE=revoked M09_PGBIN=<pg17>/bin bash supabase/tests/m09/run_local.sh  # full chain 001-059, new Supabase defaults
 ```
 
 Vault runners use plain `node` and need Node 22.18+ (native `.ts` type stripping). Use relative imports with `.ts` extensions in `app/lib/aqua-local*`; the `@/` alias does not resolve under plain node. CI (`.github/workflows/ci.yml`) runs all of the above.
@@ -67,4 +70,5 @@ Vault runners use plain `node` and need Node 22.18+ (native `.ts` type stripping
 - No new root directories or root documents beyond `REPO.yaml` allowances. Reports go in `docs/`, generated output in `artifacts/`.
 - No `_final`, `_new`, `_copy` style duplicates. Update the canonical file or archive with provenance.
 - Never rename or edit existing migration files; add the next numeric prefix. Do not apply production migrations without OWNER authorization.
+- **New tables/sequences need explicit grants.** From migration 059 on, Supabase no longer auto-grants new `public` objects to `anon`/`authenticated`/`service_role` (2026-10-30). In the same migration, enable RLS, `REVOKE ALL`, then `GRANT` exactly what each role needs (sequences included), and classify the table in `supabase/tests/m09/50_grants_tests.sql`. Rules: `docs/MIGRATIONS.md`; inventory: `docs/DATA-API-GRANTS.md`. CI lint: `scripts/lint_migration_grants.py`.
 - Small, intentional commits. Do not force-push `main`. Do not bypass hooks or validation.

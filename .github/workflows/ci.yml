@@ -61,17 +61,31 @@ jobs:
               sys.exit(1)
           print(f'OK: {len(files)} migrations')
           PYEOF
+      # From 059 on, a migration that creates a public table/sequence must
+      # grant/revoke it explicitly and enable RLS (docs/MIGRATIONS.md).
+      - name: Explicit Data API grants (migrations after 059)
+        run: |
+          python3 scripts/lint_migration_grants.py --self-test
+          python3 scripts/lint_migration_grants.py
 
   db-local-suites:
     name: Local Postgres role-boundary suites
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
+      # PostgreSQL 17 (production major; MAINTAIN privilege) + pgvector for
+      # the full-chain grants runs (migration 001 creates extension vector).
+      - name: Install PostgreSQL 17 + pgvector (PGDG)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-17 postgresql-17-pgvector
       - name: Put Postgres server binaries on PATH
         run: |
           if ! ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1; then
@@ -84,6 +98,12 @@ jobs:
         run: P0_PGROOT="$RUNNER_TEMP/p0" bash supabase/tests/p0/run_local.sh
       - name: M09 suite (058 catalog provenance + promotion, rollback)
         run: M09_PGROOT="$RUNNER_TEMP/m09" bash supabase/tests/m09/run_local.sh
+      # Full chain 001 -> 059 on a fresh database; p0 + 058 + 50 grants
+      # suites, rollback, and rebuild == production grants snapshot.
+      - name: M09 full chain, pre-2026-10-30 default privileges
+        run: GRANTS_MODE=default M09_PGBIN=/usr/lib/postgresql/17/bin M09_PGROOT="$RUNNER_TEMP/m09-default" bash supabase/tests/m09/run_local.sh
+      - name: M09 full chain, revoked default privileges (Supabase 2026-10-30)
+        run: GRANTS_MODE=revoked M09_PGBIN=/usr/lib/postgresql/17/bin M09_PGROOT="$RUNNER_TEMP/m09-revoked" bash supabase/tests/m09/run_local.sh
 
   mcp-server:
     name: MCP server
@@ -110,6 +130,12 @@ jobs:
         run: npm run manifest:check
       - name: Hosted route's vendored catalog core matches src/catalog
         run: npm run vendor:hosted:check
+      - name: Package's vendored companion matches aqua-companion
+        run: npm run vendor:companion:check
+      - name: npm pack file list has no local paths and no service-role string
+        run: |
+          npm pack --dry-run --json > "$RUNNER_TEMP/pack.json"
+          node -e 'const p=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))[0]; const bad=p.files.filter(f=>/^\/|\.\.|node_modules|\.env|\.git/.test(f.path)); if(bad.length){console.error(bad);process.exit(1)}' "$RUNNER_TEMP/pack.json"
       - name: Tests (protocol, public tools, not_public, keys, workspace tiers, injection, manifest)
         run: npm test
 
@@ -142,7 +168,7 @@ jobs:
         run: node aqua-companion/scripts/pack-site.mjs --check
       - name: Tarball runs via npx from an empty folder
         run: |
-          tgz="$(ls "$PWD"/app/public/companion/aqua-companion-*.tgz)"
+          tgz="$PWD/app/public/companion/$(node -p 'const l=require("./app/public/companion/latest.json"); l.url.split("/").pop()')"
           cd "$(mktemp -d)" && npx --yes "file:$tgz" --help | head -1
       # Agent guidance (llms.txt, llms-full.txt, /agents, /.well-known/mcp, /developers)
       # is generated from the tool registry; counts and install lines can never drift.
