@@ -119,7 +119,7 @@ async function populate(page, plan) {
       await row.getByTestId('save-draft').click()
     }
     if (spec.expect && spec.expect !== kind) throw new Error(`row ${i + 1}: expected ${spec.expect}, got ${kind}`)
-    await page.getByTestId('populate-row').nth(i).getByText(/version\(s\)/).waitFor({ timeout: 20_000 })
+    await page.getByTestId('populate-row').nth(i).getByTestId('draft-created').waitFor({ timeout: 20_000 })
     seen.push(kind)
   }
   return seen

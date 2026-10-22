@@ -96,6 +96,12 @@ export function analyticsSafeUrl(href: string): string {
   }
   if (u.protocol !== 'http:' && u.protocol !== 'https:') return href
   let changed = false
+  // /review carries identifiers of what the user is reviewing (e.g.
+  // ?program=<uuid>); analytics keeps the path only (M09 review, LOW).
+  if (ANALYTICS_QUERYLESS_ROUTE_RE.test(u.pathname) && u.search) {
+    u.search = ''
+    changed = true
+  }
   for (const k of ANALYTICS_DROPPED_QUERY_KEYS) {
     if (u.searchParams.has(k)) {
       u.searchParams.delete(k)
@@ -109,6 +115,9 @@ export function analyticsSafeUrl(href: string): string {
   if (!changed) return href
   return relative ? `${u.pathname}${u.search}${u.hash}` : u.toString()
 }
+
+/** Routes whose query string never reaches PostHog. */
+export const ANALYTICS_QUERYLESS_ROUTE_RE = /^\/review(\/|$)/
 
 /** URL-valued PostHog properties sanitized by `before_send`. */
 export const POSTHOG_URL_PROPERTIES = [
