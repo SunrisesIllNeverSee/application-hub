@@ -13,6 +13,7 @@
 import {
   canonicalJson,
   decryptText,
+  encryptField,
   encryptText,
   newId,
   nowIso,
@@ -24,6 +25,7 @@ import type {
   ActorClass,
   AnswerRecord,
   ApprovalRecord,
+  ApprovalVia,
   EventRecord,
   PacketRecord,
   ProvenanceRecord,
@@ -32,6 +34,7 @@ import type {
   VersionMethod,
   VersionRecord,
 } from './schema.ts'
+import { HISTORY_VIA, describePlaceholders, findPlaceholders, normalizeEffectiveAt } from './history.ts'
 
 export class VaultScopeError extends Error {
   constructor(message: string) {
@@ -58,6 +61,26 @@ export class VaultNotFoundError extends Error {
   constructor(message: string) {
     super(message)
     this.name = 'VaultNotFoundError'
+  }
+}
+
+/** v5: a human decision presented a hash that is not the stored version's —
+    the user approved content that is not what the vault holds. Refused. */
+export class VaultApprovalMismatchError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'VaultApprovalMismatchError'
+  }
+}
+
+/** M09b: a submitted-history confirmation was refused because the answer
+    still carries an unfilled placeholder. `markers` = history.ts rule ids. */
+export class VaultPlaceholderError extends Error {
+  markers: string[]
+  constructor(markers: string[]) {
+    super(`history attestation refused: ${describePlaceholders(markers)}`)
+    this.name = 'VaultPlaceholderError'
+    this.markers = markers
   }
 }
 
@@ -97,6 +120,8 @@ export interface CreateVersionInput {
   /** IR-026: provenance link to the source version this body was derived
       from (cross-scope reuse). Never implies approval transfer. */
   derived_from?: { version_id: string; version_sha256: string } | null
+  /** v5: evidence cited by this version (metadata — not hashed). */
+  evidence_ids?: string[]
 }
 
 export async function createVersion(
@@ -131,7 +156,7 @@ export async function createVersion(
     auto-commit in real browsers. */
 export async function buildVersionPayload(
   secret: string,
-  input: Pick<CreateVersionInput, 'answer_id' | 'title' | 'body' | 'method' | 'provenance' | 'provider' | 'model' | 'observed_flags' | 'derived_from'>,
+  input: Pick<CreateVersionInput, 'answer_id' | 'title' | 'body' | 'method' | 'provenance' | 'provider' | 'model' | 'observed_flags' | 'derived_from' | 'evidence_ids'>,
   parentVersionId: string | null = null,
 ): Promise<{ record: VersionRecord; receipt: ProvenanceRecord }> {
   // The canon blank-guard applies to EVERY version writer, not only the
@@ -155,6 +180,10 @@ export async function buildVersionPayload(
     created_at: nowIso(),
     immutable: true,
   }
+  // v5: evidence ids are metadata outside the content hash; omitted when
+  // empty so v4-shaped records stay byte-identical.
+  const evidenceIds = [...new Set((input.evidence_ids ?? []).filter((e) => typeof e === 'string' && e))]
+  if (evidenceIds.length) record.evidence_ids = evidenceIds
   const receipt: ProvenanceRecord = {
     version_id: record.id,
     method: input.method,
@@ -241,6 +270,70 @@ export async function listVersions(storage: VaultStorage, answerId: string): Pro
 }
 
 /**
+ * LF-18 / v5 — allocate the next ledger seq and append one event. MUST be
+ * called inside a storage.tx that includes 'events' so the
+ * read-max-then-write cannot interleave across tabs.
+ */
+export async function appendLedgerEvent(
+  s: VaultStorage,
+  event: Omit<EventRecord, 'id' | 'seq'>,
+): Promise<EventRecord> {
+  const events = await s.getAll<EventRecord>('events')
+  const seq = events.reduce((max, e) => Math.max(max, e.seq), 0) + 1
+  const record: EventRecord = { id: newId(), seq, ...event }
+  await s.put('events', record)
+  return record
+}
+
+/** Shared approvals-ledger writer (inside a tx over approvals + events). */
+async function writeApprovalDecision(
+  s: VaultStorage,
+  version: VersionRecord,
+  input: {
+    decision: 'approved' | 'rejected'
+    actor_class: ActorClass
+    actor_id: string | null
+    via: ApprovalVia
+    /** history_attestation only */
+    effective_at?: string
+    attestation_enc?: string
+  },
+): Promise<ApprovalRecord> {
+  const id = newId()
+  const at = nowIso()
+  const event = await appendLedgerEvent(s, {
+    kind: 'approval_decision',
+    entity: 'version',
+    entity_id: version.id,
+    payload: {
+      approval_id: id,
+      version_sha256: version.sha256,
+      decision: input.decision,
+      actor_class: input.actor_class,
+      actor_id: input.actor_id,
+      via: input.via,
+      ...(input.effective_at ? { effective_at: input.effective_at } : {}),
+    },
+    at,
+  })
+  const record: ApprovalRecord = {
+    id,
+    version_id: version.id,
+    version_sha256: version.sha256,
+    decision: input.decision,
+    actor_class: input.actor_class,
+    at,
+    seq: event.seq,
+    actor_id: input.actor_id,
+    via: input.via,
+  }
+  if (input.effective_at) record.effective_at = input.effective_at
+  if (input.attestation_enc) record.attestation_enc = input.attestation_enc
+  await s.put('approvals', record)
+  return record
+}
+
+/**
  * LF-18 — record an approval decision AND its audit receipt atomically.
  * The `seq` is allocated from the events ledger inside the same
  * transaction (max(existing)+1), so two tabs racing on the same vault get
@@ -249,47 +342,230 @@ export async function listVersions(storage: VaultStorage, answerId: string): Pro
  * adapter is single-threaded. A revocation is a NEW decision row + NEW
  * event — never an update of the prior approval.
  */
-/** actor_class is caller-asserted, not proven — under the declared
-    threat model (single-user local vault) the only real producer is the
-    browser UI, which hardcodes 'human'; 'agent' exists for provider/agent
-    pipelines that may write advisory approvals. The packet freeze gate is
-    the enforcement point: only the LATEST decision being a non-restored
-    human 'approved' satisfies it (packets.ts latestApproval). */
+/** @deprecated v5 — LEGACY primitive kept for pre-v5 callers/tests (rows
+    are written with via:'legacy', actor_id:null). New code MUST use
+    recordHumanApproval / recordHumanRevocation (hash-bound, human-only)
+    for decisions and recordSuggestion for agent recommendations.
+    actor_class is caller-asserted, not proven — the packet freeze gate
+    (status.ts approvalGate) is the enforcement point: only the LATEST
+    decision being a live, hash-bound, human 'approved' satisfies it. */
 export async function approveVersion(
   storage: VaultStorage,
   input: { version_id: string; decision: 'approved' | 'rejected'; actor_class: ActorClass },
 ): Promise<ApprovalRecord> {
   const version = await storage.get<VersionRecord>('versions', input.version_id)
   if (!version) throw new VaultNotFoundError(`version not found: ${input.version_id}`)
-  return storage.tx(['approvals', 'events'], async (s) => {
-    const events = await s.getAll<EventRecord>('events')
-    const seq = events.reduce((max, e) => Math.max(max, e.seq), 0) + 1
-    const record: ApprovalRecord = {
-      id: newId(),
-      version_id: input.version_id,
-      version_sha256: version.sha256,
+  return storage.tx(['approvals', 'events'], (s) =>
+    writeApprovalDecision(s, version, {
       decision: input.decision,
       actor_class: input.actor_class,
-      at: nowIso(),
-      seq,
+      actor_id: null,
+      via: 'legacy',
+    }),
+  )
+}
+
+export interface HumanDecisionInput {
+  version_id: string
+  /** The sha256 of the content the human was SHOWN. Must equal the stored
+      version's sha256 at write time, or the decision is refused. */
+  expected_sha256: string
+  /** Who decided — the signed-in uid or a vault-local user label. */
+  actor_id: string
+  via: Exclude<ApprovalVia, 'legacy' | 'history_attestation'>
+  /** Optional: also decrypt + rehash the stored plaintext and require it to
+      equal expected_sha256 (catches a tampered row whose stored sha256 was
+      left intact). Crypto runs BEFORE the write transaction. */
+  secret?: string
+}
+
+const HUMAN_VIA: ReadonlyArray<Exclude<ApprovalVia, 'legacy' | 'history_attestation'>> = ['review_ui', 'decision_file']
+
+async function recordHumanDecision(
+  storage: VaultStorage,
+  input: HumanDecisionInput,
+  decision: 'approved' | 'rejected',
+): Promise<ApprovalRecord> {
+  if (!input.version_id) throw new VaultNotFoundError('version_id is required')
+  if (typeof input.expected_sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(input.expected_sha256)) {
+    throw new VaultApprovalMismatchError('expected_sha256 must be the 64-hex content hash the human reviewed')
+  }
+  if (typeof input.actor_id !== 'string' || isBlankBody(input.actor_id)) {
+    throw new VaultScopeError('human decision requires actor_id')
+  }
+  if (!HUMAN_VIA.includes(input.via)) {
+    throw new VaultScopeError(`human decision via must be one of ${HUMAN_VIA.join('|')}`)
+  }
+  if (input.secret) {
+    const { title, body } = await readVersion(storage, input.secret, input.version_id)
+    const recomputed = await sha256Hex(canonicalJson({ title, body }))
+    if (recomputed !== input.expected_sha256) {
+      throw new VaultApprovalMismatchError(
+        `version ${input.version_id} plaintext does not hash to the reviewed sha256 — refused`,
+      )
     }
-    await s.put('approvals', record)
-    const event: EventRecord = {
-      id: newId(),
-      seq,
-      kind: 'approval_decision',
-      entity: 'version',
-      entity_id: input.version_id,
-      payload: {
-        approval_id: record.id,
-        version_sha256: record.version_sha256,
-        decision: record.decision,
-        actor_class: record.actor_class,
-      },
-      at: record.at,
+  }
+  return storage.tx(['versions', 'approvals', 'events'], async (s) => {
+    // Re-read INSIDE the write transaction: the hash check and the write
+    // are atomic, so a concurrent row swap cannot slip between them.
+    const version = await s.get<VersionRecord>('versions', input.version_id)
+    if (!version) throw new VaultNotFoundError(`version not found: ${input.version_id}`)
+    if (version.sha256 !== input.expected_sha256) {
+      throw new VaultApprovalMismatchError(
+        `version ${input.version_id} sha256 is ${version.sha256.slice(0, 12)}…, ` +
+          `reviewed ${input.expected_sha256.slice(0, 12)}… — decision refused`,
+      )
     }
-    await s.put('events', event)
-    return record
+    return writeApprovalDecision(s, version, {
+      decision,
+      actor_class: 'human', // hardcoded — this API cannot write an agent row
+      actor_id: input.actor_id,
+      via: input.via,
+    })
+  })
+}
+
+/**
+ * v5 — THE approval API. Re-reads the stored version, refuses on hash
+ * mismatch, and writes an `actor_class: 'human'` approval bound to that
+ * exact sha256. There is no actor_class parameter: agents recommend via
+ * recordSuggestion and can never reach this writer's 'approved' row.
+ */
+export function recordHumanApproval(
+  storage: VaultStorage,
+  input: HumanDecisionInput,
+): Promise<ApprovalRecord> {
+  return recordHumanDecision(storage, input, 'approved')
+}
+
+/** v5 — human revocation / rejection on the approvals ledger (same hash
+    binding as recordHumanApproval). */
+export function recordHumanRevocation(
+  storage: VaultStorage,
+  input: HumanDecisionInput,
+): Promise<ApprovalRecord> {
+  return recordHumanDecision(storage, input, 'rejected')
+}
+
+export interface HistoryAttestationInput {
+  version_id: string
+  /** The sha256 of the answer the user was SHOWN on the confirm screen. */
+  expected_sha256: string
+  /** The submission date (YYYY-MM-DD or ISO date-time); not in the future. */
+  effective_at: string
+  /** The user's attestation statement (stored encrypted). */
+  statement: string
+  /** Who confirmed — the signed-in uid or a vault-local user label. */
+  actor_id: string
+}
+
+/**
+ * M09b — confirm an imported answer as ACTUALLY SUBMITTED (OWNER rule
+ * 2026-10-22: submitted answers are approved as of their submission date).
+ * Writes a human approval (`actor_class: 'human'`, `via:
+ * 'history_attestation'`) bound to the exact version hash, carrying
+ * `effective_at` (the submission date) and the user's statement encrypted
+ * as `attestation_enc`.
+ *
+ * Refuses — before anything is written — when:
+ *   - the version is not an imported history record (`history: true`);
+ *   - the decrypted title+body does not hash to `expected_sha256`, or the
+ *     stored row's sha256 differs (checked again inside the write tx);
+ *   - the BODY contains an unfilled placeholder (history.ts
+ *     findPlaceholders: [CONFIRM, [ASSET NEEDED, TODO, TBD, XXX, <…>, {{…}});
+ *     this rule lives here, in the vault write, not only in the UI;
+ *   - effective_at is not a real date or is in the future;
+ *   - the statement or actor_id is blank.
+ * All crypto runs before the write transaction (IndexedDB auto-commit).
+ */
+export async function recordHistoryAttestation(
+  storage: VaultStorage,
+  secret: string,
+  input: HistoryAttestationInput,
+): Promise<ApprovalRecord> {
+  if (!input.version_id) throw new VaultNotFoundError('version_id is required')
+  if (typeof input.expected_sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(input.expected_sha256)) {
+    throw new VaultApprovalMismatchError('expected_sha256 must be the 64-hex content hash the user confirmed')
+  }
+  if (typeof input.actor_id !== 'string' || isBlankBody(input.actor_id)) {
+    throw new VaultScopeError('history attestation requires actor_id')
+  }
+  if (typeof input.statement !== 'string' || isBlankBody(input.statement)) {
+    throw new VaultScopeError('history attestation requires the user\'s attestation statement')
+  }
+  if (input.statement.length > 4000) throw new VaultScopeError('attestation statement is too long (max 4000 characters)')
+  const effectiveAt = normalizeEffectiveAt(input.effective_at)
+  if (!effectiveAt) {
+    throw new VaultScopeError('effective_at must be the submission date (YYYY-MM-DD or ISO date-time) and not in the future')
+  }
+  const { record, title, body } = await readVersion(storage, secret, input.version_id)
+  if (record.history !== true) {
+    throw new VaultScopeError(`version ${input.version_id} is not an imported submitted-history record`)
+  }
+  const recomputed = await sha256Hex(canonicalJson({ title, body }))
+  if (recomputed !== input.expected_sha256 || record.sha256 !== input.expected_sha256) {
+    throw new VaultApprovalMismatchError(
+      `version ${input.version_id} does not hash to the confirmed sha256 — refused`,
+    )
+  }
+  const markers = findPlaceholders(body)
+  if (markers.length) throw new VaultPlaceholderError(markers)
+  const attestation_enc = await encryptField(secret, input.statement)
+  return storage.tx(['versions', 'approvals', 'events'], async (s) => {
+    const version = await s.get<VersionRecord>('versions', input.version_id)
+    if (!version) throw new VaultNotFoundError(`version not found: ${input.version_id}`)
+    if (version.sha256 !== input.expected_sha256 || version.history !== true) {
+      throw new VaultApprovalMismatchError(`version ${input.version_id} changed before the attestation was written — refused`)
+    }
+    return writeApprovalDecision(s, version, {
+      decision: 'approved',
+      actor_class: 'human',
+      actor_id: input.actor_id,
+      via: HISTORY_VIA,
+      effective_at: effectiveAt,
+      attestation_enc,
+    })
+  })
+}
+
+export interface ChildVersionInput {
+  parent_version_id: string
+  body: string
+  /** Defaults to the parent's (decrypted) title. */
+  title?: string
+  method?: VersionMethod
+  provenance?: string | null
+  provider?: string | null
+  model?: string | null
+  observed_flags?: Record<string, boolean>
+  evidence_ids?: string[]
+}
+
+/**
+ * v5 — EDIT. Always a new immutable version on the parent's answer with
+ * parent_version_id set. Approvals bind version ids, so nothing carries
+ * forward: the child starts unapproved and the parent keeps its decisions.
+ */
+export async function createChildVersion(
+  storage: VaultStorage,
+  secret: string,
+  input: ChildVersionInput,
+): Promise<VersionRecord> {
+  const parent = await storage.get<VersionRecord>('versions', input.parent_version_id)
+  if (!parent) throw new VaultNotFoundError(`parent version not found: ${input.parent_version_id}`)
+  const title = input.title ?? (await decryptVersionTitle(secret, parent))
+  return createVersion(storage, secret, {
+    answer_id: parent.answer_id,
+    parent_version_id: parent.id,
+    title,
+    body: input.body,
+    method: input.method ?? 'manual',
+    provenance: input.provenance ?? null,
+    provider: input.provider ?? null,
+    model: input.model ?? null,
+    observed_flags: input.observed_flags,
+    derived_from: null,
+    evidence_ids: input.evidence_ids,
   })
 }
 

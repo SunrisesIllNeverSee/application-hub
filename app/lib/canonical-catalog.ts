@@ -1,14 +1,11 @@
 // M08 canonical catalog — the positive approval registry.
 //
-// This list is THE criterion for "owner-approved canonical application":
-// a program appears on approved-only catalog surfaces if and only if its
-// slug is listed here AND its production row carries source='canonical'
-// (inserted by the gated promotion migration). Slugs are added in the same
-// commit as the promotion data once the owner approves a QA-application
-// record — the git history of this array IS the approval record.
-//
-// Empty today = no synthetic, FundingCake, community, or funder row can
-// ever become public merely because its source enum changes.
+// This list is the M08 approval floor: these owner-approved slugs (git
+// history of this array = their approval record) always appear on
+// approved-only catalog surfaces. Since M09 a row is ALSO approved when it
+// carries source='canonical', which only the service-side promotion path
+// can set (054 guard triggers + 058 curated publish); no synthetic,
+// FundingCake, community, or funder row can become canonical from a client.
 export const CANONICAL_PROGRAM_SLUGS: readonly string[] = [
   "yc-summer-2026",
   "founding-500",
@@ -17,18 +14,29 @@ export const CANONICAL_PROGRAM_SLUGS: readonly string[] = [
   "3xcapital",
 ];
 
-// Never-matches sentinel for empty registries (keeps the query well-formed
-// without hardcoding a real program id).
-const NO_PROGRAM_ID = "00000000-0000-0000-0000-000000000000";
+// M09 (058): programs published through the curated promotion pipeline
+// (catalog_publish_candidate) carry source='canonical' and are approved by
+// that review — every publish is an append-only, curator-attributed event.
+// The slug list above stays as a floor: no existing program loses
+// visibility, and before 058 is applied the two criteria select the same
+// five rows. RLS (052) already limits anon/authenticated reads to
+// canonical rows plus a user's own saved programs, so this filter never
+// widens what the database exposes.
+export const APPROVED_SOURCE = "canonical";
 
-// Narrows a programs query to the owner-approved canonical set.
-// Applies uniformly — consistent approved-only catalog policy (M08 WS7):
-// catalog surfaces are approved-only for every user class.
+// PostgREST or-filter: slug in the registry OR source = canonical.
+export function approvedProgramsFilter(slugs: readonly string[] = CANONICAL_PROGRAM_SLUGS): string {
+  const safe = slugs.filter((s) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s));
+  const parts = [`source.eq.${APPROVED_SOURCE}`];
+  if (safe.length) parts.unshift(`slug.in.(${safe.map((s) => `"${s}"`).join(",")})`);
+  return parts.join(",");
+}
+
+// Narrows a programs query to approved programs (registry floor + curated
+// canonical publishes). Applies uniformly — consistent approved-only
+// catalog policy (M08 WS7): catalog surfaces are approved-only for every
+// user class.
 export function restrictToApprovedPrograms<T>(query: T): T {
-  const q = query as unknown as {
-    in: (c: string, v: readonly string[]) => T;
-    eq: (c: string, v: string) => T;
-  };
-  if (CANONICAL_PROGRAM_SLUGS.length === 0) return q.eq("id", NO_PROGRAM_ID);
-  return q.in("slug", CANONICAL_PROGRAM_SLUGS);
+  const q = query as unknown as { or: (filters: string) => T };
+  return q.or(approvedProgramsFilter());
 }

@@ -8,7 +8,12 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test:agent": "node --test tests/agent-readiness.test.mjs"
+    "test:agent": "node --test tests/agent-readiness.test.mjs",
+    "test:unit": "node --test tests/*.test.mjs",
+    "test:vault": "node lib/aqua-local/run-tests.mjs && node lib/aqua-local/run-approval-tests.mjs && node lib/aqua-local/run-intake-tests.mjs && node lib/aqua-local/run-legacy-import-tests.mjs && node lib/aqua-local/run-packet-tests.mjs && node lib/aqua-local/run-provider-contract-tests.mjs && node lib/aqua-local/run-v5-tests.mjs && node lib/aqua-local/run-history-tests.mjs && node lib/aqua-local-client/run-session-tests.mjs && node lib/aqua-local-client/run-score-tests.mjs",
+    "test:extension": "node --test ../webextension/application-hub/test/*.test.mjs",
+    "test:catalog": "node --test tests/catalog-*.test.mjs tests/guest-browse.test.mjs",
+    "test": "npm run test:unit && npm run test:vault && npm run test:extension"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.1",

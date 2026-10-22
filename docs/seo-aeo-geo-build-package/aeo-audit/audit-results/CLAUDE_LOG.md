@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Claude AEO Log — SigRank SignalAF"
+description: "Claude AEO Log — SigRank SignalAF (CLAUDE_LOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Claude AEO Log — SigRank SignalAF
 
 ## Run metadata

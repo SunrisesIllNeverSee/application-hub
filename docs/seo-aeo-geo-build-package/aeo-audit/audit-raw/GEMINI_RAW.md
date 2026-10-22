@@ -1,3 +1,10 @@
+---
+type: Findings
+title: "Gemini AEO Raw Evidence"
+description: "Gemini AEO Raw Evidence (GEMINI_RAW.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Gemini AEO Raw Evidence
 
 - Engine: Gemini

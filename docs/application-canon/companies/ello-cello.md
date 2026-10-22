@@ -6,6 +6,10 @@ type: employer
 domain: jobs
 homepage: https://mos2es.com
 linkedin: https://www.linkedin.com/company/mos2es
+title: "Company Profile: Ello Cello LLC"
+description: "Company Profile: Ello Cello LLC (ello-cello.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Company Profile: Ello Cello LLC

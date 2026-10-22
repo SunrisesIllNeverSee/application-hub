@@ -1,0 +1,7 @@
+{
+  "format": "aqua-public-catalog-config",
+  "version": 1,
+  "supabase_url": "https://YOUR-PROJECT-REF.supabase.co",
+  "publishable_key": "REPLACE-WITH-THE-PUBLIC-PUBLISHABLE-KEY",
+  "note": "Public, read-only catalog endpoint. The publishable (anon) key is public by design: it is the same key the AQUA web app ships to every browser, and row-level security limits it to approved canonical catalog rows. Never put a secret or service-role key here (the companion refuses them). See docs/AGENT.md, 'Public catalog'."
+}

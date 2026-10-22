@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Bing Copilot AEO Audit Log"
+description: "Bing Copilot AEO Audit Log (COPILOT_LOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Bing Copilot AEO Audit Log
 
 - Engine: Bing Copilot

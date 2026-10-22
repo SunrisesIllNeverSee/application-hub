@@ -1,3 +1,10 @@
+---
+type: Findings
+title: "Google Search / AI Overviews — Raw Evidence"
+description: "Google Search / AI Overviews — Raw Evidence (GOOGLE_SEARCH_RAW.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Google Search / AI Overviews — Raw Evidence
 
 This file preserves unabridged AI Overview text and URLs separately from human scoring.

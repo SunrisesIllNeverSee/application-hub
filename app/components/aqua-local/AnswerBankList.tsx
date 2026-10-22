@@ -92,10 +92,13 @@ export function AnswerBankList({
   /** Write the FIRST version on a versionless slot (e.g. an intake
       question waiting to be answered). */
   onNewVersion?: (entry: BankEntry) => void
-  onApprove: (versionId: string, decision: 'approved' | 'rejected') => void
+  /** M09 W5: hash-bound — `sha256` is the hash shown to the user. */
+  onApprove: (versionId: string, sha256: string, decision: 'approved' | 'rejected') => void
   approvingId: string | null
 }) {
   const [openId, setOpenId] = useState<string | null>(null)
+  // Explicit confirm step: the first click shows the exact hash being approved.
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   if (bank.length === 0) {
     // LF-15 empty state.
@@ -202,9 +205,9 @@ export function AnswerBankList({
                         >
                           {bv.approval === 'approved' ? 'Edit (new child version)' : 'Edit'}
                         </button>
-                        {(bv.approval !== 'approved' || bv.restored) && (
+                        {(bv.approval !== 'approved' || bv.restored || bv.actor_class !== 'human') && confirmId !== v.id && (
                           <button
-                            onClick={() => onApprove(v.id, 'approved')}
+                            onClick={() => setConfirmId(v.id)}
                             disabled={approvingId === v.id}
                             className="btn-secondary px-3 py-1 text-xs text-success-700 dark:text-success-400"
                           >
@@ -212,6 +215,30 @@ export function AnswerBankList({
                           </button>
                         )}
                       </div>
+                      {confirmId === v.id && (
+                        <div className="mt-2 space-y-2 rounded-md border border-success-500/40 p-2" role="region" aria-label="Confirm approval">
+                          <p className="text-neutral-700 dark:text-neutral-300">
+                            Approve v{entry.versions.length - i} exactly as stored? Bound to sha256{' '}
+                            <code className="break-all font-semibold">{v.sha256.slice(0, 12)}</code>
+                            <code className="break-all">{v.sha256.slice(12)}</code>. A later edit needs a new approval.
+                          </p>
+                          <div className="flex gap-2">
+                            <button onClick={() => setConfirmId(null)} className="btn-secondary px-3 py-1 text-xs">
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => {
+                                setConfirmId(null)
+                                onApprove(v.id, v.sha256, 'approved')
+                              }}
+                              disabled={approvingId === v.id}
+                              className="btn-primary px-3 py-1 text-xs"
+                            >
+                              Confirm approval · {v.sha256.slice(0, 12)}…
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </li>
                   )
                 })}

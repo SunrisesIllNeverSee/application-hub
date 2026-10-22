@@ -192,11 +192,13 @@ export default function AquaLocal() {
     })
   }
 
-  const handleApprove = async (versionId: string, decision: 'approved' | 'rejected') => {
+  // M09 W5: hash-bound — the list passes the sha256 it displayed and the
+  // vault refuses the decision if the stored content differs.
+  const handleApprove = async (versionId: string, sha256: string, decision: 'approved' | 'rejected') => {
     setApprovingId(versionId)
     try {
       const storage = await requireStorage()
-      await approve(storage, versionId, decision)
+      await approve(storage, { version_id: versionId, expected_sha256: sha256, decision, secret: requireSecret() })
       await refreshBank()
     } catch (e) {
       setBanner(e instanceof Error ? e.message : 'Approval failed')

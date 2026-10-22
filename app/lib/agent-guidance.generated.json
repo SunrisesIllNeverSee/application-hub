@@ -1,0 +1,500 @@
+{
+  "generated_by": "scripts/gen-agent-guidance.mjs",
+  "tool_source": "application-hub-mcp-server/TOOLS.json",
+  "companion": {
+    "package": "aqua-companion",
+    "version": "0.2.0",
+    "tarball": {
+      "file": "aqua-companion-0.2.0.tgz",
+      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz",
+      "sha256": "68b16804806e3405afa6182ae2bd450d3018bfbd07e898b9e03a59f212c2e217",
+      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz.sha256",
+      "latest_url": "https://aquaidp.xyz/companion/latest.json",
+      "packed": true
+    },
+    "npm_status": "not yet on npm: publishing aqua-companion is owner gate GB2. Until then install from the tarball above."
+  },
+  "mcp_server": {
+    "package": "aqua-mcp-server",
+    "version": "2.0.0",
+    "status": "aqua-mcp-server 2.0.0 is built on the companion and is not yet published. Once OWNER publishes it (gate GB1), `npx -y aqua-mcp-server` runs it; until then use the companion tarball. Versions below 2.0 are legacy and must not be used."
+  },
+  "hosted_mcp": {
+    "url": "https://aquaidp.xyz/mcp",
+    "status": "live",
+    "transport": "Streamable HTTP (POST JSON-RPC, JSON responses, stateless; no SSE stream)",
+    "scope": "read-only public catalog tools, resources and prompts; no authentication, no workspace tools; rate-limited",
+    "claude_code": "claude mcp add --transport http aqua-public https://aquaidp.xyz/mcp"
+  },
+  "catalog_config": {
+    "url": "https://aquaidp.xyz/.well-known/aqua-catalog.json",
+    "fields": [
+      "version",
+      "supabase_url",
+      "publishable_key",
+      "tables",
+      "notes"
+    ],
+    "rule": "publishable/anon key only; clients refuse any other role and fetch it only from https://aquaidp.xyz (or a local override file)"
+  },
+  "install": {
+    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help",
+    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz init --path <folder>",
+    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz doctor",
+    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --keychain",
+    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --workspace <folder>/AQUA --keychain",
+    "npm_later": "npx -y aqua-mcp-server   # once aqua-mcp-server 2.0.0 is published (GB1)"
+  },
+  "tiers": [
+    {
+      "tier": "read",
+      "count": 23,
+      "meaning": "Always allowed. Only reads the workspace or the public catalog cache."
+    },
+    {
+      "tier": "private_write",
+      "count": 8,
+      "meaning": "Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything."
+    },
+    {
+      "tier": "human_consent",
+      "count": 1,
+      "meaning": "Acts only after the human confirms in the MCP client UI (elicitation). Without that capability it returns requires_human with the exact command for the user to run."
+    },
+    {
+      "tier": "human_only",
+      "count": 5,
+      "meaning": "Never acts. Returns requires_human with the steps the user takes in the AQUA browser app (approve, sign, freeze/export, submit, attest)."
+    }
+  ],
+  "total": 37,
+  "mode_counts": {
+    "stdio-workspace": 37,
+    "stdio-catalog": 14,
+    "hosted": 11
+  },
+  "tools": [
+    {
+      "name": "approve_answer",
+      "tier": "human_only",
+      "title": "approve_answer",
+      "summary": "Never executes.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "attach_evidence",
+      "tier": "private_write",
+      "title": "attach_evidence",
+      "summary": "Stage an evidence record for a file the user placed in inbox/ (its sha256 is recorded) and optionally link it to a version.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "attest_submission",
+      "tier": "human_only",
+      "title": "attest_submission",
+      "summary": "Never executes.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "create_draft_version",
+      "tier": "private_write",
+      "title": "create_draft_version",
+      "summary": "Stage a NEW, unapproved draft version of an answer in this workspace (method recorded as an agent draft).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "discover_applications",
+      "tier": "read",
+      "title": "discover_applications",
+      "summary": "Search the cached public AQUA catalog (approved canonical programs) and list the applications in this workspace.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "doctor",
+      "tier": "read",
+      "title": "doctor",
+      "summary": "Self-check: Node and companion version, the public catalog configuration (source, origin, key role: only anon/publishable is accepted), connectivity and a canonical-only catalog read (counts only), workspace and macOS…",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog"
+      ]
+    },
+    {
+      "name": "export_packet",
+      "tier": "human_only",
+      "title": "export_packet",
+      "summary": "Never executes.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "get_application_details",
+      "tier": "read",
+      "title": "get_application_details",
+      "summary": "Full template of one application: exact question wording, parsed requirements (limits, required, time context, qualifiers), deadline and time zone, and where the data came from and how it was verified.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "hub_find_similar_questions",
+      "tier": "read",
+      "title": "hub_find_similar_questions",
+      "summary": "Find canonical questions in the approved catalog that ask about the same thing as the given text (lexical similarity over question wording and its recorded variants; no embeddings, nothing stored).",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_acceptance_stats",
+      "tier": "read",
+      "title": "hub_get_acceptance_stats",
+      "summary": "Public acceptance figures for one approved canonical program: acceptance rate and application count where public, and counts of verified applicant-reported outcomes by cohort (counts only, never who reported).",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_heat_scores",
+      "tier": "read",
+      "title": "hub_get_heat_scores",
+      "summary": "Approved canonical programs ranked by heat score (current applicant interest and deadline pressure).",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_program_by_slug",
+      "tier": "read",
+      "title": "hub_get_program_by_slug",
+      "summary": "One approved canonical program by slug with its public stats and theme weights (DNA) in a single call.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_program_detail",
+      "tier": "read",
+      "title": "hub_get_program_detail",
+      "summary": "Full public detail for one approved canonical program by program_id or slug: deadlines, cycles, rolling/cohort, value and acceptance figures where public.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_program_dna",
+      "tier": "read",
+      "title": "hub_get_program_dna",
+      "summary": "Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_program_questions",
+      "tier": "read",
+      "title": "hub_get_program_questions",
+      "summary": "The application questions of one approved canonical program in display order: exact wording (in untrusted_content), word and character limits, required flag, theme, and how many approved programs ask the same canonica…",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_program_rankings",
+      "tier": "read",
+      "title": "hub_get_program_rankings",
+      "summary": "Approved canonical programs ranked by program value score (what you get versus what you give up, relative to application effort).",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_question_significance",
+      "tier": "read",
+      "title": "hub_get_question_significance",
+      "summary": "How much one canonical question matters across approved programs: how many ask it and what share of approved programs that is, typical limits, theme, and which programs ask it.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_get_universal_questions",
+      "tier": "read",
+      "title": "hub_get_universal_questions",
+      "summary": "Canonical questions asked by most approved programs: the ones to answer first.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "hub_search_programs",
+      "tier": "read",
+      "title": "hub_search_programs",
+      "summary": "Search approved canonical AQUA programs (accelerators, grants, fellowships, VC and other programs) by words, type, status, equity, cash, rolling and deadline window.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ]
+    },
+    {
+      "name": "import_history",
+      "tier": "private_write",
+      "title": "import_history",
+      "summary": "Batch-stage applications the user ALREADY SUBMITTED (a folder inside the workspace inbox/, .md .txt .docx .html .json .csv) as history records: exact question wording, the submitted answer, program, source file sha256…",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "import_local_application",
+      "tier": "private_write",
+      "title": "import_local_application",
+      "summary": "Stage a private local application from a file the user placed in the workspace inbox/ folder (.txt, .md, .html, .csv, .json, .docx).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "init_workspace",
+      "tier": "human_consent",
+      "title": "init_workspace",
+      "summary": "Create an encrypted AQUA workspace ONLY after the user confirms the folder and consent in the MCP client UI (elicitation).",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog"
+      ]
+    },
+    {
+      "name": "inspect_extracted_questions",
+      "tier": "read",
+      "title": "inspect_extracted_questions",
+      "summary": "Show how the questions of a workspace application were extracted: exact wording, parsed requirements, source location, and items the parser was unsure about.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "locate_workspace",
+      "tier": "read",
+      "title": "locate_workspace",
+      "summary": "Where the AQUA workspace is (or would be created): whether this server has one open, the configured path, the folders searched, and the exact init command.",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog"
+      ]
+    },
+    {
+      "name": "match_canonical_questions",
+      "tier": "read",
+      "title": "match_canonical_questions",
+      "summary": "Match an application's questions (or given question texts) against canonical questions in the cached public catalog with the tiered matcher (exact, normalized, semantic, novel).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "prepare_catalog_candidate",
+      "tier": "private_write",
+      "title": "prepare_catalog_candidate",
+      "summary": "Build a sanitized public catalog candidate (program, deadlines, public question wording only) from a staged application imported with a public source_url.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "prepare_packet",
+      "tier": "read",
+      "title": "prepare_packet",
+      "summary": "Readiness report for freezing an application packet: per question the selectable approved version, whether its approval is bound to the exact hash, length limits, required questions, and content integrity.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "present_review_decisions",
+      "tier": "read",
+      "title": "present_review_decisions",
+      "summary": "Build the offline AQUA review file (HTML) for one application from workspace data and save it under exports/reviews/ (skipped in read-only mode).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "read_review_status",
+      "tier": "read",
+      "title": "read_review_status",
+      "summary": "Derived review status of every question in an application (gap, suggested, needs evidence, under review, approved, ...) and the Direct / Adapt / Gap reuse recommendation against the rest of the answer bank.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "record_observed_submission",
+      "tier": "private_write",
+      "title": "record_observed_submission",
+      "summary": "Store an observation that an application may have been submitted (for example a confirmation e-mail the user saved in inbox/), flagged requires_human_attestation.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "refresh_catalog",
+      "tier": "read",
+      "title": "refresh_catalog",
+      "summary": "Fetch approved canonical programs, cycles and questions from the configured public AQUA catalog endpoint (read-only, public key, nothing from the workspace is sent).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "request_evidence",
+      "tier": "private_write",
+      "title": "request_evidence",
+      "summary": "Record an evidence gap on a version (what support is missing).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "search_answer_bank",
+      "tier": "read",
+      "title": "search_answer_bank",
+      "summary": "Search the user's private answers, versions, facts and evidence in this workspace (decrypted in memory only).",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "sign_packet",
+      "tier": "human_only",
+      "title": "sign_packet",
+      "summary": "Never executes.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "submit_catalog_candidate",
+      "tier": "human_only",
+      "title": "submit_catalog_candidate",
+      "summary": "Never executes.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "sync_from_vault_export",
+      "tier": "private_write",
+      "title": "sync_from_vault_export",
+      "summary": "Import an encrypted backup the user exported from the AQUA browser vault and placed in the workspace inbox/ (the same checks as \"aqua-companion import-backup\": integrity, account binding, conflicts recorded, nothing o…",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "verify_packet",
+      "tier": "read",
+      "title": "verify_packet",
+      "summary": "Verify an exported AQUA packet JSON placed in inbox/ (or packets/): canonical manifest, manifest hash, packet id, per-answer hashes, provenance receipts and the signature if present.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    }
+  ],
+  "intentionally_absent": [
+    {
+      "name": "publish_catalog_entry",
+      "why": "Catalog publication needs reviewer authorization and source verification in the AQUA service; the agent can only prepare a candidate."
+    },
+    {
+      "name": "run_migration",
+      "why": "Database migrations change production permissions and require explicit owner authorization."
+    },
+    {
+      "name": "admin_platform",
+      "why": "Platform administration (users, roles, billing, teams) is not a user capability."
+    },
+    {
+      "name": "configure_security",
+      "why": "Security configuration (RLS, keys, service-role access) is owner-only and never handled by agents."
+    },
+    {
+      "name": "read_hosted_answers",
+      "why": "Private answers live in the browser vault and this workspace; the agent never gets database or service-role access."
+    },
+    {
+      "name": "TRANSPORT=http (self-hosted HTTP)",
+      "why": "1.x served unauthenticated write-capable HTTP. 2.0 has stdio locally and the read-only hosted endpoint only."
+    }
+  ],
+  "journey": [
+    {
+      "step": "Install",
+      "how": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help (check the published sha256 first)"
+    },
+    {
+      "step": "Set up a workspace",
+      "how": "init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`; the passphrase is typed by the user, never sent through the model"
+    },
+    {
+      "step": "Load submitted history",
+      "how": "the user puts past submitted applications in the workspace inbox/; import_history stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history"
+    },
+    {
+      "step": "Ingest the application",
+      "how": "import_local_application (a file in inbox/) or get_application_details for a catalog program"
+    },
+    {
+      "step": "Match and reuse",
+      "how": "match_canonical_questions, search_answer_bank, read_review_status (Direct / Adapt / Gap)"
+    },
+    {
+      "step": "Draft",
+      "how": "create_draft_version stages unapproved drafts; request_evidence / attach_evidence"
+    },
+    {
+      "step": "Human review and approval",
+      "how": "the user runs export-backup, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board"
+    },
+    {
+      "step": "Return approvals to the agent",
+      "how": "the user exports a browser backup into inbox/; sync_from_vault_export imports it; read_review_status shows approved with the hash preserved"
+    },
+    {
+      "step": "Packet",
+      "how": "prepare_packet (readiness), the user freezes/exports in the browser, verify_packet checks the export. Nothing is ever submitted by the agent."
+    }
+  ]
+}

@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Exchange Gateway — Installation & Deployment"
+description: "Exchange Gateway — Installation & Deployment (INSTALL.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-10-06
+---
 # Exchange Gateway — Installation & Deployment
 
 ## What you are installing

@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Contribution Exchange — Competitive Positioning"
+description: "Contribution Exchange — Competitive Positioning (COMPETITIVE_POSITIONING.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-08-22
+---
 # Contribution Exchange — Competitive Positioning
 
 ## Claim carefully

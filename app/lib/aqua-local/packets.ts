@@ -43,6 +43,7 @@ import {
   type PacketState,
   type PacketStateRecord,
   type ProvenanceRecord,
+  type ReviewRecord,
   type SignoffRecord,
   type SubmissionMethod,
   type SubmissionOutcome,
@@ -51,7 +52,8 @@ import {
   SUBMISSION_METHODS,
   SUBMISSION_OUTCOMES,
 } from './schema.ts'
-import { compareApprovals, decryptVersionTitle, isBlankBody, VaultNotFoundError } from './repo.ts'
+import { decryptVersionTitle, isBlankBody, VaultNotFoundError } from './repo.ts'
+import { approvalGate } from './status.ts'
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -192,24 +194,22 @@ async function latestApproval(
   storage: VaultStorage,
   versionId: string,
 ): Promise<ApprovalRecord | null> {
-  const all = await storage.getAll<ApprovalRecord>('approvals')
-  const forVersion = all
-    .filter((a) => a.version_id === versionId)
-    .sort(compareApprovals) // LF-18: seq when present, (at, id) for legacy rows
-  const latest = forVersion.length ? forVersion[forVersion.length - 1] : null
-  // IR-003: an imported 'restored' approval is a file claim, not session
-  // evidence — freeze requires a fresh local decision.
-  if (latest?.restored_from_backup) return null
-  if (!latest) return null
-  // IR-017: an agent-classed decision is advisory review, not user approval.
-  // The packet gate requires the latest decision to come from 'human'.
-  if (latest.actor_class !== 'human') return null
-  // F-V1: the approval pins the version's sha256 at approval time. If the
-  // stored version row was swapped, the hashes diverge — treat as no valid
-  // approval (fail closed).
+  // v5: the gate lives in status.ts (approvalGate) so the review board and
+  // freeze share ONE definition. Unchanged pre-v5 rules, all fail closed:
+  //   LF-18  latest by seq (legacy rows by (at, id));
+  //   IR-003 a restored (backup-imported) decision is a file claim → absent;
+  //   IR-017 the latest decision must be actor_class 'human';
+  //   F-V1   approval sha256 must equal the stored version sha256.
+  // v5 addition (stricter only): a later human review decision that
+  // reopened review blocks the approval until a fresh human approval.
+  // Agent reviews and suggestions can neither satisfy nor block the gate.
   const v = await storage.get<VersionRecord>('versions', versionId)
-  if (!v || v.sha256 !== latest.version_sha256) return null
-  return latest
+  if (!v) return null
+  const approvals = await storage.getAll<ApprovalRecord>('approvals')
+  const reviews = await storage.getAll<ReviewRecord>('reviews')
+  const gate = approvalGate(v, approvals, reviews)
+  if (gate.blocked_by_review) return null
+  return gate.approval
 }
 
 /**

@@ -1,4 +1,5 @@
 import type posthogType from "posthog-js";
+import { sanitizeAnalyticsProperties } from "@/lib/url-privacy";
 
 let initialized = false;
 let realPosthog: typeof posthogType | null = null;
@@ -39,5 +40,14 @@ export async function initPostHog() {
     // are enabled server-side via feature flag; refuse them client-side.
     enable_heatmaps: false,
     persistence: "localStorage+cookie",
+    // M09 hardening M5: never ship a deep-linked application URL. Drop
+    // `url` / `next` query params and `#url=` fragments from every
+    // URL-valued property ($current_url, $referrer, $initial_*, …).
+    before_send: (event) => {
+      if (event?.properties) sanitizeAnalyticsProperties(event.properties as Record<string, unknown>);
+      if (event && (event as { $set?: unknown }).$set) sanitizeAnalyticsProperties((event as { $set: Record<string, unknown> }).$set);
+      if (event && (event as { $set_once?: unknown }).$set_once) sanitizeAnalyticsProperties((event as { $set_once: Record<string, unknown> }).$set_once);
+      return event;
+    },
   });
 }

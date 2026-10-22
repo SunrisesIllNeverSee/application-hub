@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Google Search / AI Overviews AEO Log — SigRank SignalAF"
+description: "Google Search / AI Overviews AEO Log — SigRank SignalAF (GOOGLE_SEARCH_LOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Google Search / AI Overviews AEO Log — SigRank SignalAF
 
 ## Run metadata

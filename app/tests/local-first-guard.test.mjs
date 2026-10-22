@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import {
   isLocalFirst,
+  isProductionRuntime,
   refusePrivateWrite,
   refusePrivateTextFields,
   publicUrlForLocalFirstStorage,
@@ -26,6 +27,36 @@ test('isLocalFirst is off by default / with junk values', () => {
   for (const v of ['0', 'false', 'yes', 'on', '']) {
     process.env.AQUA_LOCAL_FIRST = v
     assert.equal(isLocalFirst(), false, `value ${v}`)
+  }
+})
+
+test('isLocalFirst fails CLOSED in production unless explicitly 0/false (H1)', () => {
+  for (const prod of [{ VERCEL_ENV: 'production' }, { NODE_ENV: 'production' }, { VERCEL_ENV: 'production', NODE_ENV: 'production' }]) {
+    assert.equal(isLocalFirst({ ...prod }), true, `unset in ${JSON.stringify(prod)}`)
+    for (const v of ['', 'yes', 'on', 'junk', ' ']) {
+      assert.equal(isLocalFirst({ ...prod, AQUA_LOCAL_FIRST: v }), true, `junk ${JSON.stringify(v)} in prod`)
+    }
+    for (const v of ['0', 'false', ' FALSE ']) {
+      assert.equal(isLocalFirst({ ...prod, AQUA_LOCAL_FIRST: v }), false, `explicit off ${v} in prod`)
+    }
+    assert.equal(isLocalFirst({ ...prod, AQUA_LOCAL_FIRST: '1' }), true)
+  }
+  // previews / dev keep the legacy default
+  assert.equal(isLocalFirst({ VERCEL_ENV: 'preview', NODE_ENV: 'development' }), false)
+  assert.equal(isLocalFirst({ NODE_ENV: 'test' }), false)
+  assert.equal(isProductionRuntime({ VERCEL_ENV: 'preview' }), false)
+})
+
+test('refusePrivateWrite refuses in a production runtime with the flag unset', () => {
+  const saved = { ...process.env }
+  try {
+    delete process.env.AQUA_LOCAL_FIRST
+    process.env.VERCEL_ENV = 'production'
+    const res = refusePrivateWrite()
+    assert.ok(res instanceof Response)
+    assert.equal(res.status, 403)
+  } finally {
+    for (const k of ['VERCEL_ENV', 'AQUA_LOCAL_FIRST']) { if (k in saved) process.env[k] = saved[k]; else delete process.env[k] }
   }
 })
 
@@ -168,4 +199,10 @@ test('next.config fails the build on local-first flag mismatch (wiring)', () => 
   const src = readFileSync(new URL('../next.config.mjs', import.meta.url), 'utf8')
   assert.ok(/AQUA_LOCAL_FIRST/.test(src) && /NEXT_PUBLIC_AQUA_LOCAL_FIRST/.test(src))
   assert.ok(/throw|Error/.test(src), 'mismatch must throw, not warn')
+  assert.match(src, /process\.env\.VERCEL_ENV === 'production'/, 'production build requires the client twin (fail closed)')
+})
+
+test('health route reports the effective (fail-closed) flag', () => {
+  const src = readFileSync(new URL('../app/api/health/route.ts', import.meta.url), 'utf8')
+  assert.match(src, /local_first: isLocalFirst\(\)/)
 })

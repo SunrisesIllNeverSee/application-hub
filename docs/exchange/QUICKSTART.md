@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Contribution Exchange — v0.2 Quickstart"
+description: "Contribution Exchange — v0.2 Quickstart (QUICKSTART.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-hub]
+timestamp: 2026-10-06
+---
 # Contribution Exchange — v0.2 Quickstart
 
 The shortest path from “I own a website” to “agents can discover value, talk to my domain agent, and open a governed exchange.”

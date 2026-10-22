@@ -1,0 +1,39 @@
+{
+  "name": "aqua-companion",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Local AQUA companion: an encrypted, consent-first document workspace that exchanges data with the AQUA browser vault only through its encrypted backup envelope.",
+  "type": "module",
+  "bin": {
+    "aqua-companion": "bin/aqua-companion.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "vendor",
+    "config",
+    "docs",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "vendor": "node scripts/vendor.mjs",
+    "vendor:check": "node scripts/vendor.mjs --check"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SunrisesIllNeverSee/application-hub.git",
+    "directory": "aqua-companion"
+  },
+  "keywords": [
+    "aqua",
+    "local-first",
+    "encrypted",
+    "workspace",
+    "cli"
+  ]
+}

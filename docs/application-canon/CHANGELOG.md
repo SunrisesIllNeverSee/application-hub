@@ -1,3 +1,10 @@
+---
+type: Reference
+title: "Application Canon — Changelog"
+description: "Application Canon — Changelog (CHANGELOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
+---
 # Application Canon — Changelog
 
 All changes to the application canon are logged here with date, what changed, and why.

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Link from 'next/link'
 import {
   assertVaultSecretCompatible,
   previewBackup,
@@ -11,6 +12,7 @@ import {
 } from '@/lib/aqua-local-client/session'
 import type { BackupPreview, ImportResult } from '@/lib/aqua-local-client/session'
 import { useVault } from '@/lib/aqua-local-client/VaultProvider'
+import { countPendingHistory } from '@/lib/aqua-local/history-review'
 
 // F-RESTORE — user-facing Restore Backup workflow (owner-approved gap close).
 // Uses only the existing encrypted import engine (lib/aqua-local/backup.ts).
@@ -58,6 +60,8 @@ export function RestoreBackupPanel({ onRestored }: { onRestored?: () => void }) 
   const [preview, setPreview] = useState<BackupPreview | null>(null)
   const [result, setResult] = useState<ImportResult | null>(null)
   const [busy, setBusy] = useState(false)
+  // M09b: submitted-history records waiting for the user's confirmation
+  const [historyPending, setHistoryPending] = useState(0)
   const [error, setError] = useState('')
   const fileTextRef = useRef<string>('')
 
@@ -113,6 +117,11 @@ export function RestoreBackupPanel({ onRestored }: { onRestored?: () => void }) 
       // immediately readable (empty vault: secret becomes the vault secret;
       // non-empty: it already matched, verified above).
       await vault.unlock(secret)
+      try {
+        setHistoryPending(await countPendingHistory(storage, secret))
+      } catch {
+        setHistoryPending(0)
+      }
       onRestored?.()
     } catch (e) {
       setError(describeError(e))
@@ -125,6 +134,7 @@ export function RestoreBackupPanel({ onRestored }: { onRestored?: () => void }) 
     setState('pick')
     setPreview(null)
     setResult(null)
+    setHistoryPending(0)
     setError('')
     setFile(null)
     fileTextRef.current = ''
@@ -260,6 +270,14 @@ export function RestoreBackupPanel({ onRestored }: { onRestored?: () => void }) 
               ` · ${result.skipped_duplicates} already on this device were skipped`}
             . Reload the page — everything stays on this device.
           </p>
+          {historyPending > 0 && (
+            <p className="mt-2 text-xs">
+              This vault holds submitted answers imported by the AQUA companion that you have not confirmed yet.{' '}
+              <Link href="/history" data-testid="restore-history-link" className="font-medium underline underline-offset-2">
+                Confirm submitted history ({historyPending})
+              </Link>
+            </p>
+          )}
         </div>
       )}
     </section>

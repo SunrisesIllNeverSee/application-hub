@@ -1,3 +1,10 @@
+---
+type: Findings
+title: "Grok AEO Raw Evidence"
+description: "Grok AEO Raw Evidence (GROK_RAW.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Grok AEO Raw Evidence
 
 - Engine: Grok (X-hosted interface)

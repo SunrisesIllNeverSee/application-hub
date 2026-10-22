@@ -83,6 +83,18 @@ new capture → 01-inbox/<raw>.html
 
 The bank compounds. Each step's output feeds the next.
 
+## Lane naming: 06-answers / 07-answers / 07-apply (folder map, 2026-10-22)
+
+Three folder names overlap or collide. No folders were moved, renamed or deleted; this section is the canonical reading.
+
+| Folder | Canonical meaning | Status |
+|---|---|---|
+| `06-answers/` | The reusable answer bank (`index/` by theme / QU code, `canonical/`). The only live answers lane. | LIVE, canonical |
+| `07-answers/` | Contains only `_spec.md`, a stale copy of the pre-rename answer-bank spec (the lane was renamed 07-answers to 06-answers; see `AGENTS.md` memory log). Holds no data. | SUPERSEDED, spec only, do not use for new work |
+| `07-apply/` | The active application workbench (one packet per program, `need-to-apply/` queue, `_shared/`). Its `_spec.md` heading still says "06-apply"; the folder number 07 is correct. | LIVE, canonical |
+
+Consequences: the number 07 is used twice (`07-answers` stale, `07-apply` live). When a document says "07", it means `07-apply` unless it names an answer bank, which is always `06-answers`. `08-submitted/` is unchanged. Resolving the collision by moving or deleting `07-answers/` is deferred to an OWNER-approved structural change.
+
 ## Why this flow works
 
 - `06-answers/` becomes the compounding knowledge asset.

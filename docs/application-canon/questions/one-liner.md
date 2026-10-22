@@ -12,6 +12,11 @@ asked_by:
   - 500-global
   - techstars
   - alchemist-accelerator
+type: Reference
+title: "Question Profile: What does your startup do in one sentence?"
+description: "Question Profile: What does your startup do in one sentence? (one-liner.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Question Profile: What does your startup do in one sentence?

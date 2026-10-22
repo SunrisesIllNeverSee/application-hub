@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "AQUA Application Hub — SEO/GEO/AEO Phased Implementation Plan"
+description: "AQUA Application Hub — SEO/GEO/AEO Phased Implementation Plan (AQUA_PHASED_PLAN.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo]
+timestamp: 2026-10-06
+---
 # AQUA Application Hub — SEO/GEO/AEO Phased Implementation Plan
 
 > **Target site:** aquaidp.xyz (Next.js 15, Vercel, `app/` root)

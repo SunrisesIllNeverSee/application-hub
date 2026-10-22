@@ -16,7 +16,8 @@ import {
   readVersion,
   decryptVersionTitle,
   runVaultPrivacyMigration,
-  approveVersion,
+  recordHumanApproval,
+  recordHumanRevocation,
   compareApprovals,
   exportVault,
   importVault,
@@ -98,6 +99,35 @@ export interface BankEntry {
 // Keyed by the resolved uid (or 'anon') — an account switch mid-session must
 // re-resolve, never hand a different user the previous user's vault handle.
 const storagePromises = new Map<string, Promise<VaultStorage>>()
+// v5: the RAW (unguarded) handles behind storagePromises, so sign-out /
+// account switch can close the underlying IndexedDB connections instead of
+// only dropping references (a closed connection also unblocks schema
+// upgrades in other tabs).
+const rawHandles = new Set<VaultStorage>()
+
+function releaseVaultHandles(): void {
+  storagePromises.clear()
+  for (const h of rawHandles) {
+    try {
+      h.close?.()
+    } catch {
+      // already closed — nothing to release
+    }
+  }
+  rawHandles.clear()
+}
+
+type VaultOpener = (dbName: string) => Promise<VaultStorage>
+let vaultOpener: VaultOpener = openVaultStorage
+
+/** TEST SEAM — never called by app code. Replace the IndexedDB opener (e.g.
+    with per-name in-memory stores) so getStorage()'s per-uid routing,
+    epoch revocation and close-on-sign-out run without IndexedDB. Pass null
+    to restore the real opener. */
+export function __setVaultOpenerForTests(opener: VaultOpener | null): void {
+  vaultOpener = opener ?? openVaultStorage
+  releaseVaultHandles()
+}
 
 // Identity lifecycle (M07-ID-002). The resolved name + owning uid are a
 // routing hint bound to `resolutionEpoch`: invalidateVaultIdentity() clears
@@ -121,9 +151,9 @@ export function invalidateVaultIdentity(): void {
   lastResolvedDbName = null
   lastResolvedUid = null
   // Every cached handle is epoch-bound — all are dead after this bump, so
-  // drop them all (the next getStorage() reopens cleanly). Persistent
-  // IndexedDB data is untouched.
-  storagePromises.clear()
+  // drop them all and close their connections (the next getStorage()
+  // reopens cleanly). Persistent IndexedDB data is untouched.
+  releaseVaultHandles()
 }
 
 /** Uid owning the currently resolved vault — lets auth-change handlers spot
@@ -210,7 +240,7 @@ function rememberResolved(name: string, uid: string): ResolvedVault {
     // swap ahead of the auth listener) — kill every outstanding handle:
     // a write meant for the previous account must never land in it now.
     resolutionEpoch++
-    storagePromises.clear()
+    releaseVaultHandles()
   }
   lastResolvedDbName = name
   lastResolvedUid = uid
@@ -430,7 +460,16 @@ export async function getStorage(): Promise<{ storage: VaultStorage; dbName: str
   const { name: dbName, epoch } = await resolveVaultIdentity()
   let p = storagePromises.get(dbName)
   if (!p) {
-    p = openVaultStorage(dbName).then((s) => guardVaultHandle(dbName, epoch, s))
+    p = vaultOpener(dbName).then((raw) => {
+      if (epoch !== resolutionEpoch) {
+        // Invalidated while opening — never keep a connection for a dead
+        // identity alive.
+        raw.close?.()
+      } else {
+        rawHandles.add(raw)
+      }
+      return guardVaultHandle(dbName, epoch, raw)
+    })
     storagePromises.set(dbName, p)
   }
   return { storage: await p, dbName }
@@ -622,12 +661,30 @@ export function readBody(
   return readVersion(storage, secret, versionId).then(({ title, body }) => ({ title, body }))
 }
 
+/**
+ * M09 W5 — hash-bound human decision from the Answer Bank. Routes to the v5
+ * approval API (recordHumanApproval / recordHumanRevocation): the caller
+ * passes the sha256 it DISPLAYED and the vault refuses on mismatch. The
+ * pre-v5 unbound approveVersion primitive is no longer reachable from UI.
+ */
 export function approve(
   storage: VaultStorage,
-  versionId: string,
-  decision: 'approved' | 'rejected',
+  input: {
+    version_id: string
+    expected_sha256: string
+    decision: 'approved' | 'rejected'
+    actor_id?: string | null
+    secret?: string
+  },
 ): Promise<ApprovalRecord> {
-  return approveVersion(storage, { version_id: versionId, decision, actor_class: 'human' })
+  const human = {
+    version_id: input.version_id,
+    expected_sha256: input.expected_sha256,
+    actor_id: input.actor_id || currentResolvedUid() || 'local-user',
+    via: 'review_ui' as const,
+    secret: input.secret,
+  }
+  return input.decision === 'approved' ? recordHumanApproval(storage, human) : recordHumanRevocation(storage, human)
 }
 
 /** LF-15 backup-reminder bookkeeping — a localStorage timestamp, nothing private. */
@@ -808,7 +865,8 @@ export function restoreBackup(
 
 /** Export an encrypted backup and trigger a user-initiated file download. */
 export async function downloadBackup(storage: VaultStorage, secret: string): Promise<string> {
-  const json = await exportVault(storage, secret)
+  // M09 hardening: bind the backup to the signed-in vault account (fingerprint inside the encrypted payload).
+  const json = await exportVault(storage, secret, { account_uid: currentResolvedUid() })
   const stamp = new Date().toISOString().slice(0, 10)
   const filename = `aqua-local-backup-${stamp}.json`
   const blob = new Blob([json], { type: 'application/json' })

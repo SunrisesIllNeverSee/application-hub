@@ -1,3 +1,10 @@
+---
+type: Analysis
+title: "Grok AEO Audit Log"
+description: "Grok AEO Audit Log (GROK_LOG.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # Grok AEO Audit Log
 
 - Engine: Grok (X-hosted interface)

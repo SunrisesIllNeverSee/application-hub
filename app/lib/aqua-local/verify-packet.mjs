@@ -8,9 +8,14 @@
 //   cat packet-export.json | node verify-packet.mjs -
 //
 // Exit 0 = all checks PASS. Exit 1 = any check FAIL. Per-check report on stdout.
+//
+// M09 W8: the checks live in `verifyPacketText(raw)` (pure: no I/O, no
+// exit) so the local companion's agent interface can vendor and reuse the
+// exact same logic. The CLI below only reads input, prints and exits.
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, realpathSync } from 'node:fs'
 import { webcrypto } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
 
 const subtle = webcrypto.subtle
 const te = new TextEncoder()
@@ -35,47 +40,36 @@ function b64decode(b64) {
   return new Uint8Array(Buffer.from(b64, 'base64'))
 }
 
-const results = []
-function check(name, pass, detail = '') {
-  results.push({ name, pass, detail })
-  console.log(`${pass ? 'PASS' : 'FAIL'} ${name}${detail ? ` — ${detail}` : ''}`)
-}
-
-async function main() {
-  const arg = process.argv[2]
-  if (!arg) {
-    console.error('usage: node verify-packet.mjs <packet-export.json> | -')
-    process.exit(2)
-  }
+/**
+ * Run every check on a packet export's text. Returns
+ * { ok, checks: [{ name, pass, detail }] }. Never throws for bad input.
+ */
+export async function verifyPacketText(raw) {
+  const results = []
+  const check = (name, pass, detail = '') => results.push({ name, pass, detail })
+  const done = () => ({ ok: results.length > 0 && results.every((r) => r.pass), checks: results })
 
   // --- check 1: file parses as JSON ---
-  let raw
-  try {
-    raw = arg === '-' ? readFileSync(0, 'utf8') : readFileSync(arg, 'utf8')
-  } catch (e) {
-    check('read input', false, e.message)
-    return finish()
-  }
   let doc
   try {
     doc = JSON.parse(raw)
   } catch (e) {
     check('parse JSON', false, e.message)
-    return finish()
+    return done()
   }
   check('parse JSON', true)
 
   // --- check 2: export format ---
   check(
     'export format',
-    doc.format === 'aqua-local-packet',
-    `format=${JSON.stringify(doc.format)}`,
+    doc?.format === 'aqua-local-packet',
+    `format=${JSON.stringify(doc?.format)}`,
   )
 
-  const packet = doc.packet
+  const packet = doc?.packet
   if (!packet || typeof packet !== 'object') {
     check('packet object present', false)
-    return finish()
+    return done()
   }
   check('packet object present', true)
 
@@ -161,16 +155,52 @@ async function main() {
     check('signoff signature', true, 'unsigned packet — manifest hash only (truthful no-signature state)')
   }
 
-  finish()
+  return done()
 }
 
-function finish() {
+// --- CLI ---------------------------------------------------------------------
+
+function print(r) {
+  console.log(`${r.pass ? 'PASS' : 'FAIL'} ${r.name}${r.detail ? ` — ${r.detail}` : ''}`)
+}
+
+function finish(results) {
   const failed = results.filter((r) => !r.pass)
   console.log(`\n${failed.length === 0 ? 'PASS' : 'FAIL'} — ${results.length - failed.length}/${results.length} checks passed`)
   process.exit(failed.length === 0 ? 0 : 1)
 }
 
-main().catch((e) => {
-  console.error(`FAIL — verifier error: ${e.message}`)
-  process.exit(1)
-})
+async function main() {
+  const arg = process.argv[2]
+  if (!arg) {
+    console.error('usage: node verify-packet.mjs <packet-export.json> | -')
+    process.exit(2)
+  }
+  let raw
+  try {
+    raw = arg === '-' ? readFileSync(0, 'utf8') : readFileSync(arg, 'utf8')
+  } catch (e) {
+    const r = { name: 'read input', pass: false, detail: e.message }
+    print(r)
+    return finish([r])
+  }
+  const { checks } = await verifyPacketText(raw)
+  for (const r of checks) print(r)
+  finish(checks)
+}
+
+function isMain() {
+  if (!process.argv[1]) return false
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+  } catch {
+    return false
+  }
+}
+
+if (isMain()) {
+  main().catch((e) => {
+    console.error(`FAIL — verifier error: ${e.message}`)
+    process.exit(1)
+  })
+}

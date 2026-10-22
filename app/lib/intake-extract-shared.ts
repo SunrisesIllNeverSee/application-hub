@@ -245,6 +245,28 @@ export function parseStructuredText(text: string): ExtractedPair[] {
 const Q_RE = /^\s*(?:q\s*[:.)]|question\s*[:.)]|#{1,4}\s*|\d+[\).]\s+|[-*•]\s*)?\s*(.+\?)\s*$/i
 const A_RE = /^\s*(?:a\s*[:.)]|answer\s*[:.)])\s*(.*)$/i
 const QLAB_RE = /^\s*(?:q|question)\s*[:.)]\s*(.+)$/i
+const EXPLICIT_MARKER_RE = /^\s*(?:q\s*[:.)]|question\s*[:.)]|#{1,4}\s*|\d+[\).]\s+|[-*•]\s*\S)/i
+
+export type QALineKind = 'question' | 'answer_label' | 'other'
+
+/**
+ * Line grammar shared by the deterministic Q/A parser and the M09 catalog
+ * extractor (lib/catalog/extract.ts): classifies one line with the SAME
+ * Q:/Question:/###/numbered/bullet/'?' rules used above. `text` is the
+ * question wording with the marker removed (exact otherwise), or the inline
+ * answer text after an A:/Answer: label.
+ */
+export function classifyQALine(rawLine: string): { kind: QALineKind; text: string; explicit_marker: boolean } {
+  const line = rawLine.trim()
+  const explicit = EXPLICIT_MARKER_RE.test(line)
+  const a = line.match(A_RE)
+  if (a) return { kind: 'answer_label', text: (a[1] ?? '').trim(), explicit_marker: true }
+  const lab = line.match(QLAB_RE)
+  if (lab) return { kind: 'question', text: lab[1].trim(), explicit_marker: true }
+  const q = line.match(Q_RE)
+  if (q) return { kind: 'question', text: q[1].trim(), explicit_marker: explicit }
+  return { kind: 'other', text: line, explicit_marker: explicit }
+}
 
 export function extractQAPairsDeterministicReport(text: string): QAParseReport {
   const lines = text.split(/\r?\n/)

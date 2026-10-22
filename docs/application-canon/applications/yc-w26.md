@@ -7,6 +7,11 @@ domain: founder
 status: upcoming
 deadline: [FUTURE EDIT — confirm deadline]
 url: https://www.ycombinator.com/apply
+type: Reference
+title: "Application Profile: Y Combinator Winter 2026"
+description: "Application Profile: Y Combinator Winter 2026 (yc-w26.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Application Profile: Y Combinator Winter 2026

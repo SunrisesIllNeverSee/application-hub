@@ -9,6 +9,11 @@ is_universal: true
 typical_word_limit: varies
 asked_by:
   - general
+type: Reference
+title: "Question Profile: Tell me about yourself"
+description: "Question Profile: Tell me about yourself (tell-me-about-yourself.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [application-canon]
+timestamp: 2026-09-08
 ---
 
 # Question Profile: Tell me about yourself

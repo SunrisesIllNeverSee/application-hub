@@ -1,4 +1,9 @@
 #!/bin/bash
 set -e
 root="$(git rev-parse --show-toplevel)"
+# Refuse staged unresolved merge-conflict markers.
+if git diff --cached --name-only --diff-filter=ACM -z | xargs -0 -r grep -lE '^(<<<<<<<|>>>>>>>) ' -- 2>/dev/null; then
+  echo "pre-commit: unresolved merge-conflict markers in the files above" >&2
+  exit 1
+fi
 python3 "$root/.repo/scripts/repo_check.py"

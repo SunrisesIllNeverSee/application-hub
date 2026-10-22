@@ -1,60 +1,73 @@
 /**
- * MCP server manifest for AQUA Application Hub.
+ * MCP manifest for AQUA (M09b, local-first).
  *
- * The AQUA MCP server is a local/stdio product surface — it runs inside the
- * user agent environment (Claude Desktop, Cursor, Windsurf) and connects to
- * the user Supabase session. There is no public hosted MCP endpoint at
- * aquaidp.xyz. This manifest tells agents where to find the server source,
- * how to install it, and what transport it supports.
+ * The agent path is the local AQUA companion: a stdio MCP server the user
+ * runs on their own machine, working on one consented, encrypted workspace
+ * plus the public catalog. It holds no account token and no database key;
+ * approvals, signing and packet export stay with the human in the browser.
+ *
+ * Every tool name, tier, count and install line here comes from
+ * lib/agent-guidance.generated.mjs (scripts/gen-agent-guidance.mjs), so the
+ * manifest cannot drift from the registry or from llms.txt / /agents.
  */
 
 import { NextResponse } from 'next/server'
+import { AGENT_GUIDANCE as G } from '@/lib/agent-guidance.generated.mjs'
 
 export const revalidate = 3600
 
 export async function GET() {
+  const byTier: Record<string, string[]> = {}
+  for (const t of G.tools) (byTier[t.tier] ??= []).push(t.name)
   const manifest = {
     schemaVersion: '1.0',
-    name: 'aqua-mcp-server',
-    version: '1.0.1',
-    description: 'MCP server for AQUA Application Hub — programs, questions, rankings, and applicant intelligence',
+    name: 'aqua-companion',
+    version: G.companion.version,
+    description:
+      'Local-first AQUA agent interface: a stdio MCP server over one consented, encrypted workspace on the user\'s machine plus the public AQUA catalog. No account token, no database key; approvals happen only in the AQUA browser review.',
     transport: {
       stdio: {
         command: 'npx',
-        args: ['-y', 'aqua-mcp-server'],
-        env: {
-          AQUA_LOCAL_FIRST: '1',
-          SUPABASE_URL: '${NEXT_PUBLIC_SUPABASE_URL}',
-          SUPABASE_ANON_KEY: '${NEXT_PUBLIC_SUPABASE_ANON_KEY}',
-          SUPABASE_ACCESS_TOKEN: 'user session JWT',
-        },
+        args: ['--yes', G.companion.tarball.url, 'mcp', '--keychain'],
+        env: {},
+        note: 'The server starts without a workspace; locate_workspace / init_workspace set one up with the user\'s consent. The passphrase comes from the macOS Keychain, the server environment or a terminal prompt, never from the model.',
       },
-      http: {
-        url: 'http://localhost:3000/mcp',
-        note: 'Self-hosted Streamable HTTP transport. Set TRANSPORT=http and PORT. Not hosted publicly by aquaidp.xyz.',
+      hosted: {
+        url: G.hosted_mcp.url,
+        status: G.hosted_mcp.status,
+        scope: G.hosted_mcp.scope,
       },
     },
-    npm: 'https://www.npmjs.com/package/aqua-mcp-server',
-    npmStatus: 'aqua-mcp-server@1.0.1 is published with a real dist/ (201 files, ~455KB unpacked) — npx aqua-mcp-server works. 1.0.0 was a metadata-only stub; use >=1.0.1.',
-    install: 'git clone https://github.com/SunrisesIllNeverSee/application-hub.git && cd application-hub/application-hub-mcp-server && npm ci && npm run build && node dist/index.js',
-    capabilities: {
-      tools: true,
-      resources: true,
-      prompts: true,
+    install: {
+      tarball: G.companion.tarball.url,
+      sha256: G.companion.tarball.sha256,
+      sha256Url: G.companion.tarball.sha256_url,
+      latest: G.companion.tarball.latest_url,
+      help: G.install.help,
+      claudeCode: G.install.claude_code,
+      npm: G.companion.npm_status,
     },
-    toolCount: 31,
-    toolCategories: {
-      public: ['hub_search_programs', 'hub_get_program_detail', 'hub_get_program_by_slug', 'hub_get_program_rankings', 'hub_get_heat_scores', 'hub_get_program_questions', 'hub_find_similar_questions', 'hub_get_universal_questions', 'hub_get_program_dna', 'hub_get_question_significance', 'hub_get_acceptance_stats'],
-      authenticated: ['hub_get_profile_answers', 'hub_get_application_readiness', 'hub_get_fit_score', 'hub_find_best_programs', 'hub_rank_my_answers', 'hub_log_draft_run', 'hub_save_answer', 'hub_get_answer_review_context', 'hub_save_answer_review', 'hub_stress_test_answer', 'hub_intake_application', 'hub_fill_application', 'hub_set_borrow_threshold', 'hub_search_answer_bank'],
-      canonical: ['aqua.ingest_application', 'aqua.process_reward', 'aqua.get_variations', 'aqua.qualify_answer', 'aqua.get_canonical_package', 'aqua.export_package'],
+    mcpServerPackage: {
+      name: G.mcp_server.package,
+      version: G.mcp_server.version,
+      status: G.mcp_server.status,
+      npm: 'https://www.npmjs.com/package/aqua-mcp-server',
     },
-    resourceCategories: ['programs', 'questions', 'rankings'],
-    promptTemplates: ['opportunity_scout', 'draft_answer', 'program_comparison'],
-    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/application-hub-mcp-server',
-    docs: 'https://aquaidp.xyz/mcp',
+    capabilities: { tools: true, elicitation: 'used by init_workspace when the client declares it' },
+    toolCount: G.total,
+    toolSource: G.tool_source,
+    tiers: G.tiers,
+    toolCategories: byTier,
+    tools: G.tools,
+    intentionallyAbsent: G.intentionally_absent,
+    catalogConfig: G.catalog_config,
+    journey: G.journey,
+    docs: 'https://aquaidp.xyz/agents',
+    markdown: 'https://aquaidp.xyz/agents.md',
+    repository: 'https://github.com/SunrisesIllNeverSee/application-hub/tree/main/aqua-companion',
     auth: {
-      type: 'Supabase JWT',
-      description: 'User-account tools require a Supabase JWT; public discovery tools do not. Local-first mode refuses hosted private-content writes even with authentication.',
+      type: 'none',
+      description: 'No tool takes a password, token or JWT. Private data stays in the user\'s browser vault and local workspace; the browser is where the human approves.',
     },
   }
 

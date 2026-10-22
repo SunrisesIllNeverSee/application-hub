@@ -188,12 +188,21 @@ export async function POST(req: NextRequest) {
 
     // 5. Process items based on mode.
     const embedByok = await loadEmbeddingIntegrations(supabase, user.id)
+    // M09 hardening H1: pasted text is USER-SUPPLIED, so this legacy route
+    // never touches the shared catalog with the service role. Every write
+    // here runs on the caller's user-scoped client; under migration 054 a
+    // NEW canonical question insert is refused (find-or-create then reports
+    // the item as not saved) — only existing canonical questions link. New
+    // public questions enter the catalog through the curator pipeline
+    // (/api/catalog/candidates), never from a paste.
 
     type ResultItem = {
       question_text: string
       theme: string
       was_new_question: boolean
       was_new_answer: boolean
+      match_tier?: string
+      needs_review?: boolean
     }
     const items: ResultItem[] = []
 
@@ -225,6 +234,8 @@ export async function POST(req: NextRequest) {
           theme: q.theme,
           was_new_question: result.wasNew,
           was_new_answer: false,
+          match_tier: result.decision.tier,
+          needs_review: result.decision.needs_review,
         })
       }
     } else {
@@ -285,6 +296,8 @@ export async function POST(req: NextRequest) {
           theme: pair.theme,
           was_new_question: result.wasNew,
           was_new_answer: wasNewAnswer,
+          match_tier: result.decision.tier,
+          needs_review: result.decision.needs_review,
         })
       }
     }

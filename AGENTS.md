@@ -1,131 +1,70 @@
-# Repository Operating Instructions
+---
+type: Reference
+title: "Application Hub — Agent Operating Instructions"
+description: "Instructions for Claude, Devin and other agents working in this product repository: authority, data rules, invariants, tests, coordination."
+tags: [agents, repo-standard, instructions]
+timestamp: 2026-10-22
+---
+# Agent Operating Instructions: application-hub
+
+This is the **product repository** for AQUA / Application Hub (Next.js app, MCP server, browser extension, Supabase migrations). It is **public on GitHub**. Claude Code reads this through `CLAUDE.md` (`@AGENTS.md`); other agents read it directly.
 
 ## Startup order
 
-Before creating, moving, renaming, or deleting files:
+1. Read `REPO.yaml` and this file.
+2. Run `bash .repo/scripts/install-hooks.sh` once per clone (sets `core.hooksPath` to `.repo/git-hooks`, so `repo_check.py` runs on every commit; see `docs/REPOSITORY-STANDARD.md`).
+3. Run `python3 .repo/scripts/repo_check.py` before structural changes.
+4. Read coordination state if available (see Coordination below).
 
-1. Read `REPO.yaml`.
-2. Read this file.
-3. If coordination is enabled, read `.coord/micro/STATE.md` and the tail of `.coord/micro/SCRATCHPAD.md`.
-4. If the work spans repositories, read `.coord/macro/LINK.yaml` and `.coord/macro/MACRO_STATE.md`.
-5. Run `python3 .repo/scripts/repo_check.py` before making structural changes to understand existing drift.
+## Authority
 
-## Root policy
+- Governance contracts live in the **aquarnd** repo (default path `~/Developer/_7_labs/aquarnd`), not here. This repo **implements** them.
+- Local-first architecture authority: `aqua-canon/Planning/Execution/m06/local-first/LF-Architecture-Contract.md` in aquarnd.
+- Milestone directives and plans live under `aqua-canon/Planning/Execution/` in aquarnd. If a contract and this repo disagree, the contract wins; report the drift, do not silently reconcile.
+- Production migration ledger is authoritative over migration file headers (`docs/MIGRATIONS.md`).
 
-Do not create a new root directory unless it is allowed by the selected `.repo/profiles/<type>.json` profile or explicitly added to `REPO.yaml`.
+## Public-repo data rules
 
-Do not place reports, design docs, PDFs, generated outputs, screenshots, exports, or temporary notes in root.
+- Never commit secrets, API keys, tokens, `.env*` files, user data, private answer text, session captures, or exports from a real vault.
+- Do not write security-sensitive prose (exploit details, unpatched weaknesses, credential locations) into commits, docs or PR text. Put such notes in aquarnd.
+- Test fixtures must be synthetic.
 
-## Canonical-document policy
+## Local-first invariants (do not weaken)
 
-Do not create `_final`, `_new`, `_updated`, `_revised`, `_copy`, numbered-copy, or similar versions of active documents. Update the canonical file or archive the superseded file with provenance.
+- Answer bodies, versions, approvals, packets and submission history live only in the browser-encrypted vault (`app/lib/aqua-local/`). They never reach the server.
+- `app/lib/aqua-local/` has zero network imports, except the single marked egress site `providers.ts` (BYOK, consent-gated).
+- Server write paths for private bodies refuse under `AQUA_LOCAL_FIRST` (fail closed). Postgres enforces the boundary with deny-write RLS.
+- Approval is a human act. Agent-classed approvals never count. No manufactured attestation or fake provider receipts.
+- Guard tests: `app/tests/local-first-guard.test.mjs`, `webextension/application-hub/test/local-first.test.mjs`.
 
-## Generated-output policy
-
-Generated reports/results belong in the profile's artifact/result root, not alongside source.
-
-## Archive policy
-
-Archive is provenance-preserving. Do not silently edit archived material. If an archived record must change, document why in the active coordination bus/handoff.
-
-## Micro coordination
-
-Micro coordination lives under `.coord/micro/`.
-
-- Before work: set a role and read state + scratchpad tail.
-- During work: use the scratchpad for material task assignment, blockers, decisions, and handoff notes.
-- Before stopping: save state and sign out.
-
-Do not create alternate scratchpads or parallel hidden coordination buses.
-
-## Macro coordination
-
-Macro coordination lives under `.coord/macro/` and is used only when a build spans repositories/systems. It may point to a shared build hub. Do not use macro coordination as a permanent organization inventory.
-
-## Git behavior
-
-- Prefer small, intentional commits.
-- Do not force-push the protected default branch.
-- Do not bypass repository validation just to merge.
-- Structural moves should be isolated where practical so link/import breakage is reviewable.
-
-## Validation
-
-Before handoff or PR:
+## Tests and checks
 
 ```bash
+cd app && npm test                 # unit (tests/*.test.mjs) + vault suites + extension tests
+cd app && npm run test:unit        # tests/*.test.mjs
+cd app && npm run test:vault       # lib/aqua-local run-*.mjs, session, score runners
+cd app && npm run type-check && npm run build
+cd application-hub-mcp-server && npm test && npm run check   # vitest, typecheck, build
 python3 .repo/scripts/repo_check.py --ci
 ```
 
-## stickypads — check the shared board
+Vault runners use plain `node` and need Node 22.18+ (native `.ts` type stripping). Use relative imports with `.ts` extensions in `app/lib/aqua-local*`; the `@/` alias does not resolve under plain node. CI (`.github/workflows/ci.yml`) runs all of the above.
 
-Before starting work, check the shared operational board for tasks assigned
-to you or this repo:
+## Coordination (one mechanism)
 
-```bash
-python3 ~/Developer/_control/stickypads/scripts/check_in.py --agent <your-name>
-```
+- The only coordination bus is **aquarnd `.coord/micro/`** (roles LEAD and ASSIST; sign in with `bash .coord/bin/start.sh` from the aquarnd root). Read its `AGENTS.md` and `.coord/micro/handoffs/ONBOARDING.md`.
+- This repo's `.coord/` (if present) is **machine-local session state and is gitignored**. Do not commit it, do not treat it as the bus, do not create alternate scratchpads here.
+- If aquarnd is not on this machine, work without the bus and say so in your PR or report. `.repo/scripts/session-start.sh` reports availability.
+- Stay in your lane: do not edit another role's scratchpad entries, state or handoffs.
 
-Or clone the ello-ops repo and run from there. The board has:
-- TODOs across all repos
-- Memos/notes from other agents and the owner
-- Current session state
+## Evidence versus session state
 
-If you discover work that can't be completed immediately, create a task or
-drop a note:
+- **Governance evidence** (verification outputs, decisions, handoffs) is committed in aquarnd, or for infra checks in `docs/evidence/` here. It must contain no secrets.
+- **Machine-local session state** (`.coord/`, scratch files, local vault data, `.env*`) is never committed.
 
-```bash
-# Create a formal task
-python3 ~/Developer/_control/stickypads/scripts/create_task.py \
-    --title "Specific actionable title" \
-    --project <this-repo-name> \
-    --owner <your-name>
+## Repository rules
 
-# Drop a quick memo (no format required)
-python3 ~/Developer/_control/stickypads/scripts/drop.py \
-    --from <this-repo-name> \
-    "Quick note about what needs attention"
-```
-
-At session end or meaningful completion, reconcile this repo's coord kit
-state into stickypads:
-
-```bash
-python3 ~/Developer/_control/stickypads/scripts/reconcile_coord.py \
-    --repo-path . --dry-run
-```
-
-
-## Filesystem MCP — SUGGESTED for file operations
-
-The Filesystem MCP is available for structured file operations across the
-estate. When working with multiple files or exploring directory structure,
-consider using:
-
-- `list_directory` / `directory_tree` — structured directory traversal
-- `search_files` — glob-pattern file search
-- `read_multiple_files` — batch file reads
-
-Allowed paths: ~/Developer, ~/.config/devin, ~/.config/sigrank, ~/Desktop
-
-
-## MCP Server Recommendations for This Repo
-
-Full index: `Moses_Enterprise_B2BPilot_/_workspace/MCP_INDEX.md`
-
-**Primary (use regularly):**
-- `gsc-seo-mos2es-xyz` — Google Search Console for aquaidp.xyz SEO data
-- `moses-search` — AI Search for mos2es.org content (AQUA proxies to it)
-- `web-scrape` — extract content from aquaidp.xyz live pages, check structured data
-- `indexnow` — submit new/changed URLs to Bing/Yandex after deploys
-
-**Secondary (use as needed):**
-- `context7` — verify Next.js / React / Tailwind patterns before writing
-- `playwright` / `chrome-devtools` — visual verification of aquaidp.xyz pages
-- `no-slop` / `ai-slop-checker` — check UI copy for AI writing tells
-- `repomix` — pack codebase for handoffs
-
-**Not needed here:**
-- `supabase` / `vercel` — those are for the sigrank-app repo
-- `posthog` / `ds-server` / `sigadmin` — those are for the b2bpilot workers repo
-- `blender` / `worldmonitor` — unrelated
+- No new root directories or root documents beyond `REPO.yaml` allowances. Reports go in `docs/`, generated output in `artifacts/`.
+- No `_final`, `_new`, `_copy` style duplicates. Update the canonical file or archive with provenance.
+- Never rename or edit existing migration files; add the next numeric prefix. Do not apply production migrations without OWNER authorization.
+- Small, intentional commits. Do not force-push `main`. Do not bypass hooks or validation.

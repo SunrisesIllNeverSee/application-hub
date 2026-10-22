@@ -1,0 +1,97 @@
+[
+  {
+    "name": "desktop: board lists every question with status, filters and progress",
+    "ok": true,
+    "ms": 892
+  },
+  {
+    "name": "desktop: APPROVE requires confirm and binds the displayed version hash",
+    "ok": true,
+    "ms": 705
+  },
+  {
+    "name": "desktop: EDIT creates a new child version and the approval does not transfer",
+    "ok": true,
+    "ms": 482
+  },
+  {
+    "name": "desktop: EVIDENCE / HELP request is recorded and is not an approval",
+    "ok": true,
+    "ms": 899
+  },
+  {
+    "name": "desktop: DISCUSS comment is bound to the displayed version, history labelled across versions",
+    "ok": true,
+    "ms": 816
+  },
+  {
+    "name": "desktop: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved",
+    "ok": true,
+    "ms": 834
+  },
+  {
+    "name": "desktop: one-at-a-time mode with next / previous",
+    "ok": true,
+    "ms": 984
+  },
+  {
+    "name": "desktop: export HTML → decide offline → decision file → import → confirm",
+    "ok": true,
+    "ms": 2220
+  },
+  {
+    "name": "desktop: dark theme renders the card",
+    "ok": true,
+    "ms": 451
+  },
+  {
+    "name": "desktop: no page errors",
+    "ok": true,
+    "ms": 0
+  },
+  {
+    "name": "mobile: board lists every question with status, filters and progress",
+    "ok": true,
+    "ms": 925
+  },
+  {
+    "name": "mobile: APPROVE requires confirm and binds the displayed version hash",
+    "ok": true,
+    "ms": 751
+  },
+  {
+    "name": "mobile: EDIT creates a new child version and the approval does not transfer",
+    "ok": true,
+    "ms": 551
+  },
+  {
+    "name": "mobile: EVIDENCE / HELP request is recorded and is not an approval",
+    "ok": true,
+    "ms": 934
+  },
+  {
+    "name": "mobile: DISCUSS comment is bound to the displayed version, history labelled across versions",
+    "ok": true,
+    "ms": 997
+  },
+  {
+    "name": "mobile: EDIT → \"Ask agent to revise\" (consented, local mock) creates a SUGGESTED child, never approved",
+    "ok": true,
+    "ms": 967
+  },
+  {
+    "name": "mobile: one-at-a-time mode with next / previous",
+    "ok": true,
+    "ms": 950
+  },
+  {
+    "name": "mobile: export HTML → decide offline → decision file → import → confirm",
+    "ok": true,
+    "ms": 2349
+  },
+  {
+    "name": "mobile: no page errors",
+    "ok": true,
+    "ms": 0
+  }
+]

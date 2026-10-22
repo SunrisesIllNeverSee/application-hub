@@ -11,6 +11,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
 import { embedAndStoreQuestion, type ByokIntegration } from '@/lib/embed'
+import { normalizeQuestion } from '@/lib/catalog/normalize'
+import { matchOccurrence, type CatalogQuestion, type MatchResult, type MatchTier } from '@/lib/catalog/match'
 
 export const MODEL = 'claude-haiku-4-5-20251001'
 
@@ -140,34 +142,78 @@ export async function loadEmbeddingIntegrations(
 }
 
 // ─── Archived question find-or-create (with embed-on-create) ─────────────────
+//
+// M09 W2: the old ILIKE first-60/first-30-char prefix lookup returned the
+// FIRST hit and merged silently (false-merge risk: "Tell us about your team"
+// would swallow "Tell us about your team's hiring plan"). Candidates are now
+// only RETRIEVED by ILIKE; the decision is made by the tiered matcher in
+// lib/catalog/match.ts:
+//   exact / normalized (unambiguous) → link the existing canonical question
+//   semantic / ambiguous / near miss → insert a NEW canonical question and
+//                                      report the decision as needs_review
+//   novel                             → insert a new canonical question
 
-async function findArchivedQuestion(
+export type ArchivedQuestionDecision = {
+  tier: MatchTier
+  needs_review: boolean
+  /** existing canonical the occurrence resembles (semantic / near miss), never auto-linked */
+  candidate_question_id: string | null
+  confidence: number
+  reasons: string[]
+  differences: MatchResult['differences']
+}
+
+function escapeLike(s: string): string {
+  return s.replace(/[\\%_]/g, (c) => `\\${c}`)
+}
+
+async function findArchivedQuestionCandidates(
   supabase: SupabaseLike,
   questionText: string
-): Promise<{ id: string } | null> {
+): Promise<CatalogQuestion[]> {
   const trimmed = questionText.trim()
+  const core = normalizeQuestion(trimmed).core
+  const patterns = new Set<string>()
   const head = trimmed.slice(0, 60)
-
-  if (head.length >= 8) {
-    const { data } = await supabase
-      .from('archived_questions')
-      .select('id, text')
-      .ilike('text', `%${head}%`)
-      .limit(1)
-    if (data && data.length > 0) return { id: data[0].id }
-  }
-
+  if (head.length >= 8) patterns.add(`%${escapeLike(head)}%`)
+  const corePrefix = core.replace(/[\s?.!:;,*]+$/, '').slice(0, 40)
+  if (corePrefix.length >= 8) patterns.add(`${escapeLike(corePrefix)}%`)
   const prefix = trimmed.slice(0, 30)
-  if (prefix.length >= 8) {
+  if (prefix.length >= 8) patterns.add(`${escapeLike(prefix)}%`)
+
+  const byId = new Map<string, CatalogQuestion>()
+  for (const pattern of patterns) {
     const { data } = await supabase
       .from('archived_questions')
-      .select('id, text')
-      .ilike('text', `${prefix}%`)
-      .limit(1)
-    if (data && data.length > 0) return { id: data[0].id }
+      .select('id, text, typical_word_limit')
+      .ilike('text', pattern)
+      .limit(25)
+    for (const row of (data ?? []) as Array<{ id: string; text: string; typical_word_limit?: number | null }>) {
+      if (!byId.has(row.id)) byId.set(row.id, { id: row.id, text: row.text })
+    }
   }
+  return [...byId.values()]
+}
 
-  return null
+/** Decide (read-only) whether an occurrence links to an existing canonical question. */
+export async function decideArchivedQuestion(
+  supabase: SupabaseLike,
+  questionText: string
+): Promise<{ linkId: string | null; decision: ArchivedQuestionDecision }> {
+  const candidates = await findArchivedQuestionCandidates(supabase, questionText)
+  const m = matchOccurrence({ asked_as: questionText }, candidates)
+  const linkable = (m.tier === 'exact' || m.tier === 'normalized') && m.auto_link && !!m.canonical_question_id
+  return {
+    linkId: linkable ? m.canonical_question_id! : null,
+    decision: {
+      tier: m.tier,
+      needs_review: m.needs_review || m.tier === 'semantic',
+      candidate_question_id: linkable ? null : m.canonical_question_id ?? m.candidates[0]?.id ?? null,
+      confidence: m.confidence,
+      reasons: m.reasons,
+      differences: m.differences,
+    },
+  }
 }
 
 export async function findOrCreateArchivedQuestion(
@@ -175,40 +221,29 @@ export async function findOrCreateArchivedQuestion(
   questionText: string,
   theme: SpecTheme,
   embedByok?: ByokIntegration[] | null
-): Promise<{ id: string; wasNew: boolean } | null> {
-  const matched = await findArchivedQuestion(supabase, questionText)
-  if (matched) return { id: matched.id, wasNew: false }
+): Promise<{ id: string; wasNew: boolean; decision: ArchivedQuestionDecision } | null> {
+  const { linkId, decision } = await decideArchivedQuestion(supabase, questionText)
+  if (linkId) return { id: linkId, wasNew: false, decision }
 
   const dbTheme = DB_THEME_FALLBACK.get(theme) ?? 'personal'
 
   type InsertedRow = { id: string }
   type InsertResp = { data: InsertedRow | null; error: { message?: string } | null }
 
-  const richInsert = (await supabase
+  const insert = (await supabase
     .from('archived_questions')
     .insert({ text: questionText, theme: dbTheme })
     .select('id')
     .single()) as unknown as InsertResp
 
-  let created: InsertedRow | null = null
-  if (!richInsert.error && richInsert.data) {
-    created = richInsert.data
-  } else {
-    const fallbackInsert = (await supabase
-      .from('archived_questions')
-      .insert({ text: questionText, theme: dbTheme })
-      .select('id')
-      .single()) as unknown as InsertResp
-    if (!fallbackInsert.error && fallbackInsert.data) created = fallbackInsert.data
-  }
-
-  if (!created) return null
+  if (insert.error || !insert.data) return null
+  const created = insert.data
 
   // Flywheel: a new question without an embedding is invisible to future
   // matching. Best-effort — never block intake on embedding availability.
   await embedAndStoreQuestion(supabase, created.id, questionText, embedByok)
 
-  return { id: created.id, wasNew: true }
+  return { id: created.id, wasNew: true, decision }
 }
 
 // ─── Program find-or-create ───────────────────────────────────────────────────

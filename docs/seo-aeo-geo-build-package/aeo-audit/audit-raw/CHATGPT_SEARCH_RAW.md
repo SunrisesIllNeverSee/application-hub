@@ -1,3 +1,10 @@
+---
+type: Findings
+title: "ChatGPT Search AEO Raw Evidence"
+description: "ChatGPT Search AEO Raw Evidence (CHATGPT_SEARCH_RAW.md); frontmatter added mechanically for OKF conformance, body unchanged."
+tags: [seo-aeo-geo, aeo-audit]
+timestamp: 2026-08-25
+---
 # ChatGPT Search AEO Raw Evidence
 
 - Engine: ChatGPT

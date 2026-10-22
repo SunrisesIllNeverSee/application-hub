@@ -52,10 +52,12 @@ def main():
                 warnings.append(f'unrecognized root file (review/add explicitly if legitimate): {n}')
 
     forbid=bool(deepget(cfg,'naming.forbid_version_suffixes',True))
+    exempt_paths=set(deepget(cfg,'naming.exempt_paths',[]) or [])
     if forbid:
         for p in root.rglob('*'):
             if not p.is_file(): continue
             rel=p.relative_to(root)
+            if str(rel) in exempt_paths: continue
             if any(part in SKIP for part in rel.parts): continue
             if 'archive' in [x.lower() for x in rel.parts] or '_archive' in [x.lower() for x in rel.parts]: continue
             if p.suffix.lower() in DOC_EXT and DUP_RE.search(p.name):
