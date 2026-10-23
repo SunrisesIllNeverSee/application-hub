@@ -102,7 +102,18 @@ class IdbStorage implements VaultStorage {
       transaction.onerror = () => reject(transaction.error ?? new Error('IndexedDB transaction failed'))
       transaction.onabort = () => reject(transaction.error ?? new Error('IndexedDB transaction aborted'))
     })
-    const result = await fn(new IdbStoreTx(transaction))
+    let result: R
+    try {
+      result = await fn(new IdbStoreTx(transaction))
+    } catch (e) {
+      // M09 AT22: an exception thrown by fn (a refusal such as an id
+      // collision, or a request that threw synchronously) does NOT abort an
+      // IndexedDB transaction by itself — the requests already issued would
+      // auto-commit and leave a partial write. Abort explicitly.
+      done.catch(() => {})
+      try { transaction.abort() } catch { /* already finished */ }
+      throw e
+    }
     await done
     return result
   }

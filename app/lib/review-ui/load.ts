@@ -37,7 +37,7 @@ import type { AppInstanceView } from '../aqua-local/instances.ts'
 import { buildCardViewModel } from './view-model.ts'
 import type { CardInput, ReviewCardVM } from './view-model.ts'
 import type { CurrentQuestionState, DecisionFileOrigin, ImportPlan, PlanItem } from './decision-file.ts'
-import { isKnownReviewExportNonce, newReviewExportNonce, recordReviewExport } from '../aqua-local/review-ledger.ts'
+import { consumeReviewExportNonce, isKnownReviewExportNonce, newReviewExportNonce, recordReviewExport } from '../aqua-local/review-ledger.ts'
 
 export interface ReviewContext {
   program_name: string | null
@@ -295,17 +295,28 @@ export async function applyDecisionPlan(
   secret: string,
   plan: ImportPlan,
   actorId: string,
-  selected?: Set<string>,
-  opts: { foreignConfirmed?: boolean } = {},
+  selected: Set<string>,
+  opts: {
+    foreignConfirmed?: boolean
+    /** The file's export nonce + instance: spent after a successful apply so
+        the same nonce cannot pass as "this vault" again. */
+    nonce?: string | null
+    instanceId?: string
+  } = {},
 ): Promise<ApplyResult[]> {
   // M2: a file this vault did not export needs an explicit extra confirmation.
   if (plan.origin !== 'this_vault' && opts.foreignConfirmed !== true) {
     throw new Error('This decision file was not exported by this vault — confirm the foreign-file warning before applying it.')
   }
+  // Fail closed: only the rows the user ticked are applied. There is no
+  // "apply everything" default (M09 review, LOW).
+  if (!(selected instanceof Set)) {
+    throw new Error('applyDecisionPlan requires the set of version ids the user selected')
+  }
   const out: ApplyResult[] = []
   for (const item of plan.items) {
     if (!item.applicable) continue
-    if (selected && !selected.has(item.entry.version_id)) continue
+    if (!selected.has(item.entry.version_id)) continue
     const { entry } = item
     const wrote: string[] = []
     try {
@@ -346,6 +357,9 @@ export async function applyDecisionPlan(
     } catch (e) {
       out.push({ item, ok: false, wrote, error: e instanceof Error ? e.message : String(e) })
     }
+  }
+  if (plan.origin === 'this_vault' && opts.nonce && opts.instanceId && out.some((r) => r.ok)) {
+    await consumeReviewExportNonce(storage, { instance_id: opts.instanceId, nonce: opts.nonce })
   }
   return out
 }

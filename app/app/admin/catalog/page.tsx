@@ -198,7 +198,14 @@ async function CandidateCard({ row, baseCtx, events }: { row: Row; baseCtx: Revi
                     {q.word_limit && <span>{q.word_limit} words max</span>}
                     {q.char_limit && <span>{q.char_limit} chars max</span>}
                     {q.time_context && <span>time: {q.time_context}</span>}
-                    {q.mapping ? <span>map: {q.mapping.tier} → {q.mapping.canonical_question_id?.slice(0, 8) ?? 'new'}</span> : <span>map: novel</span>}
+                    {q.mapping
+                      ? <span>map ({q.mapping.origin === 'auto_match' ? 'auto match' : 'curator'}): {q.mapping.tier} → {q.mapping.canonical_question_id?.slice(0, 8) ?? 'new'}</span>
+                      : <span>map: novel</span>}
+                    {q.suggested_mapping && (
+                      <span className="text-amber-700 dark:text-amber-400">
+                        submitter suggests: {q.suggested_mapping.tier} → {q.suggested_mapping.canonical_question_id?.slice(0, 8) ?? 'new'} (not linked until a curator confirms it)
+                      </span>
+                    )}
                     {checks?.missing_wording?.includes(i) && <span className="text-amber-700 dark:text-amber-400">not found verbatim in source</span>}
                   </p>
                 </li>

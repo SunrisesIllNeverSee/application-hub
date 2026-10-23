@@ -16,7 +16,7 @@ import {
   addEvidence,
   approvalGate,
   classifyReuse,
-  createAnswer,
+  createAnswerWithVersion,
   createAppInstance,
   createChildVersion,
   createFact,
@@ -445,11 +445,7 @@ export async function saveInstanceDraft(
     answers.find(
       (a) => a.scope.application_id === scope.application_id && a.scope.question_occurrence_id === scope.question_occurrence_id,
     ) ?? null
-  if (!answer) answer = await createAnswer(storage, scope)
-  const latest = sortVersions((await storage.getAll<VersionRecord>('versions')).filter((v) => v.answer_id === answer!.id)).at(-1)
-  return createVersion(storage, secret, {
-    answer_id: answer.id,
-    parent_version_id: latest?.id ?? null,
+  const versionInput = {
     title: input.title,
     body: input.body,
     method: input.method ?? 'manual',
@@ -457,7 +453,11 @@ export async function saveInstanceDraft(
     model: input.model ?? null,
     derived_from,
     evidence_ids: input.evidence_ids,
-  })
+  }
+  // AT22: the first draft creates answer + version atomically (no empty answer shell on refusal/failure).
+  if (!answer) return (await createAnswerWithVersion(storage, secret, scope, versionInput)).version
+  const latest = sortVersions((await storage.getAll<VersionRecord>('versions')).filter((v) => v.answer_id === answer!.id)).at(-1)
+  return createVersion(storage, secret, { ...versionInput, answer_id: answer.id, parent_version_id: latest?.id ?? null })
 }
 
 /** EDIT control: new child version; the parent and its decisions remain. */

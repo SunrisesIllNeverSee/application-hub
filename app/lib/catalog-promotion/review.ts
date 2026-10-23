@@ -28,7 +28,7 @@ export type ReviewContext = {
 export async function loadSourceFacts(admin: SupabaseClient, sourceId: string | null): Promise<ReviewContext['source']> {
   if (!sourceId) return null
   const { data } = await admin.from('catalog_sources')
-    .select('id, url, final_url, capture_method, reuse, robots_disallow, verification_status, snapshot_text')
+    .select('id, url, final_url, capture_method, reuse, robots_disallow, verification_status, snapshot_text, last_checked_at')
     .eq('id', sourceId).maybeSingle()
   return (data as ReviewContext['source']) ?? null
 }

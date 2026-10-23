@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { LOCAL_FIRST } from '@/lib/aqua-local-client/flag'
 import AquaLocal from './client'
 
 // Local-first surface (LF-10/11/12/15, flag: NEXT_PUBLIC_AQUA_LOCAL_FIRST=1).
@@ -8,7 +9,8 @@ import AquaLocal from './client'
 export const metadata = { title: 'AQUA local vault' }
 
 export default function AquaLocalPage() {
-  const flag = process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST
-  if (flag !== '1' && flag !== 'true') notFound()
+  // Same effective flag as every client gate (NEXT_PUBLIC_AQUA_LOCAL_FIRST,
+  // fail-closed in production builds — lib/aqua-local-client/flag.ts).
+  if (!LOCAL_FIRST) notFound()
   return <AquaLocal />
 }

@@ -109,11 +109,14 @@ curl https://aquaidp.xyz/openapi.json | jq .info`}</code></pre>
             The full guide is at{' '}
             <Link href="/agents" className="text-brand-600 hover:underline dark:text-brand-400">/agents</Link>.
           </p>
-          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Install (versioned tarball from this site; Node.js 22+)
-${G.install.help}
+          <pre className="overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900"><code>{`# Install (aqua-mcp-server from npm, Node.js 22+; it includes the companion)
+${G.install.mcp_help}
 
 # Connect Claude Code (the server starts without a workspace)
-${G.install.claude_code}
+${G.install.mcp_claude_code}
+
+# Fallback: the companion tarball from this site
+${G.install.help}
 
 # Self-check: config, catalog, workspace, keychain
 ${G.install.doctor}`}</code></pre>

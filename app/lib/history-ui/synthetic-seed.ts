@@ -8,7 +8,7 @@
 import { createAppInstance } from '../aqua-local/instances.ts'
 import { createAnswer, buildVersionPayload } from '../aqua-local/repo.ts'
 import { encryptField, decryptField } from '../aqua-local/crypto.ts'
-import { HISTORY_FORMAT, findPlaceholders, type HistoryMeta } from '../aqua-local/history.ts'
+import { HISTORY_FORMAT, findPlaceholders, type HistoryMeta, type HistoryParseConfidence } from '../aqua-local/history.ts'
 import type { AppInstanceRecord } from '../aqua-local/schema.ts'
 import type { VaultStorage } from '../aqua-local/vault.ts'
 
@@ -16,7 +16,7 @@ export interface SyntheticHistoryApp {
   program: string
   submitted_at: string | null
   source_file: string
-  qa: Array<{ question: string; answer: string }>
+  qa: Array<{ question: string; answer: string; parse_confidence?: HistoryParseConfidence; parse_notes?: string[] }>
 }
 
 export const SYNTHETIC_HISTORY: SyntheticHistoryApp[] = [
@@ -84,6 +84,7 @@ export async function seedSyntheticHistory(storage: VaultStorage, secret: string
         placeholder: { found: markers.length > 0, markers },
         imported_at: '2026-10-22T00:00:00.000Z',
         importer: 'aqua-companion import-history (synthetic seed)',
+        ...(x.parse_confidence ? { parse_confidence: x.parse_confidence, parse_notes: x.parse_notes ?? [] } : {}),
       }
       record.history = true
       record.history_enc = await encryptField(secret, JSON.stringify(meta))

@@ -44,8 +44,8 @@ const modeOf = (reg) => (reg.state().mode === 'ready' ? 'stdio-workspace' : 'std
  * createAquaToolRegistry({ workspace, readOnly, keychain, env, cwd, fetchImpl, stderr }).
  * Throws what the registry throws (a wrong passphrase stops startup).
  */
-export async function createCompanionBackend({ workspace, readOnly = false, keychain = false, env, cwd, fetchImpl, stderr, data = null, registry = null }) {
-  const reg = registry ?? (await createAquaToolRegistry({ workspace, readOnly, keychain, env, cwd, fetchImpl, stderr }))
+export async function createCompanionBackend({ workspace, flags = {}, readOnly = false, keychain = false, env, cwd, fetchImpl, stderr, data = null, registry = null }) {
+  const reg = registry ?? (await createAquaToolRegistry({ workspace, flags, readOnly, keychain, env, cwd, fetchImpl, stderr }))
   const byName = new Map(reg.tools.map((t) => [t.name, t]))
   const defs = new Map(COMPANION_TOOLS.map((t) => [t.name, t]))
   const ready = () => reg.state().mode === 'ready'

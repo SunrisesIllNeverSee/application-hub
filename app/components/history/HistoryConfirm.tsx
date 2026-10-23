@@ -7,6 +7,8 @@
 // hash-bound, effective_at = submission date, statement encrypted). Nothing
 // is preselected; answers with placeholders or an unknown date cannot be
 // selected, and the vault refuses placeholders even if the UI were bypassed.
+// Records the importer split with LOW confidence carry a warning and stay
+// unselectable until the user marks them as checked against what they sent.
 // Everything happens on this device; there is no server call here.
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -23,6 +25,7 @@ import {
   type HistoryGroup,
   type HistoryItem,
 } from '@/lib/aqua-local/history-review'
+import { LOW_CONFIDENCE_REASON } from '@/lib/aqua-local/history'
 import { UnlockPanel } from '@/components/aqua-local/UnlockPanel'
 import { Notice } from '@/components/review/ui'
 
@@ -39,6 +42,7 @@ export function HistoryConfirm() {
   const [load, setLoad] = useState<Load>({ kind: 'loading' })
   const [selected, setSelected] = useState<Set<string>>(() => new Set()) // nothing preselected
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set())
+  const [reviewed, setReviewed] = useState<Set<string>>(() => new Set()) // low-confidence items the user checked
   const [statement, setStatement] = useState(DEFAULT_ATTESTATION_STATEMENT)
   const [attested, setAttested] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -179,10 +183,11 @@ export function HistoryConfirm() {
                   </header>
                   <ul className="divide-y divide-neutral-200 dark:divide-neutral-800">
                     {g.items.map((it) => {
-                      const disabled = Boolean(it.disabled_reason) || it.status === 'confirmed' || busy
+                      const unreviewed = it.needs_review && !reviewed.has(it.version_id)
+                      const disabled = Boolean(it.disabled_reason) || it.status === 'confirmed' || busy || unreviewed
                       const open = expanded.has(it.version_id)
                       return (
-                        <li key={it.version_id} className="px-4 py-3" data-testid="history-item" data-version={it.version_id} data-status={it.status}>
+                        <li key={it.version_id} className="px-4 py-3" data-testid="history-item" data-version={it.version_id} data-status={it.status} data-confidence={it.parse_confidence ?? undefined}>
                           <label className={`flex gap-3 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                             <input
                               type="checkbox"
@@ -191,15 +196,35 @@ export function HistoryConfirm() {
                               checked={selected.has(it.version_id)}
                               disabled={disabled}
                               onChange={(e) => toggle(it.version_id, e.target.checked)}
-                              aria-describedby={it.disabled_reason ? `reason-${it.version_id}` : undefined}
+                              aria-describedby={it.disabled_reason ? `reason-${it.version_id}` : it.needs_review ? `lowconf-${it.version_id}` : undefined}
                             />
                             <span className="min-w-0 flex-1">
                               <span className="block text-sm font-medium text-neutral-900 dark:text-neutral-100" data-testid="history-question">{it.question}</span>
                               <span className="mt-1 block whitespace-pre-wrap break-words text-sm text-neutral-600 dark:text-neutral-300" data-testid="history-answer">
-                                {open ? it.body : it.excerpt}
+                                {open || it.needs_review ? it.body : it.excerpt}
                               </span>
                             </span>
                           </label>
+                          {it.needs_review && (
+                            <div className="mt-2 ml-7 rounded border border-warning-300 bg-warning-50 px-3 py-2 text-xs text-warning-800 dark:border-warning-700 dark:bg-warning-900/30 dark:text-warning-200" data-testid="history-low-confidence">
+                              <p id={`lowconf-${it.version_id}`}>{LOW_CONFIDENCE_REASON}</p>
+                              <label className="mt-1.5 flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  className="h-3.5 w-3.5"
+                                  data-testid="history-review-check"
+                                  checked={reviewed.has(it.version_id)}
+                                  disabled={busy}
+                                  onChange={(e) => {
+                                    const on = e.target.checked
+                                    setReviewed((p) => { const n = new Set(p); if (on) n.add(it.version_id); else n.delete(it.version_id); return n })
+                                    if (!on) toggle(it.version_id, false)
+                                  }}
+                                />
+                                <span>I checked the question and the full answer against what I submitted.</span>
+                              </label>
+                            </div>
+                          )}
                           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 pl-7 text-xs">
                             {it.status === 'confirmed' ? (
                               <span className="rounded bg-success-50 px-1.5 py-0.5 text-success-700 dark:bg-success-900/30 dark:text-success-300" data-testid="history-status">

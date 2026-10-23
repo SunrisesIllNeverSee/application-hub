@@ -43,8 +43,10 @@ export async function GET() {
       sha256: G.companion.tarball.sha256,
       sha256Url: G.companion.tarball.sha256_url,
       latest: G.companion.tarball.latest_url,
-      help: G.install.help,
-      claudeCode: G.install.claude_code,
+      primary: { command: G.install.mcp_help, claudeCode: G.install.mcp_claude_code, npm: 'https://www.npmjs.com/package/aqua-mcp-server' },
+      fallbackTarball: { help: G.install.help, claudeCode: G.install.claude_code },
+      help: G.install.mcp_help,
+      claudeCode: G.install.mcp_claude_code,
       npm: G.companion.npm_status,
     },
     mcpServerPackage: {

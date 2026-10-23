@@ -6,6 +6,7 @@
 # against a LOCAL THROWAWAY Postgres cluster only (initdb in $M09_PGROOT,
 # non-default port, loopback TCP only). It never connects to Supabase.
 #   M09_PGROOT=/some/scratch/dir ./supabase/tests/m09/run_local.sh
+# M09_RESULTS_JSON=<file> also writes every expectation (id, descr, pass) as JSON.
 # Load order = production order: live baseline (049-053 state) -> 054 ->
 # 055 -> 039 program_cycles (absent from the p0 baseline fixture) -> 058
 # twice (idempotency). Every existing p0 suite (10/20/... *_tests.sql) must
@@ -13,7 +14,22 @@
 # (the p0 baseline does not carry it; production may) and 058 is re-applied
 # so its active-only index swap is exercised before the 058 suite runs.
 # Exit status is non-zero if any expectation fails.
+#
+# GRANTS_MODE (M09 W11, explicit Data API grants) switches to the FULL-CHAIN
+# path in full_chain.sh: a fresh database built from every migration
+# (001 -> 061; no live-baseline fixture), under either
+#   GRANTS_MODE=default   the pre-2026-10-30 Supabase default privileges
+#   GRANTS_MODE=revoked   the post-2026-10-30 default (Supabase's opt-in
+#                         ALTER DEFAULT PRIVILEGES ... REVOKE statements run
+#                         BEFORE migration 001)
+# and then the p0 suites, the 058 suite, the 50 grants suite, the 60 RPC
+# caller-binding suite (061; needs the full chain, so it runs in both
+# GRANTS_MODE settings only) and the 058 and 061 rollbacks. Needs PostgreSQL 17 (production major) with pgvector; point
+# M09_PGBIN at its bin directory if it is not first on PATH.
 set -euo pipefail
+if [ -n "${M09_PGBIN:-}" ]; then export PATH="$M09_PGBIN:$PATH"; fi
+GRANTS_MODE="${GRANTS_MODE:-}"
+case "$GRANTS_MODE" in ''|default|revoked) ;; *) echo "GRANTS_MODE must be default or revoked" >&2; exit 2;; esac
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 P0="$(cd "$HERE/../p0" && pwd)"
@@ -41,6 +57,12 @@ fi
 pg_ctl -D "$PGDATA" -o "-p $PGPORT -c listen_addresses=127.0.0.1 -c unix_socket_directories=''" -l "$PGROOT/server.log" -w start >/dev/null
 psql -X -q -d postgres -c "DROP DATABASE IF EXISTS $DB" -c "CREATE DATABASE $DB"
 psql -X -At -d postgres -c "select version()"
+
+if [ -n "$GRANTS_MODE" ]; then
+  # shellcheck source=full_chain.sh
+  source "$HERE/full_chain.sh"
+  exit 0
+fi
 
 banner "load: bootstrap, live baseline, 053, seed, harness, 054, 055, 039"
 psql_q -f "$P0/00_bootstrap.sql"
@@ -85,6 +107,11 @@ psql_q -f "$M058"
 RA=$(psql -X -At -c "select count(*) from catalog_serials where origin <> 'assigned'")
 echo "after re-apply: backfilled serials = $RA"
 if [ "$RB" = "0/0/103" ] && [ "$RA" = "216" ]; then echo "ROLLBACK PASS"; else echo "ROLLBACK FAIL"; exit 1; fi
+
+# Optional per-expectation export for the W9 acceptance runner (test id, description, pass).
+if [ -n "${M09_RESULTS_JSON:-}" ]; then
+  psql -X -At -c "select coalesce(json_agg(json_build_object('id',test_id,'descr',descr,'pass',pass) order by seq),'[]') from p0.results" > "$M09_RESULTS_JSON"
+fi
 
 banner "summary"
 psql -X -c "select case when test_id like 'CP-%' then '058 suite' else 'existing p0 suites' end as suite, count(*) total, count(*) filter (where pass) passed, count(*) filter (where not pass) failed from p0.results group by 1 order by 1"

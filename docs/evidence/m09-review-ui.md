@@ -66,6 +66,8 @@ Production check (`next start`): `/dev/review-harness` returns **404**, and
 
 ## Screenshots (`docs/evidence/m09-review-ui/`)
 
+Regenerated on 2026-10-22 by the W9 acceptance run (`app/tests/acceptance/run-acceptance.mjs`, see [`m09-acceptance.md`](m09-acceptance.md)) after the M2 decision-import hardening and the "Draft created (vN)" row change.
+
 | Step | Desktop (1440) | Mobile (390) |
 |---|---|---|
 | Board | `desktop-01-board.png` | `mobile-01-board.png` |

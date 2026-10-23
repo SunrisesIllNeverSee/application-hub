@@ -7,7 +7,7 @@ timestamp: 2026-10-22
 ---
 # M09 W1 Infrastructure Verification (2026-10-22)
 
-Branch `m09/infra` (base `28795b4`). Node v26.10.0 locally; CI uses Node 22 (needs 22.18+ for native `.ts` stripping). No secrets in outputs. Verified in a worktree and in scratch clones under `/private/tmp/claude-501/`.
+Branch `m09/infra` (base `28795b4`). Node v26.10.0 locally; CI uses Node 22 (needs 22.18+ for native `.ts` stripping). No secrets in outputs. Verified in a worktree and in scratch clones under `<scratch>`.
 
 Hook-proof note: a one-off hooksPath override on the commit command line is blocked in the authoring environment by a no-bypass guard, so hook execution was proven in an isolated scratch clone using `install-hooks.sh` (which sets `core.hooksPath` only in that clone). The real checkout's `core.hooksPath` remains unset.
 

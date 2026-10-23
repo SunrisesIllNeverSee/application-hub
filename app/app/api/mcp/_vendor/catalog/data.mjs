@@ -12,6 +12,8 @@
 
 import { CatalogError, inList } from './rest.mjs'
 
+const MAX_CACHE_ENTRIES = 500
+
 const BASE_PROGRAM_COLS = 'id,slug,name,organization,description,url,apply_url,deadline_at,closes_at,opens_at,is_rolling,status,source,type,round,cohort_name,updated_at'
 const MIN_PROGRAM_COLS = 'id,slug,name,organization,description,url,apply_url,deadline_at,closes_at,opens_at,is_rolling,status,source'
 const SCORE_COLS = 'id,heat_score,program_value_score,equity_pct,cash_value_usd,credit_value_usd,network_score,brand_score,follow_on_rate_pct'
@@ -65,6 +67,7 @@ export class CatalogData {
       entry.at = this.now()
       throw e
     })
+    if (this.cache.size >= MAX_CACHE_ENTRIES) this.cache.delete(this.cache.keys().next().value) // bounded: per-program keys cannot grow it without limit
     this.cache.set(key, entry)
     return entry.promise
   }
@@ -140,20 +143,26 @@ export class CatalogData {
     })
   }
 
-  async dna(programId) {
-    const rows = await this.client.get('program_dna', { select: DNA_COLS, program_id: `eq.${programId}`, order: 'weight_pct.desc' })
-    return rows.filter((r) => r.program_id === programId)
+  dna(programId) {
+    return this.memo(`dna:${programId}`, async () => {
+      const rows = await this.client.get('program_dna', { select: DNA_COLS, program_id: `eq.${programId}`, order: 'weight_pct.desc' })
+      return rows.filter((r) => r.program_id === programId)
+    })
   }
 
-  async stats(programId) {
-    const rows = await this.client.get('program_stats', { select: STATS_COLS, program_id: `eq.${programId}` })
-    return rows.find((r) => r.program_id === programId) ?? null
+  stats(programId) {
+    return this.memo(`stats:${programId}`, async () => {
+      const rows = await this.client.get('program_stats', { select: STATS_COLS, program_id: `eq.${programId}` })
+      return rows.find((r) => r.program_id === programId) ?? null
+    })
   }
 
   /** Verified acceptance reports only (cohort + outcome; no reporter, no free text). */
-  async reports(programId) {
-    const rows = await this.client.get('acceptance_reports', { select: REPORT_COLS, program_id: `eq.${programId}`, verified: 'eq.true' })
-    return rows.filter((r) => r.program_id === programId)
+  reports(programId) {
+    return this.memo(`reports:${programId}`, async () => {
+      const rows = await this.client.get('acceptance_reports', { select: REPORT_COLS, program_id: `eq.${programId}`, verified: 'eq.true' })
+      return rows.filter((r) => r.program_id === programId)
+    })
   }
 }
 

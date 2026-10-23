@@ -47,7 +47,9 @@ export default function AgentsPage() {
 
         <section className="space-y-3" id="install">
           <h2 className={h2}>1. Install</h2>
-          <p className={p}>The companion ships as a versioned tarball from this site (Node.js 22 or newer, no dependencies):</p>
+          <p className={p}>Primary: <code className={code}>aqua-mcp-server</code> from npm (Node.js 22 or newer). It includes the companion and serves the same tools.</p>
+          <pre className={pre}><code>{G.install.mcp_help}</code></pre>
+          <p className={p}>Fallback: the companion also ships as a versioned tarball from this site (no dependencies):</p>
           <pre className={pre}><code>{G.install.help}</code></pre>
           <p className={p}>
             {sha === 'pending' ? (
@@ -57,6 +59,10 @@ export default function AgentsPage() {
             )}
           </p>
           <ul className={`list-disc space-y-1 pl-6 ${p}`}>
+            <li>
+              From a downloaded, verified copy: <code className={code}>{G.install.local_copy}</code> (pass the file with{' '}
+              <code className={code}>--package</code>; npx treats a bare absolute <code className={code}>.tgz</code> path as a program and fails).
+            </li>
             <li>npm: {G.companion.npm_status}</li>
             <li>{G.mcp_server.status}</li>
             <li>Self-check: <code className={code}>{G.install.doctor}</code></li>
@@ -65,10 +71,21 @@ export default function AgentsPage() {
 
         <section className="space-y-3" id="connect">
           <h2 className={h2}>2. Connect it to the agent</h2>
-          <pre className={pre}><code>{G.install.claude_code}</code></pre>
+          <pre className={pre}><code>{G.install.mcp_claude_code}</code></pre>
+          <p className={p}>Tarball fallback: <code className={code}>{G.install.claude_code}</code></p>
           <p className={p}>
             The server starts even when no workspace exists yet; workspace tools then return{' '}
-            <code className={code}>workspace_not_initialized</code> with next steps.
+            <code className={code}>workspace_not_initialized</code> with next steps.{' '}
+            <code className={code}>init --path &lt;folder&gt;</code> creates <code className={code}>&lt;folder&gt;/AQUA</code>; the server and the CLI
+            find a workspace only through <code className={code}>--workspace</code>, <code className={code}>AQUA_WORKSPACE</code>, or the folder they
+            run in (or a parent). After init, re-add the server with the workspace and restart the client:
+          </p>
+          <pre className={pre}><code>{G.install.mcp_claude_code_with_workspace}</code></pre>
+          <p className={p}>
+            <code className={code}>--keychain</code> reads the passphrase from a macOS Keychain item the user creates once after init:{' '}
+            <code className={code}>security add-generic-password -s aqua-companion -a &lt;workspace id&gt; -w</code> (the workspace id is in{' '}
+            <code className={code}>aqua-companion status</code>). Without that item, drop <code className={code}>--keychain</code> and give the server{' '}
+            <code className={code}>AQUA_PASSPHRASE</code> in its own environment instead.
           </p>
         </section>
 
@@ -99,7 +116,8 @@ export default function AgentsPage() {
         <section className="space-y-3" id="history">
           <h2 className={h2}>5. Submitted history</h2>
           <p className={p}>
-            The user copies past submitted applications into <code className={code}>inbox/</code>; <code className={code}>import_history</code>{' '}
+            The user copies past submitted applications into a folder inside <code className={code}>inbox/</code> (for example{' '}
+            <code className={code}>inbox/history/</code>); <code className={code}>{'import_history { folder: "history" }'}</code>{' '}
             stages each answer with its exact question, program, source hash and submission date (unknown dates are flagged, never
             guessed). After <code className={code}>aqua-companion export-backup</code> and Restore, the user confirms them at{' '}
             <Link className={a} href="/history">/history</Link>. Confirmed answers count as approved as of their submission date. Answers
@@ -110,7 +128,7 @@ export default function AgentsPage() {
         <section className="space-y-3" id="approval">
           <h2 className={h2}>6. The human approves in the browser</h2>
           <ol className={`list-decimal space-y-1 pl-6 ${p}`}>
-            <li>The user runs <code className={code}>aqua-companion export-backup &lt;file&gt;</code>.</li>
+            <li>The user runs <code className={code}>aqua-companion export-backup &lt;file&gt; --workspace &lt;folder&gt;/AQUA</code>.</li>
             <li>In the browser: <Link className={a} href="/aqua-local">AQUA Local</Link>, Restore backup, then review and approve each answer on the review board. Approval binds the exact version hash.</li>
             <li>The user exports a browser backup into the workspace <code className={code}>inbox/</code>.</li>
             <li>The agent runs <code className={code}>sync_from_vault_export</code>; <code className={code}>read_review_status</code> then shows the approvals.</li>
@@ -125,6 +143,7 @@ export default function AgentsPage() {
             <code className={code}>{`{${G.catalog_config.fields.join(', ')}}`}</code>. The key is the public publishable/anon key the web
             app already ships to every browser. Clients must {G.catalog_config.rule}.
           </p>
+          <p className={p}>The companion keeps a public catalog cache: {G.catalog_config.auto_refresh}.</p>
         </section>
 
         <section className="space-y-3" id="hosted">

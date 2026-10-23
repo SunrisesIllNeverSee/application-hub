@@ -47,6 +47,16 @@ test('analytics URLs drop url/next params and #url= fragments; others untouched'
   assert.equal(analyticsSafeUrl('$direct'), '$direct')
 })
 
+test('LOW: /review pageviews drop the whole query (no ?program=<uuid>)', () => {
+  const id = '6f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f'
+  assert.equal(analyticsSafeUrl(`https://aquaidp.xyz/review?program=${id}`), 'https://aquaidp.xyz/review')
+  assert.equal(analyticsSafeUrl(`/review/LA-1?program=${id}&tab=x`), '/review/LA-1')
+  assert.equal(analyticsSafeUrl('https://aquaidp.xyz/reviewers?program=x'), 'https://aquaidp.xyz/reviewers?program=x', 'other routes untouched')
+  const props = { $current_url: `https://aquaidp.xyz/review?program=${id}`, $referrer: `https://aquaidp.xyz/review?program=${id}` }
+  sanitizeAnalyticsProperties(props)
+  assert.ok(!JSON.stringify(props).includes(id))
+})
+
 test('PostHog before_send sanitizer covers every URL-valued property incl. $set/$set_once', () => {
   const props = {
     $current_url: `https://aquaidp.xyz/apply?path=url#url=${encodeURIComponent(LINK)}`,

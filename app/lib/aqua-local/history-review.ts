@@ -13,8 +13,8 @@
 import { decryptField } from './crypto.ts'
 import { readVersion, listApprovals, recordHistoryAttestation, VaultPlaceholderError, VaultApprovalMismatchError } from './repo.ts'
 import { approvalGate } from './status.ts'
-import { describePlaceholders, findPlaceholders, normalizeEffectiveAt, HISTORY_FORMAT, type HistoryMeta } from './history.ts'
-import type { AnswerRecord, AppInstanceRecord, VersionRecord } from './schema.ts'
+import { describePlaceholders, findPlaceholders, normalizeEffectiveAt, HISTORY_FORMAT, type HistoryMeta, type HistoryParseConfidence } from './history.ts'
+import type { AnswerRecord, AppInstanceRecord, ReviewRecord, VersionRecord } from './schema.ts'
 import type { VaultStorage } from './vault.ts'
 
 export const DATE_UNKNOWN_REASON =
@@ -39,6 +39,11 @@ export interface HistoryItem {
   /** Recomputed from the decrypted body (the importer's scan is not trusted). */
   placeholder_markers: string[]
   source_file: string | null
+  /** Importer's split confidence; null for imports that predate it. */
+  parse_confidence: HistoryParseConfidence | null
+  parse_notes: string[]
+  /** Low confidence: the user must mark the item as reviewed before it can be selected. */
+  needs_review: boolean
   /** null = selectable; otherwise why it cannot be confirmed. */
   disabled_reason: string | null
   status: 'pending' | 'confirmed'
@@ -96,6 +101,9 @@ export async function listHistoryCandidates(storage: VaultStorage, secret: strin
   const versions = (await storage.getAll<VersionRecord>('versions')).filter((v) => v.history === true)
   if (!versions.length) return []
   const approvals = await listApprovals(storage)
+  // A later human reopening review (needs_revision / needs_evidence) blocks
+  // the approval in the freeze gate, so it must here too (M09 review, LOW).
+  const reviews = await storage.getAll<ReviewRecord>('reviews')
   const answers = new Map((await storage.getAll<AnswerRecord>('answers')).map((a) => [a.id, a]))
   const programCache = new Map<string, string | null>()
   const groups = new Map<string, HistoryGroup>()
@@ -106,8 +114,12 @@ export async function listHistoryCandidates(storage: VaultStorage, secret: strin
     const program = meta?.program || (await programOf(storage, secret, appId, programCache)) || 'Unnamed application'
     const submitted = typeof meta?.submitted_at === 'string' && normalizeEffectiveAt(meta.submitted_at) ? meta.submitted_at : null
     const markers = findPlaceholders(body)
-    const gate = approvalGate(v, approvals, [])
-    const confirmed = gate.approved && gate.approval?.via === 'history_attestation'
+    // For a history version the gate already requires a live attestation.
+    const gate = approvalGate(v, approvals, reviews)
+    const confirmed = gate.approved
+    const attestation = confirmed
+      ? approvals.filter((a) => a.version_id === v.id && a.via === 'history_attestation' && !a.restored_from_backup && a.version_sha256 === v.sha256).at(-1) ?? null
+      : null
     const disabled_reason = confirmed
       ? 'Already confirmed as submitted.'
       : markers.length
@@ -128,10 +140,16 @@ export async function listHistoryCandidates(storage: VaultStorage, secret: strin
       flags: Array.isArray(meta?.flags) ? meta!.flags!.filter((f) => typeof f === 'string') : [],
       placeholder_markers: markers,
       source_file: typeof meta?.source_file === 'string' ? meta.source_file : null,
+      parse_confidence: null,
+      parse_notes: [],
+      needs_review: false,
       disabled_reason,
       status: confirmed ? 'confirmed' : 'pending',
-      confirmed_effective_at: confirmed ? gate.approval?.effective_at ?? null : null,
+      confirmed_effective_at: attestation?.effective_at ?? null,
     }
+    item.parse_confidence = meta?.parse_confidence === 'high' || meta?.parse_confidence === 'medium' || meta?.parse_confidence === 'low' ? meta.parse_confidence : null
+    item.parse_notes = Array.isArray(meta?.parse_notes) ? meta!.parse_notes!.filter((n) => typeof n === 'string') : []
+    item.needs_review = item.parse_confidence === 'low' && item.status === 'pending' && !item.disabled_reason
     const key = `${appId ?? program}|${submitted ?? 'unknown'}`
     const g = groups.get(key) ?? { key, application_id: appId, program, submitted_at: submitted, items: [] }
     g.items.push(item)

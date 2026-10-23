@@ -1,33 +1,17 @@
 import { assertPublishableKey, isPlaceholderValue, PublishableKeyError } from './lib/public-catalog-config.mjs'
-// IR-015 — local-first flag pairing is REQUIRED at build time. The
-// server flag (AQUA_LOCAL_FIRST) gates route handlers; the public twin
-// (NEXT_PUBLIC_AQUA_LOCAL_FIRST) gates direct client→Supabase writes.
-// Shipping the server flag without the public twin leaves private client
-// writes ungated — fail the build instead of deploying a half-closed
-// boundary.
-const lfServer = ['1', 'true'].includes((process.env.AQUA_LOCAL_FIRST ?? '').trim().toLowerCase())
-const lfClient = ['1', 'true'].includes((process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '').trim().toLowerCase())
-if (lfServer !== lfClient) {
-  throw new Error(
-    `local-first flag mismatch: AQUA_LOCAL_FIRST=${process.env.AQUA_LOCAL_FIRST ?? '<unset>'} ` +
-      `but NEXT_PUBLIC_AQUA_LOCAL_FIRST=${process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST ?? '<unset>'}. ` +
-      'Set BOTH (or neither) — a mismatched pair leaves private client writes ungated.',
-  )
-}
-// M09 hardening H1 — production fails CLOSED. The server guard treats a
-// production runtime as local-first unless AQUA_LOCAL_FIRST is explicitly
-// '0'/'false' (lib/local-first-guard.ts). A Vercel production build must
-// therefore carry the client twin too, or explicitly opt BOTH out with '0'.
-const lfExplicitOff = (v) => ['0', 'false'].includes((v ?? '').trim().toLowerCase())
-if (
-  process.env.VERCEL_ENV === 'production' &&
-  !lfClient &&
-  !(lfExplicitOff(process.env.AQUA_LOCAL_FIRST) && lfExplicitOff(process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST))
-) {
-  throw new Error(
-    'local-first is ON by default in production (server guard fails closed). ' +
-      'Set AQUA_LOCAL_FIRST=1 and NEXT_PUBLIC_AQUA_LOCAL_FIRST=1, or explicitly opt BOTH out with 0.',
-  )
+import { resolveLocalFirstBuildFlags } from './lib/local-first-build.mjs'
+// IR-015 / M09 hardening H1 / M09 review M4 — local-first flag pairing is
+// checked at build time (lib/local-first-build.mjs, docs/LOCAL-FIRST-FLAGS.md).
+// The server flag (AQUA_LOCAL_FIRST) gates route handlers; the public twin
+// (NEXT_PUBLIC_AQUA_LOCAL_FIRST) gates direct client→Supabase writes. In a
+// production build (NODE_ENV=production — previews and self-hosted builds
+// included — or VERCEL_ENV=preview|production) an unset flag means ON for
+// BOTH sides; the effective pair must agree or the build fails, and a
+// Vercel production build must set both explicitly.
+{
+  const lf = resolveLocalFirstBuildFlags(process.env)
+  // Make the fail-closed client default explicit in the inlined bundle value.
+  for (const [k, v] of Object.entries(lf.defaults)) process.env[k] = v
 }
 
 // M09b B1.5 — /.well-known/aqua-catalog.json publishes NEXT_PUBLIC_SUPABASE_ANON_KEY

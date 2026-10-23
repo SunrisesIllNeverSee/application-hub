@@ -57,6 +57,7 @@ export function DecisionImportPanel({
   const [results, setResults] = useState<ApplyResult[] | null>(null)
   const [foreignAck, setForeignAck] = useState(false)
   const [excerpts, setExcerpts] = useState<Map<string, string | null>>(new Map())
+  const [fileNonce, setFileNonce] = useState<string | null>(null)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -90,6 +91,7 @@ export function DecisionImportPanel({
       return
     }
     const origin = await decisionFileOrigin(storage, instanceId, parsed.file.export_nonce)
+    setFileNonce(parsed.file.export_nonce)
     const p = planDecisionImport(parsed.file, instanceId, currentStates(rows), { origin })
     if (!p.ok) {
       setErrors(p.errors)
@@ -100,7 +102,9 @@ export function DecisionImportPanel({
     const secret = vault.getSecret()
     if (secret) {
       const ids = p.items.filter((i) => i.entry.decision === 'approve').map((i) => i.entry.version_id)
-      setExcerpts(await readDecisionExcerpts(storage, secret, ids))
+      // The FULL answer, not a 300-character excerpt: the row says "you would
+      // approve exactly this answer" (M09 review, LOW). Long bodies scroll.
+      setExcerpts(await readDecisionExcerpts(storage, secret, ids, Number.POSITIVE_INFINITY))
     }
     setPlan(p)
     // Approve / needs_revision rows and everything in a foreign file start unticked.
@@ -117,7 +121,12 @@ export function DecisionImportPanel({
     setBusy(true)
     try {
       const storage = await vault.ensureStorage()
-      const r = await applyDecisionPlan(storage, secret, plan, currentResolvedUid() || LOCAL_ACTOR_ID, selected, { foreignConfirmed: foreignAck })
+      const r = await applyDecisionPlan(storage, secret, plan, currentResolvedUid() || LOCAL_ACTOR_ID, selected, {
+        foreignConfirmed: foreignAck,
+        // single-use: a second file with the same export nonce reads as foreign
+        nonce: fileNonce,
+        instanceId,
+      })
       setResults(r)
       await onApplied()
     } catch (e) {
@@ -215,7 +224,7 @@ export function DecisionImportPanel({
                         {i.entry.decision === 'approve' && (
                           <span className="mt-1 block rounded border border-neutral-200 bg-neutral-50 p-2 text-xs dark:border-neutral-800 dark:bg-neutral-950" data-testid="import-approve-detail">
                             <span className="block font-medium text-neutral-700 dark:text-neutral-300">You would approve exactly this answer:</span>
-                            <span className="mt-0.5 block whitespace-pre-wrap text-neutral-800 dark:text-neutral-200" data-testid="import-excerpt">
+                            <span className="mt-0.5 block max-h-64 overflow-y-auto whitespace-pre-wrap text-neutral-800 dark:text-neutral-200" data-testid="import-excerpt">
                               {excerpts.has(i.entry.version_id)
                                 ? excerpts.get(i.entry.version_id) ?? '(this version could not be decrypted on this device)'
                                 : '(unlock the vault to see the answer)'}

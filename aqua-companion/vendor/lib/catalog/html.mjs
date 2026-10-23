@@ -1,7 +1,7 @@
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/catalog/html.ts
-// source-sha256: e98930726c9590a6891b862e680fc418c30b6da7d1d90e7ed7333299a089e11d
-// body-sha256: 848809e9bc44ff27ccd5dde79ba82fbd016543937be39b7991f5b3c54c1c8ee1
+// source-sha256: 99a75336db46d81f4ecb735eea73f421135186e72e586f33bfb1fa0642fd5737
+// body-sha256: ecb8c8ae7d39bef0be13a200122072105a34578fca5d42944e503343d69b2464
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // M09 W2 — minimal, dependency-free HTML tree parser. PURE module.
 //
@@ -14,6 +14,8 @@
                                
                    
                          
+                                                                                
+                     
  
                                      
 
@@ -44,75 +46,219 @@ export function decodeEntities(s        )         {
   })
 }
 
-const TOKEN_RE = /<!--[\s\S]*?(?:-->|$)|<!\[CDATA\[[\s\S]*?\]\]>|<![^>]*>|<\?[^>]*>|<\/\s*([a-zA-Z][\w:-]*)\s*>|<([a-zA-Z][\w:-]*)((?:\s+[^\s"'>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*(\/?)>/g
-const ATTR_RE = /([^\s"'>\/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
+const ATTR_NAME_END = new Set([' ', '\t', '\n', '\r', '\f', '/', '>', '='])
+const isWs = (c        ) => c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f'
+const isAsciiAlpha = (c        ) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+const isNameChar = (c        ) => isAsciiAlpha(c) || (c >= '0' && c <= '9') || c === '_' || c === ':' || c === '-'
 
-function parseAttrs(raw        )                         {
-  const out                         = {}
-  for (const m of raw.matchAll(ATTR_RE)) {
-    const name = m[1].toLowerCase()
-    if (name in out) continue
-    out[name] = decodeEntities(m[2] ?? m[3] ?? m[4] ?? '')
-  }
-  return out
-}
+/**
+ * Hard bounds on the work one parse may do. The parser is a single forward
+ * scan (every input character is visited a bounded number of times), and
+ * these caps bound the size of the tree it hands to downstream walkers.
+ * Hitting any cap sets `root.truncated`; the rest of the input is ignored
+ * (elements/text) or flattened (depth).
+ */
+export const HTML_LIMITS = Object.freeze({
+  /** Characters of input considered at all. */
+  maxInputChars: 3_000_000,
+  /** Elements created; parsing stops at the cap. */
+  maxElements: 40_000,
+  /** Open-element nesting; deeper elements are attached but not entered. */
+  maxDepth: 256,
+  /** Total characters of text kept across all text nodes. */
+  maxTextChars: 1_000_000,
+  /** Attributes kept per element. */
+  maxAttrs: 64,
+})
+                                                                    
 
-/** Parse HTML into a tolerant element tree rooted at a synthetic #document element. */
-export function parseHtml(html        )           {
-  const root           = { tag: '#document', attrs: {}, children: [], parent: null }
-  let cur           = root
-  let last = 0
-  const src = html
-  TOKEN_RE.lastIndex = 0
-  let m                        
-  const pushText = (t        ) => { if (t) cur.children.push(decodeEntities(t)) }
-  const stackHas = (tag        ) => { for (let e                  = cur; e; e = e.parent) if (e.tag === tag) return true; return false }
-  const closeTo = (tag        ) => { for (let e                  = cur; e && e !== root; e = e.parent) { if (e.tag === tag) { cur = e.parent ?? root; return } } }
+                                                                                                  
 
-  while ((m = TOKEN_RE.exec(src)) !== null) {
-    pushText(src.slice(last, m.index))
-    last = TOKEN_RE.lastIndex
-    if (m[1]) { // close tag
-      const tag = m[1].toLowerCase()
-      if (stackHas(tag)) closeTo(tag)
+/**
+ * Scan a start tag at `i` (src[i] === '<', src[i+1] is an ASCII letter).
+ * Never backtracks: attribute syntax is HTML5-tolerant, so the only failure
+ * is reaching end of input inside the tag (returns null).
+ */
+function scanStartTag(src        , i        , maxAttrs        )                  {
+  const n = src.length
+  let j = i + 1
+  while (j < n && isNameChar(src[j])) j++
+  const tag = src.slice(i + 1, j).toLowerCase()
+  const attrs                         = {}
+  let count = 0
+  for (;;) {
+    while (j < n && isWs(src[j])) j++
+    if (j >= n) return null
+    const c = src[j]
+    if (c === '>') return { tag, attrs, selfClose: false, end: j + 1 }
+    if (c === '/') {
+      if (src[j + 1] === '>') return { tag, attrs, selfClose: true, end: j + 2 }
+      j++
       continue
     }
-    if (!m[2]) continue // comment / doctype / cdata / PI
-    const tag = m[2].toLowerCase()
-    const attrs = parseAttrs(m[3] ?? '')
-    const selfClose = m[4] === '/'
+    const nameStart = j
+    j++ // first char may be '=' (HTML5 treats it as part of the name)
+    while (j < n && !ATTR_NAME_END.has(src[j])) j++
+    const name = src.slice(nameStart, j).toLowerCase()
+    let k = j
+    while (k < n && isWs(src[k])) k++
+    let value = ''
+    if (src[k] === '=') {
+      k++
+      while (k < n && isWs(src[k])) k++
+      if (k >= n) return null
+      const q = src[k]
+      if (q === '"' || q === "'") {
+        const close = src.indexOf(q, k + 1)
+        if (close < 0) return null
+        value = src.slice(k + 1, close)
+        k = close + 1
+      } else {
+        const vs = k
+        while (k < n && !isWs(src[k]) && src[k] !== '>') k++
+        value = src.slice(vs, k)
+      }
+      j = k
+    }
+    if (!(name in attrs) && count < maxAttrs) { attrs[name] = decodeEntities(value); count++ }
+  }
+}
+
+const endTagRes = new Map                ()
+function endTagRe(tag        )         {
+  let re = endTagRes.get(tag)
+  if (!re) { re = new RegExp(`</\\s*${tag}\\s*>`, 'ig'); endTagRes.set(tag, re) }
+  return re
+}
+
+/**
+ * Parse HTML into a tolerant element tree rooted at a synthetic #document
+ * element. Linear in the input: a single forward scan, O(1) open-tag lookups
+ * (per-tag open counts instead of walking the ancestor chain), and every
+ * element is opened and closed at most once. Output is bounded by
+ * HTML_LIMITS; `root.truncated` is set when a cap was hit.
+ */
+export function parseHtml(html        , limits                      = {})           {
+  const L             = { ...HTML_LIMITS, ...limits }
+  const root           = { tag: '#document', attrs: {}, children: [], parent: null }
+  let src = html ?? ''
+  if (src.length > L.maxInputChars) { src = src.slice(0, L.maxInputChars); root.truncated = true }
+  const n = src.length
+  let cur           = root
+  let depth = 0
+  let elements = 0
+  let textBudget = L.maxTextChars
+  const open = new Map                ()
+  let noGtFrom = Infinity // no '>' exists at or after this index
+
+  const pushText = (to          , t        ) => {
+    if (!t || textBudget <= 0) { if (t) root.truncated = true; return }
+    if (t.length > textBudget) { t = t.slice(0, textBudget); root.truncated = true }
+    textBudget -= t.length
+    to.children.push(decodeEntities(t))
+  }
+  const enter = (el          ) => { cur = el; depth++; open.set(el.tag, (open.get(el.tag) ?? 0) + 1) }
+  const pop = () => {
+    if (cur === root) return
+    open.set(cur.tag, (open.get(cur.tag) ?? 1) - 1)
+    depth--
+    cur = cur.parent ?? root
+  }
+  const nextGt = (from        )         => {
+    if (from >= noGtFrom) return -1
+    const k = src.indexOf('>', from)
+    if (k < 0) noGtFrom = from
+    return k
+  }
+
+  let i = 0
+  let textStart = 0
+  scan: while (i < n) {
+    const lt = src.indexOf('<', i)
+    if (lt < 0) break
+    i = lt
+    const c1 = src[i + 1]
+    let tokenEnd = -1
+
+    if (c1 === '!') {
+      if (src.startsWith('<!--', i)) {
+        const k = src.indexOf('-->', i + 4)
+        tokenEnd = k < 0 ? n : k + 3
+      } else {
+        const k = src.startsWith('<![CDATA[', i) ? src.indexOf(']]>', i + 9) : -1
+        if (k >= 0) tokenEnd = k + 3
+        else { const g = nextGt(i + 2); if (g >= 0) tokenEnd = g + 1 }
+      }
+      if (tokenEnd < 0) { i++; continue }
+      pushText(cur, src.slice(textStart, i))
+      i = textStart = tokenEnd
+      continue
+    }
+    if (c1 === '?') {
+      const g = nextGt(i + 2)
+      if (g < 0) { i++; continue }
+      pushText(cur, src.slice(textStart, i))
+      i = textStart = g + 1
+      continue
+    }
+    if (c1 === '/') {
+      let j = i + 2
+      while (j < n && isWs(src[j])) j++
+      if (j < n && isAsciiAlpha(src[j])) {
+        const ns = j
+        while (j < n && isNameChar(src[j])) j++
+        const tag = src.slice(ns, j).toLowerCase()
+        while (j < n && isWs(src[j])) j++
+        if (src[j] === '>') {
+          pushText(cur, src.slice(textStart, i))
+          i = textStart = j + 1
+          if ((open.get(tag) ?? 0) > 0) { while (cur !== root && cur.tag !== tag) pop(); pop() }
+          continue
+        }
+      }
+      i++
+      continue
+    }
+    if (!c1 || !isAsciiAlpha(c1)) { i++; continue }
+
+    const st = scanStartTag(src, i, L.maxAttrs)
+    if (!st) break // unterminated tag at end of input: the remainder is text
+    pushText(cur, src.slice(textStart, i))
+    i = textStart = st.end
+    const { tag, attrs, selfClose } = st
 
     if (DROP_CONTENT.has(tag)) {
       if (!selfClose) {
-        const endRe = new RegExp(`</\\s*${tag}\\s*>`, 'ig')
-        endRe.lastIndex = last
-        const end = endRe.exec(src)
-        last = end ? endRe.lastIndex : src.length
-        TOKEN_RE.lastIndex = last
+        const re = endTagRe(tag)
+        re.lastIndex = i
+        const end = re.exec(src)
+        i = textStart = end ? re.lastIndex : n
       }
       continue
     }
+    if (elements >= L.maxElements) { root.truncated = true; textStart = n; break scan }
+    elements++
     // implicit closes
     const sib = SELF_CLOSING_SIBLINGS[tag]
-    if (sib && sib.includes(cur.tag)) cur = cur.parent ?? root
-    if (P_CLOSERS.has(tag) && cur.tag === 'p') cur = cur.parent ?? root
+    if (sib && sib.includes(cur.tag)) pop()
+    if (P_CLOSERS.has(tag) && cur.tag === 'p') pop()
 
     const el           = { tag, attrs, children: [], parent: cur }
     cur.children.push(el)
     if (RAW_TEXT.has(tag) && !selfClose) {
-      const endRe = new RegExp(`</\\s*${tag}\\s*>`, 'ig')
-      endRe.lastIndex = last
-      const end = endRe.exec(src)
-      const rawEnd = end ? end.index : src.length
-      const text = src.slice(last, rawEnd)
-      if (text) el.children.push(decodeEntities(text))
-      last = end ? endRe.lastIndex : src.length
-      TOKEN_RE.lastIndex = last
+      const re = endTagRe(tag)
+      re.lastIndex = i
+      const end = re.exec(src)
+      pushText(el, src.slice(i, end ? end.index : n))
+      i = textStart = end ? re.lastIndex : n
       continue
     }
-    if (!VOID.has(tag) && !selfClose) cur = el
+    if (!VOID.has(tag) && !selfClose) {
+      if (depth >= L.maxDepth) root.truncated = true // attached, not entered: content flattens into the parent
+      else enter(el)
+    }
   }
-  pushText(src.slice(last))
+  pushText(cur, src.slice(textStart))
   return root
 }
 

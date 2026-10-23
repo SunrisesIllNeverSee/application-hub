@@ -44,42 +44,23 @@ export interface HistoryMeta {
   placeholder: { found: boolean; markers: string[] }
   imported_at: string
   importer: string
+  /** Importer's confidence that the question/answer split is right (absent on older imports). */
+  parse_confidence?: HistoryParseConfidence
+  /** Why the confidence is below high, e.g. 'answer_contains_question_line'. */
+  parse_notes?: string[]
 }
 
-interface PlaceholderRule {
-  id: string
-  label: string
-  re: RegExp
-}
+export type HistoryParseConfidence = 'high' | 'medium' | 'low'
 
-/**
- * Unfilled-placeholder patterns. Kept deliberately narrow so ordinary prose
- * does not trip them: bracket markers are the M09 drafting conventions,
- * TODO/TBD/XXX are whole words, angle placeholders start with a letter or an
- * ellipsis right after `<` (`<company name>`, `<…>`, `<...>`; `a < b` is not
- * one), and `{{…}}` is a template slot.
- */
-export const PLACEHOLDER_RULES: readonly PlaceholderRule[] = [
-  { id: 'confirm', label: '[CONFIRM…] marker', re: /\[\s*CONFIRM/i },
-  { id: 'asset_needed', label: '[ASSET NEEDED…] marker', re: /\[\s*ASSET\s+NEEDED/i },
-  { id: 'todo', label: 'TODO', re: /\bTODO\b/i },
-  { id: 'tbd', label: 'TBD', re: /\bTBD\b/i },
-  { id: 'xxx', label: 'XXX', re: /\bX{3,}\b/i },
-  { id: 'angle', label: '<…> placeholder', re: /<(?:…|\.{2,}|[A-Za-z_][^<>\n]{0,80})>/ },
-  { id: 'mustache', label: '{{…}} template slot', re: /\{\{[^{}\n]{0,200}\}\}/ },
-]
+/** Shown next to a low-confidence record on the confirm screen. */
+export const LOW_CONFIDENCE_REASON =
+  'The importer is not sure it split this question and answer correctly. Check that both match what you submitted before you confirm it.'
 
-/** Ids of every placeholder rule the text trips (empty = clean). */
-export function findPlaceholders(text: string): string[] {
-  const s = String(text ?? '')
-  return PLACEHOLDER_RULES.filter((r) => r.re.test(s)).map((r) => r.id)
-}
-
-/** Human-readable reason for a list of placeholder ids. */
-export function describePlaceholders(ids: readonly string[]): string {
-  const labels = ids.map((id) => PLACEHOLDER_RULES.find((r) => r.id === id)?.label ?? id)
-  return labels.length ? `Contains an unfilled placeholder (${labels.join(', ')}). Fill it in before confirming.` : ''
-}
+// Placeholder detection lives in ONE module (placeholders.ts) shared by the
+// vault writes, the /history screen and the companion; re-exported here so
+// existing importers keep working.
+export { PLACEHOLDER_RULES, findPlaceholders, hasPlaceholders, describePlaceholders, normalizeForPlaceholderScan } from './placeholders.ts'
+export type { PlaceholderRule } from './placeholders.ts'
 
 const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/
 

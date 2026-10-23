@@ -49,12 +49,46 @@ export type CandidateQuestion = {
   qualifiers?: string[]
   canonical_text?: string
   theme?: string
+  /** A canonical link the publish step will write. Only AQUA's own matcher
+      (origin 'auto_match') and curator overrides ever produce one; anything a
+      submitter sends is demoted to `suggested_mapping` (M09 review M5). */
   mapping?: {
     canonical_question_id?: string
     tier: (typeof MAPPING_TIERS)[number]
     confidence?: number
     rationale?: string
+    origin?: 'auto_match'
   }
+  /** A submitter's proposed mapping. Never a canonical link: a curator must
+      confirm it with a mapping override before it counts. */
+  suggested_mapping?: SuggestedMapping
+}
+
+export const SUBMITTER_SUGGESTED = 'submitter_suggested' as const
+export type SuggestedMapping = {
+  canonical_question_id?: string
+  tier: (typeof MAPPING_TIERS)[number]
+  confidence?: number
+  rationale?: string
+  decision: typeof SUBMITTER_SUGGESTED
+}
+
+/**
+ * M09 review M5: submitter-supplied (or otherwise unconfirmed) question
+ * mappings never become canonical links. Moves every `mapping` into
+ * `suggested_mapping` (decision 'submitter_suggested'); the curator confirms
+ * one with a mapping override at review time. Returns the indexes demoted.
+ */
+export function demoteToSuggestedMappings(payload: CandidatePayload): { payload: CandidatePayload; demoted: number[] } {
+  const demoted: number[] = []
+  const questions = payload.questions.map((q, i) => {
+    if (!q.mapping) return q
+    demoted.push(i)
+    const { mapping, ...rest } = q
+    const { origin: _origin, ...m } = mapping
+    return { ...rest, suggested_mapping: { ...m, decision: SUBMITTER_SUGGESTED } }
+  })
+  return { payload: { ...payload, questions }, demoted }
 }
 
 export type CandidatePayload = {
@@ -185,10 +219,36 @@ export function isValidTimeZone(tz: string): boolean {
   try { new Intl.DateTimeFormat('en-US', { timeZone: tz }); return true } catch { return false }
 }
 
+function parseMapping(ctx: Ctx, mp: string, m: unknown, kind: 'mapping' | 'suggested'): NonNullable<CandidateQuestion['mapping']> | null {
+  if (!isObj(m)) { ctx.errors.push({ path: mp, code: 'invalid_type' }); return null }
+  allowKeys(ctx, mp, m, kind === 'mapping'
+    ? ['canonical_question_id', 'tier', 'confidence', 'rationale', 'origin']
+    : ['canonical_question_id', 'tier', 'confidence', 'rationale', 'decision'])
+  const tier = oneOf(ctx, `${mp}.tier`, m.tier, MAPPING_TIERS, true)
+  const mapping: NonNullable<CandidateQuestion['mapping']> = { tier: tier ?? 'novel' }
+  if (m.canonical_question_id !== undefined && m.canonical_question_id !== null) {
+    if (typeof m.canonical_question_id !== 'string' || !UUID_RE.test(m.canonical_question_id)) ctx.errors.push({ path: `${mp}.canonical_question_id`, code: 'invalid_uuid' })
+    else mapping.canonical_question_id = m.canonical_question_id.toLowerCase()
+  }
+  if (m.confidence !== undefined && m.confidence !== null) {
+    if (typeof m.confidence !== 'number' || !(m.confidence >= 0 && m.confidence <= 1)) ctx.errors.push({ path: `${mp}.confidence`, code: 'invalid_number' })
+    else mapping.confidence = m.confidence
+  }
+  const r = str(ctx, `${mp}.rationale`, m.rationale, { max: LIMITS.rationale }); if (r !== undefined) mapping.rationale = r
+  if (kind === 'mapping' && m.origin !== undefined) {
+    if (m.origin !== 'auto_match') ctx.errors.push({ path: `${mp}.origin`, code: 'invalid_enum' })
+    else mapping.origin = 'auto_match'
+  }
+  if (kind === 'suggested' && m.decision !== undefined && m.decision !== SUBMITTER_SUGGESTED) ctx.errors.push({ path: `${mp}.decision`, code: 'invalid_enum' })
+  if (tier === 'novel' && mapping.canonical_question_id) ctx.errors.push({ path: `${mp}.tier`, code: 'novel_with_canonical' })
+  if (tier && tier !== 'novel' && !mapping.canonical_question_id) ctx.errors.push({ path: `${mp}.canonical_question_id`, code: 'required' })
+  return mapping
+}
+
 function question(ctx: Ctx, path: string, v: unknown): CandidateQuestion | undefined {
   if (!isObj(v)) { ctx.errors.push({ path, code: 'invalid_type' }); return undefined }
   allowKeys(ctx, path, v, ['asked_as', 'order_index', 'section', 'required', 'response_type', 'word_limit', 'char_limit',
-    'time_context', 'qualifiers', 'canonical_text', 'theme', 'mapping'])
+    'time_context', 'qualifiers', 'canonical_text', 'theme', 'mapping', 'suggested_mapping'])
   const asked_as = str(ctx, `${path}.asked_as`, v.asked_as, { required: true, max: LIMITS.askedAs })
   const order_index = int(ctx, `${path}.order_index`, v.order_index, 0, LIMITS.orderIndex, true)
   const q: CandidateQuestion = { asked_as: asked_as ?? '', order_index: order_index ?? 0 }
@@ -202,26 +262,12 @@ function question(ctx: Ctx, path: string, v: unknown): CandidateQuestion | undef
   const ct = str(ctx, `${path}.canonical_text`, v.canonical_text, { max: LIMITS.canonicalText }); if (ct !== undefined) q.canonical_text = ct
   const theme = str(ctx, `${path}.theme`, v.theme, { max: LIMITS.theme, pattern: THEME_RE }); if (theme !== undefined) q.theme = theme
   if (v.mapping !== undefined && v.mapping !== null) {
-    const m = v.mapping
-    const mp = `${path}.mapping`
-    if (!isObj(m)) ctx.errors.push({ path: mp, code: 'invalid_type' })
-    else {
-      allowKeys(ctx, mp, m, ['canonical_question_id', 'tier', 'confidence', 'rationale'])
-      const tier = oneOf(ctx, `${mp}.tier`, m.tier, MAPPING_TIERS, true)
-      const mapping: NonNullable<CandidateQuestion['mapping']> = { tier: tier ?? 'novel' }
-      if (m.canonical_question_id !== undefined && m.canonical_question_id !== null) {
-        if (typeof m.canonical_question_id !== 'string' || !UUID_RE.test(m.canonical_question_id)) ctx.errors.push({ path: `${mp}.canonical_question_id`, code: 'invalid_uuid' })
-        else mapping.canonical_question_id = m.canonical_question_id.toLowerCase()
-      }
-      if (m.confidence !== undefined && m.confidence !== null) {
-        if (typeof m.confidence !== 'number' || !(m.confidence >= 0 && m.confidence <= 1)) ctx.errors.push({ path: `${mp}.confidence`, code: 'invalid_number' })
-        else mapping.confidence = m.confidence
-      }
-      const r = str(ctx, `${mp}.rationale`, m.rationale, { max: LIMITS.rationale }); if (r !== undefined) mapping.rationale = r
-      if (tier === 'novel' && mapping.canonical_question_id) ctx.errors.push({ path: `${mp}.tier`, code: 'novel_with_canonical' })
-      if (tier && tier !== 'novel' && !mapping.canonical_question_id) ctx.errors.push({ path: `${mp}.canonical_question_id`, code: 'required' })
-      q.mapping = mapping
-    }
+    const mapping = parseMapping(ctx, `${path}.mapping`, v.mapping, 'mapping')
+    if (mapping) q.mapping = mapping
+  }
+  if (v.suggested_mapping !== undefined && v.suggested_mapping !== null) {
+    const sm = parseMapping(ctx, `${path}.suggested_mapping`, v.suggested_mapping, 'suggested')
+    if (sm) q.suggested_mapping = { ...sm, decision: SUBMITTER_SUGGESTED } as SuggestedMapping
   }
   return q
 }

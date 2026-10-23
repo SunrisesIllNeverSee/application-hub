@@ -53,7 +53,9 @@ test('llms.txt, llms-full.txt and /agents.md carry the generated count, install 
     for (const must of [/locate_workspace/, /init_workspace/, /elicitation/, /requires_human/, /import_history/, /\/history/, /sync_from_vault_export/, /export-backup/, /aqua-catalog\.json/, /https:\/\/aquaidp\.xyz\/mcp/, /https:\/\/aquaidp\.xyz\/mcp: live/, /never travels through the model/, /[Ii]ntentionally absent/]) {
       assert.match(text, must, `${name}: ${must}`)
     }
-    assert.match(text, /GB1|once OWNER publishes|not yet published/, `${name}: honest npm status`)
+    assert.match(text, /npx -y aqua-mcp-server/, `${name}: aqua-mcp-server from npm is the primary install`)
+    assert.doesNotMatch(text, /not yet published|once OWNER publishes|GB1\)/, `${name}: no stale not-yet-published claim`)
+    assert.match(text, /[Ff]allback/, `${name}: the tarball is named as the fallback`)
   }
 })
 

@@ -29,8 +29,8 @@ Nothing is ever submitted by the agent.
 
 | # | Step | Who | Exact command / tool |
 |---|---|---|---|
-| 1 | Install | user or agent | `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help` (check the sha256 in https://aquaidp.xyz/companion/latest.json first) |
-| 2 | Connect the agent | user | `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --keychain` |
+| 1 | Install | user or agent | `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help` (check the sha256 in https://aquaidp.xyz/companion/latest.json first) |
+| 2 | Connect the agent | user | `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --keychain` |
 | 3 | Check | agent | `doctor` (tool) or `aqua-companion doctor` |
 | 4 | Find / create the workspace | agent proposes, **user confirms** | `locate_workspace`, then `init_workspace`: the user confirms folder + consent in the client UI (MCP elicitation). Without elicitation, or without a passphrase in the server environment, it returns `requires_human` and the user runs `aqua-companion init --path ~/Documents` in a terminal. Then restart the server with `--workspace ~/Documents/AQUA`. |
 | 5 | Load submitted history | agent | user copies past applications into `inbox/history/`; `import_history { folder: "history" }` |
@@ -38,7 +38,7 @@ Nothing is ever submitted by the agent.
 | 7 | Ingest the application | agent | user saves the form (or copies it) into `inbox/form.md`; `import_local_application { file: "form.md", source_url: "<the live URL>" }`, or `discover_applications` / `get_application_details` for catalog programs |
 | 8 | Match | agent | `match_canonical_questions { application_id }`, `search_answer_bank { query }` |
 | 9 | Draft reuse / adapt / gap | agent | `read_review_status` (Direct / Adapt / Gap), `create_draft_version` per question, `request_evidence` / `attach_evidence` |
-| 10 | To the browser | user | `aqua-companion export-backup ~/Desktop/for-browser.json`, then AQUA Local > Restore backup |
+| 10 | To the browser | user | `aqua-companion export-backup ~/Desktop/for-browser.json --workspace ~/Documents/AQUA`, then AQUA Local > Restore backup |
 | 11 | Confirm history, review, approve | **user only** | https://aquaidp.xyz/history (confirm submitted answers) and https://aquaidp.xyz/review/<application> (approve drafts; approval binds the exact hash) |
 | 12 | Approvals back to the workspace | user, then agent | user exports a fresh backup into `inbox/`; `sync_from_vault_export`; `read_review_status` now shows `approved` |
 | 13 | Packet | agent, then **user** | `prepare_packet` (readiness), user freezes/signs/exports in AQUA Local, puts the export in `inbox/`; `verify_packet { file }` |
@@ -49,11 +49,18 @@ stores a confirmation file unattested; only the user attests it in the browser.
 ## Setup
 
 You need Node.js 22 or newer. Below, `<tgz>` is
-`https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz` (or a local copy you
-verified), and `<dir>` is your workspace folder (the one that contains
+`https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz`, and `<dir>` is your workspace folder (the one that contains
 `workspace.json`; usually `~/Documents/AQUA`). From a repository checkout,
 `node <path>/aqua-companion/bin/aqua-companion.mjs` works the same as
-`npx --yes <tgz>`.
+`npx --yes <tgz>`. For a local copy of the tarball you verified, write
+`npx --yes --package <absolute path>/aqua-companion-0.2.3.tgz aqua-companion`
+instead of `npx --yes <tgz>`: npx treats a bare absolute `.tgz` path as a
+program to run and fails with "Permission denied".
+
+`init --path <folder>` creates `<folder>/AQUA`. The server and the CLI find a
+workspace only through `--workspace <dir>`, `AQUA_WORKSPACE`, or the folder
+they run in (or a parent), so pass `--workspace` to `mcp` and to commands
+such as `export-backup` when you run them from anywhere else.
 
 ### Claude Code
 
@@ -155,15 +162,38 @@ the tool runs, not by asking the agent to behave.
 
 - **read**: always allowed. These tools get a workspace handle whose write
   methods throw, so a bug cannot turn a read into a write.
-- **private_write**: stages records in your workspace. Refused when the
-  server runs with `--read-only`.
+- **private_write**: stages records in your workspace (including the review
+  HTML from `present_review_decisions`, which holds your answers in plain
+  text; at most 25 review files are kept). Refused when the server runs with
+  `--read-only`.
 - **human_only**: never does anything. Returns `{ status: "requires_human",
   how: [steps], link }` describing what you do in the AQUA web app.
 - **privileged**: not exposed at all (see below).
 
 - **human_consent**: acts only after the user confirms in the client UI
   (MCP elicitation); otherwise returns `requires_human`. Refused in
-  `--read-only` mode.
+  `--read-only` mode. Consent prompts are rationed: at most 3 per hour, and none for 5
+  minutes after a prompt nobody answered.
+
+### What changes on disk (the write policy)
+
+Only `private_write` tools write to your workspace. There are exactly two documented
+exceptions, enforced by the dispatcher (a read tool's handler never gets a writable
+workspace):
+
+1. **The agent audit log** (`audit/agent.jsonl`): an append-only line per tool call
+   with HMACs of the arguments, never content. It is written for every tool, also under
+   `--read-only`.
+2. **The public catalog cache** (`catalog-cache/snapshots/`): public data only. It is
+   refreshed by `refresh_catalog`, `discover_applications`, `get_application_details`
+   and `match_canonical_questions`, through a dispatcher-owned call, not by the tool
+   itself. Under `--read-only` the refreshed catalog is kept in memory for the session.
+
+Under `--read-only`, nothing else in the workspace changes (not even creating
+`inbox/`); the test suite compares every file and directory byte for byte before and
+after a session. `sync_from_vault_export` never chooses the account binding: for an
+older backup without an account fingerprint it returns `requires_human` with the
+`aqua-companion import-backup <file> --account <you>` command for you to run.
 
 | Capability | Tool | Tier |
 |---|---|---|
@@ -181,7 +211,7 @@ the tool runs, not by asking the agent to behave.
 | Search the private answer bank | `search_answer_bank` | read |
 | Create draft versions | `create_draft_version` | private_write |
 | Request evidence | `request_evidence`, `attach_evidence` | private_write |
-| Present review decisions | `present_review_decisions` | read (writes the review file to `exports/reviews/` unless read-only) |
+| Present review decisions | `present_review_decisions` | private_write (writes the review file to `exports/reviews/`; refused read-only) |
 | Read review status | `read_review_status` | read |
 | Prepare a packet | `prepare_packet` (readiness report; never freezes) | read |
 | Export a packet | `export_packet` | human_only |
@@ -189,7 +219,7 @@ the tool runs, not by asking the agent to behave.
 | Record an externally observed submission | `record_observed_submission` / `attest_submission` | private_write (never marks submitted) / human_only |
 | Final approval | `approve_answer` | human_only |
 | Signing | `sign_packet` | human_only |
-| Refresh the public catalog | `refresh_catalog` | read (public data only; kept in memory in read-only mode) |
+| Refresh the public catalog | `refresh_catalog` | read, plus the documented public-cache exception below |
 
 The same tool set, with the same enforcement, is what `aqua-mcp-server` 2.0
 serves: it imports `createAquaToolRegistry` and `SETUP_TOOLS` from this
@@ -279,7 +309,7 @@ return the steps you take in the browser (tests cover exactly this case).
    builds the review file (`present_review_decisions`) and the readiness
    report (`prepare_packet`). History it imported (`import_history`) is
    staged the same way.
-2. You run `aqua-companion export-backup ~/Desktop/for-browser.json` (it
+2. You run `aqua-companion export-backup ~/Desktop/for-browser.json --workspace ~/Documents/AQUA` (it
    shows a plan and asks you to confirm).
 3. In the AQUA web app: AQUA Local, Restore backup, choose the file.
 4. Confirm the answers you actually submitted at **Confirm submitted
@@ -308,23 +338,49 @@ their questions. It is public data, stored in plain text under
   from the AQUA Supabase project with read-only GET requests. The requests
   contain table and column names and public catalog ids, nothing from your
   workspace.
+- Where the catalog configuration comes from (one resolver, shared with
+  aqua-mcp-server): `--catalog-config <file or https URL>`, then
+  `AQUA_SUPABASE_URL` + `AQUA_PUBLISHABLE_KEY`, `AQUA_CATALOG_CONFIG_URL`,
+  `AQUA_CATALOG_CONFIG`, the bundled file, and finally
+  `https://aquaidp.xyz/.well-known/aqua-catalog.json` (`--offline` /
+  `AQUA_CATALOG_OFFLINE=1` skips the fetch). A configuration fetched over the
+  network is untrusted: it must name `https://<ref>.supabase.co`, it cannot
+  rename tables, and nothing from it is put into tool messages.
 - `aqua-companion catalog import-file <file>` caches a catalog JSON you
   downloaded (`{ programs, cycles, questions, canonical_questions }`).
-- Programs are kept only if they are canonical and their slug is in the
-  approval registry (`app/lib/canonical-catalog.ts`, vendored), even if the
-  server returns more.
+- The agent's catalog reads (`discover_applications`,
+  `get_application_details`, `match_canonical_questions`) refresh an empty
+  or stale cache automatically: older than 24 hours by default,
+  `AQUA_CATALOG_MAX_AGE_HOURS=<hours>` to change it, `0` to turn it off. It is
+  the same public read-only request as `refresh_catalog`, with the same
+  configuration and key rules. With `--read-only` the result is kept for the
+  session only. Offline or unconfigured, they answer from the cache, and with
+  nothing cached they return `catalog_empty: "run refresh_catalog"`.
+- Programs are kept only if they are approved, on the same rule the site
+  uses (`approvedProgramsFilter` in `app/lib/canonical-catalog.ts`,
+  vendored): the slug is in the approval registry, or the source is
+  `canonical` (published through curator review). Anything else is dropped,
+  even if the server returns it.
 
-Where the configuration comes from, in order:
+Where the configuration comes from, in order (one resolver; aqua-mcp-server
+uses the same code):
 
-1. a local file: `--catalog-config <file>` or `AQUA_CATALOG_CONFIG`
-   (`{ "supabase_url": "https://<project-ref>.supabase.co", "publishable_key": "<publishable or anon key>" }`);
-2. `aqua-companion/config/public-catalog.json`, when it holds real values
+1. `--catalog-config <file or https URL>`;
+2. `AQUA_SUPABASE_URL` + `AQUA_PUBLISHABLE_KEY`;
+3. `AQUA_CATALOG_CONFIG_URL` (an https URL);
+4. `AQUA_CATALOG_CONFIG` (a local file:
+   `{ "supabase_url": "https://<project-ref>.supabase.co", "publishable_key": "<publishable or anon key>" }`);
+5. `aqua-companion/config/public-catalog.json`, when it holds real values
    (it ships with placeholders);
-3. `https://aquaidp.xyz/.well-known/aqua-catalog.json`, which returns
-   `{ version, supabase_url, publishable_key, tables, notes }`. That exact
-   origin and path is the only place the companion fetches configuration
-   from (GET, no redirects, no cookies, nothing from the workspace).
-   `AQUA_CATALOG_OFFLINE=1` skips it.
+6. `--offline` or `AQUA_CATALOG_OFFLINE=1`: not configured (no fetch);
+7. `https://aquaidp.xyz/.well-known/aqua-catalog.json`, which returns
+   `{ version, supabase_url, publishable_key, tables, notes }` (GET, no
+   redirects, no cookies, nothing from the workspace).
+
+Anything fetched over the network (3, a URL in 1, 7) is untrusted data: its
+`supabase_url` must be an `https://<ref>.supabase.co` origin, it cannot rename
+tables, and none of its text is copied into tool messages. Local files and
+env values are your own choice (for example a loopback URL for testing).
 
 The publishable key is public by design: it is the same value the web app
 ships to every browser, and row-level security limits what it can read. The

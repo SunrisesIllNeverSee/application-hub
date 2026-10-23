@@ -1,8 +1,18 @@
 #!/bin/bash
 set -e
 root="$(git rev-parse --show-toplevel)"
-# Refuse staged unresolved merge-conflict markers.
-if git diff --cached --name-only --diff-filter=ACM -z | xargs -0 -r grep -lE '^(<<<<<<<|>>>>>>>) ' -- 2>/dev/null; then
+# Refuse staged unresolved merge-conflict markers. Checks the STAGED content
+# of added/copied/modified files. No xargs: a commit that only deletes or
+# renames files stages nothing to scan and must not be refused (BSD and GNU
+# xargs differ on running the command with empty input).
+found=""
+while IFS= read -r -d '' f; do
+  if git show ":$f" 2>/dev/null | grep -qE '^(<<<<<<<|>>>>>>>) '; then
+    found="${found}${f}"$'\n'
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACM -z)
+if [ -n "$found" ]; then
+  printf '%s' "$found" >&2
   echo "pre-commit: unresolved merge-conflict markers in the files above" >&2
   exit 1
 fi

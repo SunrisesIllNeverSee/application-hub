@@ -106,8 +106,18 @@ export async function verifyPacketText(raw) {
   // --- check 6: per-answer sha256 ---
   const questions = Array.isArray(packet.questions) ? packet.questions : []
   let allAnswersOk = questions.length > 0
+  let skipsOk = true
   for (const q of questions) {
-    if (q.skipped) continue
+    if (q.skipped === true) {
+      // A skip is an explanation, never a hidden answer: no version, body,
+      // title or hash, not approved, and a non-blank reason.
+      const ok = q.approved === false && q.version_id == null && q.answer_body == null &&
+        q.answer_title == null && q.answer_sha256 == null &&
+        typeof q.skip_reason === 'string' && q.skip_reason.trim() !== ''
+      if (!ok) skipsOk = false
+      continue
+    }
+    if (q.skipped !== false && q.skipped !== undefined) { allAnswersOk = false; continue }
     const expected = await sha256Hex(canonicalJson({ title: q.answer_title, body: q.answer_body }))
     if (expected !== q.answer_sha256 || q.approved !== true || !q.version_id) {
       allAnswersOk = false
@@ -116,7 +126,12 @@ export async function verifyPacketText(raw) {
   check(
     'per-answer sha256',
     allAnswersOk,
-    `${questions.filter((q) => !q.skipped).length} answer(s) hashed`,
+    `${questions.filter((q) => q.skipped !== true).length} answer(s) hashed`,
+  )
+  check(
+    'skipped entries are explained and carry no answer',
+    skipsOk,
+    `${questions.filter((q) => q.skipped === true).length} skip(s)`,
   )
 
   // --- check 7: provenance declared-vs-observed honesty ---

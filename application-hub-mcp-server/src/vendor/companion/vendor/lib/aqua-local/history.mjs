@@ -2,8 +2,8 @@
 // `npm run vendor:companion` in application-hub-mcp-server/ (CI checks these copies).
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/aqua-local/history.ts
-// source-sha256: 56e522b8cc9c47e23a2787a5f353dabd8f759a2177c0a8195ef42289f85ce480
-// body-sha256: 30e4100b8ad09485987b5e481af4450b3d901f608fe77326e4124b2f17acddb2
+// source-sha256: 8f6396893fab300afddd75f7575164bb33283680f41b07fbb3303bf0b21497a0
+// body-sha256: 7478f28210177eda0a1fb1735dc6e1c9c2f72a906d6f116df76fca353f84a786
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // NETWORK-BOUNDARY: no fetch/import of remote APIs allowed in aqua-local
 //
@@ -51,42 +51,23 @@ export const HISTORY_VIA = 'history_attestation'
                                                     
                      
                   
+                                                                                                 
+                                           
+                                                                                
+                        
  
 
-                           
-            
-               
-            
- 
+                                                              
 
-/**
- * Unfilled-placeholder patterns. Kept deliberately narrow so ordinary prose
- * does not trip them: bracket markers are the M09 drafting conventions,
- * TODO/TBD/XXX are whole words, angle placeholders start with a letter or an
- * ellipsis right after `<` (`<company name>`, `<…>`, `<...>`; `a < b` is not
- * one), and `{{…}}` is a template slot.
- */
-export const PLACEHOLDER_RULES                             = [
-  { id: 'confirm', label: '[CONFIRM…] marker', re: /\[\s*CONFIRM/i },
-  { id: 'asset_needed', label: '[ASSET NEEDED…] marker', re: /\[\s*ASSET\s+NEEDED/i },
-  { id: 'todo', label: 'TODO', re: /\bTODO\b/i },
-  { id: 'tbd', label: 'TBD', re: /\bTBD\b/i },
-  { id: 'xxx', label: 'XXX', re: /\bX{3,}\b/i },
-  { id: 'angle', label: '<…> placeholder', re: /<(?:…|\.{2,}|[A-Za-z_][^<>\n]{0,80})>/ },
-  { id: 'mustache', label: '{{…}} template slot', re: /\{\{[^{}\n]{0,200}\}\}/ },
-]
+/** Shown next to a low-confidence record on the confirm screen. */
+export const LOW_CONFIDENCE_REASON =
+  'The importer is not sure it split this question and answer correctly. Check that both match what you submitted before you confirm it.'
 
-/** Ids of every placeholder rule the text trips (empty = clean). */
-export function findPlaceholders(text        )           {
-  const s = String(text ?? '')
-  return PLACEHOLDER_RULES.filter((r) => r.re.test(s)).map((r) => r.id)
-}
-
-/** Human-readable reason for a list of placeholder ids. */
-export function describePlaceholders(ids                   )         {
-  const labels = ids.map((id) => PLACEHOLDER_RULES.find((r) => r.id === id)?.label ?? id)
-  return labels.length ? `Contains an unfilled placeholder (${labels.join(', ')}). Fill it in before confirming.` : ''
-}
+// Placeholder detection lives in ONE module (placeholders.ts) shared by the
+// vault writes, the /history screen and the companion; re-exported here so
+// existing importers keep working.
+export { PLACEHOLDER_RULES, findPlaceholders, hasPlaceholders, describePlaceholders, normalizeForPlaceholderScan } from './placeholders.mjs'
+                                                        
 
 const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/
 

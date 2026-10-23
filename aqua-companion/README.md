@@ -20,20 +20,22 @@ sends nothing from your workspace.
 
 ## Install
 
-`aqua-companion` is not on npm yet (owner gate GB2). Until it is, the site
-serves a versioned `npm pack` tarball with its sha256:
+`aqua-companion` is not published on npm by itself (owner gate GB2); `aqua-mcp-server`
+on npm includes it. The site also serves a versioned `npm pack` tarball with its sha256 (the fallback install):
 
 ```sh
 curl -fsSL https://aquaidp.xyz/companion/latest.json          # { version, url, sha256 }
-curl -fsSLO https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz
-shasum -a 256 aqua-companion-0.2.0.tgz                         # compare with latest.json / .tgz.sha256
-npx --yes ./aqua-companion-0.2.0.tgz --help                    # or: npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz --help
-npm install -g ./aqua-companion-0.2.0.tgz                      # optional: puts `aqua-companion` on your PATH
+curl -fsSLO https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz
+shasum -a 256 aqua-companion-0.2.3.tgz                         # compare with latest.json / .tgz.sha256
+npx --yes ./aqua-companion-0.2.3.tgz --help                    # or: npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help
+# from another folder: npx --yes --package /full/path/aqua-companion-0.2.3.tgz aqua-companion --help (a bare absolute .tgz path fails)
+npm install -g ./aqua-companion-0.2.3.tgz                      # optional: puts `aqua-companion` on your PATH
 ```
 
 From a repository checkout you can also run `node aqua-companion/bin/aqua-companion.mjs --help`.
-`aqua-mcp-server` 2.0 (built on this companion) becomes `npx -y aqua-mcp-server`
-once it is published (owner gate GB1); versions below 2.0 are legacy.
+`aqua-mcp-server` 2.0 (built on this companion) is published: `npx -y aqua-mcp-server`
+includes this companion and is the primary install; the tarball above is the fallback.
+Versions below 2.0 are legacy.
 
 ## Quick start
 
@@ -63,7 +65,7 @@ aqua-companion add-evidence --title "Pilot results" --kind passage --excerpt-fil
 aqua-companion comment --version <id> --body-file note.txt
 
 # 6. Send staged work to the browser.
-aqua-companion export-backup ~/Desktop/for-browser.json
+aqua-companion export-backup ~/Desktop/for-browser.json --workspace ~/Documents/AQUA
 #    In the web app: AQUA Local > Restore backup, choose the file, then review and approve there
 #    (/review/<application>), and confirm submitted history at /history.
 # 7. Bring the approvals back: export a fresh browser backup, then
@@ -193,7 +195,7 @@ skips the fetch, and everything works offline on the cache. Details:
 ## Using an AI agent
 
 ```sh
-claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.0.tgz mcp --workspace ~/Documents/AQUA --keychain
+claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --workspace ~/Documents/AQUA --keychain
 ```
 
 `aqua-companion mcp` serves your workspace to a local agent (Claude Code,

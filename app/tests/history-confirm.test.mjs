@@ -15,6 +15,7 @@ import {
   DATE_UNKNOWN_REASON, DEFAULT_ATTESTATION_STATEMENT,
 } from '../lib/aqua-local/history-review.ts'
 import { seedSyntheticHistory } from '../lib/history-ui/synthetic-seed.ts'
+import { recordReviewDecision } from '../lib/aqua-local/review-ledger.ts'
 
 const SECRET = 'synthetic-history-ui-secret'
 
@@ -120,10 +121,54 @@ test('the route is protected, flag-gated, and the dev harness 404s in production
   assert.match(mw, /PROTECTED_ROUTES = \[[^\]]*'\/history'/)
   const page = await readFile(new URL('../app/(app)/history/page.tsx', import.meta.url), 'utf8')
   assert.match(page, /NEXT_PUBLIC_AQUA_LOCAL_FIRST/)
+  assert.match(page, /if \(!LOCAL_FIRST\) notFound\(\)/, 'gated on the shared fail-closed client flag')
   assert.match(page, /notFound\(\)/)
   const harness = await readFile(new URL('../app/dev/history-harness/page.tsx', import.meta.url), 'utf8')
   assert.match(harness, /process\.env\.NODE_ENV === 'production'\) notFound\(\)/)
   const ui = await readFile(new URL('../components/history/HistoryConfirm.tsx', import.meta.url), 'utf8')
   assert.match(ui, /useState<Set<string>>\(\(\) => new Set\(\)\) \/\/ nothing preselected/)
   assert.doesNotMatch(ui, /fetch\(/)
+})
+
+test('low parse confidence: surfaced with notes, needs an explicit review, never preselected; older imports stay null', async () => {
+  const s = createMemoryStorage()
+  await seedSyntheticHistory(s, SECRET, [{
+    program: 'Synthetic Split Check Grant',
+    submitted_at: '2024-09-10',
+    source_file: 'synthetic-split-check.docx',
+    qa: [
+      { question: 'Who is on your team?', answer: 'Two synthetic founders.\n\nHow will you use the funds?\n\nSynthetic buoys.', parse_confidence: 'low', parse_notes: ['answer_contains_question_line'] },
+      { question: 'Why now?', answer: 'Synthetic costs fell.', parse_confidence: 'high' },
+      { question: 'Anything else?', answer: 'No (synthetic).' },
+    ],
+  }])
+  const items = flat(await listHistoryCandidates(s, SECRET))
+  const low = items.find((i) => i.question === 'Who is on your team?')
+  assert.equal(low.parse_confidence, 'low')
+  assert.deepEqual(low.parse_notes, ['answer_contains_question_line'])
+  assert.equal(low.needs_review, true)
+  assert.equal(low.disabled_reason, null, 'reviewable, not refused')
+  const high = items.find((i) => i.question === 'Why now?')
+  assert.equal(high.parse_confidence, 'high')
+  assert.equal(high.needs_review, false)
+  const legacy = items.find((i) => i.question === 'Anything else?')
+  assert.equal(legacy.parse_confidence, null)
+  assert.equal(legacy.needs_review, false)
+  const ui = await readFile(new URL('../components/history/HistoryConfirm.tsx', import.meta.url), 'utf8')
+  assert.match(ui, /data-testid="history-low-confidence"/)
+  assert.match(ui, /data-testid="history-review-check"/)
+  assert.match(ui, /it\.needs_review && !reviewed\.has\(it\.version_id\)/, 'a low-confidence item cannot be selected until reviewed')
+})
+
+test('LOW: a later human reopening review makes a confirmed record pending again (matches the freeze gate)', async () => {
+  const { s, groups } = await seeded()
+  const item = flat(groups).find((i) => !i.disabled_reason)
+  await confirmHistorySelection(s, SECRET, { items: [item], attested: true, statement: 'I submitted this (synthetic).', actor_id: 'u-test' })
+  let now = flat(await listHistoryCandidates(s, SECRET)).find((i) => i.version_id === item.version_id)
+  assert.equal(now.status, 'confirmed')
+  assert.equal(now.confirmed_effective_at, item.submitted_at)
+  await recordReviewDecision(s, SECRET, { version_id: item.version_id, expected_sha256: item.sha256, decision: 'needs_revision', actor_class: 'human', actor_id: 'u-test' })
+  now = flat(await listHistoryCandidates(s, SECRET)).find((i) => i.version_id === item.version_id)
+  assert.equal(now.status, 'pending', 'reopened by review: no longer shown as already confirmed')
+  assert.equal(now.disabled_reason, null, 'and it can be confirmed again')
 })

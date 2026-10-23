@@ -80,6 +80,8 @@ export async function buildBackend({ flags, env, cwd, stderr, fetchImpl = global
   const data = conf.configured ? new CatalogData(new CatalogClient(conf.cfg, { fetchImpl }), { allowSlugs: [...CANONICAL_PROGRAM_SLUGS] }) : null
   const backend = await createCompanionBackend({
     workspace: flags.workspace ?? env.AQUA_WORKSPACE, readOnly: Boolean(flags['read-only']), keychain: Boolean(flags.keychain),
+    // the companion resolves the catalog through the SAME resolver (below), from the same flags and env
+    flags: { ...(flags['catalog-config'] ? { 'catalog-config': flags['catalog-config'] } : {}), ...(flags.offline ? { offline: true } : {}) },
     env, cwd, fetchImpl, stderr, data, registry,
   })
   return { backend, conf }

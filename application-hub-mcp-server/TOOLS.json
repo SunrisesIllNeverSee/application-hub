@@ -3,7 +3,7 @@
   "version": 1,
   "generated_from": "application-hub-mcp-server/src (npm run manifest)",
   "package": "aqua-mcp-server",
-  "package_version": "2.0.0",
+  "package_version": "2.0.2",
   "protocol_versions": [
     "2025-11-25",
     "2025-06-18",
@@ -22,8 +22,8 @@
   },
   "tiers": {
     "stdio-workspace": {
-      "read": 23,
-      "private_write": 8,
+      "read": 22,
+      "private_write": 9,
       "human_only": 5,
       "human_consent": 1
     },
@@ -78,7 +78,7 @@
       "modes": [
         "stdio-workspace"
       ],
-      "description": "Search the cached public AQUA catalog (approved canonical programs) and list the applications in this workspace.",
+      "description": "Search the cached public AQUA catalog (approved programs) and list the applications in this workspace.",
       "source": "aqua-companion"
     },
     {
@@ -309,11 +309,11 @@
     },
     {
       "name": "present_review_decisions",
-      "tier": "read",
+      "tier": "private_write",
       "modes": [
         "stdio-workspace"
       ],
-      "description": "Build the offline AQUA review file (HTML) for one application from workspace data and save it under exports/reviews/ (skipped in read-only mode).",
+      "description": "Build the offline AQUA review file (HTML, containing the user's answers in plain text) for one application and save it under exports/reviews/ (at most 25 files are kept; refused under --read-only).",
       "source": "aqua-companion"
     },
     {

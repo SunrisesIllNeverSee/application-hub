@@ -1,0 +1,52 @@
+{
+  "note": "stand-in for aquaidp.xyz: next start of this branch behind a logging TLS front at https://127.0.0.1:18443",
+  "standin_site": [
+    {
+      "request": "GET /companion/latest.json -> 200 [curl/8.7.1]",
+      "count": 2
+    },
+    {
+      "request": "GET /.well-known/aqua-catalog.json -> 200 [curl/8.7.1]",
+      "count": 1
+    },
+    {
+      "request": "GET /companion/aqua-companion-0.2.3.tgz -> 200 [curl/8.7.1]",
+      "count": 2
+    },
+    {
+      "request": "GET /companion/aqua-companion-0.2.3.tgz -> 200 [npm/npx]",
+      "count": 1
+    },
+    {
+      "request": "GET /companion/aqua-companion-0.2.3.tgz -> 304 [npm/npx]",
+      "count": 6
+    }
+  ],
+  "application_page": [],
+  "companion_fetch": [
+    {
+      "request": "GET https://127.0.0.1:18445/rest/v1/programs -> 200",
+      "count": 2
+    },
+    {
+      "request": "GET https://127.0.0.1:18445/rest/v1/program_cycles -> 200",
+      "count": 1
+    },
+    {
+      "request": "GET https://127.0.0.1:18445/rest/v1/program_questions -> 200",
+      "count": 1
+    },
+    {
+      "request": "GET https://127.0.0.1:18445/rest/v1/archived_questions -> 200",
+      "count": 1
+    }
+  ],
+  "companion_fetch_with_body": 0,
+  "request_bodies": [],
+  "agent_webfetch_urls": [],
+  "agent_webfetch_to_production": 0,
+  "private_text_scan": {
+    "needles": 25,
+    "leaks": []
+  }
+}

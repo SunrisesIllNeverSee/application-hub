@@ -13,7 +13,14 @@
 //     importer NEVER guesses silently. Conflicting sources are flagged
 //     `date_conflict`; ambiguous numeric dates (03/04/2025) `date_ambiguous`;
 //   - every answer is scanned for unfilled placeholders with the same rules
-//     the vault write enforces (vendored aqua-local/history.mjs).
+//     the vault write enforces (vendored aqua-local/history.mjs);
+//   - md/txt/docx are split into question/answer pairs by an answered-document
+//     segmenter (segmentAnswered): explicit prompts (headings, which a .docx
+//     carries as paragraph styles; "Q:"/"Question N:"; numbered prompts; bold
+//     prompts) or, in a document with none of those, standalone lines ending
+//     in "?". Every pair carries a parse_confidence (high | medium | low) and
+//     the reasons; a low-confidence pair must be reviewed by the user before
+//     it can be confirmed as submitted.
 // Pure apart from WebCrypto hashing; no file system, no network.
 
 import { sha256Hex } from './crypto.mjs'
@@ -109,15 +116,129 @@ function pick(meta, re) {
   return null
 }
 
-function pairsFromOccurrences(extraction) {
+function pairsFromOccurrences(extraction, confidence = 'medium', notes = []) {
   const pairs = []
   const unanswered = []
   for (const o of extraction.occurrences) {
     const answer = (o.following_text ?? o.filled_value ?? '').trim()
-    if (answer) pairs.push({ question: o.asked_as, answer })
+    if (answer) pairs.push({ question: o.asked_as, answer, parse_confidence: confidence, parse_notes: [...notes] })
     else unanswered.push(o.asked_as)
   }
   return { pairs, unanswered }
+}
+
+// ---------------------------------------------------------------------------
+// answered-document segmenter (md / txt / docx text)
+// ---------------------------------------------------------------------------
+
+const LIMIT_TAIL = /\s*[([]\s*(?:max(?:imum)?\.?\s*)?(?:up to\s*)?\d[\d,]*\s*(?:-\s*\d[\d,]*\s*)?(?:words?|characters?|chars?)(?:\s*max(?:imum)?)?\s*[)\]]\s*$/i
+const MAX_PROMPT = 300
+const CONFIDENCE_RANK = { high: 3, medium: 2, low: 1 }
+
+/** Does this single line read like a question/prompt (ends in "?" or carries a word/char limit or a colon)? */
+function promptEnding(t) {
+  const core = t.replace(LIMIT_TAIL, '').replace(/[*_]+$/, '').trim()
+  if (/\?$/.test(core)) return 'question'
+  if (LIMIT_TAIL.test(t)) return 'limit'
+  if (/:$/.test(core)) return 'colon'
+  return null
+}
+
+/** Classify one line as a prompt. Returns { kind, text, strong, level? } or null. */
+function promptOf(line) {
+  const t = line.trim()
+  if (!t || t.length > MAX_PROMPT + 10) return null
+  let m = t.match(/^(#{1,6})\s+(.+?)\s*#*$/)
+  if (m) return { kind: 'heading', level: m[1].length, text: m[2].replace(/^\*\*(.+)\*\*$/, '$1').trim(), strong: true }
+  m = t.match(/^(?:Q(?:uestion)?\s*\d{0,3}\s*[:.)]|Question\s+\d{1,3}\s*[-–:.)])\s*(.+)$/i)
+  if (m && m[1].trim()) return { kind: 'q_prefix', text: m[1].replace(/^\*\*(.+)\*\*$/, '$1').trim(), strong: true }
+  m = t.match(/^\*\*(.+?)\*\*\s*:?$/)
+  if (m && promptEnding(m[1] + (t.endsWith(':') ? ':' : ''))) return { kind: 'bold', text: m[1].trim(), strong: true }
+  m = t.match(/^\d{1,2}[.)]\s+(.+)$/)
+  if (m && promptEnding(m[1])) return { kind: 'numbered', text: m[1].replace(/^\*\*(.+)\*\*$/, '$1').trim(), strong: true }
+  if (t.length <= MAX_PROMPT && promptEnding(t) === 'question' && !/^[-*•]\s/.test(t)) return { kind: 'qmark', text: t, strong: false }
+  return null
+}
+
+/** Paragraph blocks (blank-line separated); a heading line is always its own block. */
+function blocksOf(text) {
+  const blocks = []
+  let cur = []
+  const flush = () => { if (cur.length) blocks.push(cur); cur = [] }
+  for (const raw of String(text).split(/\r?\n/)) {
+    const line = raw.replace(/\s+$/, '')
+    if (!line.trim()) { flush(); continue }
+    if (/^#{1,6}\s+\S/.test(line.trim())) { flush(); blocks.push([line.trim()]); continue }
+    cur.push(line)
+  }
+  flush()
+  return blocks
+}
+
+const stripAnswerPrefix = (s) => s.replace(/^\s*(?:A|Answer|Response)\s*\d{0,3}\s*[:.)]\s*/i, '')
+
+/**
+ * Split an answered document into { title, pairs, unanswered }.
+ * Explicit prompts (headings / paragraph styles, Q:, numbered and bold
+ * prompts) win; standalone "?" lines are used only when a document has none.
+ * Each pair: { question, answer, parse_confidence, parse_notes }.
+ */
+export function segmentAnswered(text) {
+  const blocks = blocksOf(text)
+  // A block's FIRST line may be a prompt with the answer on the next lines ("Q: …\nA: …", "1. Why?\nBecause.").
+  const units = blocks.map((b) => ({ prompt: promptOf(b[0]), rest: b.slice(1).join('\n'), raw: b.join('\n') }))
+  // title: a leading level-1 heading, or a leading short plain line followed by a prompt
+  let title = null
+  let start = 0
+  const first = units[0]
+  if (first?.prompt?.kind === 'heading' && first.prompt.level === 1 && !first.rest && units.some((u, i) => i > 0 && u.prompt)) {
+    title = first.prompt.text
+    start = 1
+  } else if (first && !first.prompt && !first.raw.includes('\n') && first.raw.length <= 160 && !/[.!?:;]$/.test(first.raw.trim()) && units[1]?.prompt) {
+    title = first.raw.trim()
+    start = 1
+  }
+  const body = units.slice(start)
+  const strong = body.some((u) => u.prompt?.strong)
+  const isMarker = (u) => Boolean(u.prompt && (strong ? u.prompt.strong : true))
+  const mode = strong ? 'explicit' : 'question_lines'
+  const pairs = []
+  const unanswered = []
+  let q = null
+  let parts = []
+  const close = () => {
+    if (!q) return
+    const answer = stripAnswerPrefix(parts.join('\n\n')).trim()
+    if (!answer) {
+      unanswered.push(q.text)
+    } else {
+      const notes = []
+      let conf = q.kind === 'qmark' ? 'medium' : 'high'
+      if (q.kind === 'qmark') notes.push('split_on_question_lines')
+      if (q.kind === 'heading' && !promptEnding(q.text)) { conf = 'medium'; notes.push('heading_not_phrased_as_question') }
+      // an answer that itself contains a standalone question line may hide a second question
+      if (answer.split('\n').some((l) => promptOf(l)?.kind === 'qmark')) { conf = 'low'; notes.push('answer_contains_question_line') }
+      if (/^(?:submitted(?: at| on)?|submission date|date submitted)\s*:/im.test(answer)) { conf = 'low'; notes.push('answer_contains_metadata_line') }
+      if (answer.length < 2) { conf = 'low'; notes.push('answer_too_short') }
+      pairs.push({ question: q.text, answer, parse_confidence: conf, parse_notes: notes })
+    }
+    q = null
+    parts = []
+  }
+  for (const u of body) {
+    if (isMarker(u)) {
+      close()
+      q = u.prompt
+      if (u.rest) parts.push(u.rest)
+    } else if (q) parts.push(u.raw)
+  }
+  close()
+  return { title, pairs, unanswered, mode }
+}
+
+/** Lowest confidence first; used for a file-level summary. */
+export function lowestConfidence(pairs) {
+  return pairs.reduce((lo, p) => (CONFIDENCE_RANK[p.parse_confidence] < CONFIDENCE_RANK[lo] ? p.parse_confidence : lo), 'high')
 }
 
 function pairsFromObjects(rows) {
@@ -132,7 +253,7 @@ function pairsFromObjects(rows) {
     const q = String(r[qk] ?? '').trim()
     if (!q) continue
     const a = ak && r[ak] != null ? String(r[ak]).trim() : ''
-    if (a) pairs.push({ question: q, answer: a })
+    if (a) pairs.push({ question: q, answer: a, parse_confidence: 'high', parse_notes: [] })
     else unanswered.push(q)
   }
   return { pairs, unanswered }
@@ -172,10 +293,21 @@ function htmlMeta(html) {
   return meta
 }
 
+/** md / txt / docx text: the segmenter first; the form extractor only when it finds nothing (low confidence). */
+function answeredPairs(text, format) {
+  const seg = segmentAnswered(text)
+  const ex = extractApplication({ content: text, format })
+  const docTitle = seg.title ?? ex.program.title ?? null
+  if (seg.pairs.length) return { pairs: seg.pairs, unanswered: seg.unanswered, extractedTitle: docTitle }
+  const fb = pairsFromOccurrences(ex, 'low', ['fallback_extractor'])
+  return { pairs: fb.pairs, unanswered: fb.pairs.length ? fb.unanswered : [...seg.unanswered, ...fb.unanswered.filter((u) => !seg.unanswered.includes(u))], extractedTitle: docTitle }
+}
+
 /**
  * Parse one answered application file.
  * Returns { ok:true, format, program, program_source, organization, submitted_at,
- *   date_source, flags, date_candidates, pairs:[{question, answer, placeholders}],
+ *   date_source, flags, date_candidates,
+ *   pairs:[{question, answer, placeholders, parse_confidence, parse_notes}], parse_confidence,
  *   unanswered, source_sha256, text } or { ok:false, error, message }.
  */
 export async function parseHistoryFile({ name, bytes, date = null, program = null, now = new Date() }) {
@@ -203,9 +335,7 @@ export async function parseHistoryFile({ name, bytes, date = null, program = nul
       const ml = takeMetaLines(fm.body)
       meta = ml.meta
       text = ml.body
-      const ex = extractApplication({ content: text, format: ext.startsWith('m') ? 'markdown' : 'text' })
-      extractedTitle = ex.program.title ?? null
-      ;({ pairs, unanswered } = pairsFromOccurrences(ex))
+      ;({ pairs, unanswered, extractedTitle } = answeredPairs(text, ext.startsWith('m') ? 'markdown' : 'text'))
     } else if (ext === 'docx') {
       const parsed = await parseUserFile({ name, bytes: u8 })
       if (!parsed.ok) return { ok: false, error: parsed.error, message: parsed.error === 'parse_failed' ? 'The Word document could not be read.' : parsed.message }
@@ -213,9 +343,7 @@ export async function parseHistoryFile({ name, bytes, date = null, program = nul
       const ml = takeMetaLines(parsed.content)
       Object.assign(meta, ml.meta)
       text = ml.body
-      const ex = extractApplication({ content: text, format: 'markdown' })
-      extractedTitle = ex.program.title ?? null
-      ;({ pairs, unanswered } = pairsFromOccurrences(ex))
+      ;({ pairs, unanswered, extractedTitle } = answeredPairs(text, 'markdown'))
     } else if (ext === 'html' || ext === 'htm') {
       const html = decode(u8)
       meta = htmlMeta(html)
@@ -307,7 +435,8 @@ export async function parseHistoryFile({ name, bytes, date = null, program = nul
     date_source: chosen?.source ?? null,
     date_candidates: candidates,
     flags: [...new Set(flags)],
-    pairs: pairs.map((p) => ({ ...p, placeholders: findPlaceholders(p.answer) })),
+    pairs: pairs.map((p) => ({ parse_confidence: 'medium', parse_notes: [], ...p, placeholders: findPlaceholders(p.answer) })),
+    parse_confidence: pairs.length ? lowestConfidence(pairs.map((p) => ({ parse_confidence: 'medium', ...p }))) : null,
     unanswered,
     source_sha256,
     text,

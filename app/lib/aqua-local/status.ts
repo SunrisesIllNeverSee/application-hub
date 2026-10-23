@@ -106,7 +106,9 @@ export interface ApprovalGate {
  *   - it must be actor_class 'human', not restored_from_backup, and its
  *     version_sha256 must equal the stored version sha256 (F-V1);
  *   - v5: a later HUMAN, hash-bound, non-restored review decision in
- *     REOPENING_REVIEW_DECISIONS blocks it (review reopened ⇒ re-approve).
+ *     REOPENING_REVIEW_DECISIONS blocks it (review reopened ⇒ re-approve);
+ *   - M09b: a history version (`history: true`) needs a live history
+ *     attestation before any approval of it counts.
  * Agent-class review decisions and suggestions can never satisfy or
  * block this gate.
  */
@@ -121,11 +123,38 @@ function historyAttestationComplete(a: ApprovalRecord): boolean {
   )
 }
 
-export function approvalGate(
+/**
+ * M09b: an imported submitted-history version (`history: true`) is approved
+ * only through the history screen. True when a complete, non-restored,
+ * human `history_attestation` row bound to the version's current sha256
+ * exists. The normal approval path (recordHumanApproval) refuses history
+ * versions without one, and the gate below ignores approvals of a history
+ * version until one exists (covers rows written before that refusal).
+ */
+export function hasLiveHistoryAttestation(
   version: Pick<VersionRecord, 'id' | 'sha256'>,
+  approvals: ApprovalRecord[],
+): boolean {
+  return approvals.some(
+    (a) =>
+      a.version_id === version.id &&
+      a.via === 'history_attestation' &&
+      a.decision === 'approved' &&
+      a.actor_class === 'human' &&
+      !a.restored_from_backup &&
+      a.version_sha256 === version.sha256 &&
+      historyAttestationComplete(a),
+  )
+}
+
+export function approvalGate(
+  version: Pick<VersionRecord, 'id' | 'sha256'> & { history?: boolean },
   approvals: ApprovalRecord[],
   reviews: ReviewRecord[] = [],
 ): ApprovalGate {
+  if (version.history === true && !hasLiveHistoryAttestation(version, approvals)) {
+    return { approval: null, blocked_by_review: null, approved: false }
+  }
   const forVersion = approvals
     .filter((a) => a.version_id === version.id)
     .sort((a, b) => compareDecisionRows(approvalKey(a), approvalKey(b)))

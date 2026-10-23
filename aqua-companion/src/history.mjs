@@ -92,13 +92,14 @@ export async function prepareHistoryImport(ws, files, { date = null, program = n
         format: HISTORY_FORMAT, program: parsed.program, question: p.question, submitted_at: parsed.submitted_at, date_source: parsed.date_source,
         flags: parsed.flags, source_sha256: parsed.source_sha256, source_file: f.name,
         placeholder: { found: p.placeholders.length > 0, markers: p.placeholders }, imported_at: importedAt, importer: HISTORY_IMPORTER,
+        parse_confidence: p.parse_confidence, parse_notes: p.parse_notes,
       }
       const version = {
         id: newUuid(), answer_id: answer.id, parent_version_id: null, title, body: p.answer,
         sha256: await sha256Hex(canonicalJson({ title, body: p.answer })), method: 'imported', provenance: HISTORY_PROVENANCE,
         created_at: importedAt, immutable: true, history: true, history_meta,
       }
-      items.push({ answer, version, placeholders: p.placeholders })
+      items.push({ answer, version, placeholders: p.placeholders, parse_confidence: p.parse_confidence, parse_notes: p.parse_notes })
     }
     plan.push({ file: f, parsed, prepared, items, marker })
     reports.push({
@@ -106,10 +107,13 @@ export async function prepareHistoryImport(ws, files, { date = null, program = n
       submitted_at: parsed.submitted_at, date_source: parsed.date_source, flags: parsed.flags, program_source: parsed.program_source,
       answered: parsed.pairs.length, unanswered: parsed.unanswered.length,
       with_placeholders: items.filter((x) => x.placeholders.length).length,
+      parse_confidence: parsed.parse_confidence,
+      low_confidence: items.filter((x) => x.parse_confidence === 'low').length,
+      records: items.map((x) => ({ version_id: x.version.id, parse_confidence: x.parse_confidence, parse_notes: x.parse_notes, placeholders: x.placeholders.length > 0 })),
       version_ids: items.map((x) => x.version.id),
       // file-derived text: callers put this under untrusted_content
       program: parsed.program,
-      questions: items.map((x) => ({ version_id: x.version.id, question: x.version.history_meta.question, placeholders: x.placeholders })),
+      questions: items.map((x) => ({ version_id: x.version.id, question: x.version.history_meta.question, placeholders: x.placeholders, parse_confidence: x.parse_confidence })),
     })
   }
   const staged = reports.filter((r) => r.status === 'staged')
@@ -117,6 +121,7 @@ export async function prepareHistoryImport(ws, files, { date = null, program = n
     `stage ${staged.length} answered application(s) with ${staged.reduce((n, r) => n + r.answered, 0)} submitted answer(s) as history records (private, encrypted)`,
     `submission dates: ${staged.filter((r) => r.submitted_at).length} known, ${staged.filter((r) => !r.submitted_at).length} UNKNOWN (flagged; never guessed)`,
     `${staged.reduce((n, r) => n + r.with_placeholders, 0)} answer(s) contain unfilled placeholders and can never be confirmed until fixed`,
+    `${staged.reduce((n, r) => n + r.low_confidence, 0)} answer(s) were split with LOW confidence: check the question and answer text against what you submitted; the browser asks you to review them before they can be confirmed`,
     `${reports.length - staged.length} file(s) skipped`,
     'nothing is approved: after export-backup and Restore, you confirm submitted answers in the browser (Confirm submitted history)',
   ]
@@ -224,7 +229,7 @@ export async function cmdImportHistory(ctx, folder) {
     }
     const date = r.submitted_at ? `${r.submitted_at} (from ${r.date_source})` : 'UNKNOWN (use --date YYYY-MM-DD)'
     out(ctx, `  - ${r.file}: ${r.program} | submitted ${date} | ${r.answered} answer(s)${r.with_placeholders ? `, ${r.with_placeholders} with placeholders` : ''}${r.flags.length ? ` | flags: ${r.flags.join(', ')}` : ''}`)
-    for (const q of r.questions) out(ctx, `      ${q.placeholders.length ? '!' : '*'} ${q.question}`)
+    for (const q of r.questions) out(ctx, `      ${q.placeholders.length ? '!' : '*'} ${q.question}${q.parse_confidence === 'low' ? '  [low parse confidence: check the text]' : ''}`)
   }
   if (!prepared.plan.length) {
     out(ctx, 'Nothing to stage.')

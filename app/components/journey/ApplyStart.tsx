@@ -62,6 +62,8 @@ export function ApplyStart({
   const [model, setModel] = useState<ExtractionReviewModel | null>(() => (initialProgram ? modelFromCatalogProgram(initialProgram) : null))
   const [query, setQuery] = useState('')
   const [url, setUrl] = useState(prefill.url ?? '')
+  // The address that came from the link the user opened (query prop, #url= fragment or the login hand-off).
+  const [linkPrefill, setLinkPrefill] = useState<string | null>(prefill.url)
   const [paste, setPaste] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(prefill.refused ? prefill.refused : '')
@@ -89,7 +91,7 @@ export function ApplyStart({
     if (!raw || initialUrl) return
     const p = urlPrefill(raw)
     setPath('url')
-    if (p.url) setUrl(p.url)
+    if (p.url) { setUrl(p.url); setLinkPrefill(p.url) }
     if (p.refused) setError(p.refused)
   }, [initialUrl])
   const [creating, setCreating] = useState(false)
@@ -225,7 +227,7 @@ export function ApplyStart({
             <input aria-label="Application URL" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://program.example.org/apply" className="input text-sm" inputMode="url" />
             <button type="submit" disabled={busy} className="btn-primary shrink-0 disabled:opacity-50">{busy ? 'Reading the page…' : 'Import'}</button>
           </form>
-          {prefill.url !== null && url === prefill.url && (
+          {linkPrefill !== null && url === linkPrefill && (
             <p data-testid="url-prefilled" className="mt-2 text-xs text-brand-700 dark:text-brand-300">This address was filled in from the link you opened. Check it, then click Import — nothing has been fetched yet.</p>
           )}
           <p className="mt-2 text-xs text-neutral-500">

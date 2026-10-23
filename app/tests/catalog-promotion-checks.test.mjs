@@ -7,6 +7,8 @@ import {
   runChecks, findDuplicateTemplates, matchQuestions, applyMatches, questionSetSha256, urlKey, compareForm, CHECK_KEYS,
 } from '../lib/catalog-promotion/checks.ts'
 import { PROGRAMS } from '../../qaapplication/src/canonical-053-data.mjs'
+import { sourceFreshness, curatorOverrideAllowed, applyMatches as applyMatchesM5 } from '../lib/catalog-promotion/checks.ts'
+import { demoteToSuggestedMappings, validateCandidatePayload as validateM5 } from '../lib/catalog-promotion/schema.ts'
 
 const SNAPSHOT = `Northwind Accelerator — Spring 2027
 Applications close March 1, 2027 at 11:59pm Pacific Time.
@@ -145,4 +147,44 @@ test('questionSetSha256 matches public.catalog_question_set_sha256 (058) for the
     questionSetSha256([{ order_index: 2, section: null, asked_as: 'B' }, { order_index: 1, section: 'S', asked_as: 'Ä – q' }]),
     '48ab579050bce9de263623552e3d4857c24c995552c7c0a23b230fd8859d237a',
   )
+})
+
+// ─── M09 review M5 / M6 ─────────────────────────────────────────────────────
+
+test('M6: sourceFreshness blocks stale, failed, disallowed and robots-blocked sources', () => {
+  const base = { url: 'https://program.example.org/apply', capture_method: 'url_fetch', reuse: 'allowed', robots_disallow: false, verification_status: 'verified' }
+  assert.deepEqual(sourceFreshness(base), { fresh: true, problems: [] })
+  assert.equal(sourceFreshness({ ...base, verification_status: 'unverified' }).fresh, true, 'unverified is not stale')
+  for (const over of [{ verification_status: 'stale' }, { verification_status: 'failed' }, { reuse: 'disallowed' }, { robots_disallow: true }]) {
+    assert.equal(sourceFreshness({ ...base, ...over }).fresh, false, JSON.stringify(over))
+  }
+  assert.equal(sourceFreshness(null).fresh, false)
+  assert.equal(curatorOverrideAllowed(true, 'a reason of length'), true)
+  assert.equal(curatorOverrideAllowed(true, 'short'), false)
+  assert.equal(curatorOverrideAllowed(false, 'a reason of length'), false)
+})
+
+test('M5: suggested_mapping validates, demotion strips canonical links, auto matches carry their origin', () => {
+  const Q = '55555555-5555-4555-8555-555555555555'
+  const payload = {
+    program: { name: 'Example Program', organization: 'Example Org', kind: 'accelerator', apply_url: 'https://program.example.org/apply' },
+    cycle: { name: 'Spring 2027', is_rolling: false },
+    questions: [{ asked_as: 'Why now?', order_index: 1, mapping: { canonical_question_id: Q, tier: 'exact' } }],
+    source_refs: [{ url: 'https://program.example.org/apply', kind: 'application_form' }],
+  }
+  const v = validateM5(payload)
+  assert.ok(v.ok, JSON.stringify(v.errors))
+  const d = demoteToSuggestedMappings(v.value)
+  assert.deepEqual(d.demoted, [0])
+  assert.equal(d.payload.questions[0].mapping, undefined)
+  assert.equal(d.payload.questions[0].suggested_mapping.decision, 'submitter_suggested')
+  const again = validateM5(d.payload)
+  assert.ok(again.ok, 'a demoted payload re-validates')
+  assert.equal(again.value.questions[0].suggested_mapping.canonical_question_id, Q)
+  const bad = validateM5({ ...payload, questions: [{ asked_as: 'Why now?', order_index: 1, suggested_mapping: { canonical_question_id: Q, tier: 'exact', decision: 'auto_linked' } }] })
+  assert.equal(bad.ok, false)
+  const badOrigin = validateM5({ ...payload, questions: [{ asked_as: 'Why now?', order_index: 1, mapping: { canonical_question_id: Q, tier: 'exact', origin: 'curator' } }] })
+  assert.equal(badOrigin.ok, false)
+  const matched = applyMatchesM5(d.payload, [{ index: 0, canonical_question_id: Q, tier: 'exact' }])
+  assert.equal(matched.questions[0].mapping.origin, 'auto_match')
 })

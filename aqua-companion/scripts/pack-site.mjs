@@ -8,7 +8,7 @@
 // Outputs (served at https://aquaidp.xyz/companion/):
 //   aqua-companion-<version>.tgz
 //   aqua-companion-<version>.tgz.sha256   "<sha256>  aqua-companion-<version>.tgz"
-//   latest.json                           { version, url, sha256, sha256_url, install }
+//   latest.json                           { version, url, sha256, sha256_url, install }  (the newest; older tarballs stay)
 //
 // --check rebuilds with `npm pack` and compares the sha256 of the served
 // tarball. npm writes fixed mtimes, so the uncompressed tar is reproducible;
@@ -56,7 +56,7 @@ try {
     sha256: digest,
     sha256_url: `${url}.sha256`,
     install: `npx --yes ${url} --help`,
-    note: 'Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; npm publication of aqua-companion is pending (owner gate GB2).',
+    note: 'Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; aqua-companion is not published on npm by itself (owner gate GB2); aqua-mcp-server on npm includes it, and is the primary install.',
   }
   for (const f of built.files) if (/(^|\/)(test|\.env)/.test(f)) throw new Error(`refusing to ship ${f}`)
   if (check) {
@@ -79,6 +79,12 @@ try {
         problems.push('latest.json is missing or unreadable')
       }
       if (lj && (lj.version !== built.version || lj.url !== url || lj.sha256 !== servedSha)) problems.push('latest.json does not describe the served tarball')
+      // older versions stay served: each must still match its own .sha256 (never changed in place)
+      for (const f of fs.readdirSync(OUT)) {
+        if (f === built.filename || !/^aqua-companion-.*\.tgz$/.test(f)) continue
+        const sf = path.join(OUT, `${f}.sha256`)
+        if (!fs.existsSync(sf) || !fs.readFileSync(sf, 'utf8').startsWith(sha256(fs.readFileSync(path.join(OUT, f))))) problems.push(`${f}: its .sha256 is missing or does not match (an older served version must never change)`)
+      }
     }
     if (problems.length) {
       console.error(`pack-site --check: drift\n  ${problems.join('\n  ')}`)
@@ -86,7 +92,7 @@ try {
     } else console.log(`pack-site --check: ${built.filename} matches the source (${built.files.length} files)`)
   } else {
     fs.mkdirSync(OUT, { recursive: true })
-    for (const old of fs.readdirSync(OUT)) if (/^aqua-companion-.*\.tgz(\.sha256)?$/.test(old)) fs.rmSync(path.join(OUT, old))
+    // Previously deployed versions are KEPT (a versioned URL never 404s); only this version's files are rewritten.
     fs.copyFileSync(built.file, path.join(OUT, built.filename))
     fs.writeFileSync(path.join(OUT, `${built.filename}.sha256`), `${digest}  ${built.filename}\n`)
     fs.writeFileSync(path.join(OUT, 'latest.json'), `${JSON.stringify(latest, null, 2)}\n`)

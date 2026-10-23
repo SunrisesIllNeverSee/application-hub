@@ -112,6 +112,8 @@ Privacy check over every request the pages made:
 
 ## Screenshots (synthetic only)
 
+Regenerated on 2026-10-22 by the W9 acceptance run (`app/tests/acceptance/run-acceptance.mjs`, see [`m09-acceptance.md`](m09-acceptance.md)) after the M2 decision-import hardening and the "Draft created (vN)" row change.
+
 `docs/evidence/m09-journey/` — `w1440-<path>-<step>.jpg` for every step of
 every path (A choose/paste/url/pdf-unsupported, B review, D populate, E review,
 F prepare, G export, H historical) and `w390-<path>-{B,F,H}.jpg` plus

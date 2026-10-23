@@ -81,13 +81,14 @@ function loadCompanion() {
     package: 'aqua-companion',
     version,
     tarball: { file, url, sha256, sha256_url: `${url}.sha256`, latest_url: `${ORIGIN}/companion/latest.json`, packed },
-    npm_status: 'not yet on npm: publishing aqua-companion is owner gate GB2. Until then install from the tarball above.',
+    npm_status: 'aqua-companion is not published on npm by itself (owner gate GB2). aqua-mcp-server on npm includes it, so use that; the tarball above is the fallback.',
   }
 }
 
 async function buildData() {
   const { source, tools, absent, mode_counts } = await loadTools()
   const companion = loadCompanion()
+  const mcpVersion = readJson('application-hub-mcp-server/package.json').version
   const counts = {}
   for (const t of tools) counts[t.tier] = (counts[t.tier] ?? 0) + 1
   const tiers = TIER_ORDER.filter((k) => counts[k]).map((k) => ({ tier: k, count: counts[k], meaning: TIER_INFO[k] }))
@@ -99,8 +100,8 @@ async function buildData() {
     companion,
     mcp_server: {
       package: 'aqua-mcp-server',
-      version: '2.0.0',
-      status: 'aqua-mcp-server 2.0.0 is built on the companion and is not yet published. Once OWNER publishes it (gate GB1), `npx -y aqua-mcp-server` runs it; until then use the companion tarball. Versions below 2.0 are legacy and must not be used.',
+      version: mcpVersion,
+      status: `aqua-mcp-server is published on npm and is the primary install: \`npx -y aqua-mcp-server\`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used.`,
     },
     hosted_mcp: {
       url: `${ORIGIN}/mcp`,
@@ -112,15 +113,22 @@ async function buildData() {
     catalog_config: {
       url: `${ORIGIN}/.well-known/aqua-catalog.json`,
       fields: ['version', 'supabase_url', 'publishable_key', 'tables', 'notes'],
-      rule: 'publishable/anon key only; clients refuse any other role and fetch it only from https://aquaidp.xyz (or a local override file)',
+      rule: 'use the publishable/anon key only; they refuse any other role and fetch the configuration only from https://aquaidp.xyz (or a local override file)',
+      auto_refresh: 'discover_applications, get_application_details and match_canonical_questions refresh an empty or stale cache (older than 24 hours; AQUA_CATALOG_MAX_AGE_HOURS changes it, 0 turns it off) with the same public read-only request as refresh_catalog. Offline or unconfigured, they answer from the cache and return catalog_empty: run refresh_catalog when there is nothing cached',
     },
     install: {
+      // primary: aqua-mcp-server from npm (it includes the companion)
+      mcp_help: 'npx -y aqua-mcp-server --help',
+      mcp_claude_code: 'claude mcp add aqua -- npx -y aqua-mcp-server --keychain',
+      mcp_claude_code_with_workspace: 'claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keychain',
+      mcp_companion_cli: 'npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA',
+      // fallback: the companion tarball served by this site
       help: `npx --yes ${url} --help`,
+      local_copy: `npx --yes --package <path>/aqua-companion-${companion.version}.tgz aqua-companion --help`,
       init: `npx --yes ${url} init --path <folder>`,
       doctor: `npx --yes ${url} doctor`,
       claude_code: `claude mcp add aqua -- npx --yes ${url} mcp --keychain`,
       claude_code_with_workspace: `claude mcp add aqua -- npx --yes ${url} mcp --workspace <folder>/AQUA --keychain`,
-      npm_later: 'npx -y aqua-mcp-server   # once aqua-mcp-server 2.0.0 is published (GB1)',
     },
     tiers,
     total: tools.length,
@@ -128,13 +136,13 @@ async function buildData() {
     tools,
     intentionally_absent: (absent ?? []).map((a) => (typeof a === 'string' ? { name: a, why: '' } : { name: a.name, why: a.why ?? '' })),
     journey: [
-      { step: 'Install', how: `npx --yes ${url} --help (check the published sha256 first)` },
-      { step: 'Set up a workspace', how: 'init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`; the passphrase is typed by the user, never sent through the model' },
-      { step: 'Load submitted history', how: 'the user puts past submitted applications in the workspace inbox/; import_history stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history' },
+      { step: 'Install', how: `npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes ${url} --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)` },
+      { step: 'Set up a workspace', how: 'init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`, which creates <folder>/AQUA; then restart the MCP server with --workspace <folder>/AQUA. The passphrase is typed by the user, never sent through the model' },
+      { step: 'Load submitted history', how: 'the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: "history" } stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history' },
       { step: 'Ingest the application', how: 'import_local_application (a file in inbox/) or get_application_details for a catalog program' },
       { step: 'Match and reuse', how: 'match_canonical_questions, search_answer_bank, read_review_status (Direct / Adapt / Gap)' },
       { step: 'Draft', how: 'create_draft_version stages unapproved drafts; request_evidence / attach_evidence' },
-      { step: 'Human review and approval', how: 'the user runs export-backup, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board' },
+      { step: 'Human review and approval', how: 'the user runs export-backup <file> --workspace <folder>/AQUA, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board' },
       { step: 'Return approvals to the agent', how: 'the user exports a browser backup into inbox/; sync_from_vault_export imports it; read_review_status shows approved with the hash preserved' },
       { step: 'Packet', how: 'prepare_packet (readiness), the user freezes/exports in the browser, verify_packet checks the export. Nothing is ever submitted by the agent.' },
     ],
@@ -165,34 +173,41 @@ function agentPathSection(d, { full = false } = {}) {
 AQUA is local-first. A user's private answers live in an encrypted vault in their browser and, if they choose, in an encrypted companion workspace folder on their own computer. They are never stored on AQUA's servers, and no AQUA service hands them to an agent. An agent helps a user by running the **AQUA companion** on the user's machine: a command-line tool and stdio MCP server that works on one consented, encrypted workspace plus the public catalog.
 
 ### 1. Install
-- Today: the companion ships as a versioned tarball from this site (Node.js 22+, no dependencies):
+- Primary (npm, Node.js 22+): \`${d.install.mcp_help}\`. ${d.mcp_server.status} Its companion command line is \`${d.install.mcp_companion_cli}\`.
+- Fallback: the companion also ships as a versioned tarball from this site (no dependencies):
   \`${d.install.help}\`
 ${shaLine}
+- From a downloaded, verified copy: \`${d.install.local_copy}\`. (Pass the file with \`--package\`: npx treats a bare absolute \`.tgz\` path as a program to run and fails with "Permission denied".)
 - npm: ${c.npm_status}
-- \`aqua-mcp-server\`: ${d.mcp_server.status}
-- Self-check: \`${d.install.doctor}\` reports configuration, catalog connectivity, workspace and keychain status.
+- Self-check: \`aqua-companion doctor\` (or \`npx -y aqua-mcp-server companion doctor\`; tarball: \`${d.install.doctor}\`) reports configuration, catalog connectivity, workspace and keychain status.
 
 ### 2. Connect it to the agent (MCP over stdio)
 \`\`\`
-${d.install.claude_code}
+${d.install.mcp_claude_code}
 \`\`\`
-The server starts even when no workspace exists yet. Workspace tools then return \`workspace_not_initialized\` with next steps.
+Fallback (tarball): \`${d.install.claude_code}\`
+The server starts even when no workspace exists yet. Workspace tools then return \`workspace_not_initialized\` with next steps. \`init --path <folder>\` creates \`<folder>/AQUA\`; the server and the CLI find a workspace only through \`--workspace\`, \`AQUA_WORKSPACE\`, or the folder they run in (or a parent). After init, re-add the server with the workspace and restart the client:
+\`\`\`
+${d.install.mcp_claude_code_with_workspace}
+\`\`\`
+(Tarball fallback: \`${d.install.claude_code_with_workspace}\`)
 
 ### 3. Workspace setup and consent
 - \`locate_workspace\` (read) reports where a workspace is or would be created.
 - \`init_workspace\` (human_consent) uses MCP elicitation when the client supports it: the user confirms the folder and consent in the client UI, outside the model. Otherwise it returns \`requires_human\` with the exact command, for example \`aqua-companion init --path <folder>\`.
 - The workspace passphrase is typed by the user (terminal prompt, macOS Keychain or the server's own environment). It never travels through the model or a tool argument, and no tool accepts a password, token or JWT.
+- \`--keychain\` reads the passphrase from a macOS Keychain item the user creates once after init: \`security add-generic-password -s aqua-companion -a <workspace id> -w\` (it prompts; the workspace id is in \`aqua-companion status\`). Without that item, drop \`--keychain\` and give the server \`AQUA_PASSPHRASE\` in its own environment instead (trade-offs: docs/AGENT.md in the package).
 - The agent reads files only from the workspace \`inbox/\` folder. Ask the user to place files there.
 
 ### 4. Tiers (enforced in code, not by asking the agent to behave)
 ${tierLines(d)}
 
 ### 5. Submitted history
-The user copies past submitted applications (md, txt, docx, html, json, csv) into \`inbox/\`. \`import_history\` (or \`aqua-companion import-history <folder>\`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. After \`aqua-companion export-backup\` and Restore in the browser, the user confirms them at ${ORIGIN}/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
+The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside \`inbox/\`, for example \`inbox/history/\`. \`import_history { folder: "history" }\` (or \`aqua-companion import-history <folder>\`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a \`parse_confidence\` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After \`aqua-companion export-backup\` and Restore in the browser, the user confirms them at ${ORIGIN}/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
 
 ### 6. The human approves in the browser
 Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from ${ORIGIN}/aqua-local after Restore. The approval round trip:
-1. The user runs \`aqua-companion export-backup <file>\`.
+1. The user runs \`aqua-companion export-backup <file> --workspace <folder>/AQUA\` (the same rule: leave out \`--workspace\` only when running inside the workspace folder).
 2. In the browser: AQUA Local, Restore backup, review and approve.
 3. The user exports a browser backup and puts it in the workspace \`inbox/\`.
 4. The agent runs \`sync_from_vault_export\`; \`read_review_status\` then shows the human approvals with hashes preserved.
@@ -200,6 +215,7 @@ Drafts the agent stages are unapproved. Approval binds the exact version hash an
 
 ### 7. Public catalog configuration
 ${d.catalog_config.url} returns \`{${d.catalog_config.fields.join(', ')}}\`. The key is the public publishable/anon key the web app already ships to every browser; row-level security limits it to approved canonical catalog rows. Clients must ${d.catalog_config.rule}.
+The companion keeps a public catalog cache: ${d.catalog_config.auto_refresh}.
 
 ### 8. Hosted read-only MCP
 ${d.hosted_mcp.url}: ${d.hosted_mcp.status} (${d.hosted_mcp.scope}).
