@@ -10,19 +10,19 @@ begin;
 create table if not exists public.aqua_workspaces (
   id uuid primary key default gen_random_uuid(),
   account_id uuid not null references auth.users(id) on delete cascade,
-  workspace_id text not null,
+  workspace_key text not null,                    -- client-generated WS-<uuid>
   manifest jsonb not null,
   manifest_rev bigint not null default 1,
   schema_version int not null default 1,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (account_id, workspace_id)   -- per-account namespace; no cross-account squatting
+  unique (account_id, workspace_key)
 );
 
 -- General file table: every workspace file (record JSON, .bak, moved conflict
 -- archives, inbox/exports payloads) is a row. Record-shaped metadata columns
--- are NULL for non-record files. sha256 is over the stored bytes and is
--- recomputable server-side (bytea preserves byte fidelity).
+-- are NULL for non-record files. sha256 is computed server-side over the
+-- stored bytes (bytea preserves byte fidelity) — client claims ignored.
 create table if not exists public.aqua_workspace_records (
   id uuid primary key default gen_random_uuid(),
   account_id uuid not null references auth.users(id) on delete cascade,
@@ -69,6 +69,7 @@ alter table public.aqua_workspace_audit enable row level security;
 revoke all on public.aqua_workspaces from public, anon, authenticated, service_role;
 revoke all on public.aqua_workspace_records from public, anon, authenticated, service_role;
 revoke all on public.aqua_workspace_audit from public, anon, authenticated, service_role;
+revoke all on sequence public.aqua_workspace_audit_id_seq from public, anon, authenticated, service_role;
 
 drop policy if exists aqua_workspaces_owner on public.aqua_workspaces;
 create policy aqua_workspaces_owner on public.aqua_workspaces
@@ -78,7 +79,8 @@ create policy aqua_ws_records_owner on public.aqua_workspace_records
   for all using (account_id = auth.uid())
   with check (account_id = auth.uid()
     and exists (select 1 from public.aqua_workspaces w
-                where w.id = workspace_id and w.account_id = auth.uid()));
+                where w.id = aqua_workspace_records.workspace_id
+                  and w.account_id = auth.uid()));
 drop policy if exists aqua_ws_audit_owner on public.aqua_workspace_audit;
 create policy aqua_ws_audit_owner on public.aqua_workspace_audit
   for select using (account_id = auth.uid());
@@ -86,25 +88,27 @@ drop policy if exists aqua_ws_audit_owner_ins on public.aqua_workspace_audit;
 create policy aqua_ws_audit_owner_ins on public.aqua_workspace_audit
   for insert with check (account_id = auth.uid()
     and exists (select 1 from public.aqua_workspaces w
-                where w.id = workspace_id and w.account_id = auth.uid()));
+                where w.id = aqua_workspace_audit.workspace_id
+                  and w.account_id = auth.uid()));
 -- audit is append-only: no UPDATE/DELETE grant anywhere
 
 -- Caller-scoped grants (INVOKER RPC + RLS do the isolation).
 -- NOTE: direct UPDATE/INSERT on workspaces/records remains possible for the
 -- owner via the Data API (RLS-scoped to own rows) — CAS ordering through
 -- aqua_workspace_commit is the intended path, not an enforced one.
-grant select, insert, update, delete on public.aqua_workspaces to authenticated;  -- owner delete cascades workspace+records+audit
+grant select, insert, update, delete on public.aqua_workspaces to authenticated;  -- owner delete cascades (retention path)
 grant select, insert, update, delete on public.aqua_workspace_records to authenticated;
 grant select, insert on public.aqua_workspace_audit to authenticated;
 grant select, insert, update, delete on public.aqua_workspaces to service_role;
 grant select, insert, update, delete on public.aqua_workspace_records to service_role;
 grant select, insert on public.aqua_workspace_audit to service_role;
+grant usage, select on sequence public.aqua_workspace_audit_id_seq to service_role;
 
 -- CAS commit RPC — SECURITY INVOKER so the caller's RLS enforces account
 -- isolation for free (no cross-tenant writes possible; matches 061 convention).
--- p_ops: [{op:'put'|'replace'|'move', path, file_b64?, sha256?, rid?, kind?,
---          authority?, scope?, status?, to?}] — covers writeRecord, replaceFile
--- (.bak/rekey), moveFile (conflict archive), and non-record files.
+-- p_ops: [{op:'put'|'replace'|'move', path, file_b64?, rid?, kind?, authority?,
+--          scope?, status?, to?}] — covers writeRecord, replaceFile (.bak/rekey),
+-- moveFile (conflict archive) and non-record files. sha256 is computed here.
 create or replace function public.aqua_workspace_commit(
   p_workspace_id uuid,
   p_expected_rev bigint,
@@ -120,6 +124,8 @@ declare
   v_new_rev bigint;
   r jsonb;
 begin
+  if jsonb_typeof(p_ops) is distinct from 'array' then raise exception 'p_ops must be an array'; end if;
+  if jsonb_typeof(p_audit) is distinct from 'array' then raise exception 'p_audit must be an array'; end if;
   update public.aqua_workspaces
      set manifest = p_manifest, manifest_rev = manifest_rev + 1
    where id = p_workspace_id and manifest_rev = p_expected_rev and account_id = auth.uid()
@@ -135,17 +141,20 @@ begin
         values
           (auth.uid(), p_workspace_id, r->>'path', r->>'rid', r->>'kind',
            r->>'authority', r->>'scope', coalesce(r->>'status','live'),
-           coalesce(r->>'sha256',''), decode(r->>'file_b64', 'base64'));
+           encode(digest(decode(r->>'file_b64','base64'),'sha256'),'hex'),
+           decode(r->>'file_b64', 'base64'));
       when 'replace' then
         update public.aqua_workspace_records
            set file = decode(r->>'file_b64','base64'),
-               sha256 = coalesce(r->>'sha256', sha256),
+               sha256 = encode(digest(decode(r->>'file_b64','base64'),'sha256'),'hex'),
                status = coalesce(r->>'status', status)
          where workspace_id = p_workspace_id and path = r->>'path' and account_id = auth.uid();
+        if not found then raise exception 'missing_file:%', r->>'path'; end if;
       when 'move' then
         update public.aqua_workspace_records
            set path = r->>'to'
          where workspace_id = p_workspace_id and path = r->>'path' and account_id = auth.uid();
+        if not found then raise exception 'missing_file:%', r->>'path'; end if;
       else raise exception 'unknown_op:%', r->>'op';
     end case;
   end loop;
