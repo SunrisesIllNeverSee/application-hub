@@ -414,7 +414,7 @@ export class Workspace {
   recordFiles() {
     const all = walkInside(this.root)
     const files = all.files.filter(
-      (f) => f.endsWith('.json') && !f.startsWith('audit/quarantine/') && !f.startsWith('exports/') && !f.startsWith(`${INBOX_DIR}/`) &&
+      (f) => f.endsWith('.json') && !f.startsWith('audit/quarantine/') && !f.startsWith('exports/') && !f.startsWith(`${INBOX_DIR}/`) && !f.startsWith('Beta Reports/') &&
         f !== MANIFEST && f !== MANIFEST_BACKUP && !f.includes('.tmp-'),
     )
     return { files, symlinks: all.symlinks, other: all.other }

@@ -19,7 +19,7 @@ import { SERVER_INSTRUCTIONS as COMPANION_INSTRUCTIONS } from '../vendor/compani
 import { TOOLS as COMPANION_TOOLS } from '../vendor/companion/src/mcp-tools.mjs'
 import { PUBLIC_TOOLS, PUBLIC_TOOL_MAP, callPublicTool } from '../catalog/tools.mjs'
 import { CATALOG_RESOURCES, CATALOG_RESOURCE_TEMPLATES, ResourceNotFound, readCatalogResource } from '../catalog/resources.mjs'
-import { PROMPTS, getPrompt } from '../catalog/prompts.mjs'
+import { PROMPTS, PromptError, getPrompt } from '../catalog/prompts.mjs'
 import { toolEntry } from '../catalog/protocol.mjs'
 
 export const WORKSPACE_STATUS_URI = 'aqua://workspace/status'
@@ -111,7 +111,7 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
     },
     listPrompts: () => (noCatalog ? [] : PROMPTS.map((p) => ({ ...p }))),
     getPrompt: (name, args) => {
-      if (noCatalog) throw Object.assign(new Error(`unknown prompt: ${name}`), { code: 'unknown_prompt' })
+      if (noCatalog) throw new PromptError(`Unknown prompt: ${String(name).slice(0, 80)}`)
       return getPrompt(name, args, { hasWorkspace: ready() })
     },
   }

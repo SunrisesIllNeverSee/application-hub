@@ -328,7 +328,7 @@ export const TOOLS = [
         cycle_year: args.cycle_year ?? null,
         // a time without an unambiguous offset would be misread as local time: keep the date, the hint keeps time + zone
         deadline: args.deadline ?? (d0?.date ? (d0.time && /^(utc|gmt|z)$/i.test(d0.timezone ?? '') ? `${d0.date}T${d0.time}:00Z` : d0.date) : null),
-        questions: extraction.occurrences.map((o) => ({ text: o.asked_as, word_limit: o.requirements.word_limit ?? null, char_limit: o.requirements.char_limit ?? null, required: o.requirements.required === true, section_id: null })),
+        questions: extraction.occurrences.map((o) => ({ text: o.asked_as, word_limit: o.requirements.word_limit ?? null, char_limit: o.requirements.char_limit ?? null, required: o.requirements.required === true, section_id: o.section ?? null, options: o.field?.options ?? null })),
       }
       const prepared = await prepareLocalApplication({
         template, file_name: f.name, media_type: `aqua/${parsed.format}`, bytes_sha256, text: parsed.content,
@@ -1273,6 +1273,7 @@ export const TOOLS = [
       if (bad.length) {
         throw new ToolRefusal('invalid_map', 'Only approved versions can be assembled.', { rejected: bad })
       }
+      chosen.sort((a, b) => (a.row.order ?? 0) - (b.row.order ?? 0))
       const chosenOcc = new Set(chosen.map((c) => c.row.question_occurrence_id))
       const marksByOcc = latestMarks(model, inst.instance_id)
       const unresolved = rows
