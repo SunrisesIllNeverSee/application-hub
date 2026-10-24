@@ -28,9 +28,9 @@ AQUA is local-first. A user's private answers live in an encrypted vault in thei
 - Primary (npm, Node.js 22+): `npx -y aqua-mcp-server --help`. aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used. Its companion command line is `npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA`.
 - Fallback: the companion also ships as a versioned tarball from this site (no dependencies):
   `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help`
-- sha256: `5ff3f3a593d9ef3d7834431b26b8d396b73a69898006d1e39ba88538c84cdb77` (also at https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz.sha256; https://aquaidp.xyz/companion/latest.json lists the current version).
+- sha256: `cdfb3941c499888a6fff68c20d40b59942d0b28a2d4665995db52b8ae82a9b87` (also at https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz.sha256; https://aquaidp.xyz/companion/latest.json lists the current version).
 - From a downloaded, verified copy: `npx --yes --package <path>/aqua-companion-0.2.4.tgz aqua-companion --help`. (Pass the file with `--package`: npx treats a bare absolute `.tgz` path as a program to run and fails with "Permission denied".)
-- npm: aqua-companion is not published on npm by itself (owner gate GB2). aqua-mcp-server on npm includes it, so use that; the tarball above is the fallback.
+- npm: aqua-companion is also published on npm. aqua-mcp-server on npm includes it and is the primary install, so use that; the tarball above is the fallback.
 - Self-check: `aqua-companion doctor` (or `npx -y aqua-mcp-server companion doctor`; tarball: `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz doctor`) reports configuration, catalog connectivity, workspace and keychain status.
 
 ### 2. Connect it to the agent (MCP over stdio)

@@ -81,7 +81,7 @@ function loadCompanion() {
     package: 'aqua-companion',
     version,
     tarball: { file, url, sha256, sha256_url: `${url}.sha256`, latest_url: `${ORIGIN}/companion/latest.json`, packed },
-    npm_status: 'aqua-companion is not published on npm by itself (owner gate GB2). aqua-mcp-server on npm includes it, so use that; the tarball above is the fallback.',
+    npm_status: 'aqua-companion is also published on npm. aqua-mcp-server on npm includes it and is the primary install, so use that; the tarball above is the fallback.',
   }
 }
 
