@@ -25,6 +25,7 @@ export default function NotFound() {
             <Link className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-3 hover:border-brand-700" href="/about">About AQUA</Link>
             <Link className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-3 hover:border-brand-700" href="/contact">Contact</Link>
             <Link className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-3 hover:border-brand-700" href="/privacy">Privacy</Link>
+            <Link className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-3 hover:border-brand-700" href="/terms">Terms</Link>
           </div>
         </section>
       </main>

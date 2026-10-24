@@ -63,6 +63,7 @@ export default function AboutPage() {
           <Link href="/about/scoring" className="btn-secondary">Scoring methodology</Link>
           <Link href="/contact" className="btn-secondary">Contact</Link>
           <Link href="/privacy" className="btn-secondary">Privacy</Link>
+          <Link href="/terms" className="btn-secondary">Terms</Link>
         </div>
       </main>
     </div>
