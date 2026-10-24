@@ -13,7 +13,7 @@ const HISTORY_MD = [
 ].join('\n')
 
 test('§6 merge sequence: import, index, history, review, human approval boundary, reuse, assemble, restart persistence', async () => {
-  const { root } = await seededWorkspace('m10-seq')
+  const { v, root } = await seededWorkspace('m10-seq')
   inbox(root, 'form.md', FORM_MD)
   inbox(root, 'form2.md', FORM2)
   fs.mkdirSync(path.join(root, 'inbox/history'), { recursive: true })
@@ -66,6 +66,12 @@ test('§6 merge sequence: import, index, history, review, human approval boundar
     const st3 = await c2.call('read_review_status', { application_id: appId })
     assert.equal(st3.questions.find((q) => q.question_occurrence_id === occ0)?.candidate_links?.length, 1, 'link persists across restart')
     assert.equal(st3.questions.length, 3, 'records persist across restart')
+    // approval state persists across restart too: the vault-approved version
+    // imported in the seed is still reported approved on its instance
+    const stV = await c2.call('read_review_status', { application_id: v.inst.application_id })
+    const approvedRow = stV.questions.find((q) => q.question_occurrence_id === v.q1)
+    assert.equal(approvedRow?.approved_version_id, v.version.id, 'human approval persists across restart')
+    assert.ok(['approved', 'included_in_packet'].includes(approvedRow?.status), 'approval-derived status persists across restart')
   } finally {
     await c2.close()
   }

@@ -155,12 +155,16 @@ function latestMarks(model, instance_id) {
   return latestByOcc(model.question_marks, instance_id, (m) => ({ state: m.state, reason: m.reason }))
 }
 
-/** Latest update_question annotation per question in an instance. */
+/** Effective update_question annotations per question — the merged overlay
+ *  (per-field last-wins), matching what the model applies to the template. */
 function latestNotes(model, instance_id) {
-  return latestByOcc(model.question_notes, instance_id, (n) => {
-    const { note_id, application_id, instance_id: _i, question_occurrence_id: _q, created_at: _c, never_changes_wording: _w, rid: _r, ...fields } = n
-    return Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== null))
-  })
+  const out = new Map()
+  for (const [key, n] of (model.note_overlay ?? new Map()).entries()) {
+    if (n.instance_id !== instance_id) continue
+    const { note_id, application_id, instance_id: _i, question_occurrence_id, created_at: _c, never_changes_wording: _w, rid: _r, ...fields } = n
+    out.set(question_occurrence_id, Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== null)))
+  }
+  return out
 }
 
 const NEXT_STEPS_TO_BROWSER = [
@@ -706,7 +710,7 @@ export const TOOLS = [
         })),
         user_added_questions: model.question_adds
           .filter((r) => r.instance_id === inst.instance_id)
-          .map(({ question_occurrence_id, order, required, source_ref }) => ({ question_occurrence_id, order, required, source_ref })),
+          .map(({ question_occurrence_id, order, required, source_ref }) => ({ question_occurrence_id, order, required: required === 'required' ? true : required === 'unknown' ? null : false, source_ref })),
         note: 'recommendation is advisory (Direct = an approved answer fits, Adapt = related answer needs revision, Gap = nothing suitable). It never approves anything.',
         untrusted: {
           questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, section_id: r.section_id ?? null, options: r.options ?? null, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })),
@@ -1027,10 +1031,10 @@ export const TOOLS = [
       if (!inst.question_refs.some((r) => r.question_occurrence_id === args.question_occurrence_id)) {
         throw new ToolRefusal('not_found', `No question ${args.question_occurrence_id} in application ${inst.instance_id}. Use inspect_extracted_questions to list them.`)
       }
-      const dupe = model.links.some((l) => l.link_type === 'history_candidate' && l.instance_id === inst.instance_id && l.question_occurrence_id === args.question_occurrence_id && l.history_answer_id === args.history_answer_id)
-      if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'history_candidate', next_steps: ['That history candidate is already linked to this question.'] }
       const rec = ws.records[rid('answer', args.history_answer_id)]
       if (rec && ['archived', 'missing', 'tombstoned'].includes(rec.status)) throw new ToolRefusal('not_found', `History answer ${args.history_answer_id} is ${rec.status} — link live records only.`)
+      const dupe = model.links.some((l) => l.link_type === 'history_candidate' && l.instance_id === inst.instance_id && l.question_occurrence_id === args.question_occurrence_id && l.history_answer_id === args.history_answer_id)
+      if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'history_candidate', next_steps: ['That history candidate is already linked to this question.'] }
       // Companion-staged history carries entry.history; vault-restored history
       // answers don't — fall back to their versions' history flag.
       const isHistory = rec?.history === true
@@ -1142,7 +1146,7 @@ export const TOOLS = [
       group: S('Conditional or grouped section name.'),
       required: { type: 'string', enum: ['required', 'optional', 'unknown'], description: 'Requirement status established by the source.' },
       limit: S('Length limit, e.g. "words:250" or "chars:1000".'),
-      options: S('Visible options for a choice field.'),
+      options: S('Visible options for a choice field — one per line.'),
     }, ['application_id', 'question_occurrence_id']),
     async handler(t, args) {
       const ws = t.ws
@@ -1275,7 +1279,7 @@ export const TOOLS = [
         if (!(await versionIntact(v))) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'integrity_mismatch' }); continue }
         // The version must belong to this question or be a recorded direct-reuse
         // link (link_answer) — a bare map can't silently pair unrelated wording.
-        const scoped = model.answers.some((a) => a.id === v.answer_id && a.scope?.question_occurrence_id === occ)
+        const scoped = model.answers.some((a) => a.id === v.answer_id && a.scope?.application_id === inst.application_id && a.scope?.question_occurrence_id === occ)
         const linked = model.links.some((l) => l.link_type === 'answer_reuse' && l.instance_id === inst.instance_id && l.question_occurrence_id === occ && l.version_id === vid)
         if (!scoped && !linked) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'scope_mismatch' }); continue }
         chosen.push({ row, v })
@@ -1310,7 +1314,7 @@ export const TOOLS = [
       const markdown = `${lines.join('\n')}\n`
       let saved_to = null
       if (t.exportsWritable) {
-        saved_to = `exports/applications/application-${inst.instance_id}-${ts}.md`
+        saved_to = `exports/applications/application-${inst.instance_id}-${ts}-${newUuid().slice(0, 6)}.md`
         writeNewInside(ws.root, saved_to, markdown)
       }
       const rec_id = newUuid()

@@ -188,13 +188,19 @@ export async function loadModel(ws, vaultSecret) {
   // update_question annotations correct the EFFECTIVE question metadata (never
   // the captured wording): latest note per question overlays required, limits,
   // options and group onto the template so status/packet paths see the fix.
+  // Per-field last-wins across ALL notes in time order — a later partial
+  // correction must not silently revert an earlier one (each call only sets
+  // the fields it was given).
   const noteByOcc = new Map()
-  for (const n of m.question_notes) {
-    const prev = noteByOcc.get(`${n.instance_id}:${n.question_occurrence_id}`)
-    const k = `${n.created_at ?? ''}${n.rid ?? ''}`
-    if (!prev || k > prev.k) noteByOcc.set(`${n.instance_id}:${n.question_occurrence_id}`, { k, n })
+  const sortedNotes = [...m.question_notes].sort((a, b) => (`${a.created_at ?? ''}${a.rid ?? ''}`).localeCompare(`${b.created_at ?? ''}${b.rid ?? ''}`))
+  for (const n of sortedNotes) {
+    const key = `${n.instance_id}:${n.question_occurrence_id}`
+    const acc = noteByOcc.get(key) ?? {}
+    for (const [f, v] of Object.entries(n)) if (v !== null && v !== undefined) acc[f] = v
+    noteByOcc.set(key, acc)
   }
-  for (const { n } of noteByOcc.values()) {
+  m.note_overlay = noteByOcc
+  for (const n of noteByOcc.values()) {
     const inst = m.instances.get(n.instance_id)
     const q = inst?.template?.questions?.find((x) => x.question_occurrence_id === n.question_occurrence_id)
     if (!q) continue
