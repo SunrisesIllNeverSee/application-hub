@@ -47,6 +47,15 @@
       ]
     },
     {
+      "source": "/terms",
+      "headers": [
+        {
+          "key": "Vary",
+          "value": "Accept, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch"
+        }
+      ]
+    },
+    {
       "source": "/support",
       "headers": [
         {

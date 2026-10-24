@@ -242,6 +242,7 @@ const PUBLIC_PAGES = [
   ['FAQ', '/faq'],
   ['Contact', '/contact'],
   ['Privacy', '/privacy'],
+  ['Terms of Service', '/terms'],
   ['Scoring methodology', '/about/scoring'],
   ['Application infrastructure hub', '/application-infrastructure'],
   ['Guides index', '/guides'],

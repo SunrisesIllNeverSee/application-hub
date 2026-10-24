@@ -135,6 +135,10 @@ export const BREADCRUMBS = {
     { name: 'Home', path: '/' },
     { name: 'Privacy', path: '/privacy' },
   ]),
+  terms: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Terms of Service', path: '/terms' },
+  ]),
   developers: breadcrumbList([
     { name: 'Home', path: '/' },
     { name: 'Developers', path: '/developers' },
