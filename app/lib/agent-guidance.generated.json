@@ -3,12 +3,12 @@
   "tool_source": "application-hub-mcp-server/TOOLS.json",
   "companion": {
     "package": "aqua-companion",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "tarball": {
-      "file": "aqua-companion-0.2.3.tgz",
-      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz",
-      "sha256": "a36c492d6bb57bec1d6ff9ef164cd4e46ea1a7128ae11d95aa9074fbe6b62280",
-      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz.sha256",
+      "file": "aqua-companion-0.2.4.tgz",
+      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz",
+      "sha256": "5ff3f3a593d9ef3d7834431b26b8d396b73a69898006d1e39ba88538c84cdb77",
+      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz.sha256",
       "latest_url": "https://aquaidp.xyz/companion/latest.json",
       "packed": true
     },
@@ -43,12 +43,12 @@
     "mcp_claude_code": "claude mcp add aqua -- npx -y aqua-mcp-server --keychain",
     "mcp_claude_code_with_workspace": "claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keychain",
     "mcp_companion_cli": "npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA",
-    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help",
-    "local_copy": "npx --yes --package <path>/aqua-companion-0.2.3.tgz aqua-companion --help",
-    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz init --path <folder>",
-    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz doctor",
-    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --keychain",
-    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz mcp --workspace <folder>/AQUA --keychain"
+    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help",
+    "local_copy": "npx --yes --package <path>/aqua-companion-0.2.4.tgz aqua-companion --help",
+    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz init --path <folder>",
+    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz doctor",
+    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz mcp --keychain",
+    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz mcp --workspace <folder>/AQUA --keychain"
   },
   "tiers": [
     {
@@ -467,7 +467,7 @@
   "journey": [
     {
       "step": "Install",
-      "how": "npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.3.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)"
+      "how": "npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)"
     },
     {
       "step": "Set up a workspace",

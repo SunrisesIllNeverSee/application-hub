@@ -87,6 +87,15 @@ companion never guesses. Answers that still contain `[CONFIRM`, `[ASSET
 NEEDED`, `TODO`, `TBD`, `XXX`, `<...>` or `{{...}}` are flagged too, and the
 browser vault refuses to confirm them until you fix the text.
 
+Each record also carries a content hash over its import details (program,
+question, submission date and where it came from, source file hash, import
+time, parse confidence) bound to the exact version it describes. The browser
+checks it when you confirm and when you Restore a backup: if the details
+changed after import, the record is refused and you re-import it from the
+original file. Records imported by an older companion have no hash; they are
+marked as unverified and can still be confirmed after you check their date
+and source yourself.
+
 After `export-backup` and Restore, open **Confirm submitted history**
 (`/history`). Nothing is preselected; you tick the answers you submitted and
 attest it, and the vault records a human approval bound to the exact text,

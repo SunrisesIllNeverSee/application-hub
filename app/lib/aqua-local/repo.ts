@@ -12,6 +12,7 @@
 
 import {
   canonicalJson,
+  decryptField,
   decryptText,
   encryptField,
   encryptText,
@@ -34,7 +35,8 @@ import type {
   VersionMethod,
   VersionRecord,
 } from './schema.ts'
-import { HISTORY_VIA, normalizeEffectiveAt } from './history.ts'
+import { HISTORY_FORMAT, HISTORY_META_MISMATCH_REASON, HISTORY_VIA, checkHistoryMetaHash, normalizeEffectiveAt } from './history.ts'
+import type { HistoryMeta, HistoryMetaHashStatus } from './history.ts'
 import { describePlaceholders, findPlaceholders } from './placeholders.ts'
 import { hasLiveHistoryAttestation } from './status.ts'
 
@@ -72,6 +74,15 @@ export class VaultApprovalMismatchError extends Error {
   constructor(message: string) {
     super(message)
     this.name = 'VaultApprovalMismatchError'
+  }
+}
+
+/** G18: the encrypted history metadata no longer matches its content hash
+    (or cannot be read although a hash is recorded). Attestation is refused. */
+export class VaultHistoryMetaMismatchError extends Error {
+  constructor(versionId: string) {
+    super(`version ${versionId}: ${HISTORY_META_MISMATCH_REASON}`)
+    this.name = 'VaultHistoryMetaMismatchError'
   }
 }
 
@@ -512,6 +523,29 @@ export function recordHumanRevocation(
   return recordHumanDecision(storage, input, 'rejected')
 }
 
+/**
+ * G18: decrypt a history version's metadata and check its hash against the
+ * stored version (id + content sha256). `legacy` = no metadata or no hash
+ * (imported before G18). Metadata that is present but unreadable, of the
+ * wrong format, or carries a hash that does not match is `mismatch`
+ * (fail closed). `meta` is null when there is nothing readable.
+ */
+export async function verifyHistoryMeta(
+  secret: string,
+  v: Pick<VersionRecord, 'id' | 'sha256' | 'history_enc'>,
+): Promise<{ status: HistoryMetaHashStatus; meta: Partial<HistoryMeta> | null }> {
+  if (!v.history_enc) return { status: 'legacy', meta: null }
+  let meta: Partial<HistoryMeta> | null
+  try {
+    const m = JSON.parse(await decryptField(secret, v.history_enc)) as Partial<HistoryMeta>
+    meta = m && typeof m === 'object' && !Array.isArray(m) && m.format === HISTORY_FORMAT ? m : null
+  } catch {
+    meta = null
+  }
+  if (!meta) return { status: 'mismatch', meta: null }
+  return { status: await checkHistoryMetaHash(meta, { version_id: v.id, version_sha256: v.sha256 }), meta }
+}
+
 export interface HistoryAttestationInput {
   version_id: string
   /** The sha256 of the answer the user was SHOWN on the confirm screen. */
@@ -576,6 +610,8 @@ export async function recordHistoryAttestation(
   }
   const markers = findPlaceholders(body)
   if (markers.length) throw new VaultPlaceholderError(markers)
+  // G18: hashed metadata must still match; legacy (unhashed) metadata is allowed and shown as such.
+  if ((await verifyHistoryMeta(secret, record)).status === 'mismatch') throw new VaultHistoryMetaMismatchError(record.id)
   const attestation_enc = await encryptField(secret, input.statement)
   return storage.tx(['versions', 'approvals', 'events'], async (s) => {
     const version = await s.get<VersionRecord>('versions', input.version_id)

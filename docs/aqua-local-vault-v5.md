@@ -111,6 +111,33 @@ carry ids, hashes, enums and actor ids only. They never carry free text.
    source file sha256, importer placeholder scan). The browser screen
    (`/history`, `history-review.ts`) lists them; nothing is preselected.
 
+   **History metadata hash (G18, owner-approved 2026-10-24).** `HistoryMeta`
+   carries `meta_sha256`: sha256 (hex) of `canonicalJson` (sorted keys) of
+   `{domain: 'aqua-history-meta/v1', version_id, version_sha256, format,
+   program, question, submitted_at, date_source, flags (sorted),
+   source_sha256, source_file, placeholder {found, markers (sorted)},
+   imported_at, importer, parse_confidence, parse_notes}` (`history.ts`
+   `computeHistoryMetaHash`; absent optional fields normalize to null / empty,
+   `meta_sha256` itself is not hashed). It binds the metadata to the version
+   it describes by id and by the version's content sha256, so metadata cannot
+   be edited or copied onto another version unnoticed. The companion importer
+   writes it (`history.mjs`) and it travels inside `history_enc`. Verified
+   by `verifyHistoryMeta` (`repo.ts`): `recordHistoryAttestation` refuses
+   with `VaultHistoryMetaMismatchError` before writing anything when a
+   recorded hash does not match (or the metadata cannot be decrypted/read);
+   `importVault` and the companion's `import-backup` refuse a backup with a
+   mismatching or unreadable hashed history record; the review model gives
+   each item `meta_hash_status` (`verified`, `legacy`, `mismatch`), disables
+   mismatching items with a user-facing reason and shows none of their
+   (untrusted) details. **Legacy records** (imported before G18: no
+   `meta_sha256`, or no metadata) are `legacy`: still listed and
+   confirmable, never reported as verified, and `/history` shows a note that
+   their date and source cannot be verified. Limits: the hash is tamper
+   evidence, not authentication: someone holding the vault secret can
+   re-seal edited metadata with a fresh hash, and removing the hash turns a
+   record into `legacy`. Packets do not carry history metadata, so packet
+   verification is unchanged.
+
 ## Status precedence
 
 `deriveQuestionStatus(input)` is a pure function. The **latest** version

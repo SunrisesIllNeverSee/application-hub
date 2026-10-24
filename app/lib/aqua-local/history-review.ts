@@ -11,9 +11,9 @@
 // Not vendored into the companion (it reads the browser vault stores).
 
 import { decryptField } from './crypto.ts'
-import { readVersion, listApprovals, recordHistoryAttestation, VaultPlaceholderError, VaultApprovalMismatchError } from './repo.ts'
+import { readVersion, listApprovals, recordHistoryAttestation, verifyHistoryMeta, VaultPlaceholderError, VaultApprovalMismatchError, VaultHistoryMetaMismatchError } from './repo.ts'
 import { approvalGate } from './status.ts'
-import { describePlaceholders, findPlaceholders, normalizeEffectiveAt, HISTORY_FORMAT, type HistoryMeta, type HistoryParseConfidence } from './history.ts'
+import { describePlaceholders, findPlaceholders, normalizeEffectiveAt, HISTORY_META_MISMATCH_REASON, type HistoryMeta, type HistoryMetaHashStatus, type HistoryParseConfidence } from './history.ts'
 import type { AnswerRecord, AppInstanceRecord, ReviewRecord, VersionRecord } from './schema.ts'
 import type { VaultStorage } from './vault.ts'
 
@@ -42,6 +42,8 @@ export interface HistoryItem {
   /** Importer's split confidence; null for imports that predate it. */
   parse_confidence: HistoryParseConfidence | null
   parse_notes: string[]
+  /** G18: 'verified' = metadata hash matches; 'legacy' = imported before hashing (flagged, still confirmable); 'mismatch' = tampered (never confirmable). */
+  meta_hash_status: HistoryMetaHashStatus
   /** Low confidence: the user must mark the item as reviewed before it can be selected. */
   needs_review: boolean
   /** null = selectable; otherwise why it cannot be confirmed. */
@@ -62,16 +64,6 @@ export interface HistoryGroup {
 function excerptOf(body: string): string {
   const t = body.replace(/\s+/g, ' ').trim()
   return t.length <= EXCERPT_CHARS ? t : `${t.slice(0, EXCERPT_CHARS)}…`
-}
-
-async function readMeta(secret: string, v: VersionRecord): Promise<Partial<HistoryMeta> | null> {
-  if (!v.history_enc) return null
-  try {
-    const m = JSON.parse(await decryptField(secret, v.history_enc)) as Partial<HistoryMeta>
-    return m && typeof m === 'object' && m.format === HISTORY_FORMAT ? m : null
-  } catch {
-    return null
-  }
 }
 
 async function programOf(storage: VaultStorage, secret: string, appId: string | null, cache: Map<string, string | null>): Promise<string | null> {
@@ -108,7 +100,10 @@ export async function listHistoryCandidates(storage: VaultStorage, secret: strin
   const programCache = new Map<string, string | null>()
   const groups = new Map<string, HistoryGroup>()
   for (const v of versions) {
-    const meta = await readMeta(secret, v)
+    const verified = await verifyHistoryMeta(secret, v)
+    const metaStatus = verified.status
+    // tampered metadata is never displayed as if it were the import's details
+    const meta = metaStatus === 'mismatch' ? null : verified.meta
     const { title, body } = await readVersion(storage, secret, v.id)
     const appId = answers.get(v.answer_id)?.scope.application_id ?? null
     const program = meta?.program || (await programOf(storage, secret, appId, programCache)) || 'Unnamed application'
@@ -122,11 +117,13 @@ export async function listHistoryCandidates(storage: VaultStorage, secret: strin
       : null
     const disabled_reason = confirmed
       ? 'Already confirmed as submitted.'
-      : markers.length
-        ? describePlaceholders(markers)
-        : !submitted
-          ? DATE_UNKNOWN_REASON
-          : null
+      : metaStatus === 'mismatch'
+        ? HISTORY_META_MISMATCH_REASON
+        : markers.length
+          ? describePlaceholders(markers)
+          : !submitted
+            ? DATE_UNKNOWN_REASON
+            : null
     const item: HistoryItem = {
       version_id: v.id,
       sha256: v.sha256,
@@ -142,6 +139,7 @@ export async function listHistoryCandidates(storage: VaultStorage, secret: strin
       source_file: typeof meta?.source_file === 'string' ? meta.source_file : null,
       parse_confidence: null,
       parse_notes: [],
+      meta_hash_status: metaStatus,
       needs_review: false,
       disabled_reason,
       status: confirmed ? 'confirmed' : 'pending',
@@ -216,6 +214,8 @@ export async function confirmHistorySelection(
       const msg =
         e instanceof VaultPlaceholderError
           ? describePlaceholders(e.markers)
+          : e instanceof VaultHistoryMetaMismatchError
+            ? HISTORY_META_MISMATCH_REASON
           : e instanceof VaultApprovalMismatchError
             ? 'The answer changed since it was shown; reload and check it again.'
             : e instanceof Error
