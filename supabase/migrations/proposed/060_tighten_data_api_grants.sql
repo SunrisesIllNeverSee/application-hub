@@ -1,6 +1,10 @@
 -- ============================================================
 -- 060 — Tighten Data API grants (PROPOSED, NOT IN THE MIGRATION CHAIN)
 -- ============================================================
+-- ADOPTED 2026-10-24 as supabase/migrations/20261024090000_062_tighten_data_api_grants.sql
+-- (OWNER decision G15): A as an explicit list, B2 held until GB1, E with
+-- the E1 sender delete policy, G already done by 061. This file is kept
+-- for provenance only; 062 is authoritative.
 -- STATUS: PROPOSAL ONLY. Lives under supabase/migrations/proposed/, which
 -- the Supabase CLI and the CI migration lint do not read. Nothing here is
 -- applied by any runner. It needs an OWNER DECISION per section; to adopt

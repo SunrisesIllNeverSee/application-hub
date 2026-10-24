@@ -17,7 +17,7 @@
 #
 # GRANTS_MODE (M09 W11, explicit Data API grants) switches to the FULL-CHAIN
 # path in full_chain.sh: a fresh database built from every migration
-# (001 -> 061; no live-baseline fixture), under either
+# (001 -> 062; no live-baseline fixture), under either
 #   GRANTS_MODE=default   the pre-2026-10-30 Supabase default privileges
 #   GRANTS_MODE=revoked   the post-2026-10-30 default (Supabase's opt-in
 #                         ALTER DEFAULT PRIVILEGES ... REVOKE statements run

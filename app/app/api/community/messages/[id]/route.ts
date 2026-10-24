@@ -73,12 +73,18 @@ export async function DELETE(_req: Request, { params }: Ctx) {
   if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 500 })
   if (!row) return NextResponse.json({ error: 'Not found or forbidden' }, { status: 404 })
 
-  const { error } = await supabase
+  // RLS (062 cm_sender_delete) restricts DELETE to the sender; report a
+  // refused delete instead of a silent 0-row success
+  const { data: deleted, error } = await supabase
     .from('community_messages')
     .delete()
     .eq('id', id)
     .eq('from_user_id', user.id)
+    .select('id')
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!deleted || deleted.length === 0) {
+    return NextResponse.json({ error: 'Not found or forbidden' }, { status: 404 })
+  }
   return NextResponse.json({ ok: true })
 }
