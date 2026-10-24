@@ -11,6 +11,8 @@
 // a body that still carries an unfilled placeholder can never become a
 // history attestation.
 
+import { canonicalJson, sha256Hex } from './crypto.ts'
+
 /** Format tag inside every encrypted history record (`history_enc`). */
 export const HISTORY_FORMAT = 'aqua-history/v1'
 
@@ -48,7 +50,80 @@ export interface HistoryMeta {
   parse_confidence?: HistoryParseConfidence
   /** Why the confidence is below high, e.g. 'answer_contains_question_line'. */
   parse_notes?: string[]
+  /**
+   * G18 tamper evidence: sha256 (hex) over the canonical metadata AND the
+   * version it describes (see `computeHistoryMetaHash`). Absent on records
+   * imported before G18 ("unhashed (legacy)").
+   */
+  meta_sha256?: string
 }
+
+/** Domain tag mixed into the metadata hash so it can never collide with a version content hash. */
+export const HISTORY_META_HASH_DOMAIN = 'aqua-history-meta/v1'
+
+/** The version a history metadata record is bound to. */
+export interface HistoryMetaBinding {
+  version_id: string
+  /** The version's content sha256 (title + body). */
+  version_sha256: string
+}
+
+const orNull = <T>(v: T | undefined | null): T | null => (v === undefined || v === null ? null : v)
+const strList = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [])
+
+/**
+ * The exact object that is hashed. Every metadata field except `meta_sha256`
+ * is bound, plus `version_id` and `version_sha256`. Optional/absent values are
+ * normalized (null / empty list; `flags` and placeholder markers sorted) so
+ * the hash does not depend on key order or on how absence was spelled.
+ */
+export function historyMetaHashInput(meta: Partial<HistoryMeta>, binding: HistoryMetaBinding): Record<string, unknown> {
+  const ph = (meta.placeholder ?? {}) as Partial<HistoryMeta['placeholder']>
+  return {
+    domain: HISTORY_META_HASH_DOMAIN,
+    version_id: binding.version_id,
+    version_sha256: binding.version_sha256,
+    format: orNull(meta.format),
+    program: orNull(meta.program),
+    question: orNull(meta.question),
+    submitted_at: orNull(meta.submitted_at),
+    date_source: orNull(meta.date_source),
+    flags: [...strList(meta.flags)].sort(),
+    source_sha256: orNull(meta.source_sha256),
+    source_file: orNull(meta.source_file),
+    placeholder: { found: ph.found === true, markers: [...strList(ph.markers)].sort() },
+    imported_at: orNull(meta.imported_at),
+    importer: orNull(meta.importer),
+    parse_confidence: orNull(meta.parse_confidence),
+    parse_notes: strList(meta.parse_notes),
+  }
+}
+
+/** sha256 hex of `canonicalJson(historyMetaHashInput(meta, binding))`. */
+export async function computeHistoryMetaHash(meta: Partial<HistoryMeta>, binding: HistoryMetaBinding): Promise<string> {
+  return sha256Hex(canonicalJson(historyMetaHashInput(meta, binding)))
+}
+
+/**
+ * `verified`: hash present and matches. `legacy`: no metadata or no hash
+ * (imported before G18; allowed but flagged, never reported as verified).
+ * `mismatch`: a hash is present and does not match: refuse.
+ */
+export type HistoryMetaHashStatus = 'verified' | 'legacy' | 'mismatch'
+
+export async function checkHistoryMetaHash(meta: Partial<HistoryMeta> | null | undefined, binding: HistoryMetaBinding): Promise<HistoryMetaHashStatus> {
+  if (!meta || typeof meta !== 'object' || meta.meta_sha256 === undefined || meta.meta_sha256 === null) return 'legacy'
+  if (typeof meta.meta_sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(meta.meta_sha256)) return 'mismatch'
+  return (await computeHistoryMetaHash(meta, binding)) === meta.meta_sha256 ? 'verified' : 'mismatch'
+}
+
+/** Shown when the metadata hash does not match (attestation and restore refuse). */
+export const HISTORY_META_MISMATCH_REASON =
+  'The import details for this answer (date, source or question) changed after it was imported. It cannot be confirmed; import it again from the original file.'
+
+/** Shown next to a record imported before metadata hashing existed. */
+export const HISTORY_META_LEGACY_NOTE =
+  'Imported before tamper checks existed: the date and source details cannot be verified. Check them yourself before you confirm.'
 
 export type HistoryParseConfidence = 'high' | 'medium' | 'low'
 

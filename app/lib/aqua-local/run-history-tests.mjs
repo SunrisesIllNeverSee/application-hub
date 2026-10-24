@@ -12,8 +12,10 @@ import {
 } from './repo.ts'
 import { approvalGate } from './status.ts'
 import { exportVault, importVault } from './backup.ts'
-import { decryptField, encryptField } from './crypto.ts'
-import { findPlaceholders, normalizeEffectiveAt, isCalendarDate, HISTORY_FORMAT, describePlaceholders } from './history.ts'
+import { decryptField, encryptField, decryptText, encryptText } from './crypto.ts'
+import { findPlaceholders, normalizeEffectiveAt, isCalendarDate, HISTORY_FORMAT, describePlaceholders, computeHistoryMetaHash, checkHistoryMetaHash, historyMetaHashInput, HISTORY_META_MISMATCH_REASON } from './history.ts'
+import { VaultHistoryMetaMismatchError, verifyHistoryMeta } from './repo.ts'
+import { listHistoryCandidates, confirmHistorySelection } from './history-review.ts'
 import * as Shared from './placeholders.ts'
 import { recordHumanRevocation, VaultHistoryApprovalError } from './repo.ts'
 import { approveAsHuman } from '../aqua-local-client/review.ts'
@@ -152,6 +154,161 @@ await t('backup v2 carries history approvals and history_enc; restored ones stay
   // the user can confirm it again locally
   await attest(s2, rv)
   assert.equal(approvalGate(rv, await listApprovals(s2)).approved, true)
+})
+
+// ─── G18: content hash over the history metadata (tamper evidence) ──────────
+
+const HEX64 = /^[0-9a-f]{64}$/
+const baseMeta = () => ({
+  format: HISTORY_FORMAT, program: 'Synthetic Fund', question: 'Why now?', submitted_at: '2025-03-01', date_source: 'frontmatter',
+  flags: ['date_conflict', 'date_ambiguous'], source_sha256: 'a'.repeat(64), source_file: 'fund.md',
+  placeholder: { found: false, markers: [] }, imported_at: '2026-10-24T00:00:00.000Z', importer: 'synthetic importer',
+  parse_confidence: 'high', parse_notes: ['n1'],
+})
+const bind = { version_id: 'ver-1', version_sha256: 'b'.repeat(64) }
+/** A history version whose encrypted metadata carries a valid meta_sha256 (bound to this version's id + sha256). */
+async function hashedHistoryVersion(s, body = 'Clean synthetic answer.', over = {}) {
+  const a = await createAnswer(s, { application_id: 'LA-hist', question_occurrence_id: 'LQ-1' })
+  const { record, receipt } = await buildVersionPayload(SECRET, { answer_id: a.id, title: 'Synthetic submitted answer', body, method: 'imported' })
+  record.history = true
+  const meta = { ...baseMeta(), ...over }
+  meta.meta_sha256 = await computeHistoryMetaHash(meta, { version_id: record.id, version_sha256: record.sha256 })
+  record.history_enc = await encryptField(SECRET, JSON.stringify(meta))
+  await s.put('versions', record)
+  await s.put('provenance', receipt)
+  return { record, meta }
+}
+const reseal = async (s, record, meta) => s.put('versions', { ...record, history_enc: await encryptField(SECRET, JSON.stringify(meta)) })
+
+await t('G18: meta hash is deterministic, key-order and absence independent, 64-hex', async () => {
+  const h1 = await computeHistoryMetaHash(baseMeta(), bind)
+  assert.match(h1, HEX64)
+  assert.equal(h1, await computeHistoryMetaHash(baseMeta(), bind))
+  const m = baseMeta()
+  const reordered = Object.fromEntries(Object.entries(m).reverse())
+  reordered.flags = [...m.flags].reverse()
+  assert.equal(await computeHistoryMetaHash(reordered, bind), h1, 'key order and flag order do not matter')
+  const noOpt = baseMeta(); delete noOpt.parse_notes
+  const emptyOpt = { ...baseMeta(), parse_notes: [] }
+  assert.equal(await computeHistoryMetaHash(noOpt, bind), await computeHistoryMetaHash(emptyOpt, bind), 'absent == empty')
+  assert.equal(await computeHistoryMetaHash({ ...baseMeta(), meta_sha256: 'f'.repeat(64) }, bind), h1, 'the hash field itself is not hashed')
+  assert.equal(historyMetaHashInput(baseMeta(), bind).domain, 'aqua-history-meta/v1')
+  // pinned vector: a change to the canonical form must be deliberate (bump the domain tag)
+  assert.equal(h1, 'a982f676dd5a0652fd6f700ac56eba65e6331011f44c52f1e885d9ac38ae8e96')
+})
+
+await t('G18: every bound field changes the hash (and checkHistoryMetaHash reports mismatch)', async () => {
+  const meta = baseMeta()
+  meta.meta_sha256 = await computeHistoryMetaHash(meta, bind)
+  assert.equal(await checkHistoryMetaHash(meta, bind), 'verified')
+  const changes = {
+    format: 'aqua-history/v2', program: 'Other Fund', question: 'Why not?', submitted_at: '2025-03-02', date_source: 'filename',
+    flags: ['date_unknown'], source_sha256: 'c'.repeat(64), source_file: 'other.md',
+    placeholder: { found: true, markers: ['todo'] }, imported_at: '2026-10-25T00:00:00.000Z', importer: 'someone else',
+    parse_confidence: 'low', parse_notes: ['n2'],
+  }
+  for (const [k, v] of Object.entries(changes)) {
+    assert.equal(await checkHistoryMetaHash({ ...meta, [k]: v }, bind), 'mismatch', `changing ${k} must break the hash`)
+  }
+  for (const k of ['program', 'source_file', 'parse_confidence', 'parse_notes']) {
+    const dropped = { ...meta }; delete dropped[k]
+    assert.equal(await checkHistoryMetaHash(dropped, bind), 'mismatch', `dropping ${k} must break the hash`)
+  }
+  assert.equal(await checkHistoryMetaHash(meta, { ...bind, version_id: 'ver-2' }), 'mismatch', 'bound to the version id')
+  assert.equal(await checkHistoryMetaHash(meta, { ...bind, version_sha256: 'd'.repeat(64) }), 'mismatch', 'bound to the version content hash')
+  assert.equal(await checkHistoryMetaHash({ ...meta, meta_sha256: 'nothex' }, bind), 'mismatch')
+  assert.equal(await checkHistoryMetaHash({ ...meta, meta_sha256: '' }, bind), 'mismatch')
+})
+
+await t('G18: legacy (no hash / no metadata) is "legacy", never "verified"', async () => {
+  assert.equal(await checkHistoryMetaHash(baseMeta(), bind), 'legacy')
+  assert.equal(await checkHistoryMetaHash(null, bind), 'legacy')
+  assert.equal(await checkHistoryMetaHash(undefined, bind), 'legacy')
+})
+
+await t('G18: attestation of hashed metadata succeeds; verifyHistoryMeta reports verified', async () => {
+  const s = createMemoryStorage()
+  const { record } = await hashedHistoryVersion(s)
+  assert.equal((await verifyHistoryMeta(SECRET, record)).status, 'verified')
+  const a = await attest(s, record)
+  assert.equal(a.via, 'history_attestation')
+})
+
+await t('G18: tampered metadata refuses attestation (each bound field), nothing is written', async () => {
+  const fields = {
+    submitted_at: '2024-01-01', date_source: 'flag', program: 'Forged Fund', question: 'Forged question?', source_sha256: 'e'.repeat(64),
+    source_file: 'forged.md', imported_at: '2020-01-01T00:00:00.000Z', importer: 'forger', flags: [], parse_confidence: 'low',
+    parse_notes: ['x'], placeholder: { found: true, markers: ['todo'] },
+  }
+  for (const [k, v] of Object.entries(fields)) {
+    const s = createMemoryStorage()
+    const { record, meta } = await hashedHistoryVersion(s)
+    await reseal(s, record, { ...meta, [k]: v })
+    await assert.rejects(() => attest(s, record, { effective_at: '2025-03-01' }), (e) => e instanceof VaultHistoryMetaMismatchError && e.message.includes(HISTORY_META_MISMATCH_REASON), k)
+    assert.equal((await listApprovals(s)).length, 0, `${k}: nothing written`)
+    assert.equal((await listEvents(s)).length, 0)
+  }
+})
+
+await t('G18: metadata copied onto another version is refused (bound to version id and sha256); undecryptable metadata with a recorded hash fails closed', async () => {
+  const s = createMemoryStorage()
+  const a = await hashedHistoryVersion(s, 'First clean answer.')
+  const b = await hashedHistoryVersion(s, 'Second clean answer.')
+  await s.put('versions', { ...b.record, history_enc: a.record.history_enc })
+  await assert.rejects(() => attest(s, b.record), VaultHistoryMetaMismatchError)
+  await attest(s, a.record)
+  const s2 = createMemoryStorage()
+  const { record } = await hashedHistoryVersion(s2)
+  await s2.put('versions', { ...record, history_enc: 'not-a-blob' })
+  await assert.rejects(() => attest(s2, record), VaultHistoryMetaMismatchError)
+})
+
+await t('G18: review model flags verified / legacy / mismatch; mismatch is disabled and shows no forged details', async () => {
+  const s = createMemoryStorage()
+  const ok = await hashedHistoryVersion(s, 'Verified synthetic answer.')
+  const legacy = await historyVersion(s, 'Legacy synthetic answer.')
+  const bad = await hashedHistoryVersion(s, 'Tampered synthetic answer.')
+  await reseal(s, bad.record, { ...bad.meta, submitted_at: '2001-01-01', question: 'FORGED' })
+  const items = (await listHistoryCandidates(s, SECRET)).flatMap((g) => g.items)
+  const by = (id) => items.find((i) => i.version_id === id)
+  assert.equal(by(ok.record.id).meta_hash_status, 'verified')
+  assert.equal(by(ok.record.id).disabled_reason, null)
+  assert.equal(by(legacy.id).meta_hash_status, 'legacy')
+  assert.equal(by(legacy.id).disabled_reason, null, 'legacy stays confirmable (flagged, not blocked)')
+  const t3 = by(bad.record.id)
+  assert.equal(t3.meta_hash_status, 'mismatch')
+  assert.equal(t3.disabled_reason, HISTORY_META_MISMATCH_REASON)
+  assert.equal(t3.submitted_at, null)
+  assert.notEqual(t3.question, 'FORGED')
+  const res = await confirmHistorySelection(s, SECRET, { items: [by(ok.record.id), by(legacy.id), { version_id: bad.record.id, sha256: bad.record.sha256, submitted_at: '2025-03-01' }], attested: true, statement: 'I submitted these.', actor_id: 'u' })
+  assert.deepEqual(res.map((r) => r.ok), [true, true, false])
+  assert.equal(res[2].error, HISTORY_META_MISMATCH_REASON)
+})
+
+await t('G18: backup round trip keeps the hash valid; restore refuses tampered or unreadable metadata', async () => {
+  const s = createMemoryStorage()
+  const { record } = await hashedHistoryVersion(s)
+  await attest(s, record)
+  const text = await exportVault(s, SECRET)
+  const s2 = createMemoryStorage()
+  await importVault(s2, SECRET, text)
+  const rv = await s2.get('versions', record.id)
+  assert.equal((await verifyHistoryMeta(SECRET, rv)).status, 'verified')
+  await attest(s2, rv)
+  // re-seal a backup whose metadata was edited after hashing
+  const envelope = JSON.parse(text)
+  const payload = JSON.parse(await decryptText(SECRET, envelope))
+  const meta = JSON.parse(await decryptField(SECRET, payload.versions[0].history_enc))
+  payload.versions[0].history_enc = await encryptField(SECRET, JSON.stringify({ ...meta, submitted_at: '2020-02-02' }))
+  const forged = JSON.stringify({ ...envelope, ...(await encryptText(SECRET, JSON.stringify(payload))) })
+  await assert.rejects(() => importVault(createMemoryStorage(), SECRET, forged), /history metadata hash mismatch/)
+  payload.versions[0].history_enc = 'garbage'
+  const garbled = JSON.stringify({ ...envelope, ...(await encryptText(SECRET, JSON.stringify(payload))) })
+  await assert.rejects(() => importVault(createMemoryStorage(), SECRET, garbled), /history metadata could not be read/)
+  // legacy (unhashed) metadata still restores
+  const s3 = createMemoryStorage()
+  await historyVersion(s3, 'Legacy synthetic answer for backup.')
+  await importVault(createMemoryStorage(), SECRET, await exportVault(s3, SECRET))
 })
 
 // ─── M1: placeholder detection cannot be bypassed by Unicode / spacing ──────

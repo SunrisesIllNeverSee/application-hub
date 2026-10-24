@@ -1,7 +1,7 @@
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/aqua-local/repo.ts
-// source-sha256: 04a42745142a9f249f3f41dfc4843d216d80c38e7850671ad568db9feee71ef2
-// body-sha256: f1e5e20017ae9cc4f53a9170fb46be9506a5594806da5df7680c0ff6c2506186
+// source-sha256: 69e21bf63a5a0d90f87a0a8a99590897dd21b2f623b31b121019602e84f48c3d
+// body-sha256: 7d06c6c8a4edbb481e7644e65c5cf3979078c2d8a489e8f5f95330889b6502d7
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // NETWORK-BOUNDARY: no fetch/import of remote APIs allowed in aqua-local
 //
@@ -17,6 +17,7 @@
 
 import {
   canonicalJson,
+  decryptField,
   decryptText,
   encryptField,
   encryptText,
@@ -39,7 +40,8 @@ import {
                 
                 
                     
-import { HISTORY_VIA, normalizeEffectiveAt } from './history.mjs'
+import { HISTORY_FORMAT, HISTORY_META_MISMATCH_REASON, HISTORY_VIA, checkHistoryMetaHash, normalizeEffectiveAt } from './history.mjs'
+                                                                      
 import { describePlaceholders, findPlaceholders } from './placeholders.mjs'
 import { hasLiveHistoryAttestation } from './status.mjs'
 
@@ -77,6 +79,15 @@ export class VaultApprovalMismatchError extends Error {
   constructor(message        ) {
     super(message)
     this.name = 'VaultApprovalMismatchError'
+  }
+}
+
+/** G18: the encrypted history metadata no longer matches its content hash
+    (or cannot be read although a hash is recorded). Attestation is refused. */
+export class VaultHistoryMetaMismatchError extends Error {
+  constructor(versionId        ) {
+    super(`version ${versionId}: ${HISTORY_META_MISMATCH_REASON}`)
+    this.name = 'VaultHistoryMetaMismatchError'
   }
 }
 
@@ -517,6 +528,29 @@ export function recordHumanRevocation(
   return recordHumanDecision(storage, input, 'rejected')
 }
 
+/**
+ * G18: decrypt a history version's metadata and check its hash against the
+ * stored version (id + content sha256). `legacy` = no metadata or no hash
+ * (imported before G18). Metadata that is present but unreadable, of the
+ * wrong format, or carries a hash that does not match is `mismatch`
+ * (fail closed). `meta` is null when there is nothing readable.
+ */
+export async function verifyHistoryMeta(
+  secret        ,
+  v                                                      ,
+)                                                                                {
+  if (!v.history_enc) return { status: 'legacy', meta: null }
+  let meta                             
+  try {
+    const m = JSON.parse(await decryptField(secret, v.history_enc))                        
+    meta = m && typeof m === 'object' && !Array.isArray(m) && m.format === HISTORY_FORMAT ? m : null
+  } catch {
+    meta = null
+  }
+  if (!meta) return { status: 'mismatch', meta: null }
+  return { status: await checkHistoryMetaHash(meta, { version_id: v.id, version_sha256: v.sha256 }), meta }
+}
+
                                           
                     
                                                                            
@@ -581,6 +615,8 @@ export async function recordHistoryAttestation(
   }
   const markers = findPlaceholders(body)
   if (markers.length) throw new VaultPlaceholderError(markers)
+  // G18: hashed metadata must still match; legacy (unhashed) metadata is allowed and shown as such.
+  if ((await verifyHistoryMeta(secret, record)).status === 'mismatch') throw new VaultHistoryMetaMismatchError(record.id)
   const attestation_enc = await encryptField(secret, input.statement)
   return storage.tx(['versions', 'approvals', 'events'], async (s) => {
     const version = await s.get               ('versions', input.version_id)
