@@ -27,22 +27,22 @@ AQUA is local-first. A user's private answers live in an encrypted vault in thei
 ### 1. Install
 - Primary (npm, Node.js 22+): `npx -y aqua-mcp-server --help`. aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used. Its companion command line is `npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA`.
 - Fallback: the companion also ships as a versioned tarball from this site (no dependencies):
-  `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help`
-- sha256: `cdfb3941c499888a6fff68c20d40b59942d0b28a2d4665995db52b8ae82a9b87` (also at https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz.sha256; https://aquaidp.xyz/companion/latest.json lists the current version).
-- From a downloaded, verified copy: `npx --yes --package <path>/aqua-companion-0.2.4.tgz aqua-companion --help`. (Pass the file with `--package`: npx treats a bare absolute `.tgz` path as a program to run and fails with "Permission denied".)
+  `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz --help`
+- sha256: `3189e62c3685060955346406d25f1f66646e4c3b301ee1d557d4c2ba29da068b` (also at https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz.sha256; https://aquaidp.xyz/companion/latest.json lists the current version).
+- From a downloaded, verified copy: `npx --yes --package <path>/aqua-companion-0.2.5.tgz aqua-companion --help`. (Pass the file with `--package`: npx treats a bare absolute `.tgz` path as a program to run and fails with "Permission denied".)
 - npm: aqua-companion is also published on npm. aqua-mcp-server on npm includes it and is the primary install, so use that; the tarball above is the fallback.
-- Self-check: `aqua-companion doctor` (or `npx -y aqua-mcp-server companion doctor`; tarball: `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz doctor`) reports configuration, catalog connectivity, workspace and keychain status.
+- Self-check: `aqua-companion doctor` (or `npx -y aqua-mcp-server companion doctor`; tarball: `npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz doctor`) reports configuration, catalog connectivity, workspace and keychain status.
 
 ### 2. Connect it to the agent (MCP over stdio)
 ```
 claude mcp add aqua -- npx -y aqua-mcp-server --keychain
 ```
-Fallback (tarball): `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz mcp --keychain`
+Fallback (tarball): `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz mcp --keychain`
 The server starts even when no workspace exists yet. Workspace tools then return `workspace_not_initialized` with next steps. `init --path <folder>` creates `<folder>/AQUA`; the server and the CLI find a workspace only through `--workspace`, `AQUA_WORKSPACE`, or the folder they run in (or a parent). After init, re-add the server with the workspace and restart the client:
 ```
 claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keychain
 ```
-(Tarball fallback: `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz mcp --workspace <folder>/AQUA --keychain`)
+(Tarball fallback: `claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz mcp --workspace <folder>/AQUA --keychain`)
 
 ### 3. Workspace setup and consent
 - `locate_workspace` (read) reports where a workspace is or would be created.
@@ -53,7 +53,7 @@ claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keycha
 
 ### 4. Tiers (enforced in code, not by asking the agent to behave)
 - **read** (22): Always allowed. Only reads the workspace or the public catalog cache.
-- **private_write** (9): Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything.
+- **private_write** (15): Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything.
 - **human_consent** (1): Acts only after the human confirms in the MCP client UI (elicitation). Without that capability it returns requires_human with the exact command for the user to run.
 - **human_only** (5): Never acts. Returns requires_human with the steps the user takes in the AQUA browser app (approve, sign, freeze/export, submit, attest).
 
@@ -84,7 +84,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 - `TRANSPORT=http (self-hosted HTTP)`: 1.x served unauthenticated write-capable HTTP. 2.0 has stdio locally and the read-only hosted endpoint only.
 - There is no service-role key, no account token and no hosted private-answer tool anywhere in the agent path.
 
-Tool list (37 tools): `approve_answer`, `attach_evidence`, `attest_submission`, `create_draft_version`, `discover_applications`, `doctor`, `export_packet`, `get_application_details`, `hub_find_similar_questions`, `hub_get_acceptance_stats`, `hub_get_heat_scores`, `hub_get_program_by_slug`, `hub_get_program_detail`, `hub_get_program_dna`, `hub_get_program_questions`, `hub_get_program_rankings`, `hub_get_question_significance`, `hub_get_universal_questions`, `hub_search_programs`, `import_history`, `import_local_application`, `init_workspace`, `inspect_extracted_questions`, `locate_workspace`, `match_canonical_questions`, `prepare_catalog_candidate`, `prepare_packet`, `present_review_decisions`, `read_review_status`, `record_observed_submission`, `refresh_catalog`, `request_evidence`, `search_answer_bank`, `sign_packet`, `submit_catalog_candidate`, `sync_from_vault_export`, `verify_packet`. Full table: https://aquaidp.xyz/agents.md
+Tool list (43 tools): `add_question`, `approve_answer`, `assemble_application`, `attach_evidence`, `attest_submission`, `create_draft_version`, `discover_applications`, `doctor`, `export_packet`, `get_application_details`, `hub_find_similar_questions`, `hub_get_acceptance_stats`, `hub_get_heat_scores`, `hub_get_program_by_slug`, `hub_get_program_detail`, `hub_get_program_dna`, `hub_get_program_questions`, `hub_get_program_rankings`, `hub_get_question_significance`, `hub_get_universal_questions`, `hub_search_programs`, `import_history`, `import_local_application`, `init_workspace`, `inspect_extracted_questions`, `link_answer`, `link_history`, `locate_workspace`, `mark_question`, `match_canonical_questions`, `prepare_catalog_candidate`, `prepare_packet`, `present_review_decisions`, `read_review_status`, `record_observed_submission`, `refresh_catalog`, `request_evidence`, `search_answer_bank`, `sign_packet`, `submit_catalog_candidate`, `sync_from_vault_export`, `update_question`, `verify_packet`. Full table: https://aquaidp.xyz/agents.md
 
 ### REST API
 AQUA's REST API at https://aquaidp.xyz/api is described by the OpenAPI 3.0.3 document at https://aquaidp.xyz/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is https://aquaidp.xyz/developers.

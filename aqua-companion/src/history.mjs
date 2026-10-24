@@ -113,8 +113,9 @@ export async function prepareHistoryImport(ws, files, { date = null, program = n
       with_placeholders: items.filter((x) => x.placeholders.length).length,
       parse_confidence: parsed.parse_confidence,
       low_confidence: items.filter((x) => x.parse_confidence === 'low').length,
-      records: items.map((x) => ({ version_id: x.version.id, parse_confidence: x.parse_confidence, parse_notes: x.parse_notes, placeholders: x.placeholders.length > 0 })),
+      records: items.map((x) => ({ answer_id: x.answer.id, version_id: x.version.id, parse_confidence: x.parse_confidence, parse_notes: x.parse_notes, placeholders: x.placeholders.length > 0 })),
       version_ids: items.map((x) => x.version.id),
+      answer_ids: items.map((x) => x.answer.id),
       // file-derived text: callers put this under untrusted_content
       program: parsed.program,
       questions: items.map((x) => ({ version_id: x.version.id, question: x.version.history_meta.question, placeholders: x.placeholders, parse_confidence: x.parse_confidence })),

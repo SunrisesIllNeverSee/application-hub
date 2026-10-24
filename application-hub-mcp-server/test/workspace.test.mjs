@@ -51,7 +51,7 @@ test('workspace mode serves the companion tool set plus the public catalog tools
   for (const t of [...COMPANION_TOOLS, ...PUBLIC_TOOLS]) assert.ok(names.includes(t.name), t.name)
   const tierOf = Object.fromEntries(tools.map((t) => [t.name, t._meta['aqua/tier']]))
   for (const t of COMPANION_TOOLS) assert.equal(tierOf[t.name], t.tier, `${t.name} tier comes from the companion`)
-  assert.match(r.err, /stdio-workspace; 37 tools/)
+  assert.match(r.err, /stdio-workspace; 43 tools/)
 })
 
 test('private writes are allowed normally and refused under --read-only, before the handler runs', async () => {
@@ -166,7 +166,7 @@ test('init_workspace: decline creates nothing; accept creates the workspace and 
   assert.ok(fs.existsSync(path.join(base, 'AQUA', 'workspace.json')))
   assert.deepEqual(c.notifications.map((n) => n.method), ['notifications/tools/list_changed', 'notifications/resources/list_changed'])
   const after = (await c.request('tools/list')).result.tools.map((t) => t.name)
-  assert.equal(after.length, 37)
+  assert.equal(after.length, 43)
   assert.ok(after.includes('create_draft_version'))
   const res = (await c.request('resources/list')).result.resources.map((x) => x.uri)
   assert.ok(res.includes('aqua://workspace/status'))

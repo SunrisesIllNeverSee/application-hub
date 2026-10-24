@@ -87,6 +87,28 @@ test('prompts: list and get; missing required argument; unknown prompt', async (
   for (const id of [6, 7]) assert.match(r.responses.get(id).result.messages[0].content.text, /no workspace/)
 })
 
+test('--no-catalog removes the whole catalog surface: no hub_* tools, resources, templates or prompts', async () => {
+  const r = await runServer(['--no-catalog'], [
+    INIT(1),
+    req(2, 'tools/list'),
+    req(3, 'resources/list'),
+    req(4, 'resources/templates/list'),
+    req(5, 'resources/read', { uri: 'aqua://programs' }),
+    req(6, 'prompts/list'),
+    req(7, 'prompts/get', { name: 'start-application', arguments: { program: 'x' } }),
+    req(8, 'tools/call', { name: 'hub_search_programs', arguments: { query: 'x' } }),
+  ])
+  const tools = r.responses.get(2).result.tools.map((t) => t.name)
+  assert.equal(tools.filter((n) => n.startsWith('hub_')).length, 0, 'no hub_* tools under --no-catalog')
+  assert.equal(r.responses.get(3).result.resources.length, 0, 'no catalog resources')
+  assert.equal(r.responses.get(4).result.resourceTemplates.length, 0, 'no catalog templates')
+  assert.equal(r.responses.get(5).error.code, -32002, 'aqua://programs read refused')
+  assert.equal(r.responses.get(6).result.prompts.length, 0, 'no catalog prompts')
+  assert.ok(r.responses.get(7).error, 'prompt get refused')
+  assert.ok(r.responses.get(8).error || r.responses.get(8).result?.isError, 'hub tool call refused')
+  assert.doesNotMatch(JSON.stringify(r.responses.get(1).result.instructions ?? ''), /hub_\*/)
+})
+
 test('JSON-RPC edges: parse error, invalid request, unknown method, notifications, responses, batches', async () => {
   const r = await runServer([], ['{not json', JSON.stringify({ id: 9, method: 'x' }), INIT(1), req(2, 'no/such'), { jsonrpc: '2.0', method: 'notifications/initialized' }, { jsonrpc: '2.0', id: 77, result: {} }, [req(3, 'ping'), req(4, 'ping')], '[]'])
   assert.equal(r.out[0].error.code, -32700)

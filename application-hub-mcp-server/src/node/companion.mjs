@@ -19,7 +19,7 @@ import { SERVER_INSTRUCTIONS as COMPANION_INSTRUCTIONS } from '../vendor/compani
 import { TOOLS as COMPANION_TOOLS } from '../vendor/companion/src/mcp-tools.mjs'
 import { PUBLIC_TOOLS, PUBLIC_TOOL_MAP, callPublicTool } from '../catalog/tools.mjs'
 import { CATALOG_RESOURCES, CATALOG_RESOURCE_TEMPLATES, ResourceNotFound, readCatalogResource } from '../catalog/resources.mjs'
-import { PROMPTS, getPrompt } from '../catalog/prompts.mjs'
+import { PROMPTS, PromptError, getPrompt } from '../catalog/prompts.mjs'
 import { toolEntry } from '../catalog/protocol.mjs'
 
 export const WORKSPACE_STATUS_URI = 'aqua://workspace/status'
@@ -33,6 +33,11 @@ export const INSTRUCTIONS = [
   COMPANION_INSTRUCTIONS,
   'Public catalog tools (hub_*) read approved programs live from the public AQUA catalog with the public key; their catalog text is under untrusted_content too.',
 ].join('\n')
+
+/** Instructions for a catalog-free (--no-catalog) surface. */
+export const INSTRUCTIONS_NO_CATALOG = COMPANION_INSTRUCTIONS
+  .replace('one local, encrypted AQUA workspace and the public AQUA catalog cache.', 'one local, encrypted AQUA workspace.')
+  .replace(' the workspace or the public catalog', ' the workspace or an application source')
 
 /** The companion's tool definitions (for the manifest). */
 export const companionToolDefs = () => COMPANION_TOOLS
@@ -50,6 +55,11 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
   const defs = new Map(COMPANION_TOOLS.map((t) => [t.name, t]))
   const ready = () => reg.state().mode === 'ready'
   const visibleCompanion = () => reg.tools.filter((t) => ready() || t.setup)
+  // --no-catalog drops the public hub_* tools from the surface entirely (the
+  // plugin carries the workspace tools only; the hosted catalog endpoint is a
+  // separate product surface).
+  const noCatalog = flags['no-catalog'] === true
+  const publicTools = () => (noCatalog ? [] : PUBLIC_TOOLS)
 
   async function workspaceStatus() {
     const listed = await reg.dispatch('discover_applications', { include_workspace: true, limit: 1 })
@@ -62,10 +72,10 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
 
   return {
     registry: reg,
-    instructions: INSTRUCTIONS,
+    instructions: noCatalog ? INSTRUCTIONS_NO_CATALOG : INSTRUCTIONS,
     data,
     mode: () => modeOf(reg),
-    toolDefs: () => [...visibleCompanion().map((t) => defs.get(t.name) ?? t), ...PUBLIC_TOOLS],
+    toolDefs: () => [...visibleCompanion().map((t) => defs.get(t.name) ?? t), ...publicTools()],
     onInitialize(dispatcher) {
       reg.setElicitor(dispatcher.canElicit ? (params, opts) => dispatcher.elicit(params, opts) : null)
     },
@@ -74,10 +84,10 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
         const base = { name: t.name, description: t.description, inputSchema: t.inputSchema }
         return pv < '2025-03-26' ? base : { ...base, title: t.title, annotations: t.annotations, _meta: { 'aqua/tier': t.tier } }
       })
-      return [...companion, ...PUBLIC_TOOLS.map((d) => toolEntry(d, pv))]
+      return [...companion, ...publicTools().map((d) => toolEntry(d, pv))]
     },
     async callTool(name, args, dispatcher) {
-      if (PUBLIC_TOOL_MAP.has(name)) return callPublicTool(name, args, data)
+      if (!noCatalog && PUBLIC_TOOL_MAP.has(name)) return callPublicTool(name, args, data)
       const t = byName.get(name)
       if (!t) return { unknown: true }
       const wasReady = ready()
@@ -91,16 +101,20 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
       if (!wasReady && ready()) dispatcher?.notifyListsChanged()
       return r
     },
-    listResources: () => [...(ready() ? WORKSPACE_RESOURCES : []), ...CATALOG_RESOURCES],
-    listResourceTemplates: () => [...CATALOG_RESOURCE_TEMPLATES],
+    listResources: () => [...(ready() ? WORKSPACE_RESOURCES : []), ...(noCatalog ? [] : CATALOG_RESOURCES)],
+    listResourceTemplates: () => (noCatalog ? [] : [...CATALOG_RESOURCE_TEMPLATES]),
     async readResource(uri) {
       if (uri === WORKSPACE_STATUS_URI) {
         if (!ready()) throw new ResourceNotFound(uri)
         return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(await workspaceStatus(), null, 2) }] }
       }
+      if (noCatalog) throw new ResourceNotFound(uri)
       return readCatalogResource(uri, data)
     },
-    listPrompts: () => PROMPTS.map((p) => ({ ...p })),
-    getPrompt: (name, args) => getPrompt(name, args, { hasWorkspace: ready() }),
+    listPrompts: () => (noCatalog ? [] : PROMPTS.map((p) => ({ ...p }))),
+    getPrompt: (name, args) => {
+      if (noCatalog) throw new PromptError(`Unknown prompt: ${String(name).slice(0, 80)}`)
+      return getPrompt(name, args, { hasWorkspace: ready() })
+    },
   }
 }

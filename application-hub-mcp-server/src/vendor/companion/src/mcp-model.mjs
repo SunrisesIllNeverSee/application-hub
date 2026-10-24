@@ -44,13 +44,14 @@ export async function loadModel(ws, vaultSecret) {
     instances: new Map(), answers: [], versions: [], approvals: [], reviews: [], review_notes: {}, suggestions: [],
     evidence: [], facts: [], comments: [], provenance: {}, packets: [], packet_states: {}, sources: new Map(),
     observations: [], evidence_requests: [], undecryptable: 0,
+    links: [], question_marks: [], question_notes: [], question_adds: [], assembles: [],
     last_import: ws.manifest.imports.at(-1) ?? null,
   }
   const factRows = []
   for (const [r, e] of Object.entries(ws.records)) {
     if (DEAD.has(e.status) || r.includes('#')) continue
     const kind = e.kind
-    if (!['app_instance', 'answer', 'version', 'approval', 'review', 'suggestion', 'evidence', 'fact', 'comment', 'provenance', 'packet', 'packet_state', 'source_document', 'evidence_request', 'submission_observation'].includes(kind)) continue
+    if (!['app_instance', 'answer', 'version', 'approval', 'review', 'suggestion', 'evidence', 'fact', 'comment', 'provenance', 'packet', 'packet_state', 'source_document', 'evidence_request', 'submission_observation', 'link', 'question_mark', 'question_note', 'question_add', 'assemble'].includes(kind)) continue
     let data
     try {
       data = (await ws.decodeEntry(r)).data
@@ -64,7 +65,7 @@ export async function loadModel(ws, vaultSecret) {
       switch (kind) {
         case 'app_instance': {
           const n = proj ? await normalizeVaultRecord('app_instance', data, vaultSecret) : data
-          m.instances.set(n.instance_id, { ...meta, instance_id: n.instance_id, application_id: n.application_id, program_id: n.program_id ?? null, cycle_id: n.cycle_id ?? null, question_refs: n.question_refs ?? [], template: n.local_template ?? null, source_kind: n.source?.kind ?? null, created_at: n.created_at })
+          m.instances.set(n.instance_id, { ...meta, instance_id: n.instance_id, application_id: n.application_id, program_id: n.program_id ?? null, cycle_id: n.cycle_id ?? null, question_refs: n.question_refs ?? [], template: n.local_template ?? null, source_kind: n.source?.kind ?? null, history: e.history === true || n.history === true || Boolean(n.local_template?.history), created_at: n.created_at })
           break
         }
         case 'answer':
@@ -141,10 +142,84 @@ export async function loadModel(ws, vaultSecret) {
         case 'submission_observation':
           m.observations.push({ ...data, rid: r })
           break
+        case 'link':
+          m.links.push({ ...data, rid: r, created_at: data.created_at })
+          break
+        case 'question_mark':
+          m.question_marks.push({ ...data, rid: r })
+          break
+        case 'question_note':
+          m.question_notes.push({ ...data, rid: r })
+          break
+        case 'question_add':
+          m.question_adds.push({ ...data, rid: r })
+          break
+        case 'assemble':
+          m.assembles.push({ ...data, rid: r })
+          break
       }
     } catch {
       m.undecryptable++
     }
+  }
+  // User-added questions behave like extracted ones: fold them into each
+  // instance's question_refs + template metadata so questionRows produces a
+  // real row (linkable, markable, classifiable, assemblable). Staged records
+  // never rewrite the captured wording of extracted questions.
+  for (const add of m.question_adds) {
+    const inst = m.instances.get(add.instance_id)
+    if (!inst || !inst.template) continue
+    if (!inst.question_refs.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
+      inst.question_refs.push({ question_occurrence_id: add.question_occurrence_id, canonical_question_id: null, order: add.order ?? null })
+    }
+    inst.template.questions ??= []
+    if (!inst.template.questions.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
+      const lim = typeof add.limit === 'string' ? add.limit.trim() : ''
+      const wordM = /^words:(\d+)$/i.exec(lim)
+      const charM = /^chars:(\d+)$/i.exec(lim)
+      inst.template.questions.push({
+        question_occurrence_id: add.question_occurrence_id, text: add.text, source: 'user_added',
+        required: add.required === 'required' ? true : add.required === 'unknown' ? null : false,
+        word_limit: wordM ? Number(wordM[1]) : null, char_limit: charM ? Number(charM[1]) : null,
+        options: add.options ?? null, section_id: add.group ?? null,
+      })
+    }
+  }
+  // update_question annotations correct the EFFECTIVE question metadata (never
+  // the captured wording): latest note per question overlays required, limits,
+  // options and group onto the template so status/packet paths see the fix.
+  // Per-field last-wins across ALL notes in time order — a later partial
+  // correction must not silently revert an earlier one (each call only sets
+  // the fields it was given).
+  const noteByOcc = new Map()
+  const sortedNotes = [...m.question_notes].sort((a, b) => (`${a.created_at ?? ''}${a.rid ?? ''}`).localeCompare(`${b.created_at ?? ''}${b.rid ?? ''}`))
+  for (const n of sortedNotes) {
+    const key = `${n.instance_id}:${n.question_occurrence_id}`
+    const acc = noteByOcc.get(key) ?? {}
+    for (const [f, v] of Object.entries(n)) if (v !== null && v !== undefined) acc[f] = v
+    noteByOcc.set(key, acc)
+  }
+  m.note_overlay = noteByOcc
+  for (const n of noteByOcc.values()) {
+    const inst = m.instances.get(n.instance_id)
+    const q = inst?.template?.questions?.find((x) => x.question_occurrence_id === n.question_occurrence_id)
+    if (!q) continue
+    if (n.required === 'required') q.required = true
+    else if (n.required === 'optional') q.required = false
+    else if (n.required === 'unknown') q.required = null
+    if (typeof n.limit === 'string' && n.limit.trim()) {
+      const lim = n.limit.trim()
+      const wm = /^words:(\d+)$/i.exec(lim), cm = /^chars:(\d+)$/i.exec(lim)
+      if (wm) { q.word_limit = Number(wm[1]); q.char_limit = null }
+      else if (cm) { q.char_limit = Number(cm[1]); q.word_limit = null }
+      // unrecognized formats leave prior limits untouched
+    }
+    if (typeof n.options === 'string' && n.options.trim()) q.options = n.options.split(/\n+/).map((s) => s.trim()).filter(Boolean)
+    else if (n.options === '') q.options = null
+    if (typeof n.group === 'string') q.section_id = n.group.trim() || null
+    if (n.summary) q.annotation_summary = n.summary
+    if (n.kind) q.annotation_kind = n.kind
+    if (n.topic) q.annotation_topic = n.topic
   }
   // current fact versions: newest per fact_id; a retracted tombstone hides the fact
   const byFact = new Map()
@@ -284,7 +359,7 @@ export function questionRows(model, inst, { catalog = null, now, classify = true
     }
     rows.push({
       question_occurrence_id: occ, canonical_question_id: canonical, text, word_limit, char_limit,
-      required: meta?.required ?? cat?.required ?? false, section_id: meta?.section_id ?? cat?.section_id ?? null, order: ref.order,
+      required: meta && meta.required !== undefined ? meta.required : (cat?.required ?? false), section_id: meta?.section_id ?? cat?.section_id ?? null, options: meta?.options ?? cat?.options ?? null, order: ref.order,
       scope, answer_id: scoped[0]?.id ?? null, versions: vs, status, classification, evidence_ids, suggestions: sugg,
     })
   }
