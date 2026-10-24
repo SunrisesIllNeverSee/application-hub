@@ -143,6 +143,20 @@ function latestMarks(model, instance_id) {
   return out
 }
 
+/** Latest update_question annotation per question in an instance. */
+function latestNotes(model, instance_id) {
+  const out = new Map()
+  for (const n of model.question_notes) {
+    if (n.instance_id !== instance_id) continue
+    const prev = out.get(n.question_occurrence_id)
+    if (!prev || (n.created_at ?? '') > (prev.created_at ?? '')) {
+      const { note_id, application_id, instance_id: _i, question_occurrence_id: _q, created_at: _c, never_changes_wording: _w, rid: _r, ...fields } = n
+      out.set(n.question_occurrence_id, Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== null)))
+    }
+  }
+  return out
+}
+
 const NEXT_STEPS_TO_BROWSER = [
   'The user runs "aqua-companion export-backup <file>" in a terminal (it shows a plan and asks for confirmation).',
   'In the AQUA web app the user opens AQUA Local and uses Restore backup with that file.',
@@ -661,6 +675,7 @@ export const TOOLS = [
       const inst = requireInstance(model, args.application_id)
       const { rows } = questionRows(model, inst, { catalog: cat, now: t.now() })
       const marksByOcc = latestMarks(model, inst.instance_id)
+      const notesByOcc = latestNotes(model, inst.instance_id)
       const linksByOcc = new Map()
       for (const l of model.links) {
         if (l.instance_id !== inst.instance_id) continue
@@ -676,6 +691,7 @@ export const TOOLS = [
           freeze_eligible: r.status.freeze_eligible, governing_staged_only: r.versions.length ? staged(r.versions.at(-1)) : false,
           recommendation: r.classification ? { classification: r.classification.classification, candidate_version_id: r.classification.candidate_version_id ?? null, similarity: Math.round(r.classification.similarity * 100) / 100, reason_codes: r.classification.reasons.map((x) => x.code) } : null,
           mark: marksByOcc.get(r.question_occurrence_id) ?? null,
+          annotation: notesByOcc.get(r.question_occurrence_id) ?? null,
           candidate_links: linksByOcc.get(r.question_occurrence_id) ?? [],
         })),
         user_added_questions: model.question_adds
