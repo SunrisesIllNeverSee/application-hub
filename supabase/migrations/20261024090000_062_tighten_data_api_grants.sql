@@ -7,9 +7,9 @@
 --   A   explicit relation list, not a loop over every public relation, so
 --       tables another app adds to this database are never touched;
 --   B   as proposed;
---   B2  HELD until aqua-mcp-server 1.x is deprecated (GB1). 1.x's
---       hub_stress_test_answer still writes answer_stress_tests as
---       authenticated; 2.0 removed the tool. Not in this migration;
+--   B2  after GB1: aqua-mcp-server 1.x was deprecated on npm on
+--       2026-10-24 (1.x hub_stress_test_answer was the only writer as
+--       authenticated; 2.0 removed the tool), so B2 is included;
 --   C, D, F as proposed;
 --   E   with the E1 decision: authors may delete their own community
 --       messages. authenticated keeps DELETE on community_messages and a
@@ -104,7 +104,11 @@ REVOKE ALL ON TABLE
   public.app_import_sessions, public.answer_stress_tests
 FROM anon;
 
--- B2 (answer_stress_tests writes from authenticated): HELD until GB1.
+-- B2. answer_stress_tests writes from authenticated (after GB1, 2026-10-24).
+-- Only the deprecated aqua-mcp-server 1.x hub_stress_test_answer wrote it
+-- as authenticated; 2.0 has no such tool. The dash and persona pages only
+-- read it.
+REVOKE INSERT, UPDATE, DELETE ON TABLE public.answer_stress_tests FROM authenticated;
 
 -- ------------------------------------------------------------
 -- C. anon on user-owned, server-only and Teams tables (classes b, c, e)
@@ -237,8 +241,8 @@ COMMIT;
 --    AND a.privilege_type IN ('TRUNCATE','REFERENCES','TRIGGER','MAINTAIN')
 -- UNION ALL SELECT 'B: authenticated cannot write profile_answers',
 --   NOT has_table_privilege('authenticated', 'public.profile_answers', 'INSERT,UPDATE,DELETE')
--- UNION ALL SELECT 'B2 held: authenticated can still insert answer_stress_tests',
---   has_table_privilege('authenticated', 'public.answer_stress_tests', 'INSERT')
+-- UNION ALL SELECT 'B2: authenticated cannot write answer_stress_tests',
+--   NOT has_table_privilege('authenticated', 'public.answer_stress_tests', 'INSERT,UPDATE,DELETE')
 -- UNION ALL SELECT 'C: anon keeps SELECT on user_applications (policy dependency)',
 --   has_table_privilege('anon', 'public.user_applications', 'SELECT')
 -- UNION ALL SELECT 'C: anon cannot read user_profiles',

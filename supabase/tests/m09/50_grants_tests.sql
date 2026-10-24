@@ -20,8 +20,7 @@
 -- docs/DATA-API-GRANTS.md and every difference is recorded in
 -- p0g.findings as KNOWN-EXCESSIVE (granted, class does not need it) or
 -- MISSING (class needs it, not granted). Findings are reported, not
--- failures. After 062 the only expected finding is the held B2
--- (answer_stress_tests authenticated INSERT/UPDATE/DELETE); GR-NONCRUD
+-- failures. After 062 no finding is expected (0 excessive, 0 missing); GR-NONCRUD
 -- fails if any client role holds TRUNCATE/REFERENCES/TRIGGER/MAINTAIN.
 -- GR-E1-* exercise the 062 community_messages sender delete policy.
 -- Structural checks: GR-COVER (every relation classified), GR-POLDEP
@@ -38,9 +37,8 @@ CREATE TABLE p0g.expect (
 );
 -- letters: tables/views a=INSERT r=SELECT w=UPDATE d=DELETE; sequences
 -- r=SELECT w=UPDATE U=USAGE; '-' none. Base = the CRUD grants after 062
--- (production 2026-10-22 = 059 baseline, tightened by 062). The only base
--- that still differs from the ideal is answer_stress_tests/authenticated
--- (B2 held until GB1).
+-- (production 2026-10-22 = 059 baseline, tightened by 062). Every base
+-- now equals its class ideal.
 INSERT INTO p0g.expect VALUES
 -- (a) public catalog / reference: anon+auth SELECT, service CRUD
  ('programs','r','a','r','arw','arwd','r','arw','arwd','auth: user-owned community programs (insert/owner update); no delete policy'),
@@ -120,7 +118,7 @@ INSERT INTO p0g.expect VALUES
  ('ai_draft_runs','r','d','-','r','arwd','-','r','arwd',NULL),
  ('intake_submissions','r','d','-','r','arwd','-','r','arwd','raw pasted application text'),
  ('app_import_sessions','r','d','-','r','arwd','-','r','arwd','not covered by 051 deny policies'),
- ('answer_stress_tests','r','d','-','arwd','arwd','-','r','arwd','B2 HELD until GB1 (aqua-mcp-server 1.x deprecated): 1.x hub_stress_test_answer inserts as authenticated'),
+ ('answer_stress_tests','r','d','-','r','arwd','-','r','arwd','062 B2 (after GB1): only the deprecated 1.x hub_stress_test_answer wrote it as authenticated'),
 -- (e) teams: deferred, client writes locked by 056/057
  ('teams','r','e','-','r','arwd','-','r','arwd','056/057'),
  ('team_members','r','e','-','r','arwd','-','r','arwd','056/057'),

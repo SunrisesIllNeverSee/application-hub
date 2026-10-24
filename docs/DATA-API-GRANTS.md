@@ -58,10 +58,10 @@ AppFeeder. Nothing in this branch has been applied.
    which is fine.
 3. **062 (owner decision G15, 2026-10-24).** Apply
    `supabase/migrations/20261024090000_062_tighten_data_api_grants.sql`
-   after 061. It adopts the proposed 060 sections A, B, C, D, E (with
-   the E1 community-message sender delete policy) and F; B2 is held
-   until aqua-mcp-server 1.x is deprecated (GB1); G was already done by
-   061. Section 6 has the blast radius, the harness proves it in both
+   after 061. It adopts the proposed 060 sections A, B, B2 (after GB1,
+   the npm deprecation of aqua-mcp-server 1.x, done 2026-10-24), C, D,
+   E (with the E1 community-message sender delete policy) and F; G was
+   already done by 061. Section 6 has the blast radius, the harness proves it in both
    grant modes, and the file carries a ROLLBACK block.
 
 If a step is missed: without 059, production keeps working (existing
@@ -317,8 +317,8 @@ OWNER decided every section on 2026-10-24 (G15) and it ships as **062**:
 - **A** uses an explicit list of the 62 relations instead of the
   proposal's loop over every public relation, so a table another app
   adds to this database is never touched.
-- **B2 is held** until GB1 (npm deprecation of aqua-mcp-server 1.x):
-  1.x `hub_stress_test_answer` still inserts as authenticated.
+- **B2** waited for GB1: aqua-mcp-server 1.x (whose `hub_stress_test_answer`
+  inserted as authenticated) was deprecated on npm on 2026-10-24.
 - **E** keeps `community_messages` DELETE for authenticated and adds the
   `cm_sender_delete` policy (decision E1). Before 062 the sender-only
   delete route silently deleted nothing; it now deletes, and reports
@@ -327,8 +327,7 @@ OWNER decided every section on 2026-10-24 (G15) and it ships as **062**:
   function the proposal listed.
 
 Harness (full chain, both grant modes): the rebuild through 061 equals
-the production snapshot; after 062 the 50 suite reports one finding, the
-held B2 (answer_stress_tests authenticated INSERT/UPDATE/DELETE), 0
+the production snapshot; after 062 the 50 suite reports 0 excessive, 0
 missing, 0 non-CRUD client privileges (`GR-NONCRUD`), and `GR-E1-*`
 prove the sender delete. Expected p0 changes: P-4d/P-4e/P-4f (legacy-mode
 answer writes) and SIG-1 (anon UPDATE programs, reachable only through
@@ -338,7 +337,7 @@ the program_signals trigger) now get 42501.
 |---|---|---|
 | A | TRUNCATE/REFERENCES/TRIGGER/MAINTAIN from anon and authenticated (62 relations) | None through the Data API |
 | B | INSERT/UPDATE/DELETE on the class (d) tables from authenticated; all from anon. This makes the local-first boundary a grant rather than a flag row. | Local-first-off legacy mode only: AnswerEditor upsert, the extension userscript, MCP `hub_save_answer` / `hub_save_answer_review`, user-client writes in `api/answers/capture`, `api/applications/[id]/fill`, `api/draft`, `api/hub/ingest`, `api/import/paste`, `api/applications/intake`. All of these are already refused while local-first is on. Re-enabling legacy mode would need a re-grant migration. In the harness, p0 P-4d/P-4e/P-4f turn into 42501 (legacy-mode writes). **In 062.** |
-| B2 | answer_stress_tests writes from authenticated | MCP 1.x `hub_stress_test_answer` persistence (userClient) breaks; 2.0 removed the tool. **Held until GB1.** |
+| B2 | answer_stress_tests writes from authenticated | MCP 1.x `hub_stress_test_answer` persistence (userClient) breaks; 2.0 removed the tool. **In 062** (after GB1, 2026-10-24). |
 | C | anon on classes (b), (c), (e). anon keeps SELECT where a policy depends on it. | None found. A future public-profile page would need anon SELECT on `user_profiles`. Also makes p0 SIG-1 (anon UPDATE programs, reachable only via the program_signals trigger) 42501. **In 062.** |
 | D | authenticated on server-only tables; `_deploy_flags` writes | None found (edge functions use service_role). **In 062.** |
 | E | Client writes that no RLS policy allows; view writes; extra sequence privileges | Proposed: `community_messages` DELETE from a silent no-op to 42501. **In 062 with E1:** DELETE kept, `cm_sender_delete` policy added, so the sender-only route now deletes (and returns 404 when nothing was deleted). |
