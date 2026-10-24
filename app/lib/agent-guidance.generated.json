@@ -3,12 +3,12 @@
   "tool_source": "application-hub-mcp-server/TOOLS.json",
   "companion": {
     "package": "aqua-companion",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "tarball": {
-      "file": "aqua-companion-0.2.4.tgz",
-      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz",
-      "sha256": "cdfb3941c499888a6fff68c20d40b59942d0b28a2d4665995db52b8ae82a9b87",
-      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz.sha256",
+      "file": "aqua-companion-0.2.5.tgz",
+      "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz",
+      "sha256": "55cbfadc12539214067e5fadd71da2c10f1e68f8c7ced967b0bd559110564721",
+      "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz.sha256",
       "latest_url": "https://aquaidp.xyz/companion/latest.json",
       "packed": true
     },
@@ -16,7 +16,7 @@
   },
   "mcp_server": {
     "package": "aqua-mcp-server",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "status": "aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used."
   },
   "hosted_mcp": {
@@ -43,12 +43,12 @@
     "mcp_claude_code": "claude mcp add aqua -- npx -y aqua-mcp-server --keychain",
     "mcp_claude_code_with_workspace": "claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keychain",
     "mcp_companion_cli": "npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA",
-    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help",
-    "local_copy": "npx --yes --package <path>/aqua-companion-0.2.4.tgz aqua-companion --help",
-    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz init --path <folder>",
-    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz doctor",
-    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz mcp --keychain",
-    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz mcp --workspace <folder>/AQUA --keychain"
+    "help": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz --help",
+    "local_copy": "npx --yes --package <path>/aqua-companion-0.2.5.tgz aqua-companion --help",
+    "init": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz init --path <folder>",
+    "doctor": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz doctor",
+    "claude_code": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz mcp --keychain",
+    "claude_code_with_workspace": "claude mcp add aqua -- npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz mcp --workspace <folder>/AQUA --keychain"
   },
   "tiers": [
     {
@@ -58,7 +58,7 @@
     },
     {
       "tier": "private_write",
-      "count": 9,
+      "count": 15,
       "meaning": "Stages private records in the user's local workspace (drafts, imports, evidence). Refused in --read-only mode. Never approves anything."
     },
     {
@@ -72,18 +72,36 @@
       "meaning": "Never acts. Returns requires_human with the steps the user takes in the AQUA browser app (approve, sign, freeze/export, submit, attest)."
     }
   ],
-  "total": 37,
+  "total": 43,
   "mode_counts": {
-    "stdio-workspace": 37,
+    "stdio-workspace": 43,
     "stdio-catalog": 14,
     "hosted": 11
   },
   "tools": [
     {
+      "name": "add_question",
+      "tier": "private_write",
+      "title": "add_question",
+      "summary": "Manually index one question in an application with its exact source wording — for fields the extractor missed or fields added after a later capture.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
       "name": "approve_answer",
       "tier": "human_only",
       "title": "approve_answer",
       "summary": "Never executes.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "assemble_application",
+      "tier": "private_write",
+      "title": "assemble_application",
+      "summary": "Build a Markdown application from explicitly chosen APPROVED answer versions plus the unresolved fields and provenance.",
       "modes": [
         "stdio-workspace"
       ]
@@ -311,6 +329,24 @@
       ]
     },
     {
+      "name": "link_answer",
+      "tier": "private_write",
+      "title": "link_answer",
+      "summary": "Mark an approved answer version as a direct-reuse candidate for a later question.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
+      "name": "link_history",
+      "tier": "private_write",
+      "title": "link_history",
+      "summary": "Record a relevance link between an imported history answer (a submitted, unconfirmed record) and a workspace question.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
       "name": "locate_workspace",
       "tier": "read",
       "title": "locate_workspace",
@@ -318,6 +354,15 @@
       "modes": [
         "stdio-workspace",
         "stdio-catalog"
+      ]
+    },
+    {
+      "name": "mark_question",
+      "tier": "private_write",
+      "title": "mark_question",
+      "summary": "Mark a question not_applicable (hidden by an observed branch), skipped (known optional field deliberately left blank), or clear it back to open — always with a reason.",
+      "modes": [
+        "stdio-workspace"
       ]
     },
     {
@@ -429,6 +474,15 @@
       ]
     },
     {
+      "name": "update_question",
+      "tier": "private_write",
+      "title": "update_question",
+      "summary": "Add interpretation or correct metadata on a question — summary, general/custom kind, topic, group, required status, limit, visible options — without ever changing the captured source wording.",
+      "modes": [
+        "stdio-workspace"
+      ]
+    },
+    {
       "name": "verify_packet",
       "tier": "read",
       "title": "verify_packet",
@@ -467,7 +521,7 @@
   "journey": [
     {
       "step": "Install",
-      "how": "npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)"
+      "how": "npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)"
     },
     {
       "step": "Set up a workspace",

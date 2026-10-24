@@ -975,6 +975,7 @@ export async function prepareLocalApplication({ template, file_name, media_type,
     char_limit: q.char_limit ?? null,
     required: q.required ?? false,
     section_id: q.section_id ?? null,
+    options: q.options ?? null,
     order: i,
   }))
   const created_at = nowIso()
@@ -1042,7 +1043,7 @@ export async function cmdDraft(ctx) {
  * immutable version with a new id; it starts unapproved and nothing carries
  * an approval forward. Throws UsageError on bad references.
  */
-export async function prepareDraft(ws, { application, question, parent: parentId, title: titleIn, body, evidence_ids, method = 'manual', provenance = null, derived_from = null, extra = {} }) {
+export async function prepareDraft(ws, { application, question, parent: parentId, title: titleIn, body, evidence_ids, method = 'manual', provenance = null, derived_from = null, extra = {}, extra_refs = [] }) {
   if (typeof body !== 'string' || !body.replace(/[\s​-‍⁠﻿]/g, '').length) throw new UsageError('The draft body is empty.')
   if (body.length > MAX_INPUT_BYTES) throw new UsageError('The draft body is too large.')
   const title = titleIn ?? 'Draft'
@@ -1058,7 +1059,9 @@ export async function prepareDraft(ws, { application, question, parent: parentId
     if (!application || !question) throw new UsageError('A draft needs either a parent version or an application and a question.')
     const inst = await findInstance(ws, application)
     if (!inst) throw new UsageError(`Unknown application ${application}. Import it with import-application or import-backup first.`)
-    if (!inst.data.question_refs.some((q) => q.question_occurrence_id === question)) {
+    // User-added questions (question_add records) live in the folded model,
+    // not inst.data.question_refs — the caller passes their ids as extra_refs.
+    if (!inst.data.question_refs.some((q) => q.question_occurrence_id === question) && !(extra_refs ?? []).includes(question)) {
       throw new UsageError(`Question ${question} is not part of application ${application}.`)
     }
     const scope = { application_id: inst.data.application_id, question_occurrence_id: question }

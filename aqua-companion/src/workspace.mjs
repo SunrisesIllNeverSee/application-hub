@@ -12,7 +12,7 @@ import {
   resolveInside, walkInside, writeNewInside, PathSafetyError,
 } from './fsafe.mjs'
 
-export const COMPANION_VERSION = '0.2.3'
+export const COMPANION_VERSION = '0.2.5'
 export const SCHEMA_VERSION = 1
 export const MANIFEST = 'workspace.json'
 export const MANIFEST_BACKUP = 'workspace.json.bak'
@@ -78,6 +78,12 @@ export const KINDS = {
   // Agent-interface records that never leave the workspace (not part of export-backup):
   evidence_request: { dirs: { staging: 'reviews/suggestions' }, localOnly: true },
   submission_observation: { dirs: { staging: 'packets/observations' }, localOnly: true },
+  // Plugin-merge workflow records (skill -> engine): agent-staged, local-only.
+  link: { dirs: { staging: 'reviews/links' }, localOnly: true },
+  question_mark: { dirs: { staging: 'reviews/marks' }, localOnly: true },
+  question_note: { dirs: { staging: 'reviews/notes' }, localOnly: true },
+  question_add: { dirs: { staging: 'applications/queued/questions' }, localOnly: true },
+  assemble: { dirs: { staging: 'applications/assembled' }, localOnly: true },
 }
 
 export class WorkspaceError extends Error {
@@ -408,7 +414,7 @@ export class Workspace {
   recordFiles() {
     const all = walkInside(this.root)
     const files = all.files.filter(
-      (f) => f.endsWith('.json') && !f.startsWith('audit/quarantine/') && !f.startsWith('exports/') && !f.startsWith(`${INBOX_DIR}/`) &&
+      (f) => f.endsWith('.json') && !f.startsWith('audit/quarantine/') && !f.startsWith('exports/') && !f.startsWith(`${INBOX_DIR}/`) && !f.startsWith('Beta Reports/') &&
         f !== MANIFEST && f !== MANIFEST_BACKUP && !f.includes('.tmp-'),
     )
     return { files, symlinks: all.symlinks, other: all.other }

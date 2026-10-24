@@ -21,6 +21,12 @@ const PRIVATE_WRITE_CALLS = (ids) => [
   ['import_history', { folder: 'history' }],
   ['present_review_decisions', { application_id: ids.instance }],
   ['sync_from_vault_export', { file: 'form.md' }],
+  ['link_history', { application_id: ids.instance, question_occurrence_id: 'q-x', history_answer_id: 'a-x', reason: 'candidate' }],
+  ['link_answer', { application_id: ids.instance, question_occurrence_id: 'q-x', version_id: ids.version, reason: 'direct reuse' }],
+  ['mark_question', { application_id: ids.instance, question_occurrence_id: 'q-x', state: 'skipped', reason: 'optional' }],
+  ['update_question', { application_id: ids.instance, question_occurrence_id: 'q-x', summary: 'interpretation' }],
+  ['add_question', { application_id: ids.instance, order: 9, text: 'What else?' }],
+  ['assemble_application', { application_id: ids.instance, map: [{ question_occurrence_id: 'q-x', version_id: ids.version }] }],
 ]
 
 test('--read-only refuses every private_write tool before it runs; reads still work and nothing is written', async () => {
