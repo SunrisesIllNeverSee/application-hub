@@ -63,7 +63,7 @@ export async function loadModel(ws, vaultSecret) {
       switch (kind) {
         case 'app_instance': {
           const n = proj ? await normalizeVaultRecord('app_instance', data, vaultSecret) : data
-          m.instances.set(n.instance_id, { ...meta, instance_id: n.instance_id, application_id: n.application_id, program_id: n.program_id ?? null, cycle_id: n.cycle_id ?? null, question_refs: n.question_refs ?? [], template: n.local_template ?? null, source_kind: n.source?.kind ?? null, created_at: n.created_at })
+          m.instances.set(n.instance_id, { ...meta, instance_id: n.instance_id, application_id: n.application_id, program_id: n.program_id ?? null, cycle_id: n.cycle_id ?? null, question_refs: n.question_refs ?? [], template: n.local_template ?? null, source_kind: n.source?.kind ?? null, history: e.history === true, created_at: n.created_at })
           break
         }
         case 'answer':

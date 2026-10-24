@@ -204,7 +204,7 @@ export const TOOLS = [
         const model = await t.model()
         for (const i of model.instances.values()) {
           const c = contextOf(i, cat)
-          apps.push({ instance_id: i.instance_id, application_id: i.application_id, program_id: i.program_id, title: c.program_name, org: c.org_name, question_count: i.question_refs.length, origin: i.authority === 'projection' ? 'browser_vault' : 'staged_in_workspace' })
+          apps.push({ instance_id: i.instance_id, application_id: i.application_id, program_id: i.program_id, title: c.program_name, org: c.org_name, question_count: i.question_refs.length, origin: i.authority === 'projection' ? 'browser_vault' : 'staged_in_workspace', history: i.history === true })
         }
       }
       const cfg = await t.catalogConfig()
@@ -271,7 +271,7 @@ export const TOOLS = [
       const qs = instanceQuestions(inst, cat)
       return {
         status: 'ok', kind: 'workspace_application', instance_id: inst.instance_id, application_id: inst.application_id, program_id: inst.program_id,
-        origin: inst.authority === 'projection' ? 'browser_vault' : 'staged_in_workspace', question_count: qs.length,
+        origin: inst.authority === 'projection' ? 'browser_vault' : 'staged_in_workspace', question_count: qs.length, history: inst.history === true,
         verification: {
           source_kind: inst.source_kind, source_sha256: src?.bytes_sha256 ?? null, verified: false,
           note: inst.authority === 'projection' ? 'Copied from your browser vault backup.' : 'Imported from a local file; wording was extracted automatically and is not verified. Check it against the original.',
@@ -691,6 +691,7 @@ export const TOOLS = [
       }
       return {
         status: 'ok', instance_id: inst.instance_id, approvals_as_of: model.last_import?.at ?? null,
+        history: inst.history === true,
         questions: rows.map((r) => ({
           question_occurrence_id: r.question_occurrence_id, order: r.order, required: r.required, status: r.status.status, reasons: r.status.reasons,
           decided_by: r.status.decided_by, governing_version_id: r.status.governing_version_id, approved_version_id: r.status.approved_version_id,
@@ -1022,6 +1023,8 @@ export const TOOLS = [
       if (!inst.question_refs.some((r) => r.question_occurrence_id === args.question_occurrence_id)) {
         throw new ToolRefusal('not_found', `No question ${args.question_occurrence_id} in application ${inst.instance_id}. Use inspect_extracted_questions to list them.`)
       }
+      const dupe = model.links.some((l) => l.link_type === 'history_candidate' && l.instance_id === inst.instance_id && l.question_occurrence_id === args.question_occurrence_id && l.history_answer_id === args.history_answer_id)
+      if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'history_candidate', next_steps: ['That history candidate is already linked to this question.'] }
       const rec = ws.records[rid('answer', args.history_answer_id)]
       // Companion-staged history carries entry.history; vault-restored history
       // answers don't — fall back to their versions' history flag.
@@ -1066,6 +1069,8 @@ export const TOOLS = [
       if (!v) throw new ToolRefusal('not_found', `No version ${args.version_id} in this workspace.`)
       const gate = approvedState(model, v)
       if (!gate.approved) throw new ToolRefusal('not_approved', `Version ${args.version_id} is not an approved version; only approved wording can be linked for direct reuse.`)
+      const dupe = model.links.some((l) => l.link_type === 'answer_reuse' && l.question_occurrence_id === args.question_occurrence_id && l.version_id === args.version_id)
+      if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'answer_reuse', next_steps: ['That version is already linked to this question.'] }
       const link_id = newUuid()
       ws.records[rid('link', link_id)] = await ws.writeRecord({
         kind: 'link', key: link_id, authority: 'staging',
@@ -1193,7 +1198,7 @@ export const TOOLS = [
         data: {
           question_occurrence_id, application_id: inst.application_id, instance_id: inst.instance_id,
           order: args.order, text: args.text, source_ref: args.source_ref ?? null,
-          required: args.required ?? 'unknown', limit: args.limit ?? null, options: args.options ?? null, group: args.group ?? null,
+          required: args.required ?? 'unknown', limit: args.limit ?? null, options: args.options ? args.options.split(/\n+/).map((s) => s.trim()).filter(Boolean) : null, group: args.group ?? null,
           source: 'user_added', created_at: t.now(),
         },
         extra: { local_only: true },
@@ -1232,13 +1237,20 @@ export const TOOLS = [
       const ws = t.ws
       const model = await t.model()
       const inst = requireInstance(model, args.application_id)
+      if (inst.history === true) {
+        throw new ToolRefusal('history_application', 'This is a completed/submitted application record (imported as history) — drafts assemble only from a current blank form. Its answers stay reusable as candidates via link_history.')
+      }
       const { context, rows } = questionRows(model, inst, { catalog: await t.catalog(), now: t.now() })
       const byOcc = new Map(rows.map((r) => [r.question_occurrence_id, r]))
       const versionsById = new Map((model.versions ?? []).map((v) => [v.id, v]))
       const chosen = []
       const bad = []
+      const seenOcc = new Set()
       for (const m of args.map ?? []) {
-        const occ = m?.question_occurrence_id, vid = m?.version_id
+        const occ = m?.question_occurrence_id
+        if (occ && seenOcc.has(occ)) { bad.push({ question_occurrence_id: occ, version_id: m?.version_id ?? null, problem: 'duplicate_map_entry' }); continue }
+        if (occ) seenOcc.add(occ)
+        const vid = m?.version_id
         const row = byOcc.get(occ)
         const v = vid ? versionsById.get(vid) : null
         if (!row || !v) { bad.push({ question_occurrence_id: occ ?? null, version_id: vid ?? null, problem: 'not_found' }); continue }
@@ -1296,8 +1308,8 @@ export const TOOLS = [
         absolute_path: saved_to ? path.join(ws.root, ...saved_to.split('/')) : null,
         ...(saved_to ? {} : { not_saved_reason: 'read_only' }),
         answers_used: chosen.length, unresolved,
-        markdown,
         note: 'This is a review draft assembled from approved versions only. It is never submitted by AQUA; the user reviews, edits and submits it themselves.',
+        untrusted: { markdown },
       }
     },
   },
