@@ -134,6 +134,17 @@ function staged(v) {
   return v.authority === 'staging' && v.record_status !== 'in_vault'
 }
 
+/** Latest question_mark per question in an instance (model carries decoded data). */
+function latestMarks(model, instance_id) {
+  const out = new Map()
+  for (const m of model.question_marks) {
+    if (m.instance_id !== instance_id) continue
+    const prev = out.get(m.question_occurrence_id)
+    if (!prev || (m.created_at ?? '') > (prev.created_at ?? '')) out.set(m.question_occurrence_id, { state: m.state, reason: m.reason })
+  }
+  return out
+}
+
 const NEXT_STEPS_TO_BROWSER = [
   'The user runs "aqua-companion export-backup <file>" in a terminal (it shows a plan and asks for confirmation).',
   'In the AQUA web app the user opens AQUA Local and uses Restore backup with that file.',
@@ -651,16 +662,13 @@ export const TOOLS = [
       const cat = await t.catalog()
       const inst = requireInstance(model, args.application_id)
       const { rows } = questionRows(model, inst, { catalog: cat, now: t.now() })
-      const marksByOcc = new Map()
+      const marksByOcc = latestMarks(model, inst.instance_id)
       const linksByOcc = new Map()
-      for (const r of Object.values(t.ws.records)) {
-        if (r.data?.instance_id !== inst.instance_id) continue
-        if (r.kind === 'question_mark') marksByOcc.set(r.data.question_occurrence_id, { state: r.data.state, reason: r.data.reason })
-        else if (r.kind === 'link') {
-          const arr = linksByOcc.get(r.data.question_occurrence_id) ?? []
-          arr.push({ link_type: r.data.link_type, reason: r.data.reason })
-          linksByOcc.set(r.data.question_occurrence_id, arr)
-        }
+      for (const l of model.links) {
+        if (l.instance_id !== inst.instance_id) continue
+        const arr = linksByOcc.get(l.question_occurrence_id) ?? []
+        arr.push({ link_type: l.link_type, reason: l.reason })
+        linksByOcc.set(l.question_occurrence_id, arr)
       }
       return {
         status: 'ok', instance_id: inst.instance_id, approvals_as_of: model.last_import?.at ?? null,
@@ -672,9 +680,9 @@ export const TOOLS = [
           mark: marksByOcc.get(r.question_occurrence_id) ?? null,
           candidate_links: linksByOcc.get(r.question_occurrence_id) ?? [],
         })),
-        user_added_questions: Object.values(t.ws.records)
-          .filter((r) => r.kind === 'question_add' && r.data?.instance_id === inst.instance_id)
-          .map((r) => r.data),
+        user_added_questions: model.question_adds
+          .filter((r) => r.instance_id === inst.instance_id)
+          .map(({ question_occurrence_id, order, text, required, source_ref }) => ({ question_occurrence_id, order, text, required, source_ref })),
         note: 'recommendation is advisory (Direct = an approved answer fits, Adapt = related answer needs revision, Gap = nothing suitable). It never approves anything.',
         untrusted: { questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })) },
       }
@@ -694,14 +702,10 @@ export const TOOLS = [
       const blockers = []
       const warnings = []
       const questions = []
-      const marksByOcc = new Map()
-      for (const rec of Object.values(t.ws.records)) {
-        if (rec.kind === 'question_mark' && rec.data?.instance_id === inst.instance_id && rec.data.state !== 'open') {
-          marksByOcc.set(rec.data.question_occurrence_id, rec.data.state)
-        }
-      }
+      const marksByOcc = latestMarks(model, inst.instance_id)
       for (const r of rows) {
-        if (marksByOcc.has(r.question_occurrence_id)) continue
+        const mark = marksByOcc.get(r.question_occurrence_id)
+        if (mark && mark.state !== 'open') continue
         const sel = r.status.approved_version_id ? r.versions.find((v) => v.id === r.status.approved_version_id) : null
         const gate = sel ? approvalGate(sel, model.approvals, model.reviews) : null
         const intact = sel ? await versionIntact(sel) : null
@@ -992,8 +996,8 @@ export const TOOLS = [
         throw new ToolRefusal('not_found', `No question ${args.question_occurrence_id} in application ${inst.instance_id}. Use inspect_extracted_questions to list them.`)
       }
       const rec = ws.records[rid('answer', args.history_answer_id)]
-      if (!rec || rec.extra?.history !== true) {
-        throw new ToolRefusal('not_found', `No imported history answer ${args.history_answer_id}. import_history lists staged history answers.`)
+      if (!rec || rec.history !== true) {
+        throw new ToolRefusal('not_found', `No imported history answer ${args.history_answer_id}. import_history reports answer_ids for staged history answers.`)
       }
       const link_id = newUuid()
       ws.records[rid('link', link_id)] = await ws.writeRecord({
@@ -1066,10 +1070,10 @@ export const TOOLS = [
       if (args.state !== 'open' && !(args.reason && args.reason.trim())) {
         throw new ToolRefusal('invalid_arguments', 'mark_question needs a reason for not_applicable or skipped.')
       }
-      const key = args.question_occurrence_id
-      ws.records[rid('question_mark', key)] = await ws.writeRecord({
-        kind: 'question_mark', key, authority: 'staging',
-        data: { mark_id: key, application_id: inst.application_id, instance_id: inst.instance_id, question_occurrence_id: args.question_occurrence_id, state: args.state, reason: args.reason ?? null, created_at: t.now() },
+      const mark_id = newUuid()
+      ws.records[rid('question_mark', mark_id)] = await ws.writeRecord({
+        kind: 'question_mark', key: mark_id, authority: 'staging',
+        data: { mark_id, application_id: inst.application_id, instance_id: inst.instance_id, question_occurrence_id: args.question_occurrence_id, state: args.state, reason: args.reason ?? null, created_at: t.now() },
         extra: { local_only: true },
       })
       await ws.saveManifest()
@@ -1103,11 +1107,11 @@ export const TOOLS = [
       if (!inst.question_refs.some((r) => r.question_occurrence_id === args.question_occurrence_id)) {
         throw new ToolRefusal('not_found', `No question ${args.question_occurrence_id} in application ${inst.instance_id}.`)
       }
-      const key = args.question_occurrence_id
-      ws.records[rid('question_note', key)] = await ws.writeRecord({
-        kind: 'question_note', key, authority: 'staging',
+      const note_id = newUuid()
+      ws.records[rid('question_note', note_id)] = await ws.writeRecord({
+        kind: 'question_note', key: note_id, authority: 'staging',
         data: {
-          note_id: key, application_id: inst.application_id, instance_id: inst.instance_id, question_occurrence_id: args.question_occurrence_id,
+          note_id, application_id: inst.application_id, instance_id: inst.instance_id, question_occurrence_id: args.question_occurrence_id,
           summary: args.summary ?? null, kind: args.kind ?? null, topic: args.topic ?? null, group: args.group ?? null,
           required: args.required ?? null, limit: args.limit ?? null, options: args.options ?? null,
           never_changes_wording: true, created_at: t.now(),
@@ -1118,7 +1122,7 @@ export const TOOLS = [
       await ws.audit('update_question', { question_occurrence_id: args.question_occurrence_id, fields: Object.keys(args).filter((k) => !['application_id', 'question_occurrence_id'].includes(k)), via: 'agent' })
       return {
         status: 'ok', staged: true, question_occurrence_id: args.question_occurrence_id,
-        next_steps: ['The annotation is exported with the other staged records; captured wording is never rewritten by this tool.'],
+        next_steps: ['The annotation is recorded in the workspace and shows on review rows; captured wording is never rewritten by this tool.'],
       }
     },
   },
@@ -1171,7 +1175,14 @@ export const TOOLS = [
       title: S('Draft title; defaults to the program name.'),
       map: {
         type: 'array', maxItems: 200,
-        items: { type: 'object' },
+        items: {
+          type: 'object',
+          properties: {
+            question_occurrence_id: { type: 'string' },
+            version_id: { type: 'string' },
+          },
+          required: ['question_occurrence_id', 'version_id'],
+        },
         description: 'Pairs of {question_occurrence_id, version_id}; repeat for each field.',
       },
     }, ['application_id', 'map']),
@@ -1196,13 +1207,11 @@ export const TOOLS = [
         throw new ToolRefusal('invalid_map', 'Only approved versions can be assembled.', { rejected: bad })
       }
       const chosenOcc = new Set(chosen.map((c) => c.row.question_occurrence_id))
-      const marks = Object.values(ws.records)
-        .filter((r) => r.kind === 'question_mark' && r.data?.instance_id === inst.instance_id)
-        .map((r) => r.data)
+      const marksByOcc = latestMarks(model, inst.instance_id)
       const unresolved = rows
         .filter((r) => !chosenOcc.has(r.question_occurrence_id))
         .map((r) => {
-          const mark = marks.find((mk) => mk.question_occurrence_id === r.question_occurrence_id)
+          const mark = marksByOcc.get(r.question_occurrence_id)
           return { question_occurrence_id: r.question_occurrence_id, status: r.status.status, mark: mark ? { state: mark.state, reason: mark.reason } : null }
         })
       const title = args.title ?? context.program_name ?? `application ${inst.instance_id}`

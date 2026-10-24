@@ -16,14 +16,14 @@
     "hosted": "https://aquaidp.xyz/mcp (Streamable HTTP, no auth, rate-limited): public catalog tools, resources and prompts only."
   },
   "counts": {
-    "stdio-workspace": 37,
+    "stdio-workspace": 43,
     "stdio-catalog": 14,
     "hosted": 11
   },
   "tiers": {
     "stdio-workspace": {
       "read": 22,
-      "private_write": 9,
+      "private_write": 15,
       "human_only": 5,
       "human_consent": 1
     },
@@ -37,12 +37,30 @@
   },
   "tools": [
     {
+      "name": "add_question",
+      "tier": "private_write",
+      "modes": [
+        "stdio-workspace"
+      ],
+      "description": "Manually index one question in an application with its exact source wording — for fields the extractor missed or fields added after a later capture.",
+      "source": "aqua-companion"
+    },
+    {
       "name": "approve_answer",
       "tier": "human_only",
       "modes": [
         "stdio-workspace"
       ],
       "description": "Never executes.",
+      "source": "aqua-companion"
+    },
+    {
+      "name": "assemble_application",
+      "tier": "private_write",
+      "modes": [
+        "stdio-workspace"
+      ],
+      "description": "Build a Markdown application from explicitly chosen APPROVED answer versions plus the unresolved fields and provenance.",
       "source": "aqua-companion"
     },
     {
@@ -270,6 +288,24 @@
       "source": "aqua-companion"
     },
     {
+      "name": "link_answer",
+      "tier": "private_write",
+      "modes": [
+        "stdio-workspace"
+      ],
+      "description": "Mark an approved answer version as a direct-reuse candidate for a later question.",
+      "source": "aqua-companion"
+    },
+    {
+      "name": "link_history",
+      "tier": "private_write",
+      "modes": [
+        "stdio-workspace"
+      ],
+      "description": "Record a relevance link between an imported history answer (a submitted, unconfirmed record) and a workspace question.",
+      "source": "aqua-companion"
+    },
+    {
       "name": "locate_workspace",
       "tier": "read",
       "modes": [
@@ -279,6 +315,15 @@
       "description": "Where the AQUA workspace is (or would be created): whether this server has one open, the configured path, the folders searched, and the exact init command.",
       "source": "aqua-companion",
       "setup": true
+    },
+    {
+      "name": "mark_question",
+      "tier": "private_write",
+      "modes": [
+        "stdio-workspace"
+      ],
+      "description": "Mark a question not_applicable (hidden by an observed branch), skipped (known optional field deliberately left blank), or clear it back to open — always with a reason.",
+      "source": "aqua-companion"
     },
     {
       "name": "match_canonical_questions",
@@ -386,6 +431,15 @@
         "stdio-workspace"
       ],
       "description": "Import an encrypted backup the user exported from the AQUA browser vault and placed in the workspace inbox/ (the same checks as \"aqua-companion import-backup\": integrity, account binding, conflicts recorded, nothing overwritten).",
+      "source": "aqua-companion"
+    },
+    {
+      "name": "update_question",
+      "tier": "private_write",
+      "modes": [
+        "stdio-workspace"
+      ],
+      "description": "Add interpretation or correct metadata on a question — summary, general/custom kind, topic, group, required status, limit, visible options — without ever changing the captured source wording.",
       "source": "aqua-companion"
     },
     {

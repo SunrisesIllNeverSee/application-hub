@@ -42,13 +42,14 @@ export async function loadModel(ws, vaultSecret) {
     instances: new Map(), answers: [], versions: [], approvals: [], reviews: [], review_notes: {}, suggestions: [],
     evidence: [], facts: [], comments: [], provenance: {}, packets: [], packet_states: {}, sources: new Map(),
     observations: [], evidence_requests: [], undecryptable: 0,
+    links: [], question_marks: [], question_notes: [], question_adds: [],
     last_import: ws.manifest.imports.at(-1) ?? null,
   }
   const factRows = []
   for (const [r, e] of Object.entries(ws.records)) {
     if (DEAD.has(e.status) || r.includes('#')) continue
     const kind = e.kind
-    if (!['app_instance', 'answer', 'version', 'approval', 'review', 'suggestion', 'evidence', 'fact', 'comment', 'provenance', 'packet', 'packet_state', 'source_document', 'evidence_request', 'submission_observation'].includes(kind)) continue
+    if (!['app_instance', 'answer', 'version', 'approval', 'review', 'suggestion', 'evidence', 'fact', 'comment', 'provenance', 'packet', 'packet_state', 'source_document', 'evidence_request', 'submission_observation', 'link', 'question_mark', 'question_note', 'question_add', 'assemble'].includes(kind)) continue
     let data
     try {
       data = (await ws.decodeEntry(r)).data
@@ -139,9 +140,38 @@ export async function loadModel(ws, vaultSecret) {
         case 'submission_observation':
           m.observations.push({ ...data, rid: r })
           break
+        case 'link':
+          m.links.push({ ...data, rid: r, created_at: data.created_at })
+          break
+        case 'question_mark':
+          m.question_marks.push({ ...data, rid: r })
+          break
+        case 'question_note':
+          m.question_notes.push({ ...data, rid: r })
+          break
+        case 'question_add':
+          m.question_adds.push({ ...data, rid: r })
+          break
       }
     } catch {
       m.undecryptable++
+    }
+  }
+  // User-added questions behave like extracted ones: fold them into each
+  // instance's question_refs + template metadata so questionRows produces a
+  // real row (linkable, markable, classifiable, assemblable). Staged records
+  // never rewrite the captured wording of extracted questions.
+  for (const add of m.question_adds) {
+    const inst = m.instances.get(add.instance_id)
+    if (!inst || !inst.template) continue
+    if (!inst.question_refs.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
+      inst.question_refs.push({ question_occurrence_id: add.question_occurrence_id, canonical_question_id: null })
+    }
+    if (!inst.template.questions.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
+      inst.template.questions.push({
+        question_occurrence_id: add.question_occurrence_id, text: add.text, source: 'user_added',
+        required: add.required ?? 'unknown', word_limit: null, char_limit: null, options: add.options ?? null, group: add.group ?? null,
+      })
     }
   }
   // current fact versions: newest per fact_id; a retracted tombstone hides the fact
