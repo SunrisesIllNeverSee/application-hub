@@ -51,7 +51,9 @@ create table if not exists public.aqua_workspace_audit (
 );
 
 create or replace function public.aqua_workspaces_touch() returns trigger
-language plpgsql as $$ begin new.updated_at := now(); return new; end $$;
+language plpgsql
+set search_path = ''
+as $$ begin new.updated_at := now(); return new; end $$;
 
 drop trigger if exists aqua_workspaces_touch on public.aqua_workspaces;
 create trigger aqua_workspaces_touch before update on public.aqua_workspaces
@@ -91,7 +93,7 @@ create policy aqua_ws_audit_owner_ins on public.aqua_workspace_audit
 -- NOTE: direct UPDATE/INSERT on workspaces/records remains possible for the
 -- owner via the Data API (RLS-scoped to own rows) — CAS ordering through
 -- aqua_workspace_commit is the intended path, not an enforced one.
-grant select, insert, update on public.aqua_workspaces to authenticated;
+grant select, insert, update, delete on public.aqua_workspaces to authenticated;  -- owner delete cascades workspace+records+audit
 grant select, insert, update, delete on public.aqua_workspace_records to authenticated;
 grant select, insert on public.aqua_workspace_audit to authenticated;
 grant select, insert, update, delete on public.aqua_workspaces to service_role;
