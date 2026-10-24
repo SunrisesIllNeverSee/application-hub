@@ -18,7 +18,7 @@ export const AGENT_GUIDANCE = {
   },
   "mcp_server": {
     "package": "aqua-mcp-server",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "status": "aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used."
   },
   "hosted_mcp": {
