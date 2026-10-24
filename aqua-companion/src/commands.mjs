@@ -975,6 +975,7 @@ export async function prepareLocalApplication({ template, file_name, media_type,
     char_limit: q.char_limit ?? null,
     required: q.required ?? false,
     section_id: q.section_id ?? null,
+    options: q.options ?? null,
     order: i,
   }))
   const created_at = nowIso()

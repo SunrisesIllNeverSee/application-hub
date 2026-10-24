@@ -285,6 +285,7 @@ export const TOOLS = [
             return {
               question_occurrence_id: ref.question_occurrence_id, canonical_question_id: ref.canonical_question_id ?? null, order: ref.order, text,
               requirements: text ? { ...parseRequirements(text), word_limit: meta?.word_limit ?? c?.word_limit ?? null, char_limit: meta?.char_limit ?? c?.char_limit ?? null, required: meta?.required ?? c?.required ?? false } : null,
+              section_id: meta?.section_id ?? c?.section_id ?? null, options: meta?.options ?? c?.options ?? null,
             }
           }),
         },
@@ -427,7 +428,7 @@ export const TOOLS = [
           questions: qs.map(({ ref, meta, cat: c }, i) => {
             const text = meta?.text ?? c?.text ?? null
             const occ = extraction?.occurrences?.[i]
-            return { question_occurrence_id: ref.question_occurrence_id, order: ref.order, text, requirements: text ? parseRequirements(text) : null, word_limit: meta?.word_limit ?? c?.word_limit ?? null, char_limit: meta?.char_limit ?? c?.char_limit ?? null, required: meta?.required ?? c?.required ?? false, source_locator: occ?.source_locator ?? null, section: occ?.section ?? null }
+            return { question_occurrence_id: ref.question_occurrence_id, order: ref.order, text, requirements: text ? parseRequirements(text) : null, word_limit: meta?.word_limit ?? c?.word_limit ?? null, char_limit: meta?.char_limit ?? c?.char_limit ?? null, required: meta?.required ?? c?.required ?? false, section_id: meta?.section_id ?? null, options: occ?.field?.options ?? meta?.options ?? null, source_locator: occ?.source_locator ?? null, section: occ?.section ?? null }
           }),
           uncertain: (classification?.items ?? []).filter((x) => x.visibility === 'uncertain' && x.reasons.some(notProvenance)).map((x) => ({ kind: x.kind, value: snippet(x.value, '', 160), reasons: x.reasons.filter(notProvenance) })),
           warnings: extraction?.warnings ?? [],
@@ -706,7 +707,7 @@ export const TOOLS = [
           .map(({ question_occurrence_id, order, required, source_ref }) => ({ question_occurrence_id, order, required, source_ref })),
         note: 'recommendation is advisory (Direct = an approved answer fits, Adapt = related answer needs revision, Gap = nothing suitable). It never approves anything.',
         untrusted: {
-          questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })),
+          questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, section_id: r.section_id ?? null, options: r.options ?? null, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })),
           user_added_question_texts: model.question_adds
             .filter((r) => r.instance_id === inst.instance_id)
             .map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text })),
@@ -753,7 +754,8 @@ export const TOOLS = [
         questions.push(q)
       }
       const dedup = [...new Map(blockers.map((b) => [`${b.question_occurrence_id}|${b.code}`, b])).values()]
-      const marks_applied = [...marksByOcc.entries()].filter(([, m]) => m.state !== 'open').map(([occ, m]) => ({ question_occurrence_id: occ, ...m }))
+      const reqByOcc = new Map(rows.map((r) => [r.question_occurrence_id, r.required === true]))
+      const marks_applied = [...marksByOcc.entries()].filter(([, m]) => m.state !== 'open').map(([occ, m]) => ({ question_occurrence_id: occ, ...m, required: reqByOcc.get(occ) ?? false }))
       return {
         status: 'ok', instance_id: inst.instance_id, ready_to_freeze: dedup.length === 0 && questions.some((q) => q.selectable_version_id), approvals_as_of: model.last_import?.at ?? null,
         blockers: dedup, warnings, questions, froze_anything: false, marks_applied,
@@ -1115,8 +1117,10 @@ export const TOOLS = [
       })
       await ws.saveManifest()
       await ws.audit('mark_question', { question_occurrence_id: args.question_occurrence_id, state: args.state, via: 'agent' })
+      const rowRequired = (inst.template?.questions ?? []).find((q) => q.question_occurrence_id === args.question_occurrence_id)?.required === true
       return {
         status: 'ok', staged: true, question_occurrence_id: args.question_occurrence_id, state: args.state,
+        ...(rowRequired && args.state !== 'open' ? { marked_required: true, required_note: 'This question is required — prepare_packet will not flag it, but the browser freeze re-checks it independently.' } : {}),
         next_steps: ['read_review_status reports this mark on the question. A marked-not-applicable or skipped field still needs a recorded reason, never a placeholder answer.'],
       }
     },
@@ -1190,6 +1194,9 @@ export const TOOLS = [
       const inst = requireInstance(model, args.application_id)
       if (!inst.template) {
         throw new ToolRefusal('no_template', `Application ${inst.instance_id} has no local question template (catalog-linked or vault-native import) — questions cannot be added to it. Re-stage it with import_local_application from an inbox/ source file.`)
+      }
+      if (args.limit && !/^(words|chars):\d+$/i.test(args.limit.trim())) {
+        throw new ToolRefusal('invalid_arguments', `limit must be "words:N" or "chars:N" (got "${args.limit}") — anything else is refused rather than silently dropped.`)
       }
       const wanted = foldText(args.text)
       const dupe = (inst.template?.questions ?? []).find((q) => q.text && foldText(q.text) === wanted)
@@ -1314,7 +1321,6 @@ export const TOOLS = [
       return {
         status: 'ok', staged: true, assemble_id: rec_id, saved_to,
         absolute_path: saved_to ? path.join(ws.root, ...saved_to.split('/')) : null,
-        ...(saved_to ? {} : { not_saved_reason: 'read_only' }),
         answers_used: chosen.length, unresolved,
         length_violations: chosen.filter((c) => (c.row.word_limit && wordCount(c.v.body) > c.row.word_limit) || (c.row.char_limit && charCount(c.v.body) > c.row.char_limit)).map((c) => ({ question_occurrence_id: c.row.question_occurrence_id, word_limit: c.row.word_limit, char_limit: c.row.char_limit, word_count: wordCount(c.v.body), char_count: charCount(c.v.body) })),
         note: 'This is a review draft assembled from approved versions only. It is never submitted by AQUA; the user reviews, edits and submits it themselves. The file contains your answers in plain text — keep it private.',

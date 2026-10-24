@@ -179,7 +179,7 @@ export async function loadModel(ws, vaultSecret) {
       const charM = /^chars:(\d+)$/i.exec(lim)
       inst.template.questions.push({
         question_occurrence_id: add.question_occurrence_id, text: add.text, source: 'user_added',
-        required: add.required === 'required',
+        required: add.required === 'required' ? true : add.required === 'unknown' ? null : false,
         word_limit: wordM ? Number(wordM[1]) : null, char_limit: charM ? Number(charM[1]) : null,
         options: add.options ?? null, section_id: add.group ?? null,
       })
@@ -353,7 +353,7 @@ export function questionRows(model, inst, { catalog = null, now, classify = true
     }
     rows.push({
       question_occurrence_id: occ, canonical_question_id: canonical, text, word_limit, char_limit,
-      required: meta?.required ?? cat?.required ?? false, section_id: meta?.section_id ?? cat?.section_id ?? null, order: ref.order,
+      required: meta?.required ?? cat?.required ?? false, section_id: meta?.section_id ?? cat?.section_id ?? null, options: meta?.options ?? cat?.options ?? null, order: ref.order,
       scope, answer_id: scoped[0]?.id ?? null, versions: vs, status, classification, evidence_ids, suggestions: sugg,
     })
   }
