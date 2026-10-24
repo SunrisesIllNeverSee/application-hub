@@ -1,8 +1,8 @@
 {
   "version": "0.2.4",
   "url": "https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz",
-  "sha256": "5ff3f3a593d9ef3d7834431b26b8d396b73a69898006d1e39ba88538c84cdb77",
+  "sha256": "34ea9ce1ed56cd3a546cc8e161f3b23a99a1611c2c932873191e4d62ed3806c4",
   "sha256_url": "https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz.sha256",
   "install": "npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.4.tgz --help",
-  "note": "Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; aqua-companion is not published on npm by itself (owner gate GB2); aqua-mcp-server on npm includes it, and is the primary install."
+  "note": "Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; aqua-companion is also on npm, and aqua-mcp-server on npm includes it — the npm package is the primary install."
 }
