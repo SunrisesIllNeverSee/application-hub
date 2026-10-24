@@ -893,4 +893,54 @@ SELECT p0.test('CP-M-20','a fresh source publishes with no override and records 
  $q$SELECT (SELECT state FROM catalog_candidates WHERE id='eeeeeeee-0000-0000-0000-000000000008')||' override='||coalesce((SELECT evidence->>'source_override' FROM catalog_candidate_events WHERE candidate_id='eeeeeeee-0000-0000-0000-000000000008' AND to_state='published' ORDER BY id DESC LIMIT 1),'<null>')$q$,
  'scalar');
 
+-- ============================================================
+-- CP-N: 063 cycle/deadline-only publish (GB4)
+-- ============================================================
+-- A candidate with no questions updates an existing canonical program's
+-- cycle; its current questions are carried forward (0 created, 0 retired)
+-- and its curated name/organization stay.
+CREATE OR REPLACE FUNCTION p0m.mk_cycle_cand(p_id uuid, p_slug text, p_status text, p_cycle jsonb) RETURNS void LANGUAGE sql AS $$
+  INSERT INTO catalog_candidates (id, submitted_by, source_id, payload)
+  VALUES (p_id, '00000000-0000-0000-0000-0000000000a2', 'cccccccc-0000-0000-0000-000000000007',
+          jsonb_build_object('program', jsonb_build_object('name', 'Renamed by a cycle pack', 'organization', 'Pack Org',
+                                                           'kind', 'accelerator', 'type', 'accel', 'slug', p_slug, 'status', p_status),
+                             'cycle', p_cycle, 'questions', '[]'::jsonb))
+  ON CONFLICT (id) DO NOTHING
+$$;
+SELECT p0m.mk_cycle_cand('ffffffff-0000-0000-0000-000000000001', 'yc-summer-2026', 'open',
+  '{"name": "Winter 2027", "closes_at": "2027-01-05T00:00:00Z", "is_rolling": false}');
+SELECT p0m.mk_cycle_cand('ffffffff-0000-0000-0000-000000000002', 'no-such-program', 'open', '{"name": "X"}');
+SELECT p0m.mk_cycle_cand('ffffffff-0000-0000-0000-000000000003', 'founding-500', 'closed',
+  '{"name": "Founding 500", "closes_at": "2026-05-31"}');
+SELECT p0m.to_approved(id) FROM catalog_candidates
+ WHERE id IN ('ffffffff-0000-0000-0000-000000000001','ffffffff-0000-0000-0000-000000000002','ffffffff-0000-0000-0000-000000000003')
+   AND state = 'candidate';
+\set cn_setup 'SELECT set_config(''p0m.name'', (SELECT name FROM programs WHERE slug = ''yc-summer-2026''), true), set_config(''p0m.active'', (SELECT count(*)::text FROM program_questions pq JOIN programs p ON p.id = pq.program_id WHERE p.slug = ''yc-summer-2026'' AND pq.superseded_by_revision_id IS NULL), true)'
+SELECT p0.test('CP-N-1','cycle-only publish: existing program, all questions carried, nothing created or retired, name kept, cycle + deadline set',
+ 'n/a','new_prog=false created=0 retired=0 carried=all active=same name_kept=true cycle=Winter 2027 closes=2027-01-05 st=published',
+ 'service_role',NULL,
+ $q$SELECT catalog_publish_candidate('ffffffff-0000-0000-0000-000000000001','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT 'new_prog='||(current_setting('p0.last')::jsonb->>'new_program')
+        ||' created='||(current_setting('p0.last')::jsonb->>'occurrences_created')
+        ||' retired='||(current_setting('p0.last')::jsonb->>'occurrences_retired')
+        ||' carried='||CASE WHEN (current_setting('p0.last')::jsonb->>'occurrences_carried') = current_setting('p0m.active') THEN 'all' ELSE (current_setting('p0.last')::jsonb->>'occurrences_carried')||'/'||current_setting('p0m.active') END
+        ||' active='||CASE WHEN (SELECT count(*)::text FROM program_questions pq JOIN programs p ON p.id = pq.program_id WHERE p.slug = 'yc-summer-2026' AND pq.superseded_by_revision_id IS NULL) = current_setting('p0m.active') THEN 'same' ELSE 'changed' END
+        ||' name_kept='||((SELECT name FROM programs WHERE slug = 'yc-summer-2026') = current_setting('p0m.name'))
+        ||' cycle='||coalesce((SELECT cycle_name FROM program_cycles pc JOIN programs p ON p.id = pc.program_id WHERE p.slug = 'yc-summer-2026' AND pc.cycle_name = 'Winter 2027'), '<none>')
+        ||' closes='||coalesce((SELECT to_char(closes_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') FROM programs WHERE slug = 'yc-summer-2026'), '<null>')
+        ||' st='||(SELECT state FROM catalog_candidates WHERE id = 'ffffffff-0000-0000-0000-000000000001')$q$,
+ 'scalar', NULL, :'cn_setup');
+SELECT p0.test('CP-N-2','cycle-only publish refuses a candidate that matches no existing canonical program',
+ 'n/a','error:22023 programs_unchanged=true','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('ffffffff-0000-0000-0000-000000000002','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT current_setting('p0.last')||' programs_unchanged='||NOT EXISTS (SELECT 1 FROM programs WHERE slug LIKE 'no-such-program%')$q$,
+ 'scalar');
+SELECT p0.test('CP-N-3','cycle-only publish of a closed program: status closed, its past cycle is not marked active',
+ 'n/a','status=closed active=false retired=0','service_role',NULL,
+ $q$SELECT catalog_publish_candidate('ffffffff-0000-0000-0000-000000000003','00000000-0000-0000-0000-0000000000c1')::text$q$,
+ $q$SELECT 'status='||(SELECT status::text FROM programs WHERE slug = 'founding-500')
+        ||' active='||(SELECT is_active FROM program_cycles pc JOIN programs p ON p.id = pc.program_id WHERE p.slug = 'founding-500' AND pc.cycle_name = 'Founding 500')
+        ||' retired='||(current_setting('p0.last')::jsonb->>'occurrences_retired')$q$,
+ 'scalar');
+
 SELECT p0.report();
