@@ -9,7 +9,7 @@ begin;
 
 create table if not exists public.aqua_workspaces (
   id uuid primary key default gen_random_uuid(),
-  account_id uuid not null references auth.users(id) on delete cascade,
+  account_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   workspace_key text not null,                    -- client-generated WS-<uuid>
   manifest jsonb not null,
   manifest_rev bigint not null default 1,
@@ -25,7 +25,7 @@ create table if not exists public.aqua_workspaces (
 -- stored bytes (bytea preserves byte fidelity) — client claims ignored.
 create table if not exists public.aqua_workspace_records (
   id uuid primary key default gen_random_uuid(),
-  account_id uuid not null references auth.users(id) on delete cascade,
+  account_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   workspace_id uuid not null references public.aqua_workspaces(id) on delete cascade,
   path text not null,
   rid text, kind text, authority text, scope text,
@@ -40,7 +40,7 @@ create index if not exists aqua_ws_records_ws_kind on public.aqua_workspace_reco
 
 create table if not exists public.aqua_workspace_audit (
   id bigint generated always as identity primary key,
-  account_id uuid not null references auth.users(id) on delete cascade,
+  account_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   workspace_id uuid not null references public.aqua_workspaces(id) on delete cascade,
   log_name text not null,
   seq int not null,
@@ -118,7 +118,7 @@ create or replace function public.aqua_workspace_commit(
 ) returns bigint
 language plpgsql
 security invoker
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_new_rev bigint;

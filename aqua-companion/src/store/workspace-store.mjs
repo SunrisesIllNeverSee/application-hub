@@ -3,6 +3,7 @@
 // hosted path. Keys/derive/unlock stay client-side — the store sees
 // ciphertext only. Semantics match createFsStore exactly (O_EXCL put,
 // never-overwrite move, atomic replace, dir-boundary list).
+import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -107,7 +108,13 @@ function decodeFile(v) {
   if (typeof v === 'string' && v.startsWith('\\x')) return Buffer.from(v.slice(2), 'hex')
   return Buffer.from(v, 'base64')
 }
-const b64 = (bytes) => Buffer.from(bytes).toString('base64')
+const hex = (bytes) => '\\x' + Buffer.from(bytes).toString('hex')
+const sha = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex')
+const norm = (p) => {
+  const n = path.posix.normalize(String(p).replaceAll('\\', '/'))
+  if (n === '..' || n.startsWith('../') || path.posix.isAbsolute(n)) throw new Error(`bad path: ${JSON.stringify(p)}`)
+  return n
+}
 const err = (code) => Object.assign(new Error(code), { code })
 
 /**
@@ -134,10 +141,10 @@ export function createSupabaseStore(client, workspaceRowId) {
       if (error) throw error.code === '23505' ? err('manifest_exists') : err(error.message)
       rev = 1; return 1
     },
-    async saveManifest(m, expectRev = rev) {
+    async saveManifest(m, expectRev = rev, ops = [], audit = []) {
       const { data, error } = await client.rpc('aqua_workspace_commit', {
         p_workspace_id: workspaceRowId, p_expected_rev: expectRev,
-        p_manifest: m, p_ops: [], p_audit: [],
+        p_manifest: m, p_ops: ops, p_audit: audit,
       })
       if (error) throw error.code === 'P0404' ? err('manifest_rev_conflict') : err(error.message)
       rev = data; return rev
@@ -147,23 +154,21 @@ export function createSupabaseStore(client, workspaceRowId) {
       return error || !data ? null : decodeFile(data.file)
     },
     async putNewFile(p, bytes) {
-      const { error } = await client.from(T_REC).insert({ workspace_id: workspaceRowId, path: p, sha256: '', file: b64(bytes) })
+      const { error } = await client.from(T_REC).insert({ workspace_id: workspaceRowId, path: norm(p), sha256: sha(bytes), file: hex(bytes) })
       if (error) throw error.code === '23505' ? err('file_exists') : err(error.message)
     },
     async replaceFile(p, bytes) {
-      const { data, error } = await client.from(T_REC).update({ file: b64(bytes) })
-        .eq('workspace_id', workspaceRowId).eq('path', p).select('path')
+      const { data, error } = await client.from(T_REC).update({ file: hex(bytes), sha256: sha(bytes) })
+        .eq('workspace_id', workspaceRowId).eq('path', norm(p)).select('path')
       if (error) throw err(error.message)
       if (!data?.length) throw err(`missing_file:${p}`)
     },
-    async fileExists(p) {
-      const { data } = await client.from(T_REC).select('path', { head: false }).eq('workspace_id', workspaceRowId).eq('path', p).limit(1)
-      return (data?.length ?? 0) > 0
-    },
+    async fileExists(p) { return fileExists(p) },
     async moveFile(f, t) {
-      if (await this.fileExists(t)) throw err('file_exists')
+      f = norm(f); t = norm(t)
+      if (await fileExists(t)) throw err('file_exists')
       const { data, error } = await client.from(T_REC).update({ path: t }).eq('workspace_id', workspaceRowId).eq('path', f).select('path')
-      if (error) throw err(error.message)
+      if (error) throw error.code === '23505' ? err('file_exists') : err(error.message)
       if (!data?.length) throw err(`missing_file:${f}`)
     },
     async listFiles(prefix = '') {
@@ -174,21 +179,30 @@ export function createSupabaseStore(client, workspaceRowId) {
     },
     async appendLog(logRelPath, line) {
       const logName = path.basename(logRelPath)
-      const tail = await this.readLogTail(logRelPath)
+      const tail = await readLogTail(logRelPath)
       let seq = 1, prev = null
       if (tail.lastLine) {
-        const e = JSON.parse(tail.lastLine)
-        seq = (e.seq ?? 0) + 1; prev = e.hash ?? null
+        try {
+          const e = JSON.parse(tail.lastLine)
+          seq = (e.seq ?? 0) + 1
+        } catch { seq = tail.lastLine.length ? 2 : 1 }
+        prev = sha(tail.lastLine)  // engine: prev = sha256 of previous line text
       }
-      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logName, seq, entry: line, prev })
+      const entry = (() => { try { return JSON.parse(line) } catch { return line } })()
+      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logName, seq, entry, prev })
       if (error) throw err(error.message)
     },
-    async readLogTail(logRelPath) {
-      const logName = path.basename(logRelPath)
-      const { data, error } = await client.from(T_AUD).select('entry').eq('workspace_id', workspaceRowId).eq('log_name', logName).order('seq', { ascending: false }).limit(1)
-      if (error || !data?.length) return { lastLine: null }
-      return { lastLine: typeof data[0].entry === 'string' ? data[0].entry : JSON.stringify(data[0].entry) }
-    },
-    async tx(fn) { return fn() }, // callers needing atomicity pass ops through the commit RPC via saveManifest's p_ops
+    async readLogTail(logRelPath) { return readLogTail(logRelPath) },
+    async tx(fn) { return fn() }, // atomic bundles go through saveManifest's ops/audit params
+  }
+  async function fileExists(p) {
+    const { data } = await client.from(T_REC).select('path', { head: false }).eq('workspace_id', workspaceRowId).eq('path', norm(p)).limit(1)
+    return (data?.length ?? 0) > 0
+  }
+  async function readLogTail(logRelPath) {
+    const logName = path.basename(logRelPath)
+    const { data, error } = await client.from(T_AUD).select('entry').eq('workspace_id', workspaceRowId).eq('log_name', logName).order('seq', { ascending: false }).limit(1)
+    if (error || !data?.length) return { lastLine: null }
+    return { lastLine: typeof data[0].entry === 'string' ? data[0].entry : JSON.stringify(data[0].entry) }
   }
 }
