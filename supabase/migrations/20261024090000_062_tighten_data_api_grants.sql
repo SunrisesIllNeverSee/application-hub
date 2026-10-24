@@ -226,3 +226,27 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
   REVOKE UPDATE ON SEQUENCES FROM anon, authenticated, service_role;
 
 COMMIT;
+
+-- ------------------------------------------------------------
+-- VERIFY (read-only; run after the apply, every row should say true)
+-- ------------------------------------------------------------
+-- SELECT 'A: no client non-CRUD privileges' AS chk, count(*) = 0 AS ok
+--   FROM pg_class c, LATERAL aclexplode(c.relacl) a
+--  WHERE c.relnamespace = 'public'::regnamespace AND c.relname !~ '^(sigrank_|exchange_)'
+--    AND a.grantee IN ('anon'::regrole, 'authenticated'::regrole)
+--    AND a.privilege_type IN ('TRUNCATE','REFERENCES','TRIGGER','MAINTAIN')
+-- UNION ALL SELECT 'B: authenticated cannot write profile_answers',
+--   NOT has_table_privilege('authenticated', 'public.profile_answers', 'INSERT,UPDATE,DELETE')
+-- UNION ALL SELECT 'B2 held: authenticated can still insert answer_stress_tests',
+--   has_table_privilege('authenticated', 'public.answer_stress_tests', 'INSERT')
+-- UNION ALL SELECT 'C: anon keeps SELECT on user_applications (policy dependency)',
+--   has_table_privilege('anon', 'public.user_applications', 'SELECT')
+-- UNION ALL SELECT 'C: anon cannot read user_profiles',
+--   NOT has_table_privilege('anon', 'public.user_profiles', 'SELECT')
+-- UNION ALL SELECT 'D: authenticated cannot write _deploy_flags',
+--   NOT has_table_privilege('authenticated', 'public._deploy_flags', 'INSERT,UPDATE,DELETE')
+-- UNION ALL SELECT 'E1: sender delete policy present',
+--   EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public'
+--            AND tablename = 'community_messages' AND policyname = 'cm_sender_delete')
+-- UNION ALL SELECT 'E1: authenticated keeps DELETE on community_messages',
+--   has_table_privilege('authenticated', 'public.community_messages', 'DELETE');
