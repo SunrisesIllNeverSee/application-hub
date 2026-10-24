@@ -151,6 +151,7 @@ begin
          where workspace_id = p_workspace_id and path = r->>'path' and account_id = auth.uid();
         if not found then raise exception 'missing_file:%', r->>'path'; end if;
       when 'move' then
+        if r->>'to' is null then raise exception 'missing_to:%', r->>'path'; end if;
         update public.aqua_workspace_records
            set path = r->>'to'
          where workspace_id = p_workspace_id and path = r->>'path' and account_id = auth.uid();

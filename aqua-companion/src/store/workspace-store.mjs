@@ -1,7 +1,8 @@
 // WorkspaceStore — storage abstraction under Workspace (hosted-MCP path).
-// The fs implementation is the default; a Supabase implementation
-// implements this contract and keeps every Workspace caller unchanged.
-// Keys/derive/unlock stay client-side — the store sees ciphertext only.
+// The fs implementation is the default; the Supabase implementation is the
+// hosted path. Keys/derive/unlock stay client-side — the store sees
+// ciphertext only. Semantics match createFsStore exactly (O_EXCL put,
+// never-overwrite move, atomic replace, dir-boundary list).
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -15,7 +16,6 @@ function inside(root, rel) {
   return abs
 }
 async function noSymlinks(abs, root) {
-  // refuse if any existing component under root is a symlink
   let cur = path.resolve(root)
   const parts = path.relative(root, abs).split(path.sep)
   for (const p of parts) {
@@ -34,14 +34,14 @@ export function createFsStore(root) {
       const buf = await fs.readFile(safe('workspace.json')).catch(() => null)
       return buf ? { manifest: JSON.parse(buf.toString('utf8')), rev: null } : null
     },
-    async createManifest(m) { // exclusive create — refuse overwrite
+    async createManifest(m) {
       await noSymlinks(safe('workspace.json'), real)
       const fh = await fs.open(safe('workspace.json'), 'wx')
         .catch((e) => { throw e.code === 'EEXIST' ? Object.assign(new Error('manifest_exists'), { code: 'manifest_exists' }) : e })
       try { await fh.writeFile(JSON.stringify(m, null, 2)); await fh.sync() } finally { await fh.close() }
       return 1
     },
-    async saveManifest(m) { // .bak + atomic replace, mirroring Workspace.saveManifest
+    async saveManifest(m) {
       const abs = safe('workspace.json')
       await fs.copyFile(abs, abs + '.bak').catch(() => {})
       const tmp = abs + '.tmp-' + Math.random().toString(36).slice(2)
@@ -60,7 +60,7 @@ export function createFsStore(root) {
         .catch((e) => { throw e.code === 'EEXIST' ? Object.assign(new Error('file_exists'), { code: 'file_exists' }) : e })
       try { await fh.writeFile(bytes); await fh.sync() } finally { await fh.close() }
     },
-    async replaceFile(p, bytes) { // write-new + rename; missing source errors
+    async replaceFile(p, bytes) {
       const abs = safe(p); await noSymlinks(abs, real)
       await fs.access(abs).catch(() => { throw new Error(`missing_file:${p}`) })
       const tmp = abs + '.tmp-' + Math.random().toString(36).slice(2)
@@ -68,13 +68,13 @@ export function createFsStore(root) {
       await fs.rename(tmp, abs)
     },
     async fileExists(p) { return fs.access(safe(p)).then(() => true, () => false) },
-    async moveFile(f, t) { // link+unlink: never overwrites (matches fsafe.moveInside)
+    async moveFile(f, t) {
       const a = safe(f), b = safe(t); await noSymlinks(a, real)
       await fs.mkdir(path.dirname(b), { recursive: true })
       await fs.access(b).then(() => { throw new Error('file_exists') }, () => {})
       await fs.link(a, b); await fs.unlink(a)
     },
-    async listFiles(prefix = '') { // sorted; prefix must match a dir boundary
+    async listFiles(prefix = '') {
       const out = []
       const walk = async (dir) => {
         for (const e of await fs.readdir(dir, { withFileTypes: true }).catch(() => [])) {
@@ -86,7 +86,7 @@ export function createFsStore(root) {
       await walk(real)
       return out.sort()
     },
-    async appendLog(logRelPath, line) { // full rel path e.g. 'audit/agent.jsonl'
+    async appendLog(logRelPath, line) {
       const abs = safe(logRelPath); await noSymlinks(abs, real)
       await fs.mkdir(path.dirname(abs), { recursive: true })
       await fs.appendFile(abs, line + '\n')
@@ -97,14 +97,98 @@ export function createFsStore(root) {
       const lines = buf.trimEnd().split('\n')
       return { lastLine: lines[lines.length - 1] || null }
     },
-    async tx(fn) { return fn() }, // local fs: caller's own serialization
+    async tx(fn) { return fn() },
   }
 }
 
-/** Hosted store — Supabase rows behind aqua_workspace_commit RPC (migration 064). */
-export function createSupabaseStore(client, workspaceRowId) {
-  // client = supabase-js with the caller's bearer JWT (RLS does isolation).
-  throw new Error('createSupabaseStore: implement against migration 064 (scaffold)')
+// PostgREST bytea returns "\x<hex>" or base64 depending on accept headers.
+function decodeFile(v) {
+  if (v == null) return null
+  if (typeof v === 'string' && v.startsWith('\\x')) return Buffer.from(v.slice(2), 'hex')
+  return Buffer.from(v, 'base64')
 }
+const b64 = (bytes) => Buffer.from(bytes).toString('base64')
+const err = (code) => Object.assign(new Error(code), { code })
 
-export const __scaffold = true
+/**
+ * Hosted store — Supabase rows behind migration 064.
+ * @param client supabase-js client built with the caller's bearer JWT
+ *               (RLS enforces account isolation; never service_role).
+ * @param workspaceRowId aqua_workspaces.id (uuid).
+ * File ops go through direct table calls (unique-conflict = file_exists);
+ * saveManifest goes through the aqua_workspace_commit CAS RPC, which
+ * additionally computes sha256 and appends audit in one transaction.
+ */
+export function createSupabaseStore(client, workspaceRowId) {
+  const T_WS = 'aqua_workspaces', T_REC = 'aqua_workspace_records', T_AUD = 'aqua_workspace_audit'
+  let rev = null
+  return {
+    async loadManifest() {
+      const { data, error } = await client.from(T_WS).select('manifest, manifest_rev').eq('id', workspaceRowId).single()
+      if (error || !data) return null
+      rev = data.manifest_rev
+      return { manifest: data.manifest, rev }
+    },
+    async createManifest(m) {
+      const { error } = await client.from(T_WS).insert({ id: workspaceRowId, workspace_key: m.workspace_id, manifest: m })
+      if (error) throw error.code === '23505' ? err('manifest_exists') : err(error.message)
+      rev = 1; return 1
+    },
+    async saveManifest(m, expectRev = rev) {
+      const { data, error } = await client.rpc('aqua_workspace_commit', {
+        p_workspace_id: workspaceRowId, p_expected_rev: expectRev,
+        p_manifest: m, p_ops: [], p_audit: [],
+      })
+      if (error) throw error.code === 'P0404' ? err('manifest_rev_conflict') : err(error.message)
+      rev = data; return rev
+    },
+    async getFile(p) {
+      const { data, error } = await client.from(T_REC).select('file').eq('workspace_id', workspaceRowId).eq('path', p).single()
+      return error || !data ? null : decodeFile(data.file)
+    },
+    async putNewFile(p, bytes) {
+      const { error } = await client.from(T_REC).insert({ workspace_id: workspaceRowId, path: p, sha256: '', file: b64(bytes) })
+      if (error) throw error.code === '23505' ? err('file_exists') : err(error.message)
+    },
+    async replaceFile(p, bytes) {
+      const { data, error } = await client.from(T_REC).update({ file: b64(bytes) })
+        .eq('workspace_id', workspaceRowId).eq('path', p).select('path')
+      if (error) throw err(error.message)
+      if (!data?.length) throw err(`missing_file:${p}`)
+    },
+    async fileExists(p) {
+      const { data } = await client.from(T_REC).select('path', { head: false }).eq('workspace_id', workspaceRowId).eq('path', p).limit(1)
+      return (data?.length ?? 0) > 0
+    },
+    async moveFile(f, t) {
+      if (await this.fileExists(t)) throw err('file_exists')
+      const { data, error } = await client.from(T_REC).update({ path: t }).eq('workspace_id', workspaceRowId).eq('path', f).select('path')
+      if (error) throw err(error.message)
+      if (!data?.length) throw err(`missing_file:${f}`)
+    },
+    async listFiles(prefix = '') {
+      const { data, error } = await client.from(T_REC).select('path').eq('workspace_id', workspaceRowId).order('path')
+      if (error) throw err(error.message)
+      const pre = prefix.endsWith('/') ? prefix : prefix + '/'
+      return (data ?? []).map((r) => r.path).filter((p) => !prefix || p === prefix || p.startsWith(pre))
+    },
+    async appendLog(logRelPath, line) {
+      const logName = path.basename(logRelPath)
+      const tail = await this.readLogTail(logRelPath)
+      let seq = 1, prev = null
+      if (tail.lastLine) {
+        const e = JSON.parse(tail.lastLine)
+        seq = (e.seq ?? 0) + 1; prev = e.hash ?? null
+      }
+      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logName, seq, entry: line, prev })
+      if (error) throw err(error.message)
+    },
+    async readLogTail(logRelPath) {
+      const logName = path.basename(logRelPath)
+      const { data, error } = await client.from(T_AUD).select('entry').eq('workspace_id', workspaceRowId).eq('log_name', logName).order('seq', { ascending: false }).limit(1)
+      if (error || !data?.length) return { lastLine: null }
+      return { lastLine: typeof data[0].entry === 'string' ? data[0].entry : JSON.stringify(data[0].entry) }
+    },
+    async tx(fn) { return fn() }, // callers needing atomicity pass ops through the commit RPC via saveManifest's p_ops
+  }
+}
