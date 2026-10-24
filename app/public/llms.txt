@@ -103,6 +103,7 @@ The Contribution Exchange is not part of AQUA. It lives at https://signalaf.com/
 - FAQ: https://aquaidp.xyz/faq
 - Contact: https://aquaidp.xyz/contact
 - Privacy: https://aquaidp.xyz/privacy
+- Terms of Service: https://aquaidp.xyz/terms
 - Scoring methodology: https://aquaidp.xyz/about/scoring
 - Application infrastructure hub: https://aquaidp.xyz/application-infrastructure
 - Guides index: https://aquaidp.xyz/guides

@@ -91,6 +91,7 @@ export default function PrivacyPage() {
         <div className="flex flex-wrap gap-4 border-t border-neutral-200 pt-8 text-sm dark:border-neutral-800">
           <Link href="/about" className="btn-secondary">About</Link>
           <Link href="/contact" className="btn-secondary">Contact</Link>
+          <Link href="/terms" className="btn-secondary">Terms</Link>
           <a href="/llms.txt" className="btn-secondary">Agent guidance</a>
         </div>
       </main>

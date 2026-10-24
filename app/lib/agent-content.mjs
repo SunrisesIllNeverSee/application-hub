@@ -29,6 +29,7 @@ Agents work through the local AQUA companion, a command-line tool and stdio MCP 
 - Contact: https://aquaidp.xyz/contact
 - AQUA IDP support: https://aquaidp.xyz/support
 - Privacy: https://aquaidp.xyz/privacy
+- Terms of Service: https://aquaidp.xyz/terms
 - Scoring methodology: https://aquaidp.xyz/about/scoring
 - Sitemap: https://aquaidp.xyz/sitemap.xml
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub
@@ -75,6 +76,7 @@ This is the business mailing address associated with Ello Cello LLC's public rec
 - Product: https://aquaidp.xyz
 - About: https://aquaidp.xyz/about
 - Privacy: https://aquaidp.xyz/privacy
+- Terms of Service: https://aquaidp.xyz/terms
 - AQUA IDP support: https://aquaidp.xyz/support
 - Scoring methodology: https://aquaidp.xyz/about/scoring
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub
@@ -132,6 +134,40 @@ Users choose sources and can inspect, edit, export, or delete their local files.
 
 For privacy, access, correction, or deletion questions, contact burnmydays@proton.me. Include the account email or other identifier necessary to locate the relevant account, but do not send passwords, private API keys, or authentication tokens. Business contact information and the mailing address are published at https://aquaidp.xyz/contact.
 For plugin help or a privacy request concerning a beta report, see https://aquaidp.xyz/support and include the report ID when available.
+`,
+  '/terms': `# AQUA Terms of Service
+
+Last updated: 2026-10-24
+
+These terms cover AQUA Application Hub (aquaidp.xyz) and the AQUA IDP plugin. Both are operated by Ello Cello LLC, a New York limited liability company. By using either one, you agree to these terms.
+
+## What AQUA does
+
+AQUA helps you preserve applications, organize their questions, build a bank of answers you approve, and prepare drafts for your review. The AQUA IDP plugin does this in a local folder you choose, inside the AI host you run it in. AQUA does not approve answers for you, does not submit forms on your behalf, and does not guarantee that any application will be accepted, funded, or reviewed. Fit scores and suggestions are aids, not predictions of an outcome.
+
+## Your content
+
+You own the applications, answers, and other material you bring to AQUA. You give Ello Cello LLC only the permission it needs to store, process, and display that material to provide the service to you. With the plugin, your workspace stays in your folder, and the publisher does not receive it through the normal file workflow. Do not put passwords, API keys, payment-card data, government identifiers, protected health information, or other secrets into AQUA. See https://aquaidp.xyz/privacy for how information is handled.
+
+## Acceptable use
+
+Use AQUA for your own applications or applications you are authorized to prepare. Do not impersonate someone, misrepresent facts to a program, break a program's rules, access accounts or data you are not authorized to use, overload or interfere with the service, or bypass its security controls.
+
+## Accounts, AI providers, and hosts
+
+You are responsible for activity under your AQUA account. Your own model provider keys are governed by that provider's terms. When you run the AQUA IDP plugin, the host (for example ChatGPT, Claude, or Codex) processes your conversation and files under its own terms. AI output can be wrong: review every draft before you use it.
+
+## Paid features
+
+Prices, billing periods, and renewal terms are shown before you buy, and payments are processed by Stripe. Unless the purchase page says otherwise, subscriptions renew until you cancel, cancellation takes effect at the end of the current period, and fees already paid are not refunded except where the law requires.
+
+## Ownership, disclaimers, and limits
+
+The AQUA software, site, and brand, and the MO§ES™ framework they run on, belong to Ello Cello LLC. AQUA is provided "as is" and "as available." Ello Cello LLC is not liable for indirect or consequential damages, lost opportunities, rejected applications, or lost data. Its total liability is limited to the greater of the amount you paid for AQUA in the prior 12 months or US $100, where the law allows.
+
+## Changes, governing law, and contact
+
+We may update these terms; the date above shows the latest version. These terms are governed by New York law, with disputes in the state or federal courts in Erie County, New York. Contact: burnmydays@proton.me, or Ello Cello LLC, 84 W Utica St, Buffalo, NY 14209, United States.
 `,
   '/about/scoring': `# AQUA Scoring & Intelligence
 
@@ -685,5 +721,6 @@ The requested AQUA resource does not exist at this path.
 - About AQUA: https://aquaidp.xyz/about
 - Contact: https://aquaidp.xyz/contact
 - Privacy: https://aquaidp.xyz/privacy
+- Terms of Service: https://aquaidp.xyz/terms
 - Scoring methodology: https://aquaidp.xyz/about/scoring
 `
