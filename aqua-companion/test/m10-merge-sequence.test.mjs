@@ -49,12 +49,25 @@ test('§6 merge sequence: import, index, history, review, human approval boundar
     const imp2 = await c.call('import_local_application', { file: 'form2.md' })
     const appId2 = imp2.application_id ?? imp2.instance_id
     assert.ok(appId2)
-    // 6. assess reuse + assemble markdown draft
+    // 6. assess reuse + assemble markdown draft — with REAL reuse this time:
+    // link the vault-approved version (a human approval that arrived via the
+    // supported export→approve→import round-trip) to app2's first question,
+    // then assemble with it mapped in.
     const st2 = await c.call('read_review_status', { application_id: appId2 })
     assert.ok(st2.questions.some((q) => q.recommendation), 'reuse assessment emitted')
-    const asm = await c.call('assemble_application', { application_id: appId2, map: [] })
+    const occ2_0 = st2.questions[0].question_occurrence_id
+    const la = await c.call('link_answer', { application_id: appId2, question_occurrence_id: occ2_0, version_id: v.version.id, reason: 'direct reuse of approved wording' })
+    assert.equal(la.status, 'ok', 'approved version links for reuse')
+    const asm = await c.call('assemble_application', {
+      application_id: appId2,
+      map: [{ question_occurrence_id: occ2_0, version_id: v.version.id }],
+    })
     assert.equal(asm.status, 'ok')
     assert.ok(asm.saved_to, 'markdown draft written')
+    assert.equal(asm.answers_used, 1, 'one approved answer assembled')
+    assert.ok(asm.unresolved.length >= 1, 'remaining fields reported unresolved')
+    assert.ok(asm.untrusted_content.data.markdown.includes('## '), 'draft contains a question section')
+    assert.ok(asm.untrusted_content.data.markdown.includes(v.version.id.slice(0, 12)), 'draft cites the reused version')
   } finally {
     await c.close()
   }
