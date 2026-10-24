@@ -6,6 +6,7 @@
 // both directions. Parsing mirrors backup.ts decryptBackupPayload: every
 // refusal happens before anything is written.
 
+import { checkHistoryMetaHash } from '../vendor/lib/aqua-local/history.mjs'
 import { canonicalJson, decryptField, decryptText, encryptText, sha256Hex, DecryptError } from './crypto.mjs'
 
 export const BACKUP_FORMAT_VERSION = 2
@@ -107,6 +108,25 @@ export async function verifyVersionHashes(payload) {
 }
 
 /**
+ * G18: a history version whose metadata carries a hash must still match it
+ * (metadata + version id + content sha256). Unhashed (legacy) metadata passes.
+ */
+export async function verifyHistoryMetaHashes(payload, secret) {
+  for (const v of payload.versions ?? []) {
+    if (!v.history_enc) continue
+    let meta
+    try {
+      meta = JSON.parse(await decryptField(secret, v.history_enc))
+    } catch {
+      throw new EnvelopeError(`version ${v.id} history metadata could not be read: refusing tampered backup`)
+    }
+    if ((await checkHistoryMetaHash(meta, { version_id: v.id, version_sha256: v.sha256 })) === 'mismatch') {
+      throw new EnvelopeError(`version ${v.id} history metadata hash mismatch: refusing tampered backup`)
+    }
+  }
+}
+
+/**
  * Parse + decrypt + validate a vault envelope. Returns
  * { payload, header, envelope_sha256 }. `header` holds non-secret outer
  * fields (producer, account_fp) when present.
@@ -128,6 +148,7 @@ export async function openEnvelope(secret, text) {
   }
   validatePayload(payload)
   await verifyVersionHashes(payload)
+  await verifyHistoryMetaHashes(payload, secret)
   const header = {
     producer: typeof envelope.producer === 'string' ? envelope.producer : null,
     account_fp: typeof envelope.account_fp === 'string' && /^[0-9a-f]{64}$/.test(envelope.account_fp) ? envelope.account_fp : null,

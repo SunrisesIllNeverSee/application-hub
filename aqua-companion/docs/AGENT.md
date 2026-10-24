@@ -252,7 +252,11 @@ Notes on specific tools:
 - `import_history` reads only a folder inside `inbox/`. It never guesses a
   submission date (unknown dates are flagged; pass `date` to fill them) and
   flags answers with unfilled placeholders, which the browser vault refuses
-  to confirm. It approves nothing.
+  to confirm. It approves nothing. Each record's import details carry a
+  `meta_sha256` hash bound to the version id and content hash (G18); the
+  browser refuses to confirm or restore a record whose details no longer
+  match, and flags records without one (imported by an older companion) as
+  unverified. After a mismatch, re-import from the original file.
 - `sync_from_vault_export` runs exactly the `import-backup` checks
   (integrity, account fingerprint, conflicts recorded, nothing overwritten)
   on a browser backup in `inbox/`. A file made by `export-backup` is refused:

@@ -25,7 +25,7 @@ import {
   type HistoryGroup,
   type HistoryItem,
 } from '@/lib/aqua-local/history-review'
-import { LOW_CONFIDENCE_REASON } from '@/lib/aqua-local/history'
+import { HISTORY_META_LEGACY_NOTE, LOW_CONFIDENCE_REASON } from '@/lib/aqua-local/history'
 import { UnlockPanel } from '@/components/aqua-local/UnlockPanel'
 import { Notice } from '@/components/review/ui'
 
@@ -235,6 +235,9 @@ export function HistoryConfirm() {
                                 {it.disabled_reason}
                               </span>
                             ) : null}
+                            {it.status === 'pending' && it.meta_hash_status === 'legacy' && (
+                              <span className="text-neutral-500 dark:text-neutral-400" data-testid="history-legacy-meta">{HISTORY_META_LEGACY_NOTE}</span>
+                            )}
                             {it.excerpt.endsWith('…') && (
                               <button type="button" className="text-neutral-500 underline underline-offset-2" onClick={() => setExpanded((p) => { const n = new Set(p); if (open) n.delete(it.version_id); else n.add(it.version_id); return n })}>
                                 {open ? 'Show less' : 'Show full answer'}

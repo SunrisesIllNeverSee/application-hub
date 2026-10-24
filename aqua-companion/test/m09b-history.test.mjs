@@ -171,6 +171,55 @@ test('history round trip: export-backup -> browser confirm (vault refuses placeh
   }
 })
 
+test('G18 history metadata hash: importer stores it, restore keeps it valid, attestation verifies it, tampering is refused', async () => {
+  const app = await loadApp()
+  const hr = await import(new URL('history-review.ts', APPLIB).href)
+  const crypto = await import(new URL('crypto.ts', APPLIB).href)
+  const hist = await import(new URL('history.ts', APPLIB).href)
+  const { v, dir, root } = await boundWorkspace('g18-hist-hash')
+  historyFolder(root)
+  const c = startServer(root)
+  try {
+    await c.initialize()
+    const imp = await c.call('import_history', { folder: 'history' })
+    assert.equal(imp.status, 'ok')
+    const out = path.join(dir, 'for-browser.json')
+    const ex = await run(['export-backup', out, '--workspace', root, '--yes'])
+    assert.equal(ex.code, 0, ex.err)
+    await app.importVault(v.storage, VAULT, fs.readFileSync(out, 'utf8'))
+    const items = (await hr.listHistoryCandidates(v.storage, VAULT)).flatMap((g) => g.items)
+    assert.equal(items.length, 9)
+    assert.deepEqual([...new Set(items.map((i) => i.meta_hash_status))], ['verified'], 'every companion-imported record carries a valid hash after export + restore')
+    // the stored hash is the one the shared helper computes for (metadata, version id, version sha256)
+    const stored = (await v.storage.getAll('versions')).filter((r) => r.history === true)
+    for (const r of stored) {
+      const meta = JSON.parse(await crypto.decryptField(VAULT, r.history_enc))
+      assert.match(meta.meta_sha256, /^[0-9a-f]{64}$/)
+      assert.equal(meta.meta_sha256, await hist.computeHistoryMetaHash(meta, { version_id: r.id, version_sha256: r.sha256 }))
+    }
+    // tamper with one record's submission date after restore: refused, not confirmable
+    const clean = items.find((i) => i.question.includes('What are you building'))
+    const row = stored.find((r) => r.id === clean.version_id)
+    const meta = JSON.parse(await crypto.decryptField(VAULT, row.history_enc))
+    await v.storage.put('versions', { ...row, history_enc: await crypto.encryptField(VAULT, JSON.stringify({ ...meta, submitted_at: '2019-01-01' })) })
+    const res = await hr.confirmHistorySelection(v.storage, VAULT, { items: [clean], attested: true, statement: 'I submitted this answer.', actor_id: 'u-test' })
+    assert.equal(res[0].ok, false)
+    assert.equal(res[0].error, hist.HISTORY_META_MISMATCH_REASON)
+    // restore the metadata: attestation works and the hash stays valid through a second export
+    await v.storage.put('versions', row)
+    const ok = await hr.confirmHistorySelection(v.storage, VAULT, { items: [clean], attested: true, statement: 'I submitted this answer.', actor_id: 'u-test' })
+    assert.equal(ok[0].ok, true)
+    const after = (await hr.listHistoryCandidates(v.storage, VAULT)).flatMap((g) => g.items).find((i) => i.version_id === clean.version_id)
+    assert.equal(after.meta_hash_status, 'verified')
+    assert.equal(after.status, 'confirmed')
+    inbox(root, 'browser-export.json', await app.exportVault(v.storage, VAULT, { account_uid: UID }))
+    const sync = await c.call('sync_from_vault_export', { file: 'browser-export.json' })
+    assert.equal(sync.status, 'ok', JSON.stringify(sync))
+  } finally {
+    await c.close()
+  }
+})
+
 test('draft round trip: companion draft -> export-backup -> importVault -> approveAsHuman -> exportVault -> sync_from_vault_export -> approved, hash preserved', async () => {
   const app = await loadApp()
   const review = await import(new URL('../aqua-local-client/review.ts', APPLIB).href)

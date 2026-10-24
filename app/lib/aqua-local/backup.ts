@@ -26,7 +26,8 @@ import {
   nowIso,
   sha256Hex,
 } from './crypto.ts'
-import { VaultDecryptError } from './crypto.ts'
+import { VaultDecryptError, decryptField } from './crypto.ts'
+import { checkHistoryMetaHash } from './history.ts'
 import type { VaultStorage } from './vault.ts'
 import type {
   AnswerRecord,
@@ -294,6 +295,18 @@ async function decryptBackupPayload(secret: string, exportedJson: string): Promi
     const digest = await sha256Hex(canonicalJson({ title: v.title_plaintext ?? v.title, body: v.body_plaintext }))
     if (digest !== v.sha256) {
       throw new VaultTamperError(`version ${v.id} sha256 mismatch — refusing tampered backup`)
+    }
+    // G18: hashed history metadata must still match (unhashed legacy passes).
+    if (v.history_enc) {
+      let meta: unknown
+      try {
+        meta = JSON.parse(await decryptField(secret, v.history_enc))
+      } catch {
+        throw new VaultTamperError(`version ${v.id} history metadata could not be read — refusing tampered backup`)
+      }
+      if ((await checkHistoryMetaHash(meta as never, { version_id: v.id, version_sha256: v.sha256 })) === 'mismatch') {
+        throw new VaultTamperError(`version ${v.id} history metadata hash mismatch — refusing tampered backup`)
+      }
     }
   }
   return payload

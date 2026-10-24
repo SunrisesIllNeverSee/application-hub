@@ -22,7 +22,7 @@ import { confirmPlan, out, UsageError } from './io.mjs'
 import { openUnlocked, prepareLocalApplication } from './commands.mjs'
 import { rid } from './workspace.mjs'
 import { HISTORY_EXTENSIONS, MAX_HISTORY_FILE_BYTES, parseHistoryFile } from './history-parse.mjs'
-import { HISTORY_FORMAT } from '../vendor/lib/aqua-local/history.mjs'
+import { HISTORY_FORMAT, computeHistoryMetaHash } from '../vendor/lib/aqua-local/history.mjs'
 
 export const HISTORY_IMPORTER = 'aqua-companion import-history'
 const MAX_FILES = 200
@@ -96,9 +96,13 @@ export async function prepareHistoryImport(ws, files, { date = null, program = n
         placeholder: { found: p.placeholders.length > 0, markers: p.placeholders }, imported_at: importedAt, importer: HISTORY_IMPORTER,
         parse_confidence: p.parse_confidence, parse_notes: p.parse_notes,
       }
+      const versionId = newUuid()
+      const sha256 = await sha256Hex(canonicalJson({ title, body: p.answer }))
+      // G18: bind the metadata to the version it describes (tamper evidence)
+      history_meta.meta_sha256 = await computeHistoryMetaHash(history_meta, { version_id: versionId, version_sha256: sha256 })
       const version = {
-        id: newUuid(), answer_id: answer.id, parent_version_id: null, title, body: p.answer,
-        sha256: await sha256Hex(canonicalJson({ title, body: p.answer })), method: 'imported', provenance: HISTORY_PROVENANCE,
+        id: versionId, answer_id: answer.id, parent_version_id: null, title, body: p.answer,
+        sha256, method: 'imported', provenance: HISTORY_PROVENANCE,
         created_at: importedAt, immutable: true, history: true, history_meta,
       }
       items.push({ answer, version, placeholders: p.placeholders, parse_confidence: p.parse_confidence, parse_notes: p.parse_notes })
