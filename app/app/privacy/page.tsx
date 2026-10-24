@@ -25,7 +25,7 @@ export default function PrivacyPage() {
 
       <main className="mx-auto max-w-4xl px-6 py-16">
         <section className="mb-16">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Last updated October 2, 2026</p>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Last updated October 24, 2026</p>
           <h1 className="mb-6 text-4xl font-semibold tracking-tight md:text-5xl">AQUA Privacy</h1>
           <p className="max-w-3xl text-xl leading-relaxed text-neutral-600 dark:text-neutral-300">
             AQUA Application Hub is operated by Ello Cello LLC. This page summarizes the main information the product handles and the controls reflected in the current application architecture.
@@ -70,6 +70,10 @@ export default function PrivacyPage() {
           <h3 className="text-lg font-semibold">What stays in your workspace</h3>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
             The plugin writes source copies, question indexes, applicant context, historical answer candidates, approved answer versions, drafts, and progress records to the folder the user chooses. The publisher does not receive this application content through the plugin&apos;s normal file workflow. The files remain until the user or their host deletes them; the plugin does not impose a remote retention period on the user&apos;s folder. The host running AQUA IDP may process the conversation, authorized URLs, and files under that host&apos;s own terms and privacy policy.
+          </p>
+          <h3 className="text-lg font-semibold">Public catalog tools</h3>
+          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
+            AQUA IDP can also use AQUA&apos;s public, read-only program catalog at <code>https://aquaidp.xyz/mcp</code> to search programs, read their questions, and find similar questions across programs. When it does, the search terms and any question text you ask it to match are sent to aquaidp.xyz to answer the request and may appear in ordinary server and hosting logs. The catalog needs no account and never receives your workspace files, answer bank, or drafts.
           </p>
           <h3 className="text-lg font-semibold">Optional beta reports</h3>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
