@@ -3,7 +3,7 @@
   "version": 1,
   "generated_from": "application-hub-mcp-server/src (npm run manifest)",
   "package": "aqua-mcp-server",
-  "package_version": "2.0.3",
+  "package_version": "2.0.4",
   "protocol_versions": [
     "2025-11-25",
     "2025-06-18",
