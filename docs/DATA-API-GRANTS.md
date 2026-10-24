@@ -1,15 +1,16 @@
 ---
 type: Reference
 title: Application Hub — Data API Grants (M09 W11)
-description: Inventory of anon/authenticated/service_role grants on every public table, view, sequence and function; classes; mismatches; the 2026-10-30 Supabase default-privilege change and the owner apply order for 058/059.
+description: Inventory of anon/authenticated/service_role grants on every public table, view, sequence and function; classes; mismatches; the 2026-10-30 Supabase default-privilege change; the owner apply order for 058/059 and the 062 tightening.
 tags: [database, supabase, grants, rls, migrations]
-timestamp: 2026-10-22
+timestamp: 2026-10-24
 ---
 
 # Data API grants
 
-_Captured 2026-10-22. Migration files: `059` (applied chain, PREPARED),
-`058` (PREPARED), `proposed/060` (not in the chain)._
+_Captured 2026-10-22; 058, 059 and 061 applied to production 2026-10-23.
+`062` (2026-10-24, PREPARED, not applied) adopts the proposed 060
+tightening per the owner decision G15 (section 6)._
 
 ## 1. What changes on 2026-10-30
 
@@ -55,11 +56,13 @@ AppFeeder. Nothing in this branch has been applied.
    carry the grants. It is the fresh rebuild that needs 059, so ship them
    together. With `supabase db push` the ledger order is 058 then 059,
    which is fine.
-3. **Optional, separate decision: 060.** Adopt sections of
-   `supabase/migrations/proposed/060_tighten_data_api_grants.sql` one by
-   one (section 6). Each adopted section becomes a new migration after
-   059, and its expectations move into
-   `supabase/tests/m09/50_grants_tests.sql`.
+3. **062 (owner decision G15, 2026-10-24).** Apply
+   `supabase/migrations/20261024090000_062_tighten_data_api_grants.sql`
+   after 061. It adopts the proposed 060 sections A, B, B2 (after GB1,
+   the npm deprecation of aqua-mcp-server 1.x, done 2026-10-24), C, D,
+   E (with the E1 community-message sender delete policy) and F; G was
+   already done by 061. Section 6 has the blast radius, the harness proves it in both
+   grant modes, and the file carries a ROLLBACK block.
 
 If a step is missed: without 059, production keeps working (existing
 grants), but any table created after 2026-10-30 without explicit grants
@@ -305,24 +308,41 @@ Functions are outside the 2026-10-30 change: new functions still default to EXEC
 - Trigger functions, SECURITY INVOKER, EXECUTE service_role only (058) (10): `catalog_candidate_events_apply`, `catalog_candidates_created`, `guard_catalog_append_only`, `guard_catalog_candidate_events`, `guard_catalog_candidates`, `guard_catalog_no_truncate`, `guard_catalog_service_only`, `guard_catalog_sources`, `guard_program_questions_provenance`, `guard_programs_entity`
 - Trigger functions, SECURITY INVOKER, EXECUTE PUBLIC, anon, authenticated, service_role (16): `compute_word_count`, `deny_receipt_mutation`, `deny_reward_id_change`, `enforce_single_default_integration`, `guard_archived_questions_writes`, `guard_canonical_program_questions`, `guard_canonical_programs`, `increment_ai_usage`, `recompute_completion_pct`, `set_draft_limit_on_insert`, `snapshot_profile_answer`, `sync_draft_limit_on_tier_change`, `sync_profile_answer_columns`, `update_program_stats_on_signal`, `update_updated_at`, `update_updated_at_column`
 
-## 6. Proposed tightening (060, not applied)
+## 6. Tightening: proposed 060, adopted as 062
 
-`supabase/migrations/proposed/060_tighten_data_api_grants.sql` revokes the
-excessive grants above. The CLI and CI do not read that folder, and every
-section needs a separate owner decision. On a scratch full-chain database
-with all sections applied, the 50 suite reports **0 excessive and 0
-missing**, `GR-POLDEP` passes, and the 058 suite passes 131/131.
+`supabase/migrations/proposed/060_tighten_data_api_grants.sql` was the
+proposal (kept for provenance; the CLI and CI do not read that folder).
+OWNER decided every section on 2026-10-24 (G15) and it ships as **062**:
+
+- **A** uses an explicit list of the 62 relations instead of the
+  proposal's loop over every public relation, so a table another app
+  adds to this database is never touched.
+- **B2** waited for GB1: aqua-mcp-server 1.x (whose `hub_stress_test_answer`
+  inserted as authenticated) was deprecated on npm on 2026-10-24.
+- **E** keeps `community_messages` DELETE for authenticated and adds the
+  `cm_sender_delete` policy (decision E1). Before 062 the sender-only
+  delete route silently deleted nothing; it now deletes, and reports
+  404 when nothing was deleted.
+- **G** is not in 062: 061 section 8 already reset EXECUTE on every
+  function the proposal listed.
+
+Harness (full chain, both grant modes): the rebuild through 061 equals
+the production snapshot; after 062 the 50 suite reports 0 excessive, 0
+missing, 0 non-CRUD client privileges (`GR-NONCRUD`), and `GR-E1-*`
+prove the sender delete. Expected p0 changes: P-4d/P-4e/P-4f (legacy-mode
+answer writes) and SIG-1 (anon UPDATE programs, reachable only through
+the program_signals trigger) now get 42501.
 
 | Section | Revokes | Blast radius |
 |---|---|---|
 | A | TRUNCATE/REFERENCES/TRIGGER/MAINTAIN from anon and authenticated (62 relations) | None through the Data API |
-| B | INSERT/UPDATE/DELETE on the class (d) tables from authenticated; all from anon. This makes the local-first boundary a grant rather than a flag row. | Local-first-off legacy mode only: AnswerEditor upsert, the extension userscript, MCP `hub_save_answer` / `hub_save_answer_review`, user-client writes in `api/answers/capture`, `api/applications/[id]/fill`, `api/draft`, `api/hub/ingest`, `api/import/paste`, `api/applications/intake`. All of these are already refused while local-first is on. Re-enabling legacy mode would need a re-grant migration. In the harness, p0 P-4d/P-4e turn into 42501 (legacy-mode writes). |
-| B2 | answer_stress_tests writes from authenticated | MCP `hub_stress_test_answer` persistence (userClient) breaks in every mode |
-| C | anon on classes (b), (c), (e). anon keeps SELECT where a policy depends on it. | None found. A future public-profile page would need anon SELECT on `user_profiles`. |
-| D | authenticated on server-only tables; `_deploy_flags` writes | None found (edge functions use service_role) |
-| E | Client writes that no RLS policy allows; view writes; extra sequence privileges | `community_messages` DELETE goes from a silent 0-row no-op to 42501 in `api/community/messages/[id]` |
-| F | Residual default privileges (TRUNCATE/REFERENCES/TRIGGER/MAINTAIN on new tables, UPDATE on new sequences) | None; new objects carry explicit grants |
-| G | EXECUTE on SECURITY DEFINER functions no client calls; anon EXECUTE on `run_daily_drip` / `claim_starter_package` | None found (cron, triggers and the MCP server run as owner or service_role) |
+| B | INSERT/UPDATE/DELETE on the class (d) tables from authenticated; all from anon. This makes the local-first boundary a grant rather than a flag row. | Local-first-off legacy mode only: AnswerEditor upsert, the extension userscript, MCP `hub_save_answer` / `hub_save_answer_review`, user-client writes in `api/answers/capture`, `api/applications/[id]/fill`, `api/draft`, `api/hub/ingest`, `api/import/paste`, `api/applications/intake`. All of these are already refused while local-first is on. Re-enabling legacy mode would need a re-grant migration. In the harness, p0 P-4d/P-4e/P-4f turn into 42501 (legacy-mode writes). **In 062.** |
+| B2 | answer_stress_tests writes from authenticated | MCP 1.x `hub_stress_test_answer` persistence (userClient) breaks; 2.0 removed the tool. **In 062** (after GB1, 2026-10-24). |
+| C | anon on classes (b), (c), (e). anon keeps SELECT where a policy depends on it. | None found. A future public-profile page would need anon SELECT on `user_profiles`. Also makes p0 SIG-1 (anon UPDATE programs, reachable only via the program_signals trigger) 42501. **In 062.** |
+| D | authenticated on server-only tables; `_deploy_flags` writes | None found (edge functions use service_role). **In 062.** |
+| E | Client writes that no RLS policy allows; view writes; extra sequence privileges | Proposed: `community_messages` DELETE from a silent no-op to 42501. **In 062 with E1:** DELETE kept, `cm_sender_delete` policy added, so the sender-only route now deletes (and returns 404 when nothing was deleted). |
+| F | Residual default privileges (TRUNCATE/REFERENCES/TRIGGER/MAINTAIN on new tables, UPDATE on new sequences) | None; new objects carry explicit grants. **In 062.** |
+| G | EXECUTE on SECURITY DEFINER functions no client calls; anon EXECUTE on `run_daily_drip` / `claim_starter_package` | None found. **Already done by 061** (section 8); not in 062. |
 
 ## 7. Harness results
 

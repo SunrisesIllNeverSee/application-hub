@@ -288,12 +288,20 @@ SELECT p0r.call('RB-TRG-contribution', 'service_role import_queue accept: award_
   $q$WITH u AS (UPDATE import_queue SET status = 'accepted' WHERE id = '00000000-0000-0000-0000-00000000d061' RETURNING 1) SELECT count(*)::text FROM u$q$,
   format($q$SELECT current_setting('p0.last') || ' contributions=' || (SELECT count(*) FROM user_contributions WHERE user_id = %L)$q$, :'a1'),
   format($q$INSERT INTO import_queue (id, submitted_by) VALUES ('00000000-0000-0000-0000-00000000d061', %L)$q$, :'a1'));
-SELECT p0r.call('RB-TRG-answer', 'authenticated first profile_answers insert: award_answer_credits fires (local_first_active policy)', 'ok:1 credit=1',
+-- 062 B revoked authenticated INSERT on profile_answers (the local-first
+-- backstop no longer depends on the flag row), so the trigger is exercised
+-- through service_role, and authenticated is refused whatever the flag says.
+SELECT p0r.call('RB-TRG-answer-auth', 'local_first off: authenticated profile_answers insert refused by grant (062 B)', 'error:42501 permission denied for table profile_answers',
   'authenticator', 'authenticated', p0r.jwt('authenticated', :'a1'),
+  format($q$WITH i AS (INSERT INTO profile_answers (user_id, archived_question_id) VALUES (%L, (SELECT min(id::text)::uuid FROM archived_questions)) RETURNING 1) SELECT count(*)::text FROM i$q$, :'a1'),
+  $q$SELECT current_setting('p0.last') || ' ' || current_setting('p0r.msg')$q$,
+  format($q$DELETE FROM profile_answers WHERE user_id = %L$q$, :'a1'));
+SELECT p0r.call('RB-TRG-answer', 'service_role first profile_answers insert: award_answer_credits fires', 'ok:1 credit=1',
+  'authenticator', 'service_role', p0r.jwt('service_role'),
   format($q$WITH i AS (INSERT INTO profile_answers (user_id, archived_question_id) VALUES (%L, (SELECT min(id::text)::uuid FROM archived_questions)) RETURNING 1) SELECT count(*)::text FROM i$q$, :'a1'),
   format($q$SELECT current_setting('p0.last') || ' credit=' || (SELECT count(*) FROM credit_events WHERE user_id = %L AND event_type = 'answer_first')$q$, :'a1'),
   format($q$DELETE FROM profile_answers WHERE user_id = %L$q$, :'a1'));
-SELECT p0r.call('RB-TRG-localfirst', 'local_first on: authenticated profile_answers insert refused by the 051 policy', 'error:42501 new row violates row-level security policy "local_first_deny_insert" for table "profile_answers"',
+SELECT p0r.call('RB-TRG-localfirst', 'local_first on: authenticated profile_answers insert refused (062 B grant first; the 051 policy is the second layer)', 'error:42501 permission denied for table profile_answers',
   'authenticator', 'authenticated', p0r.jwt('authenticated', :'a1'),
   format($q$WITH i AS (INSERT INTO profile_answers (user_id, archived_question_id) VALUES (%L, (SELECT min(id::text)::uuid FROM archived_questions)) RETURNING 1) SELECT count(*)::text FROM i$q$, :'a1'),
   $q$SELECT current_setting('p0.last') || ' ' || current_setting('p0r.msg')$q$,

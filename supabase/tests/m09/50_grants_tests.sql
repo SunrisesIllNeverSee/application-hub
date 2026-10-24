@@ -7,8 +7,8 @@
 --
 -- For every table, view and sequence in public, and for each API role:
 --   GR-<rel>-<role>-<p>  the EFFECTIVE privilege equals the current
---                        baseline (production 2026-10-22, or 058's own
---                        grants for objects 058 adds). FAIL = drift: a
+--                        baseline (the 059 production baseline tightened
+--                        by 062, or 058's own grants for objects 058 adds). FAIL = drift: a
 --                        missing grant (42501 for a route) or a new grant.
 --   Tables are probed by running EXPLAIN <statement> as the role
 --   (ExecutorStart performs the privilege check; nothing executes):
@@ -20,8 +20,9 @@
 -- docs/DATA-API-GRANTS.md and every difference is recorded in
 -- p0g.findings as KNOWN-EXCESSIVE (granted, class does not need it) or
 -- MISSING (class needs it, not granted). Findings are reported, not
--- failures; the proposed revokes are in
--- supabase/migrations/proposed/060_tighten_data_api_grants.sql.
+-- failures. After 062 no finding is expected (0 excessive, 0 missing); GR-NONCRUD
+-- fails if any client role holds TRUNCATE/REFERENCES/TRIGGER/MAINTAIN.
+-- GR-E1-* exercise the 062 community_messages sender delete policy.
 -- Structural checks: GR-COVER (every relation classified), GR-POLDEP
 -- (RLS policy subquery dependencies, actual and ideal), GR-RLS (RLS on
 -- every table), GR-DEFACL (059 default privileges), GR-RLS-1.
@@ -35,92 +36,94 @@ CREATE TABLE p0g.expect (
   note text
 );
 -- letters: tables/views a=INSERT r=SELECT w=UPDATE d=DELETE; sequences
--- r=SELECT w=UPDATE U=USAGE; '-' none. Base = CRUD part of production.
+-- r=SELECT w=UPDATE U=USAGE; '-' none. Base = the CRUD grants after 062
+-- (production 2026-10-22 = 059 baseline, tightened by 062). Every base
+-- now equals its class ideal.
 INSERT INTO p0g.expect VALUES
 -- (a) public catalog / reference: anon+auth SELECT, service CRUD
- ('programs','r','a','arwd','arwd','arwd','r','arw','arwd','auth: user-owned community programs (insert/owner update); no delete policy'),
- ('program_questions','r','a','arwd','arwd','arwd','r','arw','arwd','auth: intake links, owner relationship edits'),
- ('archived_questions','r','a','arwd','arwd','arwd','r','arw','arwd','auth: intake inserts, embedding update'),
- ('program_cycles','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('program_dna','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('program_stats','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('funders','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('subscription_plans','r','a','arwd','arwd','arwd','r','r','arwd','read by increment_ai_usage trigger'),
- ('beta_settings','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('starter_packages','r','a','arwd','arwd','arwd','r','r','arwd','written only via SECURITY DEFINER claim_starter_package'),
- ('aggregate_versions','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('canonical_commitments','r','a','arwd','arwd','arwd','r','r','arwd',NULL),
- ('lineage_events','r','a','arwd','arwd','arwd','r','r','arwd','public select of canonical lineage only (RLS)'),
- ('program_listings','r','a','arwd','arwd','arwd','r','r','arwd','funder write policies exist; no code path'),
- ('seeding_entities','r','a','arwd','arwd','arwd','r','r','arwd','owner write policies exist; no code path'),
- ('opportunities','v','a','arwd','arwd','arwd','r','r','r','security_invoker view'),
- ('program_next_cycle','v','a','arwd','arwd','arwd','r','r','r','security_invoker view'),
+ ('programs','r','a','r','arw','arwd','r','arw','arwd','auth: user-owned community programs (insert/owner update); no delete policy'),
+ ('program_questions','r','a','r','arw','arwd','r','arw','arwd','auth: intake links, owner relationship edits'),
+ ('archived_questions','r','a','r','arw','arwd','r','arw','arwd','auth: intake inserts, embedding update'),
+ ('program_cycles','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('program_dna','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('program_stats','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('funders','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('subscription_plans','r','a','r','r','arwd','r','r','arwd','read by increment_ai_usage trigger'),
+ ('beta_settings','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('starter_packages','r','a','r','r','arwd','r','r','arwd','written only via SECURITY DEFINER claim_starter_package'),
+ ('aggregate_versions','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('canonical_commitments','r','a','r','r','arwd','r','r','arwd',NULL),
+ ('lineage_events','r','a','r','r','arwd','r','r','arwd','public select of canonical lineage only (RLS)'),
+ ('program_listings','r','a','r','r','arwd','r','r','arwd','funder write policies exist; no code path'),
+ ('seeding_entities','r','a','r','r','arwd','r','r','arwd','owner write policies exist; no code path'),
+ ('opportunities','v','a','r','r','r','r','r','r','security_invoker view'),
+ ('program_next_cycle','v','a','r','r','r','r','r','r','security_invoker view'),
  ('catalog_entities','r','a','r','r','arwd','r','r','arwd','058'),
  ('catalog_serials','r','a','r','r','arwd','r','r','arwd','058'),
  ('catalog_sources','r','a','-','-','arwd','-','-','arwd','058: column-level SELECT for anon/auth'),
  ('program_template_revisions','r','a','-','-','arwd','-','-','arwd','058: column-level SELECT for anon/auth'),
  ('question_mapping_decisions','r','a','-','-','arwd','-','-','arwd','058: column-level SELECT for anon/auth'),
 -- (b) user-owned Data API tables: authenticated only, RLS-scoped
- ('user_profiles','r','b','arwd','arwd','arwd','-','arw','arwd','anon: public-profile RLS policy but no anon code path'),
- ('user_applications','r','b','arwd','arwd','arwd','r','arwd','arwd','anon SELECT: referenced by the programs/program_questions/archived_questions/program_dna/program_stats read policies (policies run as the caller)'),
- ('user_integrations','r','b','arwd','arwd','arwd','-','arwd','arwd',NULL),
- ('user_question_unlocks','r','b','arwd','arwd','arwd','-','ar','arwd',NULL),
- ('user_subscriptions','r','b','arwd','arwd','arwd','-','r','arwd',NULL),
- ('user_program_fit','r','b','arwd','arwd','arwd','-','r','arwd',NULL),
- ('user_achievements','r','b','arwd','arwd','arwd','-','r','arwd',NULL),
- ('user_contributions','r','b','arwd','arwd','arwd','-','r','arwd','read through user_contribution_summary'),
- ('user_starter_claims','r','b','arwd','arwd','arwd','-','r','arwd','claims via SECURITY DEFINER rpc'),
- ('credit_events','r','b','arwd','arwd','arwd','-','r','arwd','read through user_credit_balance'),
- ('contribution_rewards','r','b','arwd','arwd','arwd','-','r','arwd',NULL),
- ('canonical_user_credits','r','b','arwd','arwd','arwd','-','r','arwd',NULL),
- ('reward_credit_receipts','r','b','arwd','arwd','arwd','-','r','arwd',NULL),
- ('ai_usage','r','b','arwd','arwd','arwd','-','arw','arwd','auth insert/update via increment_ai_usage trigger'),
- ('community_messages','r','b','arwd','arwd','arwd','-','arw','arwd','no delete policy'),
- ('import_queue','r','b','arwd','arwd','arwd','-','ar','arwd',NULL),
- ('deadline_alerts','r','b','arwd','arwd','arwd','-','r','arwd','written by the service cron'),
- ('acceptance_reports','r','b','arwd','arwd','arwd','-','ar','arwd',NULL),
- ('intake_entities','r','b','arwd','arwd','arwd','-','arw','arwd',NULL),
- ('intake_applications','r','b','arwd','arwd','arwd','-','arw','arwd',NULL),
- ('intake_questions','r','b','arwd','arwd','arwd','-','arw','arwd',NULL),
- ('intake_application_layers','r','b','arwd','arwd','arwd','-','arw','arwd',NULL),
- ('intake_events','r','b','arwd','arwd','arwd','-','ar','arwd',NULL),
- ('intake_gate_reviews','r','b','arwd','arwd','arwd','-','ar','arwd',NULL),
- ('user_contribution_summary','v','b','arwd','arwd','arwd','-','r','r','security_invoker view'),
- ('user_credit_balance','v','b','arwd','arwd','arwd','-','r','r','security_invoker view'),
+ ('user_profiles','r','b','-','arw','arwd','-','arw','arwd','anon: public-profile RLS policy but no anon code path'),
+ ('user_applications','r','b','r','arwd','arwd','r','arwd','arwd','anon SELECT: referenced by the programs/program_questions/archived_questions/program_dna/program_stats read policies (policies run as the caller)'),
+ ('user_integrations','r','b','-','arwd','arwd','-','arwd','arwd',NULL),
+ ('user_question_unlocks','r','b','-','ar','arwd','-','ar','arwd',NULL),
+ ('user_subscriptions','r','b','-','r','arwd','-','r','arwd',NULL),
+ ('user_program_fit','r','b','-','r','arwd','-','r','arwd',NULL),
+ ('user_achievements','r','b','-','r','arwd','-','r','arwd',NULL),
+ ('user_contributions','r','b','-','r','arwd','-','r','arwd','read through user_contribution_summary'),
+ ('user_starter_claims','r','b','-','r','arwd','-','r','arwd','claims via SECURITY DEFINER rpc'),
+ ('credit_events','r','b','-','r','arwd','-','r','arwd','read through user_credit_balance'),
+ ('contribution_rewards','r','b','-','r','arwd','-','r','arwd',NULL),
+ ('canonical_user_credits','r','b','-','r','arwd','-','r','arwd',NULL),
+ ('reward_credit_receipts','r','b','-','r','arwd','-','r','arwd',NULL),
+ ('ai_usage','r','b','-','arw','arwd','-','arw','arwd','auth insert/update via increment_ai_usage trigger'),
+ ('community_messages','r','b','-','arwd','arwd','-','arwd','arwd','E1 (OWNER 2026-10-24): sender delete policy cm_sender_delete (062)'),
+ ('import_queue','r','b','-','ar','arwd','-','ar','arwd',NULL),
+ ('deadline_alerts','r','b','-','r','arwd','-','r','arwd','written by the service cron'),
+ ('acceptance_reports','r','b','-','ar','arwd','-','ar','arwd',NULL),
+ ('intake_entities','r','b','-','arw','arwd','-','arw','arwd',NULL),
+ ('intake_applications','r','b','-','arw','arwd','-','arw','arwd',NULL),
+ ('intake_questions','r','b','-','arw','arwd','-','arw','arwd',NULL),
+ ('intake_application_layers','r','b','-','arw','arwd','-','arw','arwd',NULL),
+ ('intake_events','r','b','-','ar','arwd','-','ar','arwd',NULL),
+ ('intake_gate_reviews','r','b','-','ar','arwd','-','ar','arwd',NULL),
+ ('user_contribution_summary','v','b','-','r','r','-','r','r','security_invoker view'),
+ ('user_credit_balance','v','b','-','r','r','-','r','r','security_invoker view'),
  ('catalog_candidates','r','b','-','r','arwd','-','r','arwd','058: submitter reads own'),
  ('catalog_curators','r','b','-','r','arwd','-','r','arwd','058: curator reads own row'),
  ('catalog_candidate_events','r','b','-','-','arwd','-','-','arwd','058: column-level SELECT for auth'),
- ('intake_applications_ref_seq_seq','S','b','rwU','rwU','rwU','-','U','rwU','047 BIGSERIAL; auth inserts need USAGE'),
- ('intake_entities_ref_seq_seq','S','b','rwU','rwU','rwU','-','U','rwU',NULL),
- ('intake_questions_ref_seq_seq','S','b','rwU','rwU','rwU','-','U','rwU',NULL),
- ('intake_submissions_ref_seq_seq','S','b','rwU','rwU','rwU','-','U','rwU',NULL),
+ ('intake_applications_ref_seq_seq','S','b','-','U','rwU','-','U','rwU','047 BIGSERIAL; auth inserts need USAGE'),
+ ('intake_entities_ref_seq_seq','S','b','-','U','rwU','-','U','rwU',NULL),
+ ('intake_questions_ref_seq_seq','S','b','-','U','rwU','-','U','rwU',NULL),
+ ('intake_submissions_ref_seq_seq','S','b','-','U','rwU','-','U','rwU',NULL),
  ('catalog_serial_en_seq','S','c','-','-','rU','-','-','rU','058'),
  ('catalog_serial_ap_seq','S','c','-','-','rU','-','-','rU','058'),
  ('catalog_serial_qu_seq','S','c','-','-','rU','-','-','rU','058'),
  ('catalog_serial_aq_seq','S','c','-','-','rU','-','-','rU','058'),
  ('catalog_candidate_events_id_seq','S','c','-','-','rU','-','-','rU','058 identity'),
 -- (c) server-only / internal: service_role only
- ('_deploy_flags','r','c','arwd','arwd','arwd','-','r','arwd','051 local-first flag; auth read policy by design'),
- ('recruiter_alerts','r','c','arwd','arwd','arwd','-','-','arwd',NULL),
- ('stripe_events','r','c','arwd','arwd','arwd','-','-','arwd',NULL),
- ('answer_variants','r','c','arwd','arwd','arwd','r','r','arwd','edge functions (service role) only; anon/auth SELECT: referenced by the lineage_events read policy'),
- ('application_packages','r','c','arwd','arwd','arwd','r','r','arwd','edge functions (service role) only; anon/auth SELECT: referenced by the lineage_events read policy'),
- ('connected_integrations','r','c','arwd','arwd','arwd','-','-','arwd','no code path'),
- ('program_signals','r','c','arwd','arwd','arwd','-','-','arwd','anon INSERT policy WITH CHECK (true); no code path'),
+ ('_deploy_flags','r','c','-','r','arwd','-','r','arwd','051 local-first flag; auth read policy by design'),
+ ('recruiter_alerts','r','c','-','-','arwd','-','-','arwd',NULL),
+ ('stripe_events','r','c','-','-','arwd','-','-','arwd',NULL),
+ ('answer_variants','r','c','r','r','arwd','r','r','arwd','edge functions (service role) only; anon/auth SELECT: referenced by the lineage_events read policy'),
+ ('application_packages','r','c','r','r','arwd','r','r','arwd','edge functions (service role) only; anon/auth SELECT: referenced by the lineage_events read policy'),
+ ('connected_integrations','r','c','-','-','arwd','-','-','arwd','no code path'),
+ ('program_signals','r','c','-','-','arwd','-','-','arwd','anon INSERT policy WITH CHECK (true); no code path'),
 -- (d) legacy private-answer tables (local-first-off legacy mode)
- ('profile_answers','r','d','arwd','arwd','arwd','-','r','arwd','legacy mode writes; 051 RLS denies while local_first=1'),
- ('profile_answer_history','r','d','arwd','arwd','arwd','-','r','arwd',NULL),
- ('answer_reviews','r','d','arwd','arwd','arwd','-','r','arwd',NULL),
- ('application_answers','r','d','arwd','arwd','arwd','-','r','arwd',NULL),
- ('ai_draft_runs','r','d','arwd','arwd','arwd','-','r','arwd',NULL),
- ('intake_submissions','r','d','arwd','arwd','arwd','-','r','arwd','raw pasted application text'),
- ('app_import_sessions','r','d','arwd','arwd','arwd','-','r','arwd','not covered by 051 deny policies'),
- ('answer_stress_tests','r','d','arwd','arwd','arwd','-','r','arwd','not covered by 051; MCP stress test inserts as authenticated'),
+ ('profile_answers','r','d','-','r','arwd','-','r','arwd','legacy mode writes; 051 RLS denies while local_first=1'),
+ ('profile_answer_history','r','d','-','r','arwd','-','r','arwd',NULL),
+ ('answer_reviews','r','d','-','r','arwd','-','r','arwd',NULL),
+ ('application_answers','r','d','-','r','arwd','-','r','arwd',NULL),
+ ('ai_draft_runs','r','d','-','r','arwd','-','r','arwd',NULL),
+ ('intake_submissions','r','d','-','r','arwd','-','r','arwd','raw pasted application text'),
+ ('app_import_sessions','r','d','-','r','arwd','-','r','arwd','not covered by 051 deny policies'),
+ ('answer_stress_tests','r','d','-','r','arwd','-','r','arwd','062 B2 (after GB1): only the deprecated 1.x hub_stress_test_answer wrote it as authenticated'),
 -- (e) teams: deferred, client writes locked by 056/057
- ('teams','r','e','r','r','arwd','-','r','arwd','056/057'),
- ('team_members','r','e','r','r','arwd','-','r','arwd','056/057'),
- ('team_invites','r','e','r','r','arwd','-','r','arwd','056/057; accept via SECURITY DEFINER rpc'),
- ('team_answers','r','e','r','r','arwd','-','r','arwd','056/057');
+ ('teams','r','e','-','r','arwd','-','r','arwd','056/057'),
+ ('team_members','r','e','-','r','arwd','-','r','arwd','056/057'),
+ ('team_invites','r','e','-','r','arwd','-','r','arwd','056/057; accept via SECURITY DEFINER rpc'),
+ ('team_answers','r','e','-','r','arwd','-','r','arwd','056/057');
 
 DROP TABLE IF EXISTS p0g.probe_fallbacks;
 CREATE TABLE p0g.probe_fallbacks (role text, relname text, priv text, sqlstate text, message text);
@@ -280,10 +283,11 @@ SELECT p0g.record('GR-RLS', 'tables in public without row level security', 'post
   coalesce((SELECT string_agg(c.relname, ',' ORDER BY c.relname) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
              WHERE n.nspname = 'public' AND c.relkind IN ('r','p') AND NOT c.relrowsecurity), '<none>'));
 
--- The full-chain P-4f 42501 is RLS, not a grant: authenticated holds INSERT
--- on profile_answer_history; the table simply has no INSERT policy.
-SELECT p0g.record('GR-RLS-1', 'authenticated INSERT grant on profile_answer_history (P-4f is RLS)', 'authenticated',
-  'granted', CASE WHEN has_table_privilege('authenticated', 'public.profile_answer_history', 'INSERT') THEN 'granted' ELSE 'denied' END);
+-- Before 062 the full-chain P-4f 42501 was RLS (no INSERT policy on
+-- profile_answer_history while authenticated held the grant). 062 section B
+-- revokes the grant itself, so the refusal no longer depends on a policy.
+SELECT p0g.record('GR-RLS-1', 'authenticated INSERT grant on profile_answer_history revoked (062 B; was RLS-only)', 'authenticated',
+  'denied', CASE WHEN has_table_privilege('authenticated', 'public.profile_answer_history', 'INSERT') THEN 'granted' ELSE 'denied' END);
 
 -- 059 section 4: postgres' default privileges in public match the new
 -- Supabase default (no SELECT/INSERT/UPDATE/DELETE on tables, no
@@ -296,6 +300,35 @@ SELECT p0g.record('GR-DEFACL-' || t, 'default privileges for new ' || t || ' in 
                AND a.privilege_type = ANY (CASE o WHEN 'r' THEN ARRAY['SELECT','INSERT','UPDATE','DELETE']
                                                    ELSE ARRAY['USAGE','SELECT'] END)), 'none'))
 FROM (VALUES ('tables','r'::"char"),('sequences','S'::"char")) v(t, o);
+
+-- 062 section A: no client role holds a non-CRUD table privilege.
+SELECT p0g.record('GR-NONCRUD', 'relations where anon/authenticated hold TRUNCATE/REFERENCES/TRIGGER/MAINTAIN (062 A)', 'postgres', '<none>',
+  coalesce((SELECT string_agg(DISTINCT relname, ',' ORDER BY relname) FROM p0g.findings
+             WHERE finding = 'KNOWN-EXCESSIVE-NONCRUD'), '<none>'));
+
+-- 062 E1: authors may delete their own community messages, nobody else can.
+-- a1 sends to a2; a2 replies to it. Each probe runs in its own rolled-back
+-- sub-transaction (p0.test), so the setup is repeated.
+\set cm_setup 'INSERT INTO public.community_messages (id, from_user_id, to_user_id, subject, body) VALUES (''e1000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-0000000000a1'', ''00000000-0000-0000-0000-0000000000a2'', ''hi'', ''from a1''), (''e1000000-0000-0000-0000-000000000002'', ''00000000-0000-0000-0000-0000000000a2'', ''00000000-0000-0000-0000-0000000000a1'', ''re: hi'', ''reply from a2'')'
+SELECT p0.test('GR-E1-sender', 'a1 deletes own message: deleted', 'EFFECT', 'EFFECT', 'authenticated',
+  '00000000-0000-0000-0000-0000000000a1',
+  $q$DELETE FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000001'$q$,
+  $q$SELECT p0.effect(current_setting('p0.last') = 'rows=1' AND NOT EXISTS (SELECT 1 FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000001'))$q$,
+  'dml', NULL, :'cm_setup');
+SELECT p0.test('GR-E1-reply-kept', 'a1 deletes a message a2 replied to: the reply stays, parent_id becomes NULL', 'EFFECT', 'EFFECT', 'authenticated',
+  '00000000-0000-0000-0000-0000000000a1',
+  $q$DELETE FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000001'$q$,
+  $q$SELECT p0.effect(EXISTS (SELECT 1 FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000002' AND parent_id IS NULL))$q$,
+  'dml', NULL, :'cm_setup' || '; UPDATE public.community_messages SET parent_id = ''e1000000-0000-0000-0000-000000000001'' WHERE id = ''e1000000-0000-0000-0000-000000000002''');
+SELECT p0.test('GR-E1-recipient', 'a2 (recipient) deletes a1''s message: nothing deleted', 'NOEFFECT', 'NOEFFECT', 'authenticated',
+  '00000000-0000-0000-0000-0000000000a2',
+  $q$DELETE FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000001'$q$,
+  $q$SELECT p0.effect(current_setting('p0.last') <> 'rows=0' OR NOT EXISTS (SELECT 1 FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000001'))$q$,
+  'dml', NULL, :'cm_setup');
+SELECT p0.test('GR-E1-anon', 'anon deletes a message: 42501', 'error:42501', 'error:42501', 'anon', NULL,
+  $q$DELETE FROM public.community_messages WHERE id = 'e1000000-0000-0000-0000-000000000001'$q$,
+  $q$SELECT current_setting('p0.last')$q$,
+  'dml', NULL, :'cm_setup');
 
 -- report
 DO $rep$

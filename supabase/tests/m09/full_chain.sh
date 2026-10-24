@@ -6,24 +6,26 @@
 # connects to Supabase. Expects from run_local.sh: HERE P0 MIG M058 PGROOT
 # DB, psql_q, notices, banner, a running cluster and PG* env.
 #
-#   1. Build $DB from every migration (001 -> 061) in ledger order on a
+#   1. Build $DB from every migration (001 -> 062) in ledger order on a
 #      fresh database, with the default privileges of GRANTS_MODE set
-#      BEFORE 001. 058, 059 and 061 are re-applied (idempotency: grants
-#      must not change).
+#      BEFORE 001. 058, 059, 061 and 062 are re-applied (idempotency:
+#      grants must not change). The grants right after 061 are kept as
+#      the 'at061' snapshot (= production before 062).
 #   2. Build two reference databases with the other default-privilege
 #      settings (default / revoked / strict = every table+sequence default
 #      revoked) and require identical effective grants on every relation:
 #      a fresh rebuild must not depend on default privileges.
-#   3. Require the rebuild to equal the production grants snapshot
+#   3. Require the at061 snapshot to equal the production grants snapshot
 #      (fixtures/production_grants_2026-10-22.psv) for every relation that
-#      existed in production at capture time.
+#      existed in production at capture time. 062 is the change on top.
 #   4. Seed (p0 02/03), then the p0 suites, the 058 suite, the 50 grants
-#      suite, the 60 RPC caller-binding suite (061), and the 058 and 061
-#      documented rollbacks + re-apply.
+#      suite, the 60 RPC caller-binding suite (061), and the 058, 061 and
+#      062 documented rollbacks + re-apply.
 # ============================================================
 
 M059="$(ls "$MIG"/*_059_explicit_data_api_grants.sql)"
 M061="$(ls "$MIG"/*_061_bind_user_rpcs_to_caller.sql)"
+M062="$(ls "$MIG"/*_062_tighten_data_api_grants.sql)"
 # pg_proc.prosrc md5 of the functions whose body 061 replaces, in production
 # before 061 (read-only, 2026-10-22); the 061 rollback must restore exactly these.
 PROD_RPC_MD5='claim_starter_package=772df476cc9acf14618b2d63ed0449ca compute_user_fit_scores=58bcf20519bb27382d351066878e7502 get_top_programs_by_value=8b7b993a0e677549ea6c9f9c0d9f7f79 increment_draft_count=69add660f93dafed6f2433b7a2c728e8 run_daily_drip=452fd804de44497b53c8d53ae15c9d26 seed_signup_questions=310e240efb217c29fd96bd29b01fa666'
@@ -58,10 +60,19 @@ KNOWN_VERBATIM_FAILURES='^(008_intelligence_layer_v2|019_fundingcake_seed|028_so
 # GRANTS_MODE=default). test_id:stmt_outcome
 #   P-3e  002 unique index (program_id, archived_question_id) -> 23505
 #   P-4e  011/0xx sync trigger copies answer_content into content on INSERT
-#   P-4f  snapshot_profile_answer() (SECURITY INVOKER) inserts history as
-#         authenticated; profile_answer_history has no INSERT policy -> RLS
-#         42501 (the role HOLDS the INSERT grant; see 50 suite GR-RLS-1)
-KNOWN_FULL_CHAIN='P-3e:error:23505 P-4e:rows=1 P-4f:error:42501'
+# and the legacy-mode answer writes 062 section B refuses by grant on
+# purpose (local-first custody backstop; the p0 fixture models legacy mode):
+#   P-4d  authenticated INSERT into application_answers -> 42501
+#   P-4e  authenticated upsert into profile_answers -> 42501
+#   P-4f  the second profile_answers upsert -> 42501 (before 062 this was
+#         RLS on profile_answer_history; now the grant refuses first)
+# and one 062 section E refusal:
+#   SIG-1 anon UPDATE programs -> 42501 instead of an RLS-filtered 0 rows.
+#         The only way anon reached that UPDATE was the program_signals
+#         insert trigger (004); C/D revoke client access to program_signals
+#         (no code path uses it), so the trigger now fires for service_role
+#         only and anon needs no UPDATE on programs.
+KNOWN_FULL_CHAIN='P-3e:error:23505 P-4d:error:42501 P-4e:error:42501 P-4f:error:42501 SIG-1:error:42501'
 
 fail() { echo "FULL-CHAIN FAIL: $*"; exit 1; }
 
@@ -105,23 +116,26 @@ build_chain() { # $1 db, $2 mode
   psql -X -q -d postgres -c "DROP DATABASE IF EXISTS $1" -c "CREATE DATABASE $1"
   psql_q -d "$1" -f "$P0/00_bootstrap.sql" -f "$HERE/full_apply_platform_shim.sql" 2>&1 | grep -v NOTICE || true
   set_default_privs "$1" "$2"
-  local f n=0
-  for f in $(ls "$MIG"/*.sql | LC_ALL=C sort); do apply_migration "$1" "$f"; n=$((n+1)); done
   psql_q -d "$1" -f "$HERE/grants_lib.sql" 2>&1 | grep -v NOTICE || true
+  local f n=0
+  for f in $(ls "$MIG"/*.sql | LC_ALL=C sort); do
+    apply_migration "$1" "$f"; n=$((n+1))
+    [ "$f" = "$M061" ] && snapshot "$1" "$1_at061"
+  done
   echo "  $1 ($2 defaults): $n migrations applied"
 }
 
 snapshot() { psql -X -At -d "$1" -c "select line from p0g.snapshot()" > "$OUT/$2.txt"; }
 
-banner "full chain 001 -> 061, GRANTS_MODE=$GRANTS_MODE: $DB"
+banner "full chain 001 -> 062, GRANTS_MODE=$GRANTS_MODE: $DB"
 psql -X -At -d postgres -c "select 'default privileges set before 001: $GRANTS_MODE'"
 build_chain "$DB" "$GRANTS_MODE"
 snapshot "$DB" main
-banner "idempotency: re-apply 058, 059 and 061"
+banner "idempotency: re-apply 058, 059, 061 and 062"
 RPC_FIRST=$(rpc_state)
-psql_q -d "$DB" -f "$M058" -f "$M059" -f "$M061" 2>&1 | grep -v NOTICE || true
+psql_q -d "$DB" -f "$M058" -f "$M059" -f "$M061" -f "$M062" 2>&1 | grep -v NOTICE || true
 snapshot "$DB" main_reapplied
-diff "$OUT/main.txt" "$OUT/main_reapplied.txt" || fail "re-applying 058/059/061 changed grants"
+diff "$OUT/main.txt" "$OUT/main_reapplied.txt" || fail "re-applying 058/059/061/062 changed grants"
 [ "$(rpc_state)" = "$RPC_FIRST" ] || fail "re-applying 061 changed the RPC definitions or EXECUTE grants"
 echo "re-apply 061: RPC security/search_path/EXECUTE unchanged"
 echo "re-apply: grants unchanged ($(wc -l < "$OUT/main.txt" | tr -d ' ') relation/column ACL lines)"
@@ -139,14 +153,17 @@ for m in default revoked strict; do
   psql -X -q -d postgres -c "DROP DATABASE m09ref_$m"
 done
 
-banner "fresh rebuild equals production (snapshot 2026-10-22)"
+banner "rebuild through 061 equals production (snapshot 2026-10-22)"
 grep -v '^#' "$FIXTURE" | grep -v '|OUT_OF_REPO$' | LC_ALL=C sort > "$OUT/prod.txt"
-grep -v -E "$NEW_058" "$OUT/main.txt" | LC_ALL=C sort > "$OUT/main_prod_scope.txt"
+grep -v -E "$NEW_058" "$OUT/${DB}_at061.txt" | LC_ALL=C sort > "$OUT/main_prod_scope.txt"
 if diff "$OUT/prod.txt" "$OUT/main_prod_scope.txt"; then
-  echo "EQUAL: rebuild == production for $(wc -l < "$OUT/prod.txt" | tr -d ' ') in-repo relations; out-of-repo (not rebuilt): $(grep -c '|OUT_OF_REPO$' "$FIXTURE")"
+  echo "EQUAL: rebuild through 061 == production for $(wc -l < "$OUT/prod.txt" | tr -d ' ') in-repo relations; out-of-repo (not rebuilt): $(grep -c '|OUT_OF_REPO$' "$FIXTURE")"
 else
-  fail "rebuild differs from the production grants snapshot"
+  fail "rebuild through 061 differs from the production grants snapshot"
 fi
+echo "062 changes on top of production: $(diff "$OUT/${DB}_at061.txt" "$OUT/main.txt" | grep -c '^>') relation/column ACL lines"
+grep -v -E "$NEW_058" "$OUT/main.txt" | grep -v '^COL|' | grep -E '[| ](anon|authenticated)=[^ ]*[Dxtm]' \
+  && fail "062: a client role still holds TRUNCATE/REFERENCES/TRIGGER/MAINTAIN" || echo "062 A: no client non-CRUD privileges"
 echo "objects added by 058 (not in production yet): $(grep -E "$NEW_058" "$OUT/main.txt" | grep -vc '^COL|') relations, $(grep -E "$NEW_058" "$OUT/main.txt" | grep -c '^COL|') column ACLs"
 
 banner "seed + harness (p0 02/03)"
@@ -215,6 +232,21 @@ fi
 psql_q -f "$M061" 2>&1 | grep -v NOTICE || true
 [ "$(rpc_state)" = "$RPC_FIRST" ] || fail "061 re-apply after rollback differs from the first apply"
 echo "ROLLBACK PASS (061: replaced bodies md5 == production, security/search_path/EXECUTE == production; re-apply identical to first apply)"
+
+banner "rollback: the 062 documented ROLLBACK block + 059, then re-apply"
+sed -n '/^-- ROLLBACK/,/^--   COMMIT;/p' "$M062" | sed -n '/^--   BEGIN;/,/^--   COMMIT;/p' \
+  | sed -E 's/^--   //' > "$PGROOT/rollback062.sql"
+psql_q -f "$PGROOT/rollback062.sql" -f "$M059" 2>&1 | grep -v -E '^$|NOTICE|WARNING:  there is (no|already a) transaction' || true
+snapshot "$DB" after_rollback062
+diff "$OUT/${DB}_at061.txt" "$OUT/after_rollback062.txt" || fail "062 rollback does not restore the 061 grants"
+[ "$(psql -X -At -c "select count(*) from pg_policies where tablename='community_messages' and policyname='cm_sender_delete'")" = 0 ] \
+  || fail "062 rollback left cm_sender_delete"
+psql_q -f "$M062" 2>&1 | grep -v NOTICE || true
+snapshot "$DB" after_reapply062
+diff "$OUT/main.txt" "$OUT/after_reapply062.txt" || fail "062 re-apply after rollback differs from the first apply"
+[ "$(psql -X -At -c "select count(*) from pg_policies where tablename='community_messages' and policyname='cm_sender_delete'")" = 1 ] \
+  || fail "062 re-apply did not create cm_sender_delete"
+echo "ROLLBACK PASS (062: rollback + 059 == 061 grants, policy removed; re-apply identical to first apply)"
 
 banner "summary (GRANTS_MODE=$GRANTS_MODE)"
 psql -X -c "select case when test_id like 'CP-%' then '058 suite' when test_id like 'GR-%' then '50 grants suite' when test_id like 'RB-%' then '60 rpc binding suite' else 'p0 suites' end as suite,
