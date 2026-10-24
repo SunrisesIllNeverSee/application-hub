@@ -36,6 +36,7 @@ P0="$(cd "$HERE/../p0" && pwd)"
 REPO="$(cd "$HERE/../../.." && pwd)"
 MIG="$REPO/supabase/migrations"
 M058="$(ls "$MIG"/*_058_catalog_provenance_promotion.sql)"
+M063="$(ls "$MIG"/*_063_catalog_publish_cycle_only.sql)"
 PGROOT="${M09_PGROOT:-$(mktemp -d)}"
 PGDATA="$PGROOT/data"
 PGPORT="${M09_PGPORT:-54331}"
@@ -92,6 +93,8 @@ banner "002 unique index present (production shape per 002) -> re-apply 058 (ind
 psql_q -c "CREATE UNIQUE INDEX IF NOT EXISTS idx_program_questions_unique ON program_questions (program_id, archived_question_id)"
 psql_q -f "$M058"
 psql -X -At -c "select 'indexes: '||string_agg(indexname, ', ' order by indexname) from pg_indexes where tablename='program_questions'"
+# 063 replaces catalog_publish_candidate (cycle-only publish); re-applying 058 above restored the 058 body
+psql_q -f "$M063"
 
 banner "058 catalog provenance + promotion suite"
 psql_q -t -A -o /dev/null -c "select set_config('p0.phase','post',false)" -f "$HERE/40_catalog_promotion_tests.sql" 2>&1 | notices

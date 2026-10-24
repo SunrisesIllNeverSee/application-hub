@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Build the self-hosted install tarball the site serves (M09b B1.2) until
-// aqua-companion is published to npm (owner gate GB2).
+// Build the self-hosted install tarball the site serves (M09b B1.2). Kept in
+// sync with the npm package: aqua-companion is published on npm since 0.2.4
+// (owner gate GB2 done), and the served tarball must match the source.
 //
 //   node aqua-companion/scripts/pack-site.mjs           npm pack -> app/public/companion/
 //   node aqua-companion/scripts/pack-site.mjs --check   rebuild in a temp folder and compare (CI); exit 1 on drift
@@ -56,7 +57,7 @@ try {
     sha256: digest,
     sha256_url: `${url}.sha256`,
     install: `npx --yes ${url} --help`,
-    note: 'Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; aqua-companion is not published on npm by itself (owner gate GB2); aqua-mcp-server on npm includes it, and is the primary install.',
+    note: 'Self-hosted npm pack tarball of aqua-companion. Verify the sha256 before running it; aqua-companion is also on npm, and aqua-mcp-server on npm includes it — the npm package is the primary install.',
   }
   for (const f of built.files) if (/(^|\/)(test|\.env)/.test(f)) throw new Error(`refusing to ship ${f}`)
   if (check) {

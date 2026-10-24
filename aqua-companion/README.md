@@ -20,8 +20,8 @@ sends nothing from your workspace.
 
 ## Install
 
-`aqua-companion` is not published on npm by itself (owner gate GB2); `aqua-mcp-server`
-on npm includes it. The site also serves a versioned `npm pack` tarball with its sha256 (the fallback install):
+`aqua-companion` is published on npm, and `aqua-mcp-server` on npm includes it
+(the primary install). The site also serves a versioned `npm pack` tarball with its sha256 (the fallback install):
 
 ```sh
 curl -fsSL https://aquaidp.xyz/companion/latest.json          # { version, url, sha256 }

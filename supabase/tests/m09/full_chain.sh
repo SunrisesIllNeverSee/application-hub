@@ -26,6 +26,7 @@
 M059="$(ls "$MIG"/*_059_explicit_data_api_grants.sql)"
 M061="$(ls "$MIG"/*_061_bind_user_rpcs_to_caller.sql)"
 M062="$(ls "$MIG"/*_062_tighten_data_api_grants.sql)"
+M063="$(ls "$MIG"/*_063_catalog_publish_cycle_only.sql)"
 # pg_proc.prosrc md5 of the functions whose body 061 replaces, in production
 # before 061 (read-only, 2026-10-22); the 061 rollback must restore exactly these.
 PROD_RPC_MD5='claim_starter_package=772df476cc9acf14618b2d63ed0449ca compute_user_fit_scores=58bcf20519bb27382d351066878e7502 get_top_programs_by_value=8b7b993a0e677549ea6c9f9c0d9f7f79 increment_draft_count=69add660f93dafed6f2433b7a2c728e8 run_daily_drip=452fd804de44497b53c8d53ae15c9d26 seed_signup_questions=310e240efb217c29fd96bd29b01fa666'
@@ -131,11 +132,11 @@ banner "full chain 001 -> 062, GRANTS_MODE=$GRANTS_MODE: $DB"
 psql -X -At -d postgres -c "select 'default privileges set before 001: $GRANTS_MODE'"
 build_chain "$DB" "$GRANTS_MODE"
 snapshot "$DB" main
-banner "idempotency: re-apply 058, 059, 061 and 062"
+banner "idempotency: re-apply 058, 059, 061, 062 and 063"
 RPC_FIRST=$(rpc_state)
-psql_q -d "$DB" -f "$M058" -f "$M059" -f "$M061" -f "$M062" 2>&1 | grep -v NOTICE || true
+psql_q -d "$DB" -f "$M058" -f "$M059" -f "$M061" -f "$M062" -f "$M063" 2>&1 | grep -v NOTICE || true
 snapshot "$DB" main_reapplied
-diff "$OUT/main.txt" "$OUT/main_reapplied.txt" || fail "re-applying 058/059/061/062 changed grants"
+diff "$OUT/main.txt" "$OUT/main_reapplied.txt" || fail "re-applying 058/059/061/062/063 changed grants"
 [ "$(rpc_state)" = "$RPC_FIRST" ] || fail "re-applying 061 changed the RPC definitions or EXECUTE grants"
 echo "re-apply 061: RPC security/search_path/EXECUTE unchanged"
 echo "re-apply: grants unchanged ($(wc -l < "$OUT/main.txt" | tr -d ' ') relation/column ACL lines)"
