@@ -36,6 +36,8 @@ export const INSTRUCTIONS = [
 
 /** Instructions for a catalog-free (--no-catalog) surface. */
 export const INSTRUCTIONS_NO_CATALOG = COMPANION_INSTRUCTIONS
+  .replace('one local, encrypted AQUA workspace and the public AQUA catalog cache.', 'one local, encrypted AQUA workspace.')
+  .replace(' the workspace or the public catalog', ' the workspace or an application source')
 
 /** The companion's tool definitions (for the manifest). */
 export const companionToolDefs = () => COMPANION_TOOLS
