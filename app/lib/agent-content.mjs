@@ -106,7 +106,7 @@ Issue details and technical tracebacks stay in the local Beta Reports folder by 
 `,
   '/privacy': `# AQUA Privacy
 
-Last updated: 2026-10-02
+Last updated: 2026-10-24
 
 AQUA Application Hub is operated by Ello Cello LLC. This page describes the main categories of information the product handles and the controls reflected in the current application architecture. It is intended to make the public data posture legible; it does not replace any additional terms presented during a specific paid service or integration flow.
 
@@ -129,6 +129,8 @@ AQUA IDP is a separate local-folder workflow. It uses only applications, URLs, a
 Local beta reports can contain issue details and technical tracebacks. Automatic delivery is off by default. After opt-in, the plugin sends only a random report ID, time, version, command, issue type, error class, grouping fingerprint, Python version, and operating-system name over HTTPS. It does not send application questions, answers, source files, file paths, local issue descriptions, or tracebacks. The Cloudflare-hosted receiver uses the request IP for rate limiting but does not save it in the report record. Received report records expire after 30 days; infrastructure logs may have separate retention. beta-reporting --disable stops future delivery. Users can delete local reports from their workspace.
 
 Users choose sources and can inspect, edit, export, or delete their local files. An old submitted answer is not automatically approved for future reuse. AQUA IDP is not designed for payment-card data, protected health information, government identifiers, passwords, API keys, or one-time codes; redact those before providing an application.
+
+AQUA IDP can also use AQUA's public, read-only program catalog at https://aquaidp.xyz/mcp. Search terms and question text sent to it go to aquaidp.xyz to answer the request and may appear in ordinary server and hosting logs. The catalog needs no account and never receives workspace files, answer banks, or drafts.
 
 ## Requests and contact
 
