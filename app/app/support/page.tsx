@@ -76,6 +76,7 @@ export default function SupportPage() {
 
         <div className="flex flex-wrap gap-4 border-t border-neutral-200 pt-8 text-sm dark:border-neutral-800">
           <Link href="/privacy" className="btn-secondary">Privacy</Link>
+          <Link href="/terms" className="btn-secondary">Terms</Link>
           <Link href="/contact" className="btn-secondary">Contact</Link>
         </div>
       </main>
