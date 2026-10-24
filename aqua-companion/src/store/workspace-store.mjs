@@ -2,34 +2,66 @@
 // The fs implementation (fsafe.mjs) is the default; a Supabase implementation
 // implements this contract and keeps every Workspace caller unchanged.
 // Keys/derive/unlock stay client-side — the store sees ciphertext only.
+import fs from 'node:fs/promises'
+import path from 'node:path'
 
-/**
- * @typedef {Object} WorkspaceStore
- * @property {(wsid: string) => Promise<{manifest: object, rev: number} | null>} loadManifest
- * @property {(manifest: object) => Promise<number>} createManifest          // returns rev; CAS-create
- * @property {(manifest: object, expectRev: number) => Promise<number>} saveManifest  // CAS; throws manifest_rev_conflict
- * @property {(path: string) => Promise<Uint8Array | null>} getFile          // record file bytes
- * @property {(path: string, bytes: Uint8Array) => Promise<void>} putNewFile // O_EXCL; throws file_exists
- * @property {(path: string, bytes: Uint8Array) => Promise<void>} replaceFile // atomic replace (rekey/.bak)
- * @property {(path: string) => Promise<boolean>} fileExists
- * @property {(from: string, to: string) => Promise<void>} moveFile          // conflict archive, placement
- * @property {(prefix?: string) => Promise<string[]>} listFiles              // walkInside/recordFiles
- * @property {(logName: string, line: string) => Promise<void>} appendLog    // audit append (never update)
- * @property {(logName: string) => Promise<{lastLine: string | null}>} readLogTail // prev-hash chain
- * @property {<R>(fn: () => Promise<R>) => Promise<R>} tx                    // atomic blob+manifest+audit commit
- */
-
-/** Local filesystem store — wraps fsafe, zero behavior change. */
+/** Local filesystem store — the default; zero behavior change. */
 export function createFsStore(root) {
-  // implemented by wrapping the existing fsafe helpers 1:1; Workspace gets a
-  // `store` param defaulting to this so local behavior is identical.
-  throw new Error('createFsStore: wire to fsafe.mjs (scaffold)')
+  const inside = (p) => {
+    const abs = path.resolve(root, p)
+    if (!abs.startsWith(path.resolve(root) + path.sep) && abs !== path.resolve(root))
+      throw new Error(`path escapes workspace root: ${p}`)
+    return abs
+  }
+  return {
+    async loadManifest() {
+      const buf = await fs.readFile(inside('workspace.json')).catch(() => null)
+      return buf ? { manifest: JSON.parse(buf.toString('utf8')), rev: null } : null
+    },
+    async createManifest(m) { await fs.writeFile(inside('workspace.json'), JSON.stringify(m, null, 2)); return 1 },
+    async saveManifest(m) { await fs.writeFile(inside('workspace.json'), JSON.stringify(m, null, 2)); return null },
+    async getFile(p) { return fs.readFile(inside(p)).catch(() => null) },
+    async putNewFile(p, bytes) {
+      const abs = inside(p); await fs.mkdir(path.dirname(abs), { recursive: true })
+      const fh = await fs.open(abs, 'wx').catch((e) => { if (e.code === 'EEXIST') throw Object.assign(new Error('file_exists'), { code: 'file_exists' }); throw e })
+      try { await fh.writeFile(bytes) } finally { await fh.close() }
+    },
+    async replaceFile(p, bytes) {
+      const abs = inside(p)
+      const tmp = abs + '.tmp-' + Math.random().toString(36).slice(2)
+      await fs.writeFile(tmp, bytes); await fs.rename(tmp, abs)
+    },
+    async fileExists(p) { return fs.access(inside(p)).then(() => true, () => false) },
+    async moveFile(f, t) { const a = inside(f), b = inside(t); await fs.mkdir(path.dirname(b), { recursive: true }); await fs.rename(a, b) },
+    async listFiles(prefix = '') {
+      const out = []
+      const walk = async (dir) => {
+        for (const e of await fs.readdir(dir, { withFileTypes: true }).catch(() => [])) {
+          const rel = path.relative(root, path.join(dir, e.name))
+          if (e.isDirectory()) await walk(path.join(dir, e.name))
+          else if (!prefix || rel.startsWith(prefix)) out.push(rel)
+        }
+      }
+      await walk(root); return out
+    },
+    async appendLog(name, line) {
+      const abs = inside(`audit/${name}`)
+      await fs.mkdir(path.dirname(abs), { recursive: true })
+      await fs.appendFile(abs, line + '\n')
+    },
+    async readLogTail(name) {
+      const buf = await fs.readFile(inside(`audit/${name}`), 'utf8').catch(() => null)
+      if (!buf) return { lastLine: null }
+      const lines = buf.trimEnd().split('\n')
+      return { lastLine: lines[lines.length - 1] || null }
+    },
+    async tx(fn) { return fn() }, // local fs: caller's own serialization
+  }
 }
 
-/** Hosted store — Supabase rows behind aqua_workspace_commit RPC. */
+/** Hosted store — Supabase rows behind aqua_workspace_commit RPC (migration 064). */
 export function createSupabaseStore(client, workspaceRowId) {
   // client = supabase-js with the caller's bearer JWT (RLS does isolation).
-  // workspaceRowId = aqua_workspaces.id.
   throw new Error('createSupabaseStore: implement against migration 064 (scaffold)')
 }
 
