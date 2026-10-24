@@ -12,7 +12,7 @@ import {
   resolveInside, walkInside, writeNewInside, PathSafetyError,
 } from './fsafe.mjs'
 
-export const COMPANION_VERSION = '0.2.3'
+export const COMPANION_VERSION = '0.2.5'
 export const SCHEMA_VERSION = 1
 export const MANIFEST = 'workspace.json'
 export const MANIFEST_BACKUP = 'workspace.json.bak'

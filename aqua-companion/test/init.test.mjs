@@ -30,7 +30,7 @@ test('init creates the layout and a manifest with schema, kdf, key check, author
   assert.equal(m.format, 'aqua-companion-workspace')
   assert.equal(m.schema_version, 1)
   assert.match(m.workspace_id, /^WS-/)
-  assert.equal(m.companion_version, '0.2.3')
+  assert.equal(m.companion_version, '0.2.5')
   assert.equal(m.kdf.alg, 'PBKDF2-SHA256')
   assert.equal(m.kdf.iters, 210000)
   assert.ok(m.kdf.salt_b64 && m.key_check.ct_b64 && m.manifest_mac)

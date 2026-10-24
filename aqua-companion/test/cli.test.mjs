@@ -22,7 +22,7 @@ test('bin: --help, --version, unknown command', () => {
   assert.equal(h.code, 0)
   assert.match(h.out, /import-backup <file>/)
   assert.match(h.out, /never written to disk or logs/)
-  assert.equal(sh(['--version']).out.trim(), '0.2.3')
+  assert.equal(sh(['--version']).out.trim(), '0.2.5')
   assert.equal(sh(['frobnicate']).code, 2)
 })
 

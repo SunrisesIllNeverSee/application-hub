@@ -353,7 +353,7 @@ export function questionRows(model, inst, { catalog = null, now, classify = true
     }
     rows.push({
       question_occurrence_id: occ, canonical_question_id: canonical, text, word_limit, char_limit,
-      required: meta?.required ?? cat?.required ?? false, section_id: meta?.section_id ?? cat?.section_id ?? null, options: meta?.options ?? cat?.options ?? null, order: ref.order,
+      required: meta && meta.required !== undefined ? meta.required : (cat?.required ?? false), section_id: meta?.section_id ?? cat?.section_id ?? null, options: meta?.options ?? cat?.options ?? null, order: ref.order,
       scope, answer_id: scoped[0]?.id ?? null, versions: vs, status, classification, evidence_ids, suggestions: sugg,
     })
   }

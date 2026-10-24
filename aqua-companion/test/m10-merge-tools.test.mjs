@@ -55,6 +55,12 @@ test('merge tools: link, mark, note, add, assemble — staged, surfaced, persist
     assert.equal(aq.status, 'ok')
     assert.ok(aq.question_occurrence_id)
 
+    // a user-added question accepts drafts like any question (uq- ids aren't in
+    // inst.data.question_refs — they come from the folded model)
+    const uqDraft = await c.call('create_draft_version', { application_id: appId, question_occurrence_id: aq.question_occurrence_id, body: 'A staged draft on a user-added question.' })
+    assert.equal(uqDraft.status, 'ok', 'draft on uq- question stages')
+    assert.ok(uqDraft.version_id)
+
     const st = await c.call('read_review_status', { application_id: appId })
     const row0 = st.questions.find((q) => q.question_occurrence_id === occ0)
     const row1 = st.questions.find((q) => q.question_occurrence_id === occ1)
