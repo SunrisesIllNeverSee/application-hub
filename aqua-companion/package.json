@@ -1,7 +1,6 @@
 {
   "name": "aqua-companion",
   "version": "0.2.4",
-  "private": true,
   "description": "Local AQUA companion: an encrypted, consent-first document workspace that exchanges data with the AQUA browser vault only through its encrypted backup envelope.",
   "type": "module",
   "bin": {
