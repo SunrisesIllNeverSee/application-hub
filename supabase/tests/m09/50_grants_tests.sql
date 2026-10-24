@@ -97,6 +97,7 @@ INSERT INTO p0g.expect VALUES
  ('intake_entities_ref_seq_seq','S','b','-','U','rwU','-','U','rwU',NULL),
  ('intake_questions_ref_seq_seq','S','b','-','U','rwU','-','U','rwU',NULL),
  ('intake_submissions_ref_seq_seq','S','b','-','U','rwU','-','U','rwU',NULL),
+ ('aqua_workspaces','r','b','-','arw','arwd','-','arw','arwd','hosted-MCP: owner CAS manifest doc; writes via aqua_workspace_commit'), ('aqua_workspace_records','r','b','-','arw','arwd','-','arw','arwd','hosted-MCP: owner ciphertext record rows; UNIQUE(ws,path)=O_EXCL'), ('aqua_workspace_audit','r','b','-','ar','ar','-','ar','ar','hosted-MCP: append-only audit log; no update/delete'),
  ('catalog_serial_en_seq','S','c','-','-','rU','-','-','rU','058'),
  ('catalog_serial_ap_seq','S','c','-','-','rU','-','-','rU','058'),
  ('catalog_serial_qu_seq','S','c','-','-','rU','-','-','rU','058'),
