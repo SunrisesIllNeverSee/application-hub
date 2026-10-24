@@ -694,7 +694,14 @@ export const TOOLS = [
       const blockers = []
       const warnings = []
       const questions = []
+      const marksByOcc = new Map()
+      for (const rec of Object.values(t.ws.records)) {
+        if (rec.kind === 'question_mark' && rec.data?.instance_id === inst.instance_id && rec.data.state !== 'open') {
+          marksByOcc.set(rec.data.question_occurrence_id, rec.data.state)
+        }
+      }
       for (const r of rows) {
+        if (marksByOcc.has(r.question_occurrence_id)) continue
         const sel = r.status.approved_version_id ? r.versions.find((v) => v.id === r.status.approved_version_id) : null
         const gate = sel ? approvalGate(sel, model.approvals, model.reviews) : null
         const intact = sel ? await versionIntact(sel) : null
