@@ -35,6 +35,7 @@ Options
   --keychain               read the workspace passphrase from the macOS Keychain
   --catalog-config F|URL   public catalog config (file or https URL)
   --offline                do not fetch the catalog config
+  --no-catalog             exclude the public catalog tools (workspace-only plugin surface)
   --version, --help
 
 Environment
@@ -47,7 +48,7 @@ Approvals, signatures, packet export and submission happen in the AQUA browser a
 Hosted read-only endpoint: https://aquaidp.xyz/mcp
 `
 
-const BOOLEAN = new Set(['read-only', 'keychain', 'offline', 'help', 'version'])
+const BOOLEAN = new Set(['read-only', 'keychain', 'offline', 'help', 'version', 'no-catalog'])
 
 function parse(argv) {
   const flags = {}

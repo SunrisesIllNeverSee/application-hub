@@ -134,29 +134,33 @@ function staged(v) {
   return v.authority === 'staging' && v.record_status !== 'in_vault'
 }
 
-/** Latest question_mark per question in an instance (model carries decoded data). */
-function latestMarks(model, instance_id) {
+/** Latest record per question, deterministic: created_at then rid breaks ties. */
+function latestByOcc(records, instance_id, pick) {
   const out = new Map()
-  for (const m of model.question_marks) {
-    if (m.instance_id !== instance_id) continue
-    const prev = out.get(m.question_occurrence_id)
-    if (!prev || (m.created_at ?? '') > (prev.created_at ?? '')) out.set(m.question_occurrence_id, { state: m.state, reason: m.reason })
+  const seen = new Map()
+  for (const rec of records) {
+    if (rec.instance_id !== instance_id) continue
+    const key = `${rec.created_at ?? ''}${rec.rid ?? ''}`
+    const prev = seen.get(rec.question_occurrence_id)
+    if (!prev || key > prev) {
+      seen.set(rec.question_occurrence_id, key)
+      out.set(rec.question_occurrence_id, pick(rec))
+    }
   }
   return out
 }
 
+/** Latest question_mark per question in an instance (model carries decoded data). */
+function latestMarks(model, instance_id) {
+  return latestByOcc(model.question_marks, instance_id, (m) => ({ state: m.state, reason: m.reason }))
+}
+
 /** Latest update_question annotation per question in an instance. */
 function latestNotes(model, instance_id) {
-  const out = new Map()
-  for (const n of model.question_notes) {
-    if (n.instance_id !== instance_id) continue
-    const prev = out.get(n.question_occurrence_id)
-    if (!prev || (n.created_at ?? '') > (prev.created_at ?? '')) {
-      const { note_id, application_id, instance_id: _i, question_occurrence_id: _q, created_at: _c, never_changes_wording: _w, rid: _r, ...fields } = n
-      out.set(n.question_occurrence_id, Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== null)))
-    }
-  }
-  return out
+  return latestByOcc(model.question_notes, instance_id, (n) => {
+    const { note_id, application_id, instance_id: _i, question_occurrence_id: _q, created_at: _c, never_changes_wording: _w, rid: _r, ...fields } = n
+    return Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== null))
+  })
 }
 
 const NEXT_STEPS_TO_BROWSER = [
@@ -682,7 +686,7 @@ export const TOOLS = [
       for (const l of model.links) {
         if (l.instance_id !== inst.instance_id) continue
         const arr = linksByOcc.get(l.question_occurrence_id) ?? []
-        arr.push({ link_type: l.link_type, reason: l.reason })
+        arr.push({ link_id: l.link_id, link_type: l.link_type, history_answer_id: l.history_answer_id ?? null, version_id: l.version_id ?? null, reason: l.reason })
         linksByOcc.set(l.question_occurrence_id, arr)
       }
       return {
@@ -743,9 +747,11 @@ export const TOOLS = [
         questions.push(q)
       }
       const dedup = [...new Map(blockers.map((b) => [`${b.question_occurrence_id}|${b.code}`, b])).values()]
+      const marks_applied = [...marksByOcc.entries()].filter(([, m]) => m.state !== 'open').map(([occ, m]) => ({ question_occurrence_id: occ, ...m }))
       return {
         status: 'ok', instance_id: inst.instance_id, ready_to_freeze: dedup.length === 0 && questions.some((q) => q.selectable_version_id), approvals_as_of: model.last_import?.at ?? null,
-        blockers: dedup, warnings, questions, froze_anything: false,
+        blockers: dedup, warnings, questions, froze_anything: false, marks_applied,
+        ...(marks_applied.length ? { marks_note: 'These marks are agent-staged workspace annotations; the browser freeze re-checks every question independently and does not see them. Tell the user which fields were marked and why.' } : {}),
         next_steps: ['Freezing happens in the AQUA browser (AQUA Local, packet panel): the browser re-checks every approval against the exact hash at freeze time.', 'After freezing, the user signs (optional) and exports the packet there (export_packet explains).'],
       }
     },
@@ -1161,6 +1167,14 @@ export const TOOLS = [
       const ws = t.ws
       const model = await t.model()
       const inst = requireInstance(model, args.application_id)
+      const wanted = foldText(args.text)
+      const dupe = (inst.template?.questions ?? []).find((q) => q.text && foldText(q.text) === wanted)
+      if (dupe) {
+        return {
+          status: 'ok', staged: false, duplicate: true, question_occurrence_id: dupe.question_occurrence_id, application_id: inst.application_id,
+          next_steps: ['That wording is already indexed; no duplicate was created. Use update_question to correct its metadata.'],
+        }
+      }
       const question_occurrence_id = `uq-${newUuid()}`
       ws.records[rid('question_add', question_occurrence_id)] = await ws.writeRecord({
         kind: 'question_add', key: question_occurrence_id, authority: 'staging',
@@ -1217,6 +1231,7 @@ export const TOOLS = [
         const v = vid ? versionsById.get(vid) : null
         if (!row || !v) { bad.push({ question_occurrence_id: occ ?? null, version_id: vid ?? null, problem: 'not_found' }); continue }
         if (!approvedState(model, v).approved) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'not_approved' }); continue }
+        if (!(await versionIntact(v))) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'integrity_mismatch' }); continue }
         chosen.push({ row, v })
       }
       if (bad.length) {

@@ -167,12 +167,17 @@ export async function loadModel(ws, vaultSecret) {
     const inst = m.instances.get(add.instance_id)
     if (!inst || !inst.template) continue
     if (!inst.question_refs.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
-      inst.question_refs.push({ question_occurrence_id: add.question_occurrence_id, canonical_question_id: null })
+      inst.question_refs.push({ question_occurrence_id: add.question_occurrence_id, canonical_question_id: null, order: add.order ?? null })
     }
     if (!inst.template.questions.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
+      const lim = typeof add.limit === 'string' ? add.limit.trim() : ''
+      const wordM = /^words:(\d+)$/i.exec(lim)
+      const charM = /^chars:(\d+)$/i.exec(lim)
       inst.template.questions.push({
         question_occurrence_id: add.question_occurrence_id, text: add.text, source: 'user_added',
-        required: add.required ?? 'unknown', word_limit: null, char_limit: null, options: add.options ?? null, group: add.group ?? null,
+        required: add.required === 'required',
+        word_limit: wordM ? Number(wordM[1]) : null, char_limit: charM ? Number(charM[1]) : null,
+        options: add.options ?? null, section_id: add.group ?? null,
       })
     }
   }

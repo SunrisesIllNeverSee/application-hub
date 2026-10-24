@@ -50,6 +50,11 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
   const defs = new Map(COMPANION_TOOLS.map((t) => [t.name, t]))
   const ready = () => reg.state().mode === 'ready'
   const visibleCompanion = () => reg.tools.filter((t) => ready() || t.setup)
+  // --no-catalog drops the public hub_* tools from the surface entirely (the
+  // plugin carries the workspace tools only; the hosted catalog endpoint is a
+  // separate product surface).
+  const noCatalog = flags['no-catalog'] === true
+  const publicTools = () => (noCatalog ? [] : PUBLIC_TOOLS)
 
   async function workspaceStatus() {
     const listed = await reg.dispatch('discover_applications', { include_workspace: true, limit: 1 })
@@ -65,7 +70,7 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
     instructions: INSTRUCTIONS,
     data,
     mode: () => modeOf(reg),
-    toolDefs: () => [...visibleCompanion().map((t) => defs.get(t.name) ?? t), ...PUBLIC_TOOLS],
+    toolDefs: () => [...visibleCompanion().map((t) => defs.get(t.name) ?? t), ...publicTools()],
     onInitialize(dispatcher) {
       reg.setElicitor(dispatcher.canElicit ? (params, opts) => dispatcher.elicit(params, opts) : null)
     },
@@ -74,10 +79,10 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
         const base = { name: t.name, description: t.description, inputSchema: t.inputSchema }
         return pv < '2025-03-26' ? base : { ...base, title: t.title, annotations: t.annotations, _meta: { 'aqua/tier': t.tier } }
       })
-      return [...companion, ...PUBLIC_TOOLS.map((d) => toolEntry(d, pv))]
+      return [...companion, ...publicTools().map((d) => toolEntry(d, pv))]
     },
     async callTool(name, args, dispatcher) {
-      if (PUBLIC_TOOL_MAP.has(name)) return callPublicTool(name, args, data)
+      if (!noCatalog && PUBLIC_TOOL_MAP.has(name)) return callPublicTool(name, args, data)
       const t = byName.get(name)
       if (!t) return { unknown: true }
       const wasReady = ready()
