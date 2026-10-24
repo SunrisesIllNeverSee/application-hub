@@ -649,6 +649,17 @@ export const TOOLS = [
       const cat = await t.catalog()
       const inst = requireInstance(model, args.application_id)
       const { rows } = questionRows(model, inst, { catalog: cat, now: t.now() })
+      const marksByOcc = new Map()
+      const linksByOcc = new Map()
+      for (const r of Object.values(t.ws.records)) {
+        if (r.data?.instance_id !== inst.instance_id) continue
+        if (r.kind === 'question_mark') marksByOcc.set(r.data.question_occurrence_id, { state: r.data.state, reason: r.data.reason })
+        else if (r.kind === 'link') {
+          const arr = linksByOcc.get(r.data.question_occurrence_id) ?? []
+          arr.push({ link_type: r.data.link_type, reason: r.data.reason })
+          linksByOcc.set(r.data.question_occurrence_id, arr)
+        }
+      }
       return {
         status: 'ok', instance_id: inst.instance_id, approvals_as_of: model.last_import?.at ?? null,
         questions: rows.map((r) => ({
@@ -656,7 +667,12 @@ export const TOOLS = [
           decided_by: r.status.decided_by, governing_version_id: r.status.governing_version_id, approved_version_id: r.status.approved_version_id,
           freeze_eligible: r.status.freeze_eligible, governing_staged_only: r.versions.length ? staged(r.versions.at(-1)) : false,
           recommendation: r.classification ? { classification: r.classification.classification, candidate_version_id: r.classification.candidate_version_id ?? null, similarity: Math.round(r.classification.similarity * 100) / 100, reason_codes: r.classification.reasons.map((x) => x.code) } : null,
+          mark: marksByOcc.get(r.question_occurrence_id) ?? null,
+          candidate_links: linksByOcc.get(r.question_occurrence_id) ?? [],
         })),
+        user_added_questions: Object.values(t.ws.records)
+          .filter((r) => r.kind === 'question_add' && r.data?.instance_id === inst.instance_id)
+          .map((r) => r.data),
         note: 'recommendation is advisory (Direct = an approved answer fits, Adapt = related answer needs revision, Gap = nothing suitable). It never approves anything.',
         untrusted: { questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })) },
       }
