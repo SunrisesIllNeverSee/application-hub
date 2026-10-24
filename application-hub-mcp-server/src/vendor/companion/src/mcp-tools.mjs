@@ -1072,7 +1072,7 @@ export const TOOLS = [
       if (!v) throw new ToolRefusal('not_found', `No version ${args.version_id} in this workspace.`)
       const gate = approvedState(model, v)
       if (!gate.approved) throw new ToolRefusal('not_approved', `Version ${args.version_id} is not an approved version; only approved wording can be linked for direct reuse.`)
-      const dupe = model.links.some((l) => l.link_type === 'answer_reuse' && l.question_occurrence_id === args.question_occurrence_id && l.version_id === args.version_id)
+      const dupe = model.links.some((l) => l.link_type === 'answer_reuse' && l.instance_id === inst.instance_id && l.question_occurrence_id === args.question_occurrence_id && l.version_id === args.version_id)
       if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'answer_reuse', next_steps: ['That version is already linked to this question.'] }
       const link_id = newUuid()
       ws.records[rid('link', link_id)] = await ws.writeRecord({
