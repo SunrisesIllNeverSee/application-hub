@@ -65,13 +65,18 @@ create policy aqua_workspaces_owner on public.aqua_workspaces
   for all using (account_id = auth.uid()) with check (account_id = auth.uid());
 drop policy if exists aqua_ws_records_owner on public.aqua_workspace_records;
 create policy aqua_ws_records_owner on public.aqua_workspace_records
-  for all using (account_id = auth.uid()) with check (account_id = auth.uid());
+  for all using (account_id = auth.uid())
+  with check (account_id = auth.uid()
+    and exists (select 1 from public.aqua_workspaces w
+                where w.id = workspace_id and w.account_id = auth.uid()));
 drop policy if exists aqua_ws_audit_owner on public.aqua_workspace_audit;
 create policy aqua_ws_audit_owner on public.aqua_workspace_audit
   for select using (account_id = auth.uid());
 drop policy if exists aqua_ws_audit_owner_ins on public.aqua_workspace_audit;
 create policy aqua_ws_audit_owner_ins on public.aqua_workspace_audit
-  for insert with check (account_id = auth.uid());
+  for insert with check (account_id = auth.uid()
+    and exists (select 1 from public.aqua_workspaces w
+                where w.id = workspace_id and w.account_id = auth.uid()));
 -- audit is append-only: no UPDATE/DELETE grant anywhere
 
 -- Caller-scoped grants (INVOKER RPC + RLS do the isolation); service_role for server ops.
@@ -112,7 +117,8 @@ begin
       (account_id, workspace_id, path, rid, kind, authority, scope, status, sha256, file)
     values
       (auth.uid(), p_workspace_id, r->>'path', r->>'rid', r->>'kind',
-       r->>'authority', r->>'scope', coalesce(r->>'status','live'), r->>'sha256', r->'file');
+       r->>'authority', r->>'scope', coalesce(r->>'status','live'), r->>'sha256',
+       decode(r->>'file_b64', 'base64'));
   end loop;
   for a in select * from jsonb_array_elements(p_audit) loop
     insert into public.aqua_workspace_audit (account_id, workspace_id, log_name, seq, entry, prev)
@@ -121,6 +127,7 @@ begin
   return v_new_rev;
 end $$;
 
+revoke all on function public.aqua_workspaces_touch() from public, anon, authenticated, service_role;
 revoke all on function public.aqua_workspace_commit(uuid, bigint, jsonb, jsonb, jsonb) from public, anon, service_role;
 grant execute on function public.aqua_workspace_commit(uuid, bigint, jsonb, jsonb, jsonb) to authenticated;
 

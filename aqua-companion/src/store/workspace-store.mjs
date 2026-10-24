@@ -30,7 +30,7 @@ export function createFsStore(root) {
 export function createSupabaseStore(client, workspaceRowId) {
   // client = supabase-js with the caller's bearer JWT (RLS does isolation).
   // workspaceRowId = aqua_workspaces.id.
-  throw new Error('createSupabaseStore: implement against migration 063 (scaffold)')
+  throw new Error('createSupabaseStore: implement against migration 064 (scaffold)')
 }
 
 export const __scaffold = true
