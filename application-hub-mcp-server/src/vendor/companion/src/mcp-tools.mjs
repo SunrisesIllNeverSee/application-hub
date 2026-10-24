@@ -1026,6 +1026,7 @@ export const TOOLS = [
       const dupe = model.links.some((l) => l.link_type === 'history_candidate' && l.instance_id === inst.instance_id && l.question_occurrence_id === args.question_occurrence_id && l.history_answer_id === args.history_answer_id)
       if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'history_candidate', next_steps: ['That history candidate is already linked to this question.'] }
       const rec = ws.records[rid('answer', args.history_answer_id)]
+      if (rec && rec.status !== 'live') throw new ToolRefusal('not_found', `History answer ${args.history_answer_id} is ${rec.status} — link live records only.`)
       // Companion-staged history carries entry.history; vault-restored history
       // answers don't — fall back to their versions' history flag.
       const isHistory = rec?.history === true
@@ -1140,8 +1141,14 @@ export const TOOLS = [
       const ws = t.ws
       const model = await t.model()
       const inst = requireInstance(model, args.application_id)
+      if (!inst.template) {
+        throw new ToolRefusal('no_template', `Application ${inst.instance_id} has no local question template — corrections cannot be applied to it. Re-stage it with import_local_application from an inbox/ source file.`)
+      }
       if (!inst.question_refs.some((r) => r.question_occurrence_id === args.question_occurrence_id)) {
         throw new ToolRefusal('not_found', `No question ${args.question_occurrence_id} in application ${inst.instance_id}.`)
+      }
+      if (args.limit && !/^(words|chars):\d+$/i.test(args.limit.trim())) {
+        throw new ToolRefusal('invalid_arguments', `limit must be "words:N" or "chars:N" (got "${args.limit}") — anything else is refused rather than recorded as a correction that silently drops existing limits.`)
       }
       const note_id = newUuid()
       ws.records[rid('question_note', note_id)] = await ws.writeRecord({

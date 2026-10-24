@@ -172,6 +172,7 @@ export async function loadModel(ws, vaultSecret) {
     if (!inst.question_refs.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
       inst.question_refs.push({ question_occurrence_id: add.question_occurrence_id, canonical_question_id: null, order: add.order ?? null })
     }
+    inst.template.questions ??= []
     if (!inst.template.questions.some((q) => q.question_occurrence_id === add.question_occurrence_id)) {
       const lim = typeof add.limit === 'string' ? add.limit.trim() : ''
       const wordM = /^words:(\d+)$/i.exec(lim)
@@ -199,14 +200,16 @@ export async function loadModel(ws, vaultSecret) {
     if (!q) continue
     if (n.required === 'required') q.required = true
     else if (n.required === 'optional') q.required = false
+    else if (n.required === 'unknown') q.required = null
     if (typeof n.limit === 'string' && n.limit.trim()) {
       const lim = n.limit.trim()
       const wm = /^words:(\d+)$/i.exec(lim), cm = /^chars:(\d+)$/i.exec(lim)
       if (wm) { q.word_limit = Number(wm[1]); q.char_limit = null }
       else if (cm) { q.char_limit = Number(cm[1]); q.word_limit = null }
-      else { q.word_limit = null; q.char_limit = null }
+      // unrecognized formats leave prior limits untouched
     }
-    if (typeof n.options === 'string') q.options = n.options.trim() || null
+    if (typeof n.options === 'string' && n.options.trim()) q.options = n.options.split(/\n+/).map((s) => s.trim()).filter(Boolean)
+    else if (n.options === '') q.options = null
     if (typeof n.group === 'string') q.section_id = n.group.trim() || null
     if (n.summary) q.annotation_summary = n.summary
     if (n.kind) q.annotation_kind = n.kind

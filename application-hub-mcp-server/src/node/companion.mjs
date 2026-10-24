@@ -111,7 +111,7 @@ export async function createCompanionBackend({ workspace, flags = {}, readOnly =
     },
     listPrompts: () => (noCatalog ? [] : PROMPTS.map((p) => ({ ...p }))),
     getPrompt: (name, args) => {
-      if (noCatalog) throw new ResourceNotFound(`prompt:${name}`)
+      if (noCatalog) throw Object.assign(new Error(`unknown prompt: ${name}`), { code: 'unknown_prompt' })
       return getPrompt(name, args, { hasWorkspace: ready() })
     },
   }
