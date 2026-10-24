@@ -1024,7 +1024,7 @@ export const TOOLS = [
       const dupe = model.links.some((l) => l.link_type === 'history_candidate' && l.instance_id === inst.instance_id && l.question_occurrence_id === args.question_occurrence_id && l.history_answer_id === args.history_answer_id)
       if (dupe) return { status: 'ok', staged: false, duplicate: true, link_type: 'history_candidate', next_steps: ['That history candidate is already linked to this question.'] }
       const rec = ws.records[rid('answer', args.history_answer_id)]
-      if (rec && rec.status !== 'live') throw new ToolRefusal('not_found', `History answer ${args.history_answer_id} is ${rec.status} — link live records only.`)
+      if (rec && ['archived', 'missing', 'tombstoned', 'dead'].includes(rec.status)) throw new ToolRefusal('not_found', `History answer ${args.history_answer_id} is ${rec.status} — link live records only.`)
       // Companion-staged history carries entry.history; vault-restored history
       // answers don't — fall back to their versions' history flag.
       const isHistory = rec?.history === true
@@ -1264,7 +1264,7 @@ export const TOOLS = [
         // The version must belong to this question or be a recorded direct-reuse
         // link (link_answer) — a bare map can't silently pair unrelated wording.
         const scoped = model.answers.some((a) => a.id === v.answer_id && a.scope?.question_occurrence_id === occ)
-        const linked = model.links.some((l) => l.link_type === 'answer_reuse' && l.question_occurrence_id === occ && l.version_id === vid)
+        const linked = model.links.some((l) => l.link_type === 'answer_reuse' && l.instance_id === inst.instance_id && l.question_occurrence_id === occ && l.version_id === vid)
         if (!scoped && !linked) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'scope_mismatch' }); continue }
         chosen.push({ row, v })
       }
@@ -1313,7 +1313,8 @@ export const TOOLS = [
         absolute_path: saved_to ? path.join(ws.root, ...saved_to.split('/')) : null,
         ...(saved_to ? {} : { not_saved_reason: 'read_only' }),
         answers_used: chosen.length, unresolved,
-        note: 'This is a review draft assembled from approved versions only. It is never submitted by AQUA; the user reviews, edits and submits it themselves.',
+        length_violations: chosen.filter((c) => (c.row.word_limit && wordCount(c.v.body) > c.row.word_limit) || (c.row.char_limit && charCount(c.v.body) > c.row.char_limit)).map((c) => ({ question_occurrence_id: c.row.question_occurrence_id, word_limit: c.row.word_limit, char_limit: c.row.char_limit, word_count: wordCount(c.v.body), char_count: charCount(c.v.body) })),
+        note: 'This is a review draft assembled from approved versions only. It is never submitted by AQUA; the user reviews, edits and submits it themselves. The file contains your answers in plain text — keep it private.',
         untrusted: { markdown },
       }
     },
