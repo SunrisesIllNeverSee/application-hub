@@ -700,9 +700,14 @@ export const TOOLS = [
         })),
         user_added_questions: model.question_adds
           .filter((r) => r.instance_id === inst.instance_id)
-          .map(({ question_occurrence_id, order, text, required, source_ref }) => ({ question_occurrence_id, order, text, required, source_ref })),
+          .map(({ question_occurrence_id, order, required, source_ref }) => ({ question_occurrence_id, order, required, source_ref })),
         note: 'recommendation is advisory (Direct = an approved answer fits, Adapt = related answer needs revision, Gap = nothing suitable). It never approves anything.',
-        untrusted: { questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })) },
+        untrusted: {
+          questions: rows.map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text, recommendation_messages: r.classification?.reasons.map((x) => x.message) ?? [] })),
+          user_added_question_texts: model.question_adds
+            .filter((r) => r.instance_id === inst.instance_id)
+            .map((r) => ({ question_occurrence_id: r.question_occurrence_id, text: r.text })),
+        },
       }
     },
   },
@@ -1016,7 +1021,11 @@ export const TOOLS = [
         throw new ToolRefusal('not_found', `No question ${args.question_occurrence_id} in application ${inst.instance_id}. Use inspect_extracted_questions to list them.`)
       }
       const rec = ws.records[rid('answer', args.history_answer_id)]
-      if (!rec || rec.history !== true) {
+      // Companion-staged history carries entry.history; vault-restored history
+      // answers don't — fall back to their versions' history flag.
+      const isHistory = rec?.history === true
+        || Boolean(rec) && model.versions.some((v) => v.answer_id === args.history_answer_id && (v.history === true || v.history_meta))
+      if (!rec || !isHistory) {
         throw new ToolRefusal('not_found', `No imported history answer ${args.history_answer_id}. import_history reports answer_ids for staged history answers.`)
       }
       const link_id = newUuid()
@@ -1165,6 +1174,9 @@ export const TOOLS = [
       const ws = t.ws
       const model = await t.model()
       const inst = requireInstance(model, args.application_id)
+      if (!inst.template) {
+        throw new ToolRefusal('no_template', `Application ${inst.instance_id} has no local question template (catalog-linked or vault-native import) — questions cannot be added to it. Re-stage it with import_local_application from an inbox/ source file.`)
+      }
       const wanted = foldText(args.text)
       const dupe = (inst.template?.questions ?? []).find((q) => q.text && foldText(q.text) === wanted)
       if (dupe) {
@@ -1230,6 +1242,11 @@ export const TOOLS = [
         if (!row || !v) { bad.push({ question_occurrence_id: occ ?? null, version_id: vid ?? null, problem: 'not_found' }); continue }
         if (!approvedState(model, v).approved) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'not_approved' }); continue }
         if (!(await versionIntact(v))) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'integrity_mismatch' }); continue }
+        // The version must belong to this question or be a recorded direct-reuse
+        // link (link_answer) — a bare map can't silently pair unrelated wording.
+        const scoped = model.answers.some((a) => a.id === v.answer_id && a.scope?.question_occurrence_id === occ)
+        const linked = model.links.some((l) => l.link_type === 'answer_reuse' && l.question_occurrence_id === occ && l.version_id === vid)
+        if (!scoped && !linked) { bad.push({ question_occurrence_id: occ, version_id: vid, problem: 'scope_mismatch' }); continue }
         chosen.push({ row, v })
       }
       if (bad.length) {

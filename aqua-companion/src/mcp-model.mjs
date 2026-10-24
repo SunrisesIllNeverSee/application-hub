@@ -42,7 +42,7 @@ export async function loadModel(ws, vaultSecret) {
     instances: new Map(), answers: [], versions: [], approvals: [], reviews: [], review_notes: {}, suggestions: [],
     evidence: [], facts: [], comments: [], provenance: {}, packets: [], packet_states: {}, sources: new Map(),
     observations: [], evidence_requests: [], undecryptable: 0,
-    links: [], question_marks: [], question_notes: [], question_adds: [],
+    links: [], question_marks: [], question_notes: [], question_adds: [], assembles: [],
     last_import: ws.manifest.imports.at(-1) ?? null,
   }
   const factRows = []
@@ -152,6 +152,9 @@ export async function loadModel(ws, vaultSecret) {
         case 'question_add':
           m.question_adds.push({ ...data, rid: r })
           break
+        case 'assemble':
+          m.assembles.push({ ...data, rid: r })
+          break
       }
     } catch {
       m.undecryptable++
@@ -178,6 +181,34 @@ export async function loadModel(ws, vaultSecret) {
         options: add.options ?? null, section_id: add.group ?? null,
       })
     }
+  }
+  // update_question annotations correct the EFFECTIVE question metadata (never
+  // the captured wording): latest note per question overlays required, limits,
+  // options and group onto the template so status/packet paths see the fix.
+  const noteByOcc = new Map()
+  for (const n of m.question_notes) {
+    const prev = noteByOcc.get(`${n.instance_id}:${n.question_occurrence_id}`)
+    const k = `${n.created_at ?? ''}${n.rid ?? ''}`
+    if (!prev || k > prev.k) noteByOcc.set(`${n.instance_id}:${n.question_occurrence_id}`, { k, n })
+  }
+  for (const { n } of noteByOcc.values()) {
+    const inst = m.instances.get(n.instance_id)
+    const q = inst?.template?.questions?.find((x) => x.question_occurrence_id === n.question_occurrence_id)
+    if (!q) continue
+    if (n.required === 'required') q.required = true
+    else if (n.required === 'optional') q.required = false
+    if (typeof n.limit === 'string' && n.limit.trim()) {
+      const lim = n.limit.trim()
+      const wm = /^words:(\d+)$/i.exec(lim), cm = /^chars:(\d+)$/i.exec(lim)
+      if (wm) { q.word_limit = Number(wm[1]); q.char_limit = null }
+      else if (cm) { q.char_limit = Number(cm[1]); q.word_limit = null }
+      else { q.word_limit = null; q.char_limit = null }
+    }
+    if (typeof n.options === 'string') q.options = n.options.trim() || null
+    if (typeof n.group === 'string') q.section_id = n.group.trim() || null
+    if (n.summary) q.annotation_summary = n.summary
+    if (n.kind) q.annotation_kind = n.kind
+    if (n.topic) q.annotation_topic = n.topic
   }
   // current fact versions: newest per fact_id; a retracted tombstone hides the fact
   const byFact = new Map()
