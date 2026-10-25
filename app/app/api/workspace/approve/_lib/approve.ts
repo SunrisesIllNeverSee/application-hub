@@ -56,6 +56,7 @@ export type HostedApproveDeps = {
   allow?: (key: string) => boolean
   now?: () => string
   reindex?: (a: { workspaceId: string; rid: string; path: string }) => Promise<boolean>
+  engineCheck?: (a: { workspaceId: string; rid: string; path: string }) => Promise<boolean>
 }
 
 const JSON_HEADERS = { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }
@@ -221,6 +222,10 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       head.kind !== 'approval' ||
       typeof head.id !== 'string' ||
       !head.id.startsWith('approval:') ||
+      head.scope !== 'private' ||
+      !head.enc || typeof head.enc !== 'object' ||
+      typeof head.enc.iv_b64 !== 'string' ||
+      typeof head.enc.ct_b64 !== 'string' ||
       typeof head.workspace_id !== 'string' ||
       !WS_KEY_RE.test(head.workspace_id)
     ) {
@@ -276,6 +281,21 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     // audit unique key retries once with a fresh tail.
     const recPath = `${APPROVAL_DIR}/${fileNameForApproval(String(head.id).slice('approval:'.length))}`
     const recSha = sha256hex(bytes)
+
+    // The record must decrypt under this workspace BEFORE the atomic write —
+    // the store has no delete path, so an undecryptable record would be
+    // permanent and its audit receipt would claim an approval the engine
+    // could never read. A staged store serves the request bytes to decodeFile.
+    const eng = (deps.engineCheck && deps.reindex)
+      ? null
+      : await engineSession(env, origin, key, jwt, ws.id, recPath, bytes)
+    if (!deps.engineCheck || !deps.reindex) {
+      if (!eng) return json(503, { error: 'hosted_backend_unavailable', detail: 'workspace unlock is not configured' })
+      try { await eng.w.decodeFile(recPath) } catch { return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' }) }
+    } else if (!(await deps.engineCheck!({ workspaceId: ws.id, rid: String(head.id), path: recPath }))) {
+      return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' })
+    }
+
     let done = false, doneSeq = 0, doneAt = ''
     for (let attempt = 0; attempt < 2 && !done; attempt++) {
       const tail = await pg(fetchImpl, origin, key, jwt, 'GET', T_AUD, {
@@ -323,7 +343,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         })
         const dup = dupRes.status === 200 && Array.isArray(dupRes.body) && dupRes.body.length ? dupRes.body[0] : null
         if (dup && dup.sha256 === recSha) {
-          const reindexed = await reindexApproval(deps, env, origin, key, jwt, ws.id, String(head.id), recPath, recSha, now())
+          const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, String(head.id), recPath, recSha, now())
           if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval exists but is not indexed — retry to index it' })
           return json(200, {
             status: 'ok', already_recorded: true, version_id: versionId, version_sha256: expected,
@@ -341,7 +361,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     // The RPC writes record + audit atomically, but manifest.records is
     // engine-owned — index the approval through the unlocked store-backed
     // workspace so read_review_status, approvalGate and packets observe it.
-    const reindexed = await reindexApproval(deps, env, origin, key, jwt, ws.id, String(head.id), recPath, recSha, doneAt)
+    const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, String(head.id), recPath, recSha, doneAt)
     if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval was written but not indexed — retry the decision' })
 
     return json(200, {
@@ -361,32 +381,44 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
   }
 }
 
-/** Index an approval record into manifest.records via the store-backed engine.
- *  The server holds AQUA_PASSPHRASE; the manifest CAS (manifest_rev) serializes
- *  concurrent writers. content_mac comes from the engine's own decode. */
+/** Open the unlocked store-backed workspace once per request. `stagePath`'s
+ *  getFile is overridden to serve the request's own record bytes, so the
+ *  engine's decodeFile can validate an uncommitted record. */
+async function engineSession(
+  env: Env, origin: string, key: string, jwt: string,
+  workspaceId: string, stagePath: string, stageBytes: Buffer,
+): Promise<{ w: any } | null> {
+  const passphrase = env.AQUA_PASSPHRASE
+  if (!passphrase) return null
+  const { createClient } = await import('@supabase/supabase-js')
+  const { createSupabaseStore } = await import('../../../mcp/_vendor/workspace/companion/src/store/workspace-store.mjs')
+  const { Workspace } = await import('../../../mcp/_vendor/workspace/companion/src/workspace.mjs')
+  const client = createClient(origin, key, { global: { headers: { authorization: `Bearer ${jwt}` } } })
+  const real = createSupabaseStore(client, workspaceId)
+  const staged = Object.create(real)
+  staged.getFile = async (p: string) => (p === stagePath ? stageBytes : real.getFile(p))
+  const w = await (Workspace as any).openStore(staged, { env: {}, stderr: { write: () => true } })
+  await w.unlock(passphrase)
+  return { w }
+}
+
+/** Index an approval record into manifest.records via the unlocked engine.
+ *  The manifest CAS (manifest_rev) serializes concurrent writers;
+ *  content_mac comes from the engine's own decodeFile. */
 async function reindexApproval(
-  deps: HostedApproveDeps, env: Env, origin: string, key: string, jwt: string,
+  deps: HostedApproveDeps, eng: { w: any } | null, env: Env, origin: string, key: string, jwt: string,
   workspaceId: string, rid: string, recPath: string, recSha: string, at: string,
 ): Promise<boolean> {
   if (deps.reindex) return deps.reindex({ workspaceId, rid, path: recPath })
-  const passphrase = env.AQUA_PASSPHRASE
-  if (!passphrase) return false
+  if (!eng) return false
   try {
-    const { createClient } = await import('@supabase/supabase-js')
-    const { createSupabaseStore } = await import('../../../mcp/_vendor/workspace/companion/src/store/workspace-store.mjs')
-    const { Workspace } = await import('../../../mcp/_vendor/workspace/companion/src/workspace.mjs')
-    const client = createClient(origin, key, { global: { headers: { authorization: `Bearer ${jwt}` } } })
-    const store = createSupabaseStore(client, workspaceId)
-    const ctx = { env: {} as Record<string, string>, stderr: { write: () => true } }
-    const w = await (Workspace as any).openStore(store, ctx)
-    await w.unlock(passphrase)
-    const decoded = await w.decodeFile(recPath)
-    w.manifest.records[rid] = {
+    const decoded = await eng.w.decodeFile(recPath)
+    eng.w.manifest.records[rid] = {
       kind: 'approval', path: recPath, authority: 'projection', scope: 'private',
       sha256: recSha, content_mac: decoded.contentMac, status: 'live',
       created_at: at, updated_at: at,
     }
-    await w.saveManifest()
+    await eng.w.saveManifest()
     return true
   } catch {
     return false

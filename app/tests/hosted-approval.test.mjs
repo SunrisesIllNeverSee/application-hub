@@ -215,6 +215,7 @@ async function call(body, { tables = db(), token = TOKEN, headers = {}, verify =
     env: ENV,
     fetchImpl: fake.fetchImpl,
     reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
+    engineCheck: async () => true,
     verifyJwt: verify,
     allow: () => true,
     now: () => '2026-10-30T00:06:00.000Z',
@@ -230,6 +231,7 @@ test('missing or invalid auth is a 401 before anything else', async () => {
       env: ENV,
       fetchImpl: fake.fetchImpl,
     reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
+    engineCheck: async () => true,
       verifyJwt: verifyJwt,
       allow: () => true,
     })
@@ -350,6 +352,25 @@ test('body validation: via, hash shape, record shape, size', async () => {
   big.record_b64 = Buffer.from(JSON.stringify({ aqua_record: 1, kind: 'approval', id: `approval:${APPROVAL_KEY}`, workspace_id: WS_KEY }) + 'x'.repeat(300 * 1024)).toString('base64')
   const tooBig = await call(big)
   assert.equal(tooBig.res.status, 413)
+})
+
+test('a public-scope plaintext approval record is refused (forgery hole)', async () => {
+  const forged = Buffer.from(
+    JSON.stringify({
+      aqua_record: 1,
+      workspace_id: WS_KEY,
+      id: `approval:${APPROVAL_KEY}`,
+      kind: 'approval',
+      scope: 'public',                    // plaintext — no enc envelope at all
+      authority: 'projection',
+      created_at: '2026-10-30T00:05:00.000Z',
+      data: { decision: 'approved', actor_class: 'human' },
+      sha256: hex(2),
+    }) + '\n',
+  )
+  const { res, json } = await call(goodBody({ record_b64: forged.toString('base64') }))
+  assert.equal(res.status, 400)
+  assert.equal(json.error, 'bad_record')
 })
 
 test('a record for a different workspace key is refused', async () => {

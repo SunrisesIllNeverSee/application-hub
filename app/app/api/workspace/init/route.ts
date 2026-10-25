@@ -39,7 +39,12 @@ export async function POST(req: Request) {
   if (!passphrase || typeof ws?.newManifest !== 'function') {
     return json(503, { error: 'hosted_backend_unavailable', detail: 'companion init primitives unavailable' })
   }
-  const { manifest } = await ws.newManifest(passphrase)
+  const { manifest, keys } = await ws.newManifest(passphrase)
+  // newManifest produces no manifest_mac — unlock() refuses a manifest whose
+  // MAC is absent/mismatched, so stamp it the same way the CLI init path does
+  const crypto = await import('../../mcp/_vendor/workspace/companion/src/crypto.mjs') as any
+  const { manifest_mac: _omit, ...macBase } = manifest
+  manifest.manifest_mac = await crypto.macHex(keys, crypto.canonicalJson(macBase))
   const { data, error } = await client.from('aqua_workspaces')
     .insert({ workspace_key: manifest.workspace_id, manifest })
     .select('id').single()
