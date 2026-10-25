@@ -1,6 +1,6 @@
 // Hosted personal-workspace MCP endpoint (POST /mcp with a Bearer token,
 // app/app/api/mcp/_lib/workspace.ts): Bearer auth + WWW-Authenticate challenge,
-// per-user rate limit, 2 MB body cap, per-request workspace backend over the
+// per-user rate limit, 10 MB body cap, per-request workspace backend over the
 // caller's hosted store, catalog parity with the public surface.
 // Supabase and JWT verification are dep-injected; fixtures are synthetic.
 // Run: node --test tests/mcp-workspace-hosted.test.mjs
@@ -225,7 +225,7 @@ test('per-user rate limit: real mcp_workspace limiter, keyed by user id not IP',
   assert.ok(seen.some(([k, a]) => a === 'mcp_hosted' && /^mcp-ip:[0-9a-f]{24}$/.test(k)), 'ip key also applied')
 })
 
-test('2 MB body cap; a body past the catalog 64 KB cap still parses', async () => {
+test('10 MB body cap; a body past the catalog 64 KB cap still parses', async () => {
   const big = { jsonrpc: '2.0', id: 1, method: 'ping', params: { pad: 'x'.repeat(128 * 1024) } }
   assert.equal((await call(big)).res.status, 200)
   const res = await handleWorkspaceMcpPost(post('x'.repeat(MAX_WORKSPACE_BODY_BYTES + 1), { raw: true }), deps().deps)

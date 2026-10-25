@@ -17,13 +17,15 @@ export async function POST(req: Request) {
   let user: { id: string } | null = null
   try { user = await verifySupabaseJWT(token) } catch { /* falls through */ }
   if (!user?.id) return json(401, { error: 'unauthorized' })
+  const { rateLimitAllow } = await import('../../../../../lib/rate-limit.ts')
+  if (!rateLimitAllow(user.id, 'hosted_approve')) return json(429, { error: 'rate_limited' }, { 'retry-after': '60' })
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.AQUA_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.AQUA_PUBLISHABLE_KEY
   if (!url || !key) return json(503, { error: 'not_configured' })
 
   const { assertAnonKey } = await import('../../mcp/_vendor/catalog/key.mjs')
-  assertAnonKey(key)
+  try { assertAnonKey(key) } catch { return json(503, { error: 'not_configured', detail: 'the configured key is not an anon/publishable key' }) }
   const client = createClient(url, key, { global: { headers: { authorization: `Bearer ${token}` } } })
   const { data: existing } = await client
     .from('aqua_workspaces').select('id, workspace_key')

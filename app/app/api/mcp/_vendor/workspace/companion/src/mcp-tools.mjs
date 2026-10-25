@@ -674,7 +674,7 @@ export const TOOLS = [
     inputSchema: schema({
       file: S('File name inside inbox/. Pass this, file_name + content_base64, or file_sha256.'),
       file_name: FILE_NAME_PROP,
-      content_base64: { type: 'string', maxLength: B64(MAX_EVIDENCE_BYTES), description: 'Base64-encoded file content (up to 64 MB decoded); only its sha256 is recorded.' },
+      content_base64: { type: 'string', maxLength: B64(MAX_EVIDENCE_BYTES), description: 'Base64-encoded file content (up to 64 MB decoded; only its sha256 is recorded) — the hosted MCP transport caps requests at ~6.7 MB decoded; larger files need the staged-upload path (not yet implemented).' },
       file_sha256: S('sha256 (lowercase hex, 64 characters) of the evidence file — enough on its own: no file is read.', { maxLength: 64 }),
       title: S('Short description of the evidence.'), version_id: ID('Version it supports.'),
       excerpt: { type: 'string', maxLength: 20_000, description: 'Optional quoted passage from the file.' },
@@ -868,7 +868,7 @@ export const TOOLS = [
     inputSchema: schema({
       file: S('File inside inbox/ or packets/. Pass this or file_name + content_base64.'),
       file_name: FILE_NAME_PROP,
-      content_base64: { type: 'string', maxLength: B64(MAX_PACKET_BYTES), description: 'Base64-encoded packet export .json (up to 50 MB decoded).' },
+      content_base64: { type: 'string', maxLength: B64(MAX_PACKET_BYTES), description: 'Base64-encoded packet export .json (up to 50 MB decoded) — hosted MCP transport caps at ~6.7 MB decoded; larger packets need the staged path (not yet implemented).' },
     }),
     async handler(t, args) {
       const f = toolFile(t.ws, args, { allowed: ['inbox', 'packets'], exts: ['json'], maxBytes: MAX_PACKET_BYTES })
@@ -986,8 +986,8 @@ export const TOOLS = [
       folder: S('Folder inside inbox/ holding the submitted applications (for example "history" for inbox/history/). Pass this or files.'),
       files: {
         type: 'array', maxItems: MAX_HISTORY_FILES,
-        items: { type: 'object', properties: { name: { type: 'string', maxLength: 200 }, content_base64: { type: 'string', maxLength: B64(MAX_HISTORY_FILE_BYTES) } }, required: ['name', 'content_base64'] },
-        description: 'Uploaded files instead of an inbox/ folder: [{name, content_base64}], at most 200, each ≤ 5 MB decoded.',
+        items: { type: 'object', properties: { name: { type: 'string', maxLength: 200 }, content_base64: { type: 'string', maxLength: B64(MAX_HISTORY_FILE_BYTES) } }, required: ['name', 'content_base64'], additionalProperties: false },
+        description: 'Uploaded files instead of an inbox/ folder: [{name, content_base64}], at most 200, each ≤ 5 MB decoded; the hosted MCP transport caps the total request at ~6.7 MB decoded.',
       },
       date: S('Submission date (YYYY-MM-DD) to use when a file has none of its own.', { maxLength: 10 }),
       program: S('Program name to use for every file (otherwise read from each file).'),

@@ -107,7 +107,7 @@ async function buildData() {
       url: `${ORIGIN}/mcp`,
       status: 'live',
       transport: 'Streamable HTTP (POST JSON-RPC, JSON responses, stateless; no SSE stream)',
-      scope: 'read-only public catalog tools, resources and prompts; no authentication, no workspace tools; rate-limited',
+      scope: 'public catalog tools for everyone; personal workspace tools for signed-in users (Bearer OAuth, caller-JWT RLS); rate-limited',
       claude_code: `claude mcp add --transport http aqua-public ${ORIGIN}/mcp`,
     },
     catalog_config: {
@@ -170,7 +170,7 @@ function agentPathSection(d, { full = false } = {}) {
     : `- sha256: \`${c.tarball.sha256}\` (also at ${c.tarball.sha256_url}; ${c.tarball.latest_url} lists the current version).`
   return `## The agent path: the local AQUA companion
 
-AQUA is local-first. A user's private answers live in an encrypted vault in their browser and, if they choose, in an encrypted companion workspace folder on their own computer. They are never stored on AQUA's servers, and no AQUA service hands them to an agent. An agent helps a user by running the **AQUA companion** on the user's machine: a command-line tool and stdio MCP server that works on one consented, encrypted workspace plus the public catalog.
+AQUA is local-first by default. A user's private answers live in an encrypted vault in their browser and, if they choose, in an encrypted companion workspace folder on their own computer. If a user explicitly enables the hosted workspace, AQUA stores ciphertext records on its servers and the hosted engine processes plaintext transiently in-request under that user's own signed-in session; no AQUA service hands answers to an agent outside that authorized session. An agent helps a user by running the **AQUA companion** on the user's machine: a command-line tool and stdio MCP server that works on one consented, encrypted workspace plus the public catalog.
 
 ### 1. Install
 - Primary (npm, Node.js 22+): \`${d.install.mcp_help}\`. ${d.mcp_server.status} Its companion command line is \`${d.install.mcp_companion_cli}\`.
@@ -222,7 +222,7 @@ ${d.hosted_mcp.url}: ${d.hosted_mcp.status} (${d.hosted_mcp.scope}).
 
 ### 9. Intentionally absent
 ${d.intentionally_absent.map((a) => `- \`${a.name}\`${a.why ? `: ${a.why}` : ''}`).join('\n')}
-- There is no service-role key, no account token and no hosted private-answer tool anywhere in the agent path.
+- There is no service-role key anywhere. Hosted workspace tools exist only for signed-in users over Bearer OAuth; every call runs under the caller's JWT with row-level security.
 ${full ? `
 ### Tools (${d.total} tools, from ${d.tool_source})
 ${toolsTable(d)}

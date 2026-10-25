@@ -23,7 +23,7 @@
     "url": "https://aquaidp.xyz/mcp",
     "status": "live",
     "transport": "Streamable HTTP (POST JSON-RPC, JSON responses, stateless; no SSE stream)",
-    "scope": "read-only public catalog tools, resources and prompts; no authentication, no workspace tools; rate-limited",
+    "scope": "public catalog tools for everyone; personal workspace tools for signed-in users (Bearer OAuth, caller-JWT RLS); rate-limited",
     "claude_code": "claude mcp add --transport http aqua-public https://aquaidp.xyz/mcp"
   },
   "catalog_config": {

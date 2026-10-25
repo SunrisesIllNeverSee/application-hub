@@ -157,7 +157,7 @@ export default function AgentsPage() {
             {G.intentionally_absent.map((x) => (
               <li key={x.name}><code className={code}>{x.name}</code>{x.why ? `: ${x.why}` : ''}</li>
             ))}
-            <li>No service-role key, no account token and no hosted private-answer tool exist anywhere in the agent path.</li>
+            <li>No service-role key exists anywhere in the agent path. Hosted workspace tools require the user's own Bearer session; every call runs under caller-JWT row-level security.</li>
           </ul>
         </section>
 

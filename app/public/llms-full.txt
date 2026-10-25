@@ -19,7 +19,7 @@ Do not use AQUA as an admissions oracle, acceptance-probability service, or exte
 
 ## The agent path: the local AQUA companion
 
-AQUA is local-first. A user's private answers live in an encrypted vault in their browser and, if they choose, in an encrypted companion workspace folder on their own computer. They are never stored on AQUA's servers, and no AQUA service hands them to an agent. An agent helps a user by running the **AQUA companion** on the user's machine: a command-line tool and stdio MCP server that works on one consented, encrypted workspace plus the public catalog.
+AQUA is local-first by default. A user's private answers live in an encrypted vault in their browser and, if they choose, in an encrypted companion workspace folder on their own computer. If a user explicitly enables the hosted workspace, AQUA stores ciphertext records on its servers and the hosted engine processes plaintext transiently in-request under that user's own signed-in session; no AQUA service hands answers to an agent outside that authorized session. An agent helps a user by running the **AQUA companion** on the user's machine: a command-line tool and stdio MCP server that works on one consented, encrypted workspace plus the public catalog.
 
 ### 1. Install
 - Primary (npm, Node.js 22+): `npx -y aqua-mcp-server --help`. aqua-mcp-server is published on npm and is the primary install: `npx -y aqua-mcp-server`. It includes the companion and serves the same tools. Versions below 2.0 are legacy and must not be used. Its companion command line is `npx -y aqua-mcp-server companion <command>   # for example: companion init --path <folder>, companion doctor, companion export-backup <file> --workspace <folder>/AQUA`.
@@ -70,7 +70,7 @@ https://aquaidp.xyz/.well-known/aqua-catalog.json returns `{version, supabase_ur
 The companion keeps a public catalog cache: discover_applications, get_application_details and match_canonical_questions refresh an empty or stale cache (older than 24 hours; AQUA_CATALOG_MAX_AGE_HOURS changes it, 0 turns it off) with the same public read-only request as refresh_catalog. Offline or unconfigured, they answer from the cache and return catalog_empty: run refresh_catalog when there is nothing cached.
 
 ### 8. Hosted read-only MCP
-https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and prompts; no authentication, no workspace tools; rate-limited).
+https://aquaidp.xyz/mcp: live (public catalog tools for everyone; personal workspace tools for signed-in users (Bearer OAuth, caller-JWT RLS); rate-limited).
 
 ### 9. Intentionally absent
 - `publish_catalog_entry`: Catalog publication needs reviewer authorization and source verification in the AQUA service; the agent can only prepare a candidate.
@@ -79,7 +79,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 - `configure_security`: Security configuration (RLS, keys, service-role access) is owner-only and never handled by agents.
 - `read_hosted_answers`: Private answers live in the browser vault and this workspace; the agent never gets database or service-role access.
 - `TRANSPORT=http (self-hosted HTTP)`: 1.x served unauthenticated write-capable HTTP. 2.0 has stdio locally and the read-only hosted endpoint only.
-- There is no service-role key, no account token and no hosted private-answer tool anywhere in the agent path.
+- There is no service-role key anywhere. Hosted workspace tools exist only for signed-in users over Bearer OAuth; every call runs under the caller's JWT with row-level security.
 
 ### Tools (43 tools, from application-hub-mcp-server/TOOLS.json)
 | Tool | Tier | What it does |

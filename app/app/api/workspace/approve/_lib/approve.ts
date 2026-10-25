@@ -28,7 +28,7 @@ import { readCappedText } from '../../../mcp/_vendor/catalog/rest.mjs'
 import { rateLimitAllow } from '../../../../../lib/rate-limit.ts'
 
 export const MAX_BODY_BYTES = 64 * 1024
-const MAX_RECORD_BYTES = 256 * 1024
+const MAX_RECORD_BYTES = 40 * 1024  // ~53KB base64 — must stay under MAX_BODY_BYTES
 const REST_TIMEOUT_MS = 15_000
 const MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 

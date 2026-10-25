@@ -325,7 +325,7 @@ export const WORKSPACE_TOOL_DEFS = [
         "content_base64": {
           "type": "string",
           "maxLength": 89478488,
-          "description": "Base64-encoded file content (up to 64 MB decoded); only its sha256 is recorded."
+          "description": "Base64-encoded file content (up to 64 MB decoded; only its sha256 is recorded) — the hosted MCP transport caps requests at ~6.7 MB decoded; larger files need the staged-upload path (not yet implemented)."
         },
         "file_sha256": {
           "type": "string",
@@ -454,7 +454,7 @@ export const WORKSPACE_TOOL_DEFS = [
         "content_base64": {
           "type": "string",
           "maxLength": 69905068,
-          "description": "Base64-encoded packet export .json (up to 50 MB decoded)."
+          "description": "Base64-encoded packet export .json (up to 50 MB decoded) — hosted MCP transport caps at ~6.7 MB decoded; larger packets need the staged path (not yet implemented)."
         }
       },
       "required": [],
@@ -607,9 +607,10 @@ export const WORKSPACE_TOOL_DEFS = [
             "required": [
               "name",
               "content_base64"
-            ]
+            ],
+            "additionalProperties": false
           },
-          "description": "Uploaded files instead of an inbox/ folder: [{name, content_base64}], at most 200, each ≤ 5 MB decoded."
+          "description": "Uploaded files instead of an inbox/ folder: [{name, content_base64}], at most 200, each ≤ 5 MB decoded; the hosted MCP transport caps the total request at ~6.7 MB decoded."
         },
         "date": {
           "type": "string",
