@@ -30,7 +30,7 @@ import { readCappedText } from '../_vendor/catalog/rest.mjs'
 import { ResourceNotFound } from '../_vendor/catalog/resources.mjs'
 import { assertAnonKey } from '../_vendor/catalog/key.mjs'
 import { WORKSPACE_TOOL_DEFS } from '../_vendor/workspace/workspace-tools.mjs'
-import { createSupabaseStore } from '../_vendor/workspace/store/workspace-store.mjs'
+import { createSupabaseStore } from '../_vendor/workspace/companion/src/store/workspace-store.mjs'
 import {
   acceptsJson, ASSUMED_PROTOCOL_VERSION, clientKey, hostedCatalog, json, originAllowed, rpcError, type Env,
 } from './hosted.ts'
@@ -125,31 +125,62 @@ async function findWorkspaceRow(client: SupabaseLike): Promise<WorkspaceRow | nu
   return data && data.length ? (data[0] as WorkspaceRow) : null
 }
 
-class HostedBackendUnavailable extends Error {
-  constructor() {
-    super('the hosted workspace backend has no store-backed session yet')
-    this.name = 'HostedBackendUnavailable'
-  }
-}
+/**
+ * Session-init failures that map to a clean hosted_backend_unavailable tool
+ * result instead of a 500: missing deployment secrets, a passphrase that does
+ * not open the workspace, a corrupt/absent manifest mid-flight. Anything else
+ * is a bug and propagates to the outer 500 handler.
+ */
+const SESSION_INIT_ERRORS = new Set(['SecretUnavailableError', 'DecryptError', 'WorkspaceError', 'StoreUnsupportedError'])
 
 /**
- * Per-request session over the caller's hosted store.
- * TODO(m10): MISSING PIECE — nothing in the companion can run on a
- * WorkspaceStore yet. createSupabaseStore (aqua-companion/src/store/
- * workspace-store.mjs, vendored at ../_vendor/workspace/workspace-store.mjs)
- * is only the storage adapter: Workspace.open(ctx) resolves a filesystem
- * root via locateWorkspace() (sync fs.existsSync/readFileSync in
- * aqua-companion/src/workspace.mjs) and every tool handler in
- * mcp-tools.mjs gets an fs-bound workspace (t.ws.root + fsafe
- * readInside/writeNewInside). The missing piece is a store-backed
- * workspace/session (e.g. Workspace.openStore(store) plus
- * Session.init({ store })) in aqua-companion, then vendored through
- * application-hub-mcp-server (npm run vendor:companion + vendor:hosted).
- * Until it exists, tools on an initialized hosted workspace answer with a
- * clean hosted_backend_unavailable error — never fake results.
+ * Per-request session over the caller's hosted store: the real companion
+ * engine — a store-backed aqua-companion Session (Workspace.openStore over
+ * createSupabaseStore; vendored at ../_vendor/workspace/companion/). Every
+ * tool call re-opens the workspace through the store (same re-open-per-call
+ * semantics as the stdio server), and the store only ever sees ciphertext:
+ * the workspace passphrase comes from the deployment environment
+ * (AQUA_PASSPHRASE), never from the request.
+ *
+ * Honest limits on this surface: tools that need a local filesystem refuse
+ * with a named store_unsupported:<method> error — inbox file reads (`file`
+ * args; content uploads via file_name + content_base64 work), inbox folder
+ * walks, vault-backup import (sync_from_vault_export), and exports/ file
+ * writes (present_review_decisions, assemble_application,
+ * prepare_catalog_candidate skip saving the file — its payload still returns
+ * in untrusted_content where the tool has one).
  */
-function defaultSessionFactory(_ws: WorkspaceCtx): HostedSession {
-  throw new HostedBackendUnavailable()
+async function defaultSessionFactory(ws: WorkspaceCtx, env: Env, fetchImpl?: typeof fetch): Promise<HostedSession> {
+  // vendored .mjs: untyped on purpose (the companions's JSDoc types are not the TS contract here)
+  const { Session } = (await import('../_vendor/workspace/companion/src/registry.mjs')) as any
+  const { loadModel } = (await import('../_vendor/workspace/companion/src/mcp-model.mjs')) as any
+  const sessionEnv = {
+    ...process.env,
+    // public-catalog config for the store session: same project, the
+    // anon/publishable key only (the companion key check enforces the role)
+    AQUA_SUPABASE_URL: process.env.AQUA_SUPABASE_URL ?? env.NEXT_PUBLIC_SUPABASE_URL,
+    AQUA_PUBLISHABLE_KEY: process.env.AQUA_PUBLISHABLE_KEY ?? env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  }
+  const session = await new Session(
+    { env: sessionEnv, cwd: process.cwd(), stderr: { write: () => true } },
+    { fetchImpl },
+  ).init({ store: ws.store, workspaceRef: ws.row.id })
+  return {
+    async callTool(name: string, args: unknown) {
+      const r = await session.callTool(name, args)
+      if (r?.unknown) return { result: { tool: name, status: 'error', error: 'unknown_tool' }, isError: true }
+      return { result: r.result, isError: Boolean(r.isError) }
+    },
+    async readStatus() {
+      const w = await session.openWorkspace()
+      const model = await loadModel(w, session.vaultSecret)
+      const applications = []
+      for (const instance_id of model.instances.keys()) {
+        applications.push((await session.callTool('read_review_status', { application_id: instance_id })).result)
+      }
+      return { status: 'ok', workspace_id: session.workspaceId ?? null, applications }
+    },
+  }
 }
 
 /** Result mirroring the companion's notInitialized shape (registry.mjs). */
@@ -166,14 +197,14 @@ function notInitializedResult(def: { name: string; tier: string }) {
   }
 }
 
-/** Result when a hosted workspace exists but the store-backed session is not wired yet. */
-function backendUnavailableResult(def: { name: string; tier: string }) {
+/** Result when a hosted workspace exists but its tool session could not be opened. */
+function backendUnavailableResult(def: { name: string; tier: string }, detail: string | null = null) {
   return {
     tool: def.name,
     tier: def.tier,
     status: 'error',
     error: 'hosted_backend_unavailable',
-    message: 'The hosted workspace exists, but tool execution against it is not wired yet: the companion registry only runs on a filesystem workspace today (Workspace.open is fs-bound); a store-backed session over createSupabaseStore is the missing piece.',
+    message: `The hosted workspace exists, but its tool session could not be opened${detail ? ` (${detail})` : ''}. The workspace passphrase must be in the server environment (AQUA_PASSPHRASE) and must open this workspace.`,
   }
 }
 
@@ -196,11 +227,14 @@ async function workspaceBackend(env: Env, jwt: string, deps: WorkspaceDeps) {
     if (loaded) ws = { row, store, manifest: loaded.manifest }
   }
   let session: HostedSession | null = null
+  let sessionError: string | null = null
   if (ws) {
     try {
-      session = await (deps.sessionFactory ?? defaultSessionFactory)(ws)
+      session = await (deps.sessionFactory ?? ((w: WorkspaceCtx) => defaultSessionFactory(w, env, deps.fetchImpl)))(ws)
     } catch (e) {
-      if (!(e instanceof HostedBackendUnavailable)) throw e
+      if (!SESSION_INIT_ERRORS.has((e as Error)?.name ?? '')) throw e
+      sessionError = (e as Error).name
+      console.error('mcp workspace: session init failed', sessionError)
     }
   }
   const defs = WORKSPACE_TOOL_DEFS.filter((d) => !d.setup) as Array<{ name: string; tier: string; description: string; inputSchema: unknown; title?: string }>
@@ -208,7 +242,7 @@ async function workspaceBackend(env: Env, jwt: string, deps: WorkspaceDeps) {
     def,
     call: async (args: unknown) => {
       if (!ws) return { result: notInitializedResult(def), isError: true }
-      if (!session) return { result: backendUnavailableResult(def), isError: true }
+      if (!session) return { result: backendUnavailableResult(def, sessionError), isError: true }
       return session.callTool(def.name, args)
     },
   }))

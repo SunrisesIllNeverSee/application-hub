@@ -2,8 +2,8 @@
 // `npm run vendor:companion` in application-hub-mcp-server/ (CI checks these copies).
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/aqua-local/repo.ts
-// source-sha256: 69e21bf63a5a0d90f87a0a8a99590897dd21b2f623b31b121019602e84f48c3d
-// body-sha256: 7d06c6c8a4edbb481e7644e65c5cf3979078c2d8a489e8f5f95330889b6502d7
+// source-sha256: 5f74e0a51944e27360489a20676d965c67b2081af0672c6221bdcb6d14a98ea7
+// body-sha256: dc4f59d077ebc184be3fa58026b200c5a61b2de797190fcb2d40dd2de4867be5
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // NETWORK-BOUNDARY: no fetch/import of remote APIs allowed in aqua-local
 //
@@ -441,7 +441,10 @@ export class VaultHistoryApprovalError extends VaultScopeError {
   }
 }
 
-const HUMAN_VIA                                                                        = ['review_ui', 'decision_file']
+const HUMAN_VIA                                                                        = ['review_ui', 'decision_file', 'hosted_review']
+// hosted_review is read-only in the local vault — it arrives via imported
+// workspace records; local human decisions stay review_ui | decision_file
+const WRITABLE_VIA                        = ['review_ui', 'decision_file']
 
 async function recordHumanDecision(
   storage              ,
@@ -455,8 +458,8 @@ async function recordHumanDecision(
   if (typeof input.actor_id !== 'string' || isBlankBody(input.actor_id)) {
     throw new VaultScopeError('human decision requires actor_id')
   }
-  if (!HUMAN_VIA.includes(input.via)) {
-    throw new VaultScopeError(`human decision via must be one of ${HUMAN_VIA.join('|')}`)
+  if (!WRITABLE_VIA.includes(input.via)) {
+    throw new VaultScopeError(`human decision via must be one of: ${WRITABLE_VIA.join('|')}`)
   }
   const approving = decision === 'approved'
   if (approving && !input.secret) {

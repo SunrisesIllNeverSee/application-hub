@@ -11,8 +11,19 @@ import { fileURLToPath } from 'node:url'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const SRC = path.join(ROOT, 'src', 'catalog')
 const COMPANION_SRC = path.join(ROOT, 'src', 'vendor', 'companion', 'src')
+const COMPANION_ROOT = path.join(ROOT, 'src', 'vendor', 'companion')
 export const DEST = path.resolve(ROOT, '..', 'app', 'app', 'api', 'mcp', '_vendor')
 const HEADER = (rel) => `// VENDORED from application-hub-mcp-server/${rel}. Do not edit: change the source and run\n// \`npm run vendor:hosted\` in application-hub-mcp-server/ (CI checks these copies).\n`
+
+function walk(dir, base) {
+  const out = []
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name)
+    if (e.isDirectory()) out.push(...walk(p, base))
+    else if (e.isFile()) out.push(path.relative(base, p))
+  }
+  return out
+}
 
 /**
  * Workspace tool definitions for the authenticated workspace surface of the
@@ -40,12 +51,17 @@ export function plan() {
   const files = fs.readdirSync(SRC).filter((f) => f.endsWith('.mjs')).sort()
   const out = files.map((f) => ({ dest: path.join(DEST, 'catalog', f), body: HEADER(`src/catalog/${f}`) + fs.readFileSync(path.join(SRC, f), 'utf8') }))
   out.push({ dest: path.join(DEST, 'TOOLS.json'), body: fs.readFileSync(path.join(ROOT, 'TOOLS.json'), 'utf8') })
-  // The hosted store adapter keeps its source layout (store/ + sibling
-  // imports like ../fsafe.mjs) so vendored relative imports still resolve.
-  for (const rel of [path.join('store', 'workspace-store.mjs'), 'fsafe.mjs', 'crypto.mjs']) {
-    const src = path.join(COMPANION_SRC, rel)
-    if (!fs.existsSync(src)) throw new Error(`src/vendor/companion/src/${rel} is missing; run \`npm run vendor:companion\` first`)
-    out.push({ dest: path.join(DEST, 'workspace', rel), body: HEADER(`src/vendor/companion/src/${rel}`) + fs.readFileSync(src, 'utf8') })
+  // The hosted workspace surface runs the real companion engine over a
+  // WorkspaceStore (Workspace.openStore + Session.init({store})): the whole
+  // vendored companion tree goes under workspace/companion/ preserving its
+  // internal layout (src/, vendor/, config/) so relative imports — including
+  // store/workspace-store.mjs -> ../fsafe.mjs and mcp-tools.mjs ->
+  // ../vendor/lib/... — still resolve.
+  if (!fs.existsSync(COMPANION_ROOT)) throw new Error('src/vendor/companion is missing; run `npm run vendor:companion` first')
+  for (const rel of walk(COMPANION_ROOT, COMPANION_ROOT)) {
+    const src = path.join(COMPANION_ROOT, rel)
+    const body = fs.readFileSync(src, 'utf8')
+    out.push({ dest: path.join(DEST, 'workspace', 'companion', rel), body: rel.endsWith('.mjs') ? HEADER(`src/vendor/companion/${rel}`) + body : body })
   }
   out.push({
     dest: path.join(DEST, 'workspace', 'workspace-tools.mjs'),

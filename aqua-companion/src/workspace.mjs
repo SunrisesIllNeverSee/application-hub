@@ -94,6 +94,21 @@ export class WorkspaceError extends Error {
   }
 }
 
+/**
+ * A filesystem-bound Workspace method was called on a store-backed workspace
+ * (hosted path, see store/workspace-store.mjs). Named `store_unsupported:<method>`
+ * so callers fail honestly instead of silently touching a filesystem that is
+ * not there.
+ */
+export class StoreUnsupportedError extends WorkspaceError {
+  constructor(method) {
+    super(`store_unsupported:${method} — this workspace is store-backed; that operation needs the local filesystem workspace.`, 4)
+    this.name = 'StoreUnsupportedError'
+    this.code = `store_unsupported:${method}`
+    this.method = method
+  }
+}
+
 export function rid(kind, key) {
   return `${kind}:${key}`
 }
@@ -167,10 +182,40 @@ export function locateWorkspace(ctx, { allowBroken = false } = {}) {
   )
 }
 
+/**
+ * Shared post-load manifest handling for both open paths: unreadable/broken
+ * manifests (only allowed through with `allowBroken`), the schema-version
+ * gate, and records-map hydration.
+ */
+function checkedManifest(manifest, { allowBroken = false } = {}) {
+  if (!manifest || manifest.__unparseable) {
+    if (!allowBroken) {
+      throw new WorkspaceError(`${MANIFEST} is unreadable. Run "aqua-companion recover" to rebuild it.`, 4)
+    }
+    return null
+  }
+  if (manifest.schema_version > SCHEMA_VERSION) {
+    throw new WorkspaceError(
+      `This workspace uses schema ${manifest.schema_version}; this companion supports ${SCHEMA_VERSION}. Update aqua-companion.`,
+    )
+  }
+  if (!manifest.records || typeof manifest.records !== 'object' || Array.isArray(manifest.records)) manifest.records = {}
+  return manifest
+}
+
 export class Workspace {
-  constructor(ctx, root, manifest) {
+  /**
+   * @param {object|null} store  A WorkspaceStore (store/workspace-store.mjs)
+   *   when the workspace is store-backed (hosted). Then `root` is null and
+   *   every storage primitive below routes through the store; fs-only helpers
+   *   throw StoreUnsupportedError.
+   */
+  constructor(ctx, root, manifest, { store = null, rev = null } = {}) {
     this.ctx = ctx
     this.root = root
+    this.store = store
+    // Store revision at load (CAS handle for store.saveManifest; fs store ignores it)
+    this.loadedRev = rev
     this.manifest = manifest
     this.keys = null
     // MAC of the manifest as loaded; saveManifest refuses if the disk copy moved on
@@ -179,19 +224,36 @@ export class Workspace {
 
   static open(ctx, { allowBrokenManifest = false } = {}) {
     const root = locateWorkspace(ctx, { allowBroken: allowBrokenManifest })
-    const manifest = readManifestAt(root)
-    if (!manifest || manifest.__unparseable) {
-      if (!allowBrokenManifest) {
-        throw new WorkspaceError(`${MANIFEST} is unreadable. Run "aqua-companion recover" to rebuild it.`, 4)
-      }
-      return new Workspace(ctx, root, null)
-    }
-    if (manifest.schema_version > SCHEMA_VERSION) {
-      throw new WorkspaceError(
-        `This workspace uses schema ${manifest.schema_version}; this companion supports ${SCHEMA_VERSION}. Update aqua-companion.`,
-      )
-    }
+    const manifest = checkedManifest(readManifestAt(root), { allowBroken: allowBrokenManifest })
     return new Workspace(ctx, root, manifest)
+  }
+
+  /**
+   * Store-backed variant of open(): loads the manifest through the store's
+   * loadManifest() (a document row, not a filesystem scan). Async — callers
+   * must await. Same manifest verification and unlock flow as open(); the
+   * returned workspace's storage primitives route through the store.
+   */
+  static async openStore(store, ctx, { allowBrokenManifest = false } = {}) {
+    let loaded = null
+    try {
+      loaded = await store.loadManifest()
+    } catch (e) {
+      // a malformed manifest document is the store-side equivalent of an unparseable file
+      if (e instanceof SyntaxError) loaded = { manifest: { __unparseable: true }, rev: null }
+      else throw e
+    }
+    if (!loaded || loaded.manifest === null || loaded.manifest === undefined) {
+      if (!allowBrokenManifest) {
+        throw new WorkspaceError('No AQUA workspace manifest in this store. The hosted workspace is not initialized.', 2)
+      }
+      return new Workspace(ctx, null, null, { store })
+    }
+    const manifest = checkedManifest(loaded.manifest, { allowBroken: allowBrokenManifest })
+    if (manifest && !isWorkspaceManifest(manifest)) {
+      throw new WorkspaceError('The manifest in this store is not an AQUA workspace manifest.', 4)
+    }
+    return new Workspace(ctx, null, manifest, { store, rev: loaded.rev ?? null })
   }
 
   get records() {
@@ -239,11 +301,42 @@ export class Workspace {
   }
 
   /**
-   * Save the manifest. Refuses when the file on disk changed since this run
+   * Save the manifest. Refuses when the stored copy changed since this run
    * loaded it (another companion run saved in between): no last-write-wins
-   * on the index either.
+   * on the index either. On a store-backed workspace the same guard is the
+   * manifest_mac pre-check plus the store's revision CAS (the Supabase
+   * commit RPC; the fs store performs the ops/manifest write directly).
    */
   async saveManifest({ expectAbsent = false } = {}) {
+    if (this.store) {
+      if (!expectAbsent && this.loadedMac !== undefined) {
+        const cur = await this.store.loadManifest().catch(() => null)
+        const storeMac = cur?.manifest && !cur.manifest.__unparseable ? cur.manifest.manifest_mac ?? null : null
+        if (storeMac !== this.loadedMac) {
+          throw new WorkspaceError(
+            'The workspace was changed by another writer while this one was working. Nothing in the index was overwritten; try again.',
+            4,
+          )
+        }
+      }
+      this.manifest.updated_at = nowIso()
+      this.manifest.manifest_mac = await this.manifestMac(this.manifest)
+      let rev
+      try {
+        rev = await this.store.saveManifest(this.manifest, this.loadedRev, [], [])
+      } catch (e) {
+        if (e?.code === 'manifest_rev_conflict' || e?.message === 'manifest_rev_conflict') {
+          throw new WorkspaceError(
+            'The workspace was changed by another writer while this one was working. Nothing in the index was overwritten; try again.',
+            4,
+          )
+        }
+        throw e
+      }
+      if (rev !== null && rev !== undefined) this.loadedRev = rev
+      this.loadedMac = this.manifest.manifest_mac
+      return
+    }
     if (!expectAbsent && this.loadedMac !== undefined) {
       const onDisk = readManifestAt(this.root)
       const diskMac = onDisk && !onDisk.__unparseable ? onDisk.manifest_mac ?? null : null
@@ -268,6 +361,22 @@ export class Workspace {
   async audit(op, details = {}, log = AUDIT_LOG) {
     let prev = null
     let seq = 1
+    if (this.store) {
+      const { lastLine } = await this.store.readLogTail(log)
+      if (lastLine) {
+        prev = await sha256Hex(lastLine)
+        let lastSeq = null
+        try {
+          lastSeq = JSON.parse(lastLine).seq ?? null
+        } catch {
+          lastSeq = null
+        }
+        seq = (typeof lastSeq === 'number' ? lastSeq : 0) + 1
+      }
+      const entry = { seq, at: nowIso(), op, ...details, prev }
+      await this.store.appendLog(log, JSON.stringify(entry))
+      return entry
+    }
     if (existsInside(this.root, log)) {
       const lines = readInside(this.root, log).toString('utf8').split('\n').filter(Boolean)
       if (lines.length) {
@@ -284,14 +393,31 @@ export class Workspace {
     return entry
   }
 
-  /** Choose a NEW file path for a record (never reuses an existing file). */
+  /**
+   * Choose a NEW file path for a record (never reuses an existing file).
+   * On a store-backed workspace existence checks are async, so this returns a
+   * Promise — `writeRecord` awaits it; a synchronous caller must use the
+   * filesystem workspace.
+   */
   allocatePath(kind, authority, key, dirOverride = null) {
+    if (this.store) return this.allocatePathStore(kind, authority, key, dirOverride)
     const spec = KINDS[kind]
     if (!spec) throw new WorkspaceError(`unknown record kind: ${kind}`)
     const dir = dirOverride ?? spec.dirs[authority] ?? spec.dirs.projection ?? spec.dirs.staging
     const base = fileNameFor(kind, key)
     let rel = `${dir}/${base}`
     for (let n = 2; existsInside(this.root, rel); n++) rel = `${dir}/${base.replace(/\.json$/, `.${n}.json`)}`
+    return normalizeRel(rel)
+  }
+
+  /** Store-backed allocatePath: same collision walk over store.fileExists. */
+  async allocatePathStore(kind, authority, key, dirOverride = null) {
+    const spec = KINDS[kind]
+    if (!spec) throw new WorkspaceError(`unknown record kind: ${kind}`)
+    const dir = dirOverride ?? spec.dirs[authority] ?? spec.dirs.projection ?? spec.dirs.staging
+    const base = fileNameFor(kind, key)
+    let rel = `${dir}/${base}`
+    for (let n = 2; await this.store.fileExists(rel); n++) rel = `${dir}/${base.replace(/\.json$/, `.${n}.json`)}`
     return normalizeRel(rel)
   }
 
@@ -319,9 +445,10 @@ export class Workspace {
    */
   async writeRecord({ kind, key, authority, scope = 'private', source_vault_id = null, data, dir = null, extra = {} }) {
     if (KINDS[kind]?.public) scope = 'public'
-    const relPath = this.allocatePath(kind, authority, key, dir)
+    const relPath = await this.allocatePath(kind, authority, key, dir)
     const text = await this.encodeRecord({ kind, key, authority, scope, source_vault_id, data })
-    writeNewInside(this.root, relPath, text)
+    if (this.store) await this.store.putNewFile(relPath, text)
+    else writeNewInside(this.root, relPath, text)
     const now = nowIso()
     return {
       kind,
@@ -340,7 +467,15 @@ export class Workspace {
 
   /** Parse + verify + decrypt a record file. Throws on any integrity failure. */
   async decodeFile(relPath, { keysBySalt = null } = {}) {
-    const bytes = readInside(this.root, relPath)
+    let bytes
+    if (this.store) {
+      bytes = await this.store.getFile(relPath)
+      if (bytes === null || bytes === undefined) {
+        throw Object.assign(new WorkspaceError(`${relPath}: file missing`), { code: 'ENOENT' })
+      }
+    } else {
+      bytes = readInside(this.root, relPath)
+    }
     const fileSha = await sha256Hex(bytes)
     let rec
     try {
@@ -410,14 +545,29 @@ export class Workspace {
     return Object.entries(this.records).filter(([, e]) => e.status !== 'archived' && filter(e))
   }
 
-  /** All files under record directories (for orphan detection / recovery). */
+  /**
+   * All files under record directories (for orphan detection / recovery).
+   * Store-backed workspaces list asynchronously: this returns a Promise —
+   * callers on the store path must await it.
+   */
   recordFiles() {
+    if (this.store) return this.recordFilesStore()
     const all = walkInside(this.root)
     const files = all.files.filter(
       (f) => f.endsWith('.json') && !f.startsWith('audit/quarantine/') && !f.startsWith('exports/') && !f.startsWith(`${INBOX_DIR}/`) && !f.startsWith('Beta Reports/') &&
         f !== MANIFEST && f !== MANIFEST_BACKUP && !f.includes('.tmp-'),
     )
     return { files, symlinks: all.symlinks, other: all.other }
+  }
+
+  /** Store-backed recordFiles: same filter over store.listFiles; no symlink layer exists. */
+  async recordFilesStore() {
+    const all = await this.store.listFiles('')
+    const files = all.filter(
+      (f) => f.endsWith('.json') && !f.startsWith('audit/quarantine/') && !f.startsWith('exports/') && !f.startsWith(`${INBOX_DIR}/`) && !f.startsWith('Beta Reports/') &&
+        f !== MANIFEST && f !== MANIFEST_BACKUP && !f.includes('.tmp-'),
+    )
+    return { files, symlinks: [], other: [] }
   }
 }
 

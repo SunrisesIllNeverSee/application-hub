@@ -98,6 +98,9 @@ function snippet(text, query, n = 240) {
  * folders are refused.
  */
 export function confinedFile(ws, file, { allowed = ['inbox'], maxBytes = MAX_INBOX_BYTES } = {}) {
+  if (ws?.store) {
+    throw new ToolRefusal('store_unsupported:confinedFile', 'This workspace is hosted (store-backed) — there is no local inbox/ filesystem to read from. Pass file_name + content_base64 instead of file.')
+  }
   if (typeof file !== 'string' || !file.trim()) throw new ToolRefusal('invalid_path', 'Pass the name of a file inside the workspace inbox/ folder.')
   if (path.isAbsolute(file) || /^[a-zA-Z]:[\\/]/.test(file) || file.startsWith('~')) {
     throw new ToolRefusal('path_refused', 'Absolute paths are not accepted. Ask the user to copy the file into the workspace inbox/ folder, then pass its name (for example "form.docx").')
@@ -437,9 +440,11 @@ export const TOOLS = [
       candidate.verification_notes.push('Source URL declared by the user; the companion did not fetch it. AQUA re-fetches and verifies the source when the user submits.')
       const deep_link = `${APP_ORIGIN}/apply?url=${encodeURIComponent(src.declared_public_url)}`
       const rel = `exports/candidates/candidate-${inst.instance_id}-${nowIso().replace(/[:.]/g, '-')}.json`
-      writeNewInside(t.ws.root, rel, `${JSON.stringify({ ...candidate, prepared_by: 'aqua-companion mcp', instance_id: inst.instance_id }, null, 2)}\n`)
+      // exports/ files are filesystem artifacts; on a store-backed (hosted) workspace the candidate still
+      // ships in untrusted_content + deep_link, but no file is saved (there is no download path for it)
+      const saved_to = t.exportsWritable ? (writeNewInside(t.ws.root, rel, `${JSON.stringify({ ...candidate, prepared_by: 'aqua-companion mcp', instance_id: inst.instance_id }, null, 2)}\n`), rel) : null
       return {
-        status: 'ok', candidate_status: 'candidate', requires_human_approval: true, saved_to: rel,
+        status: 'ok', candidate_status: 'candidate', requires_human_approval: true, saved_to,
         counts: { questions: candidate.questions.length, withheld_uncertain: classification.uncertain.length, excluded_private: classification.private.length },
         next_steps: ['The user opens deep_link while signed in to AQUA and submits the candidate there (submit_catalog_candidate explains the steps).', 'AQUA reviewers verify the source before anything is published.'],
         untrusted: { candidate, deep_link },
@@ -733,7 +738,7 @@ export const TOOLS = [
       for (const r of rows) byStatus[r.status.status] = (byStatus[r.status.status] ?? 0) + 1
       return {
         status: 'ok', instance_id: inst.instance_id, saved_to, absolute_path: saved_to ? path.join(t.ws.root, ...saved_to.split('/')) : null,
-        ...(saved_to ? {} : { not_saved_reason: 'read_only' }),
+        ...(saved_to ? {} : { not_saved_reason: t.ws.store ? 'hosted_workspace' : 'read_only' }),
         summary: {
           questions: rows.length, approved: cards.filter((c) => c.approval.state === 'approved').length, without_answer: cards.filter((c) => !c.answer).length, by_status: byStatus,
           cards: rows.map((r, i) => ({ question_occurrence_id: r.question_occurrence_id, status: r.status.status, approval_state: cards[i].approval.state, governing_version_id: r.status.governing_version_id, governing_sha256: r.status.governing_version_sha256 })),

@@ -24,7 +24,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { decryptWithKeys, macHex, nowIso, DecryptError } from './crypto.mjs'
 import { mkdirInside } from './fsafe.mjs'
-import { AGENT_LOG, INBOX_DIR, Workspace, WorkspaceError, keyCheckText } from './workspace.mjs'
+import { AGENT_LOG, INBOX_DIR, StoreUnsupportedError, Workspace, WorkspaceError, keyCheckText } from './workspace.mjs'
 import { buildSnapshot, catalogMaxAgeHours, catalogNeedsRefresh, fetchPublicCatalog, readCatalog, resolveCatalogConfig, saveSnapshot } from './catalog.mjs'
 import { loadModel } from './mcp-model.mjs'
 import { resolveSecrets } from './secrets.mjs'
@@ -60,7 +60,7 @@ for (const tdef of TOOLS) {
   }
 }
 /** Error classes whose messages are built by companion code from fixed text (safe to show as server statements). */
-const OWN_ERRORS = new Set(['WorkspaceError', 'DecryptError', 'KeyMismatchError', 'CatalogNetworkError', 'PathSafetyError', 'UsageError', 'EnvelopeError', 'CatalogKeyRefusal', 'HistoryImportError'])
+const OWN_ERRORS = new Set(['WorkspaceError', 'StoreUnsupportedError', 'DecryptError', 'KeyMismatchError', 'CatalogNetworkError', 'PathSafetyError', 'UsageError', 'EnvelopeError', 'CatalogKeyRefusal', 'HistoryImportError'])
 
 export class UnknownToolError extends Error {
   constructor(name) {
@@ -110,9 +110,30 @@ export class Session {
    * Locate the workspace, read secrets, derive keys once (fails fast on a
    * wrong or missing passphrase). No workspace at all is NOT an error: the
    * session starts in 'not_initialized' mode.
+   *
+   * With `{ store }` (a WorkspaceStore from store/workspace-store.mjs) the
+   * session is store-backed — the hosted path: every openWorkspace() goes
+   * through Workspace.openStore (the same re-open-per-call semantics), and
+   * fs-bound session helpers (inbox mkdir, vault-backup import) are off the
+   * store path. `workspaceRef` is an opaque label for the hosted row.
    */
-  async init() {
+  async init({ store = null, workspaceRef = null } = {}) {
+    this.store = store ?? null
+    this.workspaceRef = workspaceRef ?? null
     let ws
+    if (this.store) {
+      try {
+        ws = await Workspace.openStore(this.store, this.ctx)
+      } catch (e) {
+        if (e instanceof WorkspaceError && e.exitCode === 2) {
+          this.mode = 'not_initialized'
+          return this
+        }
+        throw e
+      }
+      await this.unlockAt(ws)
+      return this
+    }
     try {
       ws = Workspace.open(this.ctx)
     } catch (e) {
@@ -136,8 +157,11 @@ export class Session {
     this.keys = ws.keys
     this.workspaceId = ws.manifest.workspace_id
     this.root = ws.root
-    this.ctx.flags = { ...this.ctx.flags, workspace: ws.root }
-    if (!this.readOnly) mkdirInside(ws.root, INBOX_DIR) // the drop folder for files the user hands to the agent (--read-only changes nothing)
+    if (!ws.store) {
+      this.ctx.flags = { ...this.ctx.flags, workspace: ws.root }
+      if (!this.readOnly) mkdirInside(ws.root, INBOX_DIR) // the drop folder for files the user hands to the agent (--read-only changes nothing)
+    }
+    // store-backed: no filesystem; the inbox is a virtual prefix inside the store, nothing to mkdir
     this.mode = 'ready'
   }
 
@@ -173,10 +197,11 @@ export class Session {
     }
   }
 
-  /** Fresh view of the workspace for one call (the CLI may have changed it meanwhile). */
+  /** Fresh view of the workspace for one call (the store or the CLI may have changed it meanwhile). */
   async openWorkspace() {
-    const ws = Workspace.open(this.ctx)
-    if (ws.manifest.workspace_id !== this.workspaceId) throw new WorkspaceError('The workspace folder now holds a different workspace. Restart the server.', 4)
+    const ws = this.store ? await Workspace.openStore(this.store, this.ctx) : Workspace.open(this.ctx)
+    if (!ws.manifest) throw new WorkspaceError('The workspace manifest is gone or unreadable. Restart the server.', 4)
+    if (ws.manifest.workspace_id !== this.workspaceId) throw new WorkspaceError('The workspace now holds a different workspace. Restart the server.', 4)
     if (ws.manifest.kdf.salt_b64 !== this.keys.salt_b64) {
       await ws.unlock(this.passphrase) // passphrase changed by rekey: derive again (fails if it no longer opens)
       this.keys = ws.keys
@@ -249,6 +274,7 @@ export class Session {
 
   /** import-backup for sync_from_vault_export: the same code path as the CLI, with this session's secrets. */
   async importBackupFile(absFile, { account = null } = {}) {
+    if (this.store) throw new StoreUnsupportedError('importBackupFile')
     const out = sink()
     const err = sink()
     const code = await runCommand(cmdImportBackup, {
@@ -261,8 +287,8 @@ export class Session {
   async audit(entry) {
     if (this.mode !== 'ready') return
     try {
-      const ws = Workspace.open(this.ctx)
-      await ws.audit('tool_call', entry, AGENT_LOG)
+      const ws = this.store ? await Workspace.openStore(this.store, this.ctx) : Workspace.open(this.ctx)
+      if (ws.manifest) await ws.audit('tool_call', entry, AGENT_LOG)
     } catch (e) {
       this.ctx.stderr.write(`aqua-companion mcp: could not write the agent audit log: ${e.message}\n`)
     }
@@ -320,7 +346,7 @@ export class Session {
           const t = {
             ws,
             readOnly: this.readOnly,
-            exportsWritable: def.writes === 'exports' && def.tier === TIER.PRIVATE_WRITE && !this.readOnly,
+            exportsWritable: def.writes === 'exports' && def.tier === TIER.PRIVATE_WRITE && !this.readOnly && !this.store,
             fetchImpl: this.fetchImpl,
             now: () => nowIso(),
             catalogConfig: () => this.catalogConfig(),
@@ -419,10 +445,12 @@ export function annotationsFor(tdef) {
  * @param {Function} [opts.fetchImpl] injectable fetch implementation, for tests
  * @param {Function} [opts.elicit]    async (params, { timeoutMs }) => { action, content }: MCP elicitation/create, when the client supports it
  * @param {object} [opts.stderr]
+ * @param {object} [opts.store]      a WorkspaceStore (store/workspace-store.mjs) — store-backed session for the hosted path (no filesystem)
+ * @param {*}      [opts.workspaceRef]  opaque hosted-workspace label kept on the session
  * @returns {Promise<{ tools: Array<{name, tier, title, description, inputSchema, annotations, handler}>, dispatch: (name: string, args?: object) => Promise<{result: object, isError: boolean}>, session: Session, state: () => object, setElicitor: (fn) => void }>}
  */
-export async function createAquaToolRegistry({ workspace, flags = {}, readOnly = false, keychain = false, env = process.env, cwd = process.cwd(), fetchImpl, elicit = null, stderr = process.stderr, exec, platform } = {}) {
-  const session = await new Session({ env, cwd, stderr, flags: { ...flags, ...(workspace ? { workspace } : {}) } }, { readOnly, keychain, fetchImpl, elicit, exec, platform }).init()
+export async function createAquaToolRegistry({ workspace, flags = {}, readOnly = false, keychain = false, env = process.env, cwd = process.cwd(), fetchImpl, elicit = null, stderr = process.stderr, exec, platform, store = null, workspaceRef = null } = {}) {
+  const session = await new Session({ env, cwd, stderr, flags: { ...flags, ...(workspace ? { workspace } : {}) } }, { readOnly, keychain, fetchImpl, elicit, exec, platform }).init({ store, workspaceRef })
   const dispatch = async (name, args = {}) => {
     const r = await session.callTool(name, args)
     if (r.unknown) throw new UnknownToolError(name)

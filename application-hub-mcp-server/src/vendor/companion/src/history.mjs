@@ -156,6 +156,9 @@ export async function commitHistoryImport(ws, plan, { via = 'cli' } = {}) {
 
 /** Files of a folder inside the workspace (confined; symlinks refused). */
 export function inboxFolderFiles(ws, folder) {
+  if (ws?.store) {
+    throw new HistoryImportError('store_unsupported:inboxFolderFiles', 'This workspace is hosted (store-backed) — there is no local inbox/ folder to walk. Pass files: [{name, content_base64}] instead of folder.')
+  }
   let rel
   try {
     rel = normalizeRel(String(folder ?? '').replace(/\/+$/, '') || 'inbox')

@@ -1,0 +1,127 @@
+{
+  "format": "aqua-companion-vendor",
+  "version": 1,
+  "generator": "aqua-companion/scripts/vendor.mjs",
+  "files": [
+    {
+      "path": "lib/aqua-local/classify.mjs",
+      "source": "app/lib/aqua-local/classify.ts",
+      "source_sha256": "b7ba78750ab290cc04ad4987e5795a92a7ee706ab999a3a8d828b1e0eb4077e4",
+      "body_sha256": "853c9697bd62194da3a2f021355cf4ca4cd12991171919bea07b9ee84adc4a13"
+    },
+    {
+      "path": "lib/aqua-local/crypto.mjs",
+      "source": "app/lib/aqua-local/crypto.ts",
+      "source_sha256": "02571baf2caaf5b4c300dbf9a61a2fe18987f0f607f243b19d12b6ee32822f34",
+      "body_sha256": "d14e420de6533663bfb1ac27f3469a7471294583cf06ee3056a559f76dcc43d8"
+    },
+    {
+      "path": "lib/aqua-local/history.mjs",
+      "source": "app/lib/aqua-local/history.ts",
+      "source_sha256": "499856462c9e5e6c759d80a50faaa08e90b6bb48f32e0338fd22057307d7d5c8",
+      "body_sha256": "0ae1ee28a7fff211fcb2ee3ba24d5dccb8a2ea247227d46f98bfa2ca213d737e"
+    },
+    {
+      "path": "lib/aqua-local/match.mjs",
+      "source": "app/lib/aqua-local/match.ts",
+      "source_sha256": "dc9a1b51b4ea718180624c565ba46280ac788507c94a46f414ecd7a1bd3d7d88",
+      "body_sha256": "e77b257ca0f15dc9d041fcc0b8e9cb4ce179cdd814aaebe83283f758bf2e34e4"
+    },
+    {
+      "path": "lib/aqua-local/placeholders.mjs",
+      "source": "app/lib/aqua-local/placeholders.ts",
+      "source_sha256": "6199d25c93634791b4bf17a6d11846ced6b940ca53c64a1f197c7565806f112a",
+      "body_sha256": "0947762914555bd2f5b52e1020a6653653e4873ded38ff8548f3902af2bb579e"
+    },
+    {
+      "path": "lib/aqua-local/repo.mjs",
+      "source": "app/lib/aqua-local/repo.ts",
+      "source_sha256": "5f74e0a51944e27360489a20676d965c67b2081af0672c6221bdcb6d14a98ea7",
+      "body_sha256": "dc4f59d077ebc184be3fa58026b200c5a61b2de797190fcb2d40dd2de4867be5"
+    },
+    {
+      "path": "lib/aqua-local/status.mjs",
+      "source": "app/lib/aqua-local/status.ts",
+      "source_sha256": "e5ed22e304b4e3476c9660e3fb7d6d0d5aa1c2aeee7352b318d6d3e252d77c51",
+      "body_sha256": "613347f48e37a6dd1690b5d7fe51cf10b11b5c1046809fd18339439370ab8ce5"
+    },
+    {
+      "path": "lib/aqua-local/verify-packet.mjs",
+      "source": "app/lib/aqua-local/verify-packet.mjs",
+      "source_sha256": "e2fad28ab964276b157372ecb2bb06704b5dff980cf079890ca3fbc99a75ee10",
+      "body_sha256": "62c680e4b299e7858fad6b4460913fa05945cfec3a0ca705aae8cbfd519f4fd6"
+    },
+    {
+      "path": "lib/canonical-catalog.mjs",
+      "source": "app/lib/canonical-catalog.ts",
+      "source_sha256": "cd619121eaf00232188aa7369a4c24c0a408bc17d517a11c01684e3874d0f74c",
+      "body_sha256": "675a70962ef4d3b5337957a6eadbbca3fe24e4f52da70ab063908ec8b6261092"
+    },
+    {
+      "path": "lib/catalog/classify.mjs",
+      "source": "app/lib/catalog/classify.ts",
+      "source_sha256": "660553c6a8677e16522b2086ea2d46c6e01fb50973f34f4429e0dfaf5b1d8d4e",
+      "body_sha256": "d5f2b5e4819e6677a8fa82852ddbe0ae0788af9dd5e6813b072d9fe6b0976995"
+    },
+    {
+      "path": "lib/catalog/extract.mjs",
+      "source": "app/lib/catalog/extract.ts",
+      "source_sha256": "28abae383e6c82a890d1695dcb1aca0a26554bad193b474bdbf9df33599c7b91",
+      "body_sha256": "3d2c768456b1b19ee91271397df1d2b63ab287bb6690307c657ff8e9558972e8"
+    },
+    {
+      "path": "lib/catalog/files.mjs",
+      "source": "app/lib/catalog/files.ts",
+      "source_sha256": "c4c74f7b771fac9cd9c4cfde1d12a848a06c79fd6d51b25713515c8d8f86f26b",
+      "body_sha256": "80f69ac820b67a166beadcf601afaf3fb78ef34c5590fc9114e0a277b6a4d405"
+    },
+    {
+      "path": "lib/catalog/html.mjs",
+      "source": "app/lib/catalog/html.ts",
+      "source_sha256": "99a75336db46d81f4ecb735eea73f421135186e72e586f33bfb1fa0642fd5737",
+      "body_sha256": "ecb8c8ae7d39bef0be13a200122072105a34578fca5d42944e503343d69b2464"
+    },
+    {
+      "path": "lib/catalog/match.mjs",
+      "source": "app/lib/catalog/match.ts",
+      "source_sha256": "5f048bd56062d1035c5ff51d6beea47f525ba35f92fd947152f724c3d83bb38f",
+      "body_sha256": "08ad20486553d483a95450cfd368abd3cdd7fc2b06e1fc6818fb91467531b469"
+    },
+    {
+      "path": "lib/catalog/normalize.mjs",
+      "source": "app/lib/catalog/normalize.ts",
+      "source_sha256": "46a4d9ad293b82e95d4b312ee70f83f5e3a187d0885c3006976bfa05f30907ea",
+      "body_sha256": "2015c0bc06e02060d4e70c152162482df52456ccc1e3b195af4c36a1689bab41"
+    },
+    {
+      "path": "lib/catalog/proposal.mjs",
+      "source": "app/lib/catalog/proposal.ts",
+      "source_sha256": "73a7d580903dd3a3d61a60feb530fdb33264e1b0baa7cc3fdb93216aa7a9fef0",
+      "body_sha256": "01dca06c224bcce9b94b450005f56377706965ac774815ae31c63c67d3bd8cf1"
+    },
+    {
+      "path": "lib/intake-extract-shared.mjs",
+      "source": "app/lib/intake-extract-shared.ts",
+      "source_sha256": "6beb1ce9d8f383280b7c942c96dcf18e8db8059250e91ac597b28d13cfe4c810",
+      "body_sha256": "f3b79ec03eb6ceedd63503e4097811bb00e8900e95dd02dc1fa6c1d2dc8cf080"
+    },
+    {
+      "path": "lib/review-ui/decision-file.mjs",
+      "source": "app/lib/review-ui/decision-file.ts",
+      "source_sha256": "a9efb6fdcaa8592c2828b45553893dbd9e56098d093f496e61a2112fef27ff5c",
+      "body_sha256": "c64883a6c7cfb05c1f91e8f2c3f7478931981b9e3235b0f1122cdc2448a4e7a5"
+    },
+    {
+      "path": "lib/review-ui/html-export.mjs",
+      "source": "app/lib/review-ui/html-export.ts",
+      "source_sha256": "e7e631047d4bfe1d1ff7665cba0af7db75fe69ad252b1877bfa1b1da5fc8d8dd",
+      "body_sha256": "a535d4cb88826a54415b61e48ab701ec1829f6657ede0f945093d3f053db5444"
+    },
+    {
+      "path": "lib/review-ui/view-model.mjs",
+      "source": "app/lib/review-ui/view-model.ts",
+      "source_sha256": "d3f0e8b1b0a3f6082f2b29982980360a08038d2758fc8c7734484c41c816af28",
+      "body_sha256": "1ebc0ed7cfc9545c41130e983f577822446ba11f6e3cd57d8d4fa5efab1b8149"
+    }
+  ]
+}

@@ -446,8 +446,11 @@ async function walk(dir) {
   const out = []
   for (const e of await readdir(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name)
-    if (e.isDirectory()) out.push(...(await walk(p)))
-    else if (/\.(tsx?|mjs)$/.test(e.name)) out.push(p)
+    // _vendor/ holds generated vendored engine code (aqua-companion copies) —
+    // not a UI surface; the primitive is guarded at its source instead
+    if (e.isDirectory()) {
+      if (e.name !== '_vendor') out.push(...(await walk(p)))
+    } else if (/\.(tsx?|mjs)$/.test(e.name)) out.push(p)
   }
   return out
 }
