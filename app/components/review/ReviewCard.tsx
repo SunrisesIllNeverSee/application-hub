@@ -572,7 +572,7 @@ function ApproveConfirm({
 }) {
   const a = vm.answer!
   const confirmRef = useRef<HTMLButtonElement>(null)
-  const [alsoHosted, setAlsoHosted] = useState(Boolean(hosted))
+  const [alsoHosted, setAlsoHosted] = useState(false)  // opt-in per approval; init consent is the gate
   useEffect(() => confirmRef.current?.focus(), [])
   return (
     <div role="region" aria-label="Confirm approval" data-testid="approve-confirm" className="space-y-3 rounded-lg border-2 border-success-500/50 bg-success-50/60 p-3 dark:bg-success-700/10">

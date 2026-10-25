@@ -424,13 +424,12 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
           // path is derived from the rid — a row here IS this approval's prior
           // write; re-verify the payload binds THIS version before indexing
           if (!serverBuilt && eng) {
-            eng.stage(recPath, null as any)
             try {
-              const d = await eng.w.decodeFile(recPath)
+              const d = await eng.w.decodeFile(recPath)  // real store serves the committed bytes
               if (d.data?.version_id !== versionId || d.data?.version_sha256 !== expected || d.data?.decision !== 'approved' || d.data?.actor_class !== 'human') {
                 return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })
               }
-            } catch { /* staged decode may fail for dup sha path — fall through */ }
+            } catch { /* undecryptable dup — fall through to reindex */ }
           }
           const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, rid, recPath, dup.sha256, now())
           if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval exists but is not indexed — retry to index it' })
@@ -486,7 +485,7 @@ async function engineSession(
   const real = createSupabaseStore(client, workspaceId)
   const staged = Object.create(real)
   let stage = { p: stagePath, b: stageBytes }
-  staged.getFile = async (p: string) => (p === stage.p ? stage.b : real.getFile(p))
+  staged.getFile = async (p: string) => (p === stage.p && stage.b != null ? stage.b : real.getFile(p))
   const w = await (Workspace as any).openStore(staged, { env: {}, stderr: { write: () => true } })
   await w.unlock(passphrase)
   return { w, stage: (p: string, b: Buffer) => { stage = { p, b } } }
