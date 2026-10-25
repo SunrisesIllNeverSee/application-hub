@@ -22,7 +22,7 @@ import { rateLimitAllow } from '../../../../lib/rate-limit.ts'
 
 export const MAX_BODY_BYTES = 64 * 1024
 /** Spec default when a request carries no MCP-Protocol-Version header. */
-const ASSUMED_PROTOCOL_VERSION = '2025-03-26'
+export const ASSUMED_PROTOCOL_VERSION = '2025-03-26'
 const DEFAULT_ALLOWED_ORIGINS = ['https://aquaidp.xyz', 'https://www.aquaidp.xyz']
 
 export const HOSTED_INSTRUCTIONS = [
@@ -30,16 +30,18 @@ export const HOSTED_INSTRUCTIONS = [
   'This is the hosted read-only endpoint (https://aquaidp.xyz/mcp): public catalog tools only. For workspace tools the user runs npx -y aqua-mcp-server --workspace <dir> locally; steps at https://aquaidp.xyz/mcp.',
 ].join('\n')
 
-type Env = Record<string, string | undefined>
+export type Env = Record<string, string | undefined>
 type Limiter = (key: string) => boolean
 export type HostedDeps = { env?: Env; fetchImpl?: typeof fetch; allow?: Limiter; now?: () => number }
 
 const JSON_HEADERS = { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }
 
-function json(status: number, body: unknown, extra: Record<string, string> = {}): Response {
+// Shared with ./_lib/workspace.ts (the authenticated workspace surface on the
+// same /mcp URL): the transport guard chain and response helpers are identical.
+export function json(status: number, body: unknown, extra: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), { status, headers: { ...JSON_HEADERS, ...extra } })
 }
-const rpcError = (status: number, code: number, message: string, extra: Record<string, string> = {}) =>
+export const rpcError = (status: number, code: number, message: string, extra: Record<string, string> = {}) =>
   json(status, { jsonrpc: '2.0', id: null, error: { code, message } }, extra)
 
 let cached: { fingerprint: string; data: InstanceType<typeof CatalogData> | null } | null = null
@@ -69,22 +71,24 @@ export function hostedCatalog(env: Env, fetchImpl?: typeof fetch): InstanceType<
  * there its LAST entry (added by the nearest proxy) is used, not the
  * client-supplied first one. No IP at all shares one bucket.
  */
-function clientKey(req: Request): string {
+export function clientKey(req: Request): string {
   const last = (h: string | null) => h?.split(',').map((s) => s.trim()).filter(Boolean).at(-1)
   const ip = req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip')?.trim() || last(req.headers.get('x-forwarded-for')) || 'unknown'
   return `mcp-ip:${createHash('sha256').update(ip).digest('hex').slice(0, 24)}`
 }
 
-function originAllowed(origin: string | null, env: Env): boolean {
+export function originAllowed(origin: string | null, env: Env): boolean {
   // Non-browser clients send no Origin. Without one there is no DNS-rebinding
-  // vector, and the endpoint is unauthenticated and read-only anyway.
+  // vector; and on both surfaces (public catalog and the Bearer workspace
+  // endpoint) no credential is ambient — a browser cross-origin POST would
+  // not carry a token.
   if (!origin) return true
   const extra = (env.AQUA_MCP_ALLOWED_ORIGINS ?? '').split(',').map((s) => s.trim()).filter(Boolean)
   const local = env.NODE_ENV !== 'production' ? ['http://localhost:3000', 'http://127.0.0.1:3000'] : []
   return [...DEFAULT_ALLOWED_ORIGINS, ...extra, ...local].includes(origin)
 }
 
-function acceptsJson(accept: string | null): boolean {
+export function acceptsJson(accept: string | null): boolean {
   if (!accept) return true
   return accept.split(',').map((s) => s.split(';')[0].trim().toLowerCase()).some((t) => t === 'application/json' || t === 'application/*' || t === '*/*')
 }

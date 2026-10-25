@@ -69,7 +69,7 @@
       "modes": [
         "stdio-workspace"
       ],
-      "description": "Stage an evidence record for a file the user placed in inbox/ (its sha256 is recorded) and optionally link it to a version.",
+      "description": "Stage an evidence record for a file — from inbox/, or uploaded as file_name + content_base64, or identified by file_sha256 alone (only the hash is recorded) — and optionally link it to a version.",
       "source": "aqua-companion"
     },
     {
@@ -376,7 +376,7 @@
       "modes": [
         "stdio-workspace"
       ],
-      "description": "Store an observation that an application may have been submitted (for example a confirmation e-mail the user saved in inbox/), flagged requires_human_attestation.",
+      "description": "Store an observation that an application may have been submitted (for example a confirmation e-mail the user saved in inbox/, or uploaded as file_name + content_base64), flagged requires_human_attestation.",
       "source": "aqua-companion"
     },
     {
@@ -448,7 +448,7 @@
       "modes": [
         "stdio-workspace"
       ],
-      "description": "Verify an exported AQUA packet JSON placed in inbox/ (or packets/): canonical manifest, manifest hash, packet id, per-answer hashes, provenance receipts and the signature if present.",
+      "description": "Verify an exported AQUA packet JSON placed in inbox/ (or packets/), or uploaded as file_name + content_base64: canonical manifest, manifest hash, packet id, per-answer hashes, provenance receipts and the signature if present.",
       "source": "aqua-companion"
     }
   ],

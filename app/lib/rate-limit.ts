@@ -30,6 +30,10 @@ const LIMITS = {
   catalog_extract_url: { windowMs: 60 * 60 * 1000, max: 30 },
   // M09b: hosted read-only MCP endpoint (/mcp → /api/mcp), keyed by client IP
   mcp_hosted: { windowMs: 60 * 1000, max: 60 },
+  // m10: hosted approval write path (/api/workspace/approve), keyed by user id
+  hosted_approve: { windowMs: 60 * 1000, max: 30 },
+  // M10: hosted personal-workspace MCP (/mcp with a Bearer token), keyed by sha256(user id)
+  mcp_workspace: { windowMs: 60 * 1000, max: 60 },
 } satisfies Record<string, LimitConfig>
 
 export type RateLimitAction = keyof typeof LIMITS

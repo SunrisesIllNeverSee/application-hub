@@ -87,7 +87,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 | `add_question` | private_write | Manually index one question in an application with its exact source wording — for fields the extractor missed or fields added after a later capture. |
 | `approve_answer` | human_only | Never executes. |
 | `assemble_application` | private_write | Build a Markdown application from explicitly chosen APPROVED answer versions plus the unresolved fields and provenance. |
-| `attach_evidence` | private_write | Stage an evidence record for a file the user placed in inbox/ (its sha256 is recorded) and optionally link it to a version. |
+| `attach_evidence` | private_write | Stage an evidence record for a file — from inbox/, or uploaded as file_name + content_base64, or identified by file_sha256 alone (only the hash is recorded) — and optionally link it to a version. |
 | `attest_submission` | human_only | Never executes. |
 | `create_draft_version` | private_write | Stage a NEW, unapproved draft version of an answer in this workspace (method recorded as an agent draft). |
 | `discover_applications` | read | Search the cached public AQUA catalog (approved programs) and list the applications in this workspace. |
@@ -118,7 +118,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 | `prepare_packet` | read | Readiness report for freezing an application packet: per question the selectable approved version, whether its approval is bound to the exact hash, length limits, required questions, and content integrity. |
 | `present_review_decisions` | private_write | Build the offline AQUA review file (HTML, containing the user's answers in plain text) for one application and save it under exports/reviews/ (at most 25 files are kept; refused under --read-only). |
 | `read_review_status` | read | Derived review status of every question in an application (gap, suggested, needs evidence, under review, approved, ...) and the Direct / Adapt / Gap reuse recommendation against the rest of the answer bank. |
-| `record_observed_submission` | private_write | Store an observation that an application may have been submitted (for example a confirmation e-mail the user saved in inbox/), flagged requires_human_attestation. |
+| `record_observed_submission` | private_write | Store an observation that an application may have been submitted (for example a confirmation e-mail the user saved in inbox/, or uploaded as file_name + content_base64), flagged requires_human_attestation. |
 | `refresh_catalog` | read | Fetch approved canonical programs, cycles and questions from the configured public AQUA catalog endpoint (read-only, public key, nothing from the workspace is sent). |
 | `request_evidence` | private_write | Record an evidence gap on a version (what support is missing). |
 | `search_answer_bank` | read | Search the user's private answers, versions, facts and evidence in this workspace (decrypted in memory only). |
@@ -126,7 +126,7 @@ https://aquaidp.xyz/mcp: live (read-only public catalog tools, resources and pro
 | `submit_catalog_candidate` | human_only | Never executes. |
 | `sync_from_vault_export` | private_write | Import an encrypted backup the user exported from the AQUA browser vault and placed in the workspace inbox/ (the same checks as "aqua-companion import-backup": integrity, account binding, conflicts recorded, nothing o… |
 | `update_question` | private_write | Add interpretation or correct metadata on a question — summary, general/custom kind, topic, group, required status, limit, visible options — without ever changing the captured source wording. |
-| `verify_packet` | read | Verify an exported AQUA packet JSON placed in inbox/ (or packets/): canonical manifest, manifest hash, packet id, per-answer hashes, provenance receipts and the signature if present. |
+| `verify_packet` | read | Verify an exported AQUA packet JSON placed in inbox/ (or packets/), or uploaded as file_name + content_base64: canonical manifest, manifest hash, packet id, per-answer hashes, provenance receipts and the signature if … |
 
 ## The fresh-agent journey
 1. **Install**: npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)
