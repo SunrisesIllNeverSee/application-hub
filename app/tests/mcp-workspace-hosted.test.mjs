@@ -10,6 +10,10 @@ import fs from 'node:fs'
 import { handleWorkspaceMcpPost, bearerToken, MAX_WORKSPACE_BODY_BYTES } from '../app/api/mcp/_lib/workspace.ts'
 import { POST } from '../app/api/mcp/route.ts'
 import { rateLimitAllow } from '../lib/rate-limit.ts'
+import { seededWorkspace, FORM_MD } from '../../aqua-companion/test/mcp-helpers.mjs'
+import { PASS, VAULT } from '../../aqua-companion/test/helpers.mjs'
+import { createFsStore } from '../app/api/mcp/_vendor/workspace/companion/src/store/workspace-store.mjs'
+import { readHostedReview, canApproveHostedCard } from '../lib/aqua-hosted.ts'
 import { ANON_JWT, ORIGIN, SERVICE_JWT, fakePostgrest } from '../../application-hub-mcp-server/test/fake-postgrest.mjs'
 
 const ENV = { NEXT_PUBLIC_SUPABASE_URL: ORIGIN, NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_JWT, NODE_ENV: 'production' }
@@ -111,19 +115,22 @@ test('catalog tools still list and answer under a Bearer token', async () => {
   const { json } = await call(rpc(1, 'tools/list'), {}, { headers: { 'mcp-protocol-version': '2025-06-18' } })
   const names = json.result.tools.map((t) => t.name)
   for (const p of PUBLIC) assert.ok(names.includes(p), p)
-  // no hosted workspace row -> workspace tools stay unlisted (stdio-catalog parity)
-  for (const w of ['search_answer_bank', 'create_draft_version', 'read_review_status']) assert.ok(!names.includes(w), w)
+  // Authentication discovers the full capability list even before setup.
+  for (const w of ['import_local_application', 'import_history', 'search_answer_bank', 'create_draft_version', 'read_review_status', 'link_answer', 'assemble_application']) assert.ok(names.includes(w), w)
+  assert.ok(!names.includes('sync_from_vault_export'), 'filesystem-only vault synchronization is not advertised')
+  assert.ok(!/run aqua-mcp-server|--workspace/.test((await call(rpc(2, 'initialize', { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'synthetic', version: '1' } }))).json.result.instructions))
   const r = await call(rpc(2, 'tools/call', { name: 'hub_get_program_questions', arguments: { slug: 'yc-summer-2026' } }))
   assert.equal(r.json.result.structuredContent.status, 'ok')
   assert.ok(r.fake.requests.length > 0)
 })
 
-test('with no hosted workspace row, workspace tools answer workspace_not_initialized (callable, unlisted)', async () => {
+test('without a hosted workspace, discoverable tools return setup guidance without changing anything', async () => {
   for (const name of ['search_answer_bank', 'create_draft_version', 'read_review_status']) {
     const r = await call(rpc(1, 'tools/call', { name, arguments: {} }))
     assert.equal(r.json.result.isError, true, name)
     assert.equal(r.json.result.structuredContent.status, 'workspace_not_initialized', name)
     assert.equal(r.json.result.structuredContent.tool, name)
+    assert.match(r.json.result.structuredContent.message, /https:\/\/aquaidp.xyz\/workspace/)
   }
   // filesystem setup tools are not exposed on the hosted surface at all
   for (const name of ['locate_workspace', 'init_workspace', 'doctor']) {
@@ -171,6 +178,64 @@ test('an injected session receives workspace calls and serves aqua://workspace/s
   assert.equal(JSON.parse(rr.json.result.contents[0].text).status, 'ok')
   const prompts = await call(rpc(4, 'prompts/get', { name: 'reuse-my-answers' }), over)
   assert.ok(!prompts.json.error, 'hasWorkspace=true reaches prompts')
+})
+
+test('real encrypted engine: uploaded drafts and history reach hosted review with exact text, provenance and no automatic approval', async (t) => {
+  const fixture = await seededWorkspace('hosted-browser-review')
+  t.after(() => fs.rmSync(fixture.dir, { recursive: true, force: true }))
+  const previous = { pass: process.env.AQUA_PASSPHRASE, vault: process.env.AQUA_VAULT_SECRET, offline: process.env.AQUA_CATALOG_OFFLINE }
+  process.env.AQUA_PASSPHRASE = PASS
+  process.env.AQUA_VAULT_SECRET = VAULT
+  process.env.AQUA_CATALOG_OFFLINE = '1'
+  t.after(() => {
+    for (const [key, value] of [['AQUA_PASSPHRASE', previous.pass], ['AQUA_VAULT_SECRET', previous.vault], ['AQUA_CATALOG_OFFLINE', previous.offline]]) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
+  })
+  const store = createFsStore(fixture.root)
+  const loaded = await store.loadManifest()
+  const over = { findWorkspace: async () => ({ id: 'real-engine-row', workspace_key: loaded.manifest.workspace_id }), storeFactory: () => store }
+  const invoke = async (name, args) => (await call(rpc(1, 'tools/call', { name, arguments: args }), over)).json.result.structuredContent
+  const imported = await invoke('import_local_application', { file_name: 'blank-review.md', content_base64: Buffer.from(FORM_MD).toString('base64') })
+  assert.equal(imported.status, 'ok')
+  const appId = imported.instance_id
+  const initial = await invoke('read_review_status', { application_id: appId })
+  const questionId = initial.questions[0].question_occurrence_id
+  const body = 'Exact synthetic wording.\nSecond line stays on the same saved version.'
+  const drafted = await invoke('create_draft_version', { application_id: appId, question_occurrence_id: questionId, title: 'Hosted browser test', body })
+  assert.equal(drafted.status, 'ok')
+  assert.match(drafted.next_steps[0], /https:\/\/aquaidp.xyz\/workspace/)
+  assert.ok(!/export-backup|terminal|Restore/.test(drafted.next_steps.join(' ')))
+  const historyText = '---\nprogram: Synthetic Historic Review\nsubmitted_at: 2025-11-01\n---\n\n## What problem are you solving?\nHistorical garden watering.\n\n## What is your deck URL?\n[TODO]\n'
+  const history = await invoke('import_history', { files: [{ name: 'past-review.md', content_base64: Buffer.from(historyText).toString('base64') }] })
+  assert.equal(history.status, 'ok')
+  assert.match(history.next_steps[0], /https:\/\/aquaidp.xyz\/workspace/)
+  // Use the actual browser helper and MCP resource handler, with only the
+  // transport and record store substituted; the encryption/model are real.
+  const data = await readHostedReview('GOOD-TOKEN', { fetchImpl: (_url, init) => handleWorkspaceMcpPost(post(JSON.parse(init.body)), deps(over).deps) })
+  const current = data.applications.find((app) => app.instance_id === appId)
+  assert.ok(current)
+  const card = current.review.cards.find((card) => card.question_occurrence_id === questionId)
+  assert.equal(card.answer.body, body)
+  assert.equal(card.answer.version_id, drafted.version_id)
+  assert.equal(card.answer.sha256, drafted.sha256)
+  assert.equal(card.integrity_ok, true)
+  assert.equal(card.approval.state, 'not_approved')
+  assert.equal(canApproveHostedCard(card), true)
+  assert.ok(current.review.cards.some((card) => card.answer === null))
+  const historical = data.applications.find((app) => app.review.history && app.review.title === 'Synthetic Historic Review')
+  assert.ok(historical)
+  const savedHistory = historical.review.cards.find((card) => card.answer?.body === 'Historical garden watering.')
+  assert.equal(savedHistory.history_source.source_file, 'past-review.md')
+  assert.equal(savedHistory.history_source.submitted_at, '2025-11-01')
+  assert.equal(savedHistory.history_source.metadata_integrity, 'verified')
+  assert.equal(savedHistory.approval.state, 'not_approved')
+  const placeholder = historical.review.cards.find((card) => card.history_source?.placeholder_found)
+  assert.ok(placeholder)
+  assert.equal(canApproveHostedCard(placeholder), false)
+  assert.ok(!JSON.stringify(data).includes(PASS))
+  assert.ok(!JSON.stringify(data).includes(VAULT))
 })
 
 test('default wiring: caller-JWT client + vendored store hit aqua_workspaces under RLS, never a privileged key', async () => {

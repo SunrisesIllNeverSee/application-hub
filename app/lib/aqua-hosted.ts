@@ -5,6 +5,7 @@
 // vault (lib/aqua-local) stays the default and is untouched here; this
 // module exists so the review surface can opt a decision into the caller's
 // hosted workspace too.
+import type { ReviewCardVM } from './review-ui/view-model.ts'
 //
 // Boundary rules kept identical to the server side:
 //   - auth is the user's own Supabase access token (Bearer), never a
@@ -150,6 +151,60 @@ export async function hostedApprove(input: HostedApproveInput, token: string, de
     token,
     deps,
   )
+}
+
+export type HostedReviewCard = ReviewCardVM & {
+  integrity_ok: boolean
+  history_source: null | {
+    source_file: string; source_sha256: string; submitted_at: string | null; date_source: string | null
+    flags: string[]; placeholder_found: boolean; metadata_integrity: 'verified' | 'legacy' | 'mismatch'
+  }
+}
+export interface HostedReviewData {
+  status: 'ok'
+  applications: Array<{
+    instance_id: string
+    review: { title: string | null; history: boolean; cards: HostedReviewCard[] }
+  }>
+}
+
+/** Fetch the caller-scoped review projection through the existing MCP resource. */
+export async function readHostedReview(token: string, deps: HostedDeps = {}): Promise<HostedReviewData> {
+  const rpc = await postJson<any>('/mcp', {
+    jsonrpc: '2.0', id: 'browser-hosted-review', method: 'resources/read',
+    params: { uri: 'aqua://workspace/status' },
+  }, token, deps)
+  if (rpc.error) throw new HostedApiError(0, 'hosted_review_unavailable', 'Could not read your hosted workspace.')
+  const content = rpc.result?.contents?.find((item: any) => item.uri === 'aqua://workspace/status' && typeof item.text === 'string')
+  let data: any
+  try { data = JSON.parse(content?.text) } catch { throw new HostedApiError(0, 'bad_review_response') }
+  if (data?.status !== 'ok' || !Array.isArray(data.applications) || data.applications.some((app: any) =>
+    typeof app?.instance_id !== 'string' || typeof app.review?.history !== 'boolean' ||
+    !Array.isArray(app.review?.cards) || app.review.cards.some((card: any) =>
+      typeof card?.question_occurrence_id !== 'string' || typeof card.integrity_ok !== 'boolean' ||
+      !card.context || !card.approval || !card.status || !card.evidence || !card.recommendation ||
+      (card.answer !== null && (typeof card.answer?.body !== 'string' || typeof card.answer?.title !== 'string' ||
+        !/^[a-f0-9-]{36}$/i.test(card.answer?.version_id ?? '') || !/^[a-f0-9]{64}$/i.test(card.answer?.sha256 ?? '')))
+    ))) throw new HostedApiError(0, 'bad_review_response')
+  return data as HostedReviewData
+}
+
+/** UI guard only; the approval endpoint independently rechecks live content. */
+export function canApproveHostedCard(card: HostedReviewCard): boolean {
+  return Boolean(card.integrity_ok && !card.history_source?.placeholder_found && card.context.original_question?.trim() && card.answer?.body.trim() && card.approval.state !== 'approved')
+}
+
+export function hostedReviewErrorMessage(error: unknown): string {
+  if (!(error instanceof HostedApiError)) return 'Could not complete this request. Please try again.'
+  switch (error.code) {
+    case 'not_signed_in': case 'unauthorized': return 'Please sign in to AQUA again, then refresh your hosted answers.'
+    case 'approval_secret_required': return 'That approval secret was not accepted. Enter the secret you chose when enabling this hosted workspace.'
+    case 'sha256_mismatch': return 'The saved answer changed after it was displayed. Refresh and review the new wording before approving.'
+    case 'version_not_found': case 'version_not_live': return 'That saved version is no longer available. Refresh your hosted answers.'
+    case 'request_failed': return 'Could not reach AQUA. Check your connection and try again.'
+    case 'local_first': case 'not_configured': case 'hosted_backend_unavailable': return 'Hosted review is not available on this deployment yet.'
+    default: return 'Could not load or update your hosted answers. Refresh and try again.'
+  }
 }
 
 // ---------------------------------------------------------------------------

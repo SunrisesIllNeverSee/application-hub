@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { findHostedWorkspace, getAccessToken, hostedInit, HostedApiError, type HostedWorkspaceRow } from '@/lib/aqua-hosted'
 import { INPUT_CLASS, Notice, Pill } from './ui'
+import { HostedReviewBoard } from './HostedReviewBoard'
 
 export type HostedWorkspaceState =
   | { status: 'probing' }
@@ -98,6 +99,7 @@ export function HostedWorkspacePanel({ hosted }: { hosted: UseHostedWorkspace })
   const fieldId = useId()
   const [approvalSecret, setApprovalSecret] = useState('')
   const [confirmation, setConfirmation] = useState('')
+  const [reviewing, setReviewing] = useState(false)
   const canEnable = approvalSecret.trim().length >= 8 && approvalSecret === confirmation
   if (state.status === 'signed_out' || state.status === 'probing') return null
   return (
@@ -155,6 +157,12 @@ export function HostedWorkspacePanel({ hosted }: { hosted: UseHostedWorkspace })
           </button>
         </form>
       )}
+      {state.status === 'ready' && <div className="mt-3">
+        <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setReviewing(!reviewing)} aria-expanded={reviewing}>
+          {reviewing ? 'Close hosted answer review' : 'Review hosted answers'}
+        </button>
+        {reviewing && <HostedReviewBoard />}
+      </div>}
       {error && (
         <div className="mt-2">
           <Notice tone="danger" testId="hosted-workspace-error">{error}</Notice>

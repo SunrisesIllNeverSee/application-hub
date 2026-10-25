@@ -10,7 +10,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 
-import { hostedInit, hostedApprove, findHostedWorkspace, HostedApiError, HOSTED_VIA } from '../lib/aqua-hosted.ts'
+import { hostedInit, hostedApprove, findHostedWorkspace, HostedApiError, HOSTED_VIA, readHostedReview, canApproveHostedCard } from '../lib/aqua-hosted.ts'
 import { createMemoryStorage } from '../lib/aqua-local/vault.ts'
 import { createAnswerWithVersion, recordHumanApproval, listApprovals, VaultScopeError } from '../lib/aqua-local/repo.ts'
 import { canonicalJson } from '../lib/aqua-local/crypto.ts'
@@ -21,6 +21,32 @@ const SECRET = 'synthetic-hosted-secret'
 
 const sha = (text) => createHash('sha256').update(text, 'utf8').digest('hex')
 const CONTENT_SHA = sha(canonicalJson({ title: 'Synthetic answer', body: 'Synthetic body text' }))
+
+test('hosted review reads the authenticated resource and fails honestly on unavailable or malformed data', async () => {
+  const data = { status: 'ok', applications: [] }
+  const { calls, fetchImpl } = fakeFetch({ status: 200, body: { jsonrpc: '2.0', id: 'browser-hosted-review', result: { contents: [{ uri: 'aqua://workspace/status', text: JSON.stringify(data) }] } } })
+  assert.deepEqual(await readHostedReview(TOKEN, { fetchImpl }), data)
+  assert.equal(calls[0].url, '/mcp')
+  assert.equal(calls[0].init.headers.authorization, `Bearer ${TOKEN}`)
+  assert.equal(JSON.parse(calls[0].init.body).method, 'resources/read')
+  for (const body of [
+    { error: { code: -32002 } },
+    { result: { contents: [] } },
+    { result: { contents: [{ uri: 'aqua://workspace/status', text: '{broken' }] } },
+    { result: { contents: [{ uri: 'aqua://workspace/status', text: JSON.stringify({ status: 'ok', applications: [{ instance_id: 'x', review: { cards: [] } }] }) }] } },
+  ]) await assert.rejects(() => readHostedReview(TOKEN, { fetchImpl: fakeFetch({ status: 200, body }).fetchImpl }), HostedApiError)
+})
+
+test('hosted approval controls require intact displayed wording and a question, and do not reopen an approval', () => {
+  const card = { integrity_ok: true, context: { original_question: 'What is your company name?' }, answer: { body: 'Synthetic company' }, approval: { state: 'not_approved' } }
+  assert.equal(canApproveHostedCard(card), true)
+  assert.equal(canApproveHostedCard({ ...card, integrity_ok: false }), false)
+  assert.equal(canApproveHostedCard({ ...card, answer: null }), false)
+  assert.equal(canApproveHostedCard({ ...card, answer: { body: ' ' } }), false)
+  assert.equal(canApproveHostedCard({ ...card, context: { original_question: null } }), false)
+  assert.equal(canApproveHostedCard({ ...card, approval: { state: 'approved' } }), false)
+  assert.equal(canApproveHostedCard({ ...card, history_source: { placeholder_found: true } }), false)
+})
 
 /** Fake fetch that captures requests and replies with a canned body. */
 function fakeFetch(reply = { status: 200, body: { status: 'ok' } }) {
