@@ -57,6 +57,7 @@ export type HostedApproveDeps = {
   now?: () => string
   reindex?: (a: { workspaceId: string; rid: string; path: string }) => Promise<boolean>
   engineCheck?: (a: { workspaceId: string; rid: string; path: string }) => Promise<boolean>
+  encodeRecord?: (a: { kind: string; key: string; authority: string; scope: string; data: Record<string, unknown> }) => Promise<string>
 }
 
 const JSON_HEADERS = { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }
@@ -199,10 +200,21 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     if (b.via !== HOSTED_VIA) return json(400, { error: 'bad_via', expected: HOSTED_VIA })
     const actorLabel =
       typeof b.actor_id === 'string' && b.actor_id.trim() && b.actor_id.length <= 200 ? b.actor_id.trim() : null
-    if (typeof b.record_b64 !== 'string' || !b.record_b64) return json(400, { error: 'bad_record' })
-    const bytes = Buffer.from(b.record_b64, 'base64')
-    if (bytes.toString('base64') !== b.record_b64.replace(/\s/g, '')) return json(400, { error: 'bad_record' })
-    if (bytes.length === 0 || bytes.length > MAX_RECORD_BYTES) return json(400, { error: 'record_too_large' })
+    // Two input modes: a client-built record_b64 (client-keyed flow), or —
+    // the callable path under the server-held-passphrase model — no record:
+    // the unlocked engine encodes the approval record itself. Either way the
+    // human binding is the same: stored version sha256 must equal the hash
+    // the human reviewed (expected_sha256).
+    const serverBuilt = b.record_b64 === undefined || b.record_b64 === null
+    let bytes: Buffer
+    if (!serverBuilt) {
+      if (typeof b.record_b64 !== 'string' || !b.record_b64) return json(400, { error: 'bad_record' })
+      bytes = Buffer.from(b.record_b64, 'base64')
+      if (bytes.toString('base64') !== b.record_b64.replace(/\s/g, '')) return json(400, { error: 'bad_record' })
+      if (bytes.length === 0 || bytes.length > MAX_RECORD_BYTES) return json(400, { error: 'record_too_large' })
+    } else {
+      bytes = Buffer.alloc(0)
+    }
     const workspaceClaim = typeof b.workspace_id === 'string' ? b.workspace_id.trim() : null
     if (workspaceClaim !== null && !UUID_RE.test(workspaceClaim) && !WS_KEY_RE.test(workspaceClaim)) {
       return json(400, { error: 'bad_workspace_id' })
@@ -210,12 +222,13 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
 
     // The record head is plaintext by design (id/kind/scope/authority are the
     // indexed metadata the file table mirrors); enc/data stays opaque.
-    let head: any
-    try {
+    let head: any = null
+    if (!serverBuilt) try {
       head = JSON.parse(bytes.toString('utf8'))
     } catch {
       return json(400, { error: 'bad_record', detail: 'record_b64 is not an AQUA record file' })
     }
+    if (!serverBuilt)
     if (
       !head ||
       head.aqua_record !== RECORD_FORMAT ||
@@ -231,23 +244,26 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     ) {
       return json(400, { error: 'bad_record', detail: 'record_b64 must be an AQUA approval record file' })
     }
-    const approvalKey = head.id.slice('approval:'.length)
+    const approvalKey = serverBuilt ? versionId : head.id.slice('approval:'.length)
     if (!approvalKey) return json(400, { error: 'bad_record' })
-    if (workspaceClaim && WS_KEY_RE.test(workspaceClaim) && workspaceClaim !== head.workspace_id) {
+    const recordWsKey = serverBuilt
+      ? (workspaceClaim && WS_KEY_RE.test(workspaceClaim) ? workspaceClaim : null)
+      : head.workspace_id
+    if (recordWsKey && workspaceClaim && WS_KEY_RE.test(workspaceClaim) && workspaceClaim !== recordWsKey) {
       return json(409, { error: 'workspace_mismatch' })
     }
 
     // Resolve the workspace row — RLS scopes this to the caller's own rows.
     const wsParams: Record<string, string> = { select: 'id,workspace_key', limit: '2' }
     if (workspaceClaim && UUID_RE.test(workspaceClaim)) wsParams.id = `eq.${workspaceClaim}`
-    else wsParams.workspace_key = `eq.${head.workspace_id}`
+    else if (recordWsKey) wsParams.workspace_key = `eq.${recordWsKey}`
     const wsRes = await pg(fetchImpl, origin, key, jwt, 'GET', T_WS, { params: wsParams })
     if (schemaMissing(wsRes)) return json(503, { error: 'not_configured' })
     if (denied(wsRes)) return json(403, { error: 'forbidden' })
     if (wsRes.status !== 200 || !Array.isArray(wsRes.body)) return json(502, { error: 'upstream' })
     if (!wsRes.body.length) return json(404, { error: 'workspace_not_found' })
     const ws = wsRes.body[0]
-    if (ws.workspace_key !== head.workspace_id) return json(409, { error: 'workspace_mismatch' })
+    if (recordWsKey && ws.workspace_key !== recordWsKey) return json(409, { error: 'workspace_mismatch' })
 
     // Locate the stored version row and re-check stored-vs-claimed — the
     // hard floor. The server never computes the reviewed hash.
@@ -279,22 +295,51 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     // approval record row, and appends the audit receipt in ONE transaction —
     // no check-then-act window, no compensating delete. A seq race on the
     // audit unique key retries once with a fresh tail.
-    const recPath = `${APPROVAL_DIR}/${fileNameForApproval(String(head.id).slice('approval:'.length))}`
-    const recSha = sha256hex(bytes)
-
-    // The record must decrypt under this workspace BEFORE the atomic write —
-    // the store has no delete path, so an undecryptable record would be
-    // permanent and its audit receipt would claim an approval the engine
-    // could never read. A staged store serves the request bytes to decodeFile.
+    const rid = serverBuilt ? `approval:${versionId}` : String(head.id)
+    let recPath = ''
     const eng = (deps.engineCheck && deps.reindex)
       ? null
-      : await engineSession(env, origin, key, jwt, ws.id, recPath, bytes)
-    if (!deps.engineCheck || !deps.reindex) {
-      if (!eng) return json(503, { error: 'hosted_backend_unavailable', detail: 'workspace unlock is not configured' })
-      try { await eng.w.decodeFile(recPath) } catch { return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' }) }
-    } else if (!(await deps.engineCheck!({ workspaceId: ws.id, rid: String(head.id), path: recPath }))) {
-      return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' })
+      : await engineSession(env, origin, key, jwt, ws.id, '__none__', bytes)
+
+    if (serverBuilt) {
+      // The unlocked engine encodes the record — same keys the hosted
+      // workspace decrypts with, actor stamped from the verified JWT.
+      if (!eng && !deps.encodeRecord) return json(503, { error: 'hosted_backend_unavailable', detail: 'workspace unlock is not configured' })
+      try {
+        const text = await (deps.encodeRecord ?? ((a: any) => eng!.w.encodeRecord(a)))({
+          kind: 'approval', key: versionId, authority: 'projection', scope: 'private',
+          data: {
+            version_id: versionId, version_sha256: expected, decision: 'approved',
+            actor_id: user.id, actor_class: 'human', via: HOSTED_VIA, decided_at: now(),
+            ...(actorLabel ? { actor_label: actorLabel } : {}),
+          },
+        })
+        bytes = Buffer.from(text, 'utf8')
+      } catch {
+        return json(503, { error: 'hosted_backend_unavailable', detail: 'the approval record could not be encoded' })
+      }
+      recPath = `${APPROVAL_DIR}/${fileNameForApproval(versionId)}`
+    } else {
+      recPath = `${APPROVAL_DIR}/${fileNameForApproval(String(head.id).slice('approval:'.length))}`
+      // The record must decrypt under this workspace BEFORE the atomic write —
+      // the store has no delete path, so an undecryptable record would be
+      // permanent and its audit receipt would claim an approval the engine
+      // could never read. A staged store serves the request bytes to decodeFile.
+      if (!deps.engineCheck || !deps.reindex) {
+        if (!eng) return json(503, { error: 'hosted_backend_unavailable', detail: 'workspace unlock is not configured' })
+        eng.stage(recPath, bytes)
+        let decoded: any
+        try { decoded = await eng.w.decodeFile(recPath) } catch { return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' }) }
+        // we already paid to decrypt — the payload must actually bind THIS
+        // version and THIS reviewed hash, not just be well-formed
+        if (decoded.data?.version_id !== versionId || decoded.data?.version_sha256 !== expected) {
+          return json(400, { error: 'bad_record', detail: 'the record binds a different version or hash than the decision' })
+        }
+      } else if (!(await deps.engineCheck!({ workspaceId: ws.id, rid, path: recPath }))) {
+        return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' })
+      }
     }
+    const recSha = sha256hex(bytes)
 
     let done = false, doneSeq = 0, doneAt = ''
     for (let attempt = 0; attempt < 2 && !done; attempt++) {
@@ -323,8 +368,8 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
           p_version_path: version.path,
           p_expected_sha256: expected,
           p_record_path: recPath,
-          p_record_b64: b.record_b64,
-          p_rid: String(head.id),
+          p_record_b64: bytes.toString('base64'),
+          p_rid: rid,
           p_audit: { log_name: AUDIT_LOG_NAME, seq, entry: auditEntry, line: JSON.stringify(auditEntry), prev },
         },
         prefer: 'return=minimal',
@@ -343,7 +388,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         })
         const dup = dupRes.status === 200 && Array.isArray(dupRes.body) && dupRes.body.length ? dupRes.body[0] : null
         if (dup && dup.sha256 === recSha) {
-          const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, String(head.id), recPath, recSha, now())
+          const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, rid, recPath, recSha, now())
           if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval exists but is not indexed — retry to index it' })
           return json(200, {
             status: 'ok', already_recorded: true, version_id: versionId, version_sha256: expected,
@@ -361,7 +406,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     // The RPC writes record + audit atomically, but manifest.records is
     // engine-owned — index the approval through the unlocked store-backed
     // workspace so read_review_status, approvalGate and packets observe it.
-    const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, String(head.id), recPath, recSha, doneAt)
+    const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, rid, recPath, recSha, doneAt)
     if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval was written but not indexed — retry the decision' })
 
     return json(200, {
@@ -387,19 +432,20 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
 async function engineSession(
   env: Env, origin: string, key: string, jwt: string,
   workspaceId: string, stagePath: string, stageBytes: Buffer,
-): Promise<{ w: any } | null> {
+): Promise<{ w: any; stage: (p: string, b: Buffer) => void } | null> {
   const passphrase = env.AQUA_PASSPHRASE
   if (!passphrase) return null
   const { createClient } = await import('@supabase/supabase-js')
   const { createSupabaseStore } = await import('../../../mcp/_vendor/workspace/companion/src/store/workspace-store.mjs')
   const { Workspace } = await import('../../../mcp/_vendor/workspace/companion/src/workspace.mjs')
-  const client = createClient(origin, key, { global: { headers: { authorization: `Bearer ${jwt}` } } })
+  const client = createClient(origin, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }, global: { headers: { authorization: `Bearer ${jwt}` } } })
   const real = createSupabaseStore(client, workspaceId)
   const staged = Object.create(real)
-  staged.getFile = async (p: string) => (p === stagePath ? stageBytes : real.getFile(p))
+  let stage = { p: stagePath, b: stageBytes }
+  staged.getFile = async (p: string) => (p === stage.p ? stage.b : real.getFile(p))
   const w = await (Workspace as any).openStore(staged, { env: {}, stderr: { write: () => true } })
   await w.unlock(passphrase)
-  return { w }
+  return { w, stage: (p: string, b: Buffer) => { stage = { p, b } } }
 }
 
 /** Index an approval record into manifest.records via the unlocked engine.

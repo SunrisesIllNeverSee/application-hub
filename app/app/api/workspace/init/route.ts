@@ -20,6 +20,14 @@ export async function POST(req: Request) {
   const { rateLimitAllow } = await import('../../../../lib/rate-limit.ts')
   if (!rateLimitAllow(user.id, 'hosted_approve')) return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers: { 'content-type': 'application/json', 'retry-after': '60' } })
 
+  // Hosted workspace is an explicit opt-in — the request must carry the
+  // consent flag; a bare Bearer token alone never provisions storage.
+  let body: Record<string, unknown> = {}
+  try { body = JSON.parse(await req.text()) } catch { /* empty */ }
+  if (body.consent_hosted_workspace !== true) {
+    return json(400, { error: 'consent_required', detail: 'POST {"consent_hosted_workspace": true} to explicitly enable a hosted workspace' })
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.AQUA_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.AQUA_PUBLISHABLE_KEY
   if (!url || !key) return json(503, { error: 'not_configured' })
@@ -46,7 +54,7 @@ export async function POST(req: Request) {
   const { manifest_mac: _omit, ...macBase } = manifest
   manifest.manifest_mac = await crypto.macHex(keys, crypto.canonicalJson(macBase))
   const { data, error } = await client.from('aqua_workspaces')
-    .insert({ workspace_key: manifest.workspace_id, manifest })
+    .insert({ workspace_key: manifest.workspace_id, manifest: { ...manifest, hosted_consent: { at: new Date().toISOString(), account_id: user.id } } })
     .select('id').single()
   if (error) {
     if (error.code === '23505') return json(200, { status: 'ok', already_initialized: true })

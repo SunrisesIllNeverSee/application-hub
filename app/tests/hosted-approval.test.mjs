@@ -209,13 +209,14 @@ const goodBody = (over = {}) => ({
 })
 
 const reindexCalls = []
-async function call(body, { tables = db(), token = TOKEN, headers = {}, verify = verifyJwt } = {}) {
+async function call(body, { tables = db(), token = TOKEN, headers = {}, verify = verifyJwt, encodeRecord = null } = {}) {
   const fake = fakePostgrest(tables)
   const res = await handleHostedApprove(post(body, { token, headers }), {
     env: ENV,
     fetchImpl: fake.fetchImpl,
     reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
     engineCheck: async () => true,
+    ...(encodeRecord ? { encodeRecord } : {}),
     verifyJwt: verify,
     allow: () => true,
     now: () => '2026-10-30T00:06:00.000Z',
@@ -230,8 +231,6 @@ test('missing or invalid auth is a 401 before anything else', async () => {
     const res = await handleHostedApprove(post(goodBody(), { token: tok }), {
       env: ENV,
       fetchImpl: fake.fetchImpl,
-    reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
-    engineCheck: async () => true,
       verifyJwt: verifyJwt,
       allow: () => true,
     })
@@ -371,6 +370,21 @@ test('a public-scope plaintext approval record is refused (forgery hole)', async
   const { res, json } = await call(goodBody({ record_b64: forged.toString('base64') }))
   assert.equal(res.status, 400)
   assert.equal(json.error, 'bad_record')
+})
+
+test('server-built mode: no record_b64 — the engine encodes, hashes bind the version', async () => {
+  const tables = db()
+  const encoded = { calls: 0 }
+  const { res, json, fake } = await call({ version_id: VERSION_ID, expected_sha256: VERSION_SHA, actor_id: 'local-user', via: 'hosted_review' }, {
+    tables,
+    encodeRecord: async (a) => { encoded.calls++; return approvalRecordBytes().toString('utf8') },
+  })
+  assert.equal(res.status, 200)
+  assert.equal(encoded.calls, 1, 'the engine built the record, not the client')
+  assert.equal(tables.aqua_workspace_records.length, 2, 'the encoded record row was written')
+  assert.equal(tables.aqua_workspace_audit.length, 1, 'the audit receipt was written')
+  const rpc = fake.requests.find((r) => r.url.includes('rpc/aqua_workspace_approve'))
+  assert.ok(rpc, 'the atomic RPC carried the server-built record')
 })
 
 test('a record for a different workspace key is refused', async () => {
