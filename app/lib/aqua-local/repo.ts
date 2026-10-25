@@ -434,7 +434,6 @@ export class VaultHistoryApprovalError extends VaultScopeError {
   }
 }
 
-const HUMAN_VIA: ReadonlyArray<Exclude<ApprovalVia, 'legacy' | 'history_attestation'>> = ['review_ui', 'decision_file', 'hosted_review']
 // hosted_review is read-only in the local vault — it arrives via imported
 // workspace records; local human decisions stay review_ui | decision_file
 const WRITABLE_VIA: ReadonlyArray<string> = ['review_ui', 'decision_file']

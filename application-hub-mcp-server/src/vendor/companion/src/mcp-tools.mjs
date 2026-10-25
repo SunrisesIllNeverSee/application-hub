@@ -1019,7 +1019,7 @@ export const TOOLS = [
           throw e
         }
       }
-      if (!files.files.length) throw new ToolRefusal('no_files', `No .md, .txt, .docx, .html, .json or .csv files in ${files.rel}/.`)
+      if (!files.files.length) throw new ToolRefusal('no_files', `No .md, .txt, .docx, .html, .json or .csv files in ${files.rel ?? 'uploads'}/.`)
       let prepared
       try {
         prepared = await prepareHistoryImport(t.ws, files.files, { date: args.date ?? null, program: args.program ?? null })
@@ -1034,7 +1034,7 @@ export const TOOLS = [
         return rest
       }
       return {
-        status: 'ok', staged: staged.length > 0, folder: files.rel,
+        status: 'ok', staged: staged.length > 0, folder: files.rel ?? 'uploads',
         counts: {
           files: files.files.length, applications: staged.length, answers: staged.reduce((n, r) => n + r.answered, 0),
           unknown_dates: staged.filter((r) => !r.submitted_at).length, with_placeholders: staged.reduce((n, r) => n + r.with_placeholders, 0),

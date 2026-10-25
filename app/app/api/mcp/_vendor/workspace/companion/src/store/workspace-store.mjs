@@ -202,8 +202,18 @@ export function createSupabaseStore(client, workspaceRowId) {
       if (!data?.length) throw err(`missing_file:${f}`)
     },
     async listFiles(prefix = '') {
-      const { data, error } = await client.from(T_REC).select('path').eq('workspace_id', workspaceRowId).order('path').limit(100000)
-      if (error) throw err(error.message)
+      const all = []
+      let after = ''
+      for (;;) {  // PostgREST max-rows silently truncates — page by last path
+        const { data, error } = await client.from(T_REC).select('path')
+          .eq('workspace_id', workspaceRowId).gt('path', after).order('path').limit(1000)
+        if (error) throw err(error.message)
+        if (!data?.length) break
+        all.push(...data)
+        if (data.length < 1000) break
+        after = data[data.length - 1].path
+      }
+      const data = all
       const pre = prefix.endsWith('/') ? prefix : prefix + '/'
       return (data ?? []).map((r) => r.path).filter((p) => !prefix || p === prefix || p.startsWith(pre))
     },

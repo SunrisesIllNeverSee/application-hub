@@ -299,12 +299,12 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     let recPath = ''
     const eng = (deps.engineCheck && deps.reindex)
       ? null
-      : await engineSession(env, origin, key, jwt, ws.id, '__none__', bytes)
+      : await engineSession(env, origin, key, jwt, ws.id, '__none__', bytes).catch(() => null)
 
     if (serverBuilt) {
       // The unlocked engine encodes the record — same keys the hosted
       // workspace decrypts with, actor stamped from the verified JWT.
-      if (!eng && !deps.encodeRecord) return json(503, { error: 'hosted_backend_unavailable', detail: 'workspace unlock is not configured' })
+      if (!eng && !deps.encodeRecord) return json(503, { error: 'hosted_backend_unavailable', detail: 'the workspace could not be opened' })
       try {
         const text = await (deps.encodeRecord ?? ((a: any) => eng!.w.encodeRecord(a)))({
           kind: 'approval', key: versionId, authority: 'projection', scope: 'private',

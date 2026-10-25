@@ -39,7 +39,7 @@ import { rateLimitAllow, type RateLimitAction } from '../../../../lib/rate-limit
 /** Private-write tools accept content arguments (drafts, evidence files): bigger cap than the catalog surface. */
 // covers the content-arg upload tools (5MB decoded ~= 6.7MB b64);
 // evidence/packet/vault-export uploads exceed any JSON-RPC transport and
-// need the staged-blob path (HOSTED-MCP-FEASIBILITY.md) — not this cap
+// need the staged-blob path (HOSTED-MCP-FEASIBILITY.md (in the aquarnd planning repo)) — not this cap
 export const MAX_WORKSPACE_BODY_BYTES = 10 * 1024 * 1024
 export const WORKSPACE_RESOURCE_METADATA = 'https://aquaidp.xyz/.well-known/oauth-protected-resource'
 const WORKSPACE_STATUS_URI = 'aqua://workspace/status'
