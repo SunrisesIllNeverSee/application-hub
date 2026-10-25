@@ -430,8 +430,3 @@ with e as (
 select relname || '|' || relkind || '|' || string_agg(rn || '=' || privs, ' ' order by i)
 from e group by relname, relkind order by 1;
 ```
-
-| aqua_workspaces | b | - | arwd | arwd | 064 hosted-MCP (draft): owner CAS manifest; delete cascades |
-| aqua_workspace_records | b | - | arwd | arwd | 064 hosted-MCP (draft): owner file rows; ops via commit RPC |
-| aqua_workspace_audit | b | - | ar | ar | 064 hosted-MCP (draft): append-only; no update/delete |
-| aqua_workspace_audit_id_seq | b | - | - | rU | 064 identity sequence |

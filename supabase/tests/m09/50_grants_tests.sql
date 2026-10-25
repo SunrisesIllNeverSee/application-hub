@@ -123,6 +123,11 @@ INSERT INTO p0g.expect VALUES
  ('teams','r','e','-','r','arwd','-','r','arwd','056/057'),
  ('team_members','r','e','-','r','arwd','-','r','arwd','056/057'),
  ('team_invites','r','e','-','r','arwd','-','r','arwd','056/057; accept via SECURITY DEFINER rpc'),
+ -- m10 hosted workspaces (064): class b, owner-scoped ciphertext storage
+ ('aqua_workspaces','r','b','-','arwd','arwd','-','arwd','arwd','064 hosted-MCP: owner CAS manifest; delete cascades (retention path)'),
+ ('aqua_workspace_records','r','b','-','arwd','arwd','-','arwd','arwd','064 hosted-MCP: owner file rows; ops via aqua_workspace_commit'),
+ ('aqua_workspace_audit','r','b','-','ar','ar','-','ar','ar','064 hosted-MCP: append-only audit; no update/delete'),
+ ('aqua_workspace_audit_id_seq','S','b','-','-','rU','-','-','rU','064 identity sequence; explicit service_role grant'),
  ('team_answers','r','e','-','r','arwd','-','r','arwd','056/057');
 
 DROP TABLE IF EXISTS p0g.probe_fallbacks;
@@ -356,11 +361,6 @@ BEGIN
     (SELECT count(*) FROM p0g.findings WHERE finding = 'MISSING');
   RAISE NOTICE 'phase=% total=% pass=% fail=%', current_setting('p0.phase'),
     (SELECT count(*) FROM p0.results WHERE test_id LIKE 'GR-%'),
- -- m10 hosted workspaces (064): class b, owner-scoped ciphertext storage
- ('aqua_workspaces','r','b','-','arwd','arwd','-','arwd','arwd','064 hosted-MCP: owner CAS manifest; delete cascades (retention path)'),
- ('aqua_workspace_records','r','b','-','arwd','arwd','-','arwd','arwd','064 hosted-MCP: owner file rows; ops via aqua_workspace_commit'),
- ('aqua_workspace_audit','r','b','-','ar','ar','-','ar','ar','064 hosted-MCP: append-only audit; no update/delete'),
- ('aqua_workspace_audit_id_seq','S','b','-','-','rU','-','-','rU','064 identity sequence; explicit service_role grant'),
     (SELECT count(*) FROM p0.results WHERE test_id LIKE 'GR-%' AND pass), v_fail;
   IF v_fail > 0 THEN RAISE EXCEPTION 'GRANTS TESTS FAILED: %', v_fail; END IF;
 END

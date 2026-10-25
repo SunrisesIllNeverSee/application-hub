@@ -6,14 +6,13 @@
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { resolveInside } from '../fsafe.mjs'
 
 const BAD = /[\0]/u
 function inside(root, rel) {
   if (!rel || typeof rel !== 'string' || BAD.test(rel)) throw new Error(`bad path: ${JSON.stringify(rel)}`)
-  const abs = path.resolve(root, rel)
-  const r = path.resolve(root)
-  if (abs !== r && !abs.startsWith(r + path.sep)) throw new Error(`path escapes workspace root: ${rel}`)
-  if (abs === r) throw new Error(`path is the workspace root itself`)
+  const abs = resolveInside(root, rel)  // fsafe: normalization + escape + symlink rules
+  if (abs === path.resolve(root)) throw new Error(`path is the workspace root itself`)
   return abs
 }
 async function noSymlinks(abs, root) {
@@ -150,7 +149,7 @@ export function createSupabaseStore(client, workspaceRowId) {
       rev = data; return rev
     },
     async getFile(p) {
-      const { data, error } = await client.from(T_REC).select('file').eq('workspace_id', workspaceRowId).eq('path', p).single()
+      const { data, error } = await client.from(T_REC).select('file').eq('workspace_id', workspaceRowId).eq('path', norm(p)).single()
       return error || !data ? null : decodeFile(data.file)
     },
     async putNewFile(p, bytes) {
@@ -178,18 +177,14 @@ export function createSupabaseStore(client, workspaceRowId) {
       return (data ?? []).map((r) => r.path).filter((p) => !prefix || p === prefix || p.startsWith(pre))
     },
     async appendLog(logRelPath, line) {
-      const logName = path.basename(logRelPath)
       const tail = await readLogTail(logRelPath)
       let seq = 1, prev = null
       if (tail.lastLine) {
-        try {
-          const e = JSON.parse(tail.lastLine)
-          seq = (e.seq ?? 0) + 1
-        } catch { seq = tail.lastLine.length ? 2 : 1 }
-        prev = sha(tail.lastLine)  // engine: prev = sha256 of previous line text
+        try { seq = (JSON.parse(tail.lastLine).seq ?? 0) + 1 } catch { seq = 2 }
+        prev = sha(Buffer.from(tail.lastLine, 'utf8'))  // engine: sha256 of the raw previous line text
       }
-      const entry = (() => { try { return JSON.parse(line) } catch { return line } })()
-      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logName, seq, entry, prev })
+      const entry = (() => { try { return JSON.parse(line) } catch { return { text: line } } })()
+      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logRelPath, seq, entry, prev })
       if (error) throw err(error.message)
     },
     async readLogTail(logRelPath) { return readLogTail(logRelPath) },
@@ -200,8 +195,7 @@ export function createSupabaseStore(client, workspaceRowId) {
     return (data?.length ?? 0) > 0
   }
   async function readLogTail(logRelPath) {
-    const logName = path.basename(logRelPath)
-    const { data, error } = await client.from(T_AUD).select('entry').eq('workspace_id', workspaceRowId).eq('log_name', logName).order('seq', { ascending: false }).limit(1)
+    const { data, error } = await client.from(T_AUD).select('entry').eq('workspace_id', workspaceRowId).eq('log_name', logRelPath).order('seq', { ascending: false }).limit(1)
     if (error || !data?.length) return { lastLine: null }
     return { lastLine: typeof data[0].entry === 'string' ? data[0].entry : JSON.stringify(data[0].entry) }
   }
