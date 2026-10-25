@@ -23,7 +23,7 @@
 //   - Logs nothing that came from the request: the only log line is a fixed
 //     string plus an error class name (same rule as the MCP endpoint).
 
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { readCappedText } from '../../../mcp/_vendor/catalog/rest.mjs'
 import { rateLimitAllow } from '../../../../../lib/rate-limit.ts'
 
@@ -305,19 +305,6 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       // The unlocked engine encodes the record — same keys the hosted
       // workspace decrypts with, actor stamped from the verified JWT.
       if (!eng && !deps.encodeRecord) return json(503, { error: 'hosted_backend_unavailable', detail: 'the workspace could not be opened' })
-      try {
-        const text = await (deps.encodeRecord ?? ((a: any) => eng!.w.encodeRecord(a)))({
-          kind: 'approval', key: versionId, authority: 'projection', scope: 'private',
-          data: {
-            version_id: versionId, version_sha256: expected, decision: 'approved',
-            actor_id: user.id, actor_class: 'human', via: HOSTED_VIA, decided_at: now(),
-            ...(actorLabel ? { actor_label: actorLabel } : {}),
-          },
-        })
-        bytes = Buffer.from(text, 'utf8')
-      } catch {
-        return json(503, { error: 'hosted_backend_unavailable', detail: 'the approval record could not be encoded' })
-      }
       recPath = `${APPROVAL_DIR}/${fileNameForApproval(versionId)}`
     } else {
       recPath = `${APPROVAL_DIR}/${fileNameForApproval(String(head.id).slice('approval:'.length))}`
@@ -332,14 +319,19 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         try { decoded = await eng.w.decodeFile(recPath) } catch { return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' }) }
         // we already paid to decrypt — the payload must actually bind THIS
         // version and THIS reviewed hash, not just be well-formed
-        if (decoded.data?.version_id !== versionId || decoded.data?.version_sha256 !== expected) {
-          return json(400, { error: 'bad_record', detail: 'the record binds a different version or hash than the decision' })
+        if (
+          decoded.data?.version_id !== versionId ||
+          decoded.data?.version_sha256 !== expected ||
+          decoded.data?.decision !== 'approved' ||
+          decoded.data?.actor_class !== 'human'
+        ) {
+          return json(400, { error: 'bad_record', detail: 'the record must be an approval of this exact version/hash by a human' })
         }
       } else if (!(await deps.engineCheck!({ workspaceId: ws.id, rid, path: recPath }))) {
         return json(400, { error: 'bad_record', detail: 'the approval record does not decrypt under this workspace' })
       }
     }
-    const recSha = sha256hex(bytes)
+    let recSha = sha256hex(bytes)
 
     let done = false, doneSeq = 0, doneAt = ''
     for (let attempt = 0; attempt < 2 && !done; attempt++) {
@@ -355,8 +347,28 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         try { seq = (last.entry?.seq ?? 0) + 1 } catch { seq = 2 }
         prev = sha256hex(Buffer.from(lastText, 'utf8'))
       }
+      const at = now()
+      if (serverBuilt) {
+        // build per-attempt so the ApprovalRecord's seq mirrors this attempt's
+        // audit seq (its authoritative ordering field)
+        try {
+          const text = await (deps.encodeRecord ?? ((a: any) => eng!.w.encodeRecord(a)))({
+            kind: 'approval', key: versionId, authority: 'projection', scope: 'private',
+            data: {
+              id: randomUUID(), version_id: versionId, version_sha256: expected,
+              decision: 'approved', actor_class: 'human', at, seq,
+              actor_id: user.id, via: HOSTED_VIA,
+              ...(actorLabel ? { actor_label: actorLabel } : {}),
+            },
+          })
+          bytes = Buffer.from(text, 'utf8')
+          recSha = sha256hex(bytes)
+        } catch {
+          return json(503, { error: 'hosted_backend_unavailable', detail: 'the approval record could not be encoded' })
+        }
+      }
       const auditEntry = {
-        at: now(), op: 'hosted_approval', version_id: versionId,
+        at, op: 'hosted_approval', version_id: versionId,
         version_sha256: expected, actor_id: user.id,
         ...(actorLabel ? { actor_label: actorLabel } : {}),
         via: HOSTED_VIA, record_path: recPath, record_sha256: recSha,

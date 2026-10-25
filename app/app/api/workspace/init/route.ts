@@ -5,6 +5,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { createClient } from '@supabase/supabase-js'
+import { readCappedText } from '../../mcp/_vendor/catalog/rest.mjs'
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
@@ -23,7 +24,8 @@ export async function POST(req: Request) {
   // Hosted workspace is an explicit opt-in — the request must carry the
   // consent flag; a bare Bearer token alone never provisions storage.
   let body: Record<string, unknown> = {}
-  try { body = JSON.parse((await req.text()).slice(0, 64 * 1024)) } catch { /* empty */ }
+  const raw = await readCappedText(req, 64 * 1024)
+  try { body = raw ? JSON.parse(raw) : {} } catch { /* empty */ }
   if (body.consent_hosted_workspace !== true) {
     return json(400, { error: 'consent_required', detail: 'POST {"consent_hosted_workspace": true} to explicitly enable a hosted workspace' })
   }
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
 
   const { assertAnonKey } = await import('../../mcp/_vendor/catalog/key.mjs')
   try { assertAnonKey(key) } catch { return json(503, { error: 'not_configured', detail: 'the configured key is not an anon/publishable key' }) }
-  const client = createClient(url, key, { global: { headers: { authorization: `Bearer ${token}` } } })
+  const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }, global: { headers: { authorization: `Bearer ${token}` } } })
   const { data: existing } = await client
     .from('aqua_workspaces').select('id, workspace_key')
     .eq('account_id', user.id).limit(1)
@@ -60,7 +62,7 @@ export async function POST(req: Request) {
     .select('id').single()
   if (error) {
     if (error.code === '23505') return json(200, { status: 'ok', already_initialized: true })
-    return json(500, { error: 'write_failed', detail: error.message })
+    return json(500, { error: 'write_failed', detail: (error as { code?: string }).code ?? 'unknown' })
   }
   return json(201, { status: 'ok', workspace_id: data.id })
 }

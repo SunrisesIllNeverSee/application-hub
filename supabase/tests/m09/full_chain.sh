@@ -53,6 +53,10 @@ OUT="$PGROOT/grants"
 mkdir -p "$OUT"
 # Objects 058 adds (absent from the 2026-10-22 production snapshot).
 NEW_058='^(COL\|)?(catalog_|program_template_revisions|question_mapping_decisions)'
+# post-061 objects (m10 hosted workspace tables) legitimately survive the
+# 062-rollback — the rollback must not drop later migrations' objects. The
+# at061 snapshot predates them, so filter them out of that comparison.
+NEW_POST061='^(COL\|)?(aqua_)'
 # Migrations that do not apply verbatim (050 restates their intended end
 # state; documented there). Applied without ON_ERROR_STOP, errors listed.
 KNOWN_VERBATIM_FAILURES='^(008_intelligence_layer_v2|019_fundingcake_seed|028_solofounders_seed)\.sql$'
@@ -239,7 +243,7 @@ sed -n '/^-- ROLLBACK/,/^--   COMMIT;/p' "$M062" | sed -n '/^--   BEGIN;/,/^--  
   | sed -E 's/^--   //' > "$PGROOT/rollback062.sql"
 psql_q -f "$PGROOT/rollback062.sql" -f "$M059" 2>&1 | grep -v -E '^$|NOTICE|WARNING:  there is (no|already a) transaction' || true
 snapshot "$DB" after_rollback062
-diff "$OUT/${DB}_at061.txt" "$OUT/after_rollback062.txt" || fail "062 rollback does not restore the 061 grants"
+diff "$OUT/${DB}_at061.txt" <(grep -v -E "$NEW_POST061" "$OUT/after_rollback062.txt") || fail "062 rollback does not restore the 061 grants" 
 [ "$(psql -X -At -c "select count(*) from pg_policies where tablename='community_messages' and policyname='cm_sender_delete'")" = 0 ] \
   || fail "062 rollback left cm_sender_delete"
 psql_q -f "$M062" 2>&1 | grep -v NOTICE || true

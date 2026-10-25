@@ -2,8 +2,8 @@
 // `npm run vendor:companion` in application-hub-mcp-server/ (CI checks these copies).
 // VENDORED FILE: DO NOT EDIT. Regenerate with: node aqua-companion/scripts/vendor.mjs
 // source: app/lib/aqua-local/repo.ts
-// source-sha256: 5f74e0a51944e27360489a20676d965c67b2081af0672c6221bdcb6d14a98ea7
-// body-sha256: dc4f59d077ebc184be3fa58026b200c5a61b2de797190fcb2d40dd2de4867be5
+// source-sha256: 46ce0d0cf30e23f5798b45a4570c0514381526d7d10c15a4af3e5041d204cb25
+// body-sha256: 95d41e1a6e6fbce09721a73181199c47fef89c5dc9584caf711036cd82e64e58
 // generator: v2; types stripped (node:module stripTypeScriptTypes, strip mode); .ts imports point at .mjs.
 // NETWORK-BOUNDARY: no fetch/import of remote APIs allowed in aqua-local
 //
@@ -441,7 +441,6 @@ export class VaultHistoryApprovalError extends VaultScopeError {
   }
 }
 
-const HUMAN_VIA                                                                        = ['review_ui', 'decision_file', 'hosted_review']
 // hosted_review is read-only in the local vault — it arrives via imported
 // workspace records; local human decisions stay review_ui | decision_file
 const WRITABLE_VIA                        = ['review_ui', 'decision_file']

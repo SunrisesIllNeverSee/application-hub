@@ -98,7 +98,7 @@ create policy aqua_ws_audit_owner_ins on public.aqua_workspace_audit
 -- owner via the Data API (RLS-scoped to own rows) — CAS ordering through
 -- aqua_workspace_commit is the intended path, not an enforced one.
 grant select, insert, update, delete on public.aqua_workspaces to authenticated;  -- owner delete cascades (retention path)
-grant select, insert, update, delete on public.aqua_workspace_records to authenticated;
+grant select, insert, update on public.aqua_workspace_records to authenticated;  -- no DELETE: retention is the workspace-row cascade
 grant select, insert on public.aqua_workspace_audit to authenticated;
 grant select, insert, update, delete on public.aqua_workspaces to service_role;
 grant select, insert, update, delete on public.aqua_workspace_records to service_role;
