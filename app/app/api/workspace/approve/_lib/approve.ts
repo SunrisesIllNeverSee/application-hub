@@ -58,6 +58,7 @@ export type HostedApproveDeps = {
   reindex?: (a: { workspaceId: string; rid: string; path: string }) => Promise<boolean>
   engineCheck?: (a: { workspaceId: string; rid: string; path: string }) => Promise<boolean>
   encodeRecord?: (a: { kind: string; key: string; authority: string; scope: string; data: Record<string, unknown> }) => Promise<string>
+  versionContentSha?: (a: { workspaceId: string; versionPath: string }) => Promise<string | null>
 }
 
 const JSON_HEADERS = { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }
@@ -284,12 +285,6 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     if (!live.length) return json(409, { error: 'version_not_live' })
     if (live.length > 1) return json(409, { error: 'version_ambiguous' })
     const version = live[0]
-    if (version.sha256 !== expected) {
-      return json(409, {
-        error: 'sha256_mismatch',
-        detail: 'the stored version record no longer matches the reviewed hash — decision refused',
-      })
-    }
 
     // Atomic write: the RPC re-checks stored-vs-claimed sha256, inserts the
     // approval record row, and appends the audit receipt in ONE transaction —
@@ -300,6 +295,20 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     const eng = (deps.engineCheck && deps.reindex)
       ? null
       : await engineSession(env, origin, key, jwt, ws.id, '__none__', bytes).catch(() => null)
+
+    // CONTENT-hash floor: expected_sha256 is the hash of what the human
+    // reviewed — sha256(canonicalJson({title, body})) — which lives inside the
+    // encrypted version record, not the file-bytes column. The engine decodes
+    // the version to verify it; the RPC separately guards the file sha.
+    if (deps.versionContentSha) {
+      const cs = await deps.versionContentSha({ workspaceId: ws.id, versionPath: version.path })
+      if (cs !== expected) return json(409, { error: 'sha256_mismatch', detail: 'the stored version no longer matches the reviewed hash — decision refused' })
+    } else {
+      if (!eng) return json(503, { error: 'hosted_backend_unavailable', detail: 'the workspace could not be opened' })
+      let contentSha: string | null = null
+      try { contentSha = (await eng.w.decodeFile(version.path))?.data?.sha256 ?? null } catch { /* falls through */ }
+      if (contentSha !== expected) return json(409, { error: 'sha256_mismatch', detail: 'the stored version no longer matches the reviewed hash — decision refused' })
+    }
 
     if (serverBuilt) {
       // The unlocked engine encodes the record — same keys the hosted
@@ -378,7 +387,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         body: {
           p_workspace_id: ws.id,
           p_version_path: version.path,
-          p_expected_sha256: expected,
+          p_expected_sha256: version.sha256,
           p_record_path: recPath,
           p_record_b64: bytes.toString('base64'),
           p_rid: rid,
@@ -399,12 +408,14 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
           params: { workspace_id: `eq.${ws.id}`, path: `eq.${recPath}`, select: 'id,sha256', limit: '1' },
         })
         const dup = dupRes.status === 200 && Array.isArray(dupRes.body) && dupRes.body.length ? dupRes.body[0] : null
-        if (dup && dup.sha256 === recSha) {
-          const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, rid, recPath, recSha, now())
+        if (dup && (serverBuilt || dup.sha256 === recSha)) {
+          // path is derived from the rid — a row here IS this approval's prior
+          // write; reindex it (a dead write after reindex_failed gets indexed)
+          const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, rid, recPath, dup.sha256, now())
           if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval exists but is not indexed — retry to index it' })
           return json(200, {
             status: 'ok', already_recorded: true, version_id: versionId, version_sha256: expected,
-            actor_id: user.id, via: HOSTED_VIA, path: recPath, sha256: recSha,
+            actor_id: user.id, via: HOSTED_VIA, path: recPath, sha256: dup.sha256,
           })
         }
         if (dup) return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })

@@ -37,9 +37,10 @@ export async function POST(req: Request) {
   const { assertAnonKey } = await import('../../mcp/_vendor/catalog/key.mjs')
   try { assertAnonKey(key) } catch { return json(503, { error: 'not_configured', detail: 'the configured key is not an anon/publishable key' }) }
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }, global: { headers: { authorization: `Bearer ${token}` } } })
-  const { data: existing } = await client
+  const { data: existing, error: existingErr } = await client
     .from('aqua_workspaces').select('id, workspace_key')
     .eq('account_id', user.id).limit(1)
+  if (existingErr) return json(503, { error: 'not_configured', detail: 'the workspace table is unreachable' })
   if (existing?.length) {
     return json(200, { status: 'ok', already_initialized: true, workspace_id: existing[0].id })
   }

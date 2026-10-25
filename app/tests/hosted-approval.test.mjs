@@ -216,6 +216,7 @@ async function call(body, { tables = db(), token = TOKEN, headers = {}, verify =
     fetchImpl: fake.fetchImpl,
     reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
     engineCheck: async () => true,
+    versionContentSha: async () => VERSION_SHA,
     ...(encodeRecord ? { encodeRecord } : {}),
     verifyJwt: verify,
     allow: () => true,
