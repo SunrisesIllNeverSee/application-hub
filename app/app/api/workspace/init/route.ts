@@ -22,6 +22,8 @@ export async function POST(req: Request) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.AQUA_PUBLISHABLE_KEY
   if (!url || !key) return json(503, { error: 'not_configured' })
 
+  const { assertAnonKey } = await import('../../mcp/_vendor/catalog/key.mjs')
+  assertAnonKey(key)
   const client = createClient(url, key, { global: { headers: { authorization: `Bearer ${token}` } } })
   const { data: existing } = await client
     .from('aqua_workspaces').select('id, workspace_key')
@@ -39,6 +41,9 @@ export async function POST(req: Request) {
   const { data, error } = await client.from('aqua_workspaces')
     .insert({ workspace_key: manifest.workspace_id, manifest })
     .select('id').single()
-  if (error) return json(500, { error: 'write_failed', detail: error.message })
+  if (error) {
+    if (error.code === '23505') return json(200, { status: 'ok', already_initialized: true })
+    return json(500, { error: 'write_failed', detail: error.message })
+  }
   return json(201, { status: 'ok', workspace_id: data.id })
 }
