@@ -3,10 +3,11 @@
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { loadConsentRequest, decideConsentRequest } from '@/lib/oauth-consent'
 
 type AuthzRequest = {
   authorization_id: string
-  client?: { name?: string; uri?: string }
+  client?: { id?: string; name?: string; uri?: string }
   scope?: string
 }
 
@@ -25,6 +26,7 @@ function ConsentInner() {
 
   const [authz, setAuthz] = useState<AuthzRequest | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<'approve' | 'deny' | null>(null)
 
   useEffect(() => {
@@ -33,21 +35,25 @@ function ConsentInner() {
       return
     }
     ;(async () => {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) {
-        // send them to sign in, then back here — the OAuth flow shouldn't die
-        window.location.assign(`/login?next=${encodeURIComponent(`/oauth/consent?authorization_id=${authorizationId}`)}`)
-        return
+      try {
+        const supabase = createClient()
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) throw sessionError
+        if (!session) {
+          window.location.assign(`/login?next=${encodeURIComponent(`/oauth/consent?authorization_id=${authorizationId}`)}`)
+          return
+        }
+        const details = await loadConsentRequest(supabase.auth.oauth, authorizationId)
+        if ('redirect_url' in details) {
+          window.location.assign(details.redirect_url)
+          return
+        }
+        setAuthz(details)
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : 'Could not load the authorization request. Return to OpenAI and reconnect.')
+      } finally {
+        setLoading(false)
       }
-      const res = await fetch(`${supabaseUrl}/oauth/v1/authorizations/${authorizationId}`, {
-        headers: { authorization: `Bearer ${session.access_token}` },
-      })
-      if (!res.ok) {
-        setError(`Could not load the authorization request (${res.status}).`)
-        return
-      }
-      setAuthz(await res.json())
     })()
   }, [authorizationId, supabaseUrl])
 
@@ -56,36 +62,30 @@ function ConsentInner() {
     setBusy(action)
     try {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(`${supabaseUrl}/oauth/v1/authorizations/${authorizationId}`, {
-        method: 'POST',
-        headers: { authorization: `Bearer ${session?.access_token}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ action }),
-      })
-      const body = await res.json().catch(() => ({}))
-      if (res.ok && typeof body.redirect_url === 'string') {
-        window.location.assign(body.redirect_url)
-        return
-      }
-      setError(`The ${action} could not be completed (${res.status}).`)
+      const redirectUrl = await decideConsentRequest(supabase.auth.oauth, authorizationId, action)
+      window.location.assign(redirectUrl)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : `The ${action} could not be completed. Return to OpenAI and reconnect.`)
     } finally {
       setBusy(null)
     }
   }, [authorizationId, supabaseUrl])
 
-  const clientName = authz?.client?.name ?? (authz as any)?.client_name ?? (authz as any)?.client?.client_name ?? 'An application'
+  const requestedName = authz?.client?.name ?? (authz as any)?.client_name ?? (authz as any)?.client?.client_name
+  const clientName = requestedName?.trim() || (authz?.client?.id ? `Application ${authz.client.id}` : 'Unknown application')
   const scope = authz?.scope ?? 'read/write access to your AQUA workspace'
 
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-md flex-col justify-center p-8">
       <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-        Authorize {clientName}?
+        {authz ? `Authorize ${clientName}?` : 'Connect to AQUA'}
       </h1>
-      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
+      {loading && !error && <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300" role="status">Loading authorization request…</p>}
+      {authz && <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
         {clientName} is asking for {scope}. Approving lets it read and write your hosted
         AQUA workspace. Human approvals still require your approval secret.
-      </p>
-      {error && <p className="mt-4 text-sm text-red-600 dark:text-red-400">{error}</p>}
+      </p>}
+      {error && <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>}
       {authz && !error && (
         <div className="mt-6 flex gap-3">
           <button
