@@ -28,7 +28,7 @@ import { readCappedText } from '../../../mcp/_vendor/catalog/rest.mjs'
 import { rateLimitAllow } from '../../../../../lib/rate-limit.ts'
 
 export const MAX_BODY_BYTES = 64 * 1024
-const MAX_RECORD_BYTES = 48 * 1024  // unreachable under the 64KB request cap by design
+const MAX_RECORD_BYTES = 256 * 1024
 const REST_TIMEOUT_MS = 15_000
 const MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 
@@ -283,9 +283,8 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         try { seq = (last.entry?.seq ?? 0) + 1 } catch { seq = 2 }
         prev = sha256hex(Buffer.from(lastText, 'utf8'))
       }
-      const at = now()
       const auditEntry = {
-        at, op: 'hosted_approval', version_id: versionId,
+        at: now(), op: 'hosted_approval', version_id: versionId,
         version_sha256: expected, actor_id: user.id,
         ...(actorLabel ? { actor_label: actorLabel } : {}),
         via: HOSTED_VIA, record_path: recPath, record_sha256: recSha,
@@ -325,38 +324,10 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         if (dup) return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })
         if (attempt === 0) continue
       }
+      console.error('approve rpc fail', res.status, res.code, res.body)
       return json(500, { error: 'write_failed', detail: msg || 'the approval could not be recorded' })
     }
     if (!done) return json(500, { error: 'audit_failed', detail: 'the approval receipt could not be written' })
-
-    // The RPC writes the record row + audit atomically, but manifest.records
-    // is engine-owned — sync the approval into the index so read_review_status,
-    // approvalGate and packets see it. Engine holds the passphrase server-side.
-    if (deps.engineSync) {
-      const synced = await deps.engineSync({ workspaceId: ws.id, rid: `approval:${String(head.id).slice('approval:'.length)}`, path: recPath })
-      if (!synced) return json(500, { error: 'reindex_failed', detail: 'approval written but not indexed — retry the decision' })
-    } else {
-      try {
-        const { createSupabaseStore } = await import('../../mcp/_vendor/workspace/companion/src/store/workspace-store.mjs')
-        const reg = await import('../../mcp/_vendor/workspace/companion/src/registry.mjs') as any
-        const { createClient } = await import('@supabase/supabase-js')
-        const passphrase = env.AQUA_PASSPHRASE
-        if (!passphrase) return json(503, { error: 'hosted_backend_unavailable', detail: 'unlock secret not configured' })
-        const store = createSupabaseStore(createClient(origin, key, { global: { headers: { authorization: `Bearer ${jwt}` } } }), ws.id)
-        const session = await reg.Session.init({ store, workspaceRef: ws.id })
-        const w = await session.openWorkspace()
-        await w.unlock(passphrase)
-        await w.saveManifest((m: any) => {
-          m.records[`approval:${String(head.id).slice('approval:'.length)}`] = {
-            kind: 'approval', path: recPath, authority: 'projection', scope: 'private',
-            sha256: recSha, status: 'live', created_at: at, updated_at: at,
-          }
-          return m
-        })
-      } catch (e) {
-        return json(500, { error: 'reindex_failed', detail: 'approval written but not indexed — retry the decision' })
-      }
-    }
 
     return json(200, {
       status: 'ok',
@@ -370,7 +341,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       at: doneAt,
     })
   } catch (e) {
-    console.error('hosted approve: internal error', (e as Error)?.name ?? 'Error')
+    console.error('hosted approve: internal error', (e as Error)?.stack ?? e)
     return json(500, { error: 'internal' })
   }
 }
