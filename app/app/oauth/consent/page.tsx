@@ -73,7 +73,7 @@ function ConsentInner() {
     }
   }, [authorizationId, supabaseUrl])
 
-  const clientName = authz?.client?.name ?? 'An application'
+  const clientName = authz?.client?.name ?? (authz as any)?.client_name ?? (authz as any)?.client?.client_name ?? 'An application'
   const scope = authz?.scope ?? 'read/write access to your AQUA workspace'
 
   return (
