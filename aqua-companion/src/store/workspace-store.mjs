@@ -170,7 +170,17 @@ export function createSupabaseStore(client, workspaceRowId) {
       return data ? decodeFile(data.file) : null
     },
     async putNewFile(p, bytes) {
-      const { error } = await client.from(T_REC).insert({ workspace_id: workspaceRowId, path: norm(p), sha256: sha(bytes), file: hex(bytes) })
+      // record files carry a plaintext head — mirror rid/kind/authority/scope
+      // so the metadata columns the migration declares actually mean something
+      let head = null
+      try { head = JSON.parse(Buffer.from(bytes).toString('utf8')) } catch { /* non-record file */ }
+      const meta = head?.aqua_record ? {
+        rid: typeof head.id === 'string' ? head.id : null,
+        kind: typeof head.kind === 'string' ? head.kind : null,
+        authority: typeof head.authority === 'string' ? head.authority : null,
+        scope: head.scope === 'public' ? 'public' : 'private',
+      } : {}
+      const { error } = await client.from(T_REC).insert({ workspace_id: workspaceRowId, path: norm(p), sha256: sha(bytes), file: hex(bytes), ...meta })
       if (error) throw error.code === '23505' ? err('file_exists') : err(error.message)
     },
     async replaceFile(p, bytes) {

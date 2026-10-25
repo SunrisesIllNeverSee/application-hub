@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs'
 import { handleHostedApprove } from '../app/api/workspace/approve/_lib/approve.ts'
 
 const ORIGIN = 'https://fakeproject.supabase.co'
-const ANON = 'anon-test-key'
+const ANON = 'sb_publishable_testkey'
 const USER = 'user-1111'
 const USER2 = 'user-2222'
 const TOKEN = 'good-token'
@@ -208,11 +208,13 @@ const goodBody = (over = {}) => ({
   ...over,
 })
 
+const reindexCalls = []
 async function call(body, { tables = db(), token = TOKEN, headers = {}, verify = verifyJwt } = {}) {
   const fake = fakePostgrest(tables)
   const res = await handleHostedApprove(post(body, { token, headers }), {
     env: ENV,
     fetchImpl: fake.fetchImpl,
+    reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
     verifyJwt: verify,
     allow: () => true,
     now: () => '2026-10-30T00:06:00.000Z',
@@ -227,6 +229,7 @@ test('missing or invalid auth is a 401 before anything else', async () => {
     const res = await handleHostedApprove(post(goodBody(), { token: tok }), {
       env: ENV,
       fetchImpl: fake.fetchImpl,
+    reindex: async ({ workspaceId, rid, path }) => { reindexCalls.push({ workspaceId, rid, path }); return true },
       verifyJwt: verifyJwt,
       allow: () => true,
     })
@@ -264,6 +267,8 @@ test('a matching sha256 writes the approval row and a server-stamped receipt', a
   assert.equal(rec.sha256, sha(approvalRecordBytes()))
   assert.equal(rec.status, 'live')
   assert.equal(tables.aqua_workspace_audit.length, 1)
+  assert.equal(reindexCalls.length, 1, 'the approval is indexed into manifest.records')
+  assert.equal(reindexCalls[0].rid, `approval:${APPROVAL_KEY}`)
   const audit = tables.aqua_workspace_audit[0]
   assert.equal(audit.log_name, 'hosted-approvals.jsonl')
   assert.equal(audit.seq, 1)

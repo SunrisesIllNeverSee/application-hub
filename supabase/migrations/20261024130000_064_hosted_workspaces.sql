@@ -16,7 +16,8 @@ create table if not exists public.aqua_workspaces (
   schema_version int not null default 1,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (account_id, workspace_key)
+  unique (account_id, workspace_key),
+  unique (account_id)   -- one hosted workspace per account; init is idempotent on 23505
 );
 
 -- General file table: every workspace file (record JSON, .bak, moved conflict
