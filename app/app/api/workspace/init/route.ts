@@ -6,11 +6,14 @@ export const dynamic = 'force-dynamic'
 
 import { createClient } from '@supabase/supabase-js'
 import { readCappedText } from '../../mcp/_vendor/catalog/rest.mjs'
+import { refusePrivateWrite } from '../../../../lib/local-first-guard.ts'
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
 
 export async function POST(req: Request) {
+  const lfRefusal = refusePrivateWrite({ surface: 'hosted_workspace_init' })
+  if (lfRefusal) return lfRefusal
   const auth = req.headers.get('authorization') ?? ''
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : ''
   if (!token) return json(401, { error: 'unauthorized', detail: 'Bearer token required' })

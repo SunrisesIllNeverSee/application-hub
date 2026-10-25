@@ -278,6 +278,11 @@ async function workspaceBackend(env: Env, jwt: string, deps: WorkspaceDeps) {
 }
 
 export async function handleWorkspaceMcpPost(req: Request, deps: WorkspaceDeps = {}): Promise<Response> {
+  // fail-closed like every private-write route: a production deploy that
+  // hasn't explicitly set AQUA_LOCAL_FIRST=0 must not accept hosted writes
+  const { refusePrivateWrite } = await import('../../../../lib/local-first-guard.ts')
+  const lfRefusal = refusePrivateWrite({ surface: 'hosted_workspace_mcp' })
+  if (lfRefusal) return lfRefusal
   const env = deps.env ?? (process.env as Env)
   const allow: Limiter = deps.allow ?? ((key, action) => rateLimitAllow(key, action))
   try {
