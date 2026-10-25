@@ -352,7 +352,7 @@ export function ReviewCard({
           busy={busy}
           hosted={hosted ?? null}
           onCancel={() => setMode(null)}
-          onConfirm={(alsoHosted) =>
+          onConfirm={(alsoHosted, hostedSecret) =>
             run('Approval', async (storage, secret) => {
               // The vault write is unchanged and stays first: it is the
               // record this board derives statuses from.
@@ -373,7 +373,7 @@ export function ReviewCard({
                 const token = await getAccessToken()
                 if (!token) throw new HostedApiError(0, 'not_signed_in', 'no session token for the hosted call')
                 const res = await hostedApprove(
-                  { version_id: a.version_id, expected_sha256: a.sha256, actor_id: actorId() },
+                  { version_id: a.version_id, expected_sha256: a.sha256, actor_id: actorId(), approval_secret: hostedSecret },
                   token,
                 )
                 return {
@@ -568,11 +568,13 @@ function ApproveConfirm({
   onCancel: () => void
   /** `alsoHosted` = the user asked to also record the approval on the
       hosted workspace (the checkbox below is that choice). */
-  onConfirm: (alsoHosted: boolean) => void
+  onConfirm: (alsoHosted: boolean, approvalSecret: string) => void
 }) {
   const a = vm.answer!
   const confirmRef = useRef<HTMLButtonElement>(null)
   const [alsoHosted, setAlsoHosted] = useState(false)  // opt-in per approval; init consent is the gate
+  const [approvalSecret, setApprovalSecret] = useState('')
+  const secretId = useId()
   useEffect(() => confirmRef.current?.focus(), [])
   return (
     <div role="region" aria-label="Confirm approval" data-testid="approve-confirm" className="space-y-3 rounded-lg border-2 border-success-500/50 bg-success-50/60 p-3 dark:bg-success-700/10">
@@ -598,14 +600,26 @@ function ApproveConfirm({
           <input
             type="checkbox"
             checked={alsoHosted}
-            onChange={(e) => setAlsoHosted(e.target.checked)}
+            disabled={busy}
+            onChange={(e) => {
+              setAlsoHosted(e.target.checked)
+              setApprovalSecret('')
+            }}
             className="mt-0.5"
           />
           <span>
             Also record this approval on my <strong>hosted workspace</strong> (bound to the same version + hash). The hosted
-            server re-checks the stored version against this content hash and refuses a mismatch — the vault approval above is
-            unaffected by the hosted result.
+            version must already exist there; this does not sync your vault. The server re-checks its content hash.
+            Your vault approval is unaffected by the hosted result.
           </span>
+        </label>
+      )}
+      {hosted && alsoHosted && (
+        <label htmlFor={secretId} className="block text-xs font-medium text-neutral-700 dark:text-neutral-300">
+          Hosted approval secret
+          <input id={secretId} type="password" autoComplete="off" minLength={8} required disabled={busy}
+            value={approvalSecret} onChange={(event) => setApprovalSecret(event.target.value)}
+            className={`${INPUT_CLASS} mt-1 w-full`} />
         </label>
       )}
       <div className="flex flex-wrap justify-end gap-2">
@@ -616,8 +630,11 @@ function ApproveConfirm({
           ref={confirmRef}
           type="button"
           data-testid="confirm-approve"
-          disabled={busy}
-          onClick={() => onConfirm(alsoHosted)}
+          disabled={busy || (alsoHosted && approvalSecret.trim().length < 8)}
+          onClick={() => {
+            onConfirm(alsoHosted, approvalSecret)
+            setApprovalSecret('')
+          }}
           className="inline-flex items-center rounded-lg bg-success-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-success-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success-500 disabled:opacity-50"
         >
           {busy ? 'Recording…' : `Confirm approval of v${a.version_number} · ${a.sha256.slice(0, 12)}…`}

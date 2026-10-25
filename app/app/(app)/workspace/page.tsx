@@ -4,6 +4,7 @@ import type { Program, UserProgramFit, UserApplication } from '@/lib/database.ty
 import { formatDeadline, programTypeLabel, formatCheckSize } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { IntakeForm } from '@/components/IntakeForm'
+import { HostedWorkspaceSetup } from '@/components/review/HostedWorkspacePanel'
 
 export const metadata = {
   title: 'My Applications',
@@ -108,6 +109,7 @@ export default async function WorkspacePage() {
         <Link href="/applications" className="btn-secondary text-sm">Browse programs</Link>
       </div>
 
+      <HostedWorkspaceSetup />
       <IntakeForm />
 
       {programsWithFit.length === 0 ? (

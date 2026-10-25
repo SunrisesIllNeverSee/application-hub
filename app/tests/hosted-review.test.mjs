@@ -36,19 +36,19 @@ function fakeFetch(reply = { status: 200, body: { status: 'ok' } }) {
 }
 
 // ---------------------------------------------------------------------------
-// hostedInit — the consent flag IS the whole request
+// hostedInit — explicit consent plus the separate human approval secret
 // ---------------------------------------------------------------------------
 
-test('hostedInit POSTs the consent flag with the caller Bearer token', async () => {
+test('hostedInit POSTs explicit consent and the human secret with the caller Bearer token', async () => {
   const { calls, fetchImpl } = fakeFetch({ status: 201, body: { status: 'ok', workspace_id: 'ws-1' } })
-  const res = await hostedInit(TOKEN, { fetchImpl, baseUrl: 'https://app.test' })
+  const res = await hostedInit(TOKEN, SECRET, { fetchImpl, baseUrl: 'https://app.test' })
   assert.equal(res.status, 'ok')
   assert.equal(calls.length, 1)
   assert.equal(calls[0].url, 'https://app.test/api/workspace/init')
   assert.equal(calls[0].init.method, 'POST')
   assert.equal(calls[0].init.headers.authorization, `Bearer ${TOKEN}`)
   assert.equal(calls[0].init.headers['content-type'], 'application/json')
-  assert.deepEqual(JSON.parse(calls[0].init.body), { consent_hosted_workspace: true })
+  assert.deepEqual(JSON.parse(calls[0].init.body), { consent_hosted_workspace: true, approval_secret: SECRET })
 })
 
 // ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ test('hostedApprove carries the Bearer token and the server-built body shape', a
     body: { status: 'ok', version_id: VERSION_ID, version_sha256: CONTENT_SHA, actor_id: 'u-1', via: HOSTED_VIA },
   })
   const res = await hostedApprove(
-    { version_id: VERSION_ID, expected_sha256: CONTENT_SHA, actor_id: 'u-1' },
+    { version_id: VERSION_ID, expected_sha256: CONTENT_SHA, actor_id: 'u-1', approval_secret: SECRET },
     TOKEN,
     { fetchImpl },
   )
@@ -77,13 +77,14 @@ test('hostedApprove carries the Bearer token and the server-built body shape', a
     expected_sha256: CONTENT_SHA,
     via: 'hosted_review',
     actor_id: 'u-1',
+    approval_secret: SECRET,
   })
   assert.ok(!('record_b64' in body), 'server-built mode: the client never ships a record')
 })
 
 test('hostedApprove omits actor_id when not given', async () => {
   const { calls, fetchImpl } = fakeFetch()
-  await hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA }, TOKEN, { fetchImpl })
+  await hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA, approval_secret: SECRET }, TOKEN, { fetchImpl })
   const body = JSON.parse(calls[0].init.body)
   assert.equal(body.via, 'hosted_review')
   assert.ok(!('actor_id' in body))
@@ -96,12 +97,12 @@ test('hostedApprove omits actor_id when not given', async () => {
 test('non-2xx error bodies surface as HostedApiError with code + detail', async () => {
   const { fetchImpl } = fakeFetch({ status: 409, body: { error: 'sha256_mismatch', detail: 'stored hash differs' } })
   await assert.rejects(
-    () => hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA }, TOKEN, { fetchImpl }),
+    () => hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA, approval_secret: SECRET }, TOKEN, { fetchImpl }),
     (e) => e instanceof HostedApiError && e.status === 409 && e.code === 'sha256_mismatch' && /stored hash differs/.test(e.message),
   )
   const nf = fakeFetch({ status: 404, body: { error: 'version_not_found' } })
   await assert.rejects(
-    () => hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA }, TOKEN, { fetchImpl: nf.fetchImpl }),
+    () => hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA, approval_secret: SECRET }, TOKEN, { fetchImpl: nf.fetchImpl }),
     (e) => e instanceof HostedApiError && e.status === 404 && e.code === 'version_not_found',
   )
   // a non-JSON or empty error body still reports the HTTP status honestly
@@ -113,7 +114,7 @@ test('non-2xx error bodies surface as HostedApiError with code + detail', async 
     },
   }
   await assert.rejects(
-    () => hostedInit(TOKEN, { fetchImpl: opaque.fetchImpl }),
+    () => hostedInit(TOKEN, SECRET, { fetchImpl: opaque.fetchImpl }),
     (e) => e instanceof HostedApiError && e.status === 502 && e.code === 'http_502',
   )
 })
@@ -124,7 +125,7 @@ test('a local-first refusal maps to the machine code, not a sentence', async () 
     body: { error: 'local-first mode: private content stays on device', local_first: true, surface: 'hosted_workspace_init' },
   })
   await assert.rejects(
-    () => hostedInit(TOKEN, { fetchImpl }),
+    () => hostedInit(TOKEN, SECRET, { fetchImpl }),
     (e) => e instanceof HostedApiError && e.status === 403 && e.code === 'local_first' && /local-first mode/.test(e.message),
   )
 })
@@ -134,7 +135,7 @@ test('a transport failure is a HostedApiError (status 0), never a silent ok', as
     throw new Error('network down')
   }
   await assert.rejects(
-    () => hostedInit(TOKEN, { fetchImpl }),
+    () => hostedInit(TOKEN, SECRET, { fetchImpl }),
     (e) => e instanceof HostedApiError && e.status === 0 && e.code === 'request_failed',
   )
 })
@@ -142,6 +143,30 @@ test('a transport failure is a HostedApiError (status 0), never a silent ok', as
 // ---------------------------------------------------------------------------
 // findHostedWorkspace — the hosted signal is the caller's own row
 // ---------------------------------------------------------------------------
+
+test('init and approve reject absent or short approval secrets before making a request', async () => {
+  const { calls, fetchImpl } = fakeFetch()
+  for (const value of [undefined, '', ' short ', '       ']) {
+    for (const invoke of [
+      () => hostedInit(TOKEN, value, { fetchImpl }),
+      () => hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA, approval_secret: value }, TOKEN, { fetchImpl }),
+    ]) {
+      await assert.rejects(invoke, (error) => error instanceof HostedApiError && error.code === 'approval_secret_required')
+    }
+  }
+  assert.equal(calls.length, 0)
+})
+
+test('the human secret is normalized consistently with the server and stays out of URLs and headers', async () => {
+  const { calls, fetchImpl } = fakeFetch()
+  await hostedInit(TOKEN, `  ${SECRET}  `, { fetchImpl })
+  await hostedApprove({ version_id: VERSION_ID, expected_sha256: CONTENT_SHA, approval_secret: `  ${SECRET}  ` }, TOKEN, { fetchImpl })
+  for (const { url, init } of calls) {
+    assert.equal(JSON.parse(init.body).approval_secret, SECRET)
+    assert.ok(!url.includes(SECRET))
+    assert.ok(!JSON.stringify(init.headers).includes(SECRET))
+  }
+})
 
 test('findHostedWorkspace returns the caller row or null, and surfaces lookup errors', async () => {
   const withRow = {

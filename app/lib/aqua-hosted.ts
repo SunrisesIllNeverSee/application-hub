@@ -50,6 +50,8 @@ export interface HostedInitResult {
 }
 
 export interface HostedApproveInput {
+  /** Entered by the human for this decision; never read from the vault or saved. */
+  approval_secret: string
   /** The hosted workspace version row id (version:<id> rid suffix). */
   version_id: string
   /** sha256(canonicalJson({title, body})) — the hash the human reviewed. */
@@ -111,12 +113,23 @@ async function postJson<T>(path: string, body: unknown, token: string, deps: Hos
 }
 
 /**
- * Provision the caller's hosted workspace. The consent flag is the whole
- * point of this call — a bare token never provisions storage. Idempotent:
+ * Provision the caller's hosted workspace with explicit storage consent
+ * and the human's approval secret. A bare token never provisions storage. Idempotent:
  * an existing workspace answers already_initialized.
  */
-export function hostedInit(token: string, deps: HostedDeps = {}): Promise<HostedInitResult> {
-  return postJson<HostedInitResult>(HOSTED_INIT_PATH, { consent_hosted_workspace: true }, token, deps)
+export async function hostedInit(token: string, approvalSecret: string, deps: HostedDeps = {}): Promise<HostedInitResult> {
+  return postJson<HostedInitResult>(HOSTED_INIT_PATH, {
+    consent_hosted_workspace: true,
+    approval_secret: requireApprovalSecret(approvalSecret),
+  }, token, deps)
+}
+
+function requireApprovalSecret(value: string): string {
+  const secret = typeof value === 'string' ? value.trim() : ''
+  if (secret.length < 8) {
+    throw new HostedApiError(0, 'approval_secret_required', 'Enter your hosted approval secret (at least 8 characters).')
+  }
+  return secret
 }
 
 /**
@@ -124,12 +137,13 @@ export function hostedInit(token: string, deps: HostedDeps = {}): Promise<Hosted
  * The server re-checks stored-vs-claimed: the version's live content hash
  * must equal expected_sha256 or the decision is refused (409).
  */
-export function hostedApprove(input: HostedApproveInput, token: string, deps: HostedDeps = {}): Promise<HostedApproveResult> {
+export async function hostedApprove(input: HostedApproveInput, token: string, deps: HostedDeps = {}): Promise<HostedApproveResult> {
   return postJson<HostedApproveResult>(
     HOSTED_APPROVE_PATH,
     {
       version_id: input.version_id,
       expected_sha256: input.expected_sha256,
+      approval_secret: requireApprovalSecret(input.approval_secret),
       via: HOSTED_VIA,
       ...(input.actor_id ? { actor_id: input.actor_id } : {}),
     },

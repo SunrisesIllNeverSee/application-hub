@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { handleHostedApprove } from '../app/api/workspace/approve/_lib/approve.ts'
+import { hostedApprove, HostedApiError } from '../lib/aqua-hosted.ts'
 
 const ORIGIN = 'https://fakeproject.supabase.co'
 const ANON = 'sb_publishable_testkey'
@@ -374,19 +375,38 @@ test('a public-scope plaintext approval record is refused (forgery hole)', async
   assert.equal(json.error, 'bad_record')
 })
 
-test('server-built mode: no record_b64 — the engine encodes, hashes bind the version', async () => {
+test('website helper reaches server-built approval with the separate human secret', async () => {
   const tables = db()
   const encoded = { calls: 0 }
-  const { res, json, fake } = await call({ version_id: VERSION_ID, expected_sha256: VERSION_SHA, actor_id: 'local-user', via: 'hosted_review', approval_secret: 'test-approval-secret' }, {
-    tables,
-    encodeRecord: async (a) => { encoded.calls++; return approvalRecordBytes().toString('utf8') },
+  let fake
+  const result = await hostedApprove({ version_id: VERSION_ID, expected_sha256: VERSION_SHA, actor_id: 'local-user', approval_secret: 'test-approval-secret' }, TOKEN, {
+    fetchImpl: async (_url, init) => {
+      const outcome = await call(JSON.parse(init.body), {
+        tables,
+        encodeRecord: async () => { encoded.calls++; return approvalRecordBytes().toString('utf8') },
+      })
+      fake = outcome.fake
+      return new Response(JSON.stringify(outcome.json), { status: outcome.res.status, headers: outcome.res.headers })
+    },
   })
-  assert.equal(res.status, 200)
+  assert.equal(result.status, 'ok')
   assert.equal(encoded.calls, 1, 'the engine built the record, not the client')
   assert.equal(tables.aqua_workspace_records.length, 2, 'the encoded record row was written')
   assert.equal(tables.aqua_workspace_audit.length, 1, 'the audit receipt was written')
   const rpc = fake.requests.find((r) => r.url.includes('rpc/aqua_workspace_approve'))
   assert.ok(rpc, 'the atomic RPC carried the server-built record')
+})
+
+test('a signed-in website client with the wrong human secret cannot record approval', async () => {
+  const tables = db()
+  await assert.rejects(() => hostedApprove({ version_id: VERSION_ID, expected_sha256: VERSION_SHA, approval_secret: 'wrong-synthetic-secret' }, TOKEN, {
+    fetchImpl: async (_url, init) => {
+      const outcome = await call(JSON.parse(init.body), { tables })
+      return new Response(JSON.stringify(outcome.json), { status: outcome.res.status, headers: outcome.res.headers })
+    },
+  }), (error) => error instanceof HostedApiError && error.status === 403 && error.code === 'approval_secret_required')
+  assert.equal(tables.aqua_workspace_records.length, 1)
+  assert.equal(tables.aqua_workspace_audit.length, 0)
 })
 
 test('a record for a different workspace key is refused', async () => {
