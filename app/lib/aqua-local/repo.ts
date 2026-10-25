@@ -434,7 +434,7 @@ export class VaultHistoryApprovalError extends VaultScopeError {
   }
 }
 
-const HUMAN_VIA: ReadonlyArray<Exclude<ApprovalVia, 'legacy' | 'history_attestation'>> = ['review_ui', 'decision_file']
+const HUMAN_VIA: ReadonlyArray<Exclude<ApprovalVia, 'legacy' | 'history_attestation'>> = ['review_ui', 'decision_file', 'hosted_review']
 
 async function recordHumanDecision(
   storage: VaultStorage,

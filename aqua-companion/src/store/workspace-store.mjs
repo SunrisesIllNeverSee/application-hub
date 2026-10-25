@@ -140,7 +140,11 @@ export function createSupabaseStore(client, workspaceRowId) {
   return {
     async loadManifest() {
       const { data, error } = await client.from(T_WS).select('manifest, manifest_rev').eq('id', workspaceRowId).single()
-      if (error || !data) return null
+      if (error) {
+        if (error.code === 'PGRST116') return null      // genuinely absent
+        throw err(error.message)                         // outage/perm ≠ absent
+      }
+      if (!data) return null
       rev = data.manifest_rev
       return { manifest: data.manifest, rev }
     },
@@ -159,7 +163,11 @@ export function createSupabaseStore(client, workspaceRowId) {
     },
     async getFile(p) {
       const { data, error } = await client.from(T_REC).select('file').eq('workspace_id', workspaceRowId).eq('path', norm(p)).single()
-      return error || !data ? null : decodeFile(data.file)
+      if (error) {
+        if (error.code === 'PGRST116') return null
+        throw err(error.message)
+      }
+      return data ? decodeFile(data.file) : null
     },
     async putNewFile(p, bytes) {
       const { error } = await client.from(T_REC).insert({ workspace_id: workspaceRowId, path: norm(p), sha256: sha(bytes), file: hex(bytes) })
