@@ -11,7 +11,7 @@ const ARGS = {
   hub_get_program_by_slug: { slug: 'yc-summer-2026' },
   hub_get_program_detail: { slug: 'yc-summer-2026' },
   hub_get_program_questions: { slug: 'yc-summer-2026' },
-  hub_get_program_dna: { slug: 'yc-summer-2026' },
+  hub_get_program_themes: { slug: 'yc-summer-2026' },
   hub_get_acceptance_stats: { slug: 'yc-summer-2026' },
 }
 
@@ -38,7 +38,7 @@ test('optional sections degrade per section; required tables make the tool not_p
   assert.equal(d.stats, null)
   const b = await c.call('hub_get_program_by_slug', { slug: 'yc-summer-2026' })
   assert.deepEqual([b.status, b.sections.dna.status, b.sections.stats.status], ['ok', 'not_public', 'not_public'])
-  assert.equal((await c.call('hub_get_program_dna', { slug: 'yc-summer-2026' })).status, 'not_public')
+  assert.equal((await c.call('hub_get_program_themes', { slug: 'yc-summer-2026' })).status, 'not_public')
   const both = catalog({ deny: { program_stats: 401, acceptance_reports: 401 } })
   assert.equal((await both.call('hub_get_acceptance_stats', { slug: 'yc-summer-2026' })).status, 'not_public')
   const one = catalog({ deny: { acceptance_reports: 401 } })

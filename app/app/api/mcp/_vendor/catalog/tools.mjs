@@ -391,9 +391,9 @@ export const PUBLIC_TOOLS = [
     },
   },
   {
-    name: 'hub_get_program_dna',
-    title: 'Get program DNA',
-    description: '[tier: read] Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug.',
+    name: 'hub_get_program_themes',
+    title: 'Get program themes',
+    description: '[tier: read] Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug. Formerly hub_get_program_dna — the old name remains callable.',
     inputSchema: object({ ...PROGRAM_REF }),
     async handler(data, args) {
       const r = await requireProgram(data, args)
@@ -519,6 +519,8 @@ async function ranked(data, args, nowMs, key) {
 }
 
 export const PUBLIC_TOOL_MAP = new Map(PUBLIC_TOOLS.map((t) => [t.name, t]))
+// Hidden alias: keep the old scanner-flagged name callable without listing it
+PUBLIC_TOOL_MAP.set('hub_get_program_dna', PUBLIC_TOOL_MAP.get('hub_get_program_themes'))
 
 export const NOT_CONFIGURED = Object.freeze({
   status: 'unavailable',

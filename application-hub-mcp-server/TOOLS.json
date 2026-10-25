@@ -184,17 +184,6 @@
       "source": "catalog"
     },
     {
-      "name": "hub_get_program_dna",
-      "tier": "read",
-      "modes": [
-        "stdio-workspace",
-        "stdio-catalog",
-        "hosted"
-      ],
-      "description": "Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug.",
-      "source": "catalog"
-    },
-    {
       "name": "hub_get_program_questions",
       "tier": "read",
       "modes": [
@@ -214,6 +203,17 @@
         "hosted"
       ],
       "description": "Approved canonical programs ranked by program value score (what you get versus what you give up, relative to application effort).",
+      "source": "catalog"
+    },
+    {
+      "name": "hub_get_program_themes",
+      "tier": "read",
+      "modes": [
+        "stdio-workspace",
+        "stdio-catalog",
+        "hosted"
+      ],
+      "description": "Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug.",
       "source": "catalog"
     },
     {

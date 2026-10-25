@@ -99,9 +99,9 @@ https://aquaidp.xyz/mcp: live (public catalog tools for everyone; personal works
 | `hub_get_heat_scores` | read | Approved canonical programs ranked by heat score (current applicant interest and deadline pressure). |
 | `hub_get_program_by_slug` | read | One approved canonical program by slug with its public stats and theme weights (DNA) in a single call. |
 | `hub_get_program_detail` | read | Full public detail for one approved canonical program by program_id or slug: deadlines, cycles, rolling/cohort, value and acceptance figures where public. |
-| `hub_get_program_dna` | read | Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug. |
 | `hub_get_program_questions` | read | The application questions of one approved canonical program in display order: exact wording (in untrusted_content), word and character limits, required flag, theme, and how many approved programs ask the same canonica… |
 | `hub_get_program_rankings` | read | Approved canonical programs ranked by program value score (what you get versus what you give up, relative to application effort). |
+| `hub_get_program_themes` | read | Theme weight breakdown of one approved canonical program (what it emphasizes, from its questions), by program_id or slug. |
 | `hub_get_question_significance` | read | How much one canonical question matters across approved programs: how many ask it and what share of approved programs that is, typical limits, theme, and which programs ask it. |
 | `hub_get_universal_questions` | read | Canonical questions asked by most approved programs: the ones to answer first. |
 | `hub_search_programs` | read | Search approved canonical AQUA programs (accelerators, grants, fellowships, VC and other programs) by words, type, status, equity, cash, rolling and deadline window. |

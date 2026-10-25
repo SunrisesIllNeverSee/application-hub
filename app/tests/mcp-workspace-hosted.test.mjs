@@ -13,7 +13,7 @@ import { rateLimitAllow } from '../lib/rate-limit.ts'
 import { ANON_JWT, ORIGIN, SERVICE_JWT, fakePostgrest } from '../../application-hub-mcp-server/test/fake-postgrest.mjs'
 
 const ENV = { NEXT_PUBLIC_SUPABASE_URL: ORIGIN, NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_JWT, NODE_ENV: 'production' }
-const PUBLIC = ['hub_find_similar_questions', 'hub_get_acceptance_stats', 'hub_get_heat_scores', 'hub_get_program_by_slug', 'hub_get_program_detail', 'hub_get_program_dna', 'hub_get_program_questions', 'hub_get_program_rankings', 'hub_get_question_significance', 'hub_get_universal_questions', 'hub_search_programs']
+const PUBLIC = ['hub_find_similar_questions', 'hub_get_acceptance_stats', 'hub_get_heat_scores', 'hub_get_program_by_slug', 'hub_get_program_detail', 'hub_get_program_themes', 'hub_get_program_questions', 'hub_get_program_rankings', 'hub_get_question_significance', 'hub_get_universal_questions', 'hub_search_programs']
 const USER = { id: '5d8b1f2e-3c4a-4b5c-8d6e-7f8a9b0c1d2e' }
 const USER2 = { id: '7a9c2e4f-5b6d-4e8f-9a0b-1c2d3e4f5a6b' }
 const METADATA = 'https://aquaidp.xyz/.well-known/oauth-protected-resource'

@@ -7,7 +7,7 @@ import { catalog, trustedStrings } from './helpers.mjs'
 import { PUBLIC_TOOLS } from '../src/catalog/tools.mjs'
 import { ORIGIN, PUBLISHABLE, SYNTHETIC_MARK } from './fake-postgrest.mjs'
 
-const LEGACY_PUBLIC = ['hub_search_programs', 'hub_get_program_detail', 'hub_get_program_by_slug', 'hub_get_program_questions', 'hub_find_similar_questions', 'hub_get_universal_questions', 'hub_get_program_rankings', 'hub_get_heat_scores', 'hub_get_program_dna', 'hub_get_question_significance', 'hub_get_acceptance_stats']
+const LEGACY_PUBLIC = ['hub_search_programs', 'hub_get_program_detail', 'hub_get_program_by_slug', 'hub_get_program_questions', 'hub_find_similar_questions', 'hub_get_universal_questions', 'hub_get_program_rankings', 'hub_get_heat_scores', 'hub_get_program_themes', 'hub_get_question_significance', 'hub_get_acceptance_stats']
 
 test('the 11 legacy public tools all exist, all tier read', () => {
   assert.deepEqual(PUBLIC_TOOLS.map((t) => t.name).sort(), [...LEGACY_PUBLIC].sort())
@@ -100,12 +100,12 @@ test('hub_get_universal_questions: share computed from approved programs', async
   assert.equal((await c.call('hub_get_universal_questions', { min_share: 0.3 })).count, 3)
 })
 
-test('hub_get_program_dna, hub_get_question_significance, rankings, heat, acceptance', async () => {
+test('hub_get_program_themes, hub_get_question_significance, rankings, heat, acceptance', async () => {
   const c = catalog()
-  const dna = await c.call('hub_get_program_dna', { slug: 'yc-summer-2026' })
+  const dna = await c.call('hub_get_program_themes', { slug: 'yc-summer-2026' })
   assert.equal(dna.computed, true)
   assert.equal(dna.themes[0].weight_pct, 57)
-  assert.equal((await c.call('hub_get_program_dna', { slug: 'redbud-vc' })).computed, false)
+  assert.equal((await c.call('hub_get_program_themes', { slug: 'redbud-vc' })).computed, false)
   const sig = await c.call('hub_get_question_significance', { question_id: 'cq-problem' })
   assert.deepEqual([sig.asked_by_programs, sig.share_of_approved_programs, sig.word_limits.min, sig.word_limits.max], [3, 1, 100, 300])
   assert.equal(sig.significance_score, undefined, 'stored cross-program aggregates are not used')
