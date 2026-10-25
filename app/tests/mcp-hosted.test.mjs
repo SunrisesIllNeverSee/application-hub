@@ -10,7 +10,7 @@ import { ANON_JWT, ORIGIN, SERVICE_JWT, fakePostgrest } from '../../application-
 import { drift } from '../../application-hub-mcp-server/scripts/vendor-hosted.mjs'
 
 const ENV = { NEXT_PUBLIC_SUPABASE_URL: ORIGIN, NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_JWT, NODE_ENV: 'production' }
-const PUBLIC = ['hub_find_similar_questions', 'hub_get_acceptance_stats', 'hub_get_heat_scores', 'hub_get_program_by_slug', 'hub_get_program_detail', 'hub_get_program_themes', 'hub_get_program_questions', 'hub_get_program_rankings', 'hub_get_question_significance', 'hub_get_universal_questions', 'hub_search_programs']
+const PUBLIC = ['hub_find_similar_questions', 'hub_get_acceptance_stats', 'hub_get_heat_scores', 'hub_get_program_by_slug', 'hub_get_program_detail', 'hub_get_program_questions', 'hub_get_program_rankings', 'hub_get_program_themes', 'hub_get_question_significance', 'hub_get_universal_questions', 'hub_search_programs']
 
 let ipSeq = 0
 function post(body, { headers = {}, raw = false } = {}) {
