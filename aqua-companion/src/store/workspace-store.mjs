@@ -188,7 +188,7 @@ export function createSupabaseStore(client, workspaceRowId) {
       if (!data?.length) throw err(`missing_file:${f}`)
     },
     async listFiles(prefix = '') {
-      const { data, error } = await client.from(T_REC).select('path').eq('workspace_id', workspaceRowId).order('path')
+      const { data, error } = await client.from(T_REC).select('path').eq('workspace_id', workspaceRowId).order('path').limit(100000)
       if (error) throw err(error.message)
       const pre = prefix.endsWith('/') ? prefix : prefix + '/'
       return (data ?? []).map((r) => r.path).filter((p) => !prefix || p === prefix || p.startsWith(pre))

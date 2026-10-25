@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (!user?.id) return json(401, { error: 'unauthorized' })
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.AQUA_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.AQUA_PUBLISHABLE_KEY
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.AQUA_PUBLISHABLE_KEY
   if (!url || !key) return json(503, { error: 'not_configured' })
 
   const client = createClient(url, key, { global: { headers: { authorization: `Bearer ${token}` } } })
