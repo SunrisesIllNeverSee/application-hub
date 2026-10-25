@@ -36,7 +36,8 @@ function ConsentInner() {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) {
-        setError('Sign in first, then retry the authorization link.')
+        // send them to sign in, then back here — the OAuth flow shouldn't die
+        window.location.assign(`/login?next=${encodeURIComponent(`/oauth/consent?authorization_id=${authorizationId}`)}`)
         return
       }
       const res = await fetch(`${supabaseUrl}/oauth/v1/authorizations/${authorizationId}`, {
