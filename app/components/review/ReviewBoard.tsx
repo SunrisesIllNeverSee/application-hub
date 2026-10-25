@@ -17,6 +17,7 @@ import { boardRowVM, FILTER_LABEL, progressSummary, type FilterKey } from '@/lib
 import { ReviewCard } from './ReviewCard'
 import { ExportReviewDialog } from './ExportReviewDialog'
 import { DecisionImportPanel } from './DecisionImportPanel'
+import { HostedWorkspacePanel, useHostedWorkspace } from './HostedWorkspacePanel'
 import { Notice, Pill } from './ui'
 
 const PAGE_SIZE = 20
@@ -46,6 +47,11 @@ export function ReviewBoard({
   const [oneAtATime, setOneAtATime] = useState(false)
   const [dialog, setDialog] = useState<null | 'export' | 'import'>(null)
   const listFocusRef = useRef<string | null>(null)
+  // m10 — is there a hosted workspace for this account? 'ready' activates
+  // the per-approval "also record on the hosted workspace" option on the
+  // card; 'none' offers the consent-gated enable action. Local vault stays
+  // the default either way.
+  const hosted = useHostedWorkspace()
 
   const refresh = useCallback(
     async (opts: { classify?: boolean } = {}) => {
@@ -228,6 +234,8 @@ export function ReviewBoard({
           {classifying && <p className="mt-1 text-[11px] text-neutral-400">Checking your answer bank for reusable answers…</p>}
         </div>
 
+        <HostedWorkspacePanel hosted={hosted} />
+
         <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter questions">
           {FILTERS.map((f) => (
             <button
@@ -343,6 +351,7 @@ export function ReviewBoard({
               index={globalIndex}
               onChanged={() => refresh()}
               headerActions={nav}
+              hosted={hosted.state.status === 'ready' ? hosted.state.workspace : null}
             />
           </aside>
         ) : (

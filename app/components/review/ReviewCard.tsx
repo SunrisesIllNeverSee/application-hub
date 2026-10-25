@@ -35,6 +35,7 @@ import {
 import type { InstanceQuestionRow } from '@/lib/aqua-local-client/review'
 import { loadCard, type ReviewContext } from '@/lib/review-ui/load'
 import { checkLimits, type ReviewCardVM, type Tone } from '@/lib/review-ui/view-model'
+import { getAccessToken, hostedApprove, HostedApiError, type HostedWorkspaceRow } from '@/lib/aqua-hosted'
 import { WordCount } from '@/components/WordCount'
 import { LocalDraftAssist, type DraftAssistResult } from '@/components/aqua-local/LocalDraftAssist'
 import { BulletList, Field, formatWhen, INPUT_CLASS, Notice, Pill, Section } from './ui'
@@ -94,6 +95,7 @@ export function ReviewCard({
   index,
   onChanged,
   headerActions,
+  hosted,
 }: {
   instanceId: string
   row: InstanceQuestionRow
@@ -102,6 +104,10 @@ export function ReviewCard({
   /** Called after every vault write so the board can re-derive statuses. */
   onChanged: () => Promise<void> | void
   headerActions?: React.ReactNode
+  /** The account's hosted workspace row when one exists — activates the
+      opt-in "also record on the hosted workspace" approval leg. Null keeps
+      approvals vault-local (the default). */
+  hosted?: HostedWorkspaceRow | null
 }) {
   const vault = useVault()
   const headingId = useId()
@@ -148,7 +154,10 @@ export function ReviewCard({
     headingRef.current?.focus()
   }, [row.question_occurrence_id])
 
-  async function run(label: string, fn: (storage: Awaited<ReturnType<typeof vault.ensureStorage>>, secret: string) => Promise<string>) {
+  async function run(
+    label: string,
+    fn: (storage: Awaited<ReturnType<typeof vault.ensureStorage>>, secret: string) => Promise<string | { tone: Tone; text: string }>,
+  ) {
     const secret = vault.getSecret()
     if (!secret) {
       setNotice({ tone: 'danger', text: 'Vault is locked — unlock to continue.' })
@@ -157,8 +166,11 @@ export function ReviewCard({
     setBusy(true)
     try {
       const storage = await vault.ensureStorage()
-      const msg = await fn(storage, secret)
-      setNotice({ tone: 'success', text: msg })
+      const out = await fn(storage, secret)
+      // A partial outcome (e.g. the hosted leg failed after the vault write
+      // landed) is surfaced at the tone the writer chose — never flattened
+      // into a bare success.
+      setNotice(typeof out === 'string' ? { tone: 'success', text: out } : out)
       setMode(null)
       await onChanged()
     } catch (e) {
@@ -338,9 +350,12 @@ export function ReviewCard({
         <ApproveConfirm
           vm={vm}
           busy={busy}
+          hosted={hosted ?? null}
           onCancel={() => setMode(null)}
-          onConfirm={() =>
+          onConfirm={(alsoHosted) =>
             run('Approval', async (storage, secret) => {
+              // The vault write is unchanged and stays first: it is the
+              // record this board derives statuses from.
               const rec = await approveAsHuman(storage, {
                 version_id: a.version_id,
                 expected_sha256: a.sha256,
@@ -348,7 +363,35 @@ export function ReviewCard({
                 via: 'review_ui',
                 secret,
               })
-              return `Approved v${a.version_number} — bound to sha256 ${rec.version_sha256.slice(0, 12)}…. Any edit creates a new version that needs a new approval.`
+              const base = `Approved v${a.version_number} — bound to sha256 ${rec.version_sha256.slice(0, 12)}…. Any edit creates a new version that needs a new approval.`
+              if (!alsoHosted) return base
+              // Hosted leg (opt-in per approval): the server re-verifies
+              // the reviewed content hash against the live version row and
+              // refuses on mismatch/not-found — failures surface honestly
+              // and never roll back or disguise the local approval.
+              try {
+                const token = await getAccessToken()
+                if (!token) throw new HostedApiError(0, 'not_signed_in', 'no session token for the hosted call')
+                const res = await hostedApprove(
+                  { version_id: a.version_id, expected_sha256: a.sha256, actor_id: actorId() },
+                  token,
+                )
+                return {
+                  tone: 'success',
+                  text: `${base} ${res.already_recorded ? 'The hosted workspace already held this approval.' : 'It was also recorded on your hosted workspace.'}`,
+                }
+              } catch (e) {
+                const why =
+                  e instanceof HostedApiError
+                    ? `${e.code}${e.status ? ` (${e.status})` : ''}`
+                    : e instanceof Error
+                      ? e.message
+                      : String(e)
+                return {
+                  tone: 'warning',
+                  text: `${base} Recording it on the hosted workspace failed — ${why}. The vault approval above stands.`,
+                }
+              }
             })
           }
         />
@@ -510,9 +553,26 @@ export function ReviewCard({
 
 // ---------------------------------------------------------------------------
 
-function ApproveConfirm({ vm, busy, onCancel, onConfirm }: { vm: ReviewCardVM; busy: boolean; onCancel: () => void; onConfirm: () => void }) {
+function ApproveConfirm({
+  vm,
+  busy,
+  hosted,
+  onCancel,
+  onConfirm,
+}: {
+  vm: ReviewCardVM
+  busy: boolean
+  /** Non-null when the account has a hosted workspace — shows the opt-in
+      leg. Absent → approvals stay vault-local only. */
+  hosted: HostedWorkspaceRow | null
+  onCancel: () => void
+  /** `alsoHosted` = the user asked to also record the approval on the
+      hosted workspace (the checkbox below is that choice). */
+  onConfirm: (alsoHosted: boolean) => void
+}) {
   const a = vm.answer!
   const confirmRef = useRef<HTMLButtonElement>(null)
+  const [alsoHosted, setAlsoHosted] = useState(Boolean(hosted))
   useEffect(() => confirmRef.current?.focus(), [])
   return (
     <div role="region" aria-label="Confirm approval" data-testid="approve-confirm" className="space-y-3 rounded-lg border-2 border-success-500/50 bg-success-50/60 p-3 dark:bg-success-700/10">
@@ -533,6 +593,21 @@ function ApproveConfirm({ vm, busy, onCancel, onConfirm }: { vm: ReviewCardVM; b
         <li>Any later edit creates a new version; this approval will not carry over to it.</li>
         {vm.recommendation_badge.classification && <li>The agent recommendation is advice only — your click here is the approval.</li>}
       </ul>
+      {hosted && (
+        <label className="flex items-start gap-2 rounded-md border border-neutral-200 px-2.5 py-2 text-xs text-neutral-700 dark:border-neutral-700 dark:text-neutral-300" data-testid="hosted-approve-option">
+          <input
+            type="checkbox"
+            checked={alsoHosted}
+            onChange={(e) => setAlsoHosted(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            Also record this approval on my <strong>hosted workspace</strong> (bound to the same version + hash). The hosted
+            server re-checks the stored version against this content hash and refuses a mismatch — the vault approval above is
+            unaffected by the hosted result.
+          </span>
+        </label>
+      )}
       <div className="flex flex-wrap justify-end gap-2">
         <button type="button" onClick={onCancel} className="btn-secondary px-3 py-1.5 text-xs">
           Cancel
@@ -542,7 +617,7 @@ function ApproveConfirm({ vm, busy, onCancel, onConfirm }: { vm: ReviewCardVM; b
           type="button"
           data-testid="confirm-approve"
           disabled={busy}
-          onClick={onConfirm}
+          onClick={() => onConfirm(alsoHosted)}
           className="inline-flex items-center rounded-lg bg-success-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-success-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success-500 disabled:opacity-50"
         >
           {busy ? 'Recording…' : `Confirm approval of v${a.version_number} · ${a.sha256.slice(0, 12)}…`}
