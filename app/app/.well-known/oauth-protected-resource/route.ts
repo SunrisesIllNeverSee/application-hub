@@ -38,7 +38,7 @@ export async function GET() {
       'https://aquaidp.xyz/mcp',
     ],
     notes:
-      'Public pages and the public catalog work without auth. Signed-in routes use the browser session. POST /mcp serves the public catalog unauthenticated, and serves hosted personal-workspace tools when it carries Authorization: Bearer <Supabase access token>. Private answers are local-first: they live in the user\'s encrypted browser vault and are never served by any API. See /.well-known/auth.md.',
+      'Public pages and the public catalog work without auth. Signed-in routes use the browser session. POST /mcp serves the public catalog unauthenticated, and serves hosted personal-workspace tools when it carries Authorization: Bearer <Supabase access token>. Private answers are local-first: they live in the user\'s encrypted browser vault and stay inside encrypted workspace records; the hosted workspace engine processes them server-side under caller-JWT RLS. See /.well-known/auth.md.',
   }
 
   return NextResponse.json(metadata, {

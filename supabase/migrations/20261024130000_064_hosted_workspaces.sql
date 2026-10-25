@@ -1,6 +1,6 @@
 -- Migration 064: hosted personal-workspace storage (m10 hosted-MCP path)
 -- Status: DRAFT — gated on owner decision to amend the local-first contract.
--- Stores ONLY ciphertext rows + manifest docs; keys never reach the server.
+-- Stores ONLY ciphertext rows + manifest docs. Server-held passphrase model: the hosted engine unlocks with a deployment secret (AQUA_PASSPHRASE) shared across tenants — the server sees plaintext transiently during calls. Per-workspace keys are a documented hardening, not implemented.
 -- Plaintext boundary (deliberate): path/rid/kind/authority/scope/status are
 -- indexing metadata mirroring the local record head — bodies stay ciphertext.
 -- Post-059 rule: RLS + REVOKE + explicit GRANT in the same file. Idempotent, transactional.
@@ -189,7 +189,8 @@ declare
 begin
   select r.sha256 into v_stored
     from public.aqua_workspace_records r
-   where r.workspace_id = p_workspace_id and r.path = p_version_path and r.account_id = auth.uid();
+   where r.workspace_id = p_workspace_id and r.path = p_version_path and r.account_id = auth.uid()
+   for update;  -- locks the version row: no replace can slip between check and insert
   if not found then
     raise exception 'version_not_found' using errcode = 'P0404';
   end if;

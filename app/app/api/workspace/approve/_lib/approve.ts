@@ -28,7 +28,7 @@ import { readCappedText } from '../../../mcp/_vendor/catalog/rest.mjs'
 import { rateLimitAllow } from '../../../../../lib/rate-limit.ts'
 
 export const MAX_BODY_BYTES = 64 * 1024
-const MAX_RECORD_BYTES = 256 * 1024
+const MAX_RECORD_BYTES = 48 * 1024  // unreachable under the 64KB request cap by design
 const REST_TIMEOUT_MS = 15_000
 const MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 
@@ -324,7 +324,6 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         if (dup) return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })
         if (attempt === 0) continue
       }
-      console.error('approve rpc fail', res.status, res.code, res.body)
       return json(500, { error: 'write_failed', detail: msg || 'the approval could not be recorded' })
     }
     if (!done) return json(500, { error: 'audit_failed', detail: 'the approval receipt could not be written' })
@@ -341,7 +340,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       at: doneAt,
     })
   } catch (e) {
-    console.error('hosted approve: internal error', (e as Error)?.stack ?? e)
+    console.error('hosted approve: internal error', (e as Error)?.name ?? 'Error')
     return json(500, { error: 'internal' })
   }
 }

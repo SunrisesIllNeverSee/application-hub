@@ -10,7 +10,7 @@
 //     (/.well-known/oauth-protected-resource);
 //   - rate-limited twice: per client IP (mcp_hosted, shared with the catalog
 //     surface) and per verified user (mcp_workspace, sha256 of the user id);
-//   - 2 MB body cap: private_write workspace tools carry content arguments
+//   - 10 MB body cap: private_write workspace tools carry content arguments
 //     (draft text, extracted files), unlike the read-only catalog surface;
 //   - workspace tools resolve against the caller's hosted workspace: a
 //     supabase-js client built with the caller's own JWT (anon/publishable
@@ -46,7 +46,7 @@ const WORKSPACE_STATUS_URI = 'aqua://workspace/status'
 
 export const WORKSPACE_INSTRUCTIONS = [
   CATALOG_INSTRUCTIONS,
-  'This is the hosted workspace endpoint (POST https://aquaidp.xyz/mcp with a Bearer token): the public catalog tools plus the AQUA workspace tools, resolved per request against the caller\'s own hosted workspace (migration-064 tables; the server stores ciphertext only). Approvals, signatures and submission still happen in the AQUA browser app, by the user. When no hosted workspace exists for the account, workspace tools answer workspace_not_initialized.',
+  'This is the hosted workspace endpoint (POST https://aquaidp.xyz/mcp with a Bearer token): the public catalog tools plus the AQUA workspace tools, resolved per request against the caller\'s own hosted workspace (migration-064 tables; the server stores ciphertext at rest; plaintext transiently in-request (server-held passphrase)). Approvals, signatures and submission still happen in the AQUA browser app, by the user. When no hosted workspace exists for the account, workspace tools answer workspace_not_initialized.',
 ].join('\n')
 
 type Limiter = (key: string, action: RateLimitAction) => boolean
