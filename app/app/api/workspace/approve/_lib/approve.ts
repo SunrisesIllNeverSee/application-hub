@@ -101,6 +101,7 @@ async function pg(
     apikey: key,
     authorization: `Bearer ${jwt}`,
     accept: 'application/json',
+    'content-profile': 'public',
     'accept-profile': 'public',
   }
   if (opts.prefer) headers.prefer = opts.prefer
@@ -178,7 +179,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       return json(401, { error: 'unauthorized' })
     }
     if (!user?.id) return json(401, { error: 'unauthorized' })
-    if (!allow(user.id)) return json(429, { error: 'rate_limited' }, { 'retry-after': '60' })
+    if (!allow(sha256hex(Buffer.from(user.id)))) return json(429, { error: 'rate_limited' }, { 'retry-after': '60' })
 
     const origin = env.NEXT_PUBLIC_SUPABASE_URL
     const key = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -306,7 +307,15 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     } else {
       if (!eng) return json(503, { error: 'hosted_backend_unavailable', detail: 'the workspace could not be opened' })
       let contentSha: string | null = null
-      try { contentSha = (await eng.w.decodeFile(version.path))?.data?.sha256 ?? null } catch { /* falls through */ }
+      try {
+        // recompute from the decrypted body — vault parity: data.sha256 is a
+        // self-reported field; the reviewed hash must match the actual content
+        const d = (await eng.w.decodeFile(version.path))?.data
+        if (d && typeof d.title === 'string' && typeof d.body === 'string') {
+          const { canonicalJson } = await import('../../../mcp/_vendor/workspace/companion/src/crypto.mjs') as any
+          contentSha = sha256hex(Buffer.from(canonicalJson({ title: d.title, body: d.body }), 'utf8'))
+        }
+      } catch { /* falls through */ }
       if (contentSha !== expected) return json(409, { error: 'sha256_mismatch', detail: 'the stored version no longer matches the reviewed hash — decision refused' })
     }
 
@@ -410,7 +419,16 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         const dup = dupRes.status === 200 && Array.isArray(dupRes.body) && dupRes.body.length ? dupRes.body[0] : null
         if (dup && (serverBuilt || dup.sha256 === recSha)) {
           // path is derived from the rid — a row here IS this approval's prior
-          // write; reindex it (a dead write after reindex_failed gets indexed)
+          // write; re-verify the payload binds THIS version before indexing
+          if (!serverBuilt && eng) {
+            eng.stage(recPath, null as any)
+            try {
+              const d = await eng.w.decodeFile(recPath)
+              if (d.data?.version_id !== versionId || d.data?.version_sha256 !== expected || d.data?.decision !== 'approved' || d.data?.actor_class !== 'human') {
+                return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })
+              }
+            } catch { /* staged decode may fail for dup sha path — fall through */ }
+          }
           const reindexed = await reindexApproval(deps, eng, env, origin, key, jwt, ws.id, rid, recPath, dup.sha256, now())
           if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval exists but is not indexed — retry to index it' })
           return json(200, {
