@@ -138,49 +138,7 @@ function denied(r: PgReply): boolean {
   return r.code === '42501' || r.status === 401 || r.status === 403
 }
 
-async function deleteRow(
-  fetchImpl: typeof fetch, origin: string, key: string, jwt: string, id: string,
-): Promise<void> {
-  await pg(fetchImpl, origin, key, jwt, 'DELETE', T_REC, { params: { id: `eq.${id}` } }).catch(() => {})
-}
 
-/**
- * Append one hash-chained receipt line to aqua_workspace_audit (same
- * convention as createSupabaseStore.appendLog: seq from the tail, prev =
- * sha256 of the previous entry text). One retry on a seq race.
- */
-async function appendAudit(
-  fetchImpl: typeof fetch, origin: string, key: string, jwt: string,
-  workspaceId: string, entry: Record<string, unknown>,
-): Promise<{ ok: boolean; seq: number }> {
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const tail = await pg(fetchImpl, origin, key, jwt, 'GET', T_AUD, {
-      params: { workspace_id: `eq.${workspaceId}`, log_name: `eq.${AUDIT_LOG_NAME}`, select: 'entry,line', order: 'seq.desc', limit: '1' },
-    })
-    if (tail.status !== 200 || !Array.isArray(tail.body)) return { ok: false, seq: 0 }
-    let seq = 1
-    let prev: string | null = null
-    if (tail.body.length) {
-      const last = tail.body[0]
-      const lastText = typeof last.line === 'string' ? last.line : JSON.stringify(last.entry)
-      try {
-        seq = (typeof last.entry === 'object' && last.entry !== null && typeof last.entry.seq === 'number' ? last.entry.seq : 0) + 1
-      } catch {
-        seq = 2
-      }
-      prev = sha256hex(Buffer.from(lastText, 'utf8'))
-    }
-    const line = { ...entry, seq, prev }
-    const ins = await pg(fetchImpl, origin, key, jwt, 'POST', T_AUD, {
-      body: { workspace_id: workspaceId, log_name: AUDIT_LOG_NAME, seq, entry: line, line: JSON.stringify(line), prev },
-      prefer: 'return=minimal',
-    })
-    if (ins.status === 201 || ins.status === 200) return { ok: true, seq }
-    if (ins.code !== '23505' || attempt === 1) return { ok: false, seq: 0 }
-    // 23505: another writer took the seq — re-read the tail and retry once
-  }
-  return { ok: false, seq: 0 }
-}
 
 export async function handleHostedApprove(req: Request, deps: HostedApproveDeps = {}): Promise<Response> {
   const env = deps.env ?? (process.env as Env)
@@ -305,78 +263,71 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       })
     }
 
-    // Write the client-built approval record file as a new row (unique path
-    // = O_EXCL; an identical re-POST is idempotent).
-    const recPath = `${APPROVAL_DIR}/${fileNameForApproval(approvalKey)}`
+    // Atomic write: the RPC re-checks stored-vs-claimed sha256, inserts the
+    // approval record row, and appends the audit receipt in ONE transaction —
+    // no check-then-act window, no compensating delete. A seq race on the
+    // audit unique key retries once with a fresh tail.
+    const recPath = `${APPROVAL_DIR}/${fileNameForApproval(String(head.id).slice('approval:'.length))}`
     const recSha = sha256hex(bytes)
-    const ins = await pg(fetchImpl, origin, key, jwt, 'POST', T_REC, {
-      body: {
-        workspace_id: ws.id,
-        path: recPath,
-        rid: head.id,
-        kind: 'approval',
-        authority: typeof head.authority === 'string' && head.authority ? head.authority : 'projection',
-        scope: head.scope === 'public' ? 'public' : 'private',
-        status: 'live',
-        sha256: recSha,
-        file: `\\x${bytes.toString('hex')}`,
-      },
-      prefer: 'return=representation',
-    })
-    let inserted: any = null
-    if (ins.code === '23505') {
-      const existing = await pg(fetchImpl, origin, key, jwt, 'GET', T_REC, {
-        params: { workspace_id: `eq.${ws.id}`, path: `eq.${recPath}`, select: 'id,sha256', limit: '1' },
+    let done = false, doneSeq = 0, doneAt = ''
+    for (let attempt = 0; attempt < 2 && !done; attempt++) {
+      const tail = await pg(fetchImpl, origin, key, jwt, 'GET', T_AUD, {
+        params: { workspace_id: `eq.${ws.id}`, log_name: `eq.${AUDIT_LOG_NAME}`, select: 'entry,line', order: 'seq.desc', limit: '1' },
       })
-      const dup = existing.status === 200 && Array.isArray(existing.body) ? existing.body[0] : null
-      if (dup && dup.sha256 === recSha) {
-        return json(200, {
-          status: 'ok', already_recorded: true, version_id: versionId, version_sha256: expected,
-          actor_id: user.id, via: HOSTED_VIA, path: recPath, sha256: recSha,
-        })
+      if (tail.status !== 200) return json(500, { error: 'audit_failed', detail: 'the approval receipt could not be prepared' })
+      let seq = 1
+      let prev: string | null = null
+      const last = Array.isArray(tail.body) && tail.body.length ? tail.body[0] : null
+      if (last) {
+        const lastText = typeof last.line === 'string' ? last.line : JSON.stringify(last.entry)
+        try { seq = (last.entry?.seq ?? 0) + 1 } catch { seq = 2 }
+        prev = sha256hex(Buffer.from(lastText, 'utf8'))
       }
-      return json(409, { error: 'approval_exists' })
+      const auditEntry = {
+        at: now(), op: 'hosted_approval', version_id: versionId,
+        version_sha256: expected, actor_id: user.id,
+        ...(actorLabel ? { actor_label: actorLabel } : {}),
+        via: HOSTED_VIA, record_path: recPath, record_sha256: recSha,
+        decision: 'approved', actor_class: 'human', seq, prev,
+      }
+      const res = await pg(fetchImpl, origin, key, jwt, 'POST', 'rpc/aqua_workspace_approve', {
+        body: {
+          p_workspace_id: ws.id,
+          p_version_path: version.path,
+          p_expected_sha256: expected,
+          p_record_path: recPath,
+          p_record_b64: b.record_b64,
+          p_rid: String(head.id),
+          p_audit: { log_name: AUDIT_LOG_NAME, seq, entry: auditEntry, line: JSON.stringify(auditEntry), prev },
+        },
+        prefer: 'return=minimal',
+      })
+      if (res.status === 200 || res.status === 204) { done = true; doneSeq = seq; doneAt = auditEntry.at; break }
+      const msg = String(res.body?.message ?? res.code ?? '')
+      if (msg.includes('sha256_mismatch')) {
+        return json(409, { error: 'sha256_mismatch', detail: 'the stored version record no longer matches the reviewed hash — decision refused' })
+      }
+      if (msg.includes('version_not_found')) {
+        return json(409, { error: 'version_changed', detail: 'the version record changed while the decision was being written — nothing was approved' })
+      }
+      if (res.code === '23505' || msg.includes('23505') || msg.includes('duplicate key')) {
+        const dupRes = await pg(fetchImpl, origin, key, jwt, 'GET', T_REC, {
+          params: { workspace_id: `eq.${ws.id}`, path: `eq.${recPath}`, select: 'id,sha256', limit: '1' },
+        })
+        const dup = dupRes.status === 200 && Array.isArray(dupRes.body) && dupRes.body.length ? dupRes.body[0] : null
+        if (dup && dup.sha256 === recSha) {
+          return json(200, {
+            status: 'ok', already_recorded: true, version_id: versionId, version_sha256: expected,
+            actor_id: user.id, via: HOSTED_VIA, path: recPath, sha256: recSha,
+          })
+        }
+        if (dup) return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })
+        if (attempt === 0) continue
+      }
+      console.error('approve rpc fail', res.status, res.code, res.body)
+      return json(500, { error: 'write_failed', detail: msg || 'the approval could not be recorded' })
     }
-    if (ins.status === 201 || ins.status === 200) {
-      inserted = Array.isArray(ins.body) ? ins.body[0] : ins.body
-    } else if (denied(ins)) {
-      return json(403, { error: 'forbidden' })
-    } else {
-      return json(502, { error: 'upstream' })
-    }
-
-    // Re-read the stored hash AFTER the write: a version row swapped under
-    // us between the check and the insert must not leave an approval bound
-    // to a hash the row no longer carries. Compensate by removing the row.
-    const recheck = await pg(fetchImpl, origin, key, jwt, 'GET', T_REC, {
-      params: { id: `eq.${version.id}`, select: 'sha256', limit: '1' },
-    })
-    const still = recheck.status === 200 && Array.isArray(recheck.body) && recheck.body.length ? recheck.body[0].sha256 : null
-    if (still !== expected) {
-      if (inserted?.id) await deleteRow(fetchImpl, origin, key, jwt, inserted.id)
-      return json(409, { error: 'version_changed', detail: 'the version record changed while the decision was being written — nothing was approved' })
-    }
-
-    // Server-side receipt (the EventRecord counterpart): actor stamped from
-    // the verified JWT, hash binding recorded, append-only audit table.
-    const at = now()
-    const audit = await appendAudit(fetchImpl, origin, key, jwt, ws.id, {
-      at,
-      op: 'hosted_approval',
-      version_id: versionId,
-      version_sha256: expected,
-      actor_id: user.id,
-      ...(actorLabel ? { actor_label: actorLabel } : {}),
-      via: HOSTED_VIA,
-      record_path: recPath,
-      record_sha256: recSha,
-      decision: 'approved',
-      actor_class: 'human',
-    })
-    if (!audit.ok) {
-      if (inserted?.id) await deleteRow(fetchImpl, origin, key, jwt, inserted.id)
-      return json(500, { error: 'audit_failed', detail: 'the approval was not recorded — nothing was approved' })
-    }
+    if (!done) return json(500, { error: 'audit_failed', detail: 'the approval receipt could not be written' })
 
     return json(200, {
       status: 'ok',
@@ -386,11 +337,11 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       via: HOSTED_VIA,
       path: recPath,
       sha256: recSha,
-      audit_seq: audit.seq,
-      at,
+      audit_seq: doneSeq,
+      at: doneAt,
     })
   } catch (e) {
-    console.error('hosted approve: internal error', (e as Error)?.name ?? 'Error')
+    console.error('hosted approve: internal error', (e as Error)?.stack ?? e)
     return json(500, { error: 'internal' })
   }
 }

@@ -118,6 +118,21 @@ function fakePostgrest(rows, opts = {}) {
     if (headers.authorization !== `Bearer ${TOKEN}` || headers.apikey !== ANON) {
       return reply(401, { code: '42501', message: 'permission denied' })
     }
+    const rpc = /^\/rest\/v1\/rpc\/aqua_workspace_approve$/.exec(u.pathname)
+    if (rpc) {
+      const p = JSON.parse(init.body)
+      const ver = tables.aqua_workspace_records.find((r) => r.workspace_id === p.p_workspace_id && r.path === p.p_version_path)
+      if (!ver) return reply(400, { message: 'version_not_found', code: 'P0404' })
+      if (ver.sha256 !== p.p_expected_sha256) return reply(400, { message: 'sha256_mismatch', code: 'P0409' })
+      if (tables.aqua_workspace_records.some((r) => r.workspace_id === p.p_workspace_id && r.path === p.p_record_path))
+        return reply(409, { code: '23505', message: 'duplicate key value violates unique constraint' })
+      const a = p.p_audit
+      if (tables.aqua_workspace_audit.some((r) => r.workspace_id === p.p_workspace_id && r.log_name === a.log_name && r.seq === a.seq))
+        return reply(409, { code: '23505', message: 'duplicate key value violates unique constraint' })
+      tables.aqua_workspace_records.push({ id: `rec-${tables.aqua_workspace_records.length + 1}`, workspace_id: p.p_workspace_id, path: p.p_record_path, rid: p.p_rid, kind: 'approval', authority: 'projection', scope: 'private', status: 'live', sha256: sha(Buffer.from(p.p_record_b64, 'base64')) })
+      tables.aqua_workspace_audit.push({ workspace_id: p.p_workspace_id, log_name: a.log_name, seq: a.seq, entry: a.entry, line: a.line, prev: a.prev })
+      return reply(200, null)
+    }
     const m = /^\/rest\/v1\/([a-z_]+)$/.exec(u.pathname)
     if (!m) return reply(404, { message: 'no route' })
     const table = m[1]

@@ -435,6 +435,9 @@ export class VaultHistoryApprovalError extends VaultScopeError {
 }
 
 const HUMAN_VIA: ReadonlyArray<Exclude<ApprovalVia, 'legacy' | 'history_attestation'>> = ['review_ui', 'decision_file', 'hosted_review']
+// hosted_review is read-only in the local vault — it arrives via imported
+// workspace records; local human decisions stay review_ui | decision_file
+const WRITABLE_VIA: ReadonlyArray<string> = ['review_ui', 'decision_file']
 
 async function recordHumanDecision(
   storage: VaultStorage,
@@ -448,8 +451,8 @@ async function recordHumanDecision(
   if (typeof input.actor_id !== 'string' || isBlankBody(input.actor_id)) {
     throw new VaultScopeError('human decision requires actor_id')
   }
-  if (!HUMAN_VIA.includes(input.via)) {
-    throw new VaultScopeError(`human decision via must be one of ${HUMAN_VIA.join('|')}`)
+  if (!WRITABLE_VIA.includes(input.via)) {
+    throw new VaultScopeError(`human decision via must be one of: ${WRITABLE_VIA.join('|')}`)
   }
   const approving = decision === 'approved'
   if (approving && !input.secret) {

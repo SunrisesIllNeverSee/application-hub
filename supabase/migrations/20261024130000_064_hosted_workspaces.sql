@@ -168,6 +168,48 @@ begin
 end $$;
 
 revoke all on function public.aqua_workspaces_touch() from public, anon, authenticated, service_role;
+-- Atomic approval: re-check the version row's stored sha256 and write the
+-- approval record + audit receipt in ONE transaction — no check-then-act race,
+-- no compensating delete. SECURITY INVOKER: RLS still owns isolation.
+create or replace function public.aqua_workspace_approve(
+  p_workspace_id uuid,
+  p_version_path text,
+  p_expected_sha256 text,
+  p_record_path text,
+  p_record_b64 text,
+  p_rid text,
+  p_audit jsonb   -- {log_name, seq, entry, line, prev}
+) returns void
+language plpgsql
+security invoker
+set search_path = public, extensions
+as $$
+declare
+  v_stored text;
+begin
+  select r.sha256 into v_stored
+    from public.aqua_workspace_records r
+   where r.workspace_id = p_workspace_id and r.path = p_version_path and r.account_id = auth.uid();
+  if not found then
+    raise exception 'version_not_found' using errcode = 'P0404';
+  end if;
+  if v_stored <> p_expected_sha256 then
+    raise exception 'sha256_mismatch' using errcode = 'P0409';
+  end if;
+  insert into public.aqua_workspace_records
+    (account_id, workspace_id, path, rid, kind, authority, scope, status, sha256, file)
+  values
+    (auth.uid(), p_workspace_id, p_record_path, p_rid, 'approval', 'projection', 'private', 'live',
+     encode(digest(decode(p_record_b64,'base64'),'sha256'),'hex'),
+     decode(p_record_b64,'base64'));
+  insert into public.aqua_workspace_audit (account_id, workspace_id, log_name, seq, entry, line, prev)
+  values (auth.uid(), p_workspace_id, p_audit->>'log_name', (p_audit->>'seq')::int,
+          p_audit->'entry', p_audit->>'line', p_audit->>'prev');
+end $$;
+
+revoke all on function public.aqua_workspace_approve(uuid, text, text, text, text, text, jsonb) from public, anon, service_role;
+grant execute on function public.aqua_workspace_approve(uuid, text, text, text, text, text, jsonb) to authenticated;
+
 revoke all on function public.aqua_workspace_commit(uuid, bigint, jsonb, jsonb, jsonb) from public, anon, service_role;
 grant execute on function public.aqua_workspace_commit(uuid, bigint, jsonb, jsonb, jsonb) to authenticated;
 
