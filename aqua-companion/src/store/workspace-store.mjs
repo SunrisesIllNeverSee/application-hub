@@ -208,7 +208,8 @@ export function createSupabaseStore(client, workspaceRowId) {
   }
   async function readLogTail(logRelPath) {
     const { data, error } = await client.from(T_AUD).select('line').eq('workspace_id', workspaceRowId).eq('log_name', logRelPath).order('seq', { ascending: false }).limit(1)
-    if (error || !data?.length) return { lastLine: null }
+    if (error) throw err(error.message)
+    if (!data?.length || data[0].line == null) return { lastLine: null }
     return { lastLine: data[0].line }
   }
 }

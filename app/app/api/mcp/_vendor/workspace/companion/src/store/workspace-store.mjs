@@ -192,7 +192,7 @@ export function createSupabaseStore(client, workspaceRowId) {
       if (!data?.length) throw err(`missing_file:${f}`)
     },
     async listFiles(prefix = '') {
-      const { data, error } = await client.from(T_REC).select('path').eq('workspace_id', workspaceRowId).order('path')
+      const { data, error } = await client.from(T_REC).select('path').eq('workspace_id', workspaceRowId).order('path').limit(100000)
       if (error) throw err(error.message)
       const pre = prefix.endsWith('/') ? prefix : prefix + '/'
       return (data ?? []).map((r) => r.path).filter((p) => !prefix || p === prefix || p.startsWith(pre))
@@ -212,7 +212,8 @@ export function createSupabaseStore(client, workspaceRowId) {
   }
   async function readLogTail(logRelPath) {
     const { data, error } = await client.from(T_AUD).select('line').eq('workspace_id', workspaceRowId).eq('log_name', logRelPath).order('seq', { ascending: false }).limit(1)
-    if (error || !data?.length) return { lastLine: null }
+    if (error) throw err(error.message)
+    if (!data?.length || data[0].line == null) return { lastLine: null }
     return { lastLine: data[0].line }
   }
 }
