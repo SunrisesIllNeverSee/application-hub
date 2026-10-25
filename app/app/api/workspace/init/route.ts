@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   try { user = await verifySupabaseJWT(token) } catch { /* falls through */ }
   if (!user?.id) return json(401, { error: 'unauthorized' })
   const { rateLimitAllow } = await import('../../../../lib/rate-limit.ts')
-  if (!rateLimitAllow(user.id, 'hosted_approve')) return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers: { 'content-type': 'application/json', 'retry-after': '60' } })
+  if (!rateLimitAllow(user.id, 'hosted_init')) return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers: { 'content-type': 'application/json', 'retry-after': '60' } })
 
   // Hosted workspace is an explicit opt-in — the request must carry the
   // consent flag; a bare Bearer token alone never provisions storage.

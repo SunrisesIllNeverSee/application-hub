@@ -32,6 +32,7 @@ const LIMITS = {
   mcp_hosted: { windowMs: 60 * 1000, max: 60 },
   // m10: hosted approval write path (/api/workspace/approve), keyed by user id
   hosted_approve: { windowMs: 60 * 1000, max: 30 },
+  hosted_init: { windowMs: 60 * 1000, max: 10 },
   // M10: hosted personal-workspace MCP (/mcp with a Bearer token), keyed by sha256(user id)
   mcp_workspace: { windowMs: 60 * 1000, max: 60 },
 } satisfies Record<string, LimitConfig>
