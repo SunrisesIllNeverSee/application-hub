@@ -45,6 +45,7 @@ create table if not exists public.aqua_workspace_audit (
   log_name text not null,
   seq int not null,
   entry jsonb not null,
+  line text not null,                -- raw appended line; prev chains over its exact bytes
   prev text,
   at timestamptz not null default now(),
   unique (workspace_id, log_name, seq)
@@ -160,8 +161,8 @@ begin
     end case;
   end loop;
   for r in select * from jsonb_array_elements(p_audit) loop
-    insert into public.aqua_workspace_audit (account_id, workspace_id, log_name, seq, entry, prev)
-    values (auth.uid(), p_workspace_id, r->>'log_name', (r->>'seq')::int, r->'entry', r->>'prev');
+    insert into public.aqua_workspace_audit (account_id, workspace_id, log_name, seq, entry, line, prev)
+    values (auth.uid(), p_workspace_id, r->>'log_name', (r->>'seq')::int, r->'entry', r->>'line', r->>'prev');
   end loop;
   return v_new_rev;
 end $$;

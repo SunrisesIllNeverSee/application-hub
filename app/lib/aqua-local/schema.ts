@@ -130,8 +130,12 @@ export interface ApprovalRecord {
 }
 
 /** `history_attestation` (M09b): the user confirmed an imported answer as
-    actually submitted (repo.ts recordHistoryAttestation). */
-export type ApprovalVia = 'review_ui' | 'decision_file' | 'history_attestation' | 'legacy'
+    actually submitted (repo.ts recordHistoryAttestation). `hosted_review`
+    (m10): the user approved through the hosted review surface
+    (app/api/workspace/approve) — the server re-checked the stored record's
+    sha256 against the claimed one before writing; the approval record
+    itself stays client-encrypted. */
+export type ApprovalVia = 'review_ui' | 'decision_file' | 'hosted_review' | 'history_attestation' | 'legacy'
 
 /**
  * LF-18 — append-only audit event ledger. Every governed mutation that

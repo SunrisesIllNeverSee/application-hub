@@ -249,7 +249,8 @@ Notes on specific tools:
 - `read_review_status`, `search_answer_bank` and `prepare_packet` report
   approvals as they were in the last browser backup you imported
   (`approvals_as_of`). The browser checks again at freeze time.
-- `import_history` reads only a folder inside `inbox/`. It never guesses a
+- `import_history` reads a folder inside `inbox/` (or uploaded `files` —
+  see above). It never guesses a
   submission date (unknown dates are flagged; pass `date` to fill them) and
   flags answers with unfilled placeholders, which the browser vault refuses
   to confirm. It approves nothing. Each record's import details carry a
@@ -290,6 +291,16 @@ evidence file, copy the file into `inbox/` and tell the agent its name.
 symlinks and every other folder are refused. The agent writes only through
 the companion: staged records, and new files under `exports/reviews/` and
 `exports/candidates/`.
+
+A client without a local filesystem (a remote or hosted connection) sends
+file content instead: `import_local_application`, `verify_packet`,
+`record_observed_submission` and `attach_evidence` take `file_name` +
+`content_base64` (the same extensions and the same decoded-size limits as
+`inbox/`; giving both `file` and `content_base64` is refused),
+`import_history` takes `files: [{name, content_base64}]` (at most 200) in
+place of `folder`, and `attach_evidence` also accepts a bare `file_sha256`
+when only the hash is needed. `sync_from_vault_export` stays inbox-only:
+a vault export can be large and belongs on disk.
 
 Supported for import: `.txt`, `.md`, `.html`, `.csv` (with a question
 column), `.json`, `.docx`. PDF is not supported yet; save it as `.docx` or

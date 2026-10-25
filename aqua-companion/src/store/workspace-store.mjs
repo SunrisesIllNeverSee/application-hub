@@ -41,7 +41,15 @@ export function createFsStore(root) {
       try { await fh.writeFile(JSON.stringify(m, null, 2)); await fh.sync() } finally { await fh.close() }
       return 1
     },
-    async saveManifest(m) {
+    async saveManifest(m, _rev = null, ops = [], audit = []) { // same ops contract as the hosted RPC
+      for (const o of ops) {
+        const b = o.file_b64 ? Buffer.from(o.file_b64, 'base64') : null
+        if (o.op === 'put') await this.putNewFile(o.path, b)
+        else if (o.op === 'replace') await this.replaceFile(o.path, b)
+        else if (o.op === 'move') await this.moveFile(o.path, o.to)
+        else throw new Error(`unknown_op:${o.op}`)
+      }
+      for (const a of audit) await this.appendLog(a.log_name, a.line ?? JSON.stringify(a.entry))
       const abs = safe('workspace.json')
       await fs.copyFile(abs, abs + '.bak').catch(() => {})
       const tmp = abs + '.tmp-' + Math.random().toString(36).slice(2)
@@ -110,8 +118,9 @@ function decodeFile(v) {
 const hex = (bytes) => '\\x' + Buffer.from(bytes).toString('hex')
 const sha = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex')
 const norm = (p) => {
+  if (!p || /\0/.test(p)) throw new Error(`bad path: ${JSON.stringify(p)}`)
   const n = path.posix.normalize(String(p).replaceAll('\\', '/'))
-  if (n === '..' || n.startsWith('../') || path.posix.isAbsolute(n)) throw new Error(`bad path: ${JSON.stringify(p)}`)
+  if (n === '.' || n === '..' || n.startsWith('../') || path.posix.isAbsolute(n)) throw new Error(`bad path: ${JSON.stringify(p)}`)
   return n
 }
 const err = (code) => Object.assign(new Error(code), { code })
@@ -176,27 +185,22 @@ export function createSupabaseStore(client, workspaceRowId) {
       const pre = prefix.endsWith('/') ? prefix : prefix + '/'
       return (data ?? []).map((r) => r.path).filter((p) => !prefix || p === prefix || p.startsWith(pre))
     },
-    async appendLog(logRelPath, line) {
-      const tail = await readLogTail(logRelPath)
-      let seq = 1, prev = null
-      if (tail.lastLine) {
-        try { seq = (JSON.parse(tail.lastLine).seq ?? 0) + 1 } catch { seq = 2 }
-        prev = sha(Buffer.from(tail.lastLine, 'utf8'))  // engine: sha256 of the raw previous line text
-      }
-      const entry = (() => { try { return JSON.parse(line) } catch { return { text: line } } })()
-      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logRelPath, seq, entry, prev })
+    async appendLog(logRelPath, line) { // caller supplies the fully-computed engine line (seq/prev inside)
+      const e = (() => { try { return JSON.parse(line) } catch { return {} } })()
+      const { error } = await client.from(T_AUD).insert({ workspace_id: workspaceRowId, log_name: logRelPath, seq: e.seq ?? 1, entry: e, line, prev: e.prev ?? null })
       if (error) throw err(error.message)
     },
     async readLogTail(logRelPath) { return readLogTail(logRelPath) },
     async tx(fn) { return fn() }, // atomic bundles go through saveManifest's ops/audit params
   }
   async function fileExists(p) {
-    const { data } = await client.from(T_REC).select('path', { head: false }).eq('workspace_id', workspaceRowId).eq('path', norm(p)).limit(1)
+    const { data, error } = await client.from(T_REC).select('path', { head: false }).eq('workspace_id', workspaceRowId).eq('path', norm(p)).limit(1)
+    if (error) throw err(error.message)
     return (data?.length ?? 0) > 0
   }
   async function readLogTail(logRelPath) {
-    const { data, error } = await client.from(T_AUD).select('entry').eq('workspace_id', workspaceRowId).eq('log_name', logRelPath).order('seq', { ascending: false }).limit(1)
+    const { data, error } = await client.from(T_AUD).select('line').eq('workspace_id', workspaceRowId).eq('log_name', logRelPath).order('seq', { ascending: false }).limit(1)
     if (error || !data?.length) return { lastLine: null }
-    return { lastLine: typeof data[0].entry === 'string' ? data[0].entry : JSON.stringify(data[0].entry) }
+    return { lastLine: data[0].line }
   }
 }
