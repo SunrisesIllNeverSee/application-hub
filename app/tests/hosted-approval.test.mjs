@@ -61,7 +61,7 @@ function approvalRecordBytes(key = APPROVAL_KEY) {
 
 function db() {
   return {
-    aqua_workspaces: [{ id: WS_ROW, workspace_key: WS_KEY }],
+    aqua_workspaces: [{ id: WS_ROW, workspace_key: WS_KEY, manifest: { hosted_approval: { sha256: sha(Buffer.from('test-approval-secret')) } } }],
     aqua_workspace_records: [
       {
         id: 'rec-version-1',
@@ -201,6 +201,7 @@ function post(body, { token = TOKEN, headers = {} } = {}) {
 
 const goodBody = (over = {}) => ({
   version_id: VERSION_ID,
+  approval_secret: 'test-approval-secret',
   expected_sha256: VERSION_SHA,
   actor_id: 'local-user',
   via: 'hosted_review',
@@ -376,7 +377,7 @@ test('a public-scope plaintext approval record is refused (forgery hole)', async
 test('server-built mode: no record_b64 — the engine encodes, hashes bind the version', async () => {
   const tables = db()
   const encoded = { calls: 0 }
-  const { res, json, fake } = await call({ version_id: VERSION_ID, expected_sha256: VERSION_SHA, actor_id: 'local-user', via: 'hosted_review' }, {
+  const { res, json, fake } = await call({ version_id: VERSION_ID, expected_sha256: VERSION_SHA, actor_id: 'local-user', via: 'hosted_review', approval_secret: 'test-approval-secret' }, {
     tables,
     encodeRecord: async (a) => { encoded.calls++; return approvalRecordBytes().toString('utf8') },
   })

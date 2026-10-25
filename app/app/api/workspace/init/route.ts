@@ -30,7 +30,11 @@ export async function POST(req: Request) {
   const raw = await readCappedText(req, 64 * 1024)
   try { body = raw ? JSON.parse(raw) : {} } catch { /* empty */ }
   if (body.consent_hosted_workspace !== true) {
-    return json(400, { error: 'consent_required', detail: 'POST {"consent_hosted_workspace": true} to explicitly enable a hosted workspace' })
+    return json(400, { error: 'consent_required', detail: 'POST {"consent_hosted_workspace": true, "approval_secret": <your secret>} to explicitly enable a hosted workspace' })
+  }
+  const approvalSecret = typeof body.approval_secret === 'string' ? body.approval_secret.trim() : ''
+  if (approvalSecret.length < 8) {
+    return json(400, { error: 'approval_secret_required', detail: 'approval_secret (min 8 chars) is the human channel — the Bearer token alone can never mint an approval' })
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.AQUA_SUPABASE_URL
@@ -54,7 +58,11 @@ export async function POST(req: Request) {
     return json(503, { error: 'hosted_backend_unavailable', detail: 'companion init primitives unavailable' })
   }
   const { manifest, keys } = await ws.newManifest(passphrase)
+  const { createHash } = await import('node:crypto')
   manifest.hosted_consent = { at: new Date().toISOString(), account_id: user.id }
+  // human channel: only the hash is stored; the secret lives with the user.
+  // The Bearer token (which agents hold) can never satisfy it.
+  manifest.hosted_approval = { sha256: createHash('sha256').update(approvalSecret, 'utf8').digest('hex'), set_at: new Date().toISOString() }
   // newManifest produces no manifest_mac — unlock() refuses a manifest whose
   // MAC is absent/mismatched. Stamp it the same way the CLI init path does,
   // AFTER every stored field is set (the MAC covers the whole document).

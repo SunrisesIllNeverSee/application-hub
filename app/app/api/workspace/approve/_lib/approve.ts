@@ -259,7 +259,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     }
 
     // Resolve the workspace row — RLS scopes this to the caller's own rows.
-    const wsParams: Record<string, string> = { select: 'id,workspace_key', limit: '2' }
+    const wsParams: Record<string, string> = { select: 'id,workspace_key,manifest', limit: '2' }
     if (workspaceClaim && UUID_RE.test(workspaceClaim)) wsParams.id = `eq.${workspaceClaim}`
     else if (recordWsKey) wsParams.workspace_key = `eq.${recordWsKey}`
     const wsRes = await pg(fetchImpl, origin, key, jwt, 'GET', T_WS, { params: wsParams })
@@ -269,6 +269,15 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     if (!wsRes.body.length) return json(404, { error: 'workspace_not_found' })
     const ws = wsRes.body[0]
     if (recordWsKey && ws.workspace_key !== recordWsKey) return json(409, { error: 'workspace_mismatch' })
+
+    // THE HUMAN CHANNEL: the Bearer token alone (which an MCP agent holds)
+    // can never mint a human approval — the caller must also prove the
+    // workspace's approval secret (user-held; only its hash is stored).
+    const secret = typeof b.approval_secret === 'string' ? b.approval_secret : ''
+    const storedHash = (ws.manifest as any)?.hosted_approval?.sha256
+    if (!storedHash || sha256hex(Buffer.from(secret, 'utf8')) !== storedHash) {
+      return json(403, { error: 'approval_secret_required', detail: 'human approval requires the workspace approval secret set at init' })
+    }
 
     // Locate the stored version row and re-check stored-vs-claimed — the
     // hard floor. The server never computes the reviewed hash.
@@ -393,7 +402,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         version_sha256: expected, actor_id: user.id,
         ...(actorLabel ? { actor_label: actorLabel } : {}),
         via: HOSTED_VIA, record_path: recPath, record_sha256: recSha,
-        decision: 'approved', actor_class: 'human', seq, prev,
+        decision: 'approved', actor_class: 'human', human_channel: 'approval_secret', seq, prev,
       }
       const res = await pg(fetchImpl, origin, key, jwt, 'POST', 'rpc/aqua_workspace_approve', {
         body: {
