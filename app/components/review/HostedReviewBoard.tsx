@@ -52,20 +52,33 @@ export function HostedReviewBoard() {
 export function HostedAnswerCard({ card, reload }: { card: HostedReviewCard; reload: () => Promise<void> }) {
   const [confirming, setConfirming] = useState(false)
   const [secret, setSecret] = useState('')
+  const [effectiveAt, setEffectiveAt] = useState(card.history_source?.submitted_at ?? '')
+  const [attested, setAttested] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const id = useId()
   const answer = card.answer
-  const cancel = () => { setConfirming(false); setSecret('') }
+  // history:true versions only count via a human history attestation (M09b
+  // gate) — plain hosted_review approval is ignored for historical answers
+  const isHistory = card.history_source != null
+  const cancel = () => { setConfirming(false); setSecret(''); setAttested(false) }
   async function approve(event: React.FormEvent) {
     event.preventDefault()
     if (!answer || !canApproveHostedCard(card) || secret.trim().length < 8 || busy) return
+    if (isHistory && (!/^\d{4}-\d{2}-\d{2}$/.test(effectiveAt) || !attested)) return
     setBusy(true)
     setError('')
     try {
       const token = await getAccessToken()
       if (!token) throw new HostedApiError(0, 'not_signed_in')
-      await hostedApprove({ version_id: answer.version_id, expected_sha256: answer.sha256, approval_secret: secret }, token)
+      await hostedApprove({
+        version_id: answer.version_id, expected_sha256: answer.sha256, approval_secret: secret,
+        ...(isHistory ? {
+          via: 'history_attestation' as const,
+          effective_at: effectiveAt,
+          attestation: `I attest that I submitted this exact answer wording in a past application on ${effectiveAt}.`,
+        } : {}),
+      }, token)
       cancel()
       await reload()
     } catch (error) {
@@ -113,12 +126,23 @@ export function HostedAnswerCard({ card, reload }: { card: HostedReviewCard; rel
     {canApproveHostedCard(card) && !confirming && <button type="button" className="btn-primary px-3 py-1.5 text-xs" onClick={() => setConfirming(true)}>Review approval of this exact version</button>}
     {confirming && answer && <form onSubmit={approve} className="space-y-2 rounded-md border border-success-500/50 p-3">
       <p className="text-xs">Approve version {answer.version_number} exactly as displayed above? Later edits will need a new approval.</p>
+      {isHistory && <>
+        <label htmlFor={`${id}-date`} className="block text-xs font-medium">Date you submitted this wording
+          <input id={`${id}-date`} type="date" required disabled={busy} value={effectiveAt}
+            onChange={(event) => setEffectiveAt(event.target.value)} className={`${INPUT_CLASS} mt-1 w-full`} />
+        </label>
+        <label className="flex items-start gap-2 text-xs" htmlFor={`${id}-attest`}>
+          <input id={`${id}-attest`} type="checkbox" required disabled={busy} checked={attested}
+            onChange={(event) => setAttested(event.target.checked)} className="mt-0.5" />
+          I attest that I submitted this exact answer wording in a past application on the date above.
+        </label>
+      </>}
       <label htmlFor={id} className="block text-xs font-medium">Hosted approval secret
         <input id={id} type="password" autoComplete="off" required minLength={8} disabled={busy} value={secret}
           onChange={(event) => setSecret(event.target.value)} className={`${INPUT_CLASS} mt-1 w-full`} />
       </label>
       <div className="flex gap-2">
-        <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={busy || secret.trim().length < 8}>{busy ? 'Recording…' : 'Confirm approval'}</button>
+        <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={busy || secret.trim().length < 8 || (isHistory && (!/^\d{4}-\d{2}-\d{2}$/.test(effectiveAt) || !attested))}>{busy ? 'Recording…' : 'Confirm approval'}</button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={busy} onClick={cancel}>Cancel</button>
       </div>
     </form>}

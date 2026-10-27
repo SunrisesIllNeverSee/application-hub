@@ -59,6 +59,12 @@ export interface HostedApproveInput {
   expected_sha256: string
   /** Advisory label only — the server stamps the actor from the JWT. */
   actor_id?: string | null
+  /** 'history_attestation' for history:true versions — requires the human's
+      attested submission date + statement; plain hosted_review never counts
+      for historical answers (M09b gate). */
+  via?: 'hosted_review' | 'history_attestation'
+  effective_at?: string
+  attestation?: string
 }
 
 export interface HostedApproveResult {
@@ -145,7 +151,8 @@ export async function hostedApprove(input: HostedApproveInput, token: string, de
       version_id: input.version_id,
       expected_sha256: input.expected_sha256,
       approval_secret: requireApprovalSecret(input.approval_secret),
-      via: HOSTED_VIA,
+      via: input.via ?? HOSTED_VIA,
+      ...(input.via === 'history_attestation' ? { effective_at: input.effective_at, attestation: input.attestation } : {}),
       ...(input.actor_id ? { actor_id: input.actor_id } : {}),
     },
     token,

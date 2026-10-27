@@ -438,3 +438,20 @@ test('route is thin, holds no privileged client and never sends service keys', (
   assert.match(lib, /authorization: `Bearer \$\{jwt\}`/)
   assert.ok(lib.includes("actor_class: 'human'"), 'the only actor_class it can stamp is human')
 })
+
+test('history_attestation requires effective_at + attestation, and records them', async () => {
+  const tables = db()
+  const missing = await call(goodBody({ via: 'history_attestation' }), { tables })
+  assert.equal(missing.res.status, 400)
+  assert.equal(missing.json.error, 'bad_attestation')
+
+  const { res, json } = await call(goodBody({
+    via: 'history_attestation',
+    effective_at: '2026-06-15',
+    attestation: 'I attest that I submitted this exact answer wording in a past application.',
+  }), { tables })
+  assert.equal(res.status, 200)
+  assert.equal(json.via, 'history_attestation')
+  const audit = tables.aqua_workspace_audit.at(-1)
+  assert.equal(audit.entry.via, 'history_attestation')
+})

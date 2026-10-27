@@ -202,7 +202,18 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     if (!SHA256_RE.test(expected)) {
       return json(400, { error: 'bad_expected_sha256', detail: 'expected_sha256 must be the 64-hex hash of the record the human reviewed' })
     }
-    if (b.via !== HOSTED_VIA) return json(400, { error: 'bad_via', expected: HOSTED_VIA })
+    const isAttestation = b.via === 'history_attestation'
+    if (b.via !== HOSTED_VIA && !isAttestation) return json(400, { error: 'bad_via', expected: `${HOSTED_VIA}|history_attestation` })
+    // history:true versions only count via a complete human attestation
+    // (M09b gate): an ISO effective_at date + a non-empty attestation payload
+    let effectiveAt: string | null = null
+    let attestation: string | null = null
+    if (isAttestation) {
+      effectiveAt = typeof b.effective_at === 'string' && /^\d{4}-\d{2}-\d{2}/.test(b.effective_at.trim()) ? b.effective_at.trim() : null
+      attestation = typeof b.attestation === 'string' && b.attestation.trim().length >= 8 ? b.attestation.trim() : null
+      if (!effectiveAt || !attestation) return json(400, { error: 'bad_attestation', detail: 'history_attestation requires effective_at (YYYY-MM-DD) and attestation (the attested statement)' })
+    }
+    const via = isAttestation ? 'history_attestation' : HOSTED_VIA
     const actorLabel =
       typeof b.actor_id === 'string' && b.actor_id.trim() && b.actor_id.length <= 200 ? b.actor_id.trim() : null
     // Two input modes: a client-built record_b64 (client-keyed flow), or —
@@ -303,7 +314,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
     // approval record row, and appends the audit receipt in ONE transaction —
     // no check-then-act window, no compensating delete. A seq race on the
     // audit unique key retries once with a fresh tail.
-    const rid = serverBuilt ? `approval:${versionId}` : String(head.id)
+    const rid = serverBuilt ? `approval:${versionId}${isAttestation ? ':attestation' : ''}` : String(head.id)
     let recPath = ''
     const eng = (deps.engineCheck && deps.reindex)
       ? null
@@ -335,7 +346,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       // The unlocked engine encodes the record — same keys the hosted
       // workspace decrypts with, actor stamped from the verified JWT.
       if (!eng && !deps.encodeRecord) return json(503, { error: 'hosted_backend_unavailable', detail: 'the workspace could not be opened' })
-      recPath = `${APPROVAL_DIR}/${fileNameForApproval(versionId)}`
+      recPath = `${APPROVAL_DIR}/${fileNameForApproval(versionId + (isAttestation ? '-attestation' : ''))}`
     } else {
       recPath = `${APPROVAL_DIR}/${fileNameForApproval(String(head.id).slice('approval:'.length))}`
       // The record must decrypt under this workspace BEFORE the atomic write —
@@ -353,7 +364,9 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
           decoded.data?.version_id !== versionId ||
           decoded.data?.version_sha256 !== expected ||
           decoded.data?.decision !== 'approved' ||
-          decoded.data?.actor_class !== 'human'
+          decoded.data?.actor_class !== 'human' ||
+          (decoded.data?.via ?? via) !== via ||
+          (isAttestation && (typeof decoded.data?.effective_at !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(decoded.data.effective_at) || typeof decoded.data?.attestation_enc !== 'string' || !decoded.data.attestation_enc))
         ) {
           return json(400, { error: 'bad_record', detail: 'the record must be an approval of this exact version/hash by a human' })
         }
@@ -387,7 +400,8 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
             data: {
               id: randomUUID(), version_id: versionId, version_sha256: expected,
               decision: 'approved', actor_class: 'human', at, seq,
-              actor_id: user.id, via: HOSTED_VIA,
+              actor_id: user.id, via,
+              ...(isAttestation ? { effective_at: effectiveAt, attestation_enc: attestation } : {}),
               ...(actorLabel ? { actor_label: actorLabel } : {}),
             },
           })
@@ -401,7 +415,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
         at, op: 'hosted_approval', version_id: versionId,
         version_sha256: expected, actor_id: user.id,
         ...(actorLabel ? { actor_label: actorLabel } : {}),
-        via: HOSTED_VIA, record_path: recPath, record_sha256: recSha,
+        via, record_path: recPath, record_sha256: recSha,
         decision: 'approved', actor_class: 'human', human_channel: 'approval_secret', seq, prev,
       }
       const res = await pg(fetchImpl, origin, key, jwt, 'POST', 'rpc/aqua_workspace_approve', {
@@ -444,7 +458,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
           if (!reindexed) return json(500, { error: 'reindex_failed', detail: 'the approval exists but is not indexed — retry to index it' })
           return json(200, {
             status: 'ok', already_recorded: true, version_id: versionId, version_sha256: expected,
-            actor_id: user.id, via: HOSTED_VIA, path: recPath, sha256: dup.sha256,
+            actor_id: user.id, via, path: recPath, sha256: dup.sha256,
           })
         }
         if (dup) return json(409, { error: 'approval_exists', detail: 'a different record already occupies this path' })
@@ -466,7 +480,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       version_id: versionId,
       version_sha256: expected,
       actor_id: user.id,
-      via: HOSTED_VIA,
+      via,
       path: recPath,
       sha256: recSha,
       audit_seq: doneSeq,
