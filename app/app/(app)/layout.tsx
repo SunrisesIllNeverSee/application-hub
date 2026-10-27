@@ -53,9 +53,10 @@ export default async function AppLayout({
     .eq('user_id', user.id)
     .maybeSingle<{ onboarding_completed_at: string | null }>()
 
-  if (!profile?.onboarding_completed_at && !isBrowseOnly) {
-    redirect('/onboarding')
-  }
+  // Onboarding is encouraged, not enforced — every click used to redirect to
+  // /onboarding until it was completed; now the site stays browsable and a
+  // floating button offers the setup path instead.
+  const needsOnboarding = !profile?.onboarding_completed_at
 
   // Fetch user's applications for sidebar list
   const { data: appRows } = await supabase
@@ -97,6 +98,14 @@ export default async function AppLayout({
         </div>
       </main>
       <CreditToast userId={user.id} />
+      {needsOnboarding && (
+        <a
+          href="/onboarding"
+          className="fixed bottom-5 right-5 z-40 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg hover:bg-brand-700"
+        >
+          Finish setup — start an application
+        </a>
+      )}
     </div>
   )
 }
