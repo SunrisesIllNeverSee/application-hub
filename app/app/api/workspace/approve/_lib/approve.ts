@@ -26,7 +26,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { readCappedText } from '../../../mcp/_vendor/catalog/rest.mjs'
 import { rateLimitAllow } from '../../../../../lib/rate-limit.ts'
-import { refusePrivateWrite } from '../../../../../lib/local-first-guard.ts'
+import { refuseHostedWrite } from '../../../../../lib/local-first-guard.ts'
 
 export const MAX_BODY_BYTES = 64 * 1024
 const MAX_RECORD_BYTES = 40 * 1024  // ~53KB base64 — must stay under MAX_BODY_BYTES
@@ -157,7 +157,7 @@ export async function handleHostedApprove(req: Request, deps: HostedApproveDeps 
       const { verifySupabaseJWT } = await import('../../../../../lib/verify-jwt.ts')
       return verifySupabaseJWT(token)
     })
-  const lfRefusal = refusePrivateWrite({ surface: 'hosted_workspace_approve' })
+  const lfRefusal = refuseHostedWrite({ surface: 'hosted_workspace_approve' }, env)
   if (lfRefusal) return lfRefusal
   try {
     const ctype = (req.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase()

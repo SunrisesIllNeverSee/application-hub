@@ -16,7 +16,7 @@ import { createFsStore } from '../app/api/mcp/_vendor/workspace/companion/src/st
 import { readHostedReview, canApproveHostedCard } from '../lib/aqua-hosted.ts'
 import { ANON_JWT, ORIGIN, SERVICE_JWT, fakePostgrest } from '../../application-hub-mcp-server/test/fake-postgrest.mjs'
 
-const ENV = { NEXT_PUBLIC_SUPABASE_URL: ORIGIN, NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_JWT, NODE_ENV: 'production' }
+const ENV = { NEXT_PUBLIC_SUPABASE_URL: ORIGIN, NEXT_PUBLIC_SUPABASE_ANON_KEY: ANON_JWT, NODE_ENV: 'production', AQUA_HOSTED_WORKSPACE: '1' }
 const PUBLIC = ['hub_find_similar_questions', 'hub_get_acceptance_stats', 'hub_get_heat_scores', 'hub_get_program_by_slug', 'hub_get_program_detail', 'hub_get_program_themes', 'hub_get_program_questions', 'hub_get_program_rankings', 'hub_get_question_significance', 'hub_get_universal_questions', 'hub_search_programs']
 const USER = { id: '5d8b1f2e-3c4a-4b5c-8d6e-7f8a9b0c1d2e' }
 const USER2 = { id: '7a9c2e4f-5b6d-4e8f-9a0b-1c2d3e4f5a6b' }
@@ -324,6 +324,13 @@ test('route.ts keeps catalog fallback for unauthenticated POSTs; workspace surfa
   assert.match(lib, /'mcp_workspace'/)
   // live dispatch: a Bearer POST reaches the workspace handler (401 on the
   // synthetic token), a plain POST keeps catalog behavior (200 ping)
-  assert.equal((await POST(post(rpc(1, 'ping'), { token: null }))).status, 200)
-  assert.equal((await POST(post(rpc(1, 'ping'), { token: 'SYNTHETIC-TOKEN' }))).status, 401)
+  const prevFlag = process.env.AQUA_HOSTED_WORKSPACE
+  process.env.AQUA_HOSTED_WORKSPACE = '1'
+  try {
+    assert.equal((await POST(post(rpc(1, 'ping'), { token: null }))).status, 200)
+    assert.equal((await POST(post(rpc(1, 'ping'), { token: 'SYNTHETIC-TOKEN' }))).status, 401)
+  } finally {
+    if (prevFlag === undefined) delete process.env.AQUA_HOSTED_WORKSPACE
+    else process.env.AQUA_HOSTED_WORKSPACE = prevFlag
+  }
 })

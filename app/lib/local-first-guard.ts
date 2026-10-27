@@ -139,3 +139,21 @@ export function publicUrlForLocalFirstStorage(
   parsed.hash = ''
   return { url: parsed.toString() }
 }
+
+/**
+ * AQUA_HOSTED_WORKSPACE: the dedicated opt-in for the hosted personal-workspace
+ * surface (/mcp Bearer, /api/workspace/init, /api/workspace/approve). Deliberately
+ * separate from AQUA_LOCAL_FIRST — the global flag must stay ON for the app's
+ * vault UI and deny-legacy-write posture while this one enables only the m10
+ * hosted routes. Fails closed: unset, '0', or junk means disabled.
+ */
+export function isHostedWorkspaceEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  const v = env.AQUA_HOSTED_WORKSPACE?.trim().toLowerCase()
+  return v === '1' || v === 'true'
+}
+
+/** 403 for a hosted-workspace call while the surface is disabled. */
+export function refuseHostedWrite(extra?: Record<string, unknown>, env?: Record<string, string | undefined>): Response | null {
+  if (isHostedWorkspaceEnabled(env)) return null
+  return Response.json({ error: 'hosted workspace is not enabled on this deployment', hosted_disabled: true, ...extra }, { status: 403 })
+}
