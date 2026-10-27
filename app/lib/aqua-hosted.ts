@@ -19,6 +19,12 @@ import type { ReviewCardVM } from './review-ui/view-model.ts'
 //     as HostedApiError, never swallowed or rewritten.
 
 export const HOSTED_INIT_PATH = '/api/workspace/init'
+const HOSTED_DISABLE_PATH = '/api/workspace/disable'
+
+/** Permanently delete the caller's hosted workspace (cascades all records). */
+export async function hostedDisable(token: string, deps: HostedDeps = {}): Promise<{ status: string; deleted: string }> {
+  return postJson(HOSTED_DISABLE_PATH, { confirm_disable: true }, token, deps)
+}
 export const HOSTED_APPROVE_PATH = '/api/workspace/approve'
 /** The only `via` the hosted approve endpoint accepts. */
 export const HOSTED_VIA = 'hosted_review' as const

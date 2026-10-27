@@ -11,7 +11,7 @@
 // the local vault remains the only place approvals are recorded.
 
 import { useCallback, useEffect, useId, useState } from 'react'
-import { findHostedWorkspace, getAccessToken, hostedInit, HostedApiError, type HostedWorkspaceRow } from '@/lib/aqua-hosted'
+import { findHostedWorkspace, getAccessToken, hostedDisable, hostedInit, HostedApiError, type HostedWorkspaceRow } from '@/lib/aqua-hosted'
 import { INPUT_CLASS, Notice, Pill } from './ui'
 import { HostedReviewBoard } from './HostedReviewBoard'
 
@@ -30,6 +30,8 @@ export interface UseHostedWorkspace {
   error: string
   /** The consent action: POST /api/workspace/init, then re-probe. */
   enable: (approvalSecret: string) => Promise<void>
+  /** The opt-out: POST /api/workspace/disable — cascades every hosted record. */
+  disable: () => Promise<void>
 }
 
 export function useHostedWorkspace(): UseHostedWorkspace {
@@ -38,8 +40,8 @@ export function useHostedWorkspace(): UseHostedWorkspace {
   const [error, setError] = useState('')
 
   const probe = useCallback(async () => {
-    // Local-only deployments keep hosted storage opt-in unavailable.
-    if (process.env.NEXT_PUBLIC_AQUA_LOCAL_FIRST !== '0') {
+    // Deployments without the hosted surface keep opt-in unavailable.
+    if (process.env.NEXT_PUBLIC_AQUA_HOSTED_WORKSPACE !== '1') {
       setState({ status: 'signed_out' })
       return
     }
@@ -85,7 +87,22 @@ export function useHostedWorkspace(): UseHostedWorkspace {
     }
   }, [])
 
-  return { state, busy, error, enable }
+  const disable = useCallback(async () => {
+    setBusy(true)
+    setError('')
+    try {
+      const token = await getAccessToken()
+      if (!token) throw new HostedApiError(0, 'not_signed_in', 'sign in to disable the hosted workspace')
+      await hostedDisable(token)
+      setState({ status: 'none' })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not disable the hosted workspace')
+    } finally {
+      setBusy(false)
+    }
+  }, [])
+
+  return { state, busy, error, enable, disable }
 }
 
 /**
@@ -95,7 +112,8 @@ export function useHostedWorkspace(): UseHostedWorkspace {
  * one exists.
  */
 export function HostedWorkspacePanel({ hosted }: { hosted: UseHostedWorkspace }) {
-  const { state, busy, error, enable } = hosted
+  const { state, busy, error, enable, disable } = hosted
+  const [confirmDisable, setConfirmDisable] = useState(false)
   const fieldId = useId()
   const [approvalSecret, setApprovalSecret] = useState('')
   const [confirmation, setConfirmation] = useState('')
@@ -105,13 +123,25 @@ export function HostedWorkspacePanel({ hosted }: { hosted: UseHostedWorkspace })
   return (
     <div className="rounded-lg border border-neutral-200 p-3 dark:border-neutral-800" data-testid="hosted-workspace-panel">
       {state.status === 'ready' ? (
-        <p className="flex flex-wrap items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
           <Pill tone="info">Hosted workspace on</Pill>
           <span>
             Your connected MCP can use your hosted workspace. Enabling it does not copy answers or approvals
             from your on-device vault. Keep your approval secret private; enter it only when you approve an answer.
           </span>
-        </p>
+          {confirmDisable ? (
+            <span className="flex items-center gap-2">
+              <button type="button" className="rounded-md bg-red-600 px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
+                disabled={busy} onClick={async () => { await disable(); setConfirmDisable(false) }}>Permanently delete hosted workspace</button>
+              <button type="button" className="text-xs underline" onClick={() => setConfirmDisable(false)}>Cancel</button>
+            </span>
+          ) : (
+            <button type="button" className="text-xs text-red-600 underline dark:text-red-400" onClick={() => setConfirmDisable(true)}>
+              Disable and delete hosted data
+            </button>
+          )}
+          {error && <span className="text-red-600 dark:text-red-400">{error}</span>}
+        </div>
       ) : (
         <form className="space-y-3" onSubmit={async (event) => {
           event.preventDefault()
