@@ -445,13 +445,25 @@ test('history_attestation requires effective_at + attestation, and records them'
   assert.equal(missing.res.status, 400)
   assert.equal(missing.json.error, 'bad_attestation')
 
+  const encoded = { data: null }
   const { res, json } = await call(goodBody({
     via: 'history_attestation',
+    record_b64: undefined,
     effective_at: '2026-06-15',
     attestation: 'I attest that I submitted this exact answer wording in a past application.',
-  }), { tables })
+  }), { tables, encodeRecord: async (a) => { encoded.data = a.data; return approvalRecordBytes().toString('utf8') } })
   assert.equal(res.status, 200)
   assert.equal(json.via, 'history_attestation')
   const audit = tables.aqua_workspace_audit.at(-1)
   assert.equal(audit.entry.via, 'history_attestation')
+  // the encoded record carries exactly what historyAttestationComplete requires
+  assert.equal(encoded.data.via, 'history_attestation')
+  assert.equal(encoded.data.effective_at, '2026-06-15')
+  assert.equal(typeof encoded.data.attestation_enc, 'string')
+  assert.ok(encoded.data.attestation_enc.length > 0)
+  assert.equal(encoded.data.decision, 'approved')
+  assert.equal(encoded.data.actor_class, 'human')
+  assert.equal(encoded.data.version_sha256, VERSION_SHA)
+  // a distinct rid/path — it can coexist with any prior normal approval
+  assert.equal(tables.aqua_workspace_records.at(-1).rid, `approval:${VERSION_ID}:attestation`)
 })

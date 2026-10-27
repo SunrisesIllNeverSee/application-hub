@@ -264,3 +264,17 @@ test("'hosted_review' stays a server-side via — the local writer still refuses
   )
   assert.equal((await listApprovals(storage)).length, 0, 'nothing was written')
 })
+
+test('latest-wins ticket: an out-of-order earlier response is superseded', async () => {
+  const { createTicketCounter } = await import('../lib/aqua-hosted.ts')
+  const seq = createTicketCounter()
+  // simulate two overlapping reloads: first is slower, resolves last
+  const first = seq.take()
+  const second = seq.take()
+  assert.equal(seq.isCurrent(first), false, 'the earlier reload is superseded')
+  assert.equal(seq.isCurrent(second), true, 'the newer reload owns the state')
+  // a third reload supersedes the second
+  const third = seq.take()
+  assert.equal(seq.isCurrent(second), false)
+  assert.equal(seq.isCurrent(third), true)
+})

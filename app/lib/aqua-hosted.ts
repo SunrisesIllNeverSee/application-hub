@@ -253,3 +253,13 @@ export async function findHostedWorkspace(client?: SupabaseLike): Promise<Hosted
   }
   return data && data.length ? (data[0] as HostedWorkspaceRow) : null
 }
+
+/**
+ * Latest-wins sequence ticket. Each reload takes a ticket; only the newest
+ * ticket commits state — a slower earlier response can never overwrite a
+ * newer reload's data, error, or loading flag.
+ */
+export function createTicketCounter(): { take: () => number; isCurrent: (t: number) => boolean } {
+  let seq = 0
+  return { take: () => ++seq, isCurrent: (t: number) => t === seq }
+}

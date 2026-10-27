@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import {
-  canApproveHostedCard, getAccessToken, hostedApprove, HostedApiError, readHostedReview, hostedReviewErrorMessage,
-  type HostedReviewCard, type HostedReviewData,
+  canApproveHostedCard, createTicketCounter, getAccessToken, hostedApprove, HostedApiError, readHostedReview,
+  hostedReviewErrorMessage, type HostedReviewCard, type HostedReviewData,
 } from '@/lib/aqua-hosted'
 import { INPUT_CLASS, Notice, Pill } from './ui'
 
@@ -11,20 +11,28 @@ export function HostedReviewBoard() {
   const [data, setData] = useState<HostedReviewData | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  // latest-wins guard: a slower earlier reload must never overwrite a newer one
+  const seq = useRef(createTicketCounter()).current
   const reload = useCallback(async () => {
+    const ticket = seq.take()
     setLoading(true)
     setError('')
     try {
       const token = await getAccessToken()
       if (!token) throw new HostedApiError(0, 'not_signed_in')
-      setData(await readHostedReview(token))
+      const next = await readHostedReview(token)
+      if (!seq.isCurrent(ticket)) return // a newer reload owns the state
+      setData(next)
     } catch (error) {
+      if (!seq.isCurrent(ticket)) return
       // Hide a previous snapshot after a failed refresh rather than showing
       // stale answer/approval state as if it were current.
       setData(null)
       setError(hostedReviewErrorMessage(error))
-    } finally { setLoading(false) }
-  }, [])
+    } finally {
+      if (seq.isCurrent(ticket)) setLoading(false)
+    }
+  }, [seq])
   useEffect(() => { void reload() }, [reload])
 
   return <section className="mt-4 space-y-4" aria-label="Hosted answer review" data-testid="hosted-review-board">
