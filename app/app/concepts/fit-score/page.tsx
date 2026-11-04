@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { BREADCRUMBS, definedTerm } from '@/lib/jsonld'
-import { pageArticle } from '@/lib/jsonld'
+import { BREADCRUMBS, definedTerm, pageArticle } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'Opportunity Fit Score — AQUA Application Hub',

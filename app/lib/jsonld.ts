@@ -131,13 +131,8 @@ export function pageArticle(
     url: `${SITE_ORIGIN}${path}`,
     mainEntityOfPage: `${SITE_ORIGIN}${path}`,
     inLanguage: 'en',
-    author: { '@type': 'Organization', name: 'AQUA Application Hub', url: SITE_ORIGIN },
-    publisher: {
-      '@type': 'Organization',
-      '@id': ORG_ID,
-      name: 'Ello Cello LLC',
-      url: SITE_ORIGIN,
-    },
+    author: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
     isPartOf: { '@id': SITE_ID },
   }
 }

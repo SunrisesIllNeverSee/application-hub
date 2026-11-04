@@ -55,10 +55,10 @@ claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keycha
 - **human_only** (5): Never acts. Returns requires_human with the steps the user takes in the AQUA browser app (approve, sign, freeze/export, submit, attest).
 
 ### 5. Submitted history
-The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside `inbox/`, for example `inbox/history/`. `import_history { folder: "history" }` (or `aqua-companion import-history <folder>`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a `parse_confidence` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After `aqua-companion export-backup` and Restore in the browser, the user confirms them on the History page of the AQUA browser app. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
+The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside `inbox/`, for example `inbox/history/`. `import_history { folder: "history" }` (or `aqua-companion import-history <folder>`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a `parse_confidence` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After `aqua-companion export-backup` and Restore in the browser, the user confirms them at https://aquaidp.xyz/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
 
 ### 6. The human approves in the browser
-Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from the AQUA Local page of the browser app after Restore. The approval round trip:
+Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from https://aquaidp.xyz/aqua-local after Restore. The approval round trip:
 1. The user runs `aqua-companion export-backup <file> --workspace <folder>/AQUA` (the same rule: leave out `--workspace` only when running inside the workspace folder).
 2. In the browser: AQUA Local, Restore backup, review and approve.
 3. The user exports a browser backup and puts it in the workspace `inbox/`.
@@ -131,11 +131,11 @@ https://aquaidp.xyz/mcp: live (public catalog tools for everyone; personal works
 ## The fresh-agent journey
 1. **Install**: npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes https://aquaidp.xyz/companion/aqua-companion-0.2.5.tgz --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)
 2. **Set up a workspace**: init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`, which creates <folder>/AQUA; then restart the MCP server with --workspace <folder>/AQUA. The passphrase is typed by the user, never sent through the model
-3. **Load submitted history**: the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: "history" } stages them; the user exports a backup and confirms them on the History page of the AQUA browser app
+3. **Load submitted history**: the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: "history" } stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history
 4. **Ingest the application**: import_local_application (a file in inbox/) or get_application_details for a catalog program
 5. **Match and reuse**: match_canonical_questions, search_answer_bank, read_review_status (Direct / Adapt / Gap)
 6. **Draft**: create_draft_version stages unapproved drafts; request_evidence / attach_evidence
-7. **Human review and approval**: the user runs export-backup <file> --workspace <folder>/AQUA, restores it in the AQUA Local page of the browser app and approves each answer on the browser review board
+7. **Human review and approval**: the user runs export-backup <file> --workspace <folder>/AQUA, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board
 8. **Return approvals to the agent**: the user exports a browser backup into inbox/; sync_from_vault_export imports it; read_review_status shows approved with the hash preserved
 9. **Packet**: prepare_packet (readiness), the user freezes/exports in the browser, verify_packet checks the export. Nothing is ever submitted by the agent.
 
@@ -175,6 +175,7 @@ The Contribution Exchange is not part of AQUA. It lives at https://signalaf.com/
 - [Comparison: AQUA vs FounderApp](https://aquaidp.xyz/vs/founderapp)
 - [Comparison: AQUA vs manual tracking](https://aquaidp.xyz/vs/manual-application-tracking)
 - [Comparison: AQUA vs spreadsheets](https://aquaidp.xyz/vs/spreadsheets-for-applications)
+- [Sign in (humans)](https://aquaidp.xyz/login)
 - [Sitemap](https://aquaidp.xyz/sitemap.xml)
 
 ## Canonical identity

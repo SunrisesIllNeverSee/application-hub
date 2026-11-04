@@ -273,7 +273,7 @@ test('5 concept pages exist with DefinedTerm + BreadcrumbList JSON-LD', async ()
   ]
   for (const c of concepts) {
     const source = await read(c.path)
-    assert.match(source, /import \{ BREADCRUMBS, definedTerm \} from '@\/lib\/jsonld'/, `${c.path} should import BREADCRUMBS + definedTerm`)
+    assert.match(source, /import \{ BREADCRUMBS, definedTerm(?:, pageArticle)? \} from '@\/lib\/jsonld'/, `${c.path} should import BREADCRUMBS + definedTerm`)
     assert.match(source, new RegExp(`BREADCRUMBS\\.${c.crumb}`), `${c.path} should use BREADCRUMBS.${c.crumb}`)
     assert.match(source, /definedTerm\(/, `${c.path} should call definedTerm()`)
     assert.match(source, /application\/ld\+json/, `${c.path} should render JSON-LD script tags`)
@@ -289,7 +289,7 @@ test('3 guide pages exist with HowTo + BreadcrumbList JSON-LD', async () => {
   ]
   for (const g of guides) {
     const source = await read(g.path)
-    assert.match(source, /import \{ BREADCRUMBS, howTo \} from '@\/lib\/jsonld'/, `${g.path} should import BREADCRUMBS + howTo`)
+    assert.match(source, /import \{ BREADCRUMBS, howTo(?:, pageArticle)? \} from '@\/lib\/jsonld'/, `${g.path} should import BREADCRUMBS + howTo`)
     assert.match(source, new RegExp(`BREADCRUMBS\\.${g.crumb}`), `${g.path} should use BREADCRUMBS.${g.crumb}`)
     assert.match(source, /howTo\(/, `${g.path} should call howTo()`)
     assert.match(source, /application\/ld\+json/, `${g.path} should render JSON-LD script tags`)

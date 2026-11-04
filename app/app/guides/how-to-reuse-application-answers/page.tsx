@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { BREADCRUMBS, howTo } from '@/lib/jsonld'
-import { pageArticle } from '@/lib/jsonld'
+import { BREADCRUMBS, howTo, pageArticle } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'How to reuse application answers — AQUA Application Hub',
