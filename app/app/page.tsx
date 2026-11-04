@@ -136,18 +136,21 @@ export default async function RootPage() {
       <main>
         <section className="mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-16 sm:px-6 lg:grid-cols-[1fr_520px] lg:pb-24 lg:pt-24">
           <div className="flex flex-col justify-center">
-            <h1 className="text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">
+            <p className="text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">
               APPLICATIONS.
               <br />
               QUESTIONS.
               <br />
               ANSWERS.
-            </h1>
+            </p>
             <p className="mt-5 bg-gradient-to-r from-brand-300 via-cyan-200 to-emerald-200 bg-clip-text text-7xl font-bold leading-none tracking-tight text-transparent md:text-8xl">
               AQUA
             </p>
-            <p className="mt-7 max-w-xl text-xl leading-8 text-neutral-300">
-              Reuse application answers across accelerators, grants, fellowships, and jobs. One answer bank for every application you&apos;ll ever write.
+            <h1 className="mt-7 max-w-xl text-xl font-normal leading-8 text-neutral-300">
+              AQUA Application Hub: reuse application answers across accelerators, grants, fellowships, and jobs.
+            </h1>
+            <p className="mt-2 max-w-xl text-xl leading-8 text-neutral-300">
+              One answer bank for every application you&apos;ll ever write.
             </p>
             <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-400">
               Your private answers live in an encrypted vault on this device — never on our servers.

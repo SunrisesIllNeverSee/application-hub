@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BREADCRUMBS, howTo } from '@/lib/jsonld'
+import { pageArticle } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'How to reuse application answers — AQUA Application Hub',
@@ -51,6 +52,10 @@ export default function HowToReuseApplicationAnswersPage() {
           '/guides/how-to-reuse-application-answers',
           STEPS,
         )).replace(/</g, '\\u003c') }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageArticle('TechArticle', 'How to reuse application answers', metadata.description as string, '/guides/how-to-reuse-application-answers')).replace(/</g, '\\u003c') }}
       />
       <nav className="sticky top-0 z-30 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80">
         <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-6">

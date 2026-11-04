@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BREADCRUMBS, howTo } from '@/lib/jsonld'
+import { pageArticle } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'How to build an answer bank for applications — AQUA Application Hub',
@@ -51,6 +52,10 @@ export default function HowToBuildAnAnswerBankPage() {
           '/guides/how-to-build-an-answer-bank',
           STEPS,
         )).replace(/</g, '\\u003c') }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageArticle('TechArticle', 'How to build an answer bank for applications', metadata.description as string, '/guides/how-to-build-an-answer-bank')).replace(/</g, '\\u003c') }}
       />
       <nav className="sticky top-0 z-30 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80">
         <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-6">

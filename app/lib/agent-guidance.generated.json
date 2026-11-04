@@ -529,7 +529,7 @@
     },
     {
       "step": "Load submitted history",
-      "how": "the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: \"history\" } stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history"
+      "how": "the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: \"history\" } stages them; the user exports a backup and confirms them on the History page of the AQUA browser app"
     },
     {
       "step": "Ingest the application",
@@ -545,7 +545,7 @@
     },
     {
       "step": "Human review and approval",
-      "how": "the user runs export-backup <file> --workspace <folder>/AQUA, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board"
+      "how": "the user runs export-backup <file> --workspace <folder>/AQUA, restores it in the AQUA Local page of the browser app and approves each answer on the browser review board"
     },
     {
       "step": "Return approvals to the agent",

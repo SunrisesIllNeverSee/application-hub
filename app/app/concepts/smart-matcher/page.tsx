@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BREADCRUMBS, definedTerm } from '@/lib/jsonld'
+import { pageArticle } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'Smart Matcher — AQUA Application Hub',
@@ -27,6 +28,10 @@ export default function SmartMatcherPage() {
             ),
           ).replace(/</g, '\\u003c'),
         }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageArticle('TechArticle', 'What is Smart Matcher for applications?', metadata.description as string, '/concepts/smart-matcher')).replace(/</g, '\\u003c') }}
       />
       <nav className="sticky top-0 z-30 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80">
         <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-6">

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { BREADCRUMBS } from '@/lib/jsonld'
+import { BREADCRUMBS, pageArticle } from '@/lib/jsonld'
 
 export const metadata: Metadata = {
   title: 'About AQUA Application Hub',
@@ -14,6 +14,10 @@ export default function AboutPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMBS.about).replace(/</g, '\\u003c') }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageArticle('Article', 'About AQUA Application Hub', metadata.description as string, '/about')).replace(/</g, '\\u003c') }}
       />
       <nav className="sticky top-0 z-30 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80">
         <div className="mx-auto flex h-14 max-w-4xl items-center gap-3 px-6">

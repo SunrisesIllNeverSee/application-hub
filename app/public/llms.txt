@@ -15,7 +15,7 @@ Do not use AQUA as an admissions oracle, acceptance-probability service, or exte
 ## How agents should use AQUA
 
 ### Web
-Start at https://aquaidp.xyz. Humans sign in at https://aquaidp.xyz/login. Everything private (answers, approvals, packets) is handled by the user in the browser vault, not by an AQUA server API.
+Start at https://aquaidp.xyz. Humans sign in through the site's sign-in page. Everything private (answers, approvals, packets) is handled by the user in the browser vault, not by an AQUA server API.
 
 ### Markdown representation
 Public canonical pages support HTTP content negotiation. Send `Accept: text/markdown`. Markdown responses use `Content-Type: text/markdown; charset=utf-8` and `Vary: Accept`. HTML remains the default for browsers. A `.md` suffix (for example https://aquaidp.xyz/agents.md) is also supported.
@@ -58,10 +58,10 @@ claude mcp add aqua -- npx -y aqua-mcp-server --workspace <folder>/AQUA --keycha
 - **human_only** (5): Never acts. Returns requires_human with the steps the user takes in the AQUA browser app (approve, sign, freeze/export, submit, attest).
 
 ### 5. Submitted history
-The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside `inbox/`, for example `inbox/history/`. `import_history { folder: "history" }` (or `aqua-companion import-history <folder>`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a `parse_confidence` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After `aqua-companion export-backup` and Restore in the browser, the user confirms them at https://aquaidp.xyz/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
+The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside `inbox/`, for example `inbox/history/`. `import_history { folder: "history" }` (or `aqua-companion import-history <folder>`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a `parse_confidence` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After `aqua-companion export-backup` and Restore in the browser, the user confirms them on the History page of the AQUA browser app. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
 
 ### 6. The human approves in the browser
-Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from https://aquaidp.xyz/aqua-local after Restore. The approval round trip:
+Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from the AQUA Local page of the browser app after Restore. The approval round trip:
 1. The user runs `aqua-companion export-backup <file> --workspace <folder>/AQUA` (the same rule: leave out `--workspace` only when running inside the workspace folder).
 2. In the browser: AQUA Local, Restore backup, review and approve.
 3. The user exports a browser backup and puts it in the workspace `inbox/`.
@@ -87,7 +87,7 @@ https://aquaidp.xyz/mcp: live (public catalog tools for everyone; personal works
 Tool list (43 tools): `add_question`, `approve_answer`, `assemble_application`, `attach_evidence`, `attest_submission`, `create_draft_version`, `discover_applications`, `doctor`, `export_packet`, `get_application_details`, `hub_find_similar_questions`, `hub_get_acceptance_stats`, `hub_get_heat_scores`, `hub_get_program_by_slug`, `hub_get_program_detail`, `hub_get_program_questions`, `hub_get_program_rankings`, `hub_get_program_themes`, `hub_get_question_significance`, `hub_get_universal_questions`, `hub_search_programs`, `import_history`, `import_local_application`, `init_workspace`, `inspect_extracted_questions`, `link_answer`, `link_history`, `locate_workspace`, `mark_question`, `match_canonical_questions`, `prepare_catalog_candidate`, `prepare_packet`, `present_review_decisions`, `read_review_status`, `record_observed_submission`, `refresh_catalog`, `request_evidence`, `search_answer_bank`, `sign_packet`, `submit_catalog_candidate`, `sync_from_vault_export`, `update_question`, `verify_packet`. Full table: https://aquaidp.xyz/agents.md
 
 ### REST API
-AQUA's REST API at https://aquaidp.xyz/api is described by the OpenAPI 3.0.3 document at https://aquaidp.xyz/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is https://aquaidp.xyz/developers.
+AQUA's REST API is described by the OpenAPI 3.0.3 document at https://aquaidp.xyz/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is https://aquaidp.xyz/developers.
 
 ## Contribution Exchange
 The Contribution Exchange is not part of AQUA. It lives at https://signalaf.com/exchange.
@@ -119,7 +119,6 @@ The Contribution Exchange is not part of AQUA. It lives at https://signalaf.com/
 - Comparison: AQUA vs FounderApp: https://aquaidp.xyz/vs/founderapp
 - Comparison: AQUA vs manual tracking: https://aquaidp.xyz/vs/manual-application-tracking
 - Comparison: AQUA vs spreadsheets: https://aquaidp.xyz/vs/spreadsheets-for-applications
-- Sign in (humans): https://aquaidp.xyz/login
 - Sitemap: https://aquaidp.xyz/sitemap.xml
 - npm (aqua-mcp-server, 2.0 pending): https://www.npmjs.com/package/aqua-mcp-server
 - Source repository: https://github.com/SunrisesIllNeverSee/application-hub

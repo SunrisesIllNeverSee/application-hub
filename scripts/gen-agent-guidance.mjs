@@ -138,11 +138,11 @@ async function buildData() {
     journey: [
       { step: 'Install', how: `npx -y aqua-mcp-server --help (primary, from npm). Fallback: the companion tarball, npx --yes ${url} --help (check the published sha256 first; for a downloaded copy use npx --yes --package <path>.tgz aqua-companion)` },
       { step: 'Set up a workspace', how: 'init_workspace (the user confirms the folder in the MCP client) or the user runs `aqua-companion init --path <folder>`, which creates <folder>/AQUA; then restart the MCP server with --workspace <folder>/AQUA. The passphrase is typed by the user, never sent through the model' },
-      { step: 'Load submitted history', how: 'the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: "history" } stages them; the user exports a backup and confirms them at https://aquaidp.xyz/history' },
+      { step: 'Load submitted history', how: 'the user copies past submitted applications into a folder inside the workspace inbox/ (for example inbox/history/); import_history { folder: "history" } stages them; the user exports a backup and confirms them on the History page of the AQUA browser app' },
       { step: 'Ingest the application', how: 'import_local_application (a file in inbox/) or get_application_details for a catalog program' },
       { step: 'Match and reuse', how: 'match_canonical_questions, search_answer_bank, read_review_status (Direct / Adapt / Gap)' },
       { step: 'Draft', how: 'create_draft_version stages unapproved drafts; request_evidence / attach_evidence' },
-      { step: 'Human review and approval', how: 'the user runs export-backup <file> --workspace <folder>/AQUA, restores it at https://aquaidp.xyz/aqua-local and approves each answer on the browser review board' },
+      { step: 'Human review and approval', how: 'the user runs export-backup <file> --workspace <folder>/AQUA, restores it in the AQUA Local page of the browser app and approves each answer on the browser review board' },
       { step: 'Return approvals to the agent', how: 'the user exports a browser backup into inbox/; sync_from_vault_export imports it; read_review_status shows approved with the hash preserved' },
       { step: 'Packet', how: 'prepare_packet (readiness), the user freezes/exports in the browser, verify_packet checks the export. Nothing is ever submitted by the agent.' },
     ],
@@ -203,10 +203,10 @@ ${d.install.mcp_claude_code_with_workspace}
 ${tierLines(d)}
 
 ### 5. Submitted history
-The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside \`inbox/\`, for example \`inbox/history/\`. \`import_history { folder: "history" }\` (or \`aqua-companion import-history <folder>\`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a \`parse_confidence\` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After \`aqua-companion export-backup\` and Restore in the browser, the user confirms them at ${ORIGIN}/history. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
+The user copies past submitted applications (md, txt, docx, html, json, csv) into a folder inside \`inbox/\`, for example \`inbox/history/\`. \`import_history { folder: "history" }\` (or \`aqua-companion import-history <folder>\`) stages each answer with the exact question wording, program, source file hash and submission date. Unknown dates are flagged, never guessed. Each answer carries a \`parse_confidence\` (high, medium, low); ask the user to check low-confidence records, which the browser also holds back until the user marks them as reviewed. After \`aqua-companion export-backup\` and Restore in the browser, the user confirms them on the History page of the AQUA browser app. Confirmed answers count as approved as of their submission date. Answers with unfilled placeholders ([CONFIRM], [ASSET NEEDED], TODO, TBD, XXX, <…>, {{…}}) can never be confirmed; the vault refuses them.
 
 ### 6. The human approves in the browser
-Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from ${ORIGIN}/aqua-local after Restore. The approval round trip:
+Drafts the agent stages are unapproved. Approval binds the exact version hash and happens only in the AQUA browser review board, opened from the AQUA Local page of the browser app after Restore. The approval round trip:
 1. The user runs \`aqua-companion export-backup <file> --workspace <folder>/AQUA\` (the same rule: leave out \`--workspace\` only when running inside the workspace folder).
 2. In the browser: AQUA Local, Restore backup, review and approve.
 3. The user exports a browser backup and puts it in the workspace \`inbox/\`.
@@ -258,7 +258,6 @@ const PUBLIC_PAGES = [
   ['Comparison: AQUA vs FounderApp', '/vs/founderapp'],
   ['Comparison: AQUA vs manual tracking', '/vs/manual-application-tracking'],
   ['Comparison: AQUA vs spreadsheets', '/vs/spreadsheets-for-applications'],
-  ['Sign in (humans)', '/login'],
   ['Sitemap', '/sitemap.xml'],
 ]
 
@@ -298,14 +297,14 @@ ${WHEN}
 ## How agents should use AQUA
 
 ### Web
-Start at ${ORIGIN}. Humans sign in at ${ORIGIN}/login. Everything private (answers, approvals, packets) is handled by the user in the browser vault, not by an AQUA server API.
+Start at ${ORIGIN}. Humans sign in through the site's sign-in page. Everything private (answers, approvals, packets) is handled by the user in the browser vault, not by an AQUA server API.
 
 ### Markdown representation
 Public canonical pages support HTTP content negotiation. Send \`Accept: text/markdown\`. Markdown responses use \`Content-Type: text/markdown; charset=utf-8\` and \`Vary: Accept\`. HTML remains the default for browsers. A \`.md\` suffix (for example ${ORIGIN}/agents.md) is also supported.
 
 ${agentPathSection(d)}
 ### REST API
-AQUA's REST API at ${ORIGIN}/api is described by the OpenAPI 3.0.3 document at ${ORIGIN}/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is ${ORIGIN}/developers.
+AQUA's REST API is described by the OpenAPI 3.0.3 document at ${ORIGIN}/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is ${ORIGIN}/developers.
 
 ${EXCHANGE}
 
