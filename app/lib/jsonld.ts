@@ -112,6 +112,31 @@ export function comparisonArticle(headline: string, description: string, path: s
   }
 }
 
+/**
+ * Article / TechArticle for concept, guide and about pages. Headline is the
+ * page's visible H1 and description is the page's meta description, so the
+ * markup matches what the page shows.
+ */
+export function pageArticle(
+  type: 'Article' | 'TechArticle',
+  headline: string,
+  description: string,
+  path: string,
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': type,
+    headline,
+    description,
+    url: `${SITE_ORIGIN}${path}`,
+    mainEntityOfPage: `${SITE_ORIGIN}${path}`,
+    inLanguage: 'en',
+    author: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': SITE_ID },
+  }
+}
+
 /** Common breadcrumb trails for AQUA pages. */
 export const BREADCRUMBS = {
   about: breadcrumbList([
@@ -178,6 +203,10 @@ export const BREADCRUMBS = {
     { name: 'Smart Matcher', path: '/concepts/smart-matcher' },
   ]),
   // Guide pages
+  guidesIndex: breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Guides', path: '/guides' },
+  ]),
   guideReuseAnswers: breadcrumbList([
     { name: 'Home', path: '/' },
     { name: 'Guides', path: '/guides' },

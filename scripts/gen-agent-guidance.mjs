@@ -305,7 +305,7 @@ Public canonical pages support HTTP content negotiation. Send \`Accept: text/mar
 
 ${agentPathSection(d)}
 ### REST API
-AQUA's REST API at ${ORIGIN}/api is described by the OpenAPI 3.0.3 document at ${ORIGIN}/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is ${ORIGIN}/developers.
+AQUA's REST API is described by the OpenAPI 3.0.3 document at ${ORIGIN}/openapi.json. Under local-first, hosted private-answer routes refuse requests (HTTP 403); agents work through the companion instead. The developer portal is ${ORIGIN}/developers.
 
 ${EXCHANGE}
 
