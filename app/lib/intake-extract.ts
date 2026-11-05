@@ -10,6 +10,7 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
+import { createPlatformAnthropic } from '@/lib/posthog/server'
 import { embedAndStoreQuestion, type ByokIntegration } from '@/lib/embed'
 import { normalizeQuestion } from '@/lib/catalog/normalize'
 import { matchOccurrence, type CatalogQuestion, type MatchResult, type MatchTier } from '@/lib/catalog/match'
@@ -36,7 +37,8 @@ type SupabaseLike = { from: (t: string) => any }
 
 export async function resolveAnthropicClient(
   supabase: SupabaseLike,
-  userId: string
+  userId: string,
+  route = 'intake-extract'
 ): Promise<Anthropic | null> {
   const { data: integrations } = await supabase
     .from('user_integrations')
@@ -56,7 +58,8 @@ export async function resolveAnthropicClient(
   }
 
   const platformKey = process.env.ANTHROPIC_API_KEY
-  return platformKey ? new Anthropic({ apiKey: platformKey }) : null
+  // AQUA's own key: LLM analytics (privacy mode, no content). BYOK above is never instrumented.
+  return platformKey ? createPlatformAnthropic(platformKey, route) : null
 }
 
 // ─── Groq (Llama) extraction fallback ───────────────────────────────────────

@@ -5,6 +5,7 @@ import { decryptKey } from '@/lib/encryption'
 import { resolveKind, buildDraftPrompt } from '@/lib/draft-prompts'
 import type { OpportunityKind } from '@/lib/draft-prompts'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
+import { createPlatformAnthropic } from '@/lib/posthog/server'
 
 function isProhibitedHost(hostname: string): boolean {
   const h = hostname.toLowerCase().replace(/^\[|\]$/g, '')
@@ -114,7 +115,11 @@ export async function POST(req: NextRequest) {
 
     // Init Anthropic client only if needed
     const anthropic = resolvedProvider === 'anthropic'
-      ? new Anthropic({ apiKey: resolvedApiKey! })
+      ? (integrationProvider === PLATFORM_PROVIDER
+          // AQUA's own key: LLM analytics (privacy mode, no content). A user's
+          // own (BYOK) key is never instrumented.
+          ? createPlatformAnthropic(resolvedApiKey!, '/api/draft')
+          : new Anthropic({ apiKey: resolvedApiKey! }))
       : null
     void integrationProvider // used in ai_draft_runs insert below
 

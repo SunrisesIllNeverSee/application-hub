@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         : 'other'
 
     // ── 1. Extract questions ────────────────────────────────────────────────
-    const anthropic = await resolveAnthropicClient(supabase, user.id)
+    const anthropic = await resolveAnthropicClient(supabase, user.id, '/api/applications/intake')
     let questions: ExtractedQuestion[] = []
     let extraction: 'ai' | 'regex' = 'regex'
     let extractionError: string | null = null
