@@ -38,7 +38,7 @@ type SupabaseLike = { from: (t: string) => any }
 export async function resolveAnthropicClient(
   supabase: SupabaseLike,
   userId: string,
-  route = 'intake-extract'
+  route: string
 ): Promise<Anthropic | null> {
   const { data: integrations } = await supabase
     .from('user_integrations')
