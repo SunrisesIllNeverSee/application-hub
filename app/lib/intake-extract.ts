@@ -10,7 +10,7 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
-import { createPlatformAnthropic } from '@/lib/posthog/server'
+import { createTrackedAnthropic } from '@/lib/posthog/server'
 import { embedAndStoreQuestion, type ByokIntegration } from '@/lib/embed'
 import { normalizeQuestion } from '@/lib/catalog/normalize'
 import { matchOccurrence, type CatalogQuestion, type MatchResult, type MatchTier } from '@/lib/catalog/match'
@@ -51,15 +51,15 @@ export async function resolveAnthropicClient(
   if (integrations?.[0]?.key_encrypted && integrations[0]?.key_storage_ref) {
     try {
       const apiKey = decryptKey(integrations[0].key_encrypted, integrations[0].key_storage_ref)
-      if (apiKey) return new Anthropic({ apiKey })
+      // LLM analytics (privacy mode, no content, no key, user id hashed).
+      if (apiKey) return createTrackedAnthropic(apiKey, route, { keySource: 'byok', userId })
     } catch {
       // fall through to platform key
     }
   }
 
   const platformKey = process.env.ANTHROPIC_API_KEY
-  // AQUA's own key: LLM analytics (privacy mode, no content). BYOK above is never instrumented.
-  return platformKey ? createPlatformAnthropic(platformKey, route) : null
+  return platformKey ? createTrackedAnthropic(platformKey, route, { keySource: 'platform', userId }) : null
 }
 
 // ─── Groq (Llama) extraction fallback ───────────────────────────────────────

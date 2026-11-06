@@ -5,7 +5,7 @@ import { decryptKey } from '@/lib/encryption'
 import { resolveKind, buildDraftPrompt } from '@/lib/draft-prompts'
 import type { OpportunityKind } from '@/lib/draft-prompts'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
-import { createPlatformAnthropic } from '@/lib/posthog/server'
+import { captureChatGeneration, createTrackedAnthropic } from '@/lib/posthog/server'
 
 function isProhibitedHost(hostname: string): boolean {
   const h = hostname.toLowerCase().replace(/^\[|\]$/g, '')
@@ -113,13 +113,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Init Anthropic client only if needed
+    // LLM analytics for both AQUA's key and the user's own key: privacy mode,
+    // no prompt or draft text, no key, user id hashed (lib/posthog/server.ts).
+    const keySource = integrationProvider === PLATFORM_PROVIDER ? 'platform' : 'byok'
     const anthropic = resolvedProvider === 'anthropic'
-      ? (integrationProvider === PLATFORM_PROVIDER
-          // AQUA's own key: LLM analytics (privacy mode, no content). A user's
-          // own (BYOK) key is never instrumented.
-          ? createPlatformAnthropic(resolvedApiKey!, '/api/draft')
-          : new Anthropic({ apiKey: resolvedApiKey! }))
+      ? createTrackedAnthropic(resolvedApiKey!, '/api/draft', { keySource, userId: user.id })
       : null
     void integrationProvider // used in ai_draft_runs insert below
 
@@ -311,6 +309,14 @@ export async function POST(req: NextRequest) {
       // This is the failure mode when a user types localhost as the Ollama URL
       // and then tries to draft from the production site — Vercel's serverless
       // function has no path back to their laptop.
+      const startedAt = Date.now()
+      const track = (fields: { httpStatus?: number; errorClass?: string; inputTokens?: number | null; outputTokens?: number | null }) =>
+        captureChatGeneration({
+          route: '/api/draft', keySource, userId: user.id,
+          provider: resolvedProvider!, model,
+          latencyMs: Date.now() - startedAt,
+          ...fields,
+        })
       let resp: Response
       try {
         resp = await fetch(`${baseUrl}/chat/completions`, {
@@ -332,6 +338,7 @@ export async function POST(req: NextRequest) {
           }),
         })
       } catch (err) {
+        track({ errorClass: 'NetworkError' })
         const msg = err instanceof Error ? err.message : 'Network error'
         const isLocal = /localhost|127\.0\.0\.1|0\.0\.0\.0|::1/i.test(baseUrl)
         const hint = resolvedProvider === 'ollama' && isLocal
@@ -342,6 +349,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: hint, code: 'provider_unreachable' }, { status: 502 })
       }
       if (!resp.ok) {
+        track({ httpStatus: resp.status, errorClass: 'ProviderHttpError' })
         const err = await resp.text()
         return NextResponse.json({ error: `Provider error: ${err}` }, { status: 502 })
       }
@@ -352,6 +360,12 @@ export async function POST(req: NextRequest) {
       draft = json.choices?.[0]?.message?.content?.trim() ?? ''
       promptTokens = json.usage?.prompt_tokens ?? null
       completionTokens = json.usage?.completion_tokens ?? null
+      track({
+        httpStatus: resp.status,
+        inputTokens: promptTokens,
+        outputTokens: completionTokens,
+        ...(draft ? {} : { errorClass: 'EmptyResponseError' }),
+      })
 
     } else {
       return NextResponse.json({ error: 'Unsupported AI provider' }, { status: 400 })

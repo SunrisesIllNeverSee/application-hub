@@ -1,4 +1,6 @@
-// Server-only PostHog LLM analytics for AQUA's OWN Anthropic key.
+// Server-only PostHog LLM analytics for AI drafting and extraction calls, made
+// with either AQUA's own Anthropic key ("platform") or a user's own key
+// ("byok": Anthropic, OpenAI, or an OpenAI-compatible endpoint such as Ollama).
 //
 // Privacy contract (users paste application and personal data into AQUA):
 //   - privacy mode is ON at the PostHog client level (per-call settings can only
@@ -6,17 +8,23 @@
 //   - a `before_send` hook is a backstop: it strips every content-bearing `$ai_*`
 //     field and reduces `$ai_error` to an error class name (Anthropic 4xx
 //     messages can echo request fragments);
-//   - events are anonymous (no distinct id => `$process_person_profile: false`);
-//   - the only custom property is the route name.
-// Captured: model, provider, tokens, latency, cost, HTTP status, error class, route.
+//   - no person profiles (`$process_person_profile: false`); when a route passes a
+//     user, the distinct id is a one-way hash of the AQUA user id (never email);
+//   - custom properties: the route name and the key source (`platform` | `byok`);
+//   - a user's key, base URL (an Ollama tunnel can be private) and prompts never
+//     leave the server.
+// Captured: model, provider, tokens, latency, cost, HTTP status, error class,
+// route, key source.
 //
 // No-op when NEXT_PUBLIC_POSTHOG_KEY is unset: callers get a plain Anthropic client.
 // Analytics must never block or fail a user request: the flush runs after the
 // response via `after()`, and every analytics step is guarded.
 //
-// Do NOT use this for a user's own (BYOK) key or anything that runs in the browser.
+// Never use this for anything that runs in the browser.
 
+import { createHash, randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
+import { captureAiGeneration } from '@posthog/ai'
 import { PostHogAnthropic } from '@posthog/ai/anthropic'
 import { PostHog, type EventMessage } from 'posthog-node'
 // `next/server.js` (not `next/server`): the plain-node test runner cannot resolve
@@ -72,16 +80,36 @@ function flushAfterResponse(ph: PostHog, after: AfterFn): void {
   }
 }
 
+/** Where the model key came from. */
+export type KeySource = 'platform' | 'byok'
+
+/** Analytics identity for a user: a one-way hash of the AQUA user id, never the id or email. */
+export function analyticsUserId(userId: string | null | undefined): string | undefined {
+  if (!userId) return undefined
+  return 'aqua_' + createHash('sha256').update('aqua-analytics:' + userId).digest('hex').slice(0, 32)
+}
+
+type Scope = { route: string; keySource: KeySource; distinctId?: string }
+
+function scopeProperties(scope: Scope): Record<string, unknown> {
+  return { route: scope.route, ai_key_source: scope.keySource, $process_person_profile: false }
+}
+
 /**
- * The PostHog client as seen by one route: adds the `route` property and
- * registers a flush AFTER each capture is queued (so the flush covers it).
+ * The PostHog client as seen by one route: adds the route and key-source
+ * properties, the hashed user id when known, and registers a flush AFTER each
+ * capture is queued (so the flush covers it).
  */
-function routeScoped(ph: PostHog, route: string, after: AfterFn): PostHog {
+function routeScoped(ph: PostHog, scope: Scope, after: AfterFn): PostHog {
   return new Proxy(ph, {
     get(target, prop) {
       if (prop === 'capture') {
         return (msg: EventMessage) => {
-          target.capture({ ...msg, properties: { ...(msg.properties ?? {}), route } })
+          target.capture({
+            ...msg,
+            ...(scope.distinctId ? { distinctId: scope.distinctId } : {}),
+            properties: { ...(msg.properties ?? {}), ...scopeProperties(scope) },
+          })
           flushAfterResponse(target, after)
         }
       }
@@ -120,7 +148,7 @@ export function getPostHogServer(): PostHog | null {
   return cached
 }
 
-export type PlatformAnthropicDeps = {
+export type TrackedLlmDeps = {
   /** Test seam: replaces the shared PostHog client. */
   posthog?: PostHog | null
   /** Test seam: replaces next/server `after`. */
@@ -128,24 +156,115 @@ export type PlatformAnthropicDeps = {
   /** Anthropic transport (tests); defaults to global fetch. */
   fetch?: typeof fetch
 }
+/** @deprecated name kept for existing callers. */
+export type PlatformAnthropicDeps = TrackedLlmDeps
+
+export type TrackOptions = {
+  /** Which key paid for the call. */
+  keySource: KeySource
+  /** The AQUA user id; hashed before it reaches PostHog. */
+  userId?: string | null
+}
 
 /**
- * An Anthropic client for AQUA's platform key. With PostHog configured it is the
- * official `@posthog/ai` Anthropic class (a real Anthropic subclass: streaming,
- * withResponse etc. unchanged), reporting privacy-mode `$ai_generation` events
- * tagged with `route`. Without PostHog it is a plain `new Anthropic({ apiKey })`.
+ * An Anthropic client. With PostHog configured it is the official `@posthog/ai`
+ * Anthropic class (a real Anthropic subclass: streaming, withResponse etc.
+ * unchanged), reporting privacy-mode `$ai_generation` events tagged with the
+ * route and key source. Without PostHog it is a plain `new Anthropic({ apiKey })`.
+ * The API key goes to Anthropic only; it is never part of an event.
  */
-export function createPlatformAnthropic(
+export function createTrackedAnthropic(
   apiKey: string,
   route: string,
-  deps: PlatformAnthropicDeps = {},
+  opts: TrackOptions,
+  deps: TrackedLlmDeps = {},
 ): Anthropic {
   const base = { apiKey, ...(deps.fetch ? { fetch: deps.fetch } : {}) }
   const ph = deps.posthog !== undefined ? deps.posthog : getPostHogServer()
   if (!ph) return new Anthropic(base)
   try {
-    return new PostHogAnthropic({ ...base, posthog: routeScoped(ph, route, deps.after ?? nextAfter) })
+    const scope: Scope = { route, keySource: opts.keySource, distinctId: analyticsUserId(opts.userId) }
+    return new PostHogAnthropic({ ...base, posthog: routeScoped(ph, scope, deps.after ?? nextAfter) })
   } catch {
     return new Anthropic(base)
+  }
+}
+
+/** AQUA's own key. Same as `createTrackedAnthropic(apiKey, route, { keySource: 'platform' })`. */
+export function createPlatformAnthropic(
+  apiKey: string,
+  route: string,
+  deps: TrackedLlmDeps = {},
+): Anthropic {
+  return createTrackedAnthropic(apiKey, route, { keySource: 'platform' }, deps)
+}
+
+export type ChatGeneration = TrackOptions & {
+  route: string
+  /** 'openai' or 'ollama' (any OpenAI-compatible endpoint). */
+  provider: string
+  model: string
+  /** Wall-clock milliseconds for the provider call. */
+  latencyMs: number
+  inputTokens?: number | null
+  outputTokens?: number | null
+  httpStatus?: number
+  /**
+   * A short error class such as 'ProviderHttpError' or 'NetworkError'. Never a
+   * provider message: those can echo the prompt.
+   */
+  errorClass?: string
+}
+
+/** An Error carrying only a class name (no message text). */
+function namedError(name: string): Error {
+  const e = new Error(name)
+  e.name = name
+  return e
+}
+
+/**
+ * Record one OpenAI-compatible chat call (user's OpenAI key or Ollama endpoint)
+ * as a privacy-mode `$ai_generation`. No prompt, completion, key or base URL is
+ * sent. Fire-and-forget: it never throws and never delays the response.
+ */
+export function captureChatGeneration(gen: ChatGeneration, deps: TrackedLlmDeps = {}): void {
+  try {
+    const ph = deps.posthog !== undefined ? deps.posthog : getPostHogServer()
+    if (!ph) return
+    const scope: Scope = { route: gen.route, keySource: gen.keySource, distinctId: analyticsUserId(gen.userId) }
+    const traceId = randomUUID()
+    const captured = captureAiGeneration(ph, {
+      distinctId: scope.distinctId,
+      traceId,
+      provider: gen.provider,
+      model: gen.model,
+      input: null,
+      output: null,
+      privacyMode: true,
+      baseURL: null,
+      httpStatus: gen.httpStatus,
+      latency: Math.max(0, gen.latencyMs) / 1000,
+      usage: { inputTokens: gen.inputTokens ?? 0, outputTokens: gen.outputTokens ?? 0 },
+      properties: scopeProperties(scope),
+      ...(gen.errorClass ? { error: namedError(gen.errorClass) } : {}),
+      onError: () => {},
+    }).catch(() => {})
+    // Flush once the event is queued, after the response has gone out.
+    const after = deps.after ?? nextAfter
+    try {
+      after(async () => {
+        try {
+          await captured
+          await ph.flush()
+        } catch {
+          // analytics must never surface an error
+        }
+      })
+    } catch {
+      // after() throws outside a request scope; the event still sends (flushAt: 1)
+    }
+  } catch {
+    // analytics must never surface an error
   }
 }

@@ -6,7 +6,7 @@ import { PostHog } from 'posthog-node'
 import { gunzipSync } from 'node:zlib'
 
 delete process.env.NEXT_PUBLIC_POSTHOG_KEY
-const { getPostHogServer, createPlatformAnthropic, sanitizeAiEvent } = await import('../lib/posthog/server.ts')
+const { getPostHogServer, createPlatformAnthropic, createTrackedAnthropic, captureChatGeneration, analyticsUserId, sanitizeAiEvent } = await import('../lib/posthog/server.ts')
 
 const SECRET = 'SSN 123-45-6789 jane@example.com'
 const ANTHROPIC_OK = {
@@ -84,4 +84,82 @@ test('a throwing after() or flush does not break the request', async () => {
   const c2 = createPlatformAnthropic('k', '/r', { posthog: ph, after: (t) => tasks.push(t), fetch: async () => json(200, ANTHROPIC_OK) })
   assert.equal((await c2.messages.create(body)).id, 'msg_1')
   for (const t of tasks) await assert.doesNotReject(t())
+})
+
+// ── BYOK (user's own key) ────────────────────────────────────────────────────
+
+function phHarness() {
+  const sent = []
+  const phFetch = async (_url, opts) => {
+    sent.push(...JSON.parse(typeof opts.body === 'string' ? opts.body : gunzipSync(opts.body).toString()).batch ?? [])
+    return { status: 200, text: async () => '{}', json: async () => ({}) }
+  }
+  const ph = new PostHog('phc_test', { host: 'http://ph.invalid', flushAt: 1, flushInterval: 0, privacyMode: true, before_send: sanitizeAiEvent, fetch: phFetch })
+  const afterTasks = []
+  return { ph, sent, afterTasks, after: (t) => { afterTasks.push(t) } }
+}
+const drainPh = async (h) => { for (const t of h.afterTasks) await t(); await h.ph.flush() }
+const USER_ID = '6f1c2a9e-0000-4000-8000-00000000abcd'
+const BYOK_KEY = 'sk-ant-USER-OWN-KEY-do-not-leak'
+
+test('analyticsUserId is a stable one-way hash, never the raw id', () => {
+  const a = analyticsUserId(USER_ID)
+  assert.equal(a, analyticsUserId(USER_ID))
+  assert.match(a, /^aqua_[0-9a-f]{32}$/)
+  assert.equal(a.includes(USER_ID), false)
+  assert.equal(analyticsUserId(null), undefined)
+})
+
+test('BYOK Anthropic: event tagged byok with the hashed user, no content and no key', async () => {
+  const h = phHarness()
+  const client = createTrackedAnthropic(BYOK_KEY, '/api/draft', { keySource: 'byok', userId: USER_ID }, { posthog: h.ph, after: h.after, fetch: async () => json(200, ANTHROPIC_OK) })
+  const res = await client.messages.create(body)
+  assert.equal(res.content[0].text, 'COMPLETION ' + SECRET)
+  await drainPh(h)
+  const ev = h.sent.find((e) => e.event === '$ai_generation')
+  assert.ok(ev)
+  assert.equal(ev.properties.ai_key_source, 'byok')
+  assert.equal(ev.properties.route, '/api/draft')
+  assert.equal(ev.distinct_id, analyticsUserId(USER_ID))
+  assert.equal(ev.properties.$process_person_profile, false)
+  assert.equal(ev.properties.$ai_input_tokens, 11)
+  const all = JSON.stringify(h.sent)
+  for (const leak of [BYOK_KEY, USER_ID, '123-45-6789', 'jane@example.com']) assert.equal(all.includes(leak), false, leak)
+})
+
+test('platform helper still tags platform', async () => {
+  const h = phHarness()
+  const client = createPlatformAnthropic('sk-ant-test', '/api/test', { posthog: h.ph, after: h.after, fetch: async () => json(200, ANTHROPIC_OK) })
+  await client.messages.create(body)
+  await drainPh(h)
+  assert.equal(h.sent.find((e) => e.event === '$ai_generation').properties.ai_key_source, 'platform')
+})
+
+test('OpenAI-compatible (Ollama/OpenAI) call: model, tokens, latency, no base URL', async () => {
+  const h = phHarness()
+  captureChatGeneration({ route: '/api/draft', keySource: 'byok', userId: USER_ID, provider: 'ollama', model: 'llama3.1:8b', latencyMs: 1500, inputTokens: 40, outputTokens: 90, httpStatus: 200 }, { posthog: h.ph, after: h.after })
+  await drainPh(h)
+  const ev = h.sent.find((e) => e.event === '$ai_generation')
+  assert.ok(ev)
+  assert.equal(ev.properties.$ai_provider, 'ollama')
+  assert.equal(ev.properties.$ai_model, 'llama3.1:8b')
+  assert.equal(ev.properties.$ai_input_tokens, 40)
+  assert.equal(ev.properties.$ai_output_tokens, 90)
+  assert.equal(ev.properties.$ai_latency, 1.5)
+  assert.equal(ev.properties.ai_key_source, 'byok')
+  assert.equal(ev.distinct_id, analyticsUserId(USER_ID))
+  assert.equal(ev.properties.$ai_base_url ?? '', '')
+  assert.equal(JSON.stringify(h.sent).includes(USER_ID), false)
+})
+
+test('OpenAI-compatible failure: recorded as an error class only, never throws', async () => {
+  const h = phHarness()
+  assert.doesNotThrow(() => captureChatGeneration({ route: '/api/draft', keySource: 'byok', provider: 'openai', model: 'gpt-4o-mini', latencyMs: 20, httpStatus: 401, errorClass: 'ProviderHttpError' }, { posthog: h.ph, after: () => { throw new Error('outside request scope') } }))
+  await h.ph.flush()
+  const ev = h.sent.find((e) => e.event === '$ai_generation')
+  assert.ok(ev)
+  assert.equal(ev.properties.$ai_is_error, true)
+  assert.equal(ev.properties.$ai_error, 'ProviderHttpError')
+  assert.equal(ev.properties.$ai_http_status, 401)
+  assert.doesNotThrow(() => captureChatGeneration({ route: '/r', keySource: 'byok', provider: 'openai', model: 'm', latencyMs: 1 }, { posthog: null }))
 })
