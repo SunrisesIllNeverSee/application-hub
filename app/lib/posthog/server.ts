@@ -103,15 +103,20 @@ function scopeProperties(scope: Scope): Record<string, unknown> {
 function routeScoped(ph: PostHog, scope: Scope, after: AfterFn): PostHog {
   return new Proxy(ph, {
     get(target, prop) {
+      const scoped = (msg: EventMessage): EventMessage => ({
+        ...msg,
+        ...(scope.distinctId ? { distinctId: scope.distinctId } : {}),
+        properties: { ...(msg.properties ?? {}), ...scopeProperties(scope) },
+      })
       if (prop === 'capture') {
         return (msg: EventMessage) => {
-          target.capture({
-            ...msg,
-            ...(scope.distinctId ? { distinctId: scope.distinctId } : {}),
-            properties: { ...(msg.properties ?? {}), ...scopeProperties(scope) },
-          })
+          target.capture(scoped(msg))
           flushAfterResponse(target, after)
         }
+      }
+      // Same scoping if a caller asks @posthog/ai for immediate capture.
+      if (prop === 'captureImmediate') {
+        return (msg: EventMessage) => target.captureImmediate(scoped(msg))
       }
       const v = Reflect.get(target, prop, target)
       return typeof v === 'function' ? v.bind(target) : v
@@ -122,10 +127,15 @@ function routeScoped(ph: PostHog, scope: Scope, after: AfterFn): PostHog {
 type ServerOptions = { fetch?: PostHogFetch }
 type PostHogFetch = NonNullable<ConstructorParameters<typeof PostHog>[1]>['fetch']
 
+/** The browser host can be a relative proxy path (e.g. /ingest); the server needs an absolute URL. */
+function serverHost(value: string | undefined): string {
+  return value && /^https?:\/\//.test(value) ? value : DEFAULT_HOST
+}
+
 function buildPostHog(key: string, opts: ServerOptions = {}): PostHog | null {
   try {
     return new PostHog(key, {
-      host: process.env.NEXT_PUBLIC_POSTHOG_HOST || DEFAULT_HOST,
+      host: serverHost(process.env.NEXT_PUBLIC_POSTHOG_HOST),
       // Serverless: send each event right away instead of batching in memory.
       flushAt: 1,
       flushInterval: 0,
@@ -245,7 +255,11 @@ export function captureChatGeneration(gen: ChatGeneration, deps: TrackedLlmDeps 
       baseURL: null,
       httpStatus: gen.httpStatus,
       latency: Math.max(0, gen.latencyMs) / 1000,
-      usage: { inputTokens: gen.inputTokens ?? 0, outputTokens: gen.outputTokens ?? 0 },
+      // Only when the provider reported usage: a failed call or an endpoint
+      // without usage must not look like a real zero-token generation.
+      ...(gen.inputTokens != null || gen.outputTokens != null
+        ? { usage: { inputTokens: gen.inputTokens ?? 0, outputTokens: gen.outputTokens ?? 0 } }
+        : {}),
       properties: scopeProperties(scope),
       ...(gen.errorClass ? { error: namedError(gen.errorClass) } : {}),
       onError: () => {},

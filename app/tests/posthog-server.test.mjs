@@ -163,3 +163,24 @@ test('OpenAI-compatible failure: recorded as an error class only, never throws',
   assert.equal(ev.properties.$ai_http_status, 401)
   assert.doesNotThrow(() => captureChatGeneration({ route: '/r', keySource: 'byok', provider: 'openai', model: 'm', latencyMs: 1 }, { posthog: null }))
 })
+
+test('a failed OpenAI-compatible call carries no token counts', async () => {
+  const h = phHarness()
+  captureChatGeneration({ route: '/api/draft', keySource: 'byok', provider: 'ollama', model: 'm', latencyMs: 5, errorClass: 'NetworkError' }, { posthog: h.ph, after: h.after })
+  await drainPh(h)
+  const ev = h.sent.find((e) => e.event === '$ai_generation')
+  assert.ok(ev)
+  assert.equal(ev.properties.$ai_input_tokens ?? null, null)
+  assert.equal(ev.properties.$ai_output_tokens ?? null, null)
+})
+
+test('immediate capture is scoped the same way', async () => {
+  const h = phHarness()
+  const client = createTrackedAnthropic(BYOK_KEY, '/api/draft', { keySource: 'byok', userId: USER_ID }, { posthog: h.ph, after: h.after, fetch: async () => json(200, ANTHROPIC_OK) })
+  await client.messages.create({ ...body, posthogCaptureImmediate: true })
+  await drainPh(h)
+  const ev = h.sent.find((e) => e.event === '$ai_generation')
+  assert.ok(ev)
+  assert.equal(ev.properties.ai_key_source, 'byok')
+  assert.equal(ev.distinct_id, analyticsUserId(USER_ID))
+})
