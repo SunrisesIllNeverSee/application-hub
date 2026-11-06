@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
+import { createTrackedAnthropic } from '@/lib/posthog/server'
 
 const MODEL = 'claude-3-5-haiku-20241022'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     // BYOK-first: prefer user's own Anthropic key, fall back to platform key
     let resolvedApiKey: string | null = null
+    let usingPlatformKey = false
 
     const { data: integration } = await supabase
       .from('user_integrations')
@@ -53,6 +55,7 @@ export async function POST(req: NextRequest) {
     if (!resolvedApiKey) {
       if (PLATFORM_DRAFTS_ENABLED && process.env.ANTHROPIC_API_KEY) {
         resolvedApiKey = process.env.ANTHROPIC_API_KEY
+        usingPlatformKey = true
       } else {
         return NextResponse.json(
           {
@@ -78,7 +81,11 @@ export async function POST(req: NextRequest) {
           .join('\n')
       : ''
 
-    const anthropic = new Anthropic({ apiKey: resolvedApiKey })
+    // LLM analytics (privacy mode, no content, no key, user id hashed) for both keys.
+    const anthropic = createTrackedAnthropic(resolvedApiKey, '/api/import/application', {
+      keySource: usingPlatformKey ? 'platform' : 'byok',
+      userId: user.id,
+    })
 
     const systemPrompt =
       'You are an expert at parsing startup accelerator applications. Extract question-answer pairs from application text.'
