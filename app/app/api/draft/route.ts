@@ -1,3 +1,4 @@
+import { connectedKeyErrorBody, CONNECTED_KEY_ERROR_STATUS } from '@/lib/anthropic-key'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
@@ -91,6 +92,10 @@ export async function POST(req: NextRequest) {
           integrationProvider = `byok_${best.provider}`
         } catch (e) {
           console.error('[/api/draft] key decryption failed:', e)
+        }
+        // A connected key that can't be used is an error, never a silent switch to AQUA's key.
+        if (!resolvedApiKey) {
+          return NextResponse.json(connectedKeyErrorBody(), { status: CONNECTED_KEY_ERROR_STATUS })
         }
       }
     }

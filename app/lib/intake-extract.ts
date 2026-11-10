@@ -10,6 +10,7 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
+import { resolveAnthropicKey } from '@/lib/anthropic-key'
 import { createTrackedAnthropic } from '@/lib/posthog/server'
 import { embedAndStoreQuestion, type ByokIntegration } from '@/lib/embed'
 import { normalizeQuestion } from '@/lib/catalog/normalize'
@@ -31,7 +32,7 @@ import type {
 } from './intake-extract-shared'
 export * from './intake-extract-shared'
 
-// ─── AI provider resolution (BYOK first, platform fallback) ──────────────────
+// ─── AI provider resolution (connected key first; platform key only when none is connected) ──────────────────
 
 type SupabaseLike = { from: (t: string) => any }
 
@@ -40,26 +41,13 @@ export async function resolveAnthropicClient(
   userId: string,
   route: string
 ): Promise<Anthropic | null> {
-  const { data: integrations } = await supabase
-    .from('user_integrations')
-    .select('key_encrypted, key_storage_ref')
-    .eq('user_id', userId)
-    .eq('provider', 'anthropic')
-    .eq('status', 'active')
-    .limit(1)
-
-  if (integrations?.[0]?.key_encrypted && integrations[0]?.key_storage_ref) {
-    try {
-      const apiKey = decryptKey(integrations[0].key_encrypted, integrations[0].key_storage_ref)
-      // LLM analytics (privacy mode, no content, no key, user id hashed).
-      if (apiKey) return createTrackedAnthropic(apiKey, route, { keySource: 'byok', userId })
-    } catch {
-      // fall through to platform key
-    }
-  }
-
-  const platformKey = process.env.ANTHROPIC_API_KEY
-  return platformKey ? createTrackedAnthropic(platformKey, route, { keySource: 'platform', userId }) : null
+  // Throws ConnectedKeyError if a connected key can't be used (never falls back to the platform key).
+  const resolved = await resolveAnthropicKey(supabase, userId, {
+    decrypt: decryptKey,
+    platformKey: process.env.ANTHROPIC_API_KEY,
+  })
+  // LLM analytics (privacy mode, no content, no key, user id hashed).
+  return resolved ? createTrackedAnthropic(resolved.apiKey, route, { keySource: resolved.keySource, userId }) : null
 }
 
 // ─── Groq (Llama) extraction fallback ───────────────────────────────────────

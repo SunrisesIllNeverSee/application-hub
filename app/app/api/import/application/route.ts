@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
 import { createTrackedAnthropic } from '@/lib/posthog/server'
+import { connectedKeyErrorBody, CONNECTED_KEY_ERROR_STATUS } from '@/lib/anthropic-key'
 import { importReplyText } from '@/lib/import-response'
 
 const MODEL = 'claude-haiku-5-5'
@@ -50,6 +51,10 @@ export async function POST(req: NextRequest) {
         resolvedApiKey = decryptKey(integration.key_encrypted, integration.key_storage_ref)
       } catch (e) {
         console.error('[/api/import/application] key decryption failed:', e)
+      }
+      // A connected key that can't be used is an error, never a silent switch to AQUA's key.
+      if (!resolvedApiKey) {
+        return NextResponse.json(connectedKeyErrorBody(), { status: CONNECTED_KEY_ERROR_STATUS })
       }
     }
 
