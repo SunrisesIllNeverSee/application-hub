@@ -25,7 +25,7 @@ export default function PrivacyPage() {
 
       <main className="mx-auto max-w-4xl px-6 py-16">
         <section className="mb-16">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Last updated October 24, 2026</p>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Last updated November 10, 2026</p>
           <h1 className="mb-6 text-4xl font-semibold tracking-tight md:text-5xl">AQUA Privacy</h1>
           <p className="max-w-3xl text-xl leading-relaxed text-neutral-600 dark:text-neutral-300">
             AQUA Application Hub is operated by Ello Cello LLC. This page summarizes the main information the product handles and the controls reflected in the current application architecture.
@@ -56,6 +56,9 @@ export default function PrivacyPage() {
           <h2 className="text-2xl font-semibold tracking-tight">Providers and user choices</h2>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
             AQUA supports bring-your-own-key model providers. When a user enables one of those providers, selected drafting or review material may be sent to that provider under the provider&apos;s own terms and privacy practices. Billing flows may use Stripe. Hosting, authentication, database, email, and delivery infrastructure may process the information necessary to provide their respective services.
+          </p>
+          <p className="leading-7 text-neutral-600 dark:text-neutral-300">
+            When the deployment has analytics configured, AQUA records limited usage data about the AI requests its servers make for drafting, application import, and extraction (requests to Anthropic, and drafting requests to OpenAI or an OpenAI-compatible endpoint such as Ollama). This applies whether the request uses AQUA&apos;s own provider key or a key you connected. The record is made with PostHog and contains the model name, token counts, response time, cost, HTTP status, the kind of error if one occurred, which AQUA feature made the call, and whether AQUA&apos;s key or your own was used. It does not include your prompts, source material, drafts, or the provider&apos;s response, and it never includes your API key, a custom provider URL, or your email address. Your account is represented by a one-way hash rather than your account ID, and no person profile is created from these records. AQUA&apos;s own provider key is used for drafting only when the operator has turned that on; it is off by default.
           </p>
           <p className="leading-7 text-neutral-600 dark:text-neutral-300">
             AQUA&apos;s application and scoring features are intended to help a user prepare and organize their own material. Public program records and internal fit signals should not be read as permission to disclose another user&apos;s answers or private profile data.
