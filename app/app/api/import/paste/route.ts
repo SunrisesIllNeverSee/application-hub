@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
     const { pasted_text, source_kind, mode, program_name } = parsed
 
     // 2. AI config — BYOK first, then platform key.
-    const anthropic = await resolveAnthropicClient(supabase, user.id)
+    const anthropic = await resolveAnthropicClient(supabase, user.id, '/api/import/paste')
 
     // No Anthropic key — fall back to regex parser if mode is qa_pairs.
     // Questions-only mode still needs AI for theme classification.
