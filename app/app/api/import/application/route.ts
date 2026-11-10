@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
 import { createTrackedAnthropic } from '@/lib/posthog/server'
+import { importReplyText } from '@/lib/import-response'
 
 const MODEL = 'claude-haiku-5-5'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
@@ -139,9 +140,12 @@ ${text}`
       system: systemPrompt,
     })
 
-    // Haiku 5.5 may lead with a thinking block: read the text block by type, not position.
-    const textBlock = message.content.find((b) => b.type === 'text')
-    const rawContent = textBlock && textBlock.type === 'text' ? textBlock.text.trim() : '[]'
+    const reply = importReplyText(message)
+    if (!reply.ok) {
+      console.error('[/api/import/application] unusable AI reply, stop_reason:', message.stop_reason)
+      return NextResponse.json({ error: reply.error }, { status: 502 })
+    }
+    const rawContent = reply.text
 
     // Parse JSON — strip markdown fences if present
     let pairs: Array<{
