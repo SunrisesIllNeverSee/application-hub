@@ -6,7 +6,7 @@ import { PostHog } from 'posthog-node'
 import { gunzipSync } from 'node:zlib'
 
 delete process.env.NEXT_PUBLIC_POSTHOG_KEY
-const { getPostHogServer, createPlatformAnthropic, createTrackedAnthropic, captureChatGeneration, analyticsUserId, sanitizeAiEvent } = await import('../lib/posthog/server.ts')
+const { getPostHogServer, createPlatformAnthropic, createTrackedAnthropic, captureChatGeneration, analyticsUserId, sanitizeAiEvent, errorClassOnly } = await import('../lib/posthog/server.ts')
 
 const SECRET = 'SSN 123-45-6789 jane@example.com'
 const ANTHROPIC_OK = {
@@ -183,4 +183,12 @@ test('immediate capture is scoped the same way', async () => {
   assert.ok(ev)
   assert.equal(ev.properties.ai_key_source, 'byok')
   assert.equal(ev.distinct_id, analyticsUserId(USER_ID))
+})
+
+test('error labels never carry message text', () => {
+  assert.equal(errorClassOnly('RateLimitError: slow down'), 'RateLimitError')
+  assert.equal(errorClassOnly('400 {"type":"error","error":{"message":"bad ' + SECRET + ' ValidationError"}}'), 'HTTP 400')
+  assert.equal(errorClassOnly('Something about ' + SECRET + ' CustomUserTextError'), 'Error')
+  assert.equal(errorClassOnly('SecretLeakError: x'), 'Error')
+  assert.equal(errorClassOnly(undefined), 'Error')
 })

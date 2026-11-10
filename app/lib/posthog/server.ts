@@ -48,10 +48,24 @@ const CONTENT_KEYS = [
   '$exception_message',
 ]
 
-/** Reduce an error string to its class name (no message text). */
-function errorClassOnly(value: unknown): string {
-  const m = typeof value === 'string' ? value.match(/[A-Za-z][A-Za-z0-9_]*Error/) : null
-  return m ? m[0] : 'Error'
+// Error class names allowed through to analytics. Anything else becomes a
+// generic label, so text echoed from a prompt or provider body never leaves.
+const KNOWN_ERROR_CLASSES = new Set([
+  'APIError', 'APIConnectionError', 'APIConnectionTimeoutError', 'APIUserAbortError',
+  'AuthenticationError', 'BadRequestError', 'ConflictError', 'InternalServerError',
+  'NotFoundError', 'PermissionDeniedError', 'RateLimitError', 'UnprocessableEntityError',
+  'OverloadedError', 'AbortError', 'TimeoutError', 'TypeError', 'SyntaxError',
+  'NetworkError', 'ParseError', 'ProviderHttpError', 'EmptyResponseError',
+])
+
+/** Reduce an error string to an allow-listed class name or HTTP status (no message text). */
+export function errorClassOnly(value: unknown): string {
+  if (typeof value !== 'string') return 'Error'
+  const status = value.match(/^\s*(\d{3})\b/)
+  if (status) return `HTTP ${status[1]}`
+  const lead = value.match(/^\s*([A-Za-z][A-Za-z0-9_]*Error)\b/)
+  if (lead && KNOWN_ERROR_CLASSES.has(lead[1])) return lead[1]
+  return 'Error'
 }
 
 /** posthog-node `before_send`: backstop on top of privacy mode. */
@@ -143,7 +157,9 @@ function buildPostHog(key: string, opts: ServerOptions = {}): PostHog | null {
       before_send: sanitizeAiEvent,
       ...(opts.fetch ? { fetch: opts.fetch } : {}),
     })
-  } catch {
+  } catch (err) {
+    // Config problem (bad key or host): say so once instead of failing silently.
+    console.warn('[posthog] server client disabled:', err instanceof Error ? err.name : 'Error')
     return null
   }
 }

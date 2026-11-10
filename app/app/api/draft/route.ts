@@ -353,9 +353,15 @@ export async function POST(req: NextRequest) {
         const err = await resp.text()
         return NextResponse.json({ error: `Provider error: ${err}` }, { status: 502 })
       }
-      const json = await resp.json() as {
+      let json: {
         choices?: Array<{ message?: { content?: string } }>
         usage?: { prompt_tokens?: number; completion_tokens?: number }
+      }
+      try {
+        json = await resp.json()
+      } catch {
+        track({ httpStatus: resp.status, errorClass: 'ParseError' })
+        return NextResponse.json({ error: 'The AI provider returned a response that was not valid JSON.' }, { status: 502 })
       }
       draft = json.choices?.[0]?.message?.content?.trim() ?? ''
       promptTokens = json.usage?.prompt_tokens ?? null
