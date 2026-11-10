@@ -61,7 +61,16 @@ export function plan() {
   for (const rel of walk(COMPANION_ROOT, COMPANION_ROOT)) {
     const src = path.join(COMPANION_ROOT, rel)
     const body = fs.readFileSync(src, 'utf8')
-    out.push({ dest: path.join(DEST, 'workspace', 'companion', rel), body: rel.endsWith('.mjs') ? HEADER(`src/vendor/companion/${rel}`) + body : body })
+    // Hosted Next.js only: fd comes from a validated runtime workspace, not a
+    // build-time asset. Avoid Turbopack tracing every workspace file into the
+    // server bundle. Never modify the canonical companion or its npm tarball.
+    let hostedBody = body
+    if (rel === 'src/fsafe.mjs') {
+      const before = '    return fs.readFileSync(fd)'
+      if (!body.includes(before)) throw new Error('hosted fsafe read signature changed; review trace exemption')
+      hostedBody = body.replace(before, '    return fs.readFileSync(/* turbopackIgnore: true */ fd)')
+    }
+    out.push({ dest: path.join(DEST, 'workspace', 'companion', rel), body: rel.endsWith('.mjs') ? HEADER(`src/vendor/companion/${rel}`) + hostedBody : hostedBody })
   }
   out.push({
     dest: path.join(DEST, 'workspace', 'workspace-tools.mjs'),
