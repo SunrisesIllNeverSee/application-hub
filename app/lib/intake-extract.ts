@@ -36,6 +36,11 @@ export * from './intake-extract-shared'
 
 type SupabaseLike = { from: (t: string) => any }
 
+/**
+ * Anthropic client for the user's connected key, else AQUA's platform key if configured, else null.
+ * @throws {ConnectedKeyError} if a connected key can't be used (callers must map it to a 422 via
+ *   `connectedKeyFailure`); it never falls back to the platform key in that case.
+ */
 export async function resolveAnthropicClient(
   supabase: SupabaseLike,
   userId: string,

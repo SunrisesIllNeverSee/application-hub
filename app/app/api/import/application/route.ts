@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { decryptKey } from '@/lib/encryption'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
 import { createTrackedAnthropic } from '@/lib/posthog/server'
-import { connectedKeyErrorBody, CONNECTED_KEY_ERROR_STATUS } from '@/lib/anthropic-key'
+import { connectedKeyFailure, resolveAnthropicKey } from '@/lib/anthropic-key'
 import { importReplyText } from '@/lib/import-response'
 
 const MODEL = 'claude-haiku-5-5'
@@ -38,24 +38,14 @@ export async function POST(req: NextRequest) {
     let resolvedApiKey: string | null = null
     let usingPlatformKey = false
 
-    const { data: integration } = await supabase
-      .from('user_integrations')
-      .select('id, key_encrypted, key_storage_ref, status')
-      .eq('user_id', user.id)
-      .eq('provider', 'anthropic')
-      .eq('status', 'active')
-      .maybeSingle()
-
-    if (integration?.key_encrypted && integration?.key_storage_ref) {
-      try {
-        resolvedApiKey = decryptKey(integration.key_encrypted, integration.key_storage_ref)
-      } catch (e) {
-        console.error('[/api/import/application] key decryption failed:', e)
-      }
-      // A connected key that can't be used is an error, never a silent switch to AQUA's key.
-      if (!resolvedApiKey) {
-        return NextResponse.json(connectedKeyErrorBody(), { status: CONNECTED_KEY_ERROR_STATUS })
-      }
+    // A connected key that can't be used is a 422, never a silent switch to AQUA's key.
+    try {
+      const connected = await resolveAnthropicKey(supabase, user.id, { decrypt: decryptKey, platformKey: undefined })
+      if (connected) resolvedApiKey = connected.apiKey
+    } catch (e) {
+      const failure = connectedKeyFailure(e)
+      if (failure) return NextResponse.json(failure.body, { status: failure.status })
+      throw e
     }
 
     if (!resolvedApiKey) {

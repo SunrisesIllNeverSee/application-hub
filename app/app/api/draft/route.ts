@@ -1,4 +1,4 @@
-import { connectedKeyErrorBody, CONNECTED_KEY_ERROR_STATUS } from '@/lib/anthropic-key'
+import { connectedKeyFailure, nonAnthropicIntegrations, resolveAnthropicKey } from '@/lib/anthropic-key'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Anthropic from '@anthropic-ai/sdk'
@@ -70,19 +70,31 @@ export async function POST(req: NextRequest) {
     let resolvedModelPreference: string | null = null
     let integrationProvider = 'byok_anthropic'
 
-    const PROVIDER_PRIORITY = ['anthropic', 'openai', 'ollama']
+    // 1. A connected Anthropic key wins. If one is connected but unusable, that is a 422:
+    //    never a silent switch to AQUA's key.
+    try {
+      const anthropicKey = await resolveAnthropicKey(supabase, user.id, { decrypt: decryptKey, platformKey: undefined })
+      if (anthropicKey) {
+        resolvedApiKey = anthropicKey.apiKey
+        resolvedProvider = 'anthropic'
+        integrationProvider = 'byok_anthropic'
+      }
+    } catch (e) {
+      const failure = connectedKeyFailure(e)
+      if (failure) return NextResponse.json(failure.body, { status: failure.status })
+      throw e
+    }
 
-    const { data: integrations } = await supabase
-      .from('user_integrations')
-      .select('id, provider, key_encrypted, key_storage_ref, base_url, model_preference, status')
-      .eq('user_id', user.id)
-      .eq('status', 'active')
+    // 2. Otherwise the user's OpenAI / Ollama integration (unchanged behavior: a row whose key
+    //    can't be decrypted is skipped, then the platform-key fallback below applies).
+    if (!resolvedApiKey) {
+      const { data: integrations } = await supabase
+        .from('user_integrations')
+        .select('id, provider, key_encrypted, key_storage_ref, base_url, model_preference, status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
 
-    if (integrations?.length) {
-      const sorted = [...integrations].sort(
-        (a, b) => PROVIDER_PRIORITY.indexOf(a.provider) - PROVIDER_PRIORITY.indexOf(b.provider)
-      )
-      const best = sorted[0]
+      const best = nonAnthropicIntegrations(integrations ?? [])[0]
       if (best?.key_encrypted && best?.key_storage_ref) {
         try {
           resolvedApiKey = decryptKey(best.key_encrypted, best.key_storage_ref)
@@ -91,11 +103,8 @@ export async function POST(req: NextRequest) {
           resolvedModelPreference = best.model_preference ?? null
           integrationProvider = `byok_${best.provider}`
         } catch (e) {
-          console.error('[/api/draft] key decryption failed:', e)
-        }
-        // A connected key that can't be used is an error, never a silent switch to AQUA's key.
-        if (!resolvedApiKey) {
-          return NextResponse.json(connectedKeyErrorBody(), { status: CONNECTED_KEY_ERROR_STATUS })
+          // Provider and integration id only: never key material.
+          console.error('[/api/draft] key decryption failed:', { provider: best.provider, integration_id: best.id, reason: e instanceof Error ? e.name : 'decrypt_error' })
         }
       }
     }
