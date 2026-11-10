@@ -192,7 +192,8 @@ export function readInside(root, rel) {
   if (!st.isFile()) throw new PathSafetyError(`not a regular file: ${rel}`)
   const fd = openConfined(root, abs, fs.constants.O_RDONLY)
   try {
-    return fs.readFileSync(fd)
+    // The path is an already-validated runtime file descriptor, not a build asset.
+    return fs.readFileSync(/* turbopackIgnore: true */ fd)
   } finally {
     fs.closeSync(fd)
   }
