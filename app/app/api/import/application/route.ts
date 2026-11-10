@@ -5,7 +5,7 @@ import { decryptKey } from '@/lib/encryption'
 import { refusePrivateWrite } from '@/lib/local-first-guard'
 import { createTrackedAnthropic } from '@/lib/posthog/server'
 
-const MODEL = 'claude-3-5-haiku-20241022'
+const MODEL = 'claude-haiku-5-5'
 const PLATFORM_DRAFTS_ENABLED = process.env.PLATFORM_AI_DRAFTS_ENABLED === 'true'
 
 export async function POST(req: NextRequest) {
@@ -133,12 +133,15 @@ ${text}`
 
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 4096,
+      max_tokens: 8192, // Haiku 5.5 thinks by default; thinking counts toward this cap
+      output_config: { effort: 'low' },
       messages: [{ role: 'user', content: userPrompt }],
       system: systemPrompt,
     })
 
-    const rawContent = message.content[0].type === 'text' ? message.content[0].text.trim() : '[]'
+    // Haiku 5.5 may lead with a thinking block: read the text block by type, not position.
+    const textBlock = message.content.find((b) => b.type === 'text')
+    const rawContent = textBlock && textBlock.type === 'text' ? textBlock.text.trim() : '[]'
 
     // Parse JSON — strip markdown fences if present
     let pairs: Array<{
