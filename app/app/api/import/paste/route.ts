@@ -1,3 +1,4 @@
+import { connectedKeyFailure } from '@/lib/anthropic-key'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import {
@@ -108,7 +109,14 @@ export async function POST(req: NextRequest) {
     const { pasted_text, source_kind, mode, program_name } = parsed
 
     // 2. AI config — BYOK first, then platform key.
-    const anthropic = await resolveAnthropicClient(supabase, user.id, '/api/import/paste')
+    let anthropic: Awaited<ReturnType<typeof resolveAnthropicClient>>
+    try {
+      anthropic = await resolveAnthropicClient(supabase, user.id, '/api/import/paste')
+    } catch (e) {
+      const failure = connectedKeyFailure(e)
+      if (failure) return NextResponse.json(failure.body, { status: failure.status })
+      throw e
+    }
 
     // No Anthropic key — fall back to regex parser if mode is qa_pairs.
     // Questions-only mode still needs AI for theme classification.

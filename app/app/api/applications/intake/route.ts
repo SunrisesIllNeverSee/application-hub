@@ -1,3 +1,4 @@
+import { connectedKeyFailure } from '@/lib/anthropic-key'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { parseRequirements } from '@/lib/catalog/normalize'
@@ -103,7 +104,14 @@ export async function POST(req: NextRequest) {
         : 'other'
 
     // ── 1. Extract questions ────────────────────────────────────────────────
-    const anthropic = await resolveAnthropicClient(supabase, user.id, '/api/applications/intake')
+    let anthropic: Awaited<ReturnType<typeof resolveAnthropicClient>>
+    try {
+      anthropic = await resolveAnthropicClient(supabase, user.id, '/api/applications/intake')
+    } catch (e) {
+      const failure = connectedKeyFailure(e)
+      if (failure) return NextResponse.json(failure.body, { status: failure.status })
+      throw e
+    }
     let questions: ExtractedQuestion[] = []
     let extraction: 'ai' | 'regex' = 'regex'
     let extractionError: string | null = null
