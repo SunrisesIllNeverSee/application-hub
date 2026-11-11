@@ -10,7 +10,9 @@
 # Everything else (production, or Vercel did not say): always build, as before.
 set -u
 
-if [ "${VERCEL_ENV:-}" = "preview" ] && [ "${VERCEL_GIT_COMMIT_REF:-}" != "main" ]; then
+# Skip only a git-branch preview: a deploy with no branch (CLI) always builds.
+ref="${VERCEL_GIT_COMMIT_REF:-}"
+if [ "${VERCEL_ENV:-}" = "preview" ] && [ -n "$ref" ] && [ "$ref" != "main" ]; then
   case "${VERCEL_GIT_COMMIT_MESSAGE:-}" in
     *"[preview]"*)
       echo "[preview] in commit message: building preview"
