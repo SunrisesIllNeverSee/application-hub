@@ -130,3 +130,13 @@ Checked-in reviewer family:
 The point is not to build yet another AI writer. The point is to build infrastructure for the application graph: questions, answers, fit signals, review loops, and reusable identity material that gets stronger with use.
 
 Founder applications are the wedge. Portability across adjacent application domains is the deeper moat.
+
+## Licensing status
+
+No repository-wide open-source license is currently granted. Public visibility
+and contribution guidance do not, by themselves, authorize copying,
+redistributing, or commercially reusing original project code and materials.
+Copyright in original project materials is reserved by its respective rights
+holder(s); third-party dependencies and assets retain their own licenses.
+A separate explicit license decision is required before representing this
+repository as open source.
