@@ -7,7 +7,8 @@
 # The "does it still build" check for PRs is the "Next.js app" job in
 # .github/workflows/ci.yml, which runs npm run build.
 #
-# Everything else (production, or Vercel did not say): always build, as before.
+# Everything else (production, or Vercel did not say): build only when something
+# under app/ changed since the last deployed commit. When in doubt, build.
 set -u
 
 # Skip only a git-branch preview: a deploy with no branch (CLI) always builds.
@@ -23,4 +24,13 @@ if [ "${VERCEL_ENV:-}" = "preview" ] && [ -n "$ref" ] && [ "$ref" != "main" ]; t
   exit 0
 fi
 
+# Compare against the last deployed commit when Vercel provides it, so a
+# multi-commit push is judged on all its commits, not only the newest one.
+# The script runs from app/ (the Vercel root directory), so "." is app/.
+base="${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}"
+if git diff --quiet "$base" HEAD -- .; then
+  echo "No app/ files changed since $base: skipping build"
+  exit 0
+fi
+# Files changed, or git could not tell (exit 128, e.g. shallow clone or unknown sha): build.
 exit 1
